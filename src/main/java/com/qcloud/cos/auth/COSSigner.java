@@ -20,10 +20,24 @@ import org.apache.commons.codec.digest.HmacUtils;
 
 import com.qcloud.cos.Headers;
 import com.qcloud.cos.http.CosHttpRequest;
+import com.qcloud.cos.http.HttpMethodName;
 import com.qcloud.cos.internal.CosServiceRequest;
 import com.qcloud.cos.utils.UrlEncoderUtils;
 
 public class COSSigner {
+    
+    private long signExpiredTime = SIGN_EXPIRED_TIME;
+    
+    // 获取签名有效期
+    public long getSignExpiredTime() {
+        return signExpiredTime;
+    }
+
+    // 设置签名有效期，单位为秒, 默认3600秒
+    public void setSignExpiredTime(long signExpiredTime) {
+        this.signExpiredTime = signExpiredTime;
+    }
+
     private boolean isAnonymous(COSCredentials cred) {
         return cred instanceof AnonymousCOSCredentials;
     }
@@ -33,23 +47,36 @@ public class COSSigner {
             return;
         }
 
-        Map<String, String> signHeaders = buildSignHeaders(request.getHeaders());
-        Map<String, String> params = request.getParameters();
+        String authoriationStr = buildAuthorizationStr(request.getHttpMethod(),
+                request.getResourcePath(), request.getHeaders(), request.getParameters(), cred);
 
+        request.addHeader(Headers.COS_AUTHORIZATION, authoriationStr);
+    }
+
+    public String buildAuthorizationStr(HttpMethodName methodName, String resouce_path,
+            COSCredentials cred) {
+        return buildAuthorizationStr(methodName, resouce_path, new HashMap<String, String>(),
+                new HashMap<String, String>(), cred);
+    }
+
+    public String buildAuthorizationStr(HttpMethodName methodName, String resouce_path,
+            Map<String, String> headerMap, Map<String, String> paramMap, COSCredentials cred) {
+
+        Map<String, String> signHeaders = buildSignHeaders(headerMap);
         // 签名中的参数和http 头部 都要进行字符串排序
         TreeMap<String, String> sortedSignHeaders = new TreeMap<>();
         TreeMap<String, String> sortedParams = new TreeMap<>();
 
         sortedSignHeaders.putAll(signHeaders);
-        sortedParams.putAll(params);
+        sortedParams.putAll(paramMap);
 
         String qHeaderListStr = buildSignMemberStr(sortedSignHeaders);
         String qUrlParamListStr = buildSignMemberStr(sortedParams);
         String qKeyTimeStr, qSignTimeStr;
         qKeyTimeStr = qSignTimeStr = buildTimeStr();
         String signKey = HmacUtils.hmacSha1Hex(cred.getCOSSecretKey(), qKeyTimeStr);
-        String formatMethod = request.getHttpMethod().toString().toLowerCase();
-        String formatUri = request.getResourcePath();
+        String formatMethod = methodName.toString().toLowerCase();
+        String formatUri = resouce_path;
         String formatParameters = formatMapToStr(sortedParams);
         String formatHeaders = formatMapToStr(sortedSignHeaders);
 
@@ -69,8 +96,7 @@ public class COSSigner {
                 .append("&").append(Q_HEADER_LIST).append("=").append(qHeaderListStr).append("&")
                 .append(Q_URL_PARAM_LIST).append("=").append(qUrlParamListStr).append("&")
                 .append(Q_SIGNATURE).append("=").append(signature).toString();
-
-        request.addHeader(Headers.COS_AUTHORIZATION, authoriationStr);
+        return authoriationStr;
     }
 
     private Map<String, String> buildSignHeaders(Map<String, String> originHeaders) {
@@ -124,7 +150,7 @@ public class COSSigner {
     private String buildTimeStr() {
         StringBuilder strBuilder = new StringBuilder();
         long startTime = System.currentTimeMillis() / 1000;
-        long endTime = startTime + SIGN_EXPIRED_TIME;
+        long endTime = startTime + this.signExpiredTime;
         strBuilder.append(startTime).append(";").append(endTime);
         return strBuilder.toString();
     }
