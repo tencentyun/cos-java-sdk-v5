@@ -522,6 +522,10 @@ public class ObjectMetadata implements ObjectExpirationResult, Cloneable {
         metadata.put(Headers.SERVER_SIDE_ENCRYPTION, serverSideEncryption);
     }
 
+    public void setSecurityToken(String securityToken) {
+    	metadata.put(Headers.SECURITY_TOKEN, securityToken);
+    }
+    
     /**
      * Returns the time this object will expire and be completely removed from COS. Returns null if
      * this object will never expire.
