@@ -51,6 +51,9 @@ public class COSSigner {
                 request.getResourcePath(), request.getHeaders(), request.getParameters(), cred);
 
         request.addHeader(Headers.COS_AUTHORIZATION, authoriationStr);
+        if (cred instanceof COSSessionCredentials) {
+        	request.addHeader(Headers.SECURITY_TOKEN, ((COSSessionCredentials) cred).getSessionToken());
+        }
     }
 
     public String buildAuthorizationStr(HttpMethodName methodName, String resouce_path,
