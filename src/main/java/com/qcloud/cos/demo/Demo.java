@@ -34,7 +34,7 @@ public class Demo {
         // 设置秘钥
         COSCredentials cred = new BasicCOSCredentials(appid, secret_id, secret_key);
         // 设置区域, 这里设置为华北
-        ClientConfig clientConfig = new ClientConfig(Region.CN_NORTH);
+        ClientConfig clientConfig = new ClientConfig(new Region("cn-north"));
         // 生成cos客户端对象
         COSClient cosClient = new COSClient(cred, clientConfig);
 
