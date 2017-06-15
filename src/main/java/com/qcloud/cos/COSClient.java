@@ -599,6 +599,12 @@ public class COSClient implements COS {
 
         return cosObject.getObjectMetadata();
     }
+    
+    @Override
+    public ObjectMetadata getobjectMetadata(String bucketName, String key)
+            throws CosClientException, CosServiceException {
+        return getObjectMetadata(new GetObjectMetadataRequest(bucketName, key));
+    }
 
     @Override
     public ObjectMetadata getObjectMetadata(GetObjectMetadataRequest getObjectMetadataRequest)
