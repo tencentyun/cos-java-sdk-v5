@@ -27,7 +27,7 @@ public class STSDemo {
 		// 使用云api秘钥，可以获取一个临时secret id，secret key和session token,
 		BasicSessionCredentials cred = getSessionCredential();
 		// 设置区域, 这里设置为华北
-        ClientConfig clientConfig = new ClientConfig(Region.CN_NORTH);
+        ClientConfig clientConfig = new ClientConfig(new Region("cn-north"));
         // 生成cos客户端对象
         COSClient cosClient = new COSClient(cred, clientConfig);
         // 上传的bucket名字
