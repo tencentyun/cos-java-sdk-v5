@@ -337,6 +337,30 @@ public interface COS {
      * well as custom user metadata that can be associated with an object in Qcloud COS.
      * </p>
      *
+     * @param bucketName   bucket name
+     * @param key          cos path
+     *
+     * @return All COS object metadata for the specified object.
+     *
+     * @throws CosClientException If any errors are encountered on the client while making the
+     *         request or handling the response.
+     * @throws CosServiceException If any errors occurred in Qcloud COS while processing the
+     *         request.
+     *
+     */
+    public ObjectMetadata getobjectMeta(String bucketName, String key) throws CosClientException, CosServiceException;
+    
+    /**
+     * <p>
+     * Gets the metadata for the specified Qcloud COS object without actually fetching the object
+     * itself. This is useful in obtaining only the object metadata, and avoids wasting bandwidth on
+     * fetching the object data.
+     * </p>
+     * <p>
+     * The object metadata contains information such as content type, content disposition, etc., as
+     * well as custom user metadata that can be associated with an object in Qcloud COS.
+     * </p>
+     *
      * @param getObjectMetadataRequest The request object specifying the bucket, key and optional
      *        version ID of the object whose metadata is being retrieved.
      *
