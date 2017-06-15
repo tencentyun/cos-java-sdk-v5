@@ -348,7 +348,7 @@ public interface COS {
      *         request.
      *
      */
-    public ObjectMetadata getobjectMeta(String bucketName, String key) throws CosClientException, CosServiceException;
+    public ObjectMetadata getobjectMetadata(String bucketName, String key) throws CosClientException, CosServiceException;
     
     /**
      * <p>
