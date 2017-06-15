@@ -510,7 +510,7 @@ public class COSClient implements COS {
     public COSObject getObject(String bucketName, String key)
             throws CosClientException, CosServiceException {
         // TODO Auto-generated method stub
-        return null;
+        return getObject(new GetObjectRequest(bucketName, key));
     }
 
     @Override
