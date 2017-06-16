@@ -27,20 +27,16 @@ public enum StorageClass {
     Standard("STANDARD"),
 
     /**
-     * The reduced redundancy storage class.
-     * This storage class allows customers to reduce their storage costs
-     * in return for a reduced level of data redundancy. Customers who are using
-     * Qcloud COS for storing non-critical, reproducible data can choose this
-     * low cost and highly available, but less redundant, storage option.
+     * STANDARD_IA
      */
-    ReducedRedundancy("REDUCED_REDUNDANCY"),
+    Standard_IA("STANDARD_IA"),
 
     /**
-     * The Qcloud Coldline storage class.
-     * This storage class means your object's data is stored in Qcloud Coldline,
-     * and Qcloud COS stores a reference to the data in the Qcloud COS bucket.
+     * The Qcloud NEARLINE storage class.
+     * This storage class means your object's data is stored in Qcloud NEARLINE,
+     * and Qcloud COS stores a reference to the data in the NEARLINE COS bucket.
      */
-    ColdLine("ColdLine");
+    NearLine("NEARLINE");
 
     /**
      * Returns the Qcloud COS {@link StorageClass} enumeration value representing the
