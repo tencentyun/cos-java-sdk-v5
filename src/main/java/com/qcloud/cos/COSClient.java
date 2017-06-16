@@ -179,7 +179,7 @@ public class COSClient implements COS {
              * !skipMd5CheckStrategy.skipClientSideValidationPerUploadPartResponse(metadata)) {
              * byte[] clientSideHash = md5DigestStream.getMd5Digest(); byte[] serverSideHash =
              * BinaryUtils.fromHex(etag);
-             * 
+             *
              * if (!Arrays.equals(clientSideHash, serverSideHash)) { final String info =
              * "bucketName: " + bucketName + ", key: " + key + ", uploadId: " + uploadId +
              * ", partNumber: " + partNumber + ", partSize: " + partSize; throw new
@@ -192,7 +192,7 @@ public class COSClient implements COS {
             UploadPartResult result = new UploadPartResult();
             result.setETag(etag);
             result.setPartNumber(partNumber);
-            
+
             return result;
         } catch (Throwable t) {
             throw Throwables.failure(t);
@@ -478,7 +478,7 @@ public class COSClient implements COS {
          * !skipMd5CheckStrategy.skipClientSideValidationPerPutResponse(returnedMetadata)) { byte[]
          * clientSideHash = BinaryUtils.fromBase64(contentMd5); byte[] serverSideHash =
          * BinaryUtils.fromHex(etag);
-         * 
+         *
          * // TODO(chengwu) 目前 COS Server端发挥的etag是 sha1 // 客户端算出来的是content-MD5, 以后这里需要做校验 if
          * (!Arrays.equals(clientSideHash, serverSideHash)) { throw new CosClientException(
          * "Unable to verify integrity of data upload.  " +
@@ -599,7 +599,7 @@ public class COSClient implements COS {
 
         return cosObject.getObjectMetadata();
     }
-    
+
     @Override
     public ObjectMetadata getobjectMetadata(String bucketName, String key)
             throws CosClientException, CosServiceException {
@@ -709,6 +709,13 @@ public class COSClient implements COS {
                         initiateMultipartUploadRequest.getKey(), initiateMultipartUploadRequest,
                         HttpMethodName.POST);
         request.addParameter("uploads", null);
+
+        if (initiateMultipartUploadRequest.getStorageClass() != null)
+            request.addHeader(Headers.STORAGE_CLASS, initiateMultipartUploadRequest.getStorageClass().toString());
+
+        if (initiateMultipartUploadRequest.getRedirectLocation() != null) {
+            request.addHeader(Headers.REDIRECT_LOCATION, initiateMultipartUploadRequest.getRedirectLocation());
+        }
 
         if (initiateMultipartUploadRequest.getAccessControlList() != null) {
             addAclHeaders(request, initiateMultipartUploadRequest.getAccessControlList());
@@ -874,7 +881,7 @@ public class COSClient implements COS {
 
             byte[] xml = RequestXmlFactory
                     .convertToXmlByteArray(completeMultipartUploadRequest.getPartETags());
-            
+
             request.addHeader("Content-Type", "text/plain");
             request.addHeader("Content-Length", String.valueOf(xml.length));
 
