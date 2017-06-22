@@ -3,6 +3,7 @@ package com.qcloud.cos.internal;
 import java.io.InputStream;
 
 import com.qcloud.cos.internal.XmlResponsesSaxParser.CompleteMultipartUploadHandler;
+import com.qcloud.cos.internal.XmlResponsesSaxParser.CopyObjectResultHandler;
 import com.qcloud.cos.model.InitiateMultipartUploadResult;
 import com.qcloud.cos.model.MultipartUploadListing;
 import com.qcloud.cos.model.ObjectListing;
@@ -150,15 +151,15 @@ public class Unmarshallers {
         }
     }
 
-    // /**
-    // * Unmarshaller for the CopyObject XML response.
-    // */
-    // public static final class CopyObjectUnmarshaller
-    // implements Unmarshaller<CopyObjectResultHandler, InputStream> {
-    // public CopyObjectResultHandler unmarshall(InputStream in) throws Exception {
-    // return new XmlResponsesSaxParser().parseCopyObjectResponse(in);
-    // }
-    // }
+     /**
+     * Unmarshaller for the CopyObject XML response.
+     */
+     public static final class CopyObjectUnmarshaller
+     implements Unmarshaller<CopyObjectResultHandler, InputStream> {
+     public CopyObjectResultHandler unmarshall(InputStream in) throws Exception {
+     return new XmlResponsesSaxParser().parseCopyObjectResponse(in);
+     }
+     }
 
     public static final class CompleteMultipartUploadResultUnmarshaller
             implements Unmarshaller<CompleteMultipartUploadHandler, InputStream> {

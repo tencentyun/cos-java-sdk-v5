@@ -51,7 +51,7 @@ public class Demo {
         String key = "/upload_single_demo.txt";
         PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, key, localFile);
         PutObjectResult putObjectResult = cosClient.putObject(putObjectRequest);
-        
+
         // 下载object
         File downFile = new File("src/test/resources/len5M_down.txt");
         GetObjectRequest getObjectRequest = new GetObjectRequest(bucketName, key);
@@ -80,7 +80,7 @@ public class Demo {
         // list bucket下的成员
         ObjectListing objectListing = cosClient.listObjects(bucketName);
         List<COSObjectSummary> objectListSummary = objectListing.getObjectSummaries();
-        
+
         // 删除刚上传的文件
         deleteObjectRequest = new DeleteObjectRequest(bucketName, key);
         cosClient.deleteObject(deleteObjectRequest);

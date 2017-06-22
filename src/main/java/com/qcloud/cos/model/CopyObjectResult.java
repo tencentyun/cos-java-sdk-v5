@@ -6,17 +6,6 @@ import java.util.Date;
 import com.qcloud.cos.internal.ObjectExpirationResult;
 import com.qcloud.cos.internal.SSEResultBase;
 
-/**
- * <p>
- * Contains the data returned by Amazon S3 from the
- * {@link AmazonS3#copyObject(CopyObjectRequest copyObjectRequest)} call.
- * This result may be ignored if not needed; otherwise, use this result
- * to access information about the new object created from the copyObject call.
- * </p>
- *
- * @see AmazonS3Client#copyObject(String, String, String, String)
- * @see AmazonS3Client#copyObject(com.amazonaws.services.s3.model.CopyObjectRequest)
- */
 public class CopyObjectResult extends SSEResultBase implements ObjectExpirationResult,Serializable {
 
     /** The ETag value of the new object */

@@ -17,12 +17,12 @@ public class STSDemo {
 
 	public static BasicSessionCredentials getSessionCredential() {
 		// 实际应用中，这里通过云api请求得到临时秘钥后，构造BasicSessionCredential
-		BasicSessionCredentials cred = 
-				new BasicSessionCredentials("1252448703", "AKIDAAyXrwmnNhmdFcte4E7mBKCoBH7gA2pL", 
-						"QckhOp2zhCXdU5QWTBevwgANN7dsELEs", "efd2f92e6b35562d387971ec7e78cfa051d058ad3");
+		BasicSessionCredentials cred =
+				new BasicSessionCredentials("1000000", "111111111111122222",
+						"333333334afafafaa", "efd2f92e6b35562d387971ec7e78cfa051d058ad3");
 		return cred;
 	}
-	
+
 	public static void main(String[] args) {
 		// 使用云api秘钥，可以获取一个临时secret id，secret key和session token,
 		BasicSessionCredentials cred = getSessionCredential();

@@ -8,13 +8,13 @@ import com.qcloud.cos.exception.CosServiceException.ErrorType;
 public class CosServiceExceptionBuilder {
 
     /**
-     * The unique AWS identifier for the service request the caller made. The AWS request ID can
-     * uniquely identify the AWS request, and is used for reporting an error to AWS support team.
+     * The unique COS identifier for the service request the caller made. The COS request ID can
+     * uniquely identify the COS request.
      */
     private String requestId;
 
     /**
-     * The AWS error code represented by this exception (ex: InvalidParameterValue).
+     * The COS error code represented by this exception (ex: InvalidParameterValue).
      */
     private String errorCode;
 
@@ -42,38 +42,18 @@ public class CosServiceExceptionBuilder {
      */
     private String errorResponseXml;
 
-    /**
-     * Returns the AWS request ID that uniquely identifies the service request the caller made.
-     *
-     * @return The AWS request ID that uniquely identifies the service request the caller made.
-     */
     public String getRequestId() {
         return requestId;
     }
 
-    /**
-     * Sets the AWS requestId for this exception.
-     *
-     * @param requestId The unique identifier for the service request the caller made.
-     */
     public void setRequestId(String requestId) {
         this.requestId = requestId;
     }
 
-    /**
-     * Sets the AWS error code represented by this exception.
-     *
-     * @param errorCode The AWS error code represented by this exception.
-     */
     public void setErrorCode(String errorCode) {
         this.errorCode = errorCode;
     }
 
-    /**
-     * Returns the AWS error code represented by this exception.
-     *
-     * @return The AWS error code represented by this exception.
-     */
     public String getErrorCode() {
         return errorCode;
     }
@@ -189,8 +169,8 @@ public class CosServiceExceptionBuilder {
     }
 
     /**
-     * Returns the AWS error type information by looking at the HTTP status code in the error
-     * response. COS error responses don't explicitly declare a sender or client fault like other AWS
+     * Returns the COS error type information by looking at the HTTP status code in the error
+     * response. COS error responses don't explicitly declare a sender or client fault like other COS
      * services, so we have to use the HTTP status code to infer this information.
      *
      * @param httpResponse The HTTP error response to use to determine the right error type to set.

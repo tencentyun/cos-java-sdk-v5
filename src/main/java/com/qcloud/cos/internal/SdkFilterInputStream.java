@@ -32,7 +32,7 @@ public class SdkFilterInputStream extends FilterInputStream implements Releasabl
      * default.
      */
     protected void abort() {
-        // no-op by default, but subclass such as S3ObjectInputStream may override
+        // no-op by default, but subclass such as cosObjectInputStream may override
     }
 
     @Override

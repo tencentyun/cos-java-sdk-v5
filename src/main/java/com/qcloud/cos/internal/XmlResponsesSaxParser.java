@@ -29,6 +29,7 @@ import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.model.AccessControlList;
 import com.qcloud.cos.model.COSObjectSummary;
 import com.qcloud.cos.model.CompleteMultipartUploadResult;
+import com.qcloud.cos.model.CopyObjectResult;
 import com.qcloud.cos.model.Grantee;
 import com.qcloud.cos.model.InitiateMultipartUploadResult;
 import com.qcloud.cos.model.MultipartUpload;
@@ -238,6 +239,7 @@ public class XmlResponsesSaxParser {
         parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
         return handler;
     }
+
     //
     // /**
     // * Parses a ListVersions response XML document from an input stream.
@@ -353,12 +355,12 @@ public class XmlResponsesSaxParser {
     // return handler;
     // }
     //
-    // public CopyObjectResultHandler parseCopyObjectResponse(InputStream inputStream)
-    // throws IOException {
-    // CopyObjectResultHandler handler = new CopyObjectResultHandler();
-    // parseXmlInputStream(handler, inputStream);
-    // return handler;
-    // }
+    public CopyObjectResultHandler parseCopyObjectResponse(InputStream inputStream)
+            throws IOException {
+        CopyObjectResultHandler handler = new CopyObjectResultHandler();
+        parseXmlInputStream(handler, inputStream);
+        return handler;
+    }
 
     public CompleteMultipartUploadHandler parseCompleteMultipartUploadResponse(
             InputStream inputStream) throws IOException {
@@ -807,119 +809,115 @@ public class XmlResponsesSaxParser {
     // }
     // }
 
-    // public static class CopyObjectResultHandler extends AbstractSSEHandler implements
-    // ObjectExpirationResult {
-    //
-    // // Data items for successful copy
-    // private final CopyObjectResult result = new CopyObjectResult();
-    //
-    // // Data items for failed copy
-    // private String errorCode = null;
-    // private String errorMessage = null;
-    // private String errorRequestId = null;
-    // private String errorHostId = null;
-    // private boolean receivedErrorResponse = false;
-    //
-    // @Override
-    // protected ServerSideEncryptionResult sseResult() {
-    // return result;
-    // }
-    //
-    // public Date getLastModified() {
-    // return result.getLastModifiedDate();
-    // }
-    //
-    // public String getVersionId() {
-    // return result.getVersionId();
-    // }
-    //
-    // public void setVersionId(String versionId) {
-    // result.setVersionId(versionId);
-    // }
-    //
-    // @Override
-    // public Date getExpirationTime() {
-    // return result.getExpirationTime();
-    // }
-    //
-    // @Override
-    // public void setExpirationTime(Date expirationTime) {
-    // result.setExpirationTime(expirationTime);
-    // }
-    //
-    // @Override
-    // public String getExpirationTimeRuleId() {
-    // return result.getExpirationTimeRuleId();
-    // }
-    //
-    // @Override
-    // public void setExpirationTimeRuleId(String expirationTimeRuleId) {
-    // result.setExpirationTimeRuleId(expirationTimeRuleId);
-    // }
-    //
-    // public String getETag() {
-    // return result.getETag();
-    // }
-    //
-    // public String getErrorCode() {
-    // return errorCode;
-    // }
-    //
-    // public String getErrorHostId() {
-    // return errorHostId;
-    // }
-    //
-    // public String getErrorMessage() {
-    // return errorMessage;
-    // }
-    //
-    // public String getErrorRequestId() {
-    // return errorRequestId;
-    // }
-    //
-    // public boolean isErrorResponse() {
-    // return receivedErrorResponse;
-    // }
-    //
-    // @Override
-    // protected void doStartElement(
-    // String uri,
-    // String name,
-    // String qName,
-    // Attributes attrs) {
-    //
-    // if (atTopLevel()) {
-    // if (name.equals("CopyObjectResult") || name.equals("CopyPartResult")) {
-    // receivedErrorResponse = false;
-    // } else if (name.equals("Error")) {
-    // receivedErrorResponse = true;
-    // }
-    // }
-    // }
-    //
-    // @Override
-    // protected void doEndElement(String uri, String name, String qName) {
-    // if (in("CopyObjectResult") || in ("CopyPartResult")) {
-    // if (name.equals("LastModified")) {
-    // result.setLastModifiedDate(ServiceUtils.parseIso8601Date(getText()));
-    // } else if (name.equals("ETag")) {
-    // result.setETag(ServiceUtils.removeQuotes(getText()));
-    // }
-    // }
-    //
-    // else if (in("Error")) {
-    // if (name.equals("Code")) {
-    // errorCode = getText();
-    // } else if (name.equals("Message")) {
-    // errorMessage = getText();
-    // } else if (name.equals("RequestId")) {
-    // errorRequestId = getText();
-    // } else if (name.equals("HostId")) {
-    // errorHostId = getText();
-    // }
-    // }
-    // }
-    // }
+    public static class CopyObjectResultHandler extends AbstractSSEHandler
+            implements ObjectExpirationResult {
+
+        // Data items for successful copy
+        private final CopyObjectResult result = new CopyObjectResult();
+
+        // Data items for failed copy
+        private String errorCode = null;
+        private String errorMessage = null;
+        private String errorRequestId = null;
+        private String errorHostId = null;
+        private boolean receivedErrorResponse = false;
+
+        @Override
+        protected ServerSideEncryptionResult sseResult() {
+            return result;
+        }
+
+        public Date getLastModified() {
+            return result.getLastModifiedDate();
+        }
+
+        public String getVersionId() {
+            return result.getVersionId();
+        }
+
+        public void setVersionId(String versionId) {
+            result.setVersionId(versionId);
+        }
+
+        @Override
+        public Date getExpirationTime() {
+            return result.getExpirationTime();
+        }
+
+        @Override
+        public void setExpirationTime(Date expirationTime) {
+            result.setExpirationTime(expirationTime);
+        }
+
+        @Override
+        public String getExpirationTimeRuleId() {
+            return result.getExpirationTimeRuleId();
+        }
+
+        @Override
+        public void setExpirationTimeRuleId(String expirationTimeRuleId) {
+            result.setExpirationTimeRuleId(expirationTimeRuleId);
+        }
+
+        public String getETag() {
+            return result.getETag();
+        }
+
+        public String getErrorCode() {
+            return errorCode;
+        }
+
+        public String getErrorHostId() {
+            return errorHostId;
+        }
+
+        public String getErrorMessage() {
+            return errorMessage;
+        }
+
+        public String getErrorRequestId() {
+            return errorRequestId;
+        }
+
+        public boolean isErrorResponse() {
+            return receivedErrorResponse;
+        }
+
+        @Override
+        protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
+
+            if (atTopLevel()) {
+                if (name.equals("CopyObjectResult") || name.equals("CopyPartResult")) {
+                    receivedErrorResponse = false;
+                } else if (name.equals("Error")) {
+                    receivedErrorResponse = true;
+                }
+            }
+        }
+
+        @Override
+        protected void doEndElement(String uri, String name, String qName) {
+            if (in("CopyObjectResult") || in("CopyPartResult")) {
+                if (name.equals("LastModified")) {
+//                    result.setLastModifiedDate(DateUtils.parseISO8601Date(getText()));
+                } else if (name.equals("ETag")) {
+                    result.setETag(StringUtils.removeQuotes(getText()));
+                }
+            }
+
+            else if (in("Error")) {
+                if (name.equals("Code")) {
+                    errorCode = getText();
+                } else if (name.equals("Message")) {
+                    errorMessage = getText();
+                } else if (name.equals("RequestId")) {
+                    errorRequestId = getText();
+                } else if (name.equals("HostId")) {
+                    errorHostId = getText();
+                }
+            }
+        }
+    }
 
     // /**
     // * Handler for parsing RequestPaymentConfiguration XML response associated

@@ -1,13 +1,18 @@
 package com.qcloud.cos.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import com.qcloud.cos.internal.CosServiceRequest;
+import com.qcloud.cos.region.Region;
 
-public class CopyObjectRequest extends CosServiceRequest {
+public class CopyObjectRequest extends CosServiceRequest implements SSECOSKeyManagementParamsProvider, Serializable{
 
+    // The Soure Bucket Region
+    private Region sourceBucketRegion;
+    
     /** The name of the bucket containing the object to be copied */
     private String sourceBucketName;
 
@@ -78,13 +83,25 @@ public class CopyObjectRequest extends CosServiceRequest {
     /** Optional field specifying the redirect location for the new object */
     private String redirectLocation;
 
+    /**
+     * The optional customer-provided server-side encryption key to use to
+     * decrypt the source object being copied.
+     */
+    private SSECustomerKey sourceSSECustomerKey;
 
+    /**
+     * The optional customer-provided server-side encryption key to use to
+     * encrypt the destination object being copied.
+     */
+    private SSECustomerKey destinationSSECustomerKey;
+
+    private SSECOSKeyManagementParams sseCOSKeyManagementParams;
+    
     /**
      * <p>
      * Constructs a new {@link com.qcloud.cos.model#CopyObjectRequest} with only basic
      * options.
      * </p>
-     * 
      * @param sourceBucketName The name of the COS bucket containing the object to copy.
      * @param sourceKey The source bucket key under which the object to copy is stored.
      * @param destinationBucketName The name of the COS bucket to which the new object will be
@@ -95,7 +112,26 @@ public class CopyObjectRequest extends CosServiceRequest {
      */
     public CopyObjectRequest(String sourceBucketName, String sourceKey,
             String destinationBucketName, String destinationKey) {
-        this(sourceBucketName, sourceKey, null, destinationBucketName, destinationKey);
+        this(null, sourceBucketName, sourceKey, null, destinationBucketName, destinationKey);
+    }
+
+    /**
+     * <p>
+     * Constructs a new {@link com.qcloud.cos.model#CopyObjectRequest} with only basic
+     * options.
+     * </p>
+     * @param sourceBucketRegion The source Bucket Region
+     * @param sourceBucketName The name of the COS bucket containing the object to copy.
+     * @param sourceKey The source bucket key under which the object to copy is stored.
+     * @param destinationBucketName The name of the COS bucket to which the new object will be
+     *        copied.
+     * @param destinationKey The destination bucket key under which the new object will be copied.
+     * 
+     * @see CopyObjectRequest#CopyObjectRequest(String, String, String, String, String)
+     */
+    public CopyObjectRequest(Region sourceBucketRegion, String sourceBucketName, String sourceKey,
+            String destinationBucketName, String destinationKey) {
+        this(sourceBucketRegion, sourceBucketName, sourceKey, null, destinationBucketName, destinationKey);
     }
 
     /**
@@ -103,7 +139,7 @@ public class CopyObjectRequest extends CosServiceRequest {
      * Constructs a new {@link CopyObjectRequest} with basic options, providing an COS version ID
      * identifying the specific version of the source object to copy.
      * </p>
-     * 
+     * @param sourceBucketRegion The source Bucket Region
      * @param sourceBucketName The name of the COS bucket containing the object to copy.
      * @param sourceKey The key in the source bucket under which the object to copy is stored.
      * @param sourceVersionId The COS version ID which uniquely identifies a specific version of the
@@ -116,13 +152,22 @@ public class CopyObjectRequest extends CosServiceRequest {
      * @see CopyObjectRequest#CopyObjectRequest(String sourceBucketName, String sourceKey, String
      *      destinationBucketName, String destinationKey)
      */
-    public CopyObjectRequest(String sourceBucketName, String sourceKey, String sourceVersionId,
+    public CopyObjectRequest(Region sourceBucketRegion, String sourceBucketName, String sourceKey, String sourceVersionId,
             String destinationBucketName, String destinationKey) {
+        this.sourceBucketRegion = sourceBucketRegion;
         this.sourceBucketName = sourceBucketName;
         this.sourceKey = sourceKey;
         this.sourceVersionId = sourceVersionId;
         this.destinationBucketName = destinationBucketName;
         this.destinationKey = destinationKey;
+    }
+    
+    public Region getSourceBucketRegion() {
+        return sourceBucketRegion;
+    }
+
+    public void setSourceBucketRegion(Region sourceBucketRegion) {
+        this.sourceBucketRegion = sourceBucketRegion;
     }
 
     /**
@@ -834,5 +879,35 @@ public class CopyObjectRequest extends CosServiceRequest {
     public CopyObjectRequest withRedirectLocation(String redirectLocation) {
         this.redirectLocation = redirectLocation;
         return this;
+    }
+    
+
+    public SSECustomerKey getSourceSSECustomerKey() {
+        return sourceSSECustomerKey;
+    }
+
+    public void setSourceSSECustomerKey(SSECustomerKey sourceSSECustomerKey) {
+        this.sourceSSECustomerKey = sourceSSECustomerKey;
+    }
+
+    public SSECustomerKey getDestinationSSECustomerKey() {
+        return destinationSSECustomerKey;
+    }
+
+    public void setDestinationSSECustomerKey(SSECustomerKey destinationSSECustomerKey) {
+        this.destinationSSECustomerKey = destinationSSECustomerKey;
+    }
+
+    public SSECOSKeyManagementParams getSseCOSKeyManagementParams() {
+        return sseCOSKeyManagementParams;
+    }
+
+    public void setSseCOSKeyManagementParams(SSECOSKeyManagementParams sseCOSKeyManagementParams) {
+        this.sseCOSKeyManagementParams = sseCOSKeyManagementParams;
+    }
+
+    @Override
+    public SSECOSKeyManagementParams getSSECOSKeyManagementParams() {
+        return this.sseCOSKeyManagementParams;
     }
 }

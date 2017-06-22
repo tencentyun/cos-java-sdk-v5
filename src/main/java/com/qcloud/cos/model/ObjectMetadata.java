@@ -159,7 +159,7 @@ public class ObjectMetadata implements ObjectExpirationResult, Cloneable {
     public Map<String, Object> getRawMetadata() {
         return Collections.unmodifiableMap(metadata);
     }
-    
+
     /**
      * For internal use only. Returns the raw value of the metadata/headers
      * for the specified key.
@@ -396,10 +396,10 @@ public class ObjectMetadata implements ObjectExpirationResult, Cloneable {
      * The COS Java client will attempt to calculate this field automatically when uploading
      * files to Qcloud COS.
      * </p>
-     * 
+     *
      * @param md5Base64 The base64 encoded MD5 hash of the content for the object associated with
      *        this metadata.
-     * 
+     *
      * @see ObjectMetadata#getContentMD5()
      */
     public void setContentMD5(String md5Base64) {
@@ -522,10 +522,15 @@ public class ObjectMetadata implements ObjectExpirationResult, Cloneable {
         metadata.put(Headers.SERVER_SIDE_ENCRYPTION, serverSideEncryption);
     }
 
+    /**
+     * Sets the security token for the object.
+     *
+     * @param securityToken The security token for the object.
+     */
     public void setSecurityToken(String securityToken) {
-    	metadata.put(Headers.SECURITY_TOKEN, securityToken);
+        metadata.put(Headers.SECURITY_TOKEN, securityToken);
     }
-    
+
     /**
      * Returns the time this object will expire and be completely removed from COS. Returns null if
      * this object will never expire.

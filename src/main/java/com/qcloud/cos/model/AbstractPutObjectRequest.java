@@ -631,7 +631,7 @@ public abstract class AbstractPutObjectRequest extends CosServiceRequest
      *
      * @param inputStream
      *            The input stream containing the data to be uploaded to Qcloud
-     *            S3. Either specify a file or an input stream containing the
+     *            COS. Either specify a file or an input stream containing the
      *            data to be uploaded to Qcloud COS, not both.
      *
      * @see AbstractPutObjectRequest#getInputStream()
@@ -655,7 +655,7 @@ public abstract class AbstractPutObjectRequest extends CosServiceRequest
      *
      * @param inputStream
      *            The InputStream containing the data to be uploaded to Qcloud
-     *            S3.
+     *            COS.
      *
      * @return This PutObjectRequest, so that additional method calls can be
      *         chained together.

@@ -34,7 +34,9 @@ import com.qcloud.cos.http.HttpResponseHandler;
 import com.qcloud.cos.http.Mimetypes;
 import com.qcloud.cos.internal.BucketNameUtils;
 import com.qcloud.cos.internal.COSObjectResponseHandler;
+import com.qcloud.cos.internal.COSVersionHeaderHandler;
 import com.qcloud.cos.internal.COSXmlResponseHandler;
+import com.qcloud.cos.internal.Constants;
 import com.qcloud.cos.internal.CosMetadataResponseHandler;
 import com.qcloud.cos.internal.CosServiceRequest;
 import com.qcloud.cos.internal.CosServiceResponse;
@@ -53,6 +55,7 @@ import com.qcloud.cos.internal.Unmarshaller;
 import com.qcloud.cos.internal.Unmarshallers;
 import com.qcloud.cos.internal.VoidCosResponseHandler;
 import com.qcloud.cos.internal.XmlResponsesSaxParser.CompleteMultipartUploadHandler;
+import com.qcloud.cos.internal.XmlResponsesSaxParser.CopyObjectResultHandler;
 import com.qcloud.cos.model.AbortMultipartUploadRequest;
 import com.qcloud.cos.model.AccessControlList;
 import com.qcloud.cos.model.Bucket;
@@ -60,6 +63,8 @@ import com.qcloud.cos.model.COSObject;
 import com.qcloud.cos.model.COSObjectInputStream;
 import com.qcloud.cos.model.CompleteMultipartUploadRequest;
 import com.qcloud.cos.model.CompleteMultipartUploadResult;
+import com.qcloud.cos.model.CopyObjectRequest;
+import com.qcloud.cos.model.CopyObjectResult;
 import com.qcloud.cos.model.CosDataSource;
 import com.qcloud.cos.model.CreateBucketRequest;
 import com.qcloud.cos.model.DeleteBucketRequest;
@@ -83,11 +88,13 @@ import com.qcloud.cos.model.PutObjectRequest;
 import com.qcloud.cos.model.PutObjectResult;
 import com.qcloud.cos.model.UploadPartRequest;
 import com.qcloud.cos.model.UploadPartResult;
+import com.qcloud.cos.region.Region;
 import com.qcloud.cos.utils.Base64;
 import com.qcloud.cos.utils.DateUtils;
 import com.qcloud.cos.utils.Md5Utils;
 import com.qcloud.cos.utils.ServiceUtils;
 import com.qcloud.cos.utils.StringUtils;
+import com.qcloud.cos.utils.UrlEncoderUtils;
 
 public class COSClient implements COS {
 
@@ -179,7 +186,7 @@ public class COSClient implements COS {
              * !skipMd5CheckStrategy.skipClientSideValidationPerUploadPartResponse(metadata)) {
              * byte[] clientSideHash = md5DigestStream.getMd5Digest(); byte[] serverSideHash =
              * BinaryUtils.fromHex(etag);
-             *
+             * 
              * if (!Arrays.equals(clientSideHash, serverSideHash)) { final String info =
              * "bucketName: " + bucketName + ", key: " + key + ", uploadId: " + uploadId +
              * ", partNumber: " + partNumber + ", partSize: " + partSize; throw new
@@ -234,6 +241,62 @@ public class COSClient implements COS {
                 request.addHeader(Headers.COS_USER_METADATA_PREFIX + key, value);
             }
         }
+    }
+
+    private void populateRequestWithCopyObjectParameters(
+            CosHttpRequest<? extends CosServiceRequest> request,
+            CopyObjectRequest copyObjectRequest) {
+        Region sourceRegion = copyObjectRequest.getSourceBucketRegion();
+        // 如果用户没有设置源region, 则默认和目的region一致
+        if (sourceRegion == null) {
+            sourceRegion = this.clientConfig.getRegion();
+        }
+        String sourceKey = copyObjectRequest.getSourceKey();
+        if (!sourceKey.startsWith("/")) {
+            sourceKey = "/" + sourceKey;
+        }
+        String copySourceHeader = String.format("%s-%s.%s.myqcloud.com%s",
+                copyObjectRequest.getSourceBucketName(), this.cred.getCOSAppId(),
+                sourceRegion.getRegionName(), UrlEncoderUtils.encodeEscapeDelimiter(sourceKey));
+        if (copyObjectRequest.getSourceVersionId() != null) {
+            copySourceHeader += "?versionId=" + copyObjectRequest.getSourceVersionId();
+        }
+        request.addHeader("x-cos-copy-source", copySourceHeader);
+
+        addDateHeader(request, Headers.COPY_SOURCE_IF_MODIFIED_SINCE,
+                copyObjectRequest.getModifiedSinceConstraint());
+        addDateHeader(request, Headers.COPY_SOURCE_IF_UNMODIFIED_SINCE,
+                copyObjectRequest.getUnmodifiedSinceConstraint());
+
+        addStringListHeader(request, Headers.COPY_SOURCE_IF_MATCH,
+                copyObjectRequest.getMatchingETagConstraints());
+        addStringListHeader(request, Headers.COPY_SOURCE_IF_NO_MATCH,
+                copyObjectRequest.getNonmatchingETagConstraints());
+
+        if (copyObjectRequest.getAccessControlList() != null) {
+            addAclHeaders(request, copyObjectRequest.getAccessControlList());
+        } else if (copyObjectRequest.getCannedAccessControlList() != null) {
+            request.addHeader(Headers.COS_CANNED_ACL,
+                    copyObjectRequest.getCannedAccessControlList().toString());
+        }
+
+        if (copyObjectRequest.getStorageClass() != null) {
+            request.addHeader(Headers.STORAGE_CLASS, copyObjectRequest.getStorageClass());
+        }
+
+        if (copyObjectRequest.getRedirectLocation() != null) {
+            request.addHeader(Headers.REDIRECT_LOCATION, copyObjectRequest.getRedirectLocation());
+        }
+
+        ObjectMetadata newObjectMetadata = copyObjectRequest.getNewObjectMetadata();
+        if (newObjectMetadata != null) {
+            request.addHeader(Headers.METADATA_DIRECTIVE, "REPLACE");
+            populateRequestMetadata(request, newObjectMetadata);
+        }
+
+        // Populate the SSE-C parameters for the destination object
+        // populateSourceSSE_C(request, copyObjectRequest.getSourceSSECustomerKey());
+        // populateSSE_C(request, copyObjectRequest.getDestinationSSECustomerKey());
     }
 
     private String formatKey(String key) {
@@ -478,7 +541,7 @@ public class COSClient implements COS {
          * !skipMd5CheckStrategy.skipClientSideValidationPerPutResponse(returnedMetadata)) { byte[]
          * clientSideHash = BinaryUtils.fromBase64(contentMd5); byte[] serverSideHash =
          * BinaryUtils.fromHex(etag);
-         *
+         * 
          * // TODO(chengwu) 目前 COS Server端发挥的etag是 sha1 // 客户端算出来的是content-MD5, 以后这里需要做校验 if
          * (!Arrays.equals(clientSideHash, serverSideHash)) { throw new CosClientException(
          * "Unable to verify integrity of data upload.  " +
@@ -605,7 +668,7 @@ public class COSClient implements COS {
             throws CosClientException, CosServiceException {
         return getObjectMetadata(new GetObjectMetadataRequest(bucketName, key));
     }
-
+    
     @Override
     public ObjectMetadata getObjectMetadata(GetObjectMetadataRequest getObjectMetadataRequest)
             throws CosClientException, CosServiceException {
@@ -709,7 +772,7 @@ public class COSClient implements COS {
                         initiateMultipartUploadRequest.getKey(), initiateMultipartUploadRequest,
                         HttpMethodName.POST);
         request.addParameter("uploads", null);
-
+        
         if (initiateMultipartUploadRequest.getStorageClass() != null)
             request.addHeader(Headers.STORAGE_CLASS, initiateMultipartUploadRequest.getStorageClass().toString());
 
@@ -1003,6 +1066,93 @@ public class COSClient implements COS {
             return emptyListing;
         }
         return listObjects(listNextBatchOfObjectsRequest.toListObjectsRequest());
+    }
+
+    @Override
+    public CopyObjectResult copyObject(CopyObjectRequest copyObjectRequest)
+            throws CosClientException, CosServiceException {
+        rejectNull(copyObjectRequest.getSourceBucketName(),
+                "The source bucket name must be specified when copying an object");
+        rejectNull(copyObjectRequest.getSourceKey(),
+                "The source object key must be specified when copying an object");
+        rejectNull(copyObjectRequest.getDestinationBucketName(),
+                "The destination bucket name must be specified when copying an object");
+        rejectNull(copyObjectRequest.getDestinationKey(),
+                "The destination object key must be specified when copying an object");
+
+        String destinationKey = copyObjectRequest.getDestinationKey();
+        String destinationBucketName = copyObjectRequest.getDestinationBucketName();
+
+        CosHttpRequest<CopyObjectRequest> request = createRequest(destinationBucketName,
+                destinationKey, copyObjectRequest, HttpMethodName.PUT);
+
+        populateRequestWithCopyObjectParameters(request, copyObjectRequest);
+
+        /*
+         * We can't send a non-zero length Content-Length header if the user specified it, otherwise
+         * it messes up the HTTP connection when the remote server thinks there's more data to pull.
+         */
+        setZeroContentLength(request);
+        CopyObjectResultHandler copyObjectResultHandler = null;
+        try {
+            @SuppressWarnings("unchecked")
+            ResponseHeaderHandlerChain<CopyObjectResultHandler> handler =
+                    new ResponseHeaderHandlerChain<CopyObjectResultHandler>(
+                            // xml payload unmarshaller
+                            new Unmarshallers.CopyObjectUnmarshaller(),
+                            // header handlers
+                            new ServerSideEncryptionHeaderHandler<CopyObjectResultHandler>(),
+                            new COSVersionHeaderHandler(),
+                            new ObjectExpirationHeaderHandler<CopyObjectResultHandler>());
+            copyObjectResultHandler = invoke(request, handler);
+        } catch (CosServiceException cse) {
+            /*
+             * If the request failed because one of the specified constraints was not met (ex:
+             * matching ETag, modified since date, etc.), then return null, so that users don't have
+             * to wrap their code in try/catch blocks and check for this status code if they want to
+             * use constraints.
+             */
+            if (cse.getStatusCode() == Constants.FAILED_PRECONDITION_STATUS_CODE) {
+                return null;
+            }
+
+            throw cse;
+        }
+
+        /*
+         * CopyObject has two failure modes: 1 - An HTTP error code is returned and the error is
+         * processed like any other error response. 2 - An HTTP 200 OK code is returned, but the
+         * response content contains an XML error response.
+         *
+         * This makes it very difficult for the client runtime to cleanly detect this case and
+         * handle it like any other error response. We could extend the runtime to have a more
+         * flexible/customizable definition of success/error (per request), but it's probably
+         * overkill for this one special case.
+         */
+        if (copyObjectResultHandler.getErrorCode() != null) {
+            String errorCode = copyObjectResultHandler.getErrorCode();
+            String errorMessage = copyObjectResultHandler.getErrorMessage();
+            String requestId = copyObjectResultHandler.getErrorRequestId();
+
+            CosServiceException cse = new CosServiceException(errorMessage);
+            cse.setErrorCode(errorCode);
+            cse.setRequestId(requestId);
+            cse.setStatusCode(200);
+
+            throw cse;
+        }
+
+        CopyObjectResult copyObjectResult = new CopyObjectResult();
+        copyObjectResult.setETag(copyObjectResultHandler.getETag());
+        copyObjectResult.setLastModifiedDate(copyObjectResultHandler.getLastModified());
+        copyObjectResult.setVersionId(copyObjectResultHandler.getVersionId());
+        copyObjectResult.setSSEAlgorithm(copyObjectResultHandler.getSSEAlgorithm());
+        copyObjectResult.setSSECustomerAlgorithm(copyObjectResultHandler.getSSECustomerAlgorithm());
+        copyObjectResult.setSSECustomerKeyMd5(copyObjectResultHandler.getSSECustomerKeyMd5());
+        copyObjectResult.setExpirationTime(copyObjectResultHandler.getExpirationTime());
+        copyObjectResult.setExpirationTimeRuleId(copyObjectResultHandler.getExpirationTimeRuleId());
+
+        return copyObjectResult;
     }
 
 }

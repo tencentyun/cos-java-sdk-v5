@@ -2,6 +2,7 @@ package com.qcloud.cos;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.List;
 
 import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.exception.CosServiceException;
@@ -10,6 +11,8 @@ import com.qcloud.cos.model.Bucket;
 import com.qcloud.cos.model.COSObject;
 import com.qcloud.cos.model.CompleteMultipartUploadRequest;
 import com.qcloud.cos.model.CompleteMultipartUploadResult;
+import com.qcloud.cos.model.CopyObjectRequest;
+import com.qcloud.cos.model.CopyObjectResult;
 import com.qcloud.cos.model.CreateBucketRequest;
 import com.qcloud.cos.model.DeleteBucketRequest;
 import com.qcloud.cos.model.DeleteObjectRequest;
@@ -337,8 +340,8 @@ public interface COS {
      * well as custom user metadata that can be associated with an object in Qcloud COS.
      * </p>
      *
-     * @param bucketName   bucket name
-     * @param key          cos path
+     * @param bucketName bucket name
+     * @param key cos path
      *
      * @return All COS object metadata for the specified object.
      *
@@ -348,8 +351,9 @@ public interface COS {
      *         request.
      *
      */
-    public ObjectMetadata getobjectMetadata(String bucketName, String key) throws CosClientException, CosServiceException;
-    
+    public ObjectMetadata getobjectMetadata(String bucketName, String key)
+            throws CosClientException, CosServiceException;
+
     /**
      * <p>
      * Gets the metadata for the specified Qcloud COS object without actually fetching the object
@@ -491,100 +495,86 @@ public interface COS {
      */
     public InitiateMultipartUploadResult initiateMultipartUpload(
             InitiateMultipartUploadRequest request) throws CosClientException, CosServiceException;
-    
+
     /**
-     * Uploads a part in a multipart upload. You must initiate a multipart
-     * upload before you can upload any part.
+     * Uploads a part in a multipart upload. You must initiate a multipart upload before you can
+     * upload any part.
      * <p>
-     * Your UploadPart request must include an upload ID and a part number. The
-     * upload ID is the ID returned by Qcloud COS in response to your Initiate
-     * Multipart Upload request. Part number can be any number between 1 and
-     * 10,000, inclusive. A part number uniquely identifies a part and also
-     * defines its position within the object being uploaded. If you upload a
-     * new part using the same part number that was specified in uploading a
-     * previous part, the previously uploaded part is overwritten.
+     * Your UploadPart request must include an upload ID and a part number. The upload ID is the ID
+     * returned by Qcloud COS in response to your Initiate Multipart Upload request. Part number can
+     * be any number between 1 and 10,000, inclusive. A part number uniquely identifies a part and
+     * also defines its position within the object being uploaded. If you upload a new part using
+     * the same part number that was specified in uploading a previous part, the previously uploaded
+     * part is overwritten.
      * <p>
-     * To ensure data is not corrupted traversing the network, specify the
-     * Content-MD5 header in the Upload Part request. Qcloud COS checks the part
-     * data against the provided MD5 value. If they do not match, Qcloud COS
-     * returns an error.
+     * To ensure data is not corrupted traversing the network, specify the Content-MD5 header in the
+     * Upload Part request. Qcloud COS checks the part data against the provided MD5 value. If they
+     * do not match, Qcloud COS returns an error.
      * <p>
-     * When you upload a part, the returned UploadPartResult contains an ETag
-     * property. You should record this ETag property value and the part number.
-     * After uploading all parts, you must send a CompleteMultipartUpload
-     * request. At that time Qcloud COS constructs a complete object by
-     * concatenating all the parts you uploaded, in ascending order based on the
-     * part numbers. The CompleteMultipartUpload request requires you to send
-     * all the part numbers and the corresponding ETag values.
+     * When you upload a part, the returned UploadPartResult contains an ETag property. You should
+     * record this ETag property value and the part number. After uploading all parts, you must send
+     * a CompleteMultipartUpload request. At that time Qcloud COS constructs a complete object by
+     * concatenating all the parts you uploaded, in ascending order based on the part numbers. The
+     * CompleteMultipartUpload request requires you to send all the part numbers and the
+     * corresponding ETag values.
      * <p>
-     * <b>Note:</b>
-     * After you initiate a multipart upload and upload one or more parts,
-     * you must either complete or abort the multipart upload in order to stop
-     * getting charged for storage of the uploaded parts.
-     * Once you complete or abort the multipart upload Qcloud COS will release the
-     * stored parts and stop charging you for their storage.
+     * <b>Note:</b> After you initiate a multipart upload and upload one or more parts, you must
+     * either complete or abort the multipart upload in order to stop getting charged for storage of
+     * the uploaded parts. Once you complete or abort the multipart upload Qcloud COS will release
+     * the stored parts and stop charging you for their storage.
      * </p>
-     * @param request
-     *            The UploadPartRequest object that specifies all the parameters
-     *            of this operation.
+     * 
+     * @param request The UploadPartRequest object that specifies all the parameters of this
+     *        operation.
      *
-     * @return An UploadPartResult from Qcloud COS containing the part number and
-     *         ETag of the new part.
+     * @return An UploadPartResult from Qcloud COS containing the part number and ETag of the new
+     *         part.
      *
-     * @throws CosClientException
-     *             If any errors are encountered in the client while making the
-     *             request or handling the response.
-     * @throws CosServiceException
-     *             If any errors occurred in Qcloud COS while processing the
-     *             request.
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * @throws CosServiceException If any errors occurred in Qcloud COS while processing the
+     *         request.
      */
-    public UploadPartResult uploadPart(UploadPartRequest uploadPartRequest) throws CosClientException, CosServiceException;
-    
+    public UploadPartResult uploadPart(UploadPartRequest uploadPartRequest)
+            throws CosClientException, CosServiceException;
+
     /**
      * Lists the parts that have been uploaded for a specific multipart upload.
      * <p>
      * This method must include the upload ID, returned by the
-     * {@link #initiateMultipartUpload(InitiateMultipartUploadRequest)}
-     * operation. This request returns a maximum of 1000 uploaded parts by
-     * default. You can restrict the number of parts returned by specifying the
-     * MaxParts property on the ListPartsRequest. If your multipart upload
-     * consists of more parts than allowed in the ListParts response, the
-     * response returns a IsTruncated field with value true, and a
-     * NextPartNumberMarker property. In subsequent ListParts request you can
-     * include the PartNumberMarker property and set its value to the
+     * {@link #initiateMultipartUpload(InitiateMultipartUploadRequest)} operation. This request
+     * returns a maximum of 1000 uploaded parts by default. You can restrict the number of parts
+     * returned by specifying the MaxParts property on the ListPartsRequest. If your multipart
+     * upload consists of more parts than allowed in the ListParts response, the response returns a
+     * IsTruncated field with value true, and a NextPartNumberMarker property. In subsequent
+     * ListParts request you can include the PartNumberMarker property and set its value to the
      * NextPartNumberMarker property value from the previous response.
      *
-     * @param request
-     *            The ListPartsRequest object that specifies all the parameters
-     *            of this operation.
+     * @param request The ListPartsRequest object that specifies all the parameters of this
+     *        operation.
      *
      * @return Returns a PartListing from Qcloud COS.
      *
-     * @throws CosClientException
-     *             If any errors are encountered in the client while making the
-     *             request or handling the response.
-     * @throws CosServiceException
-     *             If any errors occurred in Qcloud COS while processing the
-     *             request.
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * @throws CosServiceException If any errors occurred in Qcloud COS while processing the
+     *         request.
      */
     public PartListing listParts(ListPartsRequest request)
             throws CosClientException, CosServiceException;
 
     /**
-     * Aborts a multipart upload. After a multipart upload is aborted, no
-     * additional parts can be uploaded using that upload ID. The storage
-     * consumed by any previously uploaded parts will be freed. 
+     * Aborts a multipart upload. After a multipart upload is aborted, no additional parts can be
+     * uploaded using that upload ID. The storage consumed by any previously uploaded parts will be
+     * freed.
      *
-     * @param request
-     *            The AbortMultipartUploadRequest object that specifies all the
-     *            parameters of this operation.
+     * @param request The AbortMultipartUploadRequest object that specifies all the parameters of
+     *        this operation.
      *
-     * @throws CosClientException
-     *             If any errors are encountered in the client while making the
-     *             request or handling the response.
-     * @throws CosServiceException
-     *             If any errors occurred in Qcloud COS while processing the
-     *             request.
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * @throws CosServiceException If any errors occurred in Qcloud COS while processing the
+     *         request.
      */
     public void abortMultipartUpload(AbortMultipartUploadRequest request)
             throws CosClientException, CosServiceException;
@@ -592,166 +582,136 @@ public interface COS {
     /**
      * Completes a multipart upload by assembling previously uploaded parts.
      * <p>
-     * You first upload all parts using the
-     * {@link #uploadPart(UploadPartRequest)} method. After successfully
-     * uploading all individual parts of an upload, you call this operation to
-     * complete the upload. Upon receiving this request, Qcloud COS concatenates
-     * all the parts in ascending order by part number to create a new object.
-     * In the CompleteMultipartUpload request, you must provide the parts list.
-     * For each part in the list, you provide the part number and the ETag
+     * You first upload all parts using the {@link #uploadPart(UploadPartRequest)} method. After
+     * successfully uploading all individual parts of an upload, you call this operation to complete
+     * the upload. Upon receiving this request, Qcloud COS concatenates all the parts in ascending
+     * order by part number to create a new object. In the CompleteMultipartUpload request, you must
+     * provide the parts list. For each part in the list, you provide the part number and the ETag
      * header value, returned after that part was uploaded.
      * <p>
-     * Processing of a CompleteMultipartUpload request may take several minutes
-     * to complete.
+     * Processing of a CompleteMultipartUpload request may take several minutes to complete.
      * </p>
      *
-     * @param request
-     *            The CompleteMultipartUploadRequest object that specifies all
-     *            the parameters of this operation.
+     * @param request The CompleteMultipartUploadRequest object that specifies all the parameters of
+     *        this operation.
      *
-     * @return A CompleteMultipartUploadResult from COS containing the ETag for
-     *         the new object composed of the individual parts.
+     * @return A CompleteMultipartUploadResult from COS containing the ETag for the new object
+     *         composed of the individual parts.
      *
-     * @throws CosClientException
-     *             If any errors are encountered in the client while making the
-     *             request or handling the response.
-     * @throws CosServiceException
-     *             If any errors occurred in Qcloud COS while processing the
-     *             request.
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * @throws CosServiceException If any errors occurred in Qcloud COS while processing the
+     *         request.
      */
-    public CompleteMultipartUploadResult completeMultipartUpload(CompleteMultipartUploadRequest request)
-            throws CosClientException, CosServiceException;
+    public CompleteMultipartUploadResult completeMultipartUpload(
+            CompleteMultipartUploadRequest request) throws CosClientException, CosServiceException;
 
     /**
-     * Lists in-progress multipart uploads. An in-progress multipart upload is a
-     * multipart upload that has been initiated, using the
-     * InitiateMultipartUpload request, but has not yet been completed or
-     * aborted.
+     * Lists in-progress multipart uploads. An in-progress multipart upload is a multipart upload
+     * that has been initiated, using the InitiateMultipartUpload request, but has not yet been
+     * completed or aborted.
      * <p>
-     * This operation returns at most 1,000 multipart uploads in the response by
-     * default. The number of multipart uploads can be further limited using the
-     * MaxUploads property on the request parameter. If there are additional
-     * multipart uploads that satisfy the list criteria, the response will
-     * contain an IsTruncated property with the value set to true. To list the
-     * additional multipart uploads use the KeyMarker and UploadIdMarker
-     * properties on the request parameters.
+     * This operation returns at most 1,000 multipart uploads in the response by default. The number
+     * of multipart uploads can be further limited using the MaxUploads property on the request
+     * parameter. If there are additional multipart uploads that satisfy the list criteria, the
+     * response will contain an IsTruncated property with the value set to true. To list the
+     * additional multipart uploads use the KeyMarker and UploadIdMarker properties on the request
+     * parameters.
      *
-     * @param request
-     *            The ListMultipartUploadsRequest object that specifies all the
-     *            parameters of this operation.
+     * @param request The ListMultipartUploadsRequest object that specifies all the parameters of
+     *        this operation.
      *
      * @return A MultipartUploadListing from Qcloud COS.
      *
-     * @throws CosClientException
-     *             If any errors are encountered in the client while making the
-     *             request or handling the response.
-     * @throws CosServiceException
-     *             If any errors occurred in Qcloud COS while processing the
-     *             request.
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * @throws CosServiceException If any errors occurred in Qcloud COS while processing the
+     *         request.
      */
     public MultipartUploadListing listMultipartUploads(ListMultipartUploadsRequest request)
             throws CosClientException, CosServiceException;
-    
+
     /**
      * <p>
-     * Returns a list of summary information about the objects in the specified
-     * buckets.
-     * List results are <i>always</i> returned in lexicographic (alphabetical) order.
+     * Returns a list of summary information about the objects in the specified buckets. List
+     * results are <i>always</i> returned in lexicographic (alphabetical) order.
      * </p>
      * <p>
-     * Because buckets can contain a virtually unlimited number of keys, the
-     * complete results of a list query can be extremely large. To manage large
-     * result sets, Qcloud COS uses pagination to split them into multiple
-     * responses. Always check the
-     * {@link ObjectListing#isTruncated()} method to see if the returned
-     * listing is complete or if additional calls are needed to get
-     * more results. Alternatively, use the
-     * {@link COS#listNextBatchOfObjects(ObjectListing)} method as
-     * an easy way to get the next page of object listings.
+     * Because buckets can contain a virtually unlimited number of keys, the complete results of a
+     * list query can be extremely large. To manage large result sets, Qcloud COS uses pagination to
+     * split them into multiple responses. Always check the {@link ObjectListing#isTruncated()}
+     * method to see if the returned listing is complete or if additional calls are needed to get
+     * more results. Alternatively, use the {@link COS#listNextBatchOfObjects(ObjectListing)} method
+     * as an easy way to get the next page of object listings.
      * </p>
      * <p>
-     * The total number of keys in a bucket doesn't substantially
-     * affect list performance.
+     * The total number of keys in a bucket doesn't substantially affect list performance.
      * </p>
      *
-     * @param bucketName
-     *            The name of the Qcloud COS bucket to list.
+     * @param bucketName The name of the Qcloud COS bucket to list.
      *
-     * @return A listing of the objects in the specified bucket, along with any
-     *         other associated information, such as common prefixes (if a
-     *         delimiter was specified), the original request parameters, etc.
+     * @return A listing of the objects in the specified bucket, along with any other associated
+     *         information, such as common prefixes (if a delimiter was specified), the original
+     *         request parameters, etc.
      *
-     * @throws CosClientException
-     *             If any errors are encountered in the client while making the
-     *             request or handling the response.
-     * @throws CosServiceException
-     *             If any errors occurred in Qcloud COS while processing the
-     *             request.
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * @throws CosServiceException If any errors occurred in Qcloud COS while processing the
+     *         request.
      *
      * @see COS#listObjects(String, String)
      * @see COS#listObjects(ListObjectsRequest)
      */
-    public ObjectListing listObjects(String bucketName) throws CosClientException,
-            CosServiceException;
+    public ObjectListing listObjects(String bucketName)
+            throws CosClientException, CosServiceException;
 
     /**
      * <p>
-     * Returns a list of summary information about the objects in the specified
-     * bucket. Depending on request parameters, additional information is returned,
-     * such as common prefixes if a delimiter was specified.  List
-     * results are <i>always</i> returned in lexicographic (alphabetical) order.
+     * Returns a list of summary information about the objects in the specified bucket. Depending on
+     * request parameters, additional information is returned, such as common prefixes if a
+     * delimiter was specified. List results are <i>always</i> returned in lexicographic
+     * (alphabetical) order.
      * </p>
      * <p>
-     * Because buckets can contain a virtually unlimited number of keys, the
-     * complete results of a list query can be extremely large. To manage large
-     * result sets, Qcloud COS uses pagination to split them into multiple
-     * responses. Always check the
-     * {@link ObjectListing#isTruncated()} method to see if the returned
-     * listing is complete or if additional calls are needed to get
-     * more results. Alternatively, use the
-     * {@link COS#listNextBatchOfObjects(ObjectListing)} method as
-     * an easy way to get the next page of object listings.
+     * Because buckets can contain a virtually unlimited number of keys, the complete results of a
+     * list query can be extremely large. To manage large result sets, Qcloud COS uses pagination to
+     * split them into multiple responses. Always check the {@link ObjectListing#isTruncated()}
+     * method to see if the returned listing is complete or if additional calls are needed to get
+     * more results. Alternatively, use the {@link COS#listNextBatchOfObjects(ObjectListing)} method
+     * as an easy way to get the next page of object listings.
      * </p>
      * <p>
      * For example, consider a bucket that contains the following keys:
      * <ul>
-     *  <li>"foo/bar/baz"</li>
-     *  <li>"foo/bar/bash"</li>
-     *  <li>"foo/bar/bang"</li>
-     *  <li>"foo/boo"</li>
+     * <li>"foo/bar/baz"</li>
+     * <li>"foo/bar/bash"</li>
+     * <li>"foo/bar/bang"</li>
+     * <li>"foo/boo"</li>
      * </ul>
-     * If calling <code>listObjects</code> with
-     * a <code>prefix</code> value of "foo/" and a <code>delimiter</code> value of "/"
-     * on this bucket, an <code>ObjectListing</code> is returned that contains one key
-     * ("foo/boo") and one entry in the common prefixes list ("foo/bar/").
-     * To see deeper into the virtual hierarchy, make another
-     * call to <code>listObjects</code> setting the prefix parameter to any interesting
-     * common prefix to list the individual keys under that prefix.
+     * If calling <code>listObjects</code> with a <code>prefix</code> value of "foo/" and a
+     * <code>delimiter</code> value of "/" on this bucket, an <code>ObjectListing</code> is returned
+     * that contains one key ("foo/boo") and one entry in the common prefixes list ("foo/bar/"). To
+     * see deeper into the virtual hierarchy, make another call to <code>listObjects</code> setting
+     * the prefix parameter to any interesting common prefix to list the individual keys under that
+     * prefix.
      * </p>
      * <p>
-     * The total number of keys in a bucket doesn't substantially
-     * affect list performance.
+     * The total number of keys in a bucket doesn't substantially affect list performance.
      * </p>
      *
-     * @param bucketName
-     *            The name of the Qcloud COS bucket to list.
-     * @param prefix
-     *            An optional parameter restricting the response to keys
-     *            beginning with the specified prefix. Use prefixes to
-     *            separate a bucket into different sets of keys,
-     *            similar to how a file system organizes files
-     *            into directories.
+     * @param bucketName The name of the Qcloud COS bucket to list.
+     * @param prefix An optional parameter restricting the response to keys beginning with the
+     *        specified prefix. Use prefixes to separate a bucket into different sets of keys,
+     *        similar to how a file system organizes files into directories.
      *
-     * @return A listing of the objects in the specified bucket, along with any
-     *         other associated information, such as common prefixes (if a
-     *         delimiter was specified), the original request parameters, etc.
+     * @return A listing of the objects in the specified bucket, along with any other associated
+     *         information, such as common prefixes (if a delimiter was specified), the original
+     *         request parameters, etc.
      *
-     * @throws CosClientException
-     *             If any errors are encountered in the client while making the
-     *             request or handling the response.
-     * @throws CosServiceException
-     *             If any errors occurred in Qcloud COS while processing the
-     *             request.
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * @throws CosServiceException If any errors occurred in Qcloud COS while processing the
+     *         request.
      *
      * @see COS#listObjects(String)
      * @see COS#listObjects(ListObjectsRequest)
@@ -761,106 +721,87 @@ public interface COS {
 
     /**
      * <p>
-     * Returns a list of summary information about the objects in the specified
-     * bucket. Depending on the request parameters, additional information is returned,
-     * such as common prefixes if a delimiter was specified. List
-     * results are <i>always</i> returned in lexicographic (alphabetical) order.
+     * Returns a list of summary information about the objects in the specified bucket. Depending on
+     * the request parameters, additional information is returned, such as common prefixes if a
+     * delimiter was specified. List results are <i>always</i> returned in lexicographic
+     * (alphabetical) order.
      * </p>
      * <p>
-     * Because buckets can contain a virtually unlimited number of keys, the
-     * complete results of a list query can be extremely large. To manage large
-     * result sets, Qcloud COS uses pagination to split them into multiple
-     * responses. Always check the
-     * {@link ObjectListing#isTruncated()} method to see if the returned
-     * listing is complete or if additional calls are needed to get
-     * more results. Alternatively, use the
-     * {@link COS#listNextBatchOfObjects(ObjectListing)} method as
-     * an easy way to get the next page of object listings.
+     * Because buckets can contain a virtually unlimited number of keys, the complete results of a
+     * list query can be extremely large. To manage large result sets, Qcloud COS uses pagination to
+     * split them into multiple responses. Always check the {@link ObjectListing#isTruncated()}
+     * method to see if the returned listing is complete or if additional calls are needed to get
+     * more results. Alternatively, use the {@link COS#listNextBatchOfObjects(ObjectListing)} method
+     * as an easy way to get the next page of object listings.
      * </p>
      * <p>
-     * Calling {@link ListObjectsRequest#setDelimiter(String)}
-     * sets the delimiter, allowing groups of keys that share the
-     * delimiter-terminated prefix to be included
-     * in the returned listing. This allows applications to organize and browse
-     * their keys hierarchically, similar to how a file system organizes files
-     * into directories. These common prefixes can be retrieved
-     * through the {@link ObjectListing#getCommonPrefixes()} method.
+     * Calling {@link ListObjectsRequest#setDelimiter(String)} sets the delimiter, allowing groups
+     * of keys that share the delimiter-terminated prefix to be included in the returned listing.
+     * This allows applications to organize and browse their keys hierarchically, similar to how a
+     * file system organizes files into directories. These common prefixes can be retrieved through
+     * the {@link ObjectListing#getCommonPrefixes()} method.
      * </p>
      * <p>
      * For example, consider a bucket that contains the following keys:
      * <ul>
-     *  <li>"foo/bar/baz"</li>
-     *  <li>"foo/bar/bash"</li>
-     *  <li>"foo/bar/bang"</li>
-     *  <li>"foo/boo"</li>
+     * <li>"foo/bar/baz"</li>
+     * <li>"foo/bar/bash"</li>
+     * <li>"foo/bar/bang"</li>
+     * <li>"foo/boo"</li>
      * </ul>
-     * If calling <code>listObjects</code> with
-     * a prefix value of "foo/" and a delimiter value of "/"
-     * on this bucket, an <code>ObjectListing</code> is returned that contains one key
-     * ("foo/boo") and one entry in the common prefixes list ("foo/bar/").
-     * To see deeper into the virtual hierarchy, make another
-     * call to <code>listObjects</code> setting the prefix parameter to any interesting
-     * common prefix to list the individual keys under that prefix.
+     * If calling <code>listObjects</code> with a prefix value of "foo/" and a delimiter value of
+     * "/" on this bucket, an <code>ObjectListing</code> is returned that contains one key
+     * ("foo/boo") and one entry in the common prefixes list ("foo/bar/"). To see deeper into the
+     * virtual hierarchy, make another call to <code>listObjects</code> setting the prefix parameter
+     * to any interesting common prefix to list the individual keys under that prefix.
      * </p>
      * <p>
-     * The total number of keys in a bucket doesn't substantially
-     * affect list performance.
+     * The total number of keys in a bucket doesn't substantially affect list performance.
      * </p>
      *
-     * @param listObjectsRequest
-     *            The request object containing all options for listing the
-     *            objects in a specified bucket.
+     * @param listObjectsRequest The request object containing all options for listing the objects
+     *        in a specified bucket.
      *
-     * @return A listing of the objects in the specified bucket, along with any
-     *         other associated information, such as common prefixes (if a
-     *         delimiter was specified), the original request parameters, etc.
+     * @return A listing of the objects in the specified bucket, along with any other associated
+     *         information, such as common prefixes (if a delimiter was specified), the original
+     *         request parameters, etc.
      *
-     * @throws CosClientException
-     *             If any errors are encountered in the client while making the
-     *             request or handling the response.
-     * @throws CosServiceException
-     *             If any errors occurred in Qcloud COS while processing the
-     *             request.
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * @throws CosServiceException If any errors occurred in Qcloud COS while processing the
+     *         request.
      *
      * @see COS#listObjects(String)
      * @see COS#listObjects(String, String)
      */
     public ObjectListing listObjects(ListObjectsRequest listObjectsRequest)
             throws CosClientException, CosServiceException;
-    
+
     /**
      * <p>
-     * Provides an easy way to continue a truncated object listing and retrieve
-     * the next page of results.
+     * Provides an easy way to continue a truncated object listing and retrieve the next page of
+     * results.
      * </p>
      * <p>
-     * To continue the object listing and retrieve the next page of results,
-     * call the initial {@link ObjectListing} from one of the
-     * <code>listObjects</code> methods.
-     * If truncated
-     * (indicated when {@link ObjectListing#isTruncated()} returns <code>true</code>),
-     * pass the <code>ObjectListing</code> back into this method
-     * in order to retrieve the
-     * next page of results. Continue using this method to
-     * retrieve more results until the returned <code>ObjectListing</code> indicates that
-     * it is not truncated.
+     * To continue the object listing and retrieve the next page of results, call the initial
+     * {@link ObjectListing} from one of the <code>listObjects</code> methods. If truncated
+     * (indicated when {@link ObjectListing#isTruncated()} returns <code>true</code>), pass the
+     * <code>ObjectListing</code> back into this method in order to retrieve the next page of
+     * results. Continue using this method to retrieve more results until the returned
+     * <code>ObjectListing</code> indicates that it is not truncated.
      * </p>
-     * @param previousObjectListing
-     *            The previous truncated <code>ObjectListing</code>.
-     *            If a
-     *            non-truncated <code>ObjectListing</code> is passed in, an empty
-     *            <code>ObjectListing</code> is returned without ever contacting
-     *            Qcloud COS.
+     * 
+     * @param previousObjectListing The previous truncated <code>ObjectListing</code>. If a
+     *        non-truncated <code>ObjectListing</code> is passed in, an empty
+     *        <code>ObjectListing</code> is returned without ever contacting Qcloud COS.
      *
-     * @return The next set of <code>ObjectListing</code> results, beginning immediately
-     *         after the last result in the specified previous <code>ObjectListing</code>.
+     * @return The next set of <code>ObjectListing</code> results, beginning immediately after the
+     *         last result in the specified previous <code>ObjectListing</code>.
      *
-     * @throws CosClientException
-     *             If any errors are encountered in the client while making the
-     *             request or handling the response.
-     * @throws CosServiceException
-     *             If any errors occurred in Qcloud COS while processing the
-     *             request.
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * @throws CosServiceException If any errors occurred in Qcloud COS while processing the
+     *         request.
      *
      * @see COS#listObjects(String)
      * @see COS#listObjects(String, String)
@@ -872,37 +813,30 @@ public interface COS {
 
     /**
      * <p>
-     * Provides an easy way to continue a truncated object listing and retrieve
-     * the next page of results.
+     * Provides an easy way to continue a truncated object listing and retrieve the next page of
+     * results.
      * </p>
      * <p>
-     * To continue the object listing and retrieve the next page of results,
-     * call the initial {@link ObjectListing} from one of the
-     * <code>listObjects</code> methods.
-     * If truncated
-     * (indicated when {@link ObjectListing#isTruncated()} returns <code>true</code>),
-     * pass the <code>ObjectListing</code> back into this method
-     * in order to retrieve the
-     * next page of results. Continue using this method to
-     * retrieve more results until the returned <code>ObjectListing</code> indicates that
-     * it is not truncated.
+     * To continue the object listing and retrieve the next page of results, call the initial
+     * {@link ObjectListing} from one of the <code>listObjects</code> methods. If truncated
+     * (indicated when {@link ObjectListing#isTruncated()} returns <code>true</code>), pass the
+     * <code>ObjectListing</code> back into this method in order to retrieve the next page of
+     * results. Continue using this method to retrieve more results until the returned
+     * <code>ObjectListing</code> indicates that it is not truncated.
      * </p>
-     * @param listNextBatchOfObjectsRequest
-     *            The request object for listing next batch of objects using the previous
-     *            truncated <code>ObjectListing</code>. If a
-     *            non-truncated <code>ObjectListing</code> is passed in by the request object, an empty
-     *            <code>ObjectListing</code> is returned without ever contacting
-     *            Qcloud COS.
+     * 
+     * @param listNextBatchOfObjectsRequest The request object for listing next batch of objects
+     *        using the previous truncated <code>ObjectListing</code>. If a non-truncated
+     *        <code>ObjectListing</code> is passed in by the request object, an empty
+     *        <code>ObjectListing</code> is returned without ever contacting Qcloud COS.
      *
-     * @return The next set of <code>ObjectListing</code> results, beginning immediately
-     *         after the last result in the specified previous <code>ObjectListing</code>.
+     * @return The next set of <code>ObjectListing</code> results, beginning immediately after the
+     *         last result in the specified previous <code>ObjectListing</code>.
      *
-     * @throws CosClientException
-     *             If any errors are encountered in the client while making the
-     *             request or handling the response.
-     * @throws CosServiceException
-     *             If any errors occurred in Qcloud COS while processing the
-     *             request.
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * @throws CosServiceException If any errors occurred in Qcloud COS while processing the
+     *         request.
      *
      * @see COS#listObjects(String)
      * @see COS#listObjects(String, String)
@@ -911,6 +845,10 @@ public interface COS {
      */
     public ObjectListing listNextBatchOfObjects(
             ListNextBatchOfObjectsRequest listNextBatchOfObjectsRequest)
+                    throws CosClientException, CosServiceException;
+
+
+    public CopyObjectResult copyObject(CopyObjectRequest copyObjectRequest)
             throws CosClientException, CosServiceException;
 
 }
