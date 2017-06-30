@@ -248,20 +248,27 @@ public class DefaultCosHttpClient implements CosHttpClient {
     public <X, Y extends CosServiceRequest> X exeute(CosHttpRequest<Y> request,
             HttpResponseHandler<CosServiceResponse<X>> responseHandler)
                     throws CosClientException, CosServiceException {
-        HttpRequestBase httpRequest = buildHttpRequest(request);
         HttpResponse httpResponse = null;
-        try {
-            httpResponse = httpClient.execute(httpRequest);
-        } catch (ClientProtocolException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            httpRequest.abort();
-            httpRequest.releaseConnection();
-            String errMsg = String.format(
-                    "httpClient execute occur a Ioexcepiton. httpRequest: %s, excep: %s",
-                    request.toString(), e);
-            log.error(errMsg);
-            throw new CosClientException(errMsg);
+        HttpRequestBase httpRequest = null;
+        int retryIndex = 0;
+        int kMaxRetryCnt = 5;
+        while (retryIndex < kMaxRetryCnt) {
+            try {
+                httpRequest = buildHttpRequest(request);
+                httpResponse = httpClient.execute(httpRequest);
+                break;
+            } catch (IOException e) {
+                httpRequest.abort();
+                httpRequest.releaseConnection();
+                ++retryIndex;
+                if (retryIndex >= kMaxRetryCnt) {
+                    String errMsg = String.format(
+                            "httpClient execute occur a Ioexcepiton. httpRequest: %s, excep: %s",
+                            request.toString(), e);
+                    log.error(errMsg);
+                    throw new CosClientException(errMsg);
+                }
+            }
         }
         if (!isRequestSuccessful(httpResponse)) {
             try {
