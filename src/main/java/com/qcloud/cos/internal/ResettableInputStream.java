@@ -5,7 +5,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 
-import org.apache.http.annotation.NotThreadSafe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,7 +23,6 @@ import com.qcloud.cos.exception.CosClientException;
  * 
  * @see Releasable
  */
-@NotThreadSafe
 public class ResettableInputStream extends ReleasableInputStream {
     private static final Logger log = LoggerFactory.getLogger(ResettableInputStream.class);
     private final File file; // null if the file is not known

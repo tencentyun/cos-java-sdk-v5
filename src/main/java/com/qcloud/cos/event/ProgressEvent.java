@@ -3,14 +3,12 @@ package com.qcloud.cos.event;
 import java.util.EnumMap;
 import java.util.Map;
 
-import org.apache.http.annotation.Immutable;
 
 /**
  * A progress event. Typically this is used to notify a chunk of bytes has been
  * transferred. Also used to notify other types of progress events such as a
  * transfer starting, or failing.
  */
-@Immutable
 public class ProgressEvent {
     /** The number of bytes associated with the progress event. */
     private final long bytes;

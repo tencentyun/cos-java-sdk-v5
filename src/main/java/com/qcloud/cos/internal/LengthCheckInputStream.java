@@ -3,11 +3,8 @@ package com.qcloud.cos.internal;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.http.annotation.NotThreadSafe;
-
 import com.qcloud.cos.exception.CosClientException;
 
-@NotThreadSafe
 public class LengthCheckInputStream extends SdkFilterInputStream {
     public static final boolean INCLUDE_SKIPPED_BYTES = true;
     public static final boolean EXCLUDE_SKIPPED_BYTES = false;

@@ -7,7 +7,6 @@ import java.nio.channels.FileLock;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.apache.http.annotation.ThreadSafe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +24,6 @@ import com.qcloud.cos.utils.IOUtils;
  * <p>
  * Hence the need for this utility class.
  */
-@ThreadSafe
 public enum FileLocks {
     ;
     // External file lock doesn't seem to work correctly on Windows, 

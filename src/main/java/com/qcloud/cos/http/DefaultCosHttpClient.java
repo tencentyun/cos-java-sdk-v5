@@ -12,7 +12,6 @@ import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpDelete;
@@ -61,6 +60,7 @@ public class DefaultCosHttpClient implements CosHttpClient {
     private void initHttpClient() {
         this.connectionManager.setMaxTotal(this.clientConfig.getMaxConnectionsCount());
         this.connectionManager.setDefaultMaxPerRoute(this.clientConfig.getMaxConnectionsCount());
+        this.connectionManager.setValidateAfterInactivity(1);
         HttpClientBuilder httpClientBuilder =
                 HttpClients.custom().setConnectionManager(connectionManager);
         if (this.clientConfig.getHttpProxyIp() != null
@@ -259,7 +259,6 @@ public class DefaultCosHttpClient implements CosHttpClient {
                 break;
             } catch (IOException e) {
                 httpRequest.abort();
-                httpRequest.releaseConnection();
                 ++retryIndex;
                 if (retryIndex >= kMaxRetryCnt) {
                     String errMsg = String.format(

@@ -2,9 +2,7 @@ package com.qcloud.cos.model;
 
 import java.io.Serializable;
 
-import org.apache.http.annotation.Immutable;
 
-@Immutable
 public class COSObjectId implements Serializable {
     private final String bucket;
     private final String key;

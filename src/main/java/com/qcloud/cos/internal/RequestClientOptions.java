@@ -3,12 +3,10 @@ package com.qcloud.cos.internal;
 import java.io.InputStream;
 import java.util.EnumMap;
 
-import org.apache.http.annotation.NotThreadSafe;
 /**
  * Client request options such as client markers for individual
  * {@link QcloudWebServiceRequest}s.
  */
-@NotThreadSafe
 public final class RequestClientOptions {
     /**
      * Used to enable mark-and-reset for

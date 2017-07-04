@@ -3,8 +3,6 @@ package com.qcloud.cos.internal;
 import java.io.FileInputStream;
 import java.io.InputStream;
 
-import org.apache.http.annotation.NotThreadSafe;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +18,6 @@ import org.slf4j.LoggerFactory;
  * @see Releasable
  * @see ResettableInputStream
  */
-@NotThreadSafe
 public class ReleasableInputStream extends SdkFilterInputStream implements Releasable {
     private static final Logger log = LoggerFactory.getLogger(ReleasableInputStream.class);
     /**
