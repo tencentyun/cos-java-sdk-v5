@@ -139,6 +139,7 @@ public class COSClient implements COS {
             String key, X originalRequest, HttpMethodName httpMethod) {
         CosHttpRequest<X> httpRequest = new CosHttpRequest<X>(originalRequest);
         httpRequest.setHttpMethod(httpMethod);
+        httpRequest.addHeader(Headers.USER_AGENT, clientConfig.getUserAgent());
         buildUrlAndHost(httpRequest, bucketName, key);
         return httpRequest;
     }
@@ -316,6 +317,9 @@ public class COSClient implements COS {
 
         String host = String.format("%s-%s.%s.myqcloud.com", bucket, cred.getCOSAppId(),
                 clientConfig.getRegion().getRegionName());
+        if (this.clientConfig.getEndPoint() != null) {
+            host = this.clientConfig.getEndPoint();
+        }
         request.addHeader(Headers.HOST, host);
         URI endpoint;
         try {
@@ -668,7 +672,7 @@ public class COSClient implements COS {
             throws CosClientException, CosServiceException {
         return getObjectMetadata(new GetObjectMetadataRequest(bucketName, key));
     }
-    
+
     @Override
     public ObjectMetadata getObjectMetadata(GetObjectMetadataRequest getObjectMetadataRequest)
             throws CosClientException, CosServiceException {
@@ -772,12 +776,14 @@ public class COSClient implements COS {
                         initiateMultipartUploadRequest.getKey(), initiateMultipartUploadRequest,
                         HttpMethodName.POST);
         request.addParameter("uploads", null);
-        
+
         if (initiateMultipartUploadRequest.getStorageClass() != null)
-            request.addHeader(Headers.STORAGE_CLASS, initiateMultipartUploadRequest.getStorageClass().toString());
+            request.addHeader(Headers.STORAGE_CLASS,
+                    initiateMultipartUploadRequest.getStorageClass().toString());
 
         if (initiateMultipartUploadRequest.getRedirectLocation() != null) {
-            request.addHeader(Headers.REDIRECT_LOCATION, initiateMultipartUploadRequest.getRedirectLocation());
+            request.addHeader(Headers.REDIRECT_LOCATION,
+                    initiateMultipartUploadRequest.getRedirectLocation());
         }
 
         if (initiateMultipartUploadRequest.getAccessControlList() != null) {

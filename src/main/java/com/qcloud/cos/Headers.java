@@ -20,6 +20,7 @@ public interface Headers {
     public static final String ETAG = "ETag";
     public static final String LAST_MODIFIED = "Last-Modified";
     public static final String SERVER = "Server";
+    public static final String USER_AGENT = "User-Agent";
 
     /*
      * Cos HTTP Headers
