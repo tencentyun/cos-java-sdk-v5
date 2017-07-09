@@ -19,7 +19,7 @@ public class ClientConfig {
     
     private Region region;
     private HttpProtocol httpProtocol = HttpProtocol.http;
-    private String endPoint = null;
+    private String endPointSuffix = null;
     
     // http proxy代理，如果使用http proxy代理，需要设置IP与端口
     private String httpProxyIp = null;
@@ -116,12 +116,12 @@ public class ClientConfig {
         return userAgent;
     }
 
-    public String getEndPoint() {
-        return endPoint;
+    public String getEndPointSuffix() {
+        return endPointSuffix;
     }
 
-    public void setEndPoint(String endPoint) {
-        this.endPoint = endPoint;
+    public void setEndPointSuffix(String endPointSuffix) {
+        this.endPointSuffix = endPointSuffix;
     }
-    
+
 }

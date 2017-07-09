@@ -317,8 +317,13 @@ public class COSClient implements COS {
 
         String host = String.format("%s-%s.%s.myqcloud.com", bucket, cred.getCOSAppId(),
                 clientConfig.getRegion().getRegionName());
-        if (this.clientConfig.getEndPoint() != null) {
-            host = this.clientConfig.getEndPoint();
+        if (this.clientConfig.getEndPointSuffix() != null) {
+            String endPointSuffix = clientConfig.getEndPointSuffix();
+            if (endPointSuffix.startsWith(".")) {
+                host = String.format("%s-%s%s", bucket, cred.getCOSAppId(), endPointSuffix);
+            } else {
+                host = String.format("%s-%s.%s", bucket, cred.getCOSAppId(), endPointSuffix);
+            }
         }
         request.addHeader(Headers.HOST, host);
         URI endpoint;
