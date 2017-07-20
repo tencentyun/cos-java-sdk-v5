@@ -12,23 +12,22 @@ public class Md5Utils {
     public static byte[] computeMD5Hash(InputStream is) throws IOException {
         return DigestUtils.md5(is);
     }
-    
+
     /**
-     * Returns the MD5 in base64 for the data from the given input stream.
-     * Note this method closes the given input stream upon completion.
+     * Returns the MD5 in base64 for the data from the given input stream. Note this method closes
+     * the given input stream upon completion.
      */
     public static String md5AsBase64(InputStream is) throws IOException {
         return Base64.encodeAsString(computeMD5Hash(is));
     }
-    
+
     /**
-     * Computes the MD5 hash of the given data and returns it as an array of
-     * bytes.
+     * Computes the MD5 hash of the given data and returns it as an array of bytes.
      */
     public static byte[] computeMD5Hash(byte[] input) {
         return DigestUtils.md5(input);
     }
-    
+
     /**
      * Returns the MD5 in base64 for the given byte array.
      */
@@ -40,7 +39,18 @@ public class Md5Utils {
      * Computes the MD5 of the given file.
      */
     public static byte[] computeMD5Hash(File file) throws FileNotFoundException, IOException {
-        return computeMD5Hash(new FileInputStream(file));
+        FileInputStream input = null;
+        try {
+            input = new FileInputStream(file);
+            return computeMD5Hash(input);
+        } finally {
+            try {
+                if (input != null) {
+                    input.close();
+                }
+            } catch (Exception e) {
+            }
+        }
     }
 
     /**

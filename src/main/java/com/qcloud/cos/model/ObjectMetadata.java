@@ -22,7 +22,7 @@ public class ObjectMetadata implements ObjectExpirationResult, Cloneable {
      */
 
     /**
-     * Custom user metadata, represented in responses with the x-amz-meta- header prefix
+     * Custom user metadata, represented in responses with the x-cos-meta- header prefix
      */
     private Map<String, String> userMetadata;
 
@@ -56,10 +56,10 @@ public class ObjectMetadata implements ObjectExpirationResult, Cloneable {
      * </p>
      * <p>
      * Qcloud COS can store additional metadata on objects by internally representing it as HTTP
-     * headers prefixed with "x-amz-meta-". Use user-metadata to store arbitrary metadata alongside
+     * headers prefixed with "x-cos-meta-". Use user-metadata to store arbitrary metadata alongside
      * their data in Qcloud COS. When setting user metadata, callers <i>should not</i> include the
-     * internal "x-amz-meta-" prefix; this library will handle that for them. Likewise, when callers
-     * retrieve custom user-metadata, they will not see the "x-amz-meta-" header prefix.
+     * internal "x-cos-meta-" prefix; this library will handle that for them. Likewise, when callers
+     * retrieve custom user-metadata, they will not see the "x-cos-meta-" header prefix.
      * </p>
      * <p>
      * User-metadata keys are <b>case insensitive</b> and will be returned as lowercase strings,
@@ -86,10 +86,10 @@ public class ObjectMetadata implements ObjectExpirationResult, Cloneable {
      * </p>
      * <p>
      * Qcloud COS can store additional metadata on objects by internally representing it as HTTP
-     * headers prefixed with "x-amz-meta-". Use user-metadata to store arbitrary metadata alongside
+     * headers prefixed with "x-cos-meta-". Use user-metadata to store arbitrary metadata alongside
      * their data in Qcloud COS. When setting user metadata, callers <i>should not</i> include the
-     * internal "x-amz-meta-" prefix; this library will handle that for them. Likewise, when callers
-     * retrieve custom user-metadata, they will not see the "x-amz-meta-" header prefix.
+     * internal "x-cos-meta-" prefix; this library will handle that for them. Likewise, when callers
+     * retrieve custom user-metadata, they will not see the "x-cos-meta-" header prefix.
      * </p>
      * <p>
      * User-metadata keys are <b>case insensitive</b> and will be returned as lowercase strings,

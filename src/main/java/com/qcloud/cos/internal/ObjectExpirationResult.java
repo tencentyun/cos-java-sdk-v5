@@ -4,7 +4,7 @@ import java.util.Date;
 
 
 /**
- * Interface for service responses that receive the x-amz-expiration header.
+ * Interface for service responses that receive the x-cos-expiration header.
  *
  * @see Headers#EXPIRATION
  */

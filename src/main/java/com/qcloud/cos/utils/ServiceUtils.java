@@ -87,7 +87,7 @@ public class ServiceUtils {
             try {
                 final ObjectMetadata metadata = cosObject.getObjectMetadata();
                 if (!skipMd5CheckStrategy.skipClientSideValidationPerGetResponse(metadata)) {
-                    clientSideHash = Md5Utils.computeMD5Hash(new FileInputStream(dstfile));
+                    clientSideHash = Md5Utils.computeMD5Hash(dstfile);
                     serverSideHash = BinaryUtils.fromHex(metadata.getETag());
                 }
             } catch (Exception e) {
