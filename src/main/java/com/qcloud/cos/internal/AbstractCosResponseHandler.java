@@ -92,8 +92,7 @@ public abstract class AbstractCosResponseHandler<T>
                     log.warn("Unable to parse content length: " + header.getValue(), nfe);
                 }
             } else if (key.equals(Headers.ETAG)) {
-//                metadata.setHeader(key, StringUtils.removeQuotes(header.getValue()));
-                metadata.setHeader(key, header.getValue());
+                metadata.setHeader(key, StringUtils.removeQuotes(header.getValue()));
             } else if (key.equals(Headers.EXPIRES)) {
                 try {
                     metadata.setHttpExpiresDate(DateUtils.parseRFC822Date(header.getValue()));

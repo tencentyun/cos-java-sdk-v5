@@ -96,12 +96,10 @@ public class SkipMd5CheckStrategy {
      * @return True if client side validation should be skipped, false otherwise.
      */
     /*
-    public boolean skipClientSideValidation(GetObjectRequest request,
-            ObjectMetadata returnedMetadata) {
-        return skipClientSideValidationPerRequest(request)
-                || skipClientSideValidationPerGetResponse(returnedMetadata);
-    }
-    */
+     * public boolean skipClientSideValidation(GetObjectRequest request, ObjectMetadata
+     * returnedMetadata) { return skipClientSideValidationPerRequest(request) ||
+     * skipClientSideValidationPerGetResponse(returnedMetadata); }
+     */
 
     /**
      * Determines whether the client should use the {@link Headers#ETAG} header returned by COS to
@@ -118,7 +116,8 @@ public class SkipMd5CheckStrategy {
         if (isPutObjectMd5ValidationDisabledByProperty()) {
             return true;
         }
-        return putRequestInvolvesSse(request) || metadataInvolvesSse(request.getMetadata());
+        return false;
+        // return putRequestInvolvesSse(request) || metadataInvolvesSse(request.getMetadata());
     }
 
     /**
@@ -137,7 +136,7 @@ public class SkipMd5CheckStrategy {
             return true;
         }
         return false;
-//        return request.getSSECustomerKey() != null;
+        // return request.getSSECustomerKey() != null;
     }
 
     /**
@@ -168,13 +167,9 @@ public class SkipMd5CheckStrategy {
      * </p>
      */
     /*
-    public boolean skipServerSideValidation(UploadPartRequest request) {
-        if (isPutObjectMd5ValidationDisabledByProperty()) {
-            return true;
-        }
-        return false;
-    }
-    */
+     * public boolean skipServerSideValidation(UploadPartRequest request) { if
+     * (isPutObjectMd5ValidationDisabledByProperty()) { return true; } return false; }
+     */
 
     /**
      * Based on the given {@link GetObjectRequest}, returns whether the specified request should
@@ -207,7 +202,8 @@ public class SkipMd5CheckStrategy {
         if (metadata.getETag() == null || isMultipartUploadETag(metadata.getETag())) {
             return true;
         }
-        return metadataInvolvesSse(metadata);
+        return false;
+        // return metadataInvolvesSse(metadata);
     }
 
     private boolean isGetObjectMd5ValidationDisabledByProperty() {
