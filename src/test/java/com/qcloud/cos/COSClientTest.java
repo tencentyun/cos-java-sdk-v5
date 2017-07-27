@@ -67,11 +67,11 @@ public class COSClientTest {
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
-        appid = System.getProperty("appid");
-        secretId = System.getProperty("secretId");
-        secretKey = System.getProperty("secretKey");
-        region = System.getProperty("region");
-        bucket = System.getProperty("bucket");
+        appid = System.getenv("appid");
+        secretId = System.getenv("secretId");
+        secretKey = System.getenv("secretKey");
+        region = System.getenv("region");
+        bucket = System.getenv("bucket");
 
         File propFile = new File("src/test/resources/ut_account.prop");
         if (propFile.exists() && propFile.canRead()) {
@@ -98,7 +98,7 @@ public class COSClientTest {
         if (appid == null || secretId == null || secretKey == null || bucket == null
                 || region == null) {
             throw new Exception("UT account info missing");
-        }
+                }
         COSCredentials cred = new BasicCOSCredentials(appid, secretId, secretKey);
         ClientConfig clientConfig = new ClientConfig(new Region(region));
         cosclient = new COSClient(cred, clientConfig);
