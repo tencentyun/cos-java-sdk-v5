@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.qcloud</groupId>
 	<artifactId>cos_api</artifactId>
-	<version>5.1.7</version>
+	<version>5.1.8</version>
 	<packaging>jar</packaging>
 	<name>cos-java-sdk</name>
 	<description>qcloud cos sdk for tencentyun</description>
