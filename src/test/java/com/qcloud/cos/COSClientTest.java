@@ -14,12 +14,15 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
+import org.junit.Test;
 import org.junit.Test;
 
 import com.qcloud.cos.auth.BasicCOSCredentials;
 import com.qcloud.cos.auth.COSCredentials;
 import com.qcloud.cos.exception.CosServiceException;
+import com.qcloud.cos.model.DeleteObjectRequest;
+import com.qcloud.cos.model.GetObjectRequest;
+import com.qcloud.cos.model.ObjectMetadata;
 import com.qcloud.cos.model.PutObjectRequest;
 import com.qcloud.cos.model.PutObjectResult;
 import com.qcloud.cos.region.Region;
@@ -98,7 +101,7 @@ public class COSClientTest {
         if (appid == null || secretId == null || secretKey == null || bucket == null
                 || region == null) {
             throw new Exception("UT account info missing");
-                }
+        }
         COSCredentials cred = new BasicCOSCredentials(appid, secretId, secretKey);
         ClientConfig clientConfig = new ClientConfig(new Region(region));
         cosclient = new COSClient(cred, clientConfig);
@@ -117,11 +120,10 @@ public class COSClientTest {
     @After
     public void tearDown() throws Exception {}
 
-    private void putObjectFromLocalFile(File localFile) {
+    private void putObjectFromLocalFile(File localFile, String key) {
         assertNotNull(cosclient);
         assertNotNull(bucket);
 
-        String key = "/ut/" + localFile.getName();
         PutObjectRequest putObjectRequest = new PutObjectRequest(bucket, key, localFile);
         PutObjectResult putObjectResult = cosclient.putObject(putObjectRequest);
         String etag = putObjectResult.getETag();
@@ -135,59 +137,187 @@ public class COSClientTest {
 
     }
 
-    @Test
-    public void testPutObjectEmptyFile() throws CosServiceException, IOException {
+    private void putObjectFromLocalFileByInputStream(File localFile, long uploadSize,
+            String uploadEtag, String key) {
+        assertNotNull(cosclient);
+        assertNotNull(bucket);
+
+        FileInputStream input = null;
+        try {
+            input = new FileInputStream(localFile);
+            ObjectMetadata objectMetadata = new ObjectMetadata();
+            objectMetadata.setContentLength(uploadSize);
+            PutObjectRequest putObjectRequest =
+                    new PutObjectRequest(bucket, key, input, objectMetadata);
+            PutObjectResult putObjectResult = cosclient.putObject(putObjectRequest);
+            String etag = putObjectResult.getETag();
+            assertEquals(uploadEtag, etag);
+        } catch (IOException e) {
+            fail(e.toString());
+        } finally {
+            if (input != null) {
+                try {
+                    input.close();
+                } catch (IOException e) {
+                }
+            }
+        }
+
+    }
+
+    private void getObject(String key, File localDownFile) {
+        GetObjectRequest getObjectRequest = new GetObjectRequest(bucket, key);
+        try {
+            cosclient.getObject(getObjectRequest, localDownFile);
+        } catch (Exception e) {
+            fail(e.toString());
+        }
+    }
+
+
+
+    private void clearObject(String key) {
+        assertNotNull(cosclient);
+        assertNotNull(bucket);
+
+
+        DeleteObjectRequest deleteObjectRequest = new DeleteObjectRequest(bucket, key);
+        cosclient.deleteObject(deleteObjectRequest);
+
+        try {
+            cosclient.getobjectMetadata(bucket, key);
+            fail("delete key fail. key: " + key);
+        } catch (CosServiceException e) {
+            assertEquals(404, e.getStatusCode());
+        }
+    }
+
+    private void testPutGetDelObjectDiffSize(long fileSize)
+            throws CosServiceException, IOException {
         File localFile = buildTestFile(0L);
-        putObjectFromLocalFile(localFile);
-        // 确保删除成功, 检测文件在putobject里面被打开未关闭
+        File downLoadFile = new File(localFile.getAbsolutePath() + ".down");
+        String key = "/ut/" + localFile.getName();
+        // put object
+        putObjectFromLocalFile(localFile, key);
+        // get object
+        getObject(key, downLoadFile);
+        // check file
+        assertEquals(Md5Utils.md5Hex(localFile), Md5Utils.md5Hex(downLoadFile));;
+        // delete file on cos
+        clearObject(key);
+        // delete local file
         assertTrue(localFile.delete());
+        assertTrue(downLoadFile.delete());
+    }
+
+
+    @Test
+    public void testPutGetDelObjectEmpty() throws CosServiceException, IOException {
+        testPutGetDelObjectDiffSize(0L);
     }
 
     @Test
-    public void testPutObject256k() throws CosServiceException, IOException {
-        File localFile = buildTestFile(256 * 1024L);
-        putObjectFromLocalFile(localFile);
-        // 确保删除成功, 检测文件在putobject里面被打开未关闭
-        assertTrue(localFile.delete());
+    public void testPutGetDelObject256k() throws CosServiceException, IOException {
+        testPutGetDelObjectDiffSize(256 * 1024L);
     }
 
     @Test
-    public void testPutObject1M() throws CosServiceException, IOException {
-        File localFile = buildTestFile(1 * 1024 * 1024L);
-        putObjectFromLocalFile(localFile);
-        // 确保删除成功, 检测文件在putobject里面被打开未关闭
-        assertTrue(localFile.delete());
+    public void testPutGetDelObject1M() throws CosServiceException, IOException {
+        testPutGetDelObjectDiffSize(1024 * 1024L);
     }
 
     @Test
-    public void testPutObject4M() throws CosServiceException, IOException {
-        File localFile = buildTestFile(4 * 1024 * 1024L);
-        putObjectFromLocalFile(localFile);
-        // 确保删除成功, 检测文件在putobject里面被打开未关闭
-        assertTrue(localFile.delete());
+    public void testPutGetDelObject4M() throws CosServiceException, IOException {
+        testPutGetDelObjectDiffSize(4 * 1024 * 1024L);
     }
 
     @Test
-    public void testPutObject32M() throws CosServiceException, IOException {
-        File localFile = buildTestFile(32 * 1024 * 1024L);
-        putObjectFromLocalFile(localFile);
-        // 确保删除成功, 检测文件在putobject里面被打开未关闭
-        assertTrue(localFile.delete());
+    public void testPutGetDelObject32M() throws CosServiceException, IOException {
+        testPutGetDelObjectDiffSize(32 * 1024 * 1024L);
     }
 
     @Test
-    public void testPutObject100M() throws CosServiceException, IOException {
-        File localFile = buildTestFile(100 * 1024 * 1024L);
-        putObjectFromLocalFile(localFile);
-        // 确保删除成功, 检测文件在putobject里面被打开未关闭
-        assertTrue(localFile.delete());
+    public void testPutGetDelObject100M() throws CosServiceException, IOException {
+        testPutGetDelObjectDiffSize(100 * 1024 * 1024L);
     }
 
     @Test
-    public void testPutObject1G() throws CosServiceException, IOException {
-        File localFile = buildTestFile(1024 * 1024 * 1024L);
-        putObjectFromLocalFile(localFile);
-        // 确保删除成功, 检测文件在putobject里面被打开未关闭
-        assertTrue(localFile.delete());
+    public void testPutGetDelObject1G() throws CosServiceException, IOException {
+        testPutGetDelObjectDiffSize(1024 * 1024 * 1024L);
     }
+
+    // 通过流式上传
+    public void testPutObjectByStreamDiffSize(long size) throws IOException {
+        File localFile = buildTestFile(size);
+        File downLoadFile = new File(localFile.getAbsolutePath() + ".down");
+        String key = "/ut/" + localFile.getName();
+        // put object
+        putObjectFromLocalFileByInputStream(localFile, localFile.length(),
+                Md5Utils.md5Hex(localFile), key);
+        // get object
+        getObject(key, downLoadFile);
+        // check file
+        assertEquals(Md5Utils.md5Hex(localFile), Md5Utils.md5Hex(downLoadFile));
+        // delete file on cos
+        clearObject(key);
+        // delete local file
+        assertTrue(localFile.delete());
+        assertTrue(downLoadFile.delete());
+    }
+
+    @Test
+    public void testPutObjectByStreamEmpty() throws IOException {
+        testPutObjectByStreamDiffSize(0L);
+    }
+
+    @Test
+    public void testPutObjectByStream256K() throws IOException {
+        testPutObjectByStreamDiffSize(256 * 1024L);
+    }
+
+    @Test
+    public void testPutObjectByStream1M() throws IOException {
+        testPutObjectByStreamDiffSize(1024 * 1024L);
+    }
+
+    @Test
+    public void testPutObjectByStream4M() throws IOException {
+        testPutObjectByStreamDiffSize(4 * 1024 * 1024L);
+    }
+
+    @Test
+    public void testPutObjectByStream32M() throws IOException {
+        testPutObjectByStreamDiffSize(32 * 1024 * 1024L);
+    }
+
+    @Test
+    public void testPutObjectByStream100M() throws IOException {
+        testPutObjectByStreamDiffSize(100 * 1024 * 1024L);
+    }
+
+    @Test
+    public void testPutObjectByStream1G() throws IOException {
+        testPutObjectByStreamDiffSize(1024 * 1024 * 1024L);
+    }
+
+    // 测试要上传的文件长度与指定的长度不一致
+    @Test
+    public void testPutObjectByTruncateSize_0() throws IOException {
+        File localFile = buildTestFile(1024 * 1024L);
+        File downLoadFile = new File(localFile.getAbsolutePath() + ".down");
+        String key = "/ut/" + localFile.getName();
+        String uploadEtag = "d41d8cd98f00b204e9800998ecf8427e";
+        // put object
+        putObjectFromLocalFileByInputStream(localFile, 0, uploadEtag, key);
+        // get object
+        getObject(key, downLoadFile);
+        // check file
+        assertEquals(uploadEtag, Md5Utils.md5Hex(downLoadFile));;
+        // delete file on cos
+        clearObject(key);
+        // delete local file
+        assertTrue(localFile.delete());
+        assertTrue(downLoadFile.delete());
+    }
+
 }
