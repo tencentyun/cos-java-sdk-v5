@@ -5,4 +5,4 @@ jdk:
   
 install: mvn install -DskipTests=true -Dmaven.javadoc.skip=true -Dgpg.skip=true
 
-script: mvn test
+script: travis_wait 30 mvn test
