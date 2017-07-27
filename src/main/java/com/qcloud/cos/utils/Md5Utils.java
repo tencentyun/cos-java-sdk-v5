@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
 
 public class Md5Utils {
@@ -33,6 +34,10 @@ public class Md5Utils {
      */
     public static String md5AsBase64(byte[] input) {
         return Base64.encodeAsString(computeMD5Hash(input));
+    }
+    
+    public static String md5Hex(File file) throws FileNotFoundException, IOException {
+        return Hex.encodeHexString(computeMD5Hash(file));
     }
 
     /**
