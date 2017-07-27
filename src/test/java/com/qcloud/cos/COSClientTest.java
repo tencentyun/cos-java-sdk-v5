@@ -159,7 +159,7 @@ public class COSClientTest {
         assertTrue(localFile.delete());
     }
 
-    @Test
+    @Ignore
     public void testPutObject4M() throws CosServiceException, IOException {
         File localFile = buildTestFile(4 * 1024 * 1024L);
         putObjectFromLocalFile(localFile);
@@ -167,7 +167,7 @@ public class COSClientTest {
         assertTrue(localFile.delete());
     }
 
-    @Test
+    @Ignore
     public void testPutObject32M() throws CosServiceException, IOException {
         File localFile = buildTestFile(32 * 1024 * 1024L);
         putObjectFromLocalFile(localFile);
