@@ -39,6 +39,10 @@ public class Md5Utils {
     public static String md5Hex(File file) throws FileNotFoundException, IOException {
         return Hex.encodeHexString(computeMD5Hash(file));
     }
+    
+    public static String md5Hex(byte[] input) throws FileNotFoundException, IOException {
+        return Hex.encodeHexString(computeMD5Hash(input));
+    }
 
     /**
      * Computes the MD5 of the given file.
