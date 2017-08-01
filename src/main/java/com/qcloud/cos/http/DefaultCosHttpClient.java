@@ -1,11 +1,14 @@
 package com.qcloud.cos.http;
 
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.apache.http.Header;
 import org.apache.http.HttpHost;
@@ -21,11 +24,13 @@ import org.apache.http.client.methods.HttpHead;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.protocol.HttpContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,6 +42,9 @@ import com.qcloud.cos.exception.CosServiceException.ErrorType;
 import com.qcloud.cos.internal.CosErrorResponseHandler;
 import com.qcloud.cos.internal.CosServiceRequest;
 import com.qcloud.cos.internal.CosServiceResponse;
+import com.qcloud.cos.internal.ReleasableInputStream;
+import com.qcloud.cos.internal.ResettableInputStream;
+import com.qcloud.cos.internal.SdkBufferedInputStream;
 
 public class DefaultCosHttpClient implements CosHttpClient {
 
@@ -131,7 +139,7 @@ public class DefaultCosHttpClient implements CosHttpClient {
         }
         httpRequestBase.setURI(uri);
 
-        long content_length = 0;
+        long content_length = -1;
         Map<String, String> requestHeaders = request.getHeaders();
         for (Entry<String, String> headerEntry : requestHeaders.entrySet()) {
             String headerKey = headerEntry.getKey();
@@ -161,7 +169,6 @@ public class DefaultCosHttpClient implements CosHttpClient {
         if (request.getContent() != null) {
             InputStreamEntity reqEntity =
                     new InputStreamEntity(request.getContent(), content_length);
-            // reqEntity.setChunked(true);
             if (httpMethodName.equals(HttpMethodName.PUT)
                     || httpMethodName.equals(HttpMethodName.POST)) {
                 HttpEntityEnclosingRequestBase entityRequestBase =
@@ -244,28 +251,69 @@ public class DefaultCosHttpClient implements CosHttpClient {
         return exception;
     }
 
+    private <X extends CosServiceRequest> void bufferAndResetAbleContent(
+            CosHttpRequest<X> request) {
+        final InputStream origContent = request.getContent();
+        if (origContent != null) {
+            final InputStream toBeClosed = buffer(makeResettable(origContent));
+            // make "notCloseable", so reset would work with retries
+            final InputStream notCloseable = (toBeClosed == null) ? null
+                    : ReleasableInputStream.wrap(toBeClosed).disableClose();
+            request.setContent(notCloseable);
+        }
+    }
+
     @Override
     public <X, Y extends CosServiceRequest> X exeute(CosHttpRequest<Y> request,
             HttpResponseHandler<CosServiceResponse<X>> responseHandler)
                     throws CosClientException, CosServiceException {
+
         HttpResponse httpResponse = null;
         HttpRequestBase httpRequest = null;
         int retryIndex = 0;
         int kMaxRetryCnt = 5;
+        bufferAndResetAbleContent(request);
+
+        // Always mark the input stream before execution.
+        final InputStream originalContent = request.getContent();
+        if (originalContent != null && originalContent.markSupported()) {
+            final int readLimit = clientConfig.getReadLimit();
+            originalContent.mark(readLimit);
+        }
+
+
         while (retryIndex < kMaxRetryCnt) {
             try {
+                checkInterrupted();
+                // 如果是重试的则恢复流
+                if (retryIndex != 0 && originalContent != null) {
+                    originalContent.reset();
+                }
+                HttpContext context = HttpClientContext.create();
                 httpRequest = buildHttpRequest(request);
-                httpResponse = httpClient.execute(httpRequest);
+                httpResponse = httpClient.execute(httpRequest, context);
                 break;
             } catch (IOException e) {
                 httpRequest.abort();
                 ++retryIndex;
                 if (retryIndex >= kMaxRetryCnt) {
                     String errMsg = String.format(
-                            "httpClient execute occur a Ioexcepiton. httpRequest: %s, excep: %s",
+                            "httpClient execute occur a IOexcepiton. httpRequest: %s, excep: %s",
                             request.toString(), e);
                     log.error(errMsg);
                     throw new CosClientException(errMsg);
+                } else {
+                    String warnMsg = String.format(
+                            "httpClient execute occur a IOexcepiton, ready to retry[%d/%d]. httpRequest: %s, excep: %s",
+                            retryIndex, kMaxRetryCnt, request.toString(), e);
+                    log.warn(warnMsg);
+                    // 加入sleep 避免雪崩
+                    int threadSleepMs = ThreadLocalRandom.current().nextInt(10, 100);
+                    try {
+                        Thread.sleep(threadSleepMs);
+                    } catch (InterruptedException e1) {
+                        throw new CosClientException("operation has been interrupted!");
+                    }
                 }
             }
         }
@@ -279,7 +327,6 @@ public class DefaultCosHttpClient implements CosHttpClient {
                 throw cse;
             } finally {
                 httpRequest.abort();
-                httpRequest.releaseConnection();
             }
         }
         try {
@@ -292,9 +339,53 @@ public class DefaultCosHttpClient implements CosHttpClient {
             throw cce;
         } finally {
             if (!responseHandler.needsConnectionLeftOpen()) {
-                httpRequest.abort();
                 httpRequest.releaseConnection();
             }
+        }
+    }
+
+    /**
+     * Make input stream resettable if possible.
+     *
+     * @param content Input stream to make resettable
+     * @return ResettableInputStream if possible otherwise original input stream.
+     */
+    private InputStream makeResettable(InputStream content) {
+        if (!content.markSupported()) {
+            // try to wrap the content input stream to become
+            // mark-and-resettable for signing and retry purposes.
+            if (content instanceof FileInputStream) {
+                try {
+                    // ResettableInputStream supports mark-and-reset without
+                    // memory buffering
+                    return new ResettableInputStream((FileInputStream) content);
+                } catch (IOException e) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("For the record; ignore otherwise", e);
+                    }
+                }
+            }
+        }
+        return content;
+    }
+
+    /**
+     * Buffer input stream if possible.
+     *
+     * @param content Input stream to buffer
+     * @return SdkBufferedInputStream if possible, otherwise original input stream.
+     */
+    private InputStream buffer(InputStream content) {
+        if (!content.markSupported()) {
+            content = new SdkBufferedInputStream(content);
+        }
+        return content;
+    }
+
+    // check interrupted
+    private void checkInterrupted() throws CosClientException {
+        if (Thread.interrupted()) {
+            throw new CosClientException("operation has been interrupted!");
         }
     }
 

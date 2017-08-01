@@ -16,6 +16,8 @@ public class ClientConfig {
     private static final int DEFAULT_SIGN_EXPIRED = 300;
     // 默认的user_agent标识
     private static final String DEFAULT_USER_AGENT = "cos-java-sdk-v5";
+    // Read Limit
+    private static final int DEFAULT_READ_LIMIT = (2 << 17) + 1;
     
     private Region region;
     private HttpProtocol httpProtocol = HttpProtocol.http;
@@ -30,6 +32,7 @@ public class ClientConfig {
     private int socketTimeout = DEFAULT_SOCKET_TIMEOUT;
     private int maxConnectionsCount = DEFAULT_MAX_CONNECTIONS_COUNT;
     private String userAgent = DEFAULT_USER_AGENT;
+    private int readLimit = DEFAULT_READ_LIMIT;
 
     public ClientConfig(Region region) {
         super();
@@ -122,6 +125,14 @@ public class ClientConfig {
 
     public void setEndPointSuffix(String endPointSuffix) {
         this.endPointSuffix = endPointSuffix;
+    }
+
+    public int getReadLimit() {
+        return readLimit;
+    }
+
+    public void setReadLimit(int readLimit) {
+        this.readLimit = readLimit;
     }
 
 }

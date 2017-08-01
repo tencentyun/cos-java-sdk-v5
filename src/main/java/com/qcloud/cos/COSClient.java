@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -42,6 +44,7 @@ import com.qcloud.cos.internal.Constants;
 import com.qcloud.cos.internal.CosMetadataResponseHandler;
 import com.qcloud.cos.internal.CosServiceRequest;
 import com.qcloud.cos.internal.CosServiceResponse;
+import com.qcloud.cos.internal.DigestValidationInputStream;
 import com.qcloud.cos.internal.InputSubstream;
 import com.qcloud.cos.internal.LengthCheckInputStream;
 import com.qcloud.cos.internal.MD5DigestCalculatingInputStream;
@@ -173,45 +176,6 @@ public class COSClient implements COS {
                 }
                 request.addHeader(permission.getHeaderName(), granteeString.toString());
             }
-        }
-    }
-
-    private UploadPartResult doUploadPart(final String bucketName, final String key,
-            final String uploadId, final int partNumber, final long partSize,
-            CosHttpRequest<UploadPartRequest> request, InputStream inputStream,
-            MD5DigestCalculatingInputStream md5DigestStream) {
-        try {
-            request.setContent(inputStream);
-            ObjectMetadata metadata = invoke(request, new CosMetadataResponseHandler());
-            final String etag = metadata.getETag();
-
-
-            if (md5DigestStream != null && !skipMd5CheckStrategy
-                    .skipClientSideValidationPerUploadPartResponse(metadata)) {
-                byte[] clientSideHash = md5DigestStream.getMd5Digest();
-                byte[] serverSideHash = BinaryUtils.fromHex(etag);
-
-                if (!Arrays.equals(clientSideHash, serverSideHash)) {
-                    final String info = "bucketName: " + bucketName + ", key: " + key
-                            + ", uploadId: " + uploadId + ", partNumber: " + partNumber
-                            + ", partSize: " + partSize;
-                    throw new CosClientException("Unable to verify integrity of data upload.  "
-                            + "Client calculated content hash (contentMD5: "
-                            + BinaryUtils.toHex(clientSideHash)
-                            + " in hex) didn't match hash (etag: " + etag
-                            + " in hex) calculated by Qcloud COS.  "
-                            + "You may need to delete the data stored in Qcloud COS. " + "(" + info
-                            + ")");
-                }
-            }
-
-            UploadPartResult result = new UploadPartResult();
-            result.setETag(etag);
-            result.setPartNumber(partNumber);
-
-            return result;
-        } catch (Throwable t) {
-            throw Throwables.failure(t);
         }
     }
 
@@ -644,12 +608,37 @@ public class COSClient implements COS {
             HttpRequestBase httpRequest = cosObject.getObjectContent().getHttpRequest();
 
             is = new ServiceClientHolderInputStream(is, this);
-            // Ensures the data received from COS has the same length as the
-            // expected content-length
-            is = new LengthCheckInputStream(is, cosObject.getObjectMetadata().getContentLength(), // expected
-                                                                                                  // length
-                    INCLUDE_SKIPPED_BYTES); // bytes received from COS are all included even if
-                                            // skipped
+
+            // The Etag header contains a server-side MD5 of the object. If
+            // we're downloading the whole object, by default we wrap the
+            // stream in a validator that calculates an MD5 of the downloaded
+            // bytes and complains if what we received doesn't match the Etag.
+            if (!skipMd5CheckStrategy.skipClientSideValidation(getObjectRequest,
+                    cosObject.getObjectMetadata())) {
+                try {
+                    byte[] serverSideHash =
+                            BinaryUtils.fromHex(cosObject.getObjectMetadata().getETag());
+                    // No content length check is performed when the
+                    // MD5 check is enabled, since a correct MD5 check would
+                    // imply a correct content length.
+                    MessageDigest digest = MessageDigest.getInstance("MD5");
+                    is = new DigestValidationInputStream(is, digest, serverSideHash);
+                } catch (NoSuchAlgorithmException e) {
+                    log.warn("No MD5 digest algorithm available.  Unable to calculate "
+                            + "checksum and verify data integrity.", e);
+                } catch (DecoderException e) {
+                    log.warn("BinaryUtils.fromHex error. Unable to calculate "
+                            + "checksum and verify data integrity. etag:"
+                            + cosObject.getObjectMetadata().getETag(), e);
+                }
+            } else {
+                // Ensures the data received from COS has the same length as the
+                // expected content-length
+                is = new LengthCheckInputStream(is,
+                        cosObject.getObjectMetadata().getContentLength(), // expected length
+                        INCLUDE_SKIPPED_BYTES); // bytes received from S3 are all included even if
+                                                // skipped
+            }
             cosObject.setObjectContent(new COSObjectInputStream(is, httpRequest));
             return cosObject;
         } catch (CosServiceException cse) {
@@ -895,6 +884,45 @@ public class COSClient implements COS {
                     md5DigestStream);
         } finally {
             CosDataSource.Utils.cleanupDataSource(uploadPartRequest, fileOrig, isOrig, isCurr, log);
+        }
+    }
+
+    private UploadPartResult doUploadPart(final String bucketName, final String key,
+            final String uploadId, final int partNumber, final long partSize,
+            CosHttpRequest<UploadPartRequest> request, InputStream inputStream,
+            MD5DigestCalculatingInputStream md5DigestStream) {
+        try {
+            request.setContent(inputStream);
+            ObjectMetadata metadata = invoke(request, new CosMetadataResponseHandler());
+            final String etag = metadata.getETag();
+
+
+            if (md5DigestStream != null && !skipMd5CheckStrategy
+                    .skipClientSideValidationPerUploadPartResponse(metadata)) {
+                byte[] clientSideHash = md5DigestStream.getMd5Digest();
+                byte[] serverSideHash = BinaryUtils.fromHex(etag);
+
+                if (!Arrays.equals(clientSideHash, serverSideHash)) {
+                    final String info = "bucketName: " + bucketName + ", key: " + key
+                            + ", uploadId: " + uploadId + ", partNumber: " + partNumber
+                            + ", partSize: " + partSize;
+                    throw new CosClientException("Unable to verify integrity of data upload.  "
+                            + "Client calculated content hash (contentMD5: "
+                            + BinaryUtils.toHex(clientSideHash)
+                            + " in hex) didn't match hash (etag: " + etag
+                            + " in hex) calculated by Qcloud COS.  "
+                            + "You may need to delete the data stored in Qcloud COS. " + "(" + info
+                            + ")");
+                }
+            }
+
+            UploadPartResult result = new UploadPartResult();
+            result.setETag(etag);
+            result.setPartNumber(partNumber);
+
+            return result;
+        } catch (Throwable t) {
+            throw Throwables.failure(t);
         }
     }
 

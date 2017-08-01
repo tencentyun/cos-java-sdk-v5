@@ -95,11 +95,13 @@ public class SkipMd5CheckStrategy {
      * @param returnedMetadata Metadata returned in {@link COSObject}
      * @return True if client side validation should be skipped, false otherwise.
      */
-    /*
-     * public boolean skipClientSideValidation(GetObjectRequest request, ObjectMetadata
-     * returnedMetadata) { return skipClientSideValidationPerRequest(request) ||
-     * skipClientSideValidationPerGetResponse(returnedMetadata); }
-     */
+
+    public boolean skipClientSideValidation(GetObjectRequest request,
+            ObjectMetadata returnedMetadata) {
+        return skipClientSideValidationPerRequest(request)
+                || skipClientSideValidationPerGetResponse(returnedMetadata);
+    }
+
 
     /**
      * Determines whether the client should use the {@link Headers#ETAG} header returned by COS to

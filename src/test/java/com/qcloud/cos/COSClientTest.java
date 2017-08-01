@@ -15,7 +15,6 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.qcloud.cos.auth.BasicCOSCredentials;
@@ -26,6 +25,7 @@ import com.qcloud.cos.model.GetObjectRequest;
 import com.qcloud.cos.model.ObjectMetadata;
 import com.qcloud.cos.model.PutObjectRequest;
 import com.qcloud.cos.model.PutObjectResult;
+import com.qcloud.cos.model.StorageClass;
 import com.qcloud.cos.region.Region;
 import com.qcloud.cos.utils.Md5Utils;
 
@@ -36,9 +36,10 @@ public class COSClientTest {
     private static String region = null;
     private static String bucket = null;
     private static COSClient cosclient = null;
+    private static File tmpDir = null;
+    
 
     private static File buildTestFile(long fileSize) throws IOException {
-        File tmpDir = new File("src/test/resources");
         String prefix = String.format("ut_size_%d_time_%d_", fileSize, System.currentTimeMillis());
         String suffix = ".tmp";
         File tmpFile = null;
@@ -76,8 +77,8 @@ public class COSClientTest {
         secretKey = System.getenv("secretKey");
         region = System.getenv("region");
         bucket = System.getenv("bucket");
-
-        File propFile = new File("src/test/resources/ut_account.prop");
+        
+        File propFile = new File("ut_account.prop");
         if (propFile.exists() && propFile.canRead()) {
             Properties prop = new Properties();
             FileInputStream fis = null;
@@ -106,6 +107,10 @@ public class COSClientTest {
         COSCredentials cred = new BasicCOSCredentials(appid, secretId, secretKey);
         ClientConfig clientConfig = new ClientConfig(new Region(region));
         cosclient = new COSClient(cred, clientConfig);
+        tmpDir = new File("ut_test_tmp_data");
+        if (!tmpDir.exists()) {
+            tmpDir.mkdirs();
+        }
     }
 
     @AfterClass
@@ -113,6 +118,7 @@ public class COSClientTest {
         if (cosclient != null) {
             cosclient.shutdown();
         }
+        tmpDir.delete();
     }
 
     @Before
@@ -127,6 +133,7 @@ public class COSClientTest {
         assertNotNull(bucket);
 
         PutObjectRequest putObjectRequest = new PutObjectRequest(bucket, key, localFile);
+        putObjectRequest.setStorageClass(StorageClass.Standard_IA);
         PutObjectResult putObjectResult = cosclient.putObject(putObjectRequest);
         String etag = putObjectResult.getETag();
         String expectEtag = null;
@@ -152,6 +159,7 @@ public class COSClientTest {
             objectMetadata.setContentLength(uploadSize);
             PutObjectRequest putObjectRequest =
                     new PutObjectRequest(bucket, key, input, objectMetadata);
+            putObjectRequest.setStorageClass(StorageClass.Standard_IA);
             PutObjectResult putObjectResult = cosclient.putObject(putObjectRequest);
             String etag = putObjectResult.getETag();
             assertEquals(uploadEtag, etag);

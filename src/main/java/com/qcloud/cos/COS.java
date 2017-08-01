@@ -2,7 +2,6 @@ package com.qcloud.cos;
 
 import java.io.File;
 import java.io.InputStream;
-import java.util.List;
 
 import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.exception.CosServiceException;
@@ -848,6 +847,28 @@ public interface COS {
                     throws CosClientException, CosServiceException;
 
 
+    /**
+     * <p>
+     * Copy a source object to a new destination in COS.
+     * </p>
+     * <p>
+     * To copy an object, the caller's account must have read access to the source object and write
+     * access to the destination bucket.
+     * </p>
+     * 
+     * @param copyObjectRequest The request object containing all the options for copying an QCloud
+     *        COS object.
+     *
+     * @return A {@link CopyObjectResult} object containing the information returned by Amazon S3
+     *         about the newly created object, or <code>null</code> if constraints were specified
+     *         that weren't met when Qcloud COS attempted to copy the object.
+     *         
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     *         
+     * @throws CosServiceException If any errors occurred in Qcloud COS while processing the
+     *         request.
+     */
     public CopyObjectResult copyObject(CopyObjectRequest copyObjectRequest)
             throws CosClientException, CosServiceException;
 

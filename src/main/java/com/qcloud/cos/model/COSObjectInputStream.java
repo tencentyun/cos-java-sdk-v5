@@ -140,6 +140,7 @@ public class COSObjectInputStream extends SdkFilterInputStream {
     public void close() throws IOException {
         if (eof) {
             super.close();
+            httpRequest.releaseConnection();
         } else {
             doAbort();
         }
