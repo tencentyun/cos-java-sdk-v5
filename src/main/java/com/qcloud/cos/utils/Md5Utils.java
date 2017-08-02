@@ -40,7 +40,7 @@ public class Md5Utils {
         return Hex.encodeHexString(computeMD5Hash(file));
     }
     
-    public static String md5Hex(byte[] input) throws FileNotFoundException, IOException {
+    public static String md5Hex(byte[] input) {
         return Hex.encodeHexString(computeMD5Hash(input));
     }
 
