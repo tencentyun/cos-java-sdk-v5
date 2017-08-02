@@ -12,4 +12,4 @@ notifications:
   
 install: mvn install -DskipTests=true -Dmaven.javadoc.skip=true -Dgpg.skip=true
 
-script: travis_wait 30 mvn test
+script: travis_wait 90 mvn test
