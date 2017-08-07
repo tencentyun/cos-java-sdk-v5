@@ -6,7 +6,7 @@
 ```xml
 <groupId>com.qcloud</groupId>
 <artifactId>cos_api</artifactId>
-<version>5.1.8</version>
+<version>5.1.9</version>
 ```
 
 
