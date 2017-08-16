@@ -19,6 +19,7 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.Ignore;
 
 import com.qcloud.cos.auth.BasicCOSCredentials;
 import com.qcloud.cos.auth.COSCredentials;
@@ -532,7 +533,7 @@ public class COSClientTest {
         testMultiPartUploadObject(100 * 1024 * 1024L, 3 * 1024 * 1024L + 13);
     }
 
-    @Test
+    @Ignore
     public void testMultipartUploadObjectSize_1G_Part_1M() throws IOException {
         testMultiPartUploadObject(1024 * 1024 * 1024L, 1024 * 1024L);
     }
