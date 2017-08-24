@@ -8,11 +8,13 @@ import java.util.List;
 import com.qcloud.cos.internal.CosServiceRequest;
 import com.qcloud.cos.region.Region;
 
-public class CopyObjectRequest extends CosServiceRequest implements SSECOSKeyManagementParamsProvider, Serializable{
-
+public class CopyObjectRequest extends CosServiceRequest
+        implements SSECOSKeyManagementParamsProvider, Serializable {
+    // The Srouce Appid. if not set, equal to the appid of cosclient.
+    private String sourceAppid;
     // The Soure Bucket Region
     private Region sourceBucketRegion;
-    
+
     /** The name of the bucket containing the object to be copied */
     private String sourceBucketName;
 
@@ -84,24 +86,24 @@ public class CopyObjectRequest extends CosServiceRequest implements SSECOSKeyMan
     private String redirectLocation;
 
     /**
-     * The optional customer-provided server-side encryption key to use to
-     * decrypt the source object being copied.
+     * The optional customer-provided server-side encryption key to use to decrypt the source object
+     * being copied.
      */
     private SSECustomerKey sourceSSECustomerKey;
 
     /**
-     * The optional customer-provided server-side encryption key to use to
-     * encrypt the destination object being copied.
+     * The optional customer-provided server-side encryption key to use to encrypt the destination
+     * object being copied.
      */
     private SSECustomerKey destinationSSECustomerKey;
 
     private SSECOSKeyManagementParams sseCOSKeyManagementParams;
-    
+
     /**
      * <p>
-     * Constructs a new {@link com.qcloud.cos.model#CopyObjectRequest} with only basic
-     * options.
+     * Constructs a new {@link com.qcloud.cos.model#CopyObjectRequest} with only basic options.
      * </p>
+     * 
      * @param sourceBucketName The name of the COS bucket containing the object to copy.
      * @param sourceKey The source bucket key under which the object to copy is stored.
      * @param destinationBucketName The name of the COS bucket to which the new object will be
@@ -112,14 +114,14 @@ public class CopyObjectRequest extends CosServiceRequest implements SSECOSKeyMan
      */
     public CopyObjectRequest(String sourceBucketName, String sourceKey,
             String destinationBucketName, String destinationKey) {
-        this(null, sourceBucketName, sourceKey, null, destinationBucketName, destinationKey);
+        this(null, null, sourceBucketName, sourceKey, null, destinationBucketName, destinationKey);
     }
 
     /**
      * <p>
-     * Constructs a new {@link com.qcloud.cos.model#CopyObjectRequest} with only basic
-     * options.
+     * Constructs a new {@link com.qcloud.cos.model#CopyObjectRequest} with only basic options.
      * </p>
+     * 
      * @param sourceBucketRegion The source Bucket Region
      * @param sourceBucketName The name of the COS bucket containing the object to copy.
      * @param sourceKey The source bucket key under which the object to copy is stored.
@@ -129,9 +131,10 @@ public class CopyObjectRequest extends CosServiceRequest implements SSECOSKeyMan
      * 
      * @see CopyObjectRequest#CopyObjectRequest(String, String, String, String, String)
      */
-    public CopyObjectRequest(Region sourceBucketRegion, String sourceBucketName, String sourceKey,
-            String destinationBucketName, String destinationKey) {
-        this(sourceBucketRegion, sourceBucketName, sourceKey, null, destinationBucketName, destinationKey);
+    public CopyObjectRequest(String sourceAppid, Region sourceBucketRegion, String sourceBucketName,
+            String sourceKey, String destinationBucketName, String destinationKey) {
+        this(sourceAppid, sourceBucketRegion, sourceBucketName, sourceKey, null,
+                destinationBucketName, destinationKey);
     }
 
     /**
@@ -139,6 +142,7 @@ public class CopyObjectRequest extends CosServiceRequest implements SSECOSKeyMan
      * Constructs a new {@link CopyObjectRequest} with basic options, providing an COS version ID
      * identifying the specific version of the source object to copy.
      * </p>
+     * 
      * @param sourceBucketRegion The source Bucket Region
      * @param sourceBucketName The name of the COS bucket containing the object to copy.
      * @param sourceKey The key in the source bucket under which the object to copy is stored.
@@ -152,8 +156,10 @@ public class CopyObjectRequest extends CosServiceRequest implements SSECOSKeyMan
      * @see CopyObjectRequest#CopyObjectRequest(String sourceBucketName, String sourceKey, String
      *      destinationBucketName, String destinationKey)
      */
-    public CopyObjectRequest(Region sourceBucketRegion, String sourceBucketName, String sourceKey, String sourceVersionId,
-            String destinationBucketName, String destinationKey) {
+    public CopyObjectRequest(String sourceAppid, Region sourceBucketRegion, String sourceBucketName,
+            String sourceKey, String sourceVersionId, String destinationBucketName,
+            String destinationKey) {
+        this.sourceAppid = sourceAppid;
         this.sourceBucketRegion = sourceBucketRegion;
         this.sourceBucketName = sourceBucketName;
         this.sourceKey = sourceKey;
@@ -162,6 +168,15 @@ public class CopyObjectRequest extends CosServiceRequest implements SSECOSKeyMan
         this.destinationKey = destinationKey;
     }
     
+
+    public String getSourceAppid() {
+        return sourceAppid;
+    }
+
+    public void setSourceAppid(String sourceAppid) {
+        this.sourceAppid = sourceAppid;
+    }
+
     public Region getSourceBucketRegion() {
         return sourceBucketRegion;
     }
@@ -495,8 +510,8 @@ public class CopyObjectRequest extends CosServiceRequest implements SSECOSKeyMan
     }
 
     /**
-     * Gets the canned ACL to use for the new, copied object. If no canned ACL is specified, COS will
-     * default to using the {@link CannedAccessControlList#Private} canned ACL for all copied
+     * Gets the canned ACL to use for the new, copied object. If no canned ACL is specified, COS
+     * will default to using the {@link CannedAccessControlList#Private} canned ACL for all copied
      * objects.
      *
      * @return The canned ACL to set for the newly copied object, or <code>null</code> if no canned
@@ -880,7 +895,7 @@ public class CopyObjectRequest extends CosServiceRequest implements SSECOSKeyMan
         this.redirectLocation = redirectLocation;
         return this;
     }
-    
+
 
     public SSECustomerKey getSourceSSECustomerKey() {
         return sourceSSECustomerKey;

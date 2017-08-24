@@ -229,8 +229,11 @@ public class COSClient implements COS {
             sourceKey = "/" + sourceKey;
         }
         String copySourceHeader = String.format("%s-%s.%s.myqcloud.com%s",
-                copyObjectRequest.getSourceBucketName(), this.cred.getCOSAppId(),
-                sourceRegion.getRegionName(), UrlEncoderUtils.encodeEscapeDelimiter(sourceKey));
+                copyObjectRequest.getSourceBucketName(),
+                (copyObjectRequest.getSourceAppid() != null) ? copyObjectRequest.getSourceAppid()
+                        : this.cred.getCOSAppId(),
+                formatRegion(sourceRegion.getRegionName()),
+                UrlEncoderUtils.encodeEscapeDelimiter(sourceKey));
         if (copyObjectRequest.getSourceVersionId() != null) {
             copySourceHeader += "?versionId=" + copyObjectRequest.getSourceVersionId();
         }
@@ -282,13 +285,22 @@ public class COSClient implements COS {
         return key;
     }
 
+    private String formatRegion(String regionName) {
+        if (regionName.startsWith("cos.")) {
+            return regionName;
+        } else {
+            return "cos." + regionName;
+        }
+    }
+
     private <X extends CosServiceRequest> void buildUrlAndHost(CosHttpRequest<X> request,
             String bucket, String key) throws CosClientException {
         key = formatKey(key);
         request.setResourcePath(key);
 
         String host = String.format("%s-%s.%s.myqcloud.com", bucket, cred.getCOSAppId(),
-                clientConfig.getRegion().getRegionName());
+                formatRegion(clientConfig.getRegion().getRegionName()));
+
         if (this.clientConfig.getEndPointSuffix() != null) {
             String endPointSuffix = clientConfig.getEndPointSuffix();
             if (endPointSuffix.startsWith(".")) {
