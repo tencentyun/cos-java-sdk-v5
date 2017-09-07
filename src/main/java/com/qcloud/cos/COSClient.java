@@ -296,7 +296,13 @@ public class COSClient implements COS {
         if (regionName.startsWith("cos.")) {
             return regionName;
         } else {
-            return "cos." + regionName;
+            if (regionName.equals("cn-north") || regionName.equals("cn-east")
+                    || regionName.equals("cn-south") || regionName.equals("cn-southwest")
+                    || regionName.equals("cn-south-2") || regionName.equals("sg")) {
+                return regionName;
+            } else {
+                return "cos." + regionName;
+            }
         }
     }
 
