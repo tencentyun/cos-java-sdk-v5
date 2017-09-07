@@ -13,7 +13,10 @@ public class UrlEncoderUtils {
 
     public static String encode(String originUrl) {
         try {
-            return URLEncoder.encode(originUrl, "UTF-8").replace("+", "%20");
+            return URLEncoder.encode(originUrl, "UTF-8")
+                             .replace("+", "%20")
+                             .replace("*", "%2A")
+                             .replace("%7E", "~");
         } catch (UnsupportedEncodingException e) {
             log.error("URLEncoder error, encode utf8, exception: {}", e);
         }
@@ -27,12 +30,7 @@ public class UrlEncoderUtils {
 
         for (String pathSegment : pathSegmentsArr) {
             if (!pathSegment.isEmpty()) {
-                try {
-                    pathBuilder.append(PATH_DELIMITER)
-                            .append(URLEncoder.encode(pathSegment, "UTF-8").replace("+", "%20"));
-                } catch (UnsupportedEncodingException e) {
-                    log.error("URLEncoder error, encode utf8, exception: {}", e);
-                }
+                pathBuilder.append(PATH_DELIMITER).append(encode(pathSegment));
             }
         }
         if (urlPath.endsWith(PATH_DELIMITER)) {

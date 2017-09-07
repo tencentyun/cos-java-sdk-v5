@@ -11,7 +11,7 @@ public class ClientConfig {
     // 默认的SOCKET读取超时时间, 单位ms
     private static final int DEFAULT_SOCKET_TIMEOUT = 30 * 1000;
     // 默认的维护最大HTTP连接数
-    private static final int DEFAULT_MAX_CONNECTIONS_COUNT = 100;
+    private static final int DEFAULT_MAX_CONNECTIONS_COUNT = 1024;
     // 多次签名的默认过期时间,单位秒
     private static final int DEFAULT_SIGN_EXPIRED = 300;
     // 默认的user_agent标识

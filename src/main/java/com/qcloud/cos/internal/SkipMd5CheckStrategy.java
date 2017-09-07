@@ -97,7 +97,7 @@ public class SkipMd5CheckStrategy {
      */
 
     public boolean skipClientSideValidation(GetObjectRequest request,
-            ObjectMetadata returnedMetadata) {
+                                            ObjectMetadata returnedMetadata) {
         return skipClientSideValidationPerRequest(request)
                 || skipClientSideValidationPerGetResponse(returnedMetadata);
     }
@@ -201,7 +201,8 @@ public class SkipMd5CheckStrategy {
         }
         // If Etag is not provided or was computed from a multipart upload then skip the check, the
         // etag won't be the MD5 of the original content
-        if (metadata.getETag() == null || isMultipartUploadETag(metadata.getETag())) {
+        if (metadata.getETag() == null || isMultipartUploadETag(metadata.getETag())
+                || isV4ETag(metadata.getETag())) {
             return true;
         }
         return false;
@@ -254,6 +255,16 @@ public class SkipMd5CheckStrategy {
      */
     private static boolean isMultipartUploadETag(String eTag) {
         return eTag.contains("-");
+    }
+
+    // 判断下etag的长度, V5的Etag长度是32(MD5), V4的是40(sha)
+    // v4的etag则跳过校验
+    private static boolean isV4ETag(String eTag) {
+        if (eTag.length() != 32) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**

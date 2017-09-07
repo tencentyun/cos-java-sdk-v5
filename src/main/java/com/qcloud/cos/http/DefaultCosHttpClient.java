@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -25,7 +26,6 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
@@ -45,6 +45,7 @@ import com.qcloud.cos.internal.CosServiceResponse;
 import com.qcloud.cos.internal.ReleasableInputStream;
 import com.qcloud.cos.internal.ResettableInputStream;
 import com.qcloud.cos.internal.SdkBufferedInputStream;
+import com.qcloud.cos.utils.UrlEncoderUtils;
 
 public class DefaultCosHttpClient implements CosHttpClient {
 
@@ -80,10 +81,10 @@ public class DefaultCosHttpClient implements CosHttpClient {
         this.httpClient = httpClientBuilder.build();
         this.requestConfig =
                 RequestConfig.custom()
-                        .setConnectionRequestTimeout(
-                                this.clientConfig.getConnectionRequestTimeout())
-                        .setConnectTimeout(this.clientConfig.getConnectionTimeout())
-                        .setSocketTimeout(this.clientConfig.getSocketTimeout()).build();
+                             .setConnectionRequestTimeout(this.clientConfig.getConnectionRequestTimeout())
+                             .setConnectTimeout(this.clientConfig.getConnectionTimeout())
+                             .setSocketTimeout(this.clientConfig.getSocketTimeout())
+                             .build();
         this.idleConnectionMonitor = new IdleConnectionMonitorThread(this.connectionManager);
         this.idleConnectionMonitor.start();
     }
@@ -93,9 +94,68 @@ public class DefaultCosHttpClient implements CosHttpClient {
         this.idleConnectionMonitor.shutdown();
     }
 
+    // 因为Apache HTTP库自带的URL Encode对一些特殊字符如*等不进行转换, 和COS HTTP服务的URL Encode标准不一致
+    private <X extends CosServiceRequest> URI buildUri(CosHttpRequest<X> request) {
+        StringBuffer urlBuffer = new StringBuffer();
+        urlBuffer.append(request.getProtocol().toString())
+                 .append("://")
+                 .append(request.getEndpoint());
+        String encodedPath = UrlEncoderUtils.encodeEscapeDelimiter(request.getResourcePath());
+        urlBuffer.append(encodedPath);
 
-    private <X extends CosServiceRequest> HttpRequestBase buildHttpRequest(
-            CosHttpRequest<X> request) throws CosClientException {
+        StringBuffer paramBuffer = new StringBuffer();
+        boolean seeOne = false;
+        Map<String, String> requestParams = new HashMap<>();
+        requestParams.putAll(request.getParameters());
+        Map<String, List<String>> customParamsList =
+                request.getOriginalRequest().getCustomQueryParameters();
+        if (customParamsList != null) {
+            for (Entry<String, List<String>> customParamsEntry : customParamsList.entrySet()) {
+                String paramKey = customParamsEntry.getKey();
+                List<String> paramValueList = customParamsEntry.getValue();
+                int paramValueNum = paramValueList.size();
+                for (int paramValueIndex = 0; paramValueIndex < paramValueNum; ++paramValueIndex) {
+                    requestParams.put(paramKey, paramValueList.get(paramValueIndex));
+                }
+            }
+        }
+        for (Entry<String, String> paramEntry : requestParams.entrySet()) {
+            String paramKey = paramEntry.getKey();
+            if (paramKey == null) {
+                continue;
+            }
+            if (seeOne) {
+                paramBuffer.append("&");
+            }
+            paramBuffer.append(UrlEncoderUtils.encode(paramKey));
+            if (!seeOne) {
+                seeOne = true;
+            }
+            String paramValue = paramEntry.getValue();
+            if (paramValue == null) {
+                continue;
+            }
+            paramBuffer.append("=");
+            paramBuffer.append(UrlEncoderUtils.encode(paramValue));
+        }
+
+        String paramStr = paramBuffer.toString();
+        if (!paramStr.isEmpty()) {
+            urlBuffer.append("?").append(paramStr);
+        }
+
+
+        try {
+            URI uri = new URI(urlBuffer.toString());
+            return uri;
+        } catch (URISyntaxException e) {
+            throw new CosClientException("build uri error! CosHttpRequest: " + request.toString(),
+                    e);
+        }
+    }
+
+    private <X extends CosServiceRequest> HttpRequestBase buildHttpRequest(CosHttpRequest<X> request)
+            throws CosClientException {
         HttpRequestBase httpRequestBase = null;
         HttpMethodName httpMethodName = request.getHttpMethod();
         if (httpMethodName.equals(HttpMethodName.PUT)) {
@@ -110,34 +170,8 @@ public class DefaultCosHttpClient implements CosHttpClient {
             httpRequestBase = new HttpHead();
         }
 
-        URIBuilder uriBuilder = new URIBuilder(request.getEndpoint());
-        Map<String, String> requestParams = request.getParameters();
-        for (Entry<String, String> paramEntry : requestParams.entrySet()) {
-            String paramKey = paramEntry.getKey();
-            String paramValue = paramEntry.getValue();
-            uriBuilder.addParameter(paramKey, paramValue);
-        }
 
-        Map<String, List<String>> customParamsList =
-                request.getOriginalRequest().getCustomQueryParameters();
-        if (customParamsList != null) {
-            for (Entry<String, List<String>> customParamsEntry : customParamsList.entrySet()) {
-                String paramKey = customParamsEntry.getKey();
-                List<String> paramValueList = customParamsEntry.getValue();
-                int paramValueNum = paramValueList.size();
-                for (int paramValueIndex = 0; paramValueIndex < paramValueNum; ++paramValueIndex) {
-                    uriBuilder.addParameter(paramKey, paramValueList.get(paramValueIndex));
-                }
-            }
-        }
-        URI uri = null;
-        try {
-            uri = uriBuilder.build();
-        } catch (URISyntaxException e) {
-            throw new CosClientException("build uri error! CosHttpRequest: " + request.toString(),
-                    e);
-        }
-        httpRequestBase.setURI(uri);
+        httpRequestBase.setURI(buildUri(request));
 
         long content_length = -1;
         Map<String, String> requestHeaders = request.getHeaders();
@@ -189,9 +223,10 @@ public class DefaultCosHttpClient implements CosHttpClient {
         return statusCode / 100 == HttpStatus.SC_OK / 100;
     }
 
-    private <X extends CosServiceRequest> CosHttpResponse createResponse(
-            HttpRequestBase httpRequestBase, CosHttpRequest<X> request,
-            org.apache.http.HttpResponse apacheHttpResponse) throws IOException {
+    private <X extends CosServiceRequest> CosHttpResponse createResponse(HttpRequestBase httpRequestBase,
+                                                                         CosHttpRequest<X> request,
+                                                                         org.apache.http.HttpResponse apacheHttpResponse)
+                                                                                 throws IOException {
         CosHttpResponse httpResponse = new CosHttpResponse(request, httpRequestBase);
 
         if (apacheHttpResponse.getEntity() != null) {
@@ -207,9 +242,10 @@ public class DefaultCosHttpClient implements CosHttpClient {
         return httpResponse;
     }
 
-    private <X extends CosServiceRequest> CosServiceException handlerErrorMessage(
-            CosHttpRequest<X> request, HttpRequestBase httpRequestBase,
-            final org.apache.http.HttpResponse apacheHttpResponse) throws IOException {
+    private <X extends CosServiceRequest> CosServiceException handlerErrorMessage(CosHttpRequest<X> request,
+                                                                                  HttpRequestBase httpRequestBase,
+                                                                                  final org.apache.http.HttpResponse apacheHttpResponse)
+                                                                                          throws IOException {
         final StatusLine statusLine = apacheHttpResponse.getStatusLine();
         final int statusCode;
         final String reasonPhrase;
@@ -251,8 +287,7 @@ public class DefaultCosHttpClient implements CosHttpClient {
         return exception;
     }
 
-    private <X extends CosServiceRequest> void bufferAndResetAbleContent(
-            CosHttpRequest<X> request) {
+    private <X extends CosServiceRequest> void bufferAndResetAbleContent(CosHttpRequest<X> request) {
         final InputStream origContent = request.getContent();
         if (origContent != null) {
             final InputStream toBeClosed = buffer(makeResettable(origContent));
@@ -265,8 +300,9 @@ public class DefaultCosHttpClient implements CosHttpClient {
 
     @Override
     public <X, Y extends CosServiceRequest> X exeute(CosHttpRequest<Y> request,
-            HttpResponseHandler<CosServiceResponse<X>> responseHandler)
-                    throws CosClientException, CosServiceException {
+                                                     HttpResponseHandler<CosServiceResponse<X>> responseHandler)
+                                                             throws CosClientException,
+                                                             CosServiceException {
 
         HttpResponse httpResponse = null;
         HttpRequestBase httpRequest = null;
@@ -297,15 +333,19 @@ public class DefaultCosHttpClient implements CosHttpClient {
                 httpRequest.abort();
                 ++retryIndex;
                 if (retryIndex >= kMaxRetryCnt) {
-                    String errMsg = String.format(
-                            "httpClient execute occur a IOexcepiton. httpRequest: %s, excep: %s",
-                            request.toString(), e);
+                    String errMsg =
+                            String.format("httpClient execute occur a IOexcepiton. httpRequest: %s, excep: %s",
+                                          request.toString(),
+                                          e);
                     log.error(errMsg);
                     throw new CosClientException(errMsg);
                 } else {
-                    String warnMsg = String.format(
-                            "httpClient execute occur a IOexcepiton, ready to retry[%d/%d]. httpRequest: %s, excep: %s",
-                            retryIndex, kMaxRetryCnt, request.toString(), e);
+                    String warnMsg =
+                            String.format("httpClient execute occur a IOexcepiton, ready to retry[%d/%d]. httpRequest: %s, excep: %s",
+                                          retryIndex,
+                                          kMaxRetryCnt,
+                                          request.toString(),
+                                          e);
                     log.warn(warnMsg);
                     // 加入sleep 避免雪崩
                     int threadSleepMs = ThreadLocalRandom.current().nextInt(10, 100);

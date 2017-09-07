@@ -7,8 +7,6 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
@@ -142,7 +140,9 @@ public class COSClient implements COS {
     }
 
     protected <X extends CosServiceRequest> CosHttpRequest<X> createRequest(String bucketName,
-            String key, X originalRequest, HttpMethodName httpMethod) {
+                                                                            String key,
+                                                                            X originalRequest,
+                                                                            HttpMethodName httpMethod) {
         CosHttpRequest<X> httpRequest = new CosHttpRequest<X>(originalRequest);
         httpRequest.setHttpMethod(httpMethod);
         httpRequest.addHeader(Headers.USER_AGENT, clientConfig.getUserAgent());
@@ -151,7 +151,7 @@ public class COSClient implements COS {
     }
 
     private void addAclHeaders(CosHttpRequest<? extends CosServiceRequest> request,
-            AccessControlList acl) {
+                               AccessControlList acl) {
         List<Grant> grants = acl.getGrantsAsList();
         Map<Permission, Collection<Grantee>> grantsByPermission =
                 new HashMap<Permission, Collection<Grantee>>();
@@ -171,8 +171,11 @@ public class COSClient implements COS {
                         seenOne = true;
                     else
                         granteeString.append(", ");
-                    granteeString.append(grantee.getTypeIdentifier()).append("=").append("\"")
-                            .append(grantee.getIdentifier()).append("\"");
+                    granteeString.append(grantee.getTypeIdentifier())
+                                 .append("=")
+                                 .append("\"")
+                                 .append(grantee.getIdentifier())
+                                 .append("\"");
                 }
                 request.addHeader(permission.getHeaderName(), granteeString.toString());
             }
@@ -189,7 +192,7 @@ public class COSClient implements COS {
      * @param metadata The metadata containing the header information to include in the request.
      */
     protected static void populateRequestMetadata(CosHttpRequest<?> request,
-            ObjectMetadata metadata) {
+                                                  ObjectMetadata metadata) {
         Map<String, Object> rawMetadata = metadata.getRawMetadata();
         if (rawMetadata != null) {
             for (Entry<String, Object> entry : rawMetadata.entrySet()) {
@@ -216,9 +219,8 @@ public class COSClient implements COS {
         }
     }
 
-    private void populateRequestWithCopyObjectParameters(
-            CosHttpRequest<? extends CosServiceRequest> request,
-            CopyObjectRequest copyObjectRequest) {
+    private void populateRequestWithCopyObjectParameters(CosHttpRequest<? extends CosServiceRequest> request,
+                                                         CopyObjectRequest copyObjectRequest) {
         Region sourceRegion = copyObjectRequest.getSourceBucketRegion();
         // 如果用户没有设置源region, 则默认和目的region一致
         if (sourceRegion == null) {
@@ -229,31 +231,36 @@ public class COSClient implements COS {
             sourceKey = "/" + sourceKey;
         }
         String copySourceHeader = String.format("%s-%s.%s.myqcloud.com%s",
-                copyObjectRequest.getSourceBucketName(),
-                (copyObjectRequest.getSourceAppid() != null) ? copyObjectRequest.getSourceAppid()
-                        : this.cred.getCOSAppId(),
-                formatRegion(sourceRegion.getRegionName()),
-                UrlEncoderUtils.encodeEscapeDelimiter(sourceKey));
+                                                formatBucket(copyObjectRequest.getSourceBucketName()),
+                                                (copyObjectRequest.getSourceAppid() != null)
+                                                        ? copyObjectRequest.getSourceAppid()
+                                                        : this.cred.getCOSAppId(),
+                                                formatRegion(sourceRegion.getRegionName()),
+                                                UrlEncoderUtils.encodeEscapeDelimiter(sourceKey));
         if (copyObjectRequest.getSourceVersionId() != null) {
             copySourceHeader += "?versionId=" + copyObjectRequest.getSourceVersionId();
         }
         request.addHeader("x-cos-copy-source", copySourceHeader);
 
-        addDateHeader(request, Headers.COPY_SOURCE_IF_MODIFIED_SINCE,
-                copyObjectRequest.getModifiedSinceConstraint());
-        addDateHeader(request, Headers.COPY_SOURCE_IF_UNMODIFIED_SINCE,
-                copyObjectRequest.getUnmodifiedSinceConstraint());
+        addDateHeader(request,
+                      Headers.COPY_SOURCE_IF_MODIFIED_SINCE,
+                      copyObjectRequest.getModifiedSinceConstraint());
+        addDateHeader(request,
+                      Headers.COPY_SOURCE_IF_UNMODIFIED_SINCE,
+                      copyObjectRequest.getUnmodifiedSinceConstraint());
 
-        addStringListHeader(request, Headers.COPY_SOURCE_IF_MATCH,
-                copyObjectRequest.getMatchingETagConstraints());
-        addStringListHeader(request, Headers.COPY_SOURCE_IF_NO_MATCH,
-                copyObjectRequest.getNonmatchingETagConstraints());
+        addStringListHeader(request,
+                            Headers.COPY_SOURCE_IF_MATCH,
+                            copyObjectRequest.getMatchingETagConstraints());
+        addStringListHeader(request,
+                            Headers.COPY_SOURCE_IF_NO_MATCH,
+                            copyObjectRequest.getNonmatchingETagConstraints());
 
         if (copyObjectRequest.getAccessControlList() != null) {
             addAclHeaders(request, copyObjectRequest.getAccessControlList());
         } else if (copyObjectRequest.getCannedAccessControlList() != null) {
             request.addHeader(Headers.COS_CANNED_ACL,
-                    copyObjectRequest.getCannedAccessControlList().toString());
+                              copyObjectRequest.getCannedAccessControlList().toString());
         }
 
         if (copyObjectRequest.getStorageClass() != null) {
@@ -293,13 +300,38 @@ public class COSClient implements COS {
         }
     }
 
+    // 格式化一些路径, 去掉开始时的分隔符/, 比如list prefix.
+    // 因为COS V4的prefix是以/开始的,这里SDK需要坐下兼容
+    private String leftStripPathDelimiter(String path) {
+        if (path == null) {
+            return path;
+        }
+        while (path.startsWith("/")) {
+            path = path.substring(1);
+        }
+        return path;
+    }
+
+    private String formatBucket(String bucketName) {
+        if (bucketName.contains("-")) {
+            return bucketName.substring(0, bucketName.indexOf("-"));
+        } else {
+            return bucketName;
+        }
+    }
+
     private <X extends CosServiceRequest> void buildUrlAndHost(CosHttpRequest<X> request,
-            String bucket, String key) throws CosClientException {
+                                                               String bucket,
+                                                               String key)
+                                                                       throws CosClientException {
+        bucket = formatBucket(bucket);
         key = formatKey(key);
         request.setResourcePath(key);
 
-        String host = String.format("%s-%s.%s.myqcloud.com", bucket, cred.getCOSAppId(),
-                formatRegion(clientConfig.getRegion().getRegionName()));
+        String host = String.format("%s-%s.%s.myqcloud.com",
+                                    bucket,
+                                    cred.getCOSAppId(),
+                                    formatRegion(clientConfig.getRegion().getRegionName()));
 
         if (this.clientConfig.getEndPointSuffix() != null) {
             String endPointSuffix = clientConfig.getEndPointSuffix();
@@ -310,25 +342,23 @@ public class COSClient implements COS {
             }
         }
         request.addHeader(Headers.HOST, host);
-        URI endpoint;
-        try {
-            endpoint = new URI(clientConfig.getHttpProtocol().toString(), host, key, null);
-        } catch (URISyntaxException e) {
-            throw new CosClientException("format cos uri error, exception: {}", e);
-        }
-        request.setEndpoint(endpoint);
+        request.setProtocol(clientConfig.getHttpProtocol());
+        request.setEndpoint(host);
+        request.setResourcePath(key);
     }
 
     private <X, Y extends CosServiceRequest> X invoke(CosHttpRequest<Y> request,
-            Unmarshaller<X, InputStream> unmarshaller)
-                    throws CosClientException, CosServiceException {
+                                                      Unmarshaller<X, InputStream> unmarshaller)
+                                                              throws CosClientException,
+                                                              CosServiceException {
         return invoke(request, new COSXmlResponseHandler<X>(unmarshaller));
 
     }
 
     private <X, Y extends CosServiceRequest> X invoke(CosHttpRequest<Y> request,
-            HttpResponseHandler<CosServiceResponse<X>> responseHandler)
-                    throws CosClientException, CosServiceException {
+                                                      HttpResponseHandler<CosServiceResponse<X>> responseHandler)
+                                                              throws CosClientException,
+                                                              CosServiceException {
 
         COSSigner cosSigner = new COSSigner();
         cosSigner.sign(request, cred);
@@ -385,8 +415,9 @@ public class COSClient implements COS {
      * @param header The header name.
      * @param values The list of strings to join together for the header value.
      */
-    private static void addStringListHeader(CosHttpRequest<?> request, String header,
-            List<String> values) {
+    private static void addStringListHeader(CosHttpRequest<?> request,
+                                            String header,
+                                            List<String> values) {
         if (values != null && !values.isEmpty()) {
             request.addHeader(header, StringUtils.join(values));
         }
@@ -400,7 +431,7 @@ public class COSClient implements COS {
     public PutObjectResult putObject(PutObjectRequest putObjectRequest)
             throws CosClientException, CosServiceException {
         rejectNull(putObjectRequest,
-                "The PutObjectRequest parameter must be specified when uploading an object");
+                   "The PutObjectRequest parameter must be specified when uploading an object");
         final File file = putObjectRequest.getFile();
         final InputStream isOrig = putObjectRequest.getInputStream();
         final String bucketName = putObjectRequest.getBucketName();
@@ -410,7 +441,7 @@ public class COSClient implements COS {
         if (metadata == null)
             metadata = new ObjectMetadata();
         rejectNull(bucketName,
-                "The bucket name parameter must be specified when uploading an object");
+                   "The bucket name parameter must be specified when uploading an object");
         rejectNull(key, "The key parameter must be specified when uploading an object");
         // If a file is specified for upload, we need to pull some additional
         // information from it to auto-configure a few options
@@ -438,7 +469,7 @@ public class COSClient implements COS {
                 }
             }
             input = ResettableInputStream.newResettableInputStream(file,
-                    "Unable to find file to upload");
+                                                                   "Unable to find file to upload");
         }
 
         final ObjectMetadata returnedMetadata;
@@ -450,7 +481,7 @@ public class COSClient implements COS {
                 addAclHeaders(request, putObjectRequest.getAccessControlList());
             } else if (putObjectRequest.getCannedAcl() != null) {
                 request.addHeader(Headers.COS_CANNED_ACL,
-                        putObjectRequest.getCannedAcl().toString());
+                                  putObjectRequest.getCannedAcl().toString());
             }
 
             if (putObjectRequest.getStorageClass() != null) {
@@ -459,7 +490,7 @@ public class COSClient implements COS {
 
             if (putObjectRequest.getRedirectLocation() != null) {
                 request.addHeader(Headers.REDIRECT_LOCATION,
-                        putObjectRequest.getRedirectLocation());
+                                  putObjectRequest.getRedirectLocation());
                 if (input == null) {
                     input = new ByteArrayInputStream(new byte[0]);
                 }
@@ -564,13 +595,16 @@ public class COSClient implements COS {
     @Override
     public PutObjectResult putObject(String bucketName, String key, File file)
             throws CosClientException, CosServiceException {
-        return putObject(
-                new PutObjectRequest(bucketName, key, file).withMetadata(new ObjectMetadata()));
+        return putObject(new PutObjectRequest(bucketName, key,
+                file).withMetadata(new ObjectMetadata()));
     }
 
     @Override
-    public PutObjectResult putObject(String bucketName, String key, InputStream input,
-            ObjectMetadata metadata) throws CosClientException, CosServiceException {
+    public PutObjectResult putObject(String bucketName,
+                                     String key,
+                                     InputStream input,
+                                     ObjectMetadata metadata)
+                                             throws CosClientException, CosServiceException {
         return putObject(new PutObjectRequest(bucketName, key, input, metadata));
     }
 
@@ -584,14 +618,17 @@ public class COSClient implements COS {
     public COSObject getObject(GetObjectRequest getObjectRequest)
             throws CosClientException, CosServiceException {
         rejectNull(getObjectRequest,
-                "The GetObjectRequest parameter must be specified when requesting an object");
+                   "The GetObjectRequest parameter must be specified when requesting an object");
         rejectNull(getObjectRequest.getBucketName(),
-                "The bucket name parameter must be specified when requesting an object");
+                   "The bucket name parameter must be specified when requesting an object");
         rejectNull(getObjectRequest.getKey(),
-                "The key parameter must be specified when requesting an object");
+                   "The key parameter must be specified when requesting an object");
 
-        CosHttpRequest<GetObjectRequest> request = createRequest(getObjectRequest.getBucketName(),
-                getObjectRequest.getKey(), getObjectRequest, HttpMethodName.GET);
+        CosHttpRequest<GetObjectRequest> request =
+                createRequest(getObjectRequest.getBucketName(),
+                              getObjectRequest.getKey(),
+                              getObjectRequest,
+                              HttpMethodName.GET);
         if (getObjectRequest.getVersionId() != null) {
             request.addParameter("versionId", getObjectRequest.getVersionId());
         }
@@ -600,17 +637,21 @@ public class COSClient implements COS {
         long[] range = getObjectRequest.getRange();
         if (range != null) {
             request.addHeader(Headers.RANGE,
-                    "bytes=" + Long.toString(range[0]) + "-" + Long.toString(range[1]));
+                              "bytes=" + Long.toString(range[0]) + "-" + Long.toString(range[1]));
         }
 
-        addDateHeader(request, Headers.GET_OBJECT_IF_MODIFIED_SINCE,
-                getObjectRequest.getModifiedSinceConstraint());
-        addDateHeader(request, Headers.GET_OBJECT_IF_UNMODIFIED_SINCE,
-                getObjectRequest.getUnmodifiedSinceConstraint());
-        addStringListHeader(request, Headers.GET_OBJECT_IF_MATCH,
-                getObjectRequest.getMatchingETagConstraints());
-        addStringListHeader(request, Headers.GET_OBJECT_IF_NONE_MATCH,
-                getObjectRequest.getNonmatchingETagConstraints());
+        addDateHeader(request,
+                      Headers.GET_OBJECT_IF_MODIFIED_SINCE,
+                      getObjectRequest.getModifiedSinceConstraint());
+        addDateHeader(request,
+                      Headers.GET_OBJECT_IF_UNMODIFIED_SINCE,
+                      getObjectRequest.getUnmodifiedSinceConstraint());
+        addStringListHeader(request,
+                            Headers.GET_OBJECT_IF_MATCH,
+                            getObjectRequest.getMatchingETagConstraints());
+        addStringListHeader(request,
+                            Headers.GET_OBJECT_IF_NONE_MATCH,
+                            getObjectRequest.getNonmatchingETagConstraints());
 
         try {
             COSObject cosObject = invoke(request, new COSObjectResponseHandler());
@@ -626,7 +667,7 @@ public class COSClient implements COS {
             // stream in a validator that calculates an MD5 of the downloaded
             // bytes and complains if what we received doesn't match the Etag.
             if (!skipMd5CheckStrategy.skipClientSideValidation(getObjectRequest,
-                    cosObject.getObjectMetadata())) {
+                                                               cosObject.getObjectMetadata())) {
                 try {
                     byte[] serverSideHash =
                             BinaryUtils.fromHex(cosObject.getObjectMetadata().getETag());
@@ -671,21 +712,22 @@ public class COSClient implements COS {
     public ObjectMetadata getObject(final GetObjectRequest getObjectRequest, File destinationFile)
             throws CosClientException, CosServiceException {
         rejectNull(destinationFile,
-                "The destination file parameter must be specified when downloading an object directly to a file");
-        COSObject cosObject = ServiceUtils.retryableDownloadCOSObjectToFile(destinationFile,
-                new ServiceUtils.RetryableCOSDownloadTask() {
+                   "The destination file parameter must be specified when downloading an object directly to a file");
+        COSObject cosObject =
+                ServiceUtils.retryableDownloadCOSObjectToFile(destinationFile,
+                                                              new ServiceUtils.RetryableCOSDownloadTask() {
 
-                    @Override
-                    public boolean needIntegrityCheck() {
-                        return !skipMd5CheckStrategy
-                                .skipClientSideValidationPerRequest(getObjectRequest);
-                    }
+                                                                  @Override
+                                                                  public boolean needIntegrityCheck() {
+                                                                      return !skipMd5CheckStrategy.skipClientSideValidationPerRequest(getObjectRequest);
+                                                                  }
 
-                    @Override
-                    public COSObject getCOSObjectStream() {
-                        return getObject(getObjectRequest);
-                    }
-                }, ServiceUtils.OVERWRITE_MODE);
+                                                                  @Override
+                                                                  public COSObject getCOSObjectStream() {
+                                                                      return getObject(getObjectRequest);
+                                                                  }
+                                                              },
+                                                              ServiceUtils.OVERWRITE_MODE);
 
         if (cosObject == null)
             return null;
@@ -703,14 +745,14 @@ public class COSClient implements COS {
     public ObjectMetadata getObjectMetadata(GetObjectMetadataRequest getObjectMetadataRequest)
             throws CosClientException, CosServiceException {
         rejectNull(getObjectMetadataRequest,
-                "The GetObjectMetadataRequest parameter must be specified when requesting an object's metadata");
+                   "The GetObjectMetadataRequest parameter must be specified when requesting an object's metadata");
 
         String bucketName = getObjectMetadataRequest.getBucketName();
         String key = getObjectMetadataRequest.getKey();
         String versionId = getObjectMetadataRequest.getVersionId();
 
         rejectNull(bucketName,
-                "The bucket name parameter must be specified when requesting an object's metadata");
+                   "The bucket name parameter must be specified when requesting an object's metadata");
         rejectNull(key, "The key parameter must be specified when requesting an object's metadata");
 
         CosHttpRequest<GetObjectMetadataRequest> request =
@@ -724,16 +766,18 @@ public class COSClient implements COS {
     public void deleteObject(DeleteObjectRequest deleteObjectRequest)
             throws CosClientException, CosServiceException {
         rejectNull(deleteObjectRequest,
-                "The delete object request must be specified when deleting an object");
+                   "The delete object request must be specified when deleting an object");
 
         rejectNull(deleteObjectRequest.getBucketName(),
-                "The bucket name must be specified when deleting an object");
+                   "The bucket name must be specified when deleting an object");
         rejectNull(deleteObjectRequest.getKey(),
-                "The key must be specified when deleting an object");
+                   "The key must be specified when deleting an object");
 
         CosHttpRequest<DeleteObjectRequest> request =
-                createRequest(deleteObjectRequest.getBucketName(), deleteObjectRequest.getKey(),
-                        deleteObjectRequest, HttpMethodName.DELETE);
+                createRequest(deleteObjectRequest.getBucketName(),
+                              deleteObjectRequest.getKey(),
+                              deleteObjectRequest,
+                              HttpMethodName.DELETE);
         invoke(request, voidCosResponseHandler);
     }
 
@@ -741,11 +785,11 @@ public class COSClient implements COS {
     public Bucket createBucket(CreateBucketRequest createBucketRequest)
             throws CosClientException, CosServiceException {
         rejectNull(createBucketRequest,
-                "The CreateBucketRequest parameter must be specified when creating a bucket");
+                   "The CreateBucketRequest parameter must be specified when creating a bucket");
 
         String bucketName = createBucketRequest.getBucketName();
         rejectNull(bucketName,
-                "The bucket name parameter must be specified when creating a bucket");
+                   "The bucket name parameter must be specified when creating a bucket");
 
         if (bucketName != null)
             bucketName = bucketName.trim();
@@ -758,7 +802,7 @@ public class COSClient implements COS {
             addAclHeaders(request, createBucketRequest.getAccessControlList());
         } else if (createBucketRequest.getCannedAcl() != null) {
             request.addHeader(Headers.COS_CANNED_ACL,
-                    createBucketRequest.getCannedAcl().toString());
+                              createBucketRequest.getCannedAcl().toString());
         }
 
         invoke(request, voidCosResponseHandler);
@@ -770,11 +814,11 @@ public class COSClient implements COS {
     public void deleteBucket(DeleteBucketRequest deleteBucketRequest)
             throws CosClientException, CosServiceException {
         rejectNull(deleteBucketRequest,
-                "The DeleteBucketRequest parameter must be specified when deleting a bucket");
+                   "The DeleteBucketRequest parameter must be specified when deleting a bucket");
 
         String bucketName = deleteBucketRequest.getBucketName();
         rejectNull(bucketName,
-                "The bucket name parameter must be specified when deleting a bucket");
+                   "The bucket name parameter must be specified when deleting a bucket");
 
         CosHttpRequest<DeleteBucketRequest> request =
                 createRequest(bucketName, "/", deleteBucketRequest, HttpMethodName.DELETE);
@@ -782,41 +826,42 @@ public class COSClient implements COS {
     }
 
     private boolean shouldRetryCompleteMultipartUpload(CosServiceRequest originalRequest,
-            CosClientException exception, int retriesAttempted) {
+                                                       CosClientException exception,
+                                                       int retriesAttempted) {
         return false;
     }
 
     @Override
-    public InitiateMultipartUploadResult initiateMultipartUpload(
-            InitiateMultipartUploadRequest initiateMultipartUploadRequest)
-                    throws CosClientException, CosServiceException {
+    public InitiateMultipartUploadResult initiateMultipartUpload(InitiateMultipartUploadRequest initiateMultipartUploadRequest)
+            throws CosClientException, CosServiceException {
         rejectNull(initiateMultipartUploadRequest,
-                "The request parameter must be specified when initiating a multipart upload");
+                   "The request parameter must be specified when initiating a multipart upload");
         rejectNull(initiateMultipartUploadRequest.getBucketName(),
-                "The bucket name parameter must be specified when initiating a multipart upload");
+                   "The bucket name parameter must be specified when initiating a multipart upload");
         rejectNull(initiateMultipartUploadRequest.getKey(),
-                "The key parameter must be specified when initiating a multipart upload");
+                   "The key parameter must be specified when initiating a multipart upload");
 
         CosHttpRequest<InitiateMultipartUploadRequest> request =
                 createRequest(initiateMultipartUploadRequest.getBucketName(),
-                        initiateMultipartUploadRequest.getKey(), initiateMultipartUploadRequest,
-                        HttpMethodName.POST);
+                              initiateMultipartUploadRequest.getKey(),
+                              initiateMultipartUploadRequest,
+                              HttpMethodName.POST);
         request.addParameter("uploads", null);
 
         if (initiateMultipartUploadRequest.getStorageClass() != null)
             request.addHeader(Headers.STORAGE_CLASS,
-                    initiateMultipartUploadRequest.getStorageClass().toString());
+                              initiateMultipartUploadRequest.getStorageClass().toString());
 
         if (initiateMultipartUploadRequest.getRedirectLocation() != null) {
             request.addHeader(Headers.REDIRECT_LOCATION,
-                    initiateMultipartUploadRequest.getRedirectLocation());
+                              initiateMultipartUploadRequest.getRedirectLocation());
         }
 
         if (initiateMultipartUploadRequest.getAccessControlList() != null) {
             addAclHeaders(request, initiateMultipartUploadRequest.getAccessControlList());
         } else if (initiateMultipartUploadRequest.getCannedACL() != null) {
             request.addHeader(Headers.COS_CANNED_ACL,
-                    initiateMultipartUploadRequest.getCannedACL().toString());
+                              initiateMultipartUploadRequest.getCannedACL().toString());
         }
 
         if (initiateMultipartUploadRequest.objectMetadata != null) {
@@ -837,7 +882,7 @@ public class COSClient implements COS {
     public UploadPartResult uploadPart(UploadPartRequest uploadPartRequest)
             throws CosClientException, CosServiceException {
         rejectNull(uploadPartRequest,
-                "The request parameter must be specified when uploading a part");
+                   "The request parameter must be specified when uploading a part");
         final File fileOrig = uploadPartRequest.getFile();
         final InputStream isOrig = uploadPartRequest.getInputStream();
         final String bucketName = uploadPartRequest.getBucketName();
@@ -883,8 +928,8 @@ public class COSClient implements COS {
             isCurr = new InputSubstream(isCurr, uploadPartRequest.getFileOffset(), partSize,
                     uploadPartRequest.isLastPart());
             MD5DigestCalculatingInputStream md5DigestStream = null;
-            if (uploadPartRequest.getMd5Digest() == null && !skipMd5CheckStrategy
-                    .skipClientSideValidationPerRequest(uploadPartRequest)) {
+            if (uploadPartRequest.getMd5Digest() == null
+                    && !skipMd5CheckStrategy.skipClientSideValidationPerRequest(uploadPartRequest)) {
                 /*
                  * If the user hasn't set the content MD5, then we don't want to buffer the whole
                  * stream in memory just to calculate it. Instead, we can calculate it on the fly
@@ -892,25 +937,35 @@ public class COSClient implements COS {
                  */
                 isCurr = md5DigestStream = new MD5DigestCalculatingInputStream(isCurr);
             }
-            return doUploadPart(bucketName, key, uploadId, partNumber, partSize, request, isCurr,
-                    md5DigestStream);
+            return doUploadPart(bucketName,
+                                key,
+                                uploadId,
+                                partNumber,
+                                partSize,
+                                request,
+                                isCurr,
+                                md5DigestStream);
         } finally {
             CosDataSource.Utils.cleanupDataSource(uploadPartRequest, fileOrig, isOrig, isCurr, log);
         }
     }
 
-    private UploadPartResult doUploadPart(final String bucketName, final String key,
-            final String uploadId, final int partNumber, final long partSize,
-            CosHttpRequest<UploadPartRequest> request, InputStream inputStream,
-            MD5DigestCalculatingInputStream md5DigestStream) {
+    private UploadPartResult doUploadPart(final String bucketName,
+                                          final String key,
+                                          final String uploadId,
+                                          final int partNumber,
+                                          final long partSize,
+                                          CosHttpRequest<UploadPartRequest> request,
+                                          InputStream inputStream,
+                                          MD5DigestCalculatingInputStream md5DigestStream) {
         try {
             request.setContent(inputStream);
             ObjectMetadata metadata = invoke(request, new CosMetadataResponseHandler());
             final String etag = metadata.getETag();
 
 
-            if (md5DigestStream != null && !skipMd5CheckStrategy
-                    .skipClientSideValidationPerUploadPartResponse(metadata)) {
+            if (md5DigestStream != null
+                    && !skipMd5CheckStrategy.skipClientSideValidationPerUploadPartResponse(metadata)) {
                 byte[] clientSideHash = md5DigestStream.getMd5Digest();
                 byte[] serverSideHash = BinaryUtils.fromHex(etag);
 
@@ -944,21 +999,24 @@ public class COSClient implements COS {
         rejectNull(listPartsRequest, "The request parameter must be specified when listing parts");
 
         rejectNull(listPartsRequest.getBucketName(),
-                "The bucket name parameter must be specified when listing parts");
+                   "The bucket name parameter must be specified when listing parts");
         rejectNull(listPartsRequest.getKey(),
-                "The key parameter must be specified when listing parts");
+                   "The key parameter must be specified when listing parts");
         rejectNull(listPartsRequest.getUploadId(),
-                "The upload ID parameter must be specified when listing parts");
+                   "The upload ID parameter must be specified when listing parts");
 
-        CosHttpRequest<ListPartsRequest> request = createRequest(listPartsRequest.getBucketName(),
-                listPartsRequest.getKey(), listPartsRequest, HttpMethodName.GET);
+        CosHttpRequest<ListPartsRequest> request =
+                createRequest(listPartsRequest.getBucketName(),
+                              listPartsRequest.getKey(),
+                              listPartsRequest,
+                              HttpMethodName.GET);
         request.addParameter("uploadId", listPartsRequest.getUploadId());
 
         if (listPartsRequest.getMaxParts() != null)
             request.addParameter("max-parts", listPartsRequest.getMaxParts().toString());
         if (listPartsRequest.getPartNumberMarker() != null)
             request.addParameter("part-number-marker",
-                    listPartsRequest.getPartNumberMarker().toString());
+                                 listPartsRequest.getPartNumberMarker().toString());
         if (listPartsRequest.getEncodingType() != null)
             request.addParameter("encoding-type", listPartsRequest.getEncodingType());
 
@@ -969,13 +1027,13 @@ public class COSClient implements COS {
     public void abortMultipartUpload(AbortMultipartUploadRequest abortMultipartUploadRequest)
             throws CosClientException, CosServiceException {
         rejectNull(abortMultipartUploadRequest,
-                "The request parameter must be specified when aborting a multipart upload");
+                   "The request parameter must be specified when aborting a multipart upload");
         rejectNull(abortMultipartUploadRequest.getBucketName(),
-                "The bucket name parameter must be specified when aborting a multipart upload");
+                   "The bucket name parameter must be specified when aborting a multipart upload");
         rejectNull(abortMultipartUploadRequest.getKey(),
-                "The key parameter must be specified when aborting a multipart upload");
+                   "The key parameter must be specified when aborting a multipart upload");
         rejectNull(abortMultipartUploadRequest.getUploadId(),
-                "The upload ID parameter must be specified when aborting a multipart upload");
+                   "The upload ID parameter must be specified when aborting a multipart upload");
 
         String bucketName = abortMultipartUploadRequest.getBucketName();
         String key = abortMultipartUploadRequest.getKey();
@@ -989,32 +1047,34 @@ public class COSClient implements COS {
     }
 
     @Override
-    public CompleteMultipartUploadResult completeMultipartUpload(
-            CompleteMultipartUploadRequest completeMultipartUploadRequest)
-                    throws CosClientException, CosServiceException {
+    public CompleteMultipartUploadResult completeMultipartUpload(CompleteMultipartUploadRequest completeMultipartUploadRequest)
+            throws CosClientException, CosServiceException {
         rejectNull(completeMultipartUploadRequest,
-                "The request parameter must be specified when completing a multipart upload");
+                   "The request parameter must be specified when completing a multipart upload");
 
         String bucketName = completeMultipartUploadRequest.getBucketName();
         String key = completeMultipartUploadRequest.getKey();
         String uploadId = completeMultipartUploadRequest.getUploadId();
         rejectNull(bucketName,
-                "The bucket name parameter must be specified when completing a multipart upload");
+                   "The bucket name parameter must be specified when completing a multipart upload");
         rejectNull(key, "The key parameter must be specified when completing a multipart upload");
         rejectNull(uploadId,
-                "The upload ID parameter must be specified when completing a multipart upload");
+                   "The upload ID parameter must be specified when completing a multipart upload");
         rejectNull(completeMultipartUploadRequest.getPartETags(),
-                "The part ETags parameter must be specified when completing a multipart upload");
+                   "The part ETags parameter must be specified when completing a multipart upload");
 
         int retries = 0;
         CompleteMultipartUploadHandler handler;
         do {
-            CosHttpRequest<CompleteMultipartUploadRequest> request = createRequest(bucketName, key,
-                    completeMultipartUploadRequest, HttpMethodName.POST);
+            CosHttpRequest<CompleteMultipartUploadRequest> request =
+                    createRequest(bucketName,
+                                  key,
+                                  completeMultipartUploadRequest,
+                                  HttpMethodName.POST);
             request.addParameter("uploadId", uploadId);
 
-            byte[] xml = RequestXmlFactory
-                    .convertToXmlByteArray(completeMultipartUploadRequest.getPartETags());
+            byte[] xml =
+                    RequestXmlFactory.convertToXmlByteArray(completeMultipartUploadRequest.getPartETags());
 
             request.addHeader("Content-Type", "text/plain");
             request.addHeader("Content-Length", String.valueOf(xml.length));
@@ -1036,34 +1096,36 @@ public class COSClient implements COS {
                 return handler.getCompleteMultipartUploadResult();
             }
         } while (shouldRetryCompleteMultipartUpload(completeMultipartUploadRequest,
-                handler.getCOSException(), retries++));
+                                                    handler.getCOSException(),
+                                                    retries++));
 
         throw handler.getCOSException();
     }
 
     @Override
-    public MultipartUploadListing listMultipartUploads(
-            ListMultipartUploadsRequest listMultipartUploadsRequest)
-                    throws CosClientException, CosServiceException {
+    public MultipartUploadListing listMultipartUploads(ListMultipartUploadsRequest listMultipartUploadsRequest)
+            throws CosClientException, CosServiceException {
         rejectNull(listMultipartUploadsRequest,
-                "The request parameter must be specified when listing multipart uploads");
+                   "The request parameter must be specified when listing multipart uploads");
 
         rejectNull(listMultipartUploadsRequest.getBucketName(),
-                "The bucket name parameter must be specified when listing multipart uploads");
+                   "The bucket name parameter must be specified when listing multipart uploads");
 
         CosHttpRequest<ListMultipartUploadsRequest> request =
-                createRequest(listMultipartUploadsRequest.getBucketName(), null,
-                        listMultipartUploadsRequest, HttpMethodName.GET);
+                createRequest(listMultipartUploadsRequest.getBucketName(),
+                              null,
+                              listMultipartUploadsRequest,
+                              HttpMethodName.GET);
         request.addParameter("uploads", null);
 
         if (listMultipartUploadsRequest.getKeyMarker() != null)
             request.addParameter("key-marker", listMultipartUploadsRequest.getKeyMarker());
         if (listMultipartUploadsRequest.getMaxUploads() != null)
             request.addParameter("max-uploads",
-                    listMultipartUploadsRequest.getMaxUploads().toString());
+                                 listMultipartUploadsRequest.getMaxUploads().toString());
         if (listMultipartUploadsRequest.getUploadIdMarker() != null)
             request.addParameter("upload-id-marker",
-                    listMultipartUploadsRequest.getUploadIdMarker());
+                                 listMultipartUploadsRequest.getUploadIdMarker());
         if (listMultipartUploadsRequest.getDelimiter() != null)
             request.addParameter("delimiter", listMultipartUploadsRequest.getDelimiter());
         if (listMultipartUploadsRequest.getPrefix() != null)
@@ -1090,12 +1152,17 @@ public class COSClient implements COS {
     public ObjectListing listObjects(ListObjectsRequest listObjectsRequest)
             throws CosClientException, CosServiceException {
         rejectNull(listObjectsRequest.getBucketName(),
-                "The bucket name parameter must be specified when listing objects in a bucket");
+                   "The bucket name parameter must be specified when listing objects in a bucket");
 
-        CosHttpRequest<ListObjectsRequest> request = createRequest(
-                listObjectsRequest.getBucketName(), "/", listObjectsRequest, HttpMethodName.GET);
+        CosHttpRequest<ListObjectsRequest> request =
+                createRequest(listObjectsRequest.getBucketName(),
+                              "/",
+                              listObjectsRequest,
+                              HttpMethodName.GET);
+
+        // 兼容prefix以/开始, 以为COS V4的prefix等可以以斜杠开始
         if (listObjectsRequest.getPrefix() != null)
-            request.addParameter("prefix", listObjectsRequest.getPrefix());
+            request.addParameter("prefix", leftStripPathDelimiter(listObjectsRequest.getPrefix()));
         if (listObjectsRequest.getMarker() != null)
             request.addParameter("marker", listObjectsRequest.getMarker());
         if (listObjectsRequest.getDelimiter() != null)
@@ -1116,11 +1183,10 @@ public class COSClient implements COS {
     }
 
     @Override
-    public ObjectListing listNextBatchOfObjects(
-            ListNextBatchOfObjectsRequest listNextBatchOfObjectsRequest)
-                    throws CosClientException, CosServiceException {
+    public ObjectListing listNextBatchOfObjects(ListNextBatchOfObjectsRequest listNextBatchOfObjectsRequest)
+            throws CosClientException, CosServiceException {
         rejectNull(listNextBatchOfObjectsRequest,
-                "The request object parameter must be specified when listing the next batch of objects in a bucket");
+                   "The request object parameter must be specified when listing the next batch of objects in a bucket");
         ObjectListing previousObjectListing =
                 listNextBatchOfObjectsRequest.getPreviousObjectListing();
 
@@ -1143,19 +1209,22 @@ public class COSClient implements COS {
     public CopyObjectResult copyObject(CopyObjectRequest copyObjectRequest)
             throws CosClientException, CosServiceException {
         rejectNull(copyObjectRequest.getSourceBucketName(),
-                "The source bucket name must be specified when copying an object");
+                   "The source bucket name must be specified when copying an object");
         rejectNull(copyObjectRequest.getSourceKey(),
-                "The source object key must be specified when copying an object");
+                   "The source object key must be specified when copying an object");
         rejectNull(copyObjectRequest.getDestinationBucketName(),
-                "The destination bucket name must be specified when copying an object");
+                   "The destination bucket name must be specified when copying an object");
         rejectNull(copyObjectRequest.getDestinationKey(),
-                "The destination object key must be specified when copying an object");
+                   "The destination object key must be specified when copying an object");
 
         String destinationKey = copyObjectRequest.getDestinationKey();
         String destinationBucketName = copyObjectRequest.getDestinationBucketName();
 
-        CosHttpRequest<CopyObjectRequest> request = createRequest(destinationBucketName,
-                destinationKey, copyObjectRequest, HttpMethodName.PUT);
+        CosHttpRequest<CopyObjectRequest> request =
+                createRequest(destinationBucketName,
+                              destinationKey,
+                              copyObjectRequest,
+                              HttpMethodName.PUT);
 
         populateRequestWithCopyObjectParameters(request, copyObjectRequest);
 

@@ -33,8 +33,9 @@ public class Demo {
 
         // 设置秘钥
         COSCredentials cred = new BasicCOSCredentials(appid, secret_id, secret_key);
-        // 设置区域, 这里设置为华北
-        ClientConfig clientConfig = new ClientConfig(new Region("cn-north"));
+        // 设置区域, 这里设置为北京一区
+        // (COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224)
+        ClientConfig clientConfig = new ClientConfig(new Region("ap-beijing-1"));
         // 生成cos客户端对象
         COSClient cosClient = new COSClient(cred, clientConfig);
 
@@ -44,7 +45,7 @@ public class Demo {
         String bucketName = "mybucket1511";
         CreateBucketRequest createBucketRequest = new CreateBucketRequest(bucketName);
         createBucketRequest.setCannedAcl(CannedAccessControlList.PublicReadWrite);
-        Bucket created_bucket = cosClient.createBucket(createBucketRequest);
+        Bucket createdBucket = cosClient.createBucket(createBucketRequest);
 
         // 上传object, 建议20M以下的文件使用该接口
         File localFile = new File("src/test/resources/len5M.txt");
