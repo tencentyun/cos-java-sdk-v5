@@ -26,8 +26,8 @@ import com.qcloud.cos.transfer.Upload;
 
 public class Demo {
     public static void main(String[] args) throws Exception {
-        // 用户基本信息
-        String appid = "100000";
+        // 用户基本信息(参照云API秘钥)
+        String appid = "125000";
         String secret_id = "xxxxxxxxxxxxxxxx";
         String secret_key = "yyyyyyyyyyyy";
 
