@@ -26,8 +26,9 @@ public class STSDemo {
 	public static void main(String[] args) {
 		// 使用云api秘钥，可以获取一个临时secret id，secret key和session token,
 		BasicSessionCredentials cred = getSessionCredential();
-		// 设置区域, 这里设置为华北
-        ClientConfig clientConfig = new ClientConfig(new Region("cn-north"));
+        // 设置区域, 这里设置为北京一区
+        // (COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224)
+        ClientConfig clientConfig = new ClientConfig(new Region("ap-beijing-1"));
         // 生成cos客户端对象
         COSClient cosClient = new COSClient(cred, clientConfig);
         // 上传的bucket名字

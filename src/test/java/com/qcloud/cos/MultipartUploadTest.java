@@ -143,12 +143,12 @@ public class MultipartUploadTest extends AbstractCOSClientTest {
     }
 
     // 测试分块上传
-    @Ignore
+    @Test
     public void testMultipartUploadObjectSize_100M_Part_3M() throws IOException {
         testMultiPartUploadObject(100 * 1024 * 1024L, 3 * 1024 * 1024L);
     }
 
-    @Ignore
+    @Test
     public void testMultipartUploadObjectSize_100M_Part_NotAlign_1M() throws IOException {
         // 这里用一个任意尺寸的，非1M对齐的来做个测试
         testMultiPartUploadObject(100 * 1024 * 1024L, 3 * 1024 * 1024L + 13);

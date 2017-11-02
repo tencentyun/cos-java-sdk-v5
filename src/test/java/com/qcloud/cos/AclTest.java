@@ -30,7 +30,7 @@ public class AclTest extends AbstractCOSClientTest {
         AbstractCOSClientTest.destoryCosClient();
     }
 
-    @Ignore
+    @Test
     public void setGetBucketAclTest() {
         AccessControlList acl = new AccessControlList();
         Owner owner = new Owner();
@@ -49,7 +49,7 @@ public class AclTest extends AbstractCOSClientTest {
         assertEquals(Permission.FullControl.toString(), grants.get(0).getPermission().toString());
     }
 
-    @Ignore
+    @Test
     public void setGetBucketCannedAclTest() {
         cosclient.setBucketAcl(bucket, CannedAccessControlList.Private);
         AccessControlList acl = cosclient.getBucketAcl(bucket);
@@ -83,7 +83,7 @@ public class AclTest extends AbstractCOSClientTest {
         }
     }
 
-    @Ignore
+    @Test
     public void setObjectCannedAclTest() throws IOException {
         File localFile = buildTestFile(0L);
         String key = "ut/acl_test.txt";
