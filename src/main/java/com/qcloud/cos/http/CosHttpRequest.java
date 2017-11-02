@@ -17,9 +17,10 @@ public class CosHttpRequest<T extends CosServiceRequest> {
 
     /** Map of the headers included in this request */
     private Map<String, String> headers = new HashMap<String, String>();
-
+    // HTTP protocol
+    private HttpProtocol protocol;
     /** The service endpoint to which this request should be sent */
-    private URI endpoint;
+    private String endpoint;
 
     /** The HTTP method to use when sending this request. */
     private HttpMethodName httpMethod = HttpMethodName.POST;
@@ -61,6 +62,14 @@ public class CosHttpRequest<T extends CosServiceRequest> {
         addParameter(name, value);
         return this;
     }
+    
+    public HttpProtocol getProtocol() {
+        return protocol;
+    }
+
+    public void setProtocol(HttpProtocol protocol) {
+        this.protocol = protocol;
+    }
 
     public HttpMethodName getHttpMethod() {
         return httpMethod;
@@ -70,11 +79,11 @@ public class CosHttpRequest<T extends CosServiceRequest> {
         this.httpMethod = httpMethod;
     }
 
-    public void setEndpoint(URI endpoint) {
+    public void setEndpoint(String endpoint) {
         this.endpoint = endpoint;
     }
 
-    public URI getEndpoint() {
+    public String getEndpoint() {
         return endpoint;
     }
 

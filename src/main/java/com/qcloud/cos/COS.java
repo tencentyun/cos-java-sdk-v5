@@ -2,23 +2,40 @@ package com.qcloud.cos;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.List;
 
 import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.model.AbortMultipartUploadRequest;
+import com.qcloud.cos.model.AccessControlList;
 import com.qcloud.cos.model.Bucket;
+import com.qcloud.cos.model.BucketCrossOriginConfiguration;
+import com.qcloud.cos.model.BucketLifecycleConfiguration;
+import com.qcloud.cos.model.BucketVersioningConfiguration;
 import com.qcloud.cos.model.COSObject;
+import com.qcloud.cos.model.CannedAccessControlList;
 import com.qcloud.cos.model.CompleteMultipartUploadRequest;
 import com.qcloud.cos.model.CompleteMultipartUploadResult;
 import com.qcloud.cos.model.CopyObjectRequest;
 import com.qcloud.cos.model.CopyObjectResult;
 import com.qcloud.cos.model.CreateBucketRequest;
+import com.qcloud.cos.model.DeleteBucketCrossOriginConfigurationRequest;
+import com.qcloud.cos.model.DeleteBucketLifecycleConfigurationRequest;
 import com.qcloud.cos.model.DeleteBucketRequest;
 import com.qcloud.cos.model.DeleteObjectRequest;
+import com.qcloud.cos.model.GetBucketAclRequest;
+import com.qcloud.cos.model.GetBucketCrossOriginConfigurationRequest;
+import com.qcloud.cos.model.GetBucketLifecycleConfigurationRequest;
+import com.qcloud.cos.model.GetBucketLocationRequest;
+import com.qcloud.cos.model.GetBucketVersioningConfigurationRequest;
+import com.qcloud.cos.model.GetObjectAclRequest;
 import com.qcloud.cos.model.GetObjectMetadataRequest;
 import com.qcloud.cos.model.GetObjectRequest;
+import com.qcloud.cos.model.HeadBucketRequest;
+import com.qcloud.cos.model.HeadBucketResult;
 import com.qcloud.cos.model.InitiateMultipartUploadRequest;
 import com.qcloud.cos.model.InitiateMultipartUploadResult;
+import com.qcloud.cos.model.ListBucketsRequest;
 import com.qcloud.cos.model.ListMultipartUploadsRequest;
 import com.qcloud.cos.model.ListNextBatchOfObjectsRequest;
 import com.qcloud.cos.model.ListObjectsRequest;
@@ -29,6 +46,11 @@ import com.qcloud.cos.model.ObjectMetadata;
 import com.qcloud.cos.model.PartListing;
 import com.qcloud.cos.model.PutObjectRequest;
 import com.qcloud.cos.model.PutObjectResult;
+import com.qcloud.cos.model.SetBucketAclRequest;
+import com.qcloud.cos.model.SetBucketCrossOriginConfigurationRequest;
+import com.qcloud.cos.model.SetBucketLifecycleConfigurationRequest;
+import com.qcloud.cos.model.SetBucketVersioningConfigurationRequest;
+import com.qcloud.cos.model.SetObjectAclRequest;
 import com.qcloud.cos.model.UploadPartRequest;
 import com.qcloud.cos.model.UploadPartResult;
 
@@ -36,13 +58,13 @@ public interface COS {
 
     /**
      * <p>
-     * Uploads a new object to the specified Qcloud COS bucket. The <code>PutObjectRequest</code>
-     * contains all the details of the request, including the bucket to upload to, the key the
-     * object will be uploaded under, and the file or input stream containing the data to upload.
+     * Uploads a new object to the specified bucket. The <code>PutObjectRequest</code> contains all
+     * the details of the request, including the bucket to upload to, the key the object will be
+     * uploaded under, and the file or input stream containing the data to upload.
      * </p>
      * <p>
-     * Qcloud COS never stores partial objects; if during this call an exception wasn't thrown, the
-     * entire object was stored.
+     * never stores partial objects; if during this call an exception wasn't thrown, the entire
+     * object was stored.
      * </p>
      * <p>
      * Depending on whether a file or input stream is being uploaded, this method has slightly
@@ -52,10 +74,10 @@ public interface COS {
      * When uploading a file:
      * </p>
      * <ul>
-     * <li>The client automatically computes a checksum of the file. Qcloud COS uses checksums to
-     * validate the data in each file.</li>
-     * <li>Using the file extension, Qcloud COS attempts to determine the correct content type and
-     * content disposition to use for the object.</li>
+     * <li>The client automatically computes a checksum of the file. uses checksums to validate the
+     * data in each file.</li>
+     * <li>Using the file extension, attempts to determine the correct content type and content
+     * disposition to use for the object.</li>
      * </ul>
      * <p>
      * When uploading directly from an input stream:
@@ -63,10 +85,10 @@ public interface COS {
      * <ul>
      * <li>Be careful to set the correct content type in the metadata object before directly sending
      * a stream. Unlike file uploads, content types from input streams cannot be automatically
-     * determined. If the caller doesn't explicitly set the content type, it will not be set in
-     * Qcloud COS.</li>
-     * <li>Content length <b>must</b> be specified before data can be uploaded to Qcloud COS. Qcloud
-     * COS explicitly requires that the content length be sent in the request headers before it will
+     * determined. If the caller doesn't explicitly set the content type, it will not be set in .
+     * </li>
+     * <li>Content length <b>must</b> be specified before data can be uploaded to . Qcloud COS
+     * explicitly requires that the content length be sent in the request headers before it will
      * accept any of the data. If the caller doesn't provide the length, the library must buffer the
      * contents of the input stream in order to calculate it.
      * </ul>
@@ -77,15 +99,14 @@ public interface COS {
      * </p>
      *
      * @param putObjectRequest The request object containing all the parameters to upload a new
-     *        object to Qcloud COS.
+     *        object to .
      *
-     * @return A {@link PutObjectResult} object containing the information returned by Qcloud COS
-     *         for the newly created object.
+     * @return A {@link PutObjectResult} object containing the information returned by for the newly
+     *         created object.
      *
      * @throws CosClientException If any errors are encountered in the client while making the
      *         request or handling the response.
-     * @throws CosServiceException If any errors occurred in Qcloud COS while processing the
-     *         request.
+     * @throws CosServiceException If any errors occurred in while processing the request.
      *
      * @see COS#putObject(String, String, File)
      * @see COS#putObject(String, String, InputStream, ObjectMetadata)
@@ -95,19 +116,19 @@ public interface COS {
 
     /**
      * <p>
-     * Uploads the specified file to Qcloud COS under the specified bucket and key name.
+     * Uploads the specified file to under the specified bucket and key name.
      * </p>
      * <p>
-     * Qcloud COS never stores partial objects; if during this call an exception wasn't thrown, the
-     * entire object was stored.
+     * never stores partial objects; if during this call an exception wasn't thrown, the entire
+     * object was stored.
      * </p>
      * <p>
-     * The client automatically computes a checksum of the file. Qcloud COS uses checksums to
-     * validate the data in each file.
+     * The client automatically computes a checksum of the file. uses checksums to validate the data
+     * in each file.
      * </p>
      * <p>
-     * Using the file extension, Qcloud COS attempts to determine the correct content type and
-     * content disposition to use for the object.
+     * Using the file extension, attempts to determine the correct content type and content
+     * disposition to use for the object.
      * </p>
      *
      * <p>
@@ -118,15 +139,14 @@ public interface COS {
      * @param bucketName The name of an existing bucket, to which you have {@link Permission#Write}
      *        permission.
      * @param key The key under which to store the specified file.
-     * @param file The file containing the data to be uploaded to Qcloud COS.
+     * @param file The file containing the data to be uploaded to .
      * 
-     * @return A {@link PutObjectResult} object containing the information returned by Qcloud COS
-     *         for the newly created object.
+     * @return A {@link PutObjectResult} object containing the information returned by for the newly
+     *         created object.
      *
      * @throws CosClientException If any errors are encountered in the client while making the
      *         request or handling the response.
-     * @throws CosServiceException If any errors occurred in Qcloud COS while processing the
-     *         request.
+     * @throws CosServiceException If any errors occurred in while processing the request.
      *
      * @see COS#putObject(PutObjectRequest)
      * @see COS#putObject(String, String, InputStream, ObjectMetadata)
@@ -137,11 +157,11 @@ public interface COS {
 
     /**
      * <p>
-     * Uploads the specified file to Qcloud COS under the specified bucket and key name.
+     * Uploads the specified file to under the specified bucket and key name.
      * </p>
      * <p>
-     * Qcloud COS never stores partial objects; if during this call an exception wasn't thrown, the
-     * entire object was stored.
+     * never stores partial objects; if during this call an exception wasn't thrown, the entire
+     * object was stored.
      * </p>
      * <p>
      * When uploading directly from an input stream:
@@ -149,10 +169,10 @@ public interface COS {
      * <ul>
      * <li>Be careful to set the correct content type in the metadata object before directly sending
      * a stream. Unlike file uploads, content types from input streams cannot be automatically
-     * determined. If the caller doesn't explicitly set the content type, it will not be set in
-     * Qcloud COS.</li>
-     * <li>Content length <b>must</b> be specified before data can be uploaded to Qcloud COS. Qcloud
-     * COS explicitly requires that the content length be sent in the request headers before it will
+     * determined. If the caller doesn't explicitly set the content type, it will not be set in .
+     * </li>
+     * <li>Content length <b>must</b> be specified before data can be uploaded to . Qcloud COS
+     * explicitly requires that the content length be sent in the request headers before it will
      * accept any of the data. If the caller doesn't provide the length, the library must buffer the
      * contents of the input stream in order to calculate it.
      * </ul>
@@ -165,17 +185,16 @@ public interface COS {
      * @param bucketName The name of an existing bucket, to which you have {@link Permission#Write}
      *        permission.
      * @param key The key under which to store the specified file.
-     * @param input The input stream containing the data to be uploaded to Qcloud COS.
-     * @param metadata Additional metadata instructing Qcloud COS how to handle the uploaded data
-     *        (e.g. custom user metadata, hooks for specifying content type, etc.).
+     * @param input The input stream containing the data to be uploaded to .
+     * @param metadata Additional metadata instructing how to handle the uploaded data (e.g. custom
+     *        user metadata, hooks for specifying content type, etc.).
      *
-     * @return A {@link PutObjectResult} object containing the information returned by Qcloud COS
-     *         for the newly created object.
+     * @return A {@link PutObjectResult} object containing the information returned by for the newly
+     *         created object.
      *
      * @throws CosClientException If any errors are encountered in the client while making the
      *         request or handling the response.
-     * @throws CosServiceException If any errors occurred in Qcloud COS while processing the
-     *         request.
+     * @throws CosServiceException If any errors occurred in while processing the request.
      *
      * @see COS#putObject(PutObjectRequest)
      * @see COS#putObject(String, String, File)
@@ -186,7 +205,7 @@ public interface COS {
 
     /**
      * <p>
-     * Gets the object stored in Qcloud COS under the specified bucket and key.
+     * Gets the object stored in under the specified bucket and key.
      * </p>
      * <p>
      * Be extremely careful when using this method; the returned COS object contains a direct stream
@@ -194,15 +213,14 @@ public interface COS {
      * user finishes reading the data and closes the stream. Therefore:
      * </p>
      * <ul>
-     * <li>Use the data from the input stream in Qcloud COS object as soon as possible</li>
-     * <li>Close the input stream in Qcloud COS object as soon as possible</li>
+     * <li>Use the data from the input stream in object as soon as possible</li>
+     * <li>Close the input stream in object as soon as possible</li>
      * </ul>
      * If these rules are not followed, the client can run out of resources by allocating too many
      * open, but unused, HTTP connections.
      * </p>
      * <p>
-     * To get an object from Qcloud COS, the caller must have {@link Permission#Read} access to the
-     * object.
+     * To get an object from , the caller must have {@link Permission#Read} access to the object.
      * </p>
      * <p>
      * If the object fetched is publicly readable, it can also read it by pasting its URL into a
@@ -217,12 +235,11 @@ public interface COS {
      * @param bucketName The name of the bucket containing the desired object.
      * @param key The key under which the desired object is stored.
      *
-     * @return The object stored in Qcloud COS in the specified bucket and key.
+     * @return The object stored in in the specified bucket and key.
      *
      * @throws CosClientException If any errors are encountered in the client while making the
      *         request or handling the response.
-     * @throws CosServiceException If any errors occurred in Qcloud COS while processing the
-     *         request.
+     * @throws CosServiceException If any errors occurred in while processing the request.
      *
      * @see COS#getObject(GetObjectRequest)
      * @see COS#getObject(GetObjectRequest, File)
@@ -232,8 +249,8 @@ public interface COS {
 
     /**
      * <p>
-     * Gets the object stored in Qcloud COS under the specified bucket and key. Returns
-     * <code>null</code> if the specified constraints weren't met.
+     * Gets the object stored in under the specified bucket and key. Returns <code>null</code> if
+     * the specified constraints weren't met.
      * </p>
      * <p>
      * Be extremely careful when using this method; the returned COS object contains a direct stream
@@ -241,16 +258,15 @@ public interface COS {
      * user finishes reading the data and closes the stream. Therefore:
      * </p>
      * <ul>
-     * <li>Use the data from the input stream in Qcloud COS object as soon as possible,</li>
-     * <li>Close the input stream in Qcloud COS object as soon as possible.</li>
+     * <li>Use the data from the input stream in object as soon as possible,</li>
+     * <li>Close the input stream in object as soon as possible.</li>
      * </ul>
      * <p>
      * If callers do not follow those rules, then the client can run out of resources if allocating
      * too many open, but unused, HTTP connections.
      * </p>
      * <p>
-     * To get an object from Qcloud COS, the caller must have {@link Permission#Read} access to the
-     * object.
+     * To get an object from , the caller must have {@link Permission#Read} access to the object.
      * </p>
      * <p>
      * If the object fetched is publicly readable, it can also read it by pasting its URL into a
@@ -269,13 +285,12 @@ public interface COS {
      * @param getObjectRequest The request object containing all the options on how to download the
      *        object.
      *
-     * @return The object stored in Qcloud COS in the specified bucket and key. Returns
-     *         <code>null</code> if constraints were specified but not met.
+     * @return The object stored in in the specified bucket and key. Returns <code>null</code> if
+     *         constraints were specified but not met.
      *
      * @throws CosClientException If any errors are encountered in the client while making the
      *         request or handling the response.
-     * @throws CosServiceException If any errors occurred in Qcloud COS while processing the
-     *         request.
+     * @throws CosServiceException If any errors occurred in while processing the request.
      * @see COS#getObject(String, String)
      * @see COS#getObject(GetObjectRequest, File)
      */
@@ -285,18 +300,17 @@ public interface COS {
 
     /**
      * <p>
-     * Gets the object metadata for the object stored in Qcloud COS under the specified bucket and
-     * key, and saves the object contents to the specified file. Returns <code>null</code> if the
-     * specified constraints weren't met.
+     * Gets the object metadata for the object stored in under the specified bucket and key, and
+     * saves the object contents to the specified file. Returns <code>null</code> if the specified
+     * constraints weren't met.
      * </p>
      * <p>
      * Instead of using {@link COS#getObject(GetObjectRequest)}, use this method to ensure that the
-     * underlying HTTP stream resources are automatically closed as soon as possible. The Qcloud COS
-     * clients handles immediate storage of the object contents to the specified file.
+     * underlying HTTP stream resources are automatically closed as soon as possible. The clients
+     * handles immediate storage of the object contents to the specified file.
      * </p>
      * <p>
-     * To get an object from Qcloud COS, the caller must have {@link Permission#Read} access to the
-     * object.
+     * To get an object from , the caller must have {@link Permission#Read} access to the object.
      * </p>
      * <p>
      * If the object fetched is publicly readable, it can also read it by pasting its URL into a
@@ -309,9 +323,9 @@ public interface COS {
      * </p>
      * 
      * @param getObjectRequest The request object containing all the options on how to download the
-     *        Qcloud COS object content.
+     *        object content.
      * @param destinationFile Indicates the file (which might already exist) where to save the
-     *        object content being downloading from Qcloud COS.
+     *        object content being downloading from .
      *
      * @return All COS object metadata for the specified object. Returns <code>null</code> if
      *         constraints were specified but not met.
@@ -319,8 +333,7 @@ public interface COS {
      * @throws CosClientException If any errors are encountered in the client while making the
      *         request, handling the response, or writing the incoming data from COS to the
      *         specified destination file.
-     * @throws CosServiceException If any errors occurred in Qcloud COS while processing the
-     *         request.
+     * @throws CosServiceException If any errors occurred in while processing the request.
      *
      * @see COS#getObject(String, String)
      * @see COS#getObject(GetObjectRequest)
@@ -329,14 +342,26 @@ public interface COS {
             throws CosClientException, CosServiceException;
 
     /**
+     * @param bucketName Name of bucket that presumably contains object
+     * @param objectName Name of object that has to be checked
+     * @return true if exist. otherwise false;
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request, handling the response, or writing the incoming data from COS to the
+     *         specified destination file.
+     * @throws CosServiceException If any errors occurred in while processing the request.
+     */
+    boolean doesObjectExist(String bucketName, String objectName)
+            throws CosClientException, CosServiceException;
+
+    /**
      * <p>
-     * Gets the metadata for the specified Qcloud COS object without actually fetching the object
-     * itself. This is useful in obtaining only the object metadata, and avoids wasting bandwidth on
-     * fetching the object data.
+     * Gets the metadata for the specified object without actually fetching the object itself. This
+     * is useful in obtaining only the object metadata, and avoids wasting bandwidth on fetching the
+     * object data.
      * </p>
      * <p>
      * The object metadata contains information such as content type, content disposition, etc., as
-     * well as custom user metadata that can be associated with an object in Qcloud COS.
+     * well as custom user metadata that can be associated with an object in .
      * </p>
      *
      * @param bucketName bucket name
@@ -346,22 +371,21 @@ public interface COS {
      *
      * @throws CosClientException If any errors are encountered on the client while making the
      *         request or handling the response.
-     * @throws CosServiceException If any errors occurred in Qcloud COS while processing the
-     *         request.
+     * @throws CosServiceException If any errors occurred in while processing the request.
      *
      */
-    public ObjectMetadata getobjectMetadata(String bucketName, String key)
+    public ObjectMetadata getObjectMetadata(String bucketName, String key)
             throws CosClientException, CosServiceException;
 
     /**
      * <p>
-     * Gets the metadata for the specified Qcloud COS object without actually fetching the object
-     * itself. This is useful in obtaining only the object metadata, and avoids wasting bandwidth on
-     * fetching the object data.
+     * Gets the metadata for the specified object without actually fetching the object itself. This
+     * is useful in obtaining only the object metadata, and avoids wasting bandwidth on fetching the
+     * object data.
      * </p>
      * <p>
      * The object metadata contains information such as content type, content disposition, etc., as
-     * well as custom user metadata that can be associated with an object in Qcloud COS.
+     * well as custom user metadata that can be associated with an object in .
      * </p>
      *
      * @param getObjectMetadataRequest The request object specifying the bucket, key and optional
@@ -371,8 +395,7 @@ public interface COS {
      *
      * @throws CosClientException If any errors are encountered on the client while making the
      *         request or handling the response.
-     * @throws CosServiceException If any errors occurred in Qcloud COS while processing the
-     *         request.
+     * @throws CosServiceException If any errors occurred in while processing the request.
      *
      * @see COS#getObjectMetadata(String, String)
      */
@@ -385,8 +408,28 @@ public interface COS {
      * restored if versioning was enabled when the object was deleted.
      * </p>
      * <p>
-     * If attempting to delete an object that does not exist, Qcloud COS will return a success
-     * message instead of an error message.
+     * If attempting to delete an object that does not exist, will return a success message instead
+     * of an error message.
+     * </p>
+     * 
+     * @param bucketName bucket name
+     * @param key cos path
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * @throws CosServiceException If any errors occurred in while processing the request.
+     */
+
+    public void deleteObject(String bucketName, String key)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * <p>
+     * Deletes the specified object in the specified bucket. Once deleted, the object can only be
+     * restored if versioning was enabled when the object was deleted.
+     * </p>
+     * <p>
+     * If attempting to delete an object that does not exist, will return a success message instead
+     * of an error message.
      * </p>
      *
      * @param deleteObjectRequest The request object containing all options for deleting an Qcloud
@@ -394,29 +437,20 @@ public interface COS {
      *
      * @throws CosClientException If any errors are encountered in the client while making the
      *         request or handling the response.
-     * @throws CosServiceException If any errors occurred in Qcloud COS while processing the
-     *         request.
+     * @throws CosServiceException If any errors occurred in while processing the request.
      *
      * @see COSClient#deleteObject(String, String)
      */
     public void deleteObject(DeleteObjectRequest deleteObjectRequest)
             throws CosClientException, CosServiceException;
 
-
     /**
      * <p>
-     * Creates a new Qcloud COS bucket in the region which is set in ClientConfig
+     * Creates a new bucket in the region which is set in ClientConfig
      * </p>
      * <p>
-     * Every object stored in Qcloud COS is contained within a bucket. Buckets partition the
-     * namespace of objects stored in Qcloud COS at the top level. Within a bucket, any name can be
-     * used for objects. However, bucket names must be unique across the user of Qcloud COS.
-     * </p>
-     * <p>
-     * Bucket ownership is similar to the ownership of Internet domain names. Within Qcloud COS,
-     * only a single user owns each bucket. Once a uniquely named bucket is created in Qcloud COS,
-     * organize and name the objects within the bucket in any way. Ownership of the bucket is
-     * retained as long as the owner has an Qcloud COS account.
+     * Every object stored in is contained within a bucket. Appid and Bucket partition the namespace
+     * of objects stored in at the top level. Within a bucket, any name can be used for objects.
      * </p>
      * <p>
      * There are no limits to the number of objects that can be stored in a bucket. Performance does
@@ -433,7 +467,43 @@ public interface COS {
      * </p>
      * <p>
      * To create a bucket, authenticate with an account that has a valid Qcloud Access Key ID and is
-     * registered with Qcloud COS. Anonymous requests are never allowed to create buckets.
+     * registered with . Anonymous requests are never allowed to create buckets.
+     * </p>
+     *
+     * @param bucketName The name of the bucket to be created
+     * @return The newly created bucket.
+     *
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * @throws CosServiceException If any errors occurred in while processing the request.
+     */
+    public Bucket createBucket(String bucketName) throws CosClientException, CosServiceException;
+
+
+    /**
+     * <p>
+     * Creates a new bucket in the region which is set in ClientConfig
+     * </p>
+     * <p>
+     * Every object stored in is contained within a bucket. Appid and Bucket partition the namespace
+     * of objects stored in at the top level. Within a bucket, any name can be used for objects.
+     * </p>
+     * <p>
+     * There are no limits to the number of objects that can be stored in a bucket. Performance does
+     * not vary based on the number of buckets used. Store all objects within a single bucket or
+     * organize them across several buckets.
+     * </p>
+     * <p>
+     * Buckets cannot be nested; buckets cannot be created within other buckets.
+     * </p>
+     * <p>
+     * Do not make bucket create or delete calls in the high availability code path of an
+     * application. Create or delete buckets in a separate initialization or setup routine that runs
+     * less often.
+     * </p>
+     * <p>
+     * To create a bucket, authenticate with an account that has a valid Qcloud Access Key ID and is
+     * registered with . Anonymous requests are never allowed to create buckets.
      * </p>
      *
      * @param createBucketRequest The request object containing all options for creating an Qcloud
@@ -442,11 +512,28 @@ public interface COS {
      *
      * @throws CosClientException If any errors are encountered in the client while making the
      *         request or handling the response.
-     * @throws CosServiceException If any errors occurred in Qcloud COS while processing the
-     *         request.
+     * @throws CosServiceException If any errors occurred in while processing the request.
      */
     public Bucket createBucket(CreateBucketRequest createBucketRequest)
             throws CosClientException, CosServiceException;
+
+    /**
+     * <p>
+     * Deletes the specified bucket. All objects (and all object versions, if versioning was ever
+     * enabled) in the bucket must be deleted before the bucket itself can be deleted.
+     * </p>
+     * <p>
+     * Only the owner of a bucket can delete it, regardless of the bucket's access control policy
+     * (ACL).
+     * </p>
+     * 
+     * @param bucketName The name of the bucket to be deleted
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * @throws CosServiceException If any errors occurred in while processing the request.
+     *
+     */
+    public void deleteBucket(String bucketName) throws CosClientException, CosServiceException;
 
     /**
      * <p>
@@ -462,12 +549,124 @@ public interface COS {
      *        COS bucket.
      * @throws CosClientException If any errors are encountered in the client while making the
      *         request or handling the response.
-     * @throws CosServiceException If any errors occurred in Qcloud COS while processing the
-     *         request.
+     * @throws CosServiceException If any errors occurred in while processing the request.
      *
      * @see COS#deleteBucket(String)
      */
     public void deleteBucket(DeleteBucketRequest deleteBucketRequest)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * Checks if the specified bucket exists. use this method to determine if a specified bucket
+     * name already exists, and therefore can't be used to create a new bucket.
+     *
+     * <p>
+     * Internally this uses the {@link #getBucketAcl(String)} operation to determine whether the
+     * bucket exists.
+     * </p>
+     *
+     * @param bucketName The name of the bucket to check.
+     *
+     * @return The value <code>true</code> if the specified bucket exists ; the value
+     *         <code>false</code> if there is no bucket with that name.
+     *
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * @throws CosServiceException If any errors occurred in while processing the request.
+     *
+     */
+    public boolean doesBucketExist(String bucketName)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * Performs a head bucket operation on the requested bucket name. This operation is useful to
+     * determine if a bucket exists and you have permission to access it.
+     *
+     * @param headBucketRequest The request containing the bucket name.
+     * @return This method returns a {@link HeadBucketResult} if the bucket exists and you have
+     *         permission to access it. Otherwise, the method will throw an
+     *         {@link CosServiceException} with status code {@code '404 Not Found'} if the bucket
+     *         does not exist, {@code '403 Forbidden'} if the user does not have access to the
+     *         bucket
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * @throws CosServiceException If any errors occurred in while processing the request.
+     */
+    public HeadBucketResult headBucket(HeadBucketRequest headBucketRequest)
+            throws CosClientException, CosServiceException;;
+
+    /**
+     * <p>
+     * Returns a list of all buckets that the authenticated sender of the request owns.
+     * </p>
+     * 
+     *
+     * @return A list of all of the buckets owned by the authenticated sender of the request.
+     * 
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * 
+     * @throws CosServiceException If any errors occurred in while processing the request.
+     */
+    public List<Bucket> listBuckets() throws CosClientException, CosServiceException;
+
+    /**
+     * <p>
+     * Returns a list of all buckets that the authenticated sender of the request owns.
+     * </p>
+     * 
+     * @param listBucketsRequest The request containing all of the options related to the listing of
+     *        buckets.
+     *
+     * @return A list of all of the buckets owned by the authenticated sender of the request.
+     * 
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * 
+     * @throws CosServiceException If any errors occurred in while processing the request.
+     */
+    public List<Bucket> listBuckets(ListBucketsRequest listBucketsRequest)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * <p>
+     * Gets the geographical region where stores the specified bucket.
+     * </p>
+     * <p>
+     * To view the location constraint of a bucket, the user must be the bucket owner.
+     * </p>
+     * 
+     * @param bucketName The name of the bucket to get location
+     *
+     * @return The location of the specified bucket.
+     * 
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * 
+     * @throws CosServiceException If any errors occurred in while processing the request.
+     */
+    public String getBucketLocation(String bucketName)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * <p>
+     * Gets the geographical region where stores the specified bucket.
+     * </p>
+     * <p>
+     * To view the location constraint of a bucket, the user must be the bucket owner.
+     * </p>
+     * 
+     * @param getBucketLocationRequest The request object containing the name of the bucket to look
+     *        up. This must be a bucket the user owns.
+     *
+     * @return The location of the specified bucket.
+     * 
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * 
+     * @throws CosServiceException If any errors occurred in while processing the request.
+     */
+    public String getBucketLocation(GetBucketLocationRequest getBucketLocationRequest)
             throws CosClientException, CosServiceException;
 
     /**
@@ -478,19 +677,18 @@ public interface COS {
      * <p>
      * <b>Note:</b> After you initiate a multipart upload and upload one or more parts, you must
      * either complete or abort the multipart upload in order to stop getting charged for storage of
-     * the uploaded parts. Once you complete or abort the multipart upload Qcloud COS will release
-     * the stored parts and stop charging you for their storage.
+     * the uploaded parts. Once you complete or abort the multipart upload will release the stored
+     * parts and stop charging you for their storage.
      * </p>
      *
      * @param request The InitiateMultipartUploadRequest object that specifies all the parameters of
      *        this operation.
      *
-     * @return An InitiateMultipartUploadResult from Qcloud COS.
+     * @return An InitiateMultipartUploadResult from .
      *
      * @throws CosClientException If any errors are encountered in the client while making the
      *         request or handling the response.
-     * @throws CosServiceException If any errors occurred in Qcloud COS while processing the
-     *         request.
+     * @throws CosServiceException If any errors occurred in while processing the request.
      */
     public InitiateMultipartUploadResult initiateMultipartUpload(
             InitiateMultipartUploadRequest request) throws CosClientException, CosServiceException;
@@ -500,39 +698,37 @@ public interface COS {
      * upload any part.
      * <p>
      * Your UploadPart request must include an upload ID and a part number. The upload ID is the ID
-     * returned by Qcloud COS in response to your Initiate Multipart Upload request. Part number can
-     * be any number between 1 and 10,000, inclusive. A part number uniquely identifies a part and
-     * also defines its position within the object being uploaded. If you upload a new part using
-     * the same part number that was specified in uploading a previous part, the previously uploaded
+     * returned by in response to your Initiate Multipart Upload request. Part number can be any
+     * number between 1 and 10,000, inclusive. A part number uniquely identifies a part and also
+     * defines its position within the object being uploaded. If you upload a new part using the
+     * same part number that was specified in uploading a previous part, the previously uploaded
      * part is overwritten.
      * <p>
      * To ensure data is not corrupted traversing the network, specify the Content-MD5 header in the
-     * Upload Part request. Qcloud COS checks the part data against the provided MD5 value. If they
-     * do not match, Qcloud COS returns an error.
+     * Upload Part request. checks the part data against the provided MD5 value. If they do not
+     * match, returns an error.
      * <p>
      * When you upload a part, the returned UploadPartResult contains an ETag property. You should
      * record this ETag property value and the part number. After uploading all parts, you must send
-     * a CompleteMultipartUpload request. At that time Qcloud COS constructs a complete object by
-     * concatenating all the parts you uploaded, in ascending order based on the part numbers. The
+     * a CompleteMultipartUpload request. At that time constructs a complete object by concatenating
+     * all the parts you uploaded, in ascending order based on the part numbers. The
      * CompleteMultipartUpload request requires you to send all the part numbers and the
      * corresponding ETag values.
      * <p>
      * <b>Note:</b> After you initiate a multipart upload and upload one or more parts, you must
      * either complete or abort the multipart upload in order to stop getting charged for storage of
-     * the uploaded parts. Once you complete or abort the multipart upload Qcloud COS will release
-     * the stored parts and stop charging you for their storage.
+     * the uploaded parts. Once you complete or abort the multipart upload will release the stored
+     * parts and stop charging you for their storage.
      * </p>
      * 
      * @param request The UploadPartRequest object that specifies all the parameters of this
      *        operation.
      *
-     * @return An UploadPartResult from Qcloud COS containing the part number and ETag of the new
-     *         part.
+     * @return An UploadPartResult from containing the part number and ETag of the new part.
      *
      * @throws CosClientException If any errors are encountered in the client while making the
      *         request or handling the response.
-     * @throws CosServiceException If any errors occurred in Qcloud COS while processing the
-     *         request.
+     * @throws CosServiceException If any errors occurred in while processing the request.
      */
     public UploadPartResult uploadPart(UploadPartRequest uploadPartRequest)
             throws CosClientException, CosServiceException;
@@ -552,12 +748,11 @@ public interface COS {
      * @param request The ListPartsRequest object that specifies all the parameters of this
      *        operation.
      *
-     * @return Returns a PartListing from Qcloud COS.
+     * @return Returns a PartListing from .
      *
      * @throws CosClientException If any errors are encountered in the client while making the
      *         request or handling the response.
-     * @throws CosServiceException If any errors occurred in Qcloud COS while processing the
-     *         request.
+     * @throws CosServiceException If any errors occurred in while processing the request.
      */
     public PartListing listParts(ListPartsRequest request)
             throws CosClientException, CosServiceException;
@@ -572,8 +767,7 @@ public interface COS {
      *
      * @throws CosClientException If any errors are encountered in the client while making the
      *         request or handling the response.
-     * @throws CosServiceException If any errors occurred in Qcloud COS while processing the
-     *         request.
+     * @throws CosServiceException If any errors occurred in while processing the request.
      */
     public void abortMultipartUpload(AbortMultipartUploadRequest request)
             throws CosClientException, CosServiceException;
@@ -583,10 +777,10 @@ public interface COS {
      * <p>
      * You first upload all parts using the {@link #uploadPart(UploadPartRequest)} method. After
      * successfully uploading all individual parts of an upload, you call this operation to complete
-     * the upload. Upon receiving this request, Qcloud COS concatenates all the parts in ascending
-     * order by part number to create a new object. In the CompleteMultipartUpload request, you must
-     * provide the parts list. For each part in the list, you provide the part number and the ETag
-     * header value, returned after that part was uploaded.
+     * the upload. Upon receiving this request, concatenates all the parts in ascending order by
+     * part number to create a new object. In the CompleteMultipartUpload request, you must provide
+     * the parts list. For each part in the list, you provide the part number and the ETag header
+     * value, returned after that part was uploaded.
      * <p>
      * Processing of a CompleteMultipartUpload request may take several minutes to complete.
      * </p>
@@ -599,8 +793,7 @@ public interface COS {
      *
      * @throws CosClientException If any errors are encountered in the client while making the
      *         request or handling the response.
-     * @throws CosServiceException If any errors occurred in Qcloud COS while processing the
-     *         request.
+     * @throws CosServiceException If any errors occurred in while processing the request.
      */
     public CompleteMultipartUploadResult completeMultipartUpload(
             CompleteMultipartUploadRequest request) throws CosClientException, CosServiceException;
@@ -620,12 +813,11 @@ public interface COS {
      * @param request The ListMultipartUploadsRequest object that specifies all the parameters of
      *        this operation.
      *
-     * @return A MultipartUploadListing from Qcloud COS.
+     * @return A MultipartUploadListing from .
      *
      * @throws CosClientException If any errors are encountered in the client while making the
      *         request or handling the response.
-     * @throws CosServiceException If any errors occurred in Qcloud COS while processing the
-     *         request.
+     * @throws CosServiceException If any errors occurred in while processing the request.
      */
     public MultipartUploadListing listMultipartUploads(ListMultipartUploadsRequest request)
             throws CosClientException, CosServiceException;
@@ -637,17 +829,17 @@ public interface COS {
      * </p>
      * <p>
      * Because buckets can contain a virtually unlimited number of keys, the complete results of a
-     * list query can be extremely large. To manage large result sets, Qcloud COS uses pagination to
-     * split them into multiple responses. Always check the {@link ObjectListing#isTruncated()}
-     * method to see if the returned listing is complete or if additional calls are needed to get
-     * more results. Alternatively, use the {@link COS#listNextBatchOfObjects(ObjectListing)} method
-     * as an easy way to get the next page of object listings.
+     * list query can be extremely large. To manage large result sets, uses pagination to split them
+     * into multiple responses. Always check the {@link ObjectListing#isTruncated()} method to see
+     * if the returned listing is complete or if additional calls are needed to get more results.
+     * Alternatively, use the {@link COS#listNextBatchOfObjects(ObjectListing)} method as an easy
+     * way to get the next page of object listings.
      * </p>
      * <p>
      * The total number of keys in a bucket doesn't substantially affect list performance.
      * </p>
      *
-     * @param bucketName The name of the Qcloud COS bucket to list.
+     * @param bucketName The name of the bucket to list.
      *
      * @return A listing of the objects in the specified bucket, along with any other associated
      *         information, such as common prefixes (if a delimiter was specified), the original
@@ -655,8 +847,7 @@ public interface COS {
      *
      * @throws CosClientException If any errors are encountered in the client while making the
      *         request or handling the response.
-     * @throws CosServiceException If any errors occurred in Qcloud COS while processing the
-     *         request.
+     * @throws CosServiceException If any errors occurred in while processing the request.
      *
      * @see COS#listObjects(String, String)
      * @see COS#listObjects(ListObjectsRequest)
@@ -673,11 +864,11 @@ public interface COS {
      * </p>
      * <p>
      * Because buckets can contain a virtually unlimited number of keys, the complete results of a
-     * list query can be extremely large. To manage large result sets, Qcloud COS uses pagination to
-     * split them into multiple responses. Always check the {@link ObjectListing#isTruncated()}
-     * method to see if the returned listing is complete or if additional calls are needed to get
-     * more results. Alternatively, use the {@link COS#listNextBatchOfObjects(ObjectListing)} method
-     * as an easy way to get the next page of object listings.
+     * list query can be extremely large. To manage large result sets, uses pagination to split them
+     * into multiple responses. Always check the {@link ObjectListing#isTruncated()} method to see
+     * if the returned listing is complete or if additional calls are needed to get more results.
+     * Alternatively, use the {@link COS#listNextBatchOfObjects(ObjectListing)} method as an easy
+     * way to get the next page of object listings.
      * </p>
      * <p>
      * For example, consider a bucket that contains the following keys:
@@ -698,7 +889,7 @@ public interface COS {
      * The total number of keys in a bucket doesn't substantially affect list performance.
      * </p>
      *
-     * @param bucketName The name of the Qcloud COS bucket to list.
+     * @param bucketName The name of the bucket to list.
      * @param prefix An optional parameter restricting the response to keys beginning with the
      *        specified prefix. Use prefixes to separate a bucket into different sets of keys,
      *        similar to how a file system organizes files into directories.
@@ -709,8 +900,7 @@ public interface COS {
      *
      * @throws CosClientException If any errors are encountered in the client while making the
      *         request or handling the response.
-     * @throws CosServiceException If any errors occurred in Qcloud COS while processing the
-     *         request.
+     * @throws CosServiceException If any errors occurred in while processing the request.
      *
      * @see COS#listObjects(String)
      * @see COS#listObjects(ListObjectsRequest)
@@ -727,11 +917,11 @@ public interface COS {
      * </p>
      * <p>
      * Because buckets can contain a virtually unlimited number of keys, the complete results of a
-     * list query can be extremely large. To manage large result sets, Qcloud COS uses pagination to
-     * split them into multiple responses. Always check the {@link ObjectListing#isTruncated()}
-     * method to see if the returned listing is complete or if additional calls are needed to get
-     * more results. Alternatively, use the {@link COS#listNextBatchOfObjects(ObjectListing)} method
-     * as an easy way to get the next page of object listings.
+     * list query can be extremely large. To manage large result sets, uses pagination to split them
+     * into multiple responses. Always check the {@link ObjectListing#isTruncated()} method to see
+     * if the returned listing is complete or if additional calls are needed to get more results.
+     * Alternatively, use the {@link COS#listNextBatchOfObjects(ObjectListing)} method as an easy
+     * way to get the next page of object listings.
      * </p>
      * <p>
      * Calling {@link ListObjectsRequest#setDelimiter(String)} sets the delimiter, allowing groups
@@ -767,8 +957,7 @@ public interface COS {
      *
      * @throws CosClientException If any errors are encountered in the client while making the
      *         request or handling the response.
-     * @throws CosServiceException If any errors occurred in Qcloud COS while processing the
-     *         request.
+     * @throws CosServiceException If any errors occurred in while processing the request.
      *
      * @see COS#listObjects(String)
      * @see COS#listObjects(String, String)
@@ -792,15 +981,14 @@ public interface COS {
      * 
      * @param previousObjectListing The previous truncated <code>ObjectListing</code>. If a
      *        non-truncated <code>ObjectListing</code> is passed in, an empty
-     *        <code>ObjectListing</code> is returned without ever contacting Qcloud COS.
+     *        <code>ObjectListing</code> is returned without ever contacting .
      *
      * @return The next set of <code>ObjectListing</code> results, beginning immediately after the
      *         last result in the specified previous <code>ObjectListing</code>.
      *
      * @throws CosClientException If any errors are encountered in the client while making the
      *         request or handling the response.
-     * @throws CosServiceException If any errors occurred in Qcloud COS while processing the
-     *         request.
+     * @throws CosServiceException If any errors occurred in while processing the request.
      *
      * @see COS#listObjects(String)
      * @see COS#listObjects(String, String)
@@ -827,15 +1015,14 @@ public interface COS {
      * @param listNextBatchOfObjectsRequest The request object for listing next batch of objects
      *        using the previous truncated <code>ObjectListing</code>. If a non-truncated
      *        <code>ObjectListing</code> is passed in by the request object, an empty
-     *        <code>ObjectListing</code> is returned without ever contacting Qcloud COS.
+     *        <code>ObjectListing</code> is returned without ever contacting .
      *
      * @return The next set of <code>ObjectListing</code> results, beginning immediately after the
      *         last result in the specified previous <code>ObjectListing</code>.
      *
      * @throws CosClientException If any errors are encountered in the client while making the
      *         request or handling the response.
-     * @throws CosServiceException If any errors occurred in Qcloud COS while processing the
-     *         request.
+     * @throws CosServiceException If any errors occurred in while processing the request.
      *
      * @see COS#listObjects(String)
      * @see COS#listObjects(String, String)
@@ -846,6 +1033,37 @@ public interface COS {
             ListNextBatchOfObjectsRequest listNextBatchOfObjectsRequest)
                     throws CosClientException, CosServiceException;
 
+    /**
+     * <p>
+     * Copy a source object to a new destination in COS.
+     * </p>
+     * <p>
+     * To copy an object, the caller's account must have read access to the source object and write
+     * access to the destination bucket. cos support copy a object from a diff account, diff region,
+     * diff bucket
+     * </p>
+     * 
+     * 
+     * @param sourceBucketName The name of the bucket containing the source object to copy.
+     * @param sourceKey The key in the source bucket under which the source object is stored.
+     * @param destinationBucketName The name of the bucket in which the new object will be created.
+     *        This can be the same name as the source bucket's.
+     * @param destinationKey The key in the destination bucket under which the new object will be
+     *        created.
+     *
+     * @return A {@link CopyObjectResult} object containing the information returned by about the
+     *         newly created object, or <code>null</code> if constraints were specified that weren't
+     *         met when attempted to copy the object.
+     * 
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * 
+     * @throws CosServiceException If any errors occurred in while processing the request.
+     */
+
+    public CopyObjectResult copyObject(String sourceBucketName, String sourceKey,
+            String destinationBucketName, String destinationKey)
+                    throws CosClientException, CosServiceException;
 
     /**
      * <p>
@@ -853,23 +1071,544 @@ public interface COS {
      * </p>
      * <p>
      * To copy an object, the caller's account must have read access to the source object and write
-     * access to the destination bucket.
+     * access to the destination bucket. cos support copy a object from a diff account, diff region,
+     * diff bucket
      * </p>
      * 
      * @param copyObjectRequest The request object containing all the options for copying an QCloud
      *        COS object.
      *
-     * @return A {@link CopyObjectResult} object containing the information returned by Amazon S3
-     *         about the newly created object, or <code>null</code> if constraints were specified
-     *         that weren't met when Qcloud COS attempted to copy the object.
-     *         
+     * @return A {@link CopyObjectResult} object containing the information returned by about the
+     *         newly created object, or <code>null</code> if constraints were specified that weren't
+     *         met when attempted to copy the object.
+     * 
      * @throws CosClientException If any errors are encountered in the client while making the
      *         request or handling the response.
-     *         
-     * @throws CosServiceException If any errors occurred in Qcloud COS while processing the
-     *         request.
+     * 
+     * @throws CosServiceException If any errors occurred in while processing the request.
      */
     public CopyObjectResult copyObject(CopyObjectRequest copyObjectRequest)
             throws CosClientException, CosServiceException;
+
+    /**
+     * Sets the lifecycle configuration for the specified bucket.
+     * 
+     * @param bucketName the bucket name
+     * @param bucketLifecycleConfiguration lifecycle config for the bucket
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * 
+     * @throws CosServiceException If any errors occurred in while processing the request.
+     */
+
+    public void setBucketLifecycleConfiguration(String bucketName,
+            BucketLifecycleConfiguration bucketLifecycleConfiguration)
+                    throws CosClientException, CosServiceException;
+
+    /**
+     * Sets the lifecycle configuration for the specified bucket.
+     *
+     * @param setBucketLifecycleConfigurationRequest The request object containing all options for
+     *        setting the bucket lifecycle configuration.
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * 
+     * @throws CosServiceException If any errors occurred in while processing the request.
+     */
+    public void setBucketLifecycleConfiguration(
+            SetBucketLifecycleConfigurationRequest setBucketLifecycleConfigurationRequest)
+                    throws CosClientException, CosServiceException;
+
+    /**
+     * Gets the lifecycle configuration for the specified bucket, or null if the specified bucket
+     * does not exist or if no configuration has been established.
+     * 
+     * @param bucketName the bucket name
+     * 
+     * @return BucketLifecycleConfiguration the bucket lifecycle configuration
+     * 
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * 
+     * @throws CosServiceException If any errors occurred in while processing the request.
+     */
+    public BucketLifecycleConfiguration getBucketLifecycleConfiguration(String bucketName)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * Gets the lifecycle configuration for the specified bucket, or null if the specified bucket
+     * does not exist or if no configuration has been established.
+     *
+     * @param getBucketLifecycleConfigurationRequest The request object for retrieving the bucket
+     *        lifecycle configuration.
+     * @return BucketLifecycleConfiguration the bucket lifecycle configuration
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * 
+     * @throws CosServiceException If any errors occurred in while processing the request.
+     */
+    public BucketLifecycleConfiguration getBucketLifecycleConfiguration(
+            GetBucketLifecycleConfigurationRequest getBucketLifecycleConfigurationRequest)
+                    throws CosClientException, CosServiceException;
+
+    /**
+     * Removes the lifecycle configuration for the bucket specified.
+     *
+     * @param bucketName the bucket name
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * 
+     * @throws CosServiceException If any errors occurred in while processing the request.
+     */
+    public void deleteBucketLifecycleConfiguration(String bucketName)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * Removes the lifecycle configuration for the bucket specified.
+     *
+     * @param deleteBucketLifecycleConfigurationRequest The request object containing all options
+     *        for removing the bucket lifecycle configuration.
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * 
+     * @throws CosServiceException If any errors occurred in while processing the request.
+     */
+    public void deleteBucketLifecycleConfiguration(
+            DeleteBucketLifecycleConfigurationRequest deleteBucketLifecycleConfigurationRequest)
+                    throws CosClientException, CosServiceException;;
+
+    /**
+     * <p>
+     * Sets the versioning configuration for the specified bucket.
+     * </p>
+     * <p>
+     * A bucket's versioning configuration can be in one of three possible states:
+     * <ul>
+     * <li>{@link BucketVersioningConfiguration#OFF}
+     * <li>{@link BucketVersioningConfiguration#ENABLED}
+     * <li>{@link BucketVersioningConfiguration#SUSPENDED}
+     * </ul>
+     * </p>
+     * <p>
+     * By default, new buckets are in the {@link BucketVersioningConfiguration#OFF off} state. Once
+     * versioning is enabled for a bucket the status can never be reverted to
+     * {@link BucketVersioningConfiguration#OFF off}.
+     * </p>
+     * <p>
+     * Objects created before versioning was enabled or when versioning is suspended will be given
+     * the default <code>null</code> version ID (see {@link Constants#NULL_VERSION_ID}). Note that
+     * the <code>null</code> version ID is a valid version ID and is not the same as not having a
+     * version ID.
+     * </p>
+     * <p>
+     * The versioning configuration of a bucket has different implications for each operation
+     * performed on that bucket or for objects within that bucket. For example, when versioning is
+     * enabled a <code>PutObject</code> operation creates a unique object version-id for the object
+     * being uploaded. The The <code>PutObject</code> API guarantees that, if versioning is enabled
+     * for a bucket at the time of the request, the new object can only be permanently deleted using
+     * a <code>DeleteVersion</code> operation. It can never be overwritten. Additionally, the
+     * <code>PutObject</code> API guarantees that, if versioning is enabled for a bucket the
+     * request, no other object will be overwritten by that request. Refer to the documentation
+     * sections for each API for information on how versioning status affects the semantics of that
+     * particular API.
+     * </p>
+     *
+     * @param setBucketVersioningConfigurationRequest The request object containing all options for
+     *        setting the bucket versioning configuration.
+     *
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * 
+     * @throws CosServiceException If any errors occurred in while processing the request.
+     *
+     */
+    public void setBucketVersioningConfiguration(
+            SetBucketVersioningConfigurationRequest setBucketVersioningConfigurationRequest)
+                    throws CosClientException, CosServiceException;
+
+
+    /**
+     * <p>
+     * Returns the versioning configuration for the specified bucket.
+     * </p>
+     * <p>
+     * A bucket's versioning configuration can be in one of three possible states:
+     * <ul>
+     * <li>{@link BucketVersioningConfiguration#OFF}
+     * <li>{@link BucketVersioningConfiguration#ENABLED}
+     * <li>{@link BucketVersioningConfiguration#SUSPENDED}
+     * </ul>
+     * </p>
+     * <p>
+     * By default, new buckets are in the {@link BucketVersioningConfiguration#OFF off} state. Once
+     * versioning is enabled for a bucket the status can never be reverted to
+     * {@link BucketVersioningConfiguration#OFF off}.
+     * </p>
+     * <p>
+     * The versioning configuration of a bucket has different implications for each operation
+     * performed on that bucket or for objects within that bucket. For example, when versioning is
+     * enabled a <code>PutObject</code> operation creates a unique object version-id for the object
+     * being uploaded. The The <code>PutObject</code> API guarantees that, if versioning is enabled
+     * for a bucket at the time of the request, the new object can only be permanently deleted using
+     * a <code>DeleteVersion</code> operation. It can never be overwritten. Additionally, the
+     * <code>PutObject</code> API guarantees that, if versioning is enabled for a bucket the
+     * request, no other object will be overwritten by that request.
+     * </p>
+     *
+     * @param bucketName the bucket name
+     *
+     * @return The bucket versioning configuration for the specified bucket.
+     *
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * 
+     * @throws CosServiceException If any errors occurred in while processing the request.
+     *
+     */
+    public BucketVersioningConfiguration getBucketVersioningConfiguration(String bucketName)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * <p>
+     * Returns the versioning configuration for the specified bucket.
+     * </p>
+     * <p>
+     * A bucket's versioning configuration can be in one of three possible states:
+     * <ul>
+     * <li>{@link BucketVersioningConfiguration#OFF}
+     * <li>{@link BucketVersioningConfiguration#ENABLED}
+     * <li>{@link BucketVersioningConfiguration#SUSPENDED}
+     * </ul>
+     * </p>
+     * <p>
+     * By default, new buckets are in the {@link BucketVersioningConfiguration#OFF off} state. Once
+     * versioning is enabled for a bucket the status can never be reverted to
+     * {@link BucketVersioningConfiguration#OFF off}.
+     * </p>
+     * <p>
+     * The versioning configuration of a bucket has different implications for each operation
+     * performed on that bucket or for objects within that bucket. For example, when versioning is
+     * enabled a <code>PutObject</code> operation creates a unique object version-id for the object
+     * being uploaded. The The <code>PutObject</code> API guarantees that, if versioning is enabled
+     * for a bucket at the time of the request, the new object can only be permanently deleted using
+     * a <code>DeleteVersion</code> operation. It can never be overwritten. Additionally, the
+     * <code>PutObject</code> API guarantees that, if versioning is enabled for a bucket the
+     * request, no other object will be overwritten by that request.
+     * </p>
+     *
+     * @param getBucketVersioningConfigurationRequest The request object for retrieving the bucket
+     *        versioning configuration.
+     *
+     * @return The bucket versioning configuration for the specified bucket.
+     *
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * 
+     * @throws CosServiceException If any errors occurred in while processing the request.
+     *
+     */
+    public BucketVersioningConfiguration getBucketVersioningConfiguration(
+            GetBucketVersioningConfigurationRequest getBucketVersioningConfigurationRequest)
+                    throws CosClientException, CosServiceException;
+
+    /**
+     * <p>
+     * Gets the {@link AccessControlList} (ACL) for the specified object in Qcloud COS.
+     * </p>
+     * <p>
+     * Each bucket and object in Qcloud COS has an ACL that defines its access control policy. When
+     * a request is made, Qcloud COS authenticates the request using its standard authentication
+     * procedure and then checks the ACL to verify the sender was granted access to the bucket or
+     * object. If the sender is approved, the request proceeds. Otherwise, Qcloud COS returns an
+     * error.
+     * </p>
+     * 
+     * @param bucketName The name of the bucket containing the object whose ACL is being retrieved.
+     * @param key The key of the object within the specified bucket whose ACL is being retrieved.
+     *
+     * @return The <code>AccessControlList</code> for the specified Qcloud COS object.
+     *
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * 
+     * @throws CosServiceException If any errors occurred in while processing the request.
+     */
+    public AccessControlList getObjectAcl(String bucketName, String key)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * <p>
+     * Gets the {@link AccessControlList} (ACL) for the specified object in Qcloud COS.
+     * </p>
+     * <p>
+     * Each bucket and object in Qcloud COS has an ACL that defines its access control policy. When
+     * a request is made, Qcloud COS authenticates the request using its standard authentication
+     * procedure and then checks the ACL to verify the sender was granted access to the bucket or
+     * object. If the sender is approved, the request proceeds. Otherwise, Qcloud COS returns an
+     * error.
+     * </p>
+     *
+     * @param getObjectAclRequest the request object containing all the information needed for
+     *        retrieving the object ACL.
+     *
+     * @return The <code>AccessControlList</code> for the specified Qcloud COS object.
+     *
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * 
+     * @throws CosServiceException If any errors occurred in while processing the request.
+     *
+     */
+    public AccessControlList getObjectAcl(GetObjectAclRequest getObjectAclRequest)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * Sets the {@link CannedAccessControlList} for the specified object.
+     * <p>
+     * Each bucket and object in has an ACL that defines its access control policy. When a request
+     * is made, authenticates the request using its standard authentication procedure and then
+     * checks the ACL to verify the sender was granted access to the bucket or object. If the sender
+     * is approved, the request proceeds. Otherwise, returns an error.
+     * <p>
+     * 
+     * @param bucketName The name of the bucket containing the object whose ACL is being set.
+     * @param key The key of the object within the specified bucket whose ACL is being set.
+     * 
+     * @param acl The new <code>AccessControlList</code> for the specified object.
+     *
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * @throws CosServiceException If any errors occurred in while processing the request.
+     *
+     */
+    public void setObjectAcl(String bucketName, String key, AccessControlList acl)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * Sets the {@link CannedAccessControlList} for the specified object.
+     * <p>
+     * Each bucket and object in has an ACL that defines its access control policy. When a request
+     * is made, authenticates the request using its standard authentication procedure and then
+     * checks the ACL to verify the sender was granted access to the bucket or object. If the sender
+     * is approved, the request proceeds. Otherwise, returns an error.
+     * <p>
+     * 
+     * @param bucketName The name of the bucket containing the object whose ACL is being set.
+     * @param key The key of the object within the specified bucket whose ACL is being set.
+     * 
+     * @param acl The new pre-configured <code>CannedAccessControlList</code> for the specified
+     *        object.
+     *
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * @throws CosServiceException If any errors occurred in while processing the request.
+     *
+     */
+    public void setObjectAcl(String bucketName, String key, CannedAccessControlList acl)
+            throws CosClientException, CosServiceException;
+
+
+    /**
+     * Sets the {@link AccessControlList} for the specified object.
+     * <p>
+     * Each bucket and object in has an ACL that defines its access control policy. When a request
+     * is made, authenticates the request using its standard authentication procedure and then
+     * checks the ACL to verify the sender was granted access to the bucket or object. If the sender
+     * is approved, the request proceeds. Otherwise, returns an error.
+     * <p>
+     *
+     * @param setObjectAclRequest The request object containing the COS object to modify and the ACL
+     *        to set.
+     *
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * @throws CosServiceException If any errors occurred in while processing the request.
+     *
+     */
+    public void setObjectAcl(SetObjectAclRequest setObjectAclRequest)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * Sets the {@link AccessControlList} for the specified bucket.
+     * <p>
+     * Each bucket and object in COS has an ACL that defines its access control policy. When a
+     * request is made, COS authenticates the request using its standard authentication procedure
+     * and then checks the ACL to verify the sender was granted access to the bucket or object. If
+     * the sender is approved, the request proceeds. Otherwise, COS returns an error.
+     * <p>
+     * When constructing a custom <code>AccessControlList</code>, callers typically retrieve the
+     * existing <code>AccessControlList</code> for a bucket .
+     *
+     * @param bucketName The name of the bucket whose ACL is being set
+     * @param acl The new pre-configured <code>CannedAccessControlList</code> for the specified COS
+     *        bucket.
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * @throws CosServiceException If any errors occurred in while processing the request.
+     *
+     */
+    public void setBucketAcl(String bucketName, AccessControlList acl)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * Sets the {@link CannedAccessControlList} for the specified bucket.
+     * <p>
+     * Each bucket and object in COS has an ACL that defines its access control policy. When a
+     * request is made, COS authenticates the request using its standard authentication procedure
+     * and then checks the ACL to verify the sender was granted access to the bucket or object. If
+     * the sender is approved, the request proceeds. Otherwise, COS returns an error.
+     * <p>
+     * When constructing a custom <code>AccessControlList</code>, callers typically retrieve the
+     * existing <code>AccessControlList</code> for a bucket .
+     *
+     * @param bucketName The name of the bucket whose ACL is being set
+     * @param acl The <code>AccessControlList</code> for the specified COS bucket.
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * @throws CosServiceException If any errors occurred in while processing the request.
+     *
+     */
+    public void setBucketAcl(String bucketName, CannedAccessControlList acl)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * Sets the {@link AccessControlList} for the specified bucket.
+     * <p>
+     * Each bucket and object in COS has an ACL that defines its access control policy. When a
+     * request is made, COS authenticates the request using its standard authentication procedure
+     * and then checks the ACL to verify the sender was granted access to the bucket or object. If
+     * the sender is approved, the request proceeds. Otherwise, COS returns an error.
+     * <p>
+     * When constructing a custom <code>AccessControlList</code>, callers typically retrieve the
+     * existing <code>AccessControlList</code> for a bucket .
+     *
+     * @param setBucketAclRequest The request object containing the bucket to modify and the ACL to
+     *        set.
+     *
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * @throws CosServiceException If any errors occurred in while processing the request.
+     *
+     */
+    public void setBucketAcl(SetBucketAclRequest setBucketAclRequest)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * Gets the {@link AccessControlList} (ACL) for the specified bucket.
+     * <p>
+     * Each bucket and object in COS has an ACL that defines its access control policy. When a
+     * request is made, COS authenticates the request using its standard authentication procedure
+     * and then checks the ACL to verify the sender was granted access to the bucket or object. If
+     * the sender is approved, the request proceeds. Otherwise, COS returns an error.
+     *
+     * @param bucketName The name of the bucket whose ACL is being retrieved.
+     *
+     * @return The <code>AccessControlList</code> for the specified COS bucket.
+     *
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * @throws CosServiceException If any errors occurred in COS while processing the request.
+     */
+    public AccessControlList getBucketAcl(String bucketName)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * Gets the {@link AccessControlList} (ACL) for the specified bucket.
+     * <p>
+     * Each bucket and object in COS has an ACL that defines its access control policy. When a
+     * request is made, COS authenticates the request using its standard authentication procedure
+     * and then checks the ACL to verify the sender was granted access to the bucket or object. If
+     * the sender is approved, the request proceeds. Otherwise, COS returns an error.
+     *
+     * @param getBucketAclRequest The request containing the name of the bucket whose ACL is being
+     *        retrieved.
+     *
+     * @return The <code>AccessControlList</code> for the specified COS bucket.
+     *
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * @throws CosServiceException If any errors occurred in COS while processing the request.
+     */
+    public AccessControlList getBucketAcl(GetBucketAclRequest getBucketAclRequest)
+            throws CosClientException, CosServiceException;
+
+
+    /**
+     * Gets the cross origin configuration for the specified bucket, or null if no configuration has
+     * been established.
+     *
+     * @param bucketName the bucket name
+     * @return BucketCrossOriginConfiguration bucket cross origin configuration
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * @throws CosServiceException If any errors occurred in COS while processing the request.
+     */
+    public BucketCrossOriginConfiguration getBucketCrossOriginConfiguration(String bucketName)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * Gets the cross origin configuration for the specified bucket, or null if no configuration has
+     * been established.
+     *
+     * @param getBucketCrossOriginConfigurationRequest The request object for retrieving the bucket
+     *        cross origin configuration.
+     * @return BucketCrossOriginConfiguration bucket cross origin configuration
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * @throws CosServiceException If any errors occurred in COS while processing the request.
+     */
+    public BucketCrossOriginConfiguration getBucketCrossOriginConfiguration(
+            GetBucketCrossOriginConfigurationRequest getBucketCrossOriginConfigurationRequest)
+                    throws CosClientException, CosServiceException;
+
+
+    /**
+     * Sets the cross origin configuration for the specified bucket.
+     *
+     * @param bucketName the bucket name
+     * @param BucketCrossOriginConfiguration The bucketCrossOriginConfiguration contains all options
+     *        for setting the bucket cross origin configuration.
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * @throws CosServiceException If any errors occurred in COS while processing the request.
+     */
+    public void setBucketCrossOriginConfiguration(String bucketName,
+            BucketCrossOriginConfiguration bucketCrossOriginConfiguration)
+                    throws CosClientException, CosServiceException;
+
+    /**
+     * Sets the cross origin configuration for the specified bucket.
+     *
+     * @param setBucketCrossOriginConfigurationRequest The request object containing all options for
+     *        setting the bucket cross origin configuration.
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * @throws CosServiceException If any errors occurred in COS while processing the request.
+     */
+    public void setBucketCrossOriginConfiguration(
+            SetBucketCrossOriginConfigurationRequest setBucketCrossOriginConfigurationRequest)
+                    throws CosClientException, CosServiceException;
+
+    /**
+     * Delete the cross origin configuration for the specified bucket.
+     *
+     * @param bucketName The bucket name
+     * 
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * @throws CosServiceException If any errors occurred in COS while processing the request.
+     */
+    public void deleteBucketCrossOriginConfiguration(String bucketName)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * Delete the cross origin configuration for the specified bucket.
+     *
+     * @param deleteBucketCrossOriginConfigurationRequest The request object containing all options
+     *        for deleting the bucket cross origin configuration.
+     */
+    public void deleteBucketCrossOriginConfiguration(
+            DeleteBucketCrossOriginConfigurationRequest deleteBucketCrossOriginConfigurationRequest)
+                    throws CosClientException, CosServiceException;
 
 }

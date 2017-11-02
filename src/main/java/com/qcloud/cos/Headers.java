@@ -143,4 +143,7 @@ public interface Headers {
      * Tag length applicable to authenticated encrypt/decryption.
      */
     public static final String CRYPTO_TAG_LENGTH = "x-cos-tag-len";
+    
+    /** Region where the bucket is located. This header is returned only in HEAD bucket and ListObjects response. */
+    public static final String COS_BUCKET_REGION = "x-cos-bucket-region";
 }

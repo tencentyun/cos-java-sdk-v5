@@ -26,25 +26,26 @@ import com.qcloud.cos.transfer.Upload;
 
 public class Demo {
     public static void main(String[] args) throws Exception {
-        // 用户基本信息
-        String appid = "100000";
+        // 用户基本信息(参照云API秘钥)
+        String appid = "125000";
         String secret_id = "xxxxxxxxxxxxxxxx";
         String secret_key = "yyyyyyyyyyyy";
 
         // 设置秘钥
         COSCredentials cred = new BasicCOSCredentials(appid, secret_id, secret_key);
-        // 设置区域, 这里设置为华北
-        ClientConfig clientConfig = new ClientConfig(new Region("cn-north"));
+        // 设置区域, 这里设置为北京一区
+        // (COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224)
+        ClientConfig clientConfig = new ClientConfig(new Region("ap-beijing-1"));
         // 生成cos客户端对象
         COSClient cosClient = new COSClient(cred, clientConfig);
 
         // 创建bucket
         // bucket数量上限200个, bucket是重操作, 一般不建议创建如此多的bucket
         // 重复创建同名bucket会报错
-        String bucketName = "mybucket1511";
+        String bucketName = "mybucket123";
         CreateBucketRequest createBucketRequest = new CreateBucketRequest(bucketName);
         createBucketRequest.setCannedAcl(CannedAccessControlList.PublicReadWrite);
-        Bucket created_bucket = cosClient.createBucket(createBucketRequest);
+        Bucket createdBucket = cosClient.createBucket(createBucketRequest);
 
         // 上传object, 建议20M以下的文件使用该接口
         File localFile = new File("src/test/resources/len5M.txt");

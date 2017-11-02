@@ -18,4 +18,10 @@ public class Constants {
 
     /** The maximum allowed parts in a multipart upload. */
     public static final int MAXIMUM_UPLOAD_PARTS = 10000;
+    
+    public static final int NO_SUCH_BUCKET_STATUS_CODE = 404;
+
+    public static final int BUCKET_ACCESS_FORBIDDEN_STATUS_CODE = 403;
+
+    public static final int BUCKET_REDIRECT_STATUS_CODE = 301;
 }

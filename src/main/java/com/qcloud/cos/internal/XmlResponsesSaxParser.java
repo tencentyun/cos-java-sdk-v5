@@ -7,14 +7,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
@@ -26,7 +22,17 @@ import org.xml.sax.helpers.XMLReaderFactory;
 
 import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.exception.CosServiceException;
+import com.qcloud.cos.model.AbortIncompleteMultipartUpload;
 import com.qcloud.cos.model.AccessControlList;
+import com.qcloud.cos.model.Bucket;
+import com.qcloud.cos.model.BucketCrossOriginConfiguration;
+import com.qcloud.cos.model.BucketLifecycleConfiguration;
+import com.qcloud.cos.model.BucketLifecycleConfiguration.NoncurrentVersionTransition;
+import com.qcloud.cos.model.BucketLifecycleConfiguration.Rule;
+import com.qcloud.cos.model.BucketLifecycleConfiguration.Transition;
+import com.qcloud.cos.model.BucketVersioningConfiguration;
+import com.qcloud.cos.model.CORSRule;
+import com.qcloud.cos.model.CORSRule.AllowedMethods;
 import com.qcloud.cos.model.COSObjectSummary;
 import com.qcloud.cos.model.CompleteMultipartUploadResult;
 import com.qcloud.cos.model.CopyObjectResult;
@@ -39,8 +45,14 @@ import com.qcloud.cos.model.Owner;
 import com.qcloud.cos.model.PartListing;
 import com.qcloud.cos.model.PartSummary;
 import com.qcloud.cos.model.Permission;
+import com.qcloud.cos.model.UinGrantee;
+import com.qcloud.cos.model.Tag.LifecycleTagPredicate;
+import com.qcloud.cos.model.Tag.Tag;
+import com.qcloud.cos.model.lifecycle.LifecycleAndOperator;
+import com.qcloud.cos.model.lifecycle.LifecycleFilter;
+import com.qcloud.cos.model.lifecycle.LifecycleFilterPredicate;
+import com.qcloud.cos.model.lifecycle.LifecyclePrefixPredicate;
 import com.qcloud.cos.utils.DateUtils;
-import com.qcloud.cos.utils.ServiceUtils;
 import com.qcloud.cos.utils.StringUtils;
 
 
@@ -255,34 +267,36 @@ public class XmlResponsesSaxParser {
     // return handler;
     // }
     //
-    // /**
-    // * Parses a ListAllMyBuckets response XML document from an input stream.
-    // *
-    // * @param inputStream XML data input stream.
-    // * @return the XML handler object populated with data parsed from the XML stream.
-    // * @throws CosClientException
-    // */
-    // public ListAllMyBucketsHandler parseListMyBucketsResponse(InputStream inputStream)
-    // throws IOException {
-    // ListAllMyBucketsHandler handler = new ListAllMyBucketsHandler();
-    // parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
-    // return handler;
-    // }
+    /**
+     * Parses a ListAllMyBuckets response XML document from an input stream.
+     *
+     * @param inputStream XML data input stream.
+     * @return the XML handler object populated with data parsed from the XML stream.
+     * @throws CosClientException
+     */
+    public ListAllMyBucketsHandler parseListMyBucketsResponse(InputStream inputStream)
+            throws IOException {
+        ListAllMyBucketsHandler handler = new ListAllMyBucketsHandler();
+        parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
+        return handler;
+    }
+
     //
-    // /**
-    // * Parses an AccessControlListHandler response XML document from an input stream.
-    // *
-    // * @param inputStream XML data input stream.
-    // * @return the XML handler object populated with data parsed from the XML stream.
-    // *
-    // * @throws CosClientException
-    // */
-    // public AccessControlListHandler parseAccessControlListResponse(InputStream inputStream)
-    // throws IOException {
-    // AccessControlListHandler handler = new AccessControlListHandler();
-    // parseXmlInputStream(handler, inputStream);
-    // return handler;
-    // }
+    /**
+     * Parses an AccessControlListHandler response XML document from an input stream.
+     *
+     * @param inputStream XML data input stream.
+     * @return the XML handler object populated with data parsed from the XML stream.
+     *
+     * @throws CosClientException
+     */
+    public AccessControlListHandler parseAccessControlListResponse(InputStream inputStream)
+            throws IOException {
+        AccessControlListHandler handler = new AccessControlListHandler();
+        parseXmlInputStream(handler, inputStream);
+        return handler;
+    }
+
     //
     // /**
     // * Parses a LoggingStatus response XML document for a bucket from an input stream.
@@ -299,32 +313,35 @@ public class XmlResponsesSaxParser {
     // return handler;
     // }
     //
-    // public BucketLifecycleConfigurationHandler parseBucketLifecycleConfigurationResponse(
-    // InputStream inputStream) throws IOException {
-    // BucketLifecycleConfigurationHandler handler = new BucketLifecycleConfigurationHandler();
-    // parseXmlInputStream(handler, inputStream);
-    // return handler;
-    // }
-    //
-    // public BucketCrossOriginConfigurationHandler parseBucketCrossOriginConfigurationResponse(
-    // InputStream inputStream) throws IOException {
-    // BucketCrossOriginConfigurationHandler handler = new BucketCrossOriginConfigurationHandler();
-    // parseXmlInputStream(handler, inputStream);
-    // return handler;
-    // }
-    //
-    // public String parseBucketLocationResponse(InputStream inputStream) throws IOException {
-    // BucketLocationHandler handler = new BucketLocationHandler();
-    // parseXmlInputStream(handler, inputStream);
-    // return handler.getLocation();
-    // }
-    //
-    // public BucketVersioningConfigurationHandler parseVersioningConfigurationResponse(
-    // InputStream inputStream) throws IOException {
-    // BucketVersioningConfigurationHandler handler = new BucketVersioningConfigurationHandler();
-    // parseXmlInputStream(handler, inputStream);
-    // return handler;
-    // }
+    public BucketLifecycleConfigurationHandler parseBucketLifecycleConfigurationResponse(
+            InputStream inputStream) throws IOException {
+        BucketLifecycleConfigurationHandler handler = new BucketLifecycleConfigurationHandler();
+        parseXmlInputStream(handler, inputStream);
+        return handler;
+    }
+
+
+    public BucketCrossOriginConfigurationHandler parseBucketCrossOriginConfigurationResponse(
+            InputStream inputStream) throws IOException {
+        BucketCrossOriginConfigurationHandler handler = new BucketCrossOriginConfigurationHandler();
+        parseXmlInputStream(handler, inputStream);
+        return handler;
+    }
+
+
+    public String parseBucketLocationResponse(InputStream inputStream) throws IOException {
+        BucketLocationHandler handler = new BucketLocationHandler();
+        parseXmlInputStream(handler, inputStream);
+        return handler.getLocation();
+    }
+
+    public BucketVersioningConfigurationHandler parseVersioningConfigurationResponse(
+            InputStream inputStream) throws IOException {
+        BucketVersioningConfigurationHandler handler = new BucketVersioningConfigurationHandler();
+        parseXmlInputStream(handler, inputStream);
+        return handler;
+    }
+
     //
     // public BucketWebsiteConfigurationHandler parseWebsiteConfigurationResponse(
     // InputStream inputStream) throws IOException {
@@ -552,179 +569,160 @@ public class XmlResponsesSaxParser {
         }
     }
 
-    // /**
-    // * Handler for ListAllMyBuckets response XML documents. The document is
-    // * parsed into {@link Bucket}s available via the {@link #getBuckets()}
-    // * method.
-    // */
-    // public static class ListAllMyBucketsHandler extends AbstractHandler {
-    //
-    // private final List<Bucket> buckets = new ArrayList<Bucket>();
-    // private Owner bucketsOwner = null;
-    //
-    // private Bucket currentBucket = null;
-    //
-    // /**
-    // * @return the buckets listed in the document.
-    // */
-    // public List<Bucket> getBuckets() {
-    // return buckets;
-    // }
-    //
-    // /**
-    // * @return the owner of the buckets.
-    // */
-    // public Owner getOwner() {
-    // return bucketsOwner;
-    // }
-    //
-    // @Override
-    // protected void doStartElement(
-    // String uri,
-    // String name,
-    // String qName,
-    // Attributes attrs) {
-    //
-    // if (in("ListAllMyBucketsResult")) {
-    // if (name.equals("Owner")) {
-    // bucketsOwner = new Owner();
-    // }
-    // } else if (in("ListAllMyBucketsResult", "Buckets")) {
-    // if (name.equals("Bucket")) {
-    // currentBucket = new Bucket();
-    // currentBucket.setOwner(bucketsOwner);
-    // }
-    // }
-    // }
-    //
-    // @Override
-    // protected void doEndElement(String uri, String name, String qName) {
-    // if (in("ListAllMyBucketsResult", "Owner")) {
-    // if (name.equals("ID")) {
-    // bucketsOwner.setId(getText());
-    //
-    // } else if (name.equals("DisplayName")) {
-    // bucketsOwner.setDisplayName(getText());
-    // }
-    // }
-    //
-    // else if (in("ListAllMyBucketsResult", "Buckets")) {
-    // if (name.equals("Bucket")) {
-    // buckets.add(currentBucket);
-    // currentBucket = null;
-    // }
-    // }
-    //
-    // else if (in("ListAllMyBucketsResult", "Buckets", "Bucket")) {
-    // if (name.equals("Name")) {
-    // currentBucket.setName(getText());
-    //
-    // } else if (name.equals("CreationDate")) {
-    // Date creationDate = DateUtils.parseISO8601Date(getText());
-    // currentBucket.setCreationDate(creationDate);
-    // }
-    // }
-    // }
-    // }
+    /**
+     * Handler for ListAllMyBuckets response XML documents. The document is parsed into
+     * {@link Bucket}s available via the {@link #getBuckets()} method.
+     */
+    public static class ListAllMyBucketsHandler extends AbstractHandler {
+
+        private final List<Bucket> buckets = new ArrayList<Bucket>();
+        private Owner bucketsOwner = null;
+
+        private Bucket currentBucket = null;
+
+        /**
+         * @return the buckets listed in the document.
+         */
+        public List<Bucket> getBuckets() {
+            return buckets;
+        }
+
+        /**
+         * @return the owner of the buckets.
+         */
+        public Owner getOwner() {
+            return bucketsOwner;
+        }
+
+        @Override
+        protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
+
+            if (in("ListAllMyBucketsResult")) {
+                if (name.equals("Owner")) {
+                    bucketsOwner = new Owner();
+                }
+            } else if (in("ListAllMyBucketsResult", "Buckets")) {
+                if (name.equals("Bucket")) {
+                    currentBucket = new Bucket();
+                    currentBucket.setOwner(bucketsOwner);
+                }
+            }
+        }
+
+        @Override
+        protected void doEndElement(String uri, String name, String qName) {
+            if (in("ListAllMyBucketsResult", "Owner")) {
+                if (name.equals("ID")) {
+                    bucketsOwner.setId(getText());
+
+                } else if (name.equals("DisplayName")) {
+                    bucketsOwner.setDisplayName(getText());
+                }
+            }
+
+            else if (in("ListAllMyBucketsResult", "Buckets")) {
+                if (name.equals("Bucket")) {
+                    buckets.add(currentBucket);
+                    currentBucket = null;
+                }
+            }
+
+            else if (in("ListAllMyBucketsResult", "Buckets", "Bucket")) {
+                if (name.equals("Name")) {
+                    currentBucket.setName(getText());
+
+                } else if (name.equals("CreationDate")) {
+                    Date creationDate = DateUtils.parseISO8601Date(getText());
+                    currentBucket.setCreationDate(creationDate);
+                } else if (name.equals("CreateDate")) {
+                    Date creationDate = DateUtils.parseISO8601Date(getText());
+                    currentBucket.setCreationDate(creationDate);
+                }
+            }
+        }
+    }
+
 
     /**
      * Handler for AccessControlList response XML documents. The document is parsed into an
      * {@link AccessControlList} object available via the {@link #getAccessControlList()} method.
      */
-    // public static class AccessControlListHandler extends AbstractHandler {
-    //
-    // private final AccessControlList accessControlList =
-    // new AccessControlList();
-    //
-    // private Grantee currentGrantee = null;
-    // private Permission currentPermission = null;
-    //
-    // /**
-    // * @return an object representing the ACL document.
-    // */
-    // public AccessControlList getAccessControlList() {
-    // return accessControlList;
-    // }
-    //
-    // @Override
-    // protected void doStartElement(
-    // String uri,
-    // String name,
-    // String qName,
-    // Attributes attrs) {
-    //
-    // if (in("AccessControlPolicy")) {
-    // if (name.equals("Owner")) {
-    // accessControlList.setOwner(new Owner());
-    //
-    // }
-    // }
-    //
-    // else if (in("AccessControlPolicy", "AccessControlList", "Grant")) {
-    // if (name.equals("Grantee")) {
-    // String type = XmlResponsesSaxParser
-    // .findAttributeValue( "xsi:type", attrs );
-    //
-    // if ("CanonicalUser".equals(type)) {
-    // currentGrantee = new CanonicalGrantee(null);
-    // } else if ("Group".equals(type)) {
-    // /*
-    // * Nothing to do for GroupGrantees here since we
-    // * can't construct an empty enum value early.
-    // */
-    // }
-    // }
-    // }
-    // }
-    //
-    // @Override
-    // protected void doEndElement(String uri, String name, String qName) {
-    // if (in("AccessControlPolicy", "Owner")) {
-    // if (name.equals("ID")) {
-    // accessControlList.getOwner().setId(getText());
-    // } else if (name.equals("DisplayName")) {
-    // accessControlList.getOwner().setDisplayName(getText());
-    // }
-    // }
-    //
-    // else if (in("AccessControlPolicy", "AccessControlList")) {
-    // if (name.equals("Grant")) {
-    // accessControlList.grantPermission(
-    // currentGrantee, currentPermission);
-    //
-    // currentGrantee = null;
-    // currentPermission = null;
-    // }
-    // }
-    //
-    // else if (in("AccessControlPolicy", "AccessControlList", "Grant")) {
-    // if (name.equals("Permission")) {
-    // currentPermission = Permission.parsePermission(getText());
-    // }
-    // }
-    //
-    // else if (in("AccessControlPolicy", "AccessControlList", "Grant", "Grantee")) {
-    // if (name.equals("ID")) {
-    // currentGrantee.setIdentifier(getText());
-    //
-    // } else if (name.equals("EmailAddress")) {
-    // currentGrantee.setIdentifier(getText());
-    //
-    // } else if (name.equals("URI")) {
-    // /*
-    // * Only GroupGrantees contain an URI element in them, and we
-    // * can't construct currentGrantee during startElement for a
-    // * GroupGrantee since it's an enum.
-    // */
-    // currentGrantee = GroupGrantee.parseGroupGrantee(getText());
-    //
-    // } else if (name.equals("DisplayName")) {
-    // ((CanonicalGrantee) currentGrantee)
-    // .setDisplayName(getText());
-    // }
-    // }
-    // }
-    // }
+    public static class AccessControlListHandler extends AbstractHandler {
+
+        private final AccessControlList accessControlList = new AccessControlList();
+
+        private Grantee currentGrantee = null;
+        private Permission currentPermission = null;
+
+        /**
+         * @return an object representing the ACL document.
+         */
+        public AccessControlList getAccessControlList() {
+            return accessControlList;
+        }
+
+        @Override
+        protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
+
+            if (in("AccessControlPolicy")) {
+                if (name.equals("Owner")) {
+                    accessControlList.setOwner(new Owner());
+
+                }
+            }
+
+            else if (in("AccessControlPolicy", "AccessControlList", "Grant")) {
+                if (name.equals("Grantee")) {
+                    String type = XmlResponsesSaxParser.findAttributeValue("xsi:type", attrs);
+
+                    if ("Group".equals(type)) {
+                        /*
+                         * Nothing to do for GroupGrantees here since we
+                         * can't construct an empty enum value early.
+                         */
+                    } else if ("CanonicalUser".equals(type)) {
+                        currentGrantee = new UinGrantee(null);
+                    }
+                }
+            }
+        }
+
+        @Override
+        protected void doEndElement(String uri, String name, String qName) {
+            if (in("AccessControlPolicy", "Owner")) {
+                if (name.equals("ID")) {
+                    accessControlList.getOwner().setId(getText());
+                } else if (name.equals("DisplayName")) {
+                    accessControlList.getOwner().setDisplayName(getText());
+                }
+            }
+
+            else if (in("AccessControlPolicy", "AccessControlList")) {
+                if (name.equals("Grant")) {
+                    accessControlList.grantPermission(currentGrantee, currentPermission);
+
+                    currentGrantee = null;
+                    currentPermission = null;
+                }
+            }
+
+            else if (in("AccessControlPolicy", "AccessControlList", "Grant")) {
+                if (name.equals("Permission")) {
+                    currentPermission = Permission.parsePermission(getText());
+                }
+            }
+
+            else if (in("AccessControlPolicy", "AccessControlList", "Grant", "Grantee")) {
+                if (name.equals("ID")) {
+                    currentGrantee.setIdentifier(getText());
+
+                } else if (name.equals("DisplayName")) {
+                    ((UinGrantee) currentGrantee).setDisplayName(getText());
+                }
+            }
+        }
+    }
+
 
     /**
      * Handler for LoggingStatus response XML documents for a bucket. The document is parsed into an
@@ -773,41 +771,37 @@ public class XmlResponsesSaxParser {
      * parsed into a String representing the bucket's location, available via the
      * {@link #getLocation()} method.
      */
-    // public static class BucketLocationHandler extends AbstractHandler {
-    //
-    // private String location = null;
-    //
-    // /**
-    // * @return
-    // * the bucket's location.
-    // */
-    // public String getLocation() {
-    // return location;
-    // }
-    //
-    // @Override
-    // protected void doStartElement(
-    // String uri,
-    // String name,
-    // String qName,
-    // Attributes attrs) {
-    //
-    // }
-    //
-    // @Override
-    // protected void doEndElement(String uri, String name, String qName) {
-    // if (atTopLevel()) {
-    // if (name.equals("LocationConstraint")) {
-    // String elementText = getText();
-    // if (elementText.length() == 0) {
-    // location = null;
-    // } else {
-    // location = elementText;
-    // }
-    // }
-    // }
-    // }
-    // }
+    public static class BucketLocationHandler extends AbstractHandler {
+
+        private String location = null;
+
+        /**
+         * @return the bucket's location.
+         */
+        public String getLocation() {
+            return location;
+        }
+
+        @Override
+        protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
+
+        }
+
+        @Override
+        protected void doEndElement(String uri, String name, String qName) {
+            if (atTopLevel()) {
+                if (name.equals("LocationConstraint")) {
+                    String elementText = getText();
+                    if (elementText.length() == 0) {
+                        location = null;
+                    } else {
+                        location = elementText;
+                    }
+                }
+            }
+        }
+    }
+
 
     public static class CopyObjectResultHandler extends AbstractSSEHandler
             implements ObjectExpirationResult {
@@ -899,7 +893,7 @@ public class XmlResponsesSaxParser {
         protected void doEndElement(String uri, String name, String qName) {
             if (in("CopyObjectResult") || in("CopyPartResult")) {
                 if (name.equals("LastModified")) {
-//                    result.setLastModifiedDate(DateUtils.parseISO8601Date(getText()));
+                    // result.setLastModifiedDate(DateUtils.parseISO8601Date(getText()));
                 } else if (name.equals("ETag")) {
                     result.setETag(StringUtils.removeQuotes(getText()));
                 }
@@ -918,6 +912,7 @@ public class XmlResponsesSaxParser {
             }
         }
     }
+
 
     // /**
     // * Handler for parsing RequestPaymentConfiguration XML response associated
@@ -1203,42 +1198,31 @@ public class XmlResponsesSaxParser {
     // }
     // }
     //
-    // public static class BucketVersioningConfigurationHandler extends AbstractHandler {
-    //
-    // private final BucketVersioningConfiguration configuration =
-    // new BucketVersioningConfiguration();
-    //
-    // public BucketVersioningConfiguration getConfiguration() { return configuration; }
-    //
-    // @Override
-    // protected void doStartElement(
-    // String uri,
-    // String name,
-    // String qName,
-    // Attributes attrs) {
-    //
-    // }
-    //
-    // @Override
-    // protected void doEndElement(String uri, String name, String qName) {
-    // if (in("VersioningConfiguration")) {
-    // if (name.equals("Status")) {
-    // configuration.setStatus(getText());
-    //
-    // } else if (name.equals("MfaDelete")) {
-    // String mfaDeleteStatus = getText();
-    //
-    // if (mfaDeleteStatus.equals("Disabled")) {
-    // configuration.setMfaDeleteEnabled(false);
-    // } else if (mfaDeleteStatus.equals("Enabled")) {
-    // configuration.setMfaDeleteEnabled(true);
-    // } else {
-    // configuration.setMfaDeleteEnabled(null);
-    // }
-    // }
-    // }
-    // }
-    // }
+    public static class BucketVersioningConfigurationHandler extends AbstractHandler {
+
+        private final BucketVersioningConfiguration configuration =
+                new BucketVersioningConfiguration();
+
+        public BucketVersioningConfiguration getConfiguration() {
+            return configuration;
+        }
+
+        @Override
+        protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
+
+        }
+
+        @Override
+        protected void doEndElement(String uri, String name, String qName) {
+            if (in("VersioningConfiguration")) {
+                if (name.equals("Status")) {
+                    configuration.setStatus(getText());
+
+                }
+            }
+        }
+    }
+
 
     /*
      * <?xml version="1.0" encoding="UTF-8"?> <CompleteMultipartUploadResult>
@@ -1361,6 +1345,7 @@ public class XmlResponsesSaxParser {
         }
     }
 
+
     /*
      * <?xml version="1.0" encoding="UTF-8"?> <InitiateMultipartUploadResult>
      * <Bucket>example-bucket</Bucket> <Key>example-object</Key>
@@ -1395,6 +1380,7 @@ public class XmlResponsesSaxParser {
             }
         }
     }
+
 
     public static class ListMultipartUploadsHandler extends AbstractHandler {
 
@@ -1483,6 +1469,7 @@ public class XmlResponsesSaxParser {
             }
         }
     }
+
 
     public static class ListPartsHandler extends AbstractHandler {
 
@@ -1699,6 +1686,7 @@ public class XmlResponsesSaxParser {
     // }
     // }
 
+
     // public static class DeleteObjectsHandler extends AbstractHandler {
     //
     // private final DeleteObjectsResponse response =
@@ -1789,206 +1777,262 @@ public class XmlResponsesSaxParser {
      * <Expiration> <Date>2020-12-31T00:00:00.000Z</Date> </Expiration> </Rule>
      * </LifecycleConfiguration>
      */
-    // public static class BucketLifecycleConfigurationHandler extends AbstractHandler {
-    //
-    // private final BucketLifecycleConfiguration configuration =
-    // new BucketLifecycleConfiguration(new ArrayList<Rule>());
-    //
-    // private Rule currentRule;
-    // private Transition currentTransition;
-    // private NoncurrentVersionTransition currentNcvTransition;
-    //
-    // public BucketLifecycleConfiguration getConfiguration() {
-    // return configuration;
-    // }
-    //
-    // @Override
-    // protected void doStartElement(
-    // String uri,
-    // String name,
-    // String qName,
-    // Attributes attrs) {
-    //
-    // if (in("LifecycleConfiguration")) {
-    // if (name.equals("Rule")) {
-    // currentRule = new Rule();
-    // }
-    // } else if (in("LifecycleConfiguration", "Rule")) {
-    // if (name.equals("Transition")) {
-    // currentTransition = new Transition();
-    // } else if (name.equals("NoncurrentVersionTransition")) {
-    // currentNcvTransition = new NoncurrentVersionTransition();
-    // }
-    // }
-    // }
-    //
-    // @Override
-    // protected void doEndElement(String uri, String name, String qName) {
-    // if (in("LifecycleConfiguration")) {
-    // if (name.equals("Rule")) {
-    // configuration.getRules().add(currentRule);
-    // currentRule = null;
-    // }
-    // }
-    //
-    // else if (in("LifecycleConfiguration", "Rule")) {
-    // if ( name.equals("ID") ) {
-    // currentRule.setId(getText());
-    //
-    // } else if ( name.equals("Prefix") ) {
-    // currentRule.setPrefix(getText());
-    //
-    // } else if ( name.equals("Status") ) {
-    // currentRule.setStatus(getText());
-    //
-    // } else if (name.equals("Transition")) {
-    // currentRule.addTransition(currentTransition);
-    // currentTransition = null;
-    //
-    // } else if (name.equals("NoncurrentVersionTransition")) {
-    // currentRule.addNoncurrentVersionTransition(
-    // currentNcvTransition);
-    // currentNcvTransition = null;
-    // }
-    // }
-    //
-    // else if (in("LifecycleConfiguration", "Rule", "Expiration")) {
-    // if (name.equals("Date")) {
-    // currentRule.setExpirationDate(
-    // ServiceUtils.parseIso8601Date(getText()));
-    // } else if (name.equals("Days")) {
-    // currentRule.setExpirationInDays(
-    // Integer.parseInt(getText()));
-    // }
-    // }
-    //
-    // else if (in("LifecycleConfiguration", "Rule", "Transition")) {
-    // if (name.equals("StorageClass")) {
-    // currentTransition.setStorageClass(getText());
-    // } else if (name.equals("Date")) {
-    // currentTransition.setDate(
-    // ServiceUtils.parseIso8601Date(getText()));
-    //
-    // } else if (name.equals("Days")) {
-    // currentTransition.setDays(Integer.parseInt(getText()));
-    // }
-    // }
-    //
-    // else if (in("LifecycleConfiguration", "Rule", "NoncurrentVersionExpiration")) {
-    // if (name.equals("NoncurrentDays")) {
-    // currentRule.setNoncurrentVersionExpirationInDays(
-    // Integer.parseInt(getText()));
-    // }
-    // }
-    //
-    // else if (in("LifecycleConfiguration", "Rule", "NoncurrentVersionTransition")) {
-    // if (name.equals("StorageClass")) {
-    // currentNcvTransition.setStorageClass(getText());
-    // } else if (name.equals("NoncurrentDays")) {
-    // currentNcvTransition.setDays(Integer.parseInt(getText()));
-    // }
-    // }
-    // }
-    // }
+    public static class BucketLifecycleConfigurationHandler extends AbstractHandler {
 
-    // public static class BucketCrossOriginConfigurationHandler extends AbstractHandler {
-    //
-    // private final BucketCrossOriginConfiguration configuration =
-    // new BucketCrossOriginConfiguration(new ArrayList<CORSRule>());
-    //
-    // private CORSRule currentRule;
-    // private List<AllowedMethods> allowedMethods = null;
-    // private List<String> allowedOrigins = null;
-    // private List<String> exposedHeaders = null;
-    // private List<String> allowedHeaders = null;
-    //
-    // public BucketCrossOriginConfiguration getConfiguration() {
-    // return configuration;
-    // }
-    //
-    // @Override
-    // protected void doStartElement(
-    // String uri,
-    // String name,
-    // String qName,
-    // Attributes attrs) {
-    //
-    // if (in("CORSConfiguration")) {
-    // if (name.equals("CORSRule")) {
-    // currentRule = new CORSRule();
-    // }
-    // } else if (in("CORSConfiguration", "CORSRule")) {
-    // if (name.equals("AllowedOrigin")) {
-    // if (allowedOrigins == null) {
-    // allowedOrigins = new ArrayList<String>();
-    // }
-    // } else if (name.equals("AllowedMethod")) {
-    // if (allowedMethods == null) {
-    // allowedMethods = new ArrayList<AllowedMethods>();
-    // }
-    // } else if (name.equals("ExposeHeader")) {
-    // if (exposedHeaders == null) {
-    // exposedHeaders = new ArrayList<String>();
-    // }
-    // } else if (name.equals("AllowedHeader")) {
-    // if (allowedHeaders == null) {
-    // allowedHeaders = new LinkedList<String>();
-    // }
-    // }
-    // }
-    // }
-    //
-    // @Override
-    // protected void doEndElement(String uri, String name, String qName) {
-    // if (in("CORSConfiguration")) {
-    // if (name.equals("CORSRule")) {
-    // currentRule.setAllowedHeaders(allowedHeaders);
-    // currentRule.setAllowedMethods(allowedMethods);
-    // currentRule.setAllowedOrigins(allowedOrigins);
-    // currentRule.setExposedHeaders(exposedHeaders);
-    // allowedHeaders = null;
-    // allowedMethods = null;
-    // allowedOrigins = null;
-    // exposedHeaders = null;
-    //
-    // configuration.getRules().add(currentRule);
-    // currentRule = null;
-    // }
-    // } else if (in("CORSConfiguration", "CORSRule")) {
-    // if (name.equals("ID")) {
-    // currentRule.setId(getText());
-    //
-    // } else if (name.equals("AllowedOrigin")) {
-    // allowedOrigins.add(getText());
-    //
-    // } else if (name.equals("AllowedMethod")) {
-    // allowedMethods.add(AllowedMethods.fromValue(getText()));
-    //
-    // } else if (name.equals("MaxAgeSeconds")) {
-    // currentRule.setMaxAgeSeconds(Integer.parseInt(getText()));
-    //
-    // } else if (name.equals("ExposeHeader")) {
-    // exposedHeaders.add(getText());
-    //
-    // } else if (name.equals("AllowedHeader")) {
-    // allowedHeaders.add(getText());
-    // }
-    // }
-    // }
-    // }
-    //
-    // private static String findAttributeValue(
-    // String qnameToFind,
-    // Attributes attrs) {
-    //
-    // for (int i = 0; i < attrs.getLength(); i++) {
-    // String qname = attrs.getQName(i);
-    // if (qname.trim().equalsIgnoreCase(qnameToFind.trim())) {
-    // return attrs.getValue(i);
-    // }
-    // }
-    //
-    // return null;
-    // }
+        private final BucketLifecycleConfiguration configuration =
+                new BucketLifecycleConfiguration(new ArrayList<Rule>());
+
+        private Rule currentRule;
+        private Transition currentTransition;
+        private NoncurrentVersionTransition currentNcvTransition;
+        private AbortIncompleteMultipartUpload abortIncompleteMultipartUpload;
+        private LifecycleFilter currentFilter;
+        private List<LifecycleFilterPredicate> andOperandsList;
+        private String currentTagKey;
+        private String currentTagValue;
+
+        public BucketLifecycleConfiguration getConfiguration() {
+            return configuration;
+        }
+
+        @Override
+        protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
+
+            if (in("LifecycleConfiguration")) {
+                if (name.equals("Rule")) {
+                    currentRule = new Rule();
+                }
+            } else if (in("LifecycleConfiguration", "Rule")) {
+                if (name.equals("Transition")) {
+                    currentTransition = new Transition();
+                } else if (name.equals("NoncurrentVersionTransition")) {
+                    currentNcvTransition = new NoncurrentVersionTransition();
+                } else if (name.equals("AbortIncompleteMultipartUpload")) {
+                    abortIncompleteMultipartUpload = new AbortIncompleteMultipartUpload();
+                } else if (name.equals("Filter")) {
+                    currentFilter = new LifecycleFilter();
+                }
+            } else if (in("LifecycleConfiguration", "Rule", "Filter")) {
+                if (name.equals("And")) {
+                    andOperandsList = new ArrayList<LifecycleFilterPredicate>();
+                }
+            }
+        }
+
+        @Override
+        protected void doEndElement(String uri, String name, String qName) {
+            if (in("LifecycleConfiguration")) {
+                if (name.equals("Rule")) {
+                    configuration.getRules().add(currentRule);
+                    currentRule = null;
+                }
+            }
+
+            else if (in("LifecycleConfiguration", "Rule")) {
+                if (name.equals("ID")) {
+                    currentRule.setId(getText());
+
+                } else if (name.equals("Status")) {
+                    currentRule.setStatus(getText());
+
+                } else if (name.equals("Transition")) {
+                    currentRule.addTransition(currentTransition);
+                    currentTransition = null;
+
+                } else if (name.equals("NoncurrentVersionTransition")) {
+                    currentRule.addNoncurrentVersionTransition(currentNcvTransition);
+                    currentNcvTransition = null;
+                } else if (name.equals("AbortIncompleteMultipartUpload")) {
+                    currentRule.setAbortIncompleteMultipartUpload(abortIncompleteMultipartUpload);
+                    abortIncompleteMultipartUpload = null;
+                } else if (name.equals("Filter")) {
+                    currentRule.setFilter(currentFilter);
+                    currentFilter = null;
+                }
+            }
+
+            else if (in("LifecycleConfiguration", "Rule", "Expiration")) {
+                if (name.equals("Date")) {
+                    currentRule.setExpirationDate(DateUtils.parseISO8601Date(getText()));
+                } else if (name.equals("Days")) {
+                    currentRule.setExpirationInDays(Integer.parseInt(getText()));
+                } else if (name.equals("ExpiredObjectDeleteMarker")) {
+                    if ("true".equals(getText())) {
+                        currentRule.setExpiredObjectDeleteMarker(true);
+                    }
+                }
+            }
+
+            else if (in("LifecycleConfiguration", "Rule", "Transition")) {
+                if (name.equals("StorageClass")) {
+                    currentTransition.setStorageClass(getText());
+                } else if (name.equals("Date")) {
+                    currentTransition.setDate(DateUtils.parseISO8601Date(getText()));
+
+                } else if (name.equals("Days")) {
+                    currentTransition.setDays(Integer.parseInt(getText()));
+                }
+            }
+
+            else if (in("LifecycleConfiguration", "Rule", "NoncurrentVersionExpiration")) {
+                if (name.equals("NoncurrentDays")) {
+                    currentRule.setNoncurrentVersionExpirationInDays(Integer.parseInt(getText()));
+                }
+            }
+
+            else if (in("LifecycleConfiguration", "Rule", "NoncurrentVersionTransition")) {
+                if (name.equals("StorageClass")) {
+                    currentNcvTransition.setStorageClass(getText());
+                } else if (name.equals("NoncurrentDays")) {
+                    currentNcvTransition.setDays(Integer.parseInt(getText()));
+                }
+            }
+
+            else if (in("LifecycleConfiguration", "Rule", "AbortIncompleteMultipartUpload")) {
+                if (name.equals("DaysAfterInitiation")) {
+                    abortIncompleteMultipartUpload
+                            .setDaysAfterInitiation(Integer.parseInt(getText()));
+                }
+            }
+
+            else if (in("LifecycleConfiguration", "Rule", "Filter")) {
+                if (name.equals("Prefix")) {
+                    currentFilter.setPredicate(new LifecyclePrefixPredicate(getText()));
+                } else if (name.equals("Tag")) {
+                    currentFilter.setPredicate(
+                            new LifecycleTagPredicate(new Tag(currentTagKey, currentTagValue)));
+                    currentTagKey = null;
+                    currentTagValue = null;
+                } else if (name.equals("And")) {
+                    currentFilter.setPredicate(new LifecycleAndOperator(andOperandsList));
+                    andOperandsList = null;
+                }
+            }
+
+            else if (in("LifecycleConfiguration", "Rule", "Filter", "Tag")) {
+                if (name.equals("Key")) {
+                    currentTagKey = getText();
+                } else if (name.equals("Value")) {
+                    currentTagValue = getText();
+                }
+            }
+
+            else if (in("LifecycleConfiguration", "Rule", "Filter", "And")) {
+                if (name.equals("Prefix")) {
+                    andOperandsList.add(new LifecyclePrefixPredicate(getText()));
+                } else if (name.equals("Tag")) {
+                    andOperandsList.add(
+                            new LifecycleTagPredicate(new Tag(currentTagKey, currentTagValue)));
+                    currentTagKey = null;
+                    currentTagValue = null;
+                }
+            }
+
+            else if (in("LifecycleConfiguration", "Rule", "Filter", "And", "Tag")) {
+                if (name.equals("Key")) {
+                    currentTagKey = getText();
+                } else if (name.equals("Value")) {
+                    currentTagValue = getText();
+                }
+            }
+
+        }
+    }
+
+
+    public static class BucketCrossOriginConfigurationHandler extends AbstractHandler {
+
+        private final BucketCrossOriginConfiguration configuration =
+                new BucketCrossOriginConfiguration(new ArrayList<CORSRule>());
+
+        private CORSRule currentRule;
+        private List<AllowedMethods> allowedMethods = null;
+        private List<String> allowedOrigins = null;
+        private List<String> exposedHeaders = null;
+        private List<String> allowedHeaders = null;
+
+        public BucketCrossOriginConfiguration getConfiguration() {
+            return configuration;
+        }
+
+        @Override
+        protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
+
+            if (in("CORSConfiguration")) {
+                if (name.equals("CORSRule")) {
+                    currentRule = new CORSRule();
+                }
+            } else if (in("CORSConfiguration", "CORSRule")) {
+                if (name.equals("AllowedOrigin")) {
+                    if (allowedOrigins == null) {
+                        allowedOrigins = new ArrayList<String>();
+                    }
+                } else if (name.equals("AllowedMethod")) {
+                    if (allowedMethods == null) {
+                        allowedMethods = new ArrayList<AllowedMethods>();
+                    }
+                } else if (name.equals("ExposeHeader")) {
+                    if (exposedHeaders == null) {
+                        exposedHeaders = new ArrayList<String>();
+                    }
+                } else if (name.equals("AllowedHeader")) {
+                    if (allowedHeaders == null) {
+                        allowedHeaders = new LinkedList<String>();
+                    }
+                }
+            }
+        }
+
+        @Override
+        protected void doEndElement(String uri, String name, String qName) {
+            if (in("CORSConfiguration")) {
+                if (name.equals("CORSRule")) {
+                    currentRule.setAllowedHeaders(allowedHeaders);
+                    currentRule.setAllowedMethods(allowedMethods);
+                    currentRule.setAllowedOrigins(allowedOrigins);
+                    currentRule.setExposedHeaders(exposedHeaders);
+                    allowedHeaders = null;
+                    allowedMethods = null;
+                    allowedOrigins = null;
+                    exposedHeaders = null;
+
+                    configuration.getRules().add(currentRule);
+                    currentRule = null;
+                }
+            } else if (in("CORSConfiguration", "CORSRule")) {
+                if (name.equals("ID")) {
+                    currentRule.setId(getText());
+
+                } else if (name.equals("AllowedOrigin")) {
+                    allowedOrigins.add(getText());
+
+                } else if (name.equals("AllowedMethod")) {
+                    allowedMethods.add(AllowedMethods.fromValue(getText()));
+
+                } else if (name.equals("MaxAgeSeconds")) {
+                    currentRule.setMaxAgeSeconds(Integer.parseInt(getText()));
+
+                } else if (name.equals("ExposeHeader")) {
+                    exposedHeaders.add(getText());
+
+                } else if (name.equals("AllowedHeader")) {
+                    allowedHeaders.add(getText());
+                }
+            }
+        }
+
+    }
+
+    private static String findAttributeValue(String qnameToFind, Attributes attrs) {
+
+        for (int i = 0; i < attrs.getLength(); i++) {
+            String qname = attrs.getQName(i);
+            if (qname.trim().equalsIgnoreCase(qnameToFind.trim())) {
+                return attrs.getValue(i);
+            }
+        }
+
+        return null;
+    }
 }
 
