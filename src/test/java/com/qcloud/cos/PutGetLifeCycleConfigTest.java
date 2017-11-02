@@ -87,7 +87,7 @@ public class PutGetLifeCycleConfigTest extends AbstractCOSClientTest {
         testPutGetDelRules(rules);
     }
 
-    @Test
+    @Ignore
     public void testPutGetDelLifeCycleForNormalBucket() {
         List<Rule> rules = new ArrayList<>();
 
@@ -130,7 +130,7 @@ public class PutGetLifeCycleConfigTest extends AbstractCOSClientTest {
         testPutGetDelRules(rules);
     }
 
-    @Test
+    @Ignore
     public void testPutGetDelLifeCycleForBucketWithVersions() {
         BucketVersioningConfiguration bucketVersionConfig =
                 new BucketVersioningConfiguration(BucketVersioningConfiguration.ENABLED);

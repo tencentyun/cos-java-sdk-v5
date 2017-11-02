@@ -162,7 +162,7 @@ public class PutGetDelTest extends AbstractCOSClientTest {
         return content;
     }
 
-    @Test
+    @Ignore
     public void testPutGetDelObjectNameContainSpecialLetter() throws IOException {
         File localFile = buildTestFile(0L);
         File downLoadFile = new File(localFile.getAbsolutePath() + ".down");
