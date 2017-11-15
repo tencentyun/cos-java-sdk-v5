@@ -25,7 +25,7 @@ public class BucketReplicationTest extends AbstractCOSClientTest {
         AbstractCOSClientTest.destoryCosClient();
     }
 
-    @Test
+    @Ignore
     public void setGetDelBucketReplicationTest() {
         if (!judgeUserInfoValid()) {
             return;
