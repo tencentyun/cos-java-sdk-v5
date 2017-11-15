@@ -11,6 +11,7 @@ import com.qcloud.cos.model.AccessControlList;
 import com.qcloud.cos.model.Bucket;
 import com.qcloud.cos.model.BucketCrossOriginConfiguration;
 import com.qcloud.cos.model.BucketLifecycleConfiguration;
+import com.qcloud.cos.model.BucketReplicationConfiguration;
 import com.qcloud.cos.model.BucketVersioningConfiguration;
 import com.qcloud.cos.model.COSObject;
 import com.qcloud.cos.model.CannedAccessControlList;
@@ -21,12 +22,14 @@ import com.qcloud.cos.model.CopyObjectResult;
 import com.qcloud.cos.model.CreateBucketRequest;
 import com.qcloud.cos.model.DeleteBucketCrossOriginConfigurationRequest;
 import com.qcloud.cos.model.DeleteBucketLifecycleConfigurationRequest;
+import com.qcloud.cos.model.DeleteBucketReplicationConfigurationRequest;
 import com.qcloud.cos.model.DeleteBucketRequest;
 import com.qcloud.cos.model.DeleteObjectRequest;
 import com.qcloud.cos.model.GetBucketAclRequest;
 import com.qcloud.cos.model.GetBucketCrossOriginConfigurationRequest;
 import com.qcloud.cos.model.GetBucketLifecycleConfigurationRequest;
 import com.qcloud.cos.model.GetBucketLocationRequest;
+import com.qcloud.cos.model.GetBucketReplicationConfigurationRequest;
 import com.qcloud.cos.model.GetBucketVersioningConfigurationRequest;
 import com.qcloud.cos.model.GetObjectAclRequest;
 import com.qcloud.cos.model.GetObjectMetadataRequest;
@@ -49,6 +52,7 @@ import com.qcloud.cos.model.PutObjectResult;
 import com.qcloud.cos.model.SetBucketAclRequest;
 import com.qcloud.cos.model.SetBucketCrossOriginConfigurationRequest;
 import com.qcloud.cos.model.SetBucketLifecycleConfigurationRequest;
+import com.qcloud.cos.model.SetBucketReplicationConfigurationRequest;
 import com.qcloud.cos.model.SetBucketVersioningConfigurationRequest;
 import com.qcloud.cos.model.SetObjectAclRequest;
 import com.qcloud.cos.model.UploadPartRequest;
@@ -1111,8 +1115,8 @@ public interface COS {
      * @param setBucketLifecycleConfigurationRequest The request object containing all options for
      *        setting the bucket lifecycle configuration.
      * @throws CosClientException If any errors are encountered in the client while making the
+     *                      `------+++++++++++++++++++++++++++++++++++++++++++++++++*
      *         request or handling the response.
-     * 
      * @throws CosServiceException If any errors occurred in while processing the request.
      */
     public void setBucketLifecycleConfiguration(
@@ -1611,4 +1615,81 @@ public interface COS {
             DeleteBucketCrossOriginConfigurationRequest deleteBucketCrossOriginConfigurationRequest)
                     throws CosClientException, CosServiceException;
 
+
+    /**
+     * Sets a replication configuration for a bucket.
+     *
+     * @param bucketName The bucket name for which the replication configuration is set.
+     * @param configuration The replication configuration.
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * @throws CosServiceException If any errors occurred in COS while processing the request.
+     */
+    public void setBucketReplicationConfiguration(String bucketName,
+            BucketReplicationConfiguration configuration)
+                    throws CosClientException, CosServiceException;
+
+    /**
+     * Sets a replication configuration for the QCloud bucket.
+     *
+     * @param setBucketReplicationConfigurationRequest The request object containing all the options
+     *        for setting a replication configuration for QCloud bucket.
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * @throws CosServiceException If any errors occurred in COS while processing the request.
+     */
+    public void setBucketReplicationConfiguration(
+            SetBucketReplicationConfigurationRequest setBucketReplicationConfigurationRequest)
+                    throws CosClientException, CosServiceException;
+
+    /**
+     * Retrieves the replication configuration for the given QCloud bucket.
+     *
+     * @param bucketName The bucket name for which the replication configuration is to be retrieved.
+     * @return the replication configuration of the bucket.
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * @throws CosServiceException If any errors occurred in COS while processing the request.
+     */
+    public BucketReplicationConfiguration getBucketReplicationConfiguration(String bucketName)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * Retrieves the replication configuration for the given QCloud bucket.
+     *
+     * @param getBucketReplicationConfigurationRequest The request object for retrieving the bucket
+     *        replication configuration.
+     * @return the replication configuration of the bucket.
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * @throws CosServiceException If any errors occurred in COS while processing the request.
+     */
+    BucketReplicationConfiguration getBucketReplicationConfiguration(
+            GetBucketReplicationConfigurationRequest getBucketReplicationConfigurationRequest)
+                    throws CosClientException, CosServiceException;;
+
+    /**
+     * Deletes the replication configuration for the given QCloud bucket.
+     *
+     * @param bucketName The bucket name for which the replication configuration is to be deleted.
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * @throws CosServiceException If any errors occurred in COS while processing the request.
+     */
+    void deleteBucketReplicationConfiguration(String bucketName)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * Deletes the replication configuration for the given QCloud bucket.
+     *
+     * @param deleteBucketReplicationConfigurationRequest The request object for delete bucket replication configuration.
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * @throws CosServiceException If any errors occurred in COS while processing the request.
+     */
+    void deleteBucketReplicationConfiguration(DeleteBucketReplicationConfigurationRequest deleteBucketReplicationConfigurationRequest)
+            throws CosClientException, CosServiceException;
+
 }
+
+

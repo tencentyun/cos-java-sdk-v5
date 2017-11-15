@@ -9,6 +9,7 @@ import com.qcloud.cos.model.AccessControlList;
 import com.qcloud.cos.model.Bucket;
 import com.qcloud.cos.model.BucketCrossOriginConfiguration;
 import com.qcloud.cos.model.BucketLifecycleConfiguration;
+import com.qcloud.cos.model.BucketReplicationConfiguration;
 import com.qcloud.cos.model.BucketVersioningConfiguration;
 import com.qcloud.cos.model.InitiateMultipartUploadResult;
 import com.qcloud.cos.model.MultipartUploadListing;
@@ -215,6 +216,17 @@ public class Unmarshallers {
             implements Unmarshaller<BucketCrossOriginConfiguration, InputStream> {
         public BucketCrossOriginConfiguration unmarshall(InputStream in) throws Exception {
             return new XmlResponsesSaxParser().parseBucketCrossOriginConfigurationResponse(in)
+                    .getConfiguration();
+        }
+    }
+
+    /**
+     * Unmarshaller for the BucketNotificationConfiguration XML response.
+     */
+    public static final class BucketReplicationConfigurationUnmarshaller
+            implements Unmarshaller<BucketReplicationConfiguration, InputStream> {
+        public BucketReplicationConfiguration unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser().parseReplicationConfigurationResponse(in)
                     .getConfiguration();
         }
     }

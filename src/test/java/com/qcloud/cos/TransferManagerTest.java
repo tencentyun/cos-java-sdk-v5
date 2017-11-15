@@ -28,12 +28,16 @@ public class TransferManagerTest extends AbstractCOSClientTest {
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
         AbstractCOSClientTest.initCosClient();
-        transferManager = new TransferManager(AbstractCOSClientTest.cosclient);
+        if (cosclient != null) {
+            transferManager = new TransferManager(AbstractCOSClientTest.cosclient);
+        }
     }
 
     @AfterClass
     public static void tearDownAfterClass() throws Exception {
-        transferManager.shutdownNow();
+        if (transferManager != null) {
+            transferManager.shutdownNow();
+        }
         AbstractCOSClientTest.destoryCosClient();
     }
 
@@ -41,6 +45,9 @@ public class TransferManagerTest extends AbstractCOSClientTest {
     @Test
     public void testTransferManagerUploadDownSmallFile()
             throws IOException, CosServiceException, CosClientException, InterruptedException {
+        if (!judgeUserInfoValid()) {
+            return;
+        }
         TransferManager transferManager = new TransferManager(cosclient);
         File localFile = buildTestFile(1024 * 1024 * 2L);
         File downFile = new File(localFile.getAbsolutePath() + ".down");
@@ -74,6 +81,9 @@ public class TransferManagerTest extends AbstractCOSClientTest {
     @Test
     public void testTransferManagerUploadDownBigFile()
             throws IOException, CosServiceException, CosClientException, InterruptedException {
+        if (!judgeUserInfoValid()) {
+            return;
+        }
         TransferManager transferManager = new TransferManager(cosclient);
         File localFile = buildTestFile(1024 * 1024 * 10L);
         File downFile = new File(localFile.getAbsolutePath() + ".down");
@@ -103,6 +113,9 @@ public class TransferManagerTest extends AbstractCOSClientTest {
     @Test
     public void testTransferManagerUploadLocalDir()
             throws IOException, CosServiceException, CosClientException, InterruptedException {
+        if (!judgeUserInfoValid()) {
+            return;
+        }
         String folderPrefix = "/ut_uploaddir/";
         File localFile1 = buildTestFile(1L);
         File localFile2 = buildTestFile(1024L);
@@ -129,6 +142,9 @@ public class TransferManagerTest extends AbstractCOSClientTest {
     @Test
     public void testTransferManagerUploadDownloadDir()
             throws IOException, CosServiceException, CosClientException, InterruptedException {
+        if (!judgeUserInfoValid()) {
+            return;
+        }
         String folderPrefix = "/ut_uploaddir/";
         File localFile1 = buildTestFile(1L);
         File localFile2 = buildTestFile(1024L);

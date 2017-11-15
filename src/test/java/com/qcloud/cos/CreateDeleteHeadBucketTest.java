@@ -32,6 +32,9 @@ public class CreateDeleteHeadBucketTest extends AbstractCOSClientTest {
 
     @Test
     public void testCreateDeleteBucketPublicRead() throws Exception {
+        if (!judgeUserInfoValid()) {
+            return;
+        }
         String bucketName = "publicreadbucket";
         CreateBucketRequest createBucketRequest = new CreateBucketRequest(bucketName);
         createBucketRequest.setCannedAcl(CannedAccessControlList.PublicRead);
@@ -51,6 +54,9 @@ public class CreateDeleteHeadBucketTest extends AbstractCOSClientTest {
 
     @Test
     public void testCreateDeleteBucketPublicReadWrite() throws Exception {
+        if (!judgeUserInfoValid()) {
+            return;
+        }
         String bucketName = "publicreadwritebucket";
         CreateBucketRequest createBucketRequest = new CreateBucketRequest(bucketName);
         createBucketRequest.setCannedAcl(CannedAccessControlList.PublicReadWrite);
@@ -74,6 +80,9 @@ public class CreateDeleteHeadBucketTest extends AbstractCOSClientTest {
 
     @Test
     public void testCreateDeleteBucketPrivate() throws Exception {
+        if (!judgeUserInfoValid()) {
+            return;
+        }
         String bucketName = "privatebucket";
         CreateBucketRequest createBucketRequest = new CreateBucketRequest(bucketName);
         createBucketRequest.setCannedAcl(CannedAccessControlList.Private);

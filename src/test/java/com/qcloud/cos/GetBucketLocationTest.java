@@ -19,6 +19,9 @@ public class GetBucketLocationTest extends AbstractCOSClientTest {
     
     @Test
     public void getbucketLocationTest() {
+        if (!judgeUserInfoValid()) {
+            return;
+        }
         String location = cosclient.getBucketLocation(bucket);
         assertEquals(clientConfig.getRegion().getRegionName(), location);
     }

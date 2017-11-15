@@ -104,6 +104,9 @@ public class MultipartUploadTest extends AbstractCOSClientTest {
     }
 
     public void testMultiPartUploadObject(long filesize, long partSize) throws IOException {
+        if (!judgeUserInfoValid()) {
+            return;
+        }
         assertTrue(partSize >= 1024 * 1024L);
         assertTrue(filesize >= partSize);
         String key =
@@ -143,12 +146,12 @@ public class MultipartUploadTest extends AbstractCOSClientTest {
     }
 
     // 测试分块上传
-    @Test
+    @Ignore
     public void testMultipartUploadObjectSize_100M_Part_3M() throws IOException {
         testMultiPartUploadObject(100 * 1024 * 1024L, 3 * 1024 * 1024L);
     }
 
-    @Test
+    @Ignore
     public void testMultipartUploadObjectSize_100M_Part_NotAlign_1M() throws IOException {
         // 这里用一个任意尺寸的，非1M对齐的来做个测试
         testMultiPartUploadObject(100 * 1024 * 1024L, 3 * 1024 * 1024L + 13);
@@ -166,6 +169,9 @@ public class MultipartUploadTest extends AbstractCOSClientTest {
 
     @Test
     public void testListMultipartUploads() {
+        if (!judgeUserInfoValid()) {
+            return;
+        }
         String key = "ut/testListMultipart.txt";
         String uploadId = testInitMultipart(key);
         ListMultipartUploadsRequest listMultipartUploadsRequest =
@@ -192,6 +198,9 @@ public class MultipartUploadTest extends AbstractCOSClientTest {
     
     @Test
     public void testAbortMultipartUploads() {
+        if (!judgeUserInfoValid()) {
+            return;
+        }
         String key = "ut/testAbortMultipart.txt";
         String uploadId = testInitMultipart(key);
         AbortMultipartUploadRequest abortMultipartUploadRequest = new AbortMultipartUploadRequest(bucket, key, uploadId);

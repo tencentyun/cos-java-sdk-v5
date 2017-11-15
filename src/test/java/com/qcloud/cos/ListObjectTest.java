@@ -49,6 +49,9 @@ public class ListObjectTest extends AbstractCOSClientTest {
 
     @Test
     public void ListObjectNoDelimiterTest() {
+        if (!judgeUserInfoValid()) {
+            return;
+        }
         ObjectListing objectListing = cosclient.listObjects(bucket, keyPrefix);
         assertEquals(0L, objectListing.getCommonPrefixes().size());
         assertEquals(arrayNum, objectListing.getObjectSummaries().size());
@@ -64,6 +67,9 @@ public class ListObjectTest extends AbstractCOSClientTest {
 
     @Test
     public void ListObjectWithDelimiterTest() {
+        if (!judgeUserInfoValid()) {
+            return;
+        }
         ListObjectsRequest listObjectsRequest =
                 new ListObjectsRequest(bucket, keyPrefix, null, "/", 100);
         ObjectListing objectListing = cosclient.listObjects(listObjectsRequest);
@@ -73,6 +79,9 @@ public class ListObjectTest extends AbstractCOSClientTest {
     
     @Test
     public void ListObjectStartWithDelimiterTest() {
+        if (!judgeUserInfoValid()) {
+            return;
+        }
         ListObjectsRequest listObjectsRequest =
                 new ListObjectsRequest(bucket, "/" + keyPrefix, null, "/", 100);
         ObjectListing objectListing = cosclient.listObjects(listObjectsRequest);
@@ -82,6 +91,9 @@ public class ListObjectTest extends AbstractCOSClientTest {
 
     @Test
     public void ListNextBatchObjectWithNoTrunCated() {
+        if (!judgeUserInfoValid()) {
+            return;
+        }
         ObjectListing objectListingPrev = new ObjectListing();
         objectListingPrev.setBucketName(bucket);
         objectListingPrev.setPrefix(keyPrefix);
@@ -107,6 +119,9 @@ public class ListObjectTest extends AbstractCOSClientTest {
 
     @Test
     public void ListNextBatchObjectWithTrunCated() {
+        if (!judgeUserInfoValid()) {
+            return;
+        }
         ObjectListing objectListingPrev = new ObjectListing();
         objectListingPrev.setBucketName(bucket);
         objectListingPrev.setPrefix(keyPrefix);

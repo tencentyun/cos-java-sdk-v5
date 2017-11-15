@@ -32,6 +32,9 @@ public class AclTest extends AbstractCOSClientTest {
 
     @Test
     public void setGetBucketAclTest() {
+        if (!judgeUserInfoValid()) {
+            return;
+        }
         AccessControlList acl = new AccessControlList();
         Owner owner = new Owner();
         owner.setId("qcs::cam::uin/2779643970:uin/2779643970");
@@ -49,8 +52,11 @@ public class AclTest extends AbstractCOSClientTest {
         assertEquals(Permission.FullControl.toString(), grants.get(0).getPermission().toString());
     }
 
-    @Test
+    @Ignore
     public void setGetBucketCannedAclTest() {
+        if (!judgeUserInfoValid()) {
+            return;
+        }
         cosclient.setBucketAcl(bucket, CannedAccessControlList.Private);
         AccessControlList acl = cosclient.getBucketAcl(bucket);
         
@@ -58,6 +64,9 @@ public class AclTest extends AbstractCOSClientTest {
 
     @Test
     public void setGetObjectAclTest() throws IOException {
+        if (!judgeUserInfoValid()) {
+            return;
+        }
         File localFile = buildTestFile(0L);
         String key = "ut/acl_test.txt";
         putObjectFromLocalFile(localFile, key);
@@ -83,8 +92,11 @@ public class AclTest extends AbstractCOSClientTest {
         }
     }
 
-    @Test
+    @Ignore
     public void setObjectCannedAclTest() throws IOException {
+        if (!judgeUserInfoValid()) {
+            return;
+        }
         File localFile = buildTestFile(0L);
         String key = "ut/acl_test.txt";
         putObjectFromLocalFile(localFile, key);

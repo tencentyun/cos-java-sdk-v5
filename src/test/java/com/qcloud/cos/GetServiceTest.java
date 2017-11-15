@@ -23,6 +23,9 @@ public class GetServiceTest extends AbstractCOSClientTest {
 
     @Test
     public void testGetService() {
+        if (!judgeUserInfoValid()) {
+            return;
+        }
         List<Bucket> buckets = cosclient.listBuckets();
         for (Bucket bucketElement : buckets) {
             if (bucketElement.getName().equals(bucket + "-" + appid)) {

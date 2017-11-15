@@ -97,7 +97,7 @@ public class SkipMd5CheckStrategy {
      */
 
     public boolean skipClientSideValidation(GetObjectRequest request,
-                                            ObjectMetadata returnedMetadata) {
+            ObjectMetadata returnedMetadata) {
         return skipClientSideValidationPerRequest(request)
                 || skipClientSideValidationPerGetResponse(returnedMetadata);
     }
@@ -210,7 +210,12 @@ public class SkipMd5CheckStrategy {
     }
 
     private boolean isGetObjectMd5ValidationDisabledByProperty() {
-        return System.getProperty(DISABLE_GET_OBJECT_MD5_VALIDATION_PROPERTY) != null;
+        String propertyValue = System.getProperty(DISABLE_GET_OBJECT_MD5_VALIDATION_PROPERTY);
+        if (propertyValue != null && propertyValue.equalsIgnoreCase("false")) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
     private boolean isPutObjectMd5ValidationDisabledByProperty() {

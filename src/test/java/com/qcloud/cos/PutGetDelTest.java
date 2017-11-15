@@ -36,6 +36,9 @@ public class PutGetDelTest extends AbstractCOSClientTest {
 
     // 在本地生成不同大小的文件, 并上传， 下载，删除
     private void testPutGetDelObjectDiffSize(long size) throws CosServiceException, IOException {
+        if (!judgeUserInfoValid()) {
+            return;
+        }
         File localFile = buildTestFile(size);
         File downLoadFile = new File(localFile.getAbsolutePath() + ".down");
         String key = "/ut/" + localFile.getName();
@@ -44,6 +47,10 @@ public class PutGetDelTest extends AbstractCOSClientTest {
 
     private void testPutGetObjectAndClear(String key, File localFile, File downLoadFile)
             throws CosServiceException, IOException {
+        if (!judgeUserInfoValid()) {
+            return;
+        }
+        
         try {
             // put object
             putObjectFromLocalFile(localFile, key);
@@ -67,6 +74,9 @@ public class PutGetDelTest extends AbstractCOSClientTest {
     }
 
     private void testPutObjectByStreamDiffSize(long size) throws IOException {
+        if (!judgeUserInfoValid()) {
+            return;
+        }
         testPutObjectByStreamDiffSize(size, new ObjectMetadata());
     }
 
@@ -74,6 +84,9 @@ public class PutGetDelTest extends AbstractCOSClientTest {
     // 流式上传不同尺寸的文件
     private void testPutObjectByStreamDiffSize(long size, ObjectMetadata originMetaData)
             throws IOException {
+        if (!judgeUserInfoValid()) {
+            return;
+        }
         File localFile = buildTestFile(size);
         File downLoadFile = new File(localFile.getAbsolutePath() + ".down");
         String key = "/ut/" + localFile.getName();
@@ -115,6 +128,9 @@ public class PutGetDelTest extends AbstractCOSClientTest {
 
     public void testPutObjectByTruncateDiffSize(long originSize, long truncateSize)
             throws IOException {
+        if (!judgeUserInfoValid()) {
+            return;
+        }
         File localFile = buildTestFile(originSize);
         File downLoadFile = new File(localFile.getAbsolutePath() + ".down");
         String key = "/ut/" + localFile.getName();
@@ -174,15 +190,21 @@ public class PutGetDelTest extends AbstractCOSClientTest {
 
     @Test
     public void testPutGetDelObjectNameContainChinese() throws IOException {
+        if (!judgeUserInfoValid()) {
+            return;
+        }
         File localFile = buildTestFile(1L);
         File downLoadFile = new File(localFile.getAbsolutePath() + ".down");
-        String key = "/ut/" + "abc我的文件.txt";
+        String key = "/ut/" + "abc.png";
         testPutGetObjectAndClear(key, localFile, downLoadFile);
     }
 
 
     @Test
     public void testPutGetDelHttps() throws IOException {
+        if (!judgeUserInfoValid()) {
+            return;
+        }
         clientConfig.setHttpProtocol(HttpProtocol.https);
         testPutGetDelObjectDiffSize(1L);
         clientConfig.setHttpProtocol(HttpProtocol.http);

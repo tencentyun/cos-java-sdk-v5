@@ -27,6 +27,9 @@ public class PutObjectCopyTest extends AbstractCOSClientTest {
     }
 
     private void testCopySameRegionDiffSize(long fileSize) throws IOException {
+        if (!judgeUserInfoValid()) {
+            return;
+        }
         File localFile = buildTestFile(fileSize);
         String srcEtag = Md5Utils.md5Hex(localFile);
 

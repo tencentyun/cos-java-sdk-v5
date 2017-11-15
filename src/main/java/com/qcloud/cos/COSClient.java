@@ -65,6 +65,7 @@ import com.qcloud.cos.model.Bucket;
 import com.qcloud.cos.model.BucketConfigurationXmlFactory;
 import com.qcloud.cos.model.BucketCrossOriginConfiguration;
 import com.qcloud.cos.model.BucketLifecycleConfiguration;
+import com.qcloud.cos.model.BucketReplicationConfiguration;
 import com.qcloud.cos.model.BucketVersioningConfiguration;
 import com.qcloud.cos.model.COSObject;
 import com.qcloud.cos.model.COSObjectInputStream;
@@ -77,6 +78,7 @@ import com.qcloud.cos.model.CosDataSource;
 import com.qcloud.cos.model.CreateBucketRequest;
 import com.qcloud.cos.model.DeleteBucketCrossOriginConfigurationRequest;
 import com.qcloud.cos.model.DeleteBucketLifecycleConfigurationRequest;
+import com.qcloud.cos.model.DeleteBucketReplicationConfigurationRequest;
 import com.qcloud.cos.model.DeleteBucketRequest;
 import com.qcloud.cos.model.DeleteObjectRequest;
 import com.qcloud.cos.model.GenericBucketRequest;
@@ -84,6 +86,7 @@ import com.qcloud.cos.model.GetBucketAclRequest;
 import com.qcloud.cos.model.GetBucketCrossOriginConfigurationRequest;
 import com.qcloud.cos.model.GetBucketLifecycleConfigurationRequest;
 import com.qcloud.cos.model.GetBucketLocationRequest;
+import com.qcloud.cos.model.GetBucketReplicationConfigurationRequest;
 import com.qcloud.cos.model.GetBucketVersioningConfigurationRequest;
 import com.qcloud.cos.model.GetObjectAclRequest;
 import com.qcloud.cos.model.GetObjectMetadataRequest;
@@ -110,6 +113,7 @@ import com.qcloud.cos.model.PutObjectResult;
 import com.qcloud.cos.model.SetBucketAclRequest;
 import com.qcloud.cos.model.SetBucketCrossOriginConfigurationRequest;
 import com.qcloud.cos.model.SetBucketLifecycleConfigurationRequest;
+import com.qcloud.cos.model.SetBucketReplicationConfigurationRequest;
 import com.qcloud.cos.model.SetBucketVersioningConfigurationRequest;
 import com.qcloud.cos.model.SetObjectAclRequest;
 import com.qcloud.cos.model.UploadPartRequest;
@@ -1835,7 +1839,100 @@ public class COSClient implements COS {
         invoke(request, voidCosResponseHandler);
     }
 
+    @Override
+    public void setBucketReplicationConfiguration(String bucketName,
+            BucketReplicationConfiguration configuration)
+                    throws CosClientException, CosServiceException {
+        setBucketReplicationConfiguration(
+                new SetBucketReplicationConfigurationRequest(bucketName, configuration));
+    }
 
+    @Override
+    public void setBucketReplicationConfiguration(
+            SetBucketReplicationConfigurationRequest setBucketReplicationConfigurationRequest)
+                    throws CosClientException, CosServiceException {
+        rejectNull(setBucketReplicationConfigurationRequest,
+                "The set bucket replication configuration request object must be specified.");
+
+        final String bucketName = setBucketReplicationConfigurationRequest.getBucketName();
+
+        final BucketReplicationConfiguration bucketReplicationConfiguration =
+                setBucketReplicationConfigurationRequest.getReplicationConfiguration();
+
+        rejectNull(bucketName,
+                "The bucket name parameter must be specified when setting replication configuration.");
+        rejectNull(bucketReplicationConfiguration,
+                "The replication configuration parameter must be specified when setting replication configuration.");
+
+        CosHttpRequest<SetBucketReplicationConfigurationRequest> request = createRequest(bucketName,
+                null, setBucketReplicationConfigurationRequest, HttpMethodName.PUT);
+        request.addParameter("replication", null);
+
+        final byte[] bytes = new BucketConfigurationXmlFactory()
+                .convertToXmlByteArray(bucketReplicationConfiguration);
+
+        request.addHeader("Content-Length", String.valueOf(bytes.length));
+        request.addHeader("Content-Type", "application/xml");
+        request.setContent(new ByteArrayInputStream(bytes));
+
+
+        try {
+            request.addHeader("Content-MD5", BinaryUtils.toBase64(Md5Utils.computeMD5Hash(bytes)));
+        } catch (Exception e) {
+            throw new CosClientException(
+                    "Not able to compute MD5 of the replication rule configuration. Exception Message : "
+                            + e.getMessage(),
+                    e);
+        }
+        invoke(request, voidCosResponseHandler);
+    }
+
+    @Override
+    public BucketReplicationConfiguration getBucketReplicationConfiguration(String bucketName)
+            throws CosClientException, CosServiceException {
+        return getBucketReplicationConfiguration(
+                new GetBucketReplicationConfigurationRequest(bucketName));
+    }
+
+    @Override
+    public BucketReplicationConfiguration getBucketReplicationConfiguration(
+            GetBucketReplicationConfigurationRequest getBucketReplicationConfigurationRequest)
+                    throws CosClientException, CosServiceException {
+        rejectNull(getBucketReplicationConfigurationRequest,
+                "The bucket request parameter must be specified when retrieving replication configuration");
+        String bucketName = getBucketReplicationConfigurationRequest.getBucketName();
+        rejectNull(bucketName,
+                "The bucket request must specify a bucket name when retrieving replication configuration");
+
+        CosHttpRequest<GetBucketReplicationConfigurationRequest> request = createRequest(bucketName,
+                null, getBucketReplicationConfigurationRequest, HttpMethodName.GET);
+        request.addParameter("replication", null);
+
+        return invoke(request, new Unmarshallers.BucketReplicationConfigurationUnmarshaller());
+    }
+
+    @Override
+    public void deleteBucketReplicationConfiguration(String bucketName)
+            throws CosClientException, CosServiceException {
+        deleteBucketReplicationConfiguration(
+                new DeleteBucketReplicationConfigurationRequest(bucketName));
+    }
+
+    @Override
+    public void deleteBucketReplicationConfiguration(
+            DeleteBucketReplicationConfigurationRequest deleteBucketReplicationConfigurationRequest)
+                    throws CosClientException, CosServiceException {
+        final String bucketName = deleteBucketReplicationConfigurationRequest.getBucketName();
+        rejectNull(bucketName,
+                "The bucket name parameter must be specified when deleting replication configuration");
+
+        CosHttpRequest<DeleteBucketReplicationConfigurationRequest> request =
+                createRequest(bucketName, null, deleteBucketReplicationConfigurationRequest,
+                        HttpMethodName.DELETE);
+        request.addParameter("replication", null);
+
+        invoke(request, voidCosResponseHandler);
+    }
 
 }
 

@@ -23,6 +23,9 @@ public class BucketVersioningTest extends AbstractCOSClientTest {
 
     @Test
     public void testBucketVersioningEnabled() {
+        if (!judgeUserInfoValid()) {
+            return;
+        }
         BucketVersioningConfiguration bucketVersioningEnabled =
                 new BucketVersioningConfiguration(BucketVersioningConfiguration.ENABLED);
         cosclient.setBucketVersioningConfiguration(
@@ -35,6 +38,9 @@ public class BucketVersioningTest extends AbstractCOSClientTest {
 
     @Test
     public void testBucketVersioningSuspended() {
+        if (!judgeUserInfoValid()) {
+            return;
+        }
         BucketVersioningConfiguration bucketVersioningEnabled =
                 new BucketVersioningConfiguration(BucketVersioningConfiguration.SUSPENDED);
         cosclient.setBucketVersioningConfiguration(

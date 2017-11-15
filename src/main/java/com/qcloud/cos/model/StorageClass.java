@@ -10,11 +10,6 @@ package com.qcloud.cos.model;
  * <code>STANDARD</code> storage class is the default storage class, and means that
  * redundant copies of data will be stored in different locations.
  * </p>
- * <p>
- * The <code>REDUCED_REDUNDANCY</code> storage class offers customers who are using Qcloud COS
- * for storing non-critical, reproducible data a low-cost highly available,
- * but less redundant, storage option.
- * </p>
  */
 public enum StorageClass {
 

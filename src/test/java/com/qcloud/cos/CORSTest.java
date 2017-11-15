@@ -27,6 +27,9 @@ public class CORSTest extends AbstractCOSClientTest {
 
     @Test
     public void setBucketCORSTest() {
+        if (!judgeUserInfoValid()) {
+            return;
+        }
         BucketCrossOriginConfiguration bucketCORS = new BucketCrossOriginConfiguration();
         List<CORSRule> corsRules = new ArrayList<>();
         CORSRule corsRule = new CORSRule();

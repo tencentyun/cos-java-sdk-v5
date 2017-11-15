@@ -1,6 +1,7 @@
 package com.qcloud.cos.model;
 
 import java.util.List;
+import java.util.Map;
 
 import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.internal.XmlWriter;
@@ -85,7 +86,7 @@ public class BucketConfigurationXmlFactory {
 
         return xml.getBytes();
     }
-    
+
     private void writeRule(XmlWriter xml, CORSRule rule) {
         xml.start("CORSRule");
         if (rule.getId() != null) {
@@ -101,7 +102,7 @@ public class BucketConfigurationXmlFactory {
                 xml.start("AllowedMethod").value(method.toString()).end();
             }
         }
-        if(rule.getMaxAgeSeconds() != 0) {
+        if (rule.getMaxAgeSeconds() != 0) {
             xml.start("MaxAgeSeconds").value(Integer.toString(rule.getMaxAgeSeconds())).end();
         }
         if (rule.getExposedHeaders() != null) {
@@ -110,11 +111,11 @@ public class BucketConfigurationXmlFactory {
             }
         }
         if (rule.getAllowedHeaders() != null) {
-            for(String header : rule.getAllowedHeaders()) {
+            for (String header : rule.getAllowedHeaders()) {
                 xml.start("AllowedHeader").value(header).end();
             }
         }
-        xml.end();//</CORSRule>
+        xml.end();// </CORSRule>
     }
 
     private void writeRule(XmlWriter xml, Rule rule) {
@@ -257,6 +258,36 @@ public class BucketConfigurationXmlFactory {
             }
             xml.end(); // </And>
         }
+    }
+
+    public byte[] convertToXmlByteArray(BucketReplicationConfiguration replicationConfiguration) {
+        XmlWriter xml = new XmlWriter();
+        xml.start("ReplicationConfiguration");
+        Map<String, ReplicationRule> rules = replicationConfiguration.getRules();
+
+        final String role = replicationConfiguration.getRoleName();
+        xml.start("Role").value(role).end();
+        for (Map.Entry<String, ReplicationRule> entry : rules.entrySet()) {
+            final String ruleId = entry.getKey();
+            final ReplicationRule rule = entry.getValue();
+
+            xml.start("Rule");
+            xml.start("ID").value(ruleId).end();
+            xml.start("Prefix").value(rule.getPrefix()).end();
+            xml.start("Status").value(rule.getStatus()).end();
+
+            final ReplicationDestinationConfig config = rule.getDestinationConfig();
+            xml.start("Destination");
+            xml.start("Bucket").value(config.getBucketQCS()).end();
+            if (config.getStorageClass() != null) {
+                xml.start("StorageClass").value(config.getStorageClass()).end();
+            }
+            xml.end();
+
+            xml.end();
+        }
+        xml.end();
+        return xml.getBytes();
     }
 
     /**

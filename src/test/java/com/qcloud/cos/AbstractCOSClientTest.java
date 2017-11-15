@@ -12,10 +12,9 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import com.qcloud.cos.auth.BasicCOSCredentials;
 import com.qcloud.cos.auth.COSCredentials;
-import com.qcloud.cos.exception.CosServiceException;
+import com.qcloud.cos.internal.SkipMd5CheckStrategy;
 import com.qcloud.cos.model.AccessControlList;
 import com.qcloud.cos.model.CannedAccessControlList;
-import com.qcloud.cos.model.DeleteObjectRequest;
 import com.qcloud.cos.model.GetObjectMetadataRequest;
 import com.qcloud.cos.model.GetObjectRequest;
 import com.qcloud.cos.model.ObjectMetadata;
@@ -97,7 +96,8 @@ public class AbstractCOSClientTest {
 
         if (appid == null || secretId == null || secretKey == null || bucket == null
                 || region == null) {
-            throw new Exception("UT account info missing");
+            System.out.println("cos ut user info missing. skip all test");
+            return;
         }
         COSCredentials cred = new BasicCOSCredentials(appid, secretId, secretKey);
         clientConfig = new ClientConfig(new Region(region));
@@ -112,13 +112,20 @@ public class AbstractCOSClientTest {
         if (cosclient != null) {
             cosclient.shutdown();
         }
-        tmpDir.delete();
+        if (tmpDir != null) {
+            tmpDir.delete();
+        }
+    }
+
+    protected static boolean judgeUserInfoValid() {
+        return cosclient != null;
     }
 
     // 从本地上传
     protected static void putObjectFromLocalFile(File localFile, String key) {
-        assertNotNull(cosclient);
-        assertNotNull(bucket);
+        if (!judgeUserInfoValid()) {
+            return;
+        }
 
         AccessControlList acl = new AccessControlList();
         UinGrantee uinGrantee = new UinGrantee("734000014");
@@ -143,8 +150,9 @@ public class AbstractCOSClientTest {
     // 流式上传
     protected static void putObjectFromLocalFileByInputStream(File localFile, long uploadSize,
             String uploadEtag, String key) {
-        assertNotNull(cosclient);
-        assertNotNull(bucket);
+        if (!judgeUserInfoValid()) {
+            return;
+        }
         ObjectMetadata objectMetadata = new ObjectMetadata();
         objectMetadata.setContentLength(uploadSize);
         putObjectFromLocalFileByInputStream(localFile, uploadSize, uploadEtag, key, objectMetadata);
@@ -152,8 +160,9 @@ public class AbstractCOSClientTest {
 
     protected static void putObjectFromLocalFileByInputStream(File localFile, long uploadSize,
             String uploadEtag, String key, ObjectMetadata objectMetadata) {
-        assertNotNull(cosclient);
-        assertNotNull(bucket);
+        if (!judgeUserInfoValid()) {
+            return;
+        }
 
         FileInputStream input = null;
         try {
@@ -208,6 +217,7 @@ public class AbstractCOSClientTest {
 
     // 下载COS的object
     protected static void getObject(String key, File localDownFile) {
+        System.setProperty(SkipMd5CheckStrategy.DISABLE_GET_OBJECT_MD5_VALIDATION_PROPERTY, "true");
         GetObjectRequest getObjectRequest = new GetObjectRequest(bucket, key);
         try {
             cosclient.getObject(getObjectRequest, localDownFile);
@@ -219,8 +229,9 @@ public class AbstractCOSClientTest {
 
     // 删除COS上的object
     protected static void clearObject(String key) {
-        assertNotNull(cosclient);
-        assertNotNull(bucket);
+        if (!judgeUserInfoValid()) {
+            return;
+        }
 
         cosclient.deleteObject(bucket, key);
 

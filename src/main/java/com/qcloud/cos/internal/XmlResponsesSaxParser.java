@@ -30,6 +30,7 @@ import com.qcloud.cos.model.BucketLifecycleConfiguration;
 import com.qcloud.cos.model.BucketLifecycleConfiguration.NoncurrentVersionTransition;
 import com.qcloud.cos.model.BucketLifecycleConfiguration.Rule;
 import com.qcloud.cos.model.BucketLifecycleConfiguration.Transition;
+import com.qcloud.cos.model.BucketReplicationConfiguration;
 import com.qcloud.cos.model.BucketVersioningConfiguration;
 import com.qcloud.cos.model.CORSRule;
 import com.qcloud.cos.model.CORSRule.AllowedMethods;
@@ -45,6 +46,8 @@ import com.qcloud.cos.model.Owner;
 import com.qcloud.cos.model.PartListing;
 import com.qcloud.cos.model.PartSummary;
 import com.qcloud.cos.model.Permission;
+import com.qcloud.cos.model.ReplicationDestinationConfig;
+import com.qcloud.cos.model.ReplicationRule;
 import com.qcloud.cos.model.UinGrantee;
 import com.qcloud.cos.model.Tag.LifecycleTagPredicate;
 import com.qcloud.cos.model.Tag.Tag;
@@ -351,12 +354,13 @@ public class XmlResponsesSaxParser {
     // }
     //
     //
-    // public BucketReplicationConfigurationHandler parseReplicationConfigurationResponse(
-    // InputStream inputStream) throws IOException {
-    // BucketReplicationConfigurationHandler handler = new BucketReplicationConfigurationHandler();
-    // parseXmlInputStream(handler, inputStream);
-    // return handler;
-    // }
+    public BucketReplicationConfigurationHandler parseReplicationConfigurationResponse(
+            InputStream inputStream) throws IOException {
+        BucketReplicationConfigurationHandler handler = new BucketReplicationConfigurationHandler();
+        parseXmlInputStream(handler, inputStream);
+        return handler;
+    }
+
     //
     // public BucketTaggingConfigurationHandler parseTaggingConfigurationResponse(
     // InputStream inputStream) throws IOException {
@@ -1557,77 +1561,74 @@ public class XmlResponsesSaxParser {
         }
     }
 
-    // public static class BucketReplicationConfigurationHandler extends
-    // AbstractHandler {
-    //
-    // private final BucketReplicationConfiguration bucketReplicationConfiguration = new
-    // BucketReplicationConfiguration();
-    // private String currentRuleId;
-    // private ReplicationRule currentRule;
-    // private ReplicationDestinationConfig destinationConfig;
-    // private static final String REPLICATION_CONFIG = "ReplicationConfiguration";
-    // private static final String ROLE = "Role";
-    // private static final String RULE = "Rule";
-    // private static final String DESTINATION = "Destination";
-    // private static final String ID = "ID";
-    // private static final String PREFIX = "Prefix";
-    // private static final String STATUS = "Status";
-    // private static final String BUCKET = "Bucket";
-    // private static final String STORAGECLASS = "StorageClass";
-    //
-    // public BucketReplicationConfiguration getConfiguration() {
-    // return bucketReplicationConfiguration;
-    // }
-    //
-    // @Override
-    // protected void doStartElement(String uri, String name, String qName,
-    // Attributes attrs) {
-    //
-    // if (in(REPLICATION_CONFIG)) {
-    // if (name.equals(RULE)) {
-    // currentRule = new ReplicationRule();
-    // }
-    // } else if (in(REPLICATION_CONFIG, RULE)) {
-    // if (name.equals(DESTINATION)) {
-    // destinationConfig = new ReplicationDestinationConfig();
-    // }
-    // }
-    // }
-    //
-    // @Override
-    // protected void doEndElement(String uri, String name, String qName) {
-    // if (in(REPLICATION_CONFIG)) {
-    // if (name.equals(RULE)) {
-    // bucketReplicationConfiguration.addRule(currentRuleId,
-    // currentRule);
-    // currentRule = null;
-    // currentRuleId = null;
-    // destinationConfig = null;
-    // } else if (name.equals(ROLE)) {
-    // bucketReplicationConfiguration.setRoleARN(getText());
-    // }
-    // } else if (in(REPLICATION_CONFIG, RULE)) {
-    // if (name.equals(ID)) {
-    // currentRuleId = getText();
-    // } else if (name.equals(PREFIX)) {
-    // currentRule.setPrefix(getText());
-    // } else {
-    // if (name.equals(STATUS)) {
-    // currentRule.setStatus(getText());
-    //
-    // } else if (name.equals(DESTINATION)) {
-    // currentRule.setDestinationConfig(destinationConfig);
-    // }
-    // }
-    // } else if (in(REPLICATION_CONFIG, RULE, DESTINATION)) {
-    // if (name.equals(BUCKET)) {
-    // destinationConfig.setBucketARN(getText());
-    // } else if (name.equals(STORAGECLASS)) {
-    // destinationConfig.setStorageClass(getText());
-    // }
-    // }
-    // }
-    // }
+    public static class BucketReplicationConfigurationHandler extends AbstractHandler {
+
+        private final BucketReplicationConfiguration bucketReplicationConfiguration =
+                new BucketReplicationConfiguration();
+        private String currentRuleId;
+        private ReplicationRule currentRule;
+        private ReplicationDestinationConfig destinationConfig;
+        private static final String REPLICATION_CONFIG = "ReplicationConfiguration";
+        private static final String ROLE = "Role";
+        private static final String RULE = "Rule";
+        private static final String DESTINATION = "Destination";
+        private static final String ID = "ID";
+        private static final String PREFIX = "Prefix";
+        private static final String STATUS = "Status";
+        private static final String BUCKET = "Bucket";
+        private static final String STORAGECLASS = "StorageClass";
+
+        public BucketReplicationConfiguration getConfiguration() {
+            return bucketReplicationConfiguration;
+        }
+
+        @Override
+        protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
+
+            if (in(REPLICATION_CONFIG)) {
+                if (name.equals(RULE)) {
+                    currentRule = new ReplicationRule();
+                }
+            } else if (in(REPLICATION_CONFIG, RULE)) {
+                if (name.equals(DESTINATION)) {
+                    destinationConfig = new ReplicationDestinationConfig();
+                }
+            }
+        }
+
+        @Override
+        protected void doEndElement(String uri, String name, String qName) {
+            if (in(REPLICATION_CONFIG)) {
+                if (name.equals(RULE)) {
+                    bucketReplicationConfiguration.addRule(currentRuleId, currentRule);
+                    currentRule = null;
+                    currentRuleId = null;
+                    destinationConfig = null;
+                } else if (name.equals(ROLE)) {
+                    bucketReplicationConfiguration.setRoleName(getText());
+                }
+            } else if (in(REPLICATION_CONFIG, RULE)) {
+                if (name.equals(ID)) {
+                    currentRuleId = getText();
+                } else if (name.equals(PREFIX)) {
+                    currentRule.setPrefix(getText());
+                } else {
+                    if (name.equals(STATUS)) {
+                        currentRule.setStatus(getText());
+
+                    } else if (name.equals(DESTINATION)) {
+                        currentRule.setDestinationConfig(destinationConfig);
+                    }
+                }
+            } else if (in(REPLICATION_CONFIG, RULE, DESTINATION)) {
+                if (name.equals(BUCKET)) {
+                    destinationConfig.setBucketQCS(getText());
+                } else if (name.equals(STORAGECLASS)) {
+                    destinationConfig.setStorageClass(getText());
+                }
+            }
+        }
+    }
     //
     // public static class BucketTaggingConfigurationHandler extends AbstractHandler {
     //
