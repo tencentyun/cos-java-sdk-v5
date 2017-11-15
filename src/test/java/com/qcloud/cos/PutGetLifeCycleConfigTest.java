@@ -90,7 +90,7 @@ public class PutGetLifeCycleConfigTest extends AbstractCOSClientTest {
         testPutGetDelRules(rules);
     }
 
-    @Test
+    @Ignore
     public void testPutGetDelLifeCycleForNormalBucket() {
         if (!judgeUserInfoValid()) {
             return;
@@ -136,7 +136,7 @@ public class PutGetLifeCycleConfigTest extends AbstractCOSClientTest {
         testPutGetDelRules(rules);
     }
 
-    @Test
+    @Ignore
     public void testPutGetDelLifeCycleForBucketWithVersions() {
         if (!judgeUserInfoValid()) {
             return;
