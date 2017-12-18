@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Date;
 import java.util.Properties;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -21,9 +22,11 @@ import com.qcloud.cos.model.ObjectMetadata;
 import com.qcloud.cos.model.Permission;
 import com.qcloud.cos.model.PutObjectRequest;
 import com.qcloud.cos.model.PutObjectResult;
+import com.qcloud.cos.model.ResponseHeaderOverrides;
 import com.qcloud.cos.model.StorageClass;
 import com.qcloud.cos.model.UinGrantee;
 import com.qcloud.cos.region.Region;
+import com.qcloud.cos.utils.DateUtils;
 import com.qcloud.cos.utils.Md5Utils;
 
 public class AbstractCOSClientTest {
@@ -66,7 +69,6 @@ public class AbstractCOSClientTest {
     }
 
     public static void initCosClient() throws Exception {
-        appid = System.getenv("appid");
         secretId = System.getenv("secretId");
         secretKey = System.getenv("secretKey");
         region = System.getenv("region");
@@ -79,7 +81,6 @@ public class AbstractCOSClientTest {
             try {
                 fis = new FileInputStream(propFile);
                 prop.load(fis);
-                appid = prop.getProperty("appid");
                 secretId = prop.getProperty("secretId");
                 secretKey = prop.getProperty("secretKey");
                 region = prop.getProperty("region");
@@ -94,12 +95,12 @@ public class AbstractCOSClientTest {
             }
         }
 
-        if (appid == null || secretId == null || secretKey == null || bucket == null
+        if (secretId == null || secretKey == null || bucket == null
                 || region == null) {
             System.out.println("cos ut user info missing. skip all test");
             return;
         }
-        COSCredentials cred = new BasicCOSCredentials(appid, secretId, secretKey);
+        COSCredentials cred = new BasicCOSCredentials(secretId, secretKey);
         clientConfig = new ClientConfig(new Region(region));
         cosclient = new COSClient(cred, clientConfig);
         tmpDir = new File("ut_test_tmp_data");
@@ -132,8 +133,8 @@ public class AbstractCOSClientTest {
         acl.grantPermission(uinGrantee, Permission.Read);
         PutObjectRequest putObjectRequest = new PutObjectRequest(bucket, key, localFile);
         putObjectRequest.setStorageClass(StorageClass.Standard_IA);
-        putObjectRequest.setCannedAcl(CannedAccessControlList.PublicRead);
-        putObjectRequest.setAccessControlList(acl);
+        // putObjectRequest.setCannedAcl(CannedAccessControlList.PublicRead);
+        // putObjectRequest.setAccessControlList(acl);
 
         PutObjectResult putObjectResult = cosclient.putObject(putObjectRequest);
         String etag = putObjectResult.getETag();
@@ -219,8 +220,25 @@ public class AbstractCOSClientTest {
     protected static void getObject(String key, File localDownFile) {
         System.setProperty(SkipMd5CheckStrategy.DISABLE_GET_OBJECT_MD5_VALIDATION_PROPERTY, "true");
         GetObjectRequest getObjectRequest = new GetObjectRequest(bucket, key);
+        ResponseHeaderOverrides responseHeaders = new ResponseHeaderOverrides();
+        String responseContentType="image/x-icon";
+        String responseContentLanguage = "zh-CN";
+        String responseContentDispositon = "filename=\"abc.txt\"";
+        String responseCacheControl = "no-cache";
+        String expireStr = DateUtils.formatRFC822Date(new Date(System.currentTimeMillis() + 24 * 3600 * 1000));
+        responseHeaders.setContentType(responseContentType);
+        responseHeaders.setContentLanguage(responseContentLanguage);
+        responseHeaders.setContentDisposition(responseContentDispositon);
+        responseHeaders.setCacheControl(responseCacheControl);
+        responseHeaders.setExpires(expireStr);
+        
+        getObjectRequest.setResponseHeaders(responseHeaders);
         try {
-            cosclient.getObject(getObjectRequest, localDownFile);
+            ObjectMetadata objectMetadata = cosclient.getObject(getObjectRequest, localDownFile);
+            assertEquals(responseContentType, objectMetadata.getContentType());
+            assertEquals(responseContentLanguage, objectMetadata.getContentLanguage());
+            assertEquals(responseContentDispositon, objectMetadata.getContentDisposition());
+            assertEquals(responseCacheControl, objectMetadata.getCacheControl());
         } catch (Exception e) {
             fail(e.toString());
         }
@@ -234,7 +252,6 @@ public class AbstractCOSClientTest {
         }
 
         cosclient.deleteObject(bucket, key);
-
         assertFalse(cosclient.doesObjectExist(bucket, key));
     }
 }

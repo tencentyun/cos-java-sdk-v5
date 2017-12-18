@@ -11,6 +11,7 @@ import static com.qcloud.cos.auth.COSSignerConstants.Q_SIGN_TIME;
 import static com.qcloud.cos.auth.COSSignerConstants.Q_URL_PARAM_LIST;
 import static com.qcloud.cos.auth.COSSignerConstants.SIGN_EXPIRED_TIME;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -25,9 +26,9 @@ import com.qcloud.cos.internal.CosServiceRequest;
 import com.qcloud.cos.utils.UrlEncoderUtils;
 
 public class COSSigner {
-    
+
     private long signExpiredTime = SIGN_EXPIRED_TIME;
-    
+
     // 获取签名有效期
     public long getSignExpiredTime() {
         return signExpiredTime;
@@ -47,23 +48,32 @@ public class COSSigner {
             return;
         }
 
-        String authoriationStr = buildAuthorizationStr(request.getHttpMethod(),
-                request.getResourcePath(), request.getHeaders(), request.getParameters(), cred);
+        Date expiredTime = new Date(System.currentTimeMillis() + this.signExpiredTime * 1000);
+        String authoriationStr =
+                buildAuthorizationStr(request.getHttpMethod(), request.getResourcePath(),
+                        request.getHeaders(), request.getParameters(), cred, expiredTime);
 
         request.addHeader(Headers.COS_AUTHORIZATION, authoriationStr);
         if (cred instanceof COSSessionCredentials) {
-        	request.addHeader(Headers.SECURITY_TOKEN, ((COSSessionCredentials) cred).getSessionToken());
+            request.addHeader(Headers.SECURITY_TOKEN,
+                    ((COSSessionCredentials) cred).getSessionToken());
         }
     }
 
     public String buildAuthorizationStr(HttpMethodName methodName, String resouce_path,
-            COSCredentials cred) {
+            COSCredentials cred, Date expiredTime) {
+
         return buildAuthorizationStr(methodName, resouce_path, new HashMap<String, String>(),
-                new HashMap<String, String>(), cred);
+                new HashMap<String, String>(), cred, expiredTime);
     }
 
     public String buildAuthorizationStr(HttpMethodName methodName, String resouce_path,
-            Map<String, String> headerMap, Map<String, String> paramMap, COSCredentials cred) {
+            Map<String, String> headerMap, Map<String, String> paramMap, COSCredentials cred,
+            Date expiredTime) {
+
+        if (isAnonymous(cred)) {
+            return null;
+        }
 
         Map<String, String> signHeaders = buildSignHeaders(headerMap);
         // 签名中的参数和http 头部 都要进行字符串排序
@@ -76,7 +86,7 @@ public class COSSigner {
         String qHeaderListStr = buildSignMemberStr(sortedSignHeaders);
         String qUrlParamListStr = buildSignMemberStr(sortedParams);
         String qKeyTimeStr, qSignTimeStr;
-        qKeyTimeStr = qSignTimeStr = buildTimeStr();
+        qKeyTimeStr = qSignTimeStr = buildTimeStr(expiredTime);
         String signKey = HmacUtils.hmacSha1Hex(cred.getCOSSecretKey(), qKeyTimeStr);
         String formatMethod = methodName.toString().toLowerCase();
         String formatUri = resouce_path;
@@ -106,7 +116,8 @@ public class COSSigner {
         Map<String, String> signHeaders = new HashMap<>();
         for (String key : originHeaders.keySet()) {
             if (key.equalsIgnoreCase("host") || key.equalsIgnoreCase("content-type")
-                    || key.startsWith("x") || key.startsWith("X")) {
+                    || key.equalsIgnoreCase("content-md5") || key.startsWith("x")
+                    || key.startsWith("X")) {
                 String lowerKey = key.toLowerCase();
                 String value = originHeaders.get(key);
                 signHeaders.put(lowerKey, value);
@@ -150,10 +161,10 @@ public class COSSigner {
         return strBuilder.toString();
     }
 
-    private String buildTimeStr() {
+    private String buildTimeStr(Date expiredTime) {
         StringBuilder strBuilder = new StringBuilder();
         long startTime = System.currentTimeMillis() / 1000;
-        long endTime = startTime + this.signExpiredTime;
+        long endTime = expiredTime.getTime() / 1000;
         strBuilder.append(startTime).append(";").append(endTime);
         return strBuilder.toString();
     }

@@ -35,10 +35,12 @@ import com.qcloud.cos.event.TransferStateChangeListener;
 import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.exception.FileLockException;
+import com.qcloud.cos.internal.CopyImpl;
 import com.qcloud.cos.internal.CosServiceRequest;
 import com.qcloud.cos.internal.FileLocks;
 import com.qcloud.cos.model.AbortMultipartUploadRequest;
 import com.qcloud.cos.model.COSObjectSummary;
+import com.qcloud.cos.model.CopyObjectRequest;
 import com.qcloud.cos.model.GetObjectMetadataRequest;
 import com.qcloud.cos.model.GetObjectRequest;
 import com.qcloud.cos.model.ListMultipartUploadsRequest;
@@ -1201,6 +1203,211 @@ public class TransferManager {
 
         return doDownload(request, new File(persistableDownload.getFile()), null, null,
                 APPEND_MODE);
+    }
+
+    /**
+     * <p>
+     * Schedules a new transfer to copy data. This method is non-blocking and returns immediately
+     * (before the copy has finished).
+     * </p>
+     * <p>
+     * <code>TransferManager</code> doesn't support copying of encrypted objects whose encryption
+     * materials are stored in an instruction file.
+     * </p>
+     * <p>
+     * Use the returned <code>Copy</code> object to check if the copy is complete.
+     * </p>
+     * <p>
+     * If resources are available, the copy request will begin immediately. Otherwise, the copy is
+     * scheduled and started as soon as resources become available.
+     * </p>
+     * <p>
+     * <b>Note:</b> If the {@link TransferManager} is created with a regional COS client and the
+     * source & destination buckets are in different regions, use the
+     * {@link #copy(CopyObjectRequest, COS, TransferStateChangeListener)} method.
+     * </p>
+     * 
+     * @param sourceBucketName The name of the bucket from where the object is to be copied.
+     * @param sourceKey The name of the COS object.
+     * @param destinationBucketName The name of the bucket to where the COS object has to be copied.
+     * @param destinationKey The name of the object in the destination bucket.
+     *
+     * @return A new <code>Copy</code> object to use to check the state of the copy request being
+     *         processed.
+     *
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * @throws CosServiceException If any errors occurred in Qcloud COS while processing the
+     *         request.
+     *
+     * @see TransferManager#copy(CopyObjectRequest, COS, TransferStateChangeListener)
+     */
+
+    public Copy copy(String sourceBucketName, String sourceKey, String destinationBucketName,
+            String destinationKey) throws CosServiceException, CosClientException {
+        return copy(new CopyObjectRequest(sourceBucketName, sourceKey, destinationBucketName,
+                destinationKey));
+    }
+
+    /**
+     * <p>
+     * Schedules a new transfer to copy data from one object to another . This method is
+     * non-blocking and returns immediately (i.e. before the copy has finished).
+     * </p>
+     * <p>
+     * <code>TransferManager</code> doesn't support copying of encrypted objects whose encryption
+     * materials are stored in an instruction file.
+     * </p>
+     * <p>
+     * Use the returned <code>Copy</code> object to check if the copy is complete.
+     * </p>
+     * <p>
+     * If resources are available, the copy request will begin immediately. Otherwise, the copy is
+     * scheduled and started as soon as resources become available.
+     * </p>
+     * <p>
+     * <b>Note:</b> If the {@link TransferManager} is created with a regional COS client and the
+     * source & destination buckets are in different regions, use the
+     * {@link #copy(CopyObjectRequest, COS, TransferStateChangeListener)} method.
+     * </p>
+     *
+     * @param copyObjectRequest The request containing all the parameters for the copy.
+     *
+     * @return A new <code>Copy</code> object to use to check the state of the copy request being
+     *         processed.
+     *
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * @throws CosServiceException If any errors occurred in Qcloud COS while processing the
+     *         request.
+     *
+     * @see TransferManager#copy(CopyObjectRequest, COS, TransferStateChangeListener)
+     */
+    public Copy copy(final CopyObjectRequest copyObjectRequest) {
+        return copy(copyObjectRequest, null);
+    }
+
+    /**
+     * <p>
+     * Schedules a new transfer to copy data from one object to another . This method is
+     * non-blocking and returns immediately (i.e. before the copy has finished).
+     * </p>
+     * <p>
+     * <code>TransferManager</code> doesn't support copying of encrypted objects whose encryption
+     * materials are stored in an instruction file.
+     * </p>
+     * <p>
+     * Use the returned <code>Copy</code> object to check if the copy is complete.
+     * </p>
+     * <p>
+     * If resources are available, the copy request will begin immediately. Otherwise, the copy is
+     * scheduled and started as soon as resources become available.
+     * </p>
+     * <p>
+     * <b>Note:</b> If the {@link TransferManager} is created with a regional COS client and the
+     * source & destination buckets are in different regions, use the
+     * {@link #copy(CopyObjectRequest, COS, TransferStateChangeListener)} method.
+     * </p>
+     *
+     * @param copyObjectRequest The request containing all the parameters for the copy.
+     * @param stateChangeListener The transfer state change listener to monitor the copy request
+     * @return A new <code>Copy</code> object to use to check the state of the copy request being
+     *         processed.
+     *
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * @throws CosServiceException If any errors occurred in Qcloud COS while processing the
+     *         request.
+     *
+     * @see TransferManager#copy(CopyObjectRequest, COS, TransferStateChangeListener)
+     */
+    public Copy copy(final CopyObjectRequest copyObjectRequest,
+            final TransferStateChangeListener stateChangeListener)
+                    throws CosClientException, CosServiceException {
+        return copy(copyObjectRequest, cos, stateChangeListener);
+    }
+
+    /**
+     * <p>
+     * Schedules a new transfer to copy data from one object to another . This method is
+     * non-blocking and returns immediately (i.e. before the copy has finished).
+     * </p>
+     * <p>
+     * Note: You need to use this method if the {@link TransferManager} is created with a regional
+     * COS client and the source & destination buckets are in different regions.
+     * </p>
+     * <p>
+     * <code>TransferManager</code> doesn't support copying of encrypted objects whose encryption
+     * materials are stored in an instruction file.
+     * </p>
+     * <p>
+     * Use the returned <code>Copy</code> object to check if the copy is complete.
+     * </p>
+     * <p>
+     * If resources are available, the copy request will begin immediately. Otherwise, the copy is
+     * scheduled and started as soon as resources become available.
+     * </p>
+     * 
+     * <p>
+     * <b>Note:</b> If the {@link TransferManager} is created with a regional COS client and the
+     * source & destination buckets are in different regions, use the
+     * {@link #copy(CopyObjectRequest, COS, TransferStateChangeListener)} method.
+     * </p>
+     * 
+     * @param copyObjectRequest The request containing all the parameters for the copy.
+     * @param srcCOS An COS client constructed for the region in which the source object's bucket is
+     *        located.
+     * @param stateChangeListener The transfer state change listener to monitor the copy request
+     * @return A new <code>Copy</code> object to use to check the state of the copy request being
+     *         processed.
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * @throws CosServiceException If any errors occurred in Qcloud COS while processing the
+     *         request.
+     */
+    public Copy copy(final CopyObjectRequest copyObjectRequest, final COS srcCOS,
+            final TransferStateChangeListener stateChangeListener)
+                    throws CosServiceException, CosClientException {
+
+        appendSingleObjectUserAgent(copyObjectRequest);
+
+        assertParameterNotNull(copyObjectRequest.getSourceBucketName(),
+                "The source bucket name must be specified when a copy request is initiated.");
+        assertParameterNotNull(copyObjectRequest.getSourceKey(),
+                "The source object key must be specified when a copy request is initiated.");
+        assertParameterNotNull(copyObjectRequest.getDestinationBucketName(),
+                "The destination bucket name must be specified when a copy request is initiated.");
+        assertParameterNotNull(copyObjectRequest.getDestinationKey(),
+                "The destination object key must be specified when a copy request is initiated.");
+        assertParameterNotNull(srcCOS, "The srcCOS parameter is mandatory");
+        
+        String description = "Copying object from " + copyObjectRequest.getSourceBucketName() + "/"
+                + copyObjectRequest.getSourceKey() + " to "
+                + copyObjectRequest.getDestinationBucketName() + "/"
+                + copyObjectRequest.getDestinationKey();
+        
+        
+
+        GetObjectMetadataRequest getObjectMetadataRequest =
+                new GetObjectMetadataRequest(copyObjectRequest.getSourceBucketName(),
+                        copyObjectRequest.getSourceKey())
+                                .withVersionId(copyObjectRequest.getSourceVersionId());
+
+        ObjectMetadata metadata = srcCOS.getObjectMetadata(getObjectMetadataRequest);
+
+        TransferProgress transferProgress = new TransferProgress();
+        transferProgress.setTotalBytesToTransfer(metadata.getContentLength());
+
+        ProgressListenerChain listenerChain =
+                new ProgressListenerChain(new TransferProgressUpdatingListener(transferProgress));
+        CopyImpl copy =
+                new CopyImpl(description, transferProgress, listenerChain, stateChangeListener);
+        CopyCallable copyCallable = new CopyCallable(this, threadPool, copy, copyObjectRequest,
+                metadata, listenerChain);
+        CopyMonitor watcher = CopyMonitor.create(this, copy, threadPool, copyCallable,
+                copyObjectRequest, listenerChain);
+        copy.setMonitor(watcher);
+        return copy;
     }
 
     /**

@@ -5,16 +5,23 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.Executors;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.Ignore;
 
+import com.qcloud.cos.auth.BasicCOSCredentials;
+import com.qcloud.cos.auth.COSCredentials;
 import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.exception.CosServiceException;
+import com.qcloud.cos.model.CopyObjectRequest;
 import com.qcloud.cos.model.GetObjectRequest;
 import com.qcloud.cos.model.PutObjectRequest;
 import com.qcloud.cos.model.UploadResult;
+import com.qcloud.cos.region.Region;
+import com.qcloud.cos.transfer.Copy;
 import com.qcloud.cos.transfer.Download;
 import com.qcloud.cos.transfer.MultipleFileDownload;
 import com.qcloud.cos.transfer.MultipleFileUpload;
@@ -29,7 +36,7 @@ public class TransferManagerTest extends AbstractCOSClientTest {
     public static void setUpBeforeClass() throws Exception {
         AbstractCOSClientTest.initCosClient();
         if (cosclient != null) {
-            transferManager = new TransferManager(AbstractCOSClientTest.cosclient);
+            transferManager = new TransferManager(AbstractCOSClientTest.cosclient, Executors.newFixedThreadPool(32));
         }
     }
 
@@ -188,4 +195,69 @@ public class TransferManagerTest extends AbstractCOSClientTest {
             clearObject(key2);
         }
     }
+
+    // transfer manager对不同园区5G以上文件进行分块拷贝
+    @Ignore
+    public void testTransferManagerCopyBigFileFromDiffRegion() throws CosServiceException, CosClientException, InterruptedException {
+        COSCredentials srcCred = new BasicCOSCredentials(secretId, secretKey);
+        String srcRegion = "ap-guangzhou";
+        ClientConfig srcClientConfig = new ClientConfig(new Region(srcRegion));
+        COSClient srcCOSClient = new COSClient(srcCred, srcClientConfig);
+        String srcBucketName = "chengwus3gz-1251668577";
+        String srcKey = "/ut_copy/len10G_1.txt";
+        String destKey = "/ut_copy_dest/len10G_1.txt";
+        CopyObjectRequest copyObjectRequest =
+                new CopyObjectRequest(new Region(srcRegion), srcBucketName, srcKey, bucket, destKey);
+        Copy copy = transferManager.copy(copyObjectRequest, srcCOSClient, null);
+        copy.waitForCompletion();
+    }
+
+    // transfer manager对不同园区5G以下文件进行使用put object copy
+    @Ignore
+    public void testTransferManagerCopySmallFileFromDiffRegion() throws CosServiceException, CosClientException, InterruptedException {
+        COSCredentials srcCred = new BasicCOSCredentials(secretId, secretKey);
+        String srcRegion = "ap-guangzhou";
+        ClientConfig srcClientConfig = new ClientConfig(new Region(srcRegion));
+        COSClient srcCOSClient = new COSClient(srcCred, srcClientConfig);
+        String srcBucketName = "chengwus3gz-1251668577";
+        String srcKey = "/ut_copy/len1G.txt";
+        String destKey = "/ut_copy_dest/len1G.txt";
+        CopyObjectRequest copyObjectRequest =
+                new CopyObjectRequest(new Region(srcRegion), srcBucketName, srcKey, bucket, destKey);
+        Copy copy = transferManager.copy(copyObjectRequest, srcCOSClient, null);
+        copy.waitForCompletion();
+    }
+
+    // transfer manager对相同园区使用put object copy
+    @Ignore
+    public void testTransferManagerCopyBigFileFromSameRegion() throws CosServiceException, CosClientException, InterruptedException {
+        COSCredentials srcCred = new BasicCOSCredentials(secretId, secretKey);
+        String srcRegion = region;
+        ClientConfig srcClientConfig = new ClientConfig(new Region(srcRegion));
+        COSClient srcCOSClient = new COSClient(srcCred, srcClientConfig);
+        String srcBucketName = bucket;
+        String srcKey = "/ut_copy/len10G_1.txt";
+        String destKey = "/ut_copy_dest/len10G_2.txt";
+        CopyObjectRequest copyObjectRequest =
+                new CopyObjectRequest(new Region(srcRegion), srcBucketName, srcKey, bucket, destKey);
+        Copy copy = transferManager.copy(copyObjectRequest, srcCOSClient, null);
+        copy.waitForCompletion();
+    }
+
+    // transfer manager对相同园区使用put object copy
+    @Ignore
+    public void testTransferManagerCopySmallFileFromSameRegion() throws CosServiceException, CosClientException, InterruptedException {
+        COSCredentials srcCred = new BasicCOSCredentials(secretId, secretKey);
+        String srcRegion = region;
+        ClientConfig srcClientConfig = new ClientConfig(new Region(srcRegion));
+        COSClient srcCOSClient = new COSClient(srcCred, srcClientConfig);
+        String srcBucketName = bucket;
+        String srcKey = "/ut_copy/len1G.txt";
+        String destKey = "/ut_copy_dest/len1G_2.txt";
+        CopyObjectRequest copyObjectRequest =
+                new CopyObjectRequest(srcBucketName, srcKey, bucket, destKey);
+        Copy copy = transferManager.copy(copyObjectRequest, srcCOSClient, null);
+        copy.waitForCompletion();
+    }
+
 }

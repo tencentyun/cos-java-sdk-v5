@@ -35,7 +35,7 @@ public class CreateDeleteHeadBucketTest extends AbstractCOSClientTest {
         if (!judgeUserInfoValid()) {
             return;
         }
-        String bucketName = "publicreadbucket";
+        String bucketName = "publicreadbucket-1251668577";
         CreateBucketRequest createBucketRequest = new CreateBucketRequest(bucketName);
         createBucketRequest.setCannedAcl(CannedAccessControlList.PublicRead);
         Bucket bucket = cosclient.createBucket(createBucketRequest);
@@ -57,7 +57,7 @@ public class CreateDeleteHeadBucketTest extends AbstractCOSClientTest {
         if (!judgeUserInfoValid()) {
             return;
         }
-        String bucketName = "publicreadwritebucket";
+        String bucketName = "publicreadwritebucket-1251668577";
         CreateBucketRequest createBucketRequest = new CreateBucketRequest(bucketName);
         createBucketRequest.setCannedAcl(CannedAccessControlList.PublicReadWrite);
         AccessControlList accessControlList = new AccessControlList();
@@ -83,7 +83,7 @@ public class CreateDeleteHeadBucketTest extends AbstractCOSClientTest {
         if (!judgeUserInfoValid()) {
             return;
         }
-        String bucketName = "privatebucket";
+        String bucketName = "privatebucket-1251668577";
         CreateBucketRequest createBucketRequest = new CreateBucketRequest(bucketName);
         createBucketRequest.setCannedAcl(CannedAccessControlList.Private);
         Bucket bucket = cosclient.createBucket(createBucketRequest);

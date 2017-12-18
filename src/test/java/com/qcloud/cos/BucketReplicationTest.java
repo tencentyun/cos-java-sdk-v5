@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
+import org.junit.Test;
 
 import com.qcloud.cos.model.BucketReplicationConfiguration;
 import com.qcloud.cos.model.BucketVersioningConfiguration;
@@ -25,7 +25,7 @@ public class BucketReplicationTest extends AbstractCOSClientTest {
         AbstractCOSClientTest.destoryCosClient();
     }
 
-    @Ignore
+    @Test
     public void setGetDelBucketReplicationTest() {
         if (!judgeUserInfoValid()) {
             return;

@@ -2,10 +2,14 @@ package com.qcloud.cos;
 
 import java.io.File;
 import java.io.InputStream;
+import java.net.URL;
+import java.util.Date;
 import java.util.List;
 
 import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.exception.CosServiceException;
+import com.qcloud.cos.exception.MultiObjectDeleteException;
+import com.qcloud.cos.http.HttpMethodName;
 import com.qcloud.cos.model.AbortMultipartUploadRequest;
 import com.qcloud.cos.model.AccessControlList;
 import com.qcloud.cos.model.Bucket;
@@ -19,12 +23,17 @@ import com.qcloud.cos.model.CompleteMultipartUploadRequest;
 import com.qcloud.cos.model.CompleteMultipartUploadResult;
 import com.qcloud.cos.model.CopyObjectRequest;
 import com.qcloud.cos.model.CopyObjectResult;
+import com.qcloud.cos.model.CopyPartRequest;
+import com.qcloud.cos.model.CopyPartResult;
 import com.qcloud.cos.model.CreateBucketRequest;
 import com.qcloud.cos.model.DeleteBucketCrossOriginConfigurationRequest;
 import com.qcloud.cos.model.DeleteBucketLifecycleConfigurationRequest;
 import com.qcloud.cos.model.DeleteBucketReplicationConfigurationRequest;
 import com.qcloud.cos.model.DeleteBucketRequest;
 import com.qcloud.cos.model.DeleteObjectRequest;
+import com.qcloud.cos.model.DeleteObjectsRequest;
+import com.qcloud.cos.model.DeleteObjectsResult;
+import com.qcloud.cos.model.GeneratePresignedUrlRequest;
 import com.qcloud.cos.model.GetBucketAclRequest;
 import com.qcloud.cos.model.GetBucketCrossOriginConfigurationRequest;
 import com.qcloud.cos.model.GetBucketLifecycleConfigurationRequest;
@@ -60,6 +69,12 @@ import com.qcloud.cos.model.UploadPartResult;
 
 public interface COS {
 
+    /**
+     * return the client config. client config include the region info, default expired sign time, etc.
+     * @return ClientConfig.
+     */
+    public ClientConfig getClientConfig();
+    
     /**
      * <p>
      * Uploads a new object to the specified bucket. The <code>PutObjectRequest</code> contains all
@@ -406,6 +421,8 @@ public interface COS {
     public ObjectMetadata getObjectMetadata(GetObjectMetadataRequest getObjectMetadataRequest)
             throws CosClientException, CosServiceException;
 
+
+
     /**
      * <p>
      * Deletes the specified object in the specified bucket. Once deleted, the object can only be
@@ -447,6 +464,23 @@ public interface COS {
      */
     public void deleteObject(DeleteObjectRequest deleteObjectRequest)
             throws CosClientException, CosServiceException;
+
+    /**
+     * Deletes multiple objects in a single bucket from COS.
+     * <p>
+     * In some cases, some objects will be successfully deleted, while some attempts will cause an
+     * error. If any object in the request cannot be deleted, this method throws a
+     * {@link MultiObjectDeleteException} with details of the error.
+     *
+     * @param deleteObjectsRequest The request object containing all options for deleting multiple
+     *        objects.
+     * @throws MultiObjectDeleteException if one or more of the objects couldn't be deleted.
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * @throws CosServiceException If any errors occurred in while processing the request.
+     */
+    public DeleteObjectsResult deleteObjects(DeleteObjectsRequest deleteObjectsRequest)
+            throws MultiObjectDeleteException, CosClientException, CosServiceException;
 
     /**
      * <p>
@@ -1095,6 +1129,29 @@ public interface COS {
             throws CosClientException, CosServiceException;
 
     /**
+     * Copies a source object to a part of a multipart upload.
+     *
+     * To copy an object, the caller's account must have read access to the source object and write
+     * access to the destination bucket.
+     * </p>
+     *
+     * @param copyPartRequest The request object containing all the options for copying an object.
+     *
+     * @return CopyPartResult containing the information returned by COS about the newly created
+     *         object, or <code>null</code> if constraints were specified that weren't met when COS
+     *         attempted to copy the object.
+     *
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * 
+     * @throws CosServiceException If any errors occurred in while processing the request.
+     *
+     */
+    public CopyPartResult copyPart(CopyPartRequest copyPartRequest)
+            throws CosClientException, CosServiceException;
+
+
+    /**
      * Sets the lifecycle configuration for the specified bucket.
      * 
      * @param bucketName the bucket name
@@ -1115,8 +1172,8 @@ public interface COS {
      * @param setBucketLifecycleConfigurationRequest The request object containing all options for
      *        setting the bucket lifecycle configuration.
      * @throws CosClientException If any errors are encountered in the client while making the
-     *                      `------+++++++++++++++++++++++++++++++++++++++++++++++++*
-     *         request or handling the response.
+     *         `------+++++++++++++++++++++++++++++++++++++++++++++++++* request or handling the
+     *         response.
      * @throws CosServiceException If any errors occurred in while processing the request.
      */
     public void setBucketLifecycleConfiguration(
@@ -1682,13 +1739,126 @@ public interface COS {
     /**
      * Deletes the replication configuration for the given QCloud bucket.
      *
-     * @param deleteBucketReplicationConfigurationRequest The request object for delete bucket replication configuration.
+     * @param deleteBucketReplicationConfigurationRequest The request object for delete bucket
+     *        replication configuration.
      * @throws CosClientException If any errors are encountered in the client while making the
      *         request or handling the response.
      * @throws CosServiceException If any errors occurred in COS while processing the request.
      */
-    void deleteBucketReplicationConfiguration(DeleteBucketReplicationConfigurationRequest deleteBucketReplicationConfigurationRequest)
-            throws CosClientException, CosServiceException;
+    void deleteBucketReplicationConfiguration(
+            DeleteBucketReplicationConfigurationRequest deleteBucketReplicationConfigurationRequest)
+                    throws CosClientException, CosServiceException;
+
+    /**
+     * <p>
+     * Returns a pre-signed URL for accessing COS resource. you can specify the expiration time.
+     * Defaults, if you didn't set the expiration time, the expired time of ClientConfig will be
+     * used.
+     * </p>
+     * <p>
+     * Pre-signed URLs allow clients to form a URL for an COS resource, and then sign it with the
+     * current COS security credentials. The pre-signed URL can be shared to other users, allowing
+     * access to the resource without providing an account's security credentials.
+     * </p>
+     * <p>
+     * Pre-signed URLs are useful in many situations where COS security credentials aren't available
+     * from the client that needs to make the actual request to COS.
+     * </p>
+     * <p>
+     * For example, an application may need remote users to upload files to the application owner's
+     * COS bucket, but doesn't need to ship the COS security credentials with the application. A
+     * pre-signed URL to PUT an object into the owner's bucket can be generated from a remote
+     * location with the owner's COS security credentials, then the pre-signed URL can be passed to
+     * the end user's application to use.
+     * </p>
+     *
+     * @param bucketName The name of the bucket containing the desired object.
+     * @param key The key in the specified bucket under which the desired object is stored.
+     * @param expiration The time at which the returned pre-signed URL will expire.
+     * 
+     * @return A pre-signed URL that can be used to access an COS resource without requiring the
+     *         user of the URL to know the account's credentials.
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * @see COS#generatePresignedUrl(String, String, Date)
+     * @see COS#generatePresignedUrl(String, String, Date, HttpMethodName)
+     */
+    public URL generatePresignedUrl(String bucketName, String key, Date expiration)
+            throws CosClientException;
+
+    /**
+     * <p>
+     * Returns a pre-signed URL for accessing COS resource. you can specify the expiration time.
+     * Defaults, if you didn't set the expiration time, the expired time of ClientConfig will be
+     * used.
+     * </p>
+     * <p>
+     * Pre-signed URLs allow clients to form a URL for an COS resource, and then sign it with the
+     * current COS security credentials. The pre-signed URL can be shared to other users, allowing
+     * access to the resource without providing an account's security credentials.
+     * </p>
+     * <p>
+     * Pre-signed URLs are useful in many situations where COS security credentials aren't available
+     * from the client that needs to make the actual request to COS.
+     * </p>
+     * <p>
+     * For example, an application may need remote users to upload files to the application owner's
+     * COS bucket, but doesn't need to ship the COS security credentials with the application. A
+     * pre-signed URL to PUT an object into the owner's bucket can be generated from a remote
+     * location with the owner's COS security credentials, then the pre-signed URL can be passed to
+     * the end user's application to use.
+     * </p>
+     *
+     * @param bucketName The name of the bucket containing the desired object.
+     * @param key The key in the specified bucket under which the desired object is stored.
+     * @param expiration The time at which the returned pre-signed URL will expire.
+     * @param method The HTTP method verb to use for this URL
+     * 
+     * @return A pre-signed URL that can be used to access an COS resource without requiring the
+     *         user of the URL to know the account's credentials.
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     *         
+     * @see COS#generatePresignedUrl(String, String, Date)
+     * @see COS#generatePresignedUrl(String, String, Date, HttpMethodName)
+     */
+    public URL generatePresignedUrl(String bucketName, String key, Date expiration, HttpMethodName method)
+            throws CosClientException;
+
+    /**
+     * <p>
+     * Returns a pre-signed URL for accessing COS resource. you can specify the expiration time.
+     * Defaults, if you didn't set the expiration time, the expired time of ClientConfig will be
+     * used.
+     * </p>
+     * <p>
+     * Pre-signed URLs allow clients to form a URL for an COS resource, and then sign it with the
+     * current COS security credentials. The pre-signed URL can be shared to other users, allowing
+     * access to the resource without providing an account's security credentials.
+     * </p>
+     * <p>
+     * Pre-signed URLs are useful in many situations where COS security credentials aren't available
+     * from the client that needs to make the actual request to COS.
+     * </p>
+     * <p>
+     * For example, an application may need remote users to upload files to the application owner's
+     * COS bucket, but doesn't need to ship the COS security credentials with the application. A
+     * pre-signed URL to PUT an object into the owner's bucket can be generated from a remote
+     * location with the owner's COS security credentials, then the pre-signed URL can be passed to
+     * the end user's application to use.
+     * </p>
+     *
+     * @param generatePresignedUrlRequest The request object containing all the options for
+     *        generating a pre-signed URL (bucket name, key, expiration date, etc).
+     * @return A pre-signed URL that can be used to access an COS resource without requiring the
+     *         user of the URL to know the account's credentials.
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * @see COS#generatePresignedUrl(String, String, Date)
+     * @see COS#generatePresignedUrl(String, String, Date, HttpMethod)
+     */
+    public URL generatePresignedUrl(GeneratePresignedUrlRequest generatePresignedUrlRequest)
+            throws CosClientException;
 
 }
 

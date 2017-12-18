@@ -28,7 +28,7 @@ public class GetServiceTest extends AbstractCOSClientTest {
         }
         List<Bucket> buckets = cosclient.listBuckets();
         for (Bucket bucketElement : buckets) {
-            if (bucketElement.getName().equals(bucket + "-" + appid)) {
+            if (bucketElement.getName().equals(bucket)) {
                 return;
             }
         }

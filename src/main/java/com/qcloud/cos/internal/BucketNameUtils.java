@@ -17,7 +17,8 @@ public enum BucketNameUtils {
 
         for (int i = 0; i < bucketName.length(); ++i) {
             char next = bucketName.charAt(i);
-
+            if (next == '-') 
+                continue;
             if (next >= 'a' && next <= 'z')
                 continue;
 
@@ -34,7 +35,7 @@ public enum BucketNameUtils {
             }
             
             throw new IllegalArgumentException(
-                    "Bucket name only should contain lowercase characters and num");
+                    "Bucket name only should contain lowercase characters, num and -");
         }
     }
 }

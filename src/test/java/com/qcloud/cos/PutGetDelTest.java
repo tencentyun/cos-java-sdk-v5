@@ -184,7 +184,7 @@ public class PutGetDelTest extends AbstractCOSClientTest {
         File downLoadFile = new File(localFile.getAbsolutePath() + ".down");
         // 目前server端有bug, 不支持冒号，问号，待修复后添加上
         String key =
-                "/→↓←→↖↗↙↘! \"#$%&()*+',-./0123456789;<=>@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
+                "/→↓←→↖↗↙↘!? //////\"#$%&()*+',-./0123456789;<=>@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
         testPutGetObjectAndClear(key, localFile, downLoadFile);
     }
 
@@ -195,7 +195,7 @@ public class PutGetDelTest extends AbstractCOSClientTest {
         }
         File localFile = buildTestFile(1L);
         File downLoadFile = new File(localFile.getAbsolutePath() + ".down");
-        String key = "/ut/" + "abc.png";
+        String key = "/ut/" + "测试文件.png";
         testPutGetObjectAndClear(key, localFile, downLoadFile);
     }
 

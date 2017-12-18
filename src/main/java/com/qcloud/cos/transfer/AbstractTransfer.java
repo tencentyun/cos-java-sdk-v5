@@ -35,11 +35,11 @@ public abstract class AbstractTransfer implements Transfer {
     /** Collection of listeners to be notified for changes to the state of this transfer via setState() */
     protected final Collection<TransferStateChangeListener> stateChangeListeners = new LinkedList<TransferStateChangeListener>();
 
-    AbstractTransfer(String description, TransferProgress transferProgress, ProgressListenerChain progressListenerChain) {
+    public AbstractTransfer(String description, TransferProgress transferProgress, ProgressListenerChain progressListenerChain) {
         this(description, transferProgress, progressListenerChain, null);
     }
 
-    AbstractTransfer(String description, TransferProgress transferProgress,
+    public AbstractTransfer(String description, TransferProgress transferProgress,
             ProgressListenerChain progressListenerChain, TransferStateChangeListener stateChangeListener) {
         this.description = description;
         this.listenerChain = progressListenerChain;

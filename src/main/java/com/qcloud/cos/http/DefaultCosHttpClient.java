@@ -36,6 +36,8 @@ import org.slf4j.LoggerFactory;
 
 import com.qcloud.cos.ClientConfig;
 import com.qcloud.cos.Headers;
+import com.qcloud.cos.event.ProgressInputStream;
+import com.qcloud.cos.event.ProgressListener;
 import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.exception.CosServiceException.ErrorType;
@@ -81,10 +83,10 @@ public class DefaultCosHttpClient implements CosHttpClient {
         this.httpClient = httpClientBuilder.build();
         this.requestConfig =
                 RequestConfig.custom()
-                             .setConnectionRequestTimeout(this.clientConfig.getConnectionRequestTimeout())
-                             .setConnectTimeout(this.clientConfig.getConnectionTimeout())
-                             .setSocketTimeout(this.clientConfig.getSocketTimeout())
-                             .build();
+                        .setConnectionRequestTimeout(
+                                this.clientConfig.getConnectionRequestTimeout())
+                        .setConnectTimeout(this.clientConfig.getConnectionTimeout())
+                        .setSocketTimeout(this.clientConfig.getSocketTimeout()).build();
         this.idleConnectionMonitor = new IdleConnectionMonitorThread(this.connectionManager);
         this.idleConnectionMonitor.start();
     }
@@ -97,9 +99,8 @@ public class DefaultCosHttpClient implements CosHttpClient {
     // 因为Apache HTTP库自带的URL Encode对一些特殊字符如*等不进行转换, 和COS HTTP服务的URL Encode标准不一致
     private <X extends CosServiceRequest> URI buildUri(CosHttpRequest<X> request) {
         StringBuffer urlBuffer = new StringBuffer();
-        urlBuffer.append(request.getProtocol().toString())
-                 .append("://")
-                 .append(request.getEndpoint());
+        urlBuffer.append(request.getProtocol().toString()).append("://")
+                .append(request.getEndpoint());
         String encodedPath = UrlEncoderUtils.encodeEscapeDelimiter(request.getResourcePath());
         urlBuffer.append(encodedPath);
 
@@ -154,8 +155,8 @@ public class DefaultCosHttpClient implements CosHttpClient {
         }
     }
 
-    private <X extends CosServiceRequest> HttpRequestBase buildHttpRequest(CosHttpRequest<X> request)
-            throws CosClientException {
+    private <X extends CosServiceRequest> HttpRequestBase buildHttpRequest(
+            CosHttpRequest<X> request) throws CosClientException {
         HttpRequestBase httpRequestBase = null;
         HttpMethodName httpMethodName = request.getHttpMethod();
         if (httpMethodName.equals(HttpMethodName.PUT)) {
@@ -223,10 +224,9 @@ public class DefaultCosHttpClient implements CosHttpClient {
         return statusCode / 100 == HttpStatus.SC_OK / 100;
     }
 
-    private <X extends CosServiceRequest> CosHttpResponse createResponse(HttpRequestBase httpRequestBase,
-                                                                         CosHttpRequest<X> request,
-                                                                         org.apache.http.HttpResponse apacheHttpResponse)
-                                                                                 throws IOException {
+    private <X extends CosServiceRequest> CosHttpResponse createResponse(
+            HttpRequestBase httpRequestBase, CosHttpRequest<X> request,
+            org.apache.http.HttpResponse apacheHttpResponse) throws IOException {
         CosHttpResponse httpResponse = new CosHttpResponse(request, httpRequestBase);
 
         if (apacheHttpResponse.getEntity() != null) {
@@ -242,10 +242,9 @@ public class DefaultCosHttpClient implements CosHttpClient {
         return httpResponse;
     }
 
-    private <X extends CosServiceRequest> CosServiceException handlerErrorMessage(CosHttpRequest<X> request,
-                                                                                  HttpRequestBase httpRequestBase,
-                                                                                  final org.apache.http.HttpResponse apacheHttpResponse)
-                                                                                          throws IOException {
+    private <X extends CosServiceRequest> CosServiceException handlerErrorMessage(
+            CosHttpRequest<X> request, HttpRequestBase httpRequestBase,
+            final org.apache.http.HttpResponse apacheHttpResponse) throws IOException {
         final StatusLine statusLine = apacheHttpResponse.getStatusLine();
         final int statusCode;
         final String reasonPhrase;
@@ -287,7 +286,8 @@ public class DefaultCosHttpClient implements CosHttpClient {
         return exception;
     }
 
-    private <X extends CosServiceRequest> void bufferAndResetAbleContent(CosHttpRequest<X> request) {
+    private <X extends CosServiceRequest> void bufferAndResetAbleContent(
+            CosHttpRequest<X> request) {
         final InputStream origContent = request.getContent();
         if (origContent != null) {
             final InputStream toBeClosed = buffer(makeResettable(origContent));
@@ -298,11 +298,21 @@ public class DefaultCosHttpClient implements CosHttpClient {
         }
     }
 
+    /**
+     * Wrap with a {@link ProgressInputStream} to report request progress to listener.
+     *
+     * @param listener Listener to report to
+     * @param content Input stream to monitor progress for
+     * @return Wrapped input stream with progress monitoring capabilities.
+     */
+    private InputStream monitorStreamProgress(ProgressListener listener, InputStream content) {
+        return ProgressInputStream.inputStreamForRequest(content, listener);
+    }
+
     @Override
     public <X, Y extends CosServiceRequest> X exeute(CosHttpRequest<Y> request,
-                                                     HttpResponseHandler<CosServiceResponse<X>> responseHandler)
-                                                             throws CosClientException,
-                                                             CosServiceException {
+            HttpResponseHandler<CosServiceResponse<X>> responseHandler)
+                    throws CosClientException, CosServiceException {
 
         HttpResponse httpResponse = null;
         HttpRequestBase httpRequest = null;
@@ -311,7 +321,11 @@ public class DefaultCosHttpClient implements CosHttpClient {
         bufferAndResetAbleContent(request);
 
         // Always mark the input stream before execution.
+        ProgressListener progressListener = request.getProgressListener();
         final InputStream originalContent = request.getContent();
+        if (originalContent != null) {
+            request.setContent(monitorStreamProgress(progressListener, originalContent));
+        }
         if (originalContent != null && originalContent.markSupported()) {
             final int readLimit = clientConfig.getReadLimit();
             originalContent.mark(readLimit);
@@ -333,19 +347,15 @@ public class DefaultCosHttpClient implements CosHttpClient {
                 httpRequest.abort();
                 ++retryIndex;
                 if (retryIndex >= kMaxRetryCnt) {
-                    String errMsg =
-                            String.format("httpClient execute occur a IOexcepiton. httpRequest: %s, excep: %s",
-                                          request.toString(),
-                                          e);
+                    String errMsg = String.format(
+                            "httpClient execute occur a IOexcepiton. httpRequest: %s, excep: %s",
+                            request.toString(), e);
                     log.error(errMsg);
                     throw new CosClientException(errMsg);
                 } else {
-                    String warnMsg =
-                            String.format("httpClient execute occur a IOexcepiton, ready to retry[%d/%d]. httpRequest: %s, excep: %s",
-                                          retryIndex,
-                                          kMaxRetryCnt,
-                                          request.toString(),
-                                          e);
+                    String warnMsg = String.format(
+                            "httpClient execute occur a IOexcepiton, ready to retry[%d/%d]. httpRequest: %s, excep: %s",
+                            retryIndex, kMaxRetryCnt, request.toString(), e);
                     log.warn(warnMsg);
                     // 加入sleep 避免雪崩
                     int threadSleepMs = ThreadLocalRandom.current().nextInt(10, 100);

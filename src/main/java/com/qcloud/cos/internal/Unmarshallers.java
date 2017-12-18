@@ -194,15 +194,15 @@ public class Unmarshallers {
         }
     }
 
-    // public static final class DeleteObjectsResultUnmarshaller
-    // implements Unmarshaller<DeleteObjectsResponse, InputStream> {
-    //
-    // public DeleteObjectsResponse unmarshall(InputStream in) throws Exception {
-    // return new XmlResponsesSaxParser().parseDeletedObjectsResult(in)
-    // .getDeleteObjectResult();
-    // }
-    // }
-    //
+    public static final class DeleteObjectsResultUnmarshaller
+            implements Unmarshaller<DeleteObjectsResponse, InputStream> {
+
+        public DeleteObjectsResponse unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser().parseDeletedObjectsResult(in)
+                    .getDeleteObjectResult();
+        }
+    }
+
     public static final class BucketLifecycleConfigurationUnmarshaller
             implements Unmarshaller<BucketLifecycleConfiguration, InputStream> {
 

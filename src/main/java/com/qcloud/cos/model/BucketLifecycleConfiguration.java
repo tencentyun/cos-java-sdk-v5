@@ -501,7 +501,7 @@ public class BucketLifecycleConfiguration {
 
     /**
      * The non-current-version transition attribute of the rule, describing how non-current versions
-     * of objects will move between different storage classes in Amazon S3.
+     * of objects will move between different storage classes.
      */
     public static class NoncurrentVersionTransition implements Serializable {
 

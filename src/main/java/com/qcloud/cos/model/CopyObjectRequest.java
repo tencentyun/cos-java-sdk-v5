@@ -116,12 +116,32 @@ public class CopyObjectRequest extends CosServiceRequest
             String destinationBucketName, String destinationKey) {
         this(null, null, sourceBucketName, sourceKey, null, destinationBucketName, destinationKey);
     }
-
+    
     /**
      * <p>
      * Constructs a new {@link com.qcloud.cos.model#CopyObjectRequest} with only basic options.
      * </p>
      * 
+     * @param sourceBucketRegion The source Bucket Region
+     * @param sourceBucketName The name of the COS bucket containing the object to copy.
+     * @param sourceKey The source bucket key under which the object to copy is stored.
+     * @param destinationBucketName The name of the COS bucket to which the new object will be
+     *        copied.
+     * @param destinationKey The destination bucket key under which the new object will be copied.
+     * 
+     * @see CopyObjectRequest#CopyObjectRequest(String, String, String, String, String)
+     */
+    public CopyObjectRequest(Region sourceBucketRegion, String sourceBucketName,
+            String sourceKey, String destinationBucketName, String destinationKey) {
+        this(null, sourceBucketRegion, sourceBucketName, sourceKey, null,
+                destinationBucketName, destinationKey);
+    }
+
+    /**
+     * <p>
+     * Constructs a new {@link com.qcloud.cos.model#CopyObjectRequest} with only basic options.
+     * </p>
+     * @param sourceAppid  The source bucket appid
      * @param sourceBucketRegion The source Bucket Region
      * @param sourceBucketName The name of the COS bucket containing the object to copy.
      * @param sourceKey The source bucket key under which the object to copy is stored.

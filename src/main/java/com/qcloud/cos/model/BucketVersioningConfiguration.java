@@ -104,7 +104,7 @@ public class BucketVersioningConfiguration implements Serializable {
      *            The desired status of versioning for this bucket versioning
      *            configuration.
      * 
-     * @return The updated S3BucketVersioningConfiguration object so that
+     * @return The updated BucketVersioningConfiguration object so that
      *         additional method calls may be chained together.
      * 
      * @see #ENABLED

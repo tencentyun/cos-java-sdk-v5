@@ -7,6 +7,8 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
@@ -17,6 +19,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Pattern;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.http.client.methods.HttpRequestBase;
@@ -27,6 +30,8 @@ import com.qcloud.cos.auth.COSCredentials;
 import com.qcloud.cos.auth.COSSigner;
 import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.exception.CosServiceException;
+import com.qcloud.cos.exception.CosServiceException.ErrorType;
+import com.qcloud.cos.exception.MultiObjectDeleteException;
 import com.qcloud.cos.exception.Throwables;
 import com.qcloud.cos.http.CosHttpClient;
 import com.qcloud.cos.http.CosHttpRequest;
@@ -41,10 +46,12 @@ import com.qcloud.cos.internal.Constants;
 import com.qcloud.cos.internal.CosMetadataResponseHandler;
 import com.qcloud.cos.internal.CosServiceRequest;
 import com.qcloud.cos.internal.CosServiceResponse;
+import com.qcloud.cos.internal.DeleteObjectsResponse;
 import com.qcloud.cos.internal.DigestValidationInputStream;
 import com.qcloud.cos.internal.InputSubstream;
 import com.qcloud.cos.internal.LengthCheckInputStream;
 import com.qcloud.cos.internal.MD5DigestCalculatingInputStream;
+import com.qcloud.cos.internal.MultiObjectDeleteXmlFactory;
 import com.qcloud.cos.internal.ObjectExpirationHeaderHandler;
 import com.qcloud.cos.internal.ReleasableInputStream;
 import com.qcloud.cos.internal.RequestXmlFactory;
@@ -74,6 +81,8 @@ import com.qcloud.cos.model.CompleteMultipartUploadRequest;
 import com.qcloud.cos.model.CompleteMultipartUploadResult;
 import com.qcloud.cos.model.CopyObjectRequest;
 import com.qcloud.cos.model.CopyObjectResult;
+import com.qcloud.cos.model.CopyPartRequest;
+import com.qcloud.cos.model.CopyPartResult;
 import com.qcloud.cos.model.CosDataSource;
 import com.qcloud.cos.model.CreateBucketRequest;
 import com.qcloud.cos.model.DeleteBucketCrossOriginConfigurationRequest;
@@ -81,6 +90,9 @@ import com.qcloud.cos.model.DeleteBucketLifecycleConfigurationRequest;
 import com.qcloud.cos.model.DeleteBucketReplicationConfigurationRequest;
 import com.qcloud.cos.model.DeleteBucketRequest;
 import com.qcloud.cos.model.DeleteObjectRequest;
+import com.qcloud.cos.model.DeleteObjectsRequest;
+import com.qcloud.cos.model.DeleteObjectsResult;
+import com.qcloud.cos.model.GeneratePresignedUrlRequest;
 import com.qcloud.cos.model.GenericBucketRequest;
 import com.qcloud.cos.model.GetBucketAclRequest;
 import com.qcloud.cos.model.GetBucketCrossOriginConfigurationRequest;
@@ -110,6 +122,7 @@ import com.qcloud.cos.model.PartListing;
 import com.qcloud.cos.model.Permission;
 import com.qcloud.cos.model.PutObjectRequest;
 import com.qcloud.cos.model.PutObjectResult;
+import com.qcloud.cos.model.ResponseHeaderOverrides;
 import com.qcloud.cos.model.SetBucketAclRequest;
 import com.qcloud.cos.model.SetBucketCrossOriginConfigurationRequest;
 import com.qcloud.cos.model.SetBucketLifecycleConfigurationRequest;
@@ -151,6 +164,11 @@ public class COSClient implements COS {
         this.cosHttpClient.shutdown();
     }
 
+    @Override
+    public ClientConfig getClientConfig() {
+        return clientConfig;
+    }
+
     /**
      * <p>
      * Asserts that the specified parameter value is not <code>null</code> and if it is, throws an
@@ -176,6 +194,7 @@ public class COSClient implements COS {
         } else {
             buildUrlAndHost(httpRequest, bucketName, key, false);
         }
+        httpRequest.setProgressListener(originalRequest.getGeneralProgressListener());
         return httpRequest;
     }
 
@@ -253,14 +272,12 @@ public class COSClient implements COS {
         if (sourceRegion == null) {
             sourceRegion = this.clientConfig.getRegion();
         }
-        String sourceKey = copyObjectRequest.getSourceKey();
-        if (!sourceKey.startsWith("/")) {
-            sourceKey = "/" + sourceKey;
-        }
-        String copySourceHeader = String.format("%s-%s.%s.myqcloud.com%s",
-                formatBucket(copyObjectRequest.getSourceBucketName()),
+        String sourceKey = formatKey(copyObjectRequest.getSourceKey());
+
+        String sourceBucket = formatBucket(copyObjectRequest.getSourceBucketName(),
                 (copyObjectRequest.getSourceAppid() != null) ? copyObjectRequest.getSourceAppid()
-                        : this.cred.getCOSAppId(),
+                        : this.cred.getCOSAppId());
+        String copySourceHeader = String.format("%s.%s.myqcloud.com%s", sourceBucket,
                 formatRegion(sourceRegion.getRegionName()),
                 UrlEncoderUtils.encodeEscapeDelimiter(sourceKey));
         if (copyObjectRequest.getSourceVersionId() != null) {
@@ -299,9 +316,45 @@ public class COSClient implements COS {
             populateRequestMetadata(request, newObjectMetadata);
         }
 
-        // Populate the SSE-C parameters for the destination object
-        // populateSourceSSE_C(request, copyObjectRequest.getSourceSSECustomerKey());
-        // populateSSE_C(request, copyObjectRequest.getDestinationSSECustomerKey());
+    }
+
+    private void populateRequestWithCopyPartParameters(
+            CosHttpRequest<? extends CosServiceRequest> request, CopyPartRequest copyPartRequest) {
+        Region sourceRegion = copyPartRequest.getSourceBucketRegion();
+        // 如果用户没有设置源region, 则默认和目的region一致
+        if (sourceRegion == null) {
+            sourceRegion = this.clientConfig.getRegion();
+        }
+        String sourceKey = formatKey(copyPartRequest.getSourceKey());
+
+        String sourceBucket = formatBucket(copyPartRequest.getSourceBucketName(),
+                (copyPartRequest.getSourceAppid() != null) ? copyPartRequest.getSourceAppid()
+                        : this.cred.getCOSAppId());
+        String copySourceHeader = String.format("%s.%s.myqcloud.com%s", sourceBucket,
+                formatRegion(sourceRegion.getRegionName()),
+                UrlEncoderUtils.encodeEscapeDelimiter(sourceKey));
+
+        if (copyPartRequest.getSourceVersionId() != null) {
+            copySourceHeader += "?versionId=" + copyPartRequest.getSourceVersionId();
+        }
+        request.addHeader("x-cos-copy-source", copySourceHeader);
+
+        addDateHeader(request, Headers.COPY_SOURCE_IF_MODIFIED_SINCE,
+                copyPartRequest.getModifiedSinceConstraint());
+        addDateHeader(request, Headers.COPY_SOURCE_IF_UNMODIFIED_SINCE,
+                copyPartRequest.getUnmodifiedSinceConstraint());
+
+        addStringListHeader(request, Headers.COPY_SOURCE_IF_MATCH,
+                copyPartRequest.getMatchingETagConstraints());
+        addStringListHeader(request, Headers.COPY_SOURCE_IF_NO_MATCH,
+                copyPartRequest.getNonmatchingETagConstraints());
+
+        if (copyPartRequest.getFirstByte() != null && copyPartRequest.getLastByte() != null) {
+            String range =
+                    "bytes=" + copyPartRequest.getFirstByte() + "-" + copyPartRequest.getLastByte();
+            request.addHeader(Headers.COPY_PART_RANGE, range);
+        }
+
     }
 
     private String formatKey(String key) {
@@ -340,12 +393,23 @@ public class COSClient implements COS {
         return path;
     }
 
-    private String formatBucket(String bucketName) {
-        String appidSuffix = "-" + cred.getCOSAppId();
+    // 格式化bucket, 是bucket返回带appid
+    private String formatBucket(String bucketName, String appid) throws CosClientException {
+        if (appid == null) {
+            String parrtern = ".*-(125|100)[0-9]{3,}$";
+            if (Pattern.matches(parrtern, bucketName)) {
+                return bucketName;
+            } else {
+                throw new CosClientException(
+                        "please make sure bucket name must contain legal appid when appid is missing. example: music-1251122334");
+            }
+        }
+
+        String appidSuffix = "-" + appid;
         if (bucketName.endsWith(appidSuffix)) {
-            return bucketName.substring(0, bucketName.lastIndexOf("-"));
-        } else {
             return bucketName;
+        } else {
+            return bucketName + appidSuffix;
         }
     }
 
@@ -357,16 +421,16 @@ public class COSClient implements COS {
         if (isServiceRequest) {
             host = "service.cos.myqcloud.com";
         } else {
-            bucket = formatBucket(bucket);
-            host = String.format("%s-%s.%s.myqcloud.com", bucket, cred.getCOSAppId(),
+            bucket = formatBucket(bucket, cred.getCOSAppId());
+            host = String.format("%s.%s.myqcloud.com", bucket,
                     formatRegion(clientConfig.getRegion().getRegionName()));
 
             if (this.clientConfig.getEndPointSuffix() != null) {
                 String endPointSuffix = clientConfig.getEndPointSuffix();
                 if (endPointSuffix.startsWith(".")) {
-                    host = String.format("%s-%s%s", bucket, cred.getCOSAppId(), endPointSuffix);
+                    host = String.format("%s%s", bucket, endPointSuffix);
                 } else {
-                    host = String.format("%s-%s.%s", bucket, cred.getCOSAppId(), endPointSuffix);
+                    host = String.format("%s.%s", bucket, endPointSuffix);
                 }
             }
         }
@@ -457,6 +521,44 @@ public class COSClient implements COS {
     private boolean shouldRetryCompleteMultipartUpload(CosServiceRequest originalRequest,
             CosClientException exception, int retriesAttempted) {
         return false;
+    }
+
+    /**
+     * <p>
+     * Adds response headers parameters to the request given, if non-null.
+     * </p>
+     *
+     * @param request The request to add the response header parameters to.
+     * @param responseHeaders The full set of response headers to add, or null for none.
+     */
+    private static void addResponseHeaderParameters(CosHttpRequest<?> request,
+            ResponseHeaderOverrides responseHeaders) {
+        if (responseHeaders != null) {
+            if (responseHeaders.getCacheControl() != null) {
+                request.addParameter(ResponseHeaderOverrides.RESPONSE_HEADER_CACHE_CONTROL,
+                        responseHeaders.getCacheControl());
+            }
+            if (responseHeaders.getContentDisposition() != null) {
+                request.addParameter(ResponseHeaderOverrides.RESPONSE_HEADER_CONTENT_DISPOSITION,
+                        responseHeaders.getContentDisposition());
+            }
+            if (responseHeaders.getContentEncoding() != null) {
+                request.addParameter(ResponseHeaderOverrides.RESPONSE_HEADER_CONTENT_ENCODING,
+                        responseHeaders.getContentEncoding());
+            }
+            if (responseHeaders.getContentLanguage() != null) {
+                request.addParameter(ResponseHeaderOverrides.RESPONSE_HEADER_CONTENT_LANGUAGE,
+                        responseHeaders.getContentLanguage());
+            }
+            if (responseHeaders.getContentType() != null) {
+                request.addParameter(ResponseHeaderOverrides.RESPONSE_HEADER_CONTENT_TYPE,
+                        responseHeaders.getContentType());
+            }
+            if (responseHeaders.getExpires() != null) {
+                request.addParameter(ResponseHeaderOverrides.RESPONSE_HEADER_EXPIRES,
+                        responseHeaders.getExpires());
+            }
+        }
     }
 
     @Override
@@ -654,6 +756,7 @@ public class COSClient implements COS {
             request.addHeader(Headers.RANGE,
                     "bytes=" + Long.toString(range[0]) + "-" + Long.toString(range[1]));
         }
+        addResponseHeaderParameters(request, getObjectRequest.getResponseHeaders());
 
         addDateHeader(request, Headers.GET_OBJECT_IF_MODIFIED_SINCE,
                 getObjectRequest.getModifiedSinceConstraint());
@@ -700,7 +803,7 @@ public class COSClient implements COS {
                 // expected content-length
                 is = new LengthCheckInputStream(is,
                         cosObject.getObjectMetadata().getContentLength(), // expected length
-                        INCLUDE_SKIPPED_BYTES); // bytes received from S3 are all included even if
+                        INCLUDE_SKIPPED_BYTES); // bytes received from cos are all included even if
                                                 // skipped
             }
             cosObject.setObjectContent(new COSObjectInputStream(is, httpRequest));
@@ -807,6 +910,53 @@ public class COSClient implements COS {
                 createRequest(deleteObjectRequest.getBucketName(), deleteObjectRequest.getKey(),
                         deleteObjectRequest, HttpMethodName.DELETE);
         invoke(request, voidCosResponseHandler);
+    }
+
+    @Override
+    public DeleteObjectsResult deleteObjects(DeleteObjectsRequest deleteObjectsRequest)
+            throws MultiObjectDeleteException, CosClientException, CosServiceException {
+        CosHttpRequest<DeleteObjectsRequest> request =
+                createRequest(deleteObjectsRequest.getBucketName(), null, deleteObjectsRequest,
+                        HttpMethodName.POST);
+        request.addParameter("delete", null);
+
+        byte[] content =
+                new MultiObjectDeleteXmlFactory().convertToXmlByteArray(deleteObjectsRequest);
+        request.addHeader("Content-Length", String.valueOf(content.length));
+        request.addHeader("Content-Type", "application/xml");
+        request.setContent(new ByteArrayInputStream(content));
+        try {
+            byte[] md5 = Md5Utils.computeMD5Hash(content);
+            String md5Base64 = BinaryUtils.toBase64(md5);
+            request.addHeader("Content-MD5", md5Base64);
+        } catch (Exception e) {
+            throw new CosClientException("Couldn't compute md5 sum", e);
+        }
+
+        @SuppressWarnings("unchecked")
+        ResponseHeaderHandlerChain<DeleteObjectsResponse> responseHandler =
+                new ResponseHeaderHandlerChain<DeleteObjectsResponse>(
+                        new Unmarshallers.DeleteObjectsResultUnmarshaller());
+
+        DeleteObjectsResponse response = invoke(request, responseHandler);
+
+        /*
+         * If the result was only partially successful, throw an exception
+         */
+        if (!response.getErrors().isEmpty()) {
+            Map<String, String> headers = responseHandler.getResponseHeaders();
+
+            MultiObjectDeleteException ex = new MultiObjectDeleteException(response.getErrors(),
+                    response.getDeletedObjects());
+
+            ex.setStatusCode(200);
+            ex.setRequestId(headers.get(Headers.REQUEST_ID));
+
+            throw ex;
+        }
+        DeleteObjectsResult result = new DeleteObjectsResult(response.getDeletedObjects());
+
+        return result;
     }
 
     @Override
@@ -1386,6 +1536,100 @@ public class COSClient implements COS {
     }
 
     @Override
+    public CopyPartResult copyPart(CopyPartRequest copyPartRequest)
+            throws CosClientException, CosServiceException {
+        rejectNull(copyPartRequest.getSourceBucketName(),
+                "The source bucket name must be specified when copying a part");
+        rejectNull(copyPartRequest.getSourceKey(),
+                "The source object key must be specified when copying a part");
+        rejectNull(copyPartRequest.getDestinationBucketName(),
+                "The destination bucket name must be specified when copying a part");
+        rejectNull(copyPartRequest.getUploadId(),
+                "The upload id must be specified when copying a part");
+        rejectNull(copyPartRequest.getDestinationKey(),
+                "The destination object key must be specified when copying a part");
+        rejectNull(copyPartRequest.getPartNumber(),
+                "The part number must be specified when copying a part");
+
+        String destinationKey = copyPartRequest.getDestinationKey();
+        String destinationBucketName = copyPartRequest.getDestinationBucketName();
+
+        CosHttpRequest<CopyPartRequest> request = createRequest(destinationBucketName,
+                destinationKey, copyPartRequest, HttpMethodName.PUT);
+
+        populateRequestWithCopyPartParameters(request, copyPartRequest);
+
+        request.addParameter("uploadId", copyPartRequest.getUploadId());
+        request.addParameter("partNumber", Integer.toString(copyPartRequest.getPartNumber()));
+
+        /*
+         * We can't send a non-zero length Content-Length header if the user
+         * specified it, otherwise it messes up the HTTP connection when the
+         * remote server thinks there's more data to pull.
+         */
+        setZeroContentLength(request);
+        CopyObjectResultHandler copyObjectResultHandler = null;
+        try {
+            @SuppressWarnings("unchecked")
+            ResponseHeaderHandlerChain<CopyObjectResultHandler> handler =
+                    new ResponseHeaderHandlerChain<CopyObjectResultHandler>(
+                            // xml payload unmarshaller
+                            new Unmarshallers.CopyObjectUnmarshaller(),
+                            // header handlers
+                            new ServerSideEncryptionHeaderHandler<CopyObjectResultHandler>(),
+                            new COSVersionHeaderHandler());
+            copyObjectResultHandler = invoke(request, handler);
+        } catch (CosServiceException cse) {
+            /*
+             * If the request failed because one of the specified constraints
+             * was not met (ex: matching ETag, modified since date, etc.), then
+             * return null, so that users don't have to wrap their code in
+             * try/catch blocks and check for this status code if they want to
+             * use constraints.
+             */
+            if (cse.getStatusCode() == Constants.FAILED_PRECONDITION_STATUS_CODE) {
+                return null;
+            }
+
+            throw cse;
+        }
+
+        /*
+         * CopyPart has two failure modes: 1 - An HTTP error code is returned
+         * and the error is processed like any other error response. 2 - An HTTP
+         * 200 OK code is returned, but the response content contains an XML
+         * error response.
+         *
+         * This makes it very difficult for the client runtime to cleanly detect
+         * this case and handle it like any other error response. We could
+         * extend the runtime to have a more flexible/customizable definition of
+         * success/error (per request), but it's probably overkill for this one
+         * special case.
+         */
+        if (copyObjectResultHandler.getErrorCode() != null) {
+            String errorCode = copyObjectResultHandler.getErrorCode();
+            String errorMessage = copyObjectResultHandler.getErrorMessage();
+            String requestId = copyObjectResultHandler.getErrorRequestId();
+
+            CosServiceException cse = new CosServiceException(errorMessage);
+            cse.setErrorCode(errorCode);
+            cse.setErrorType(ErrorType.Service);
+            cse.setRequestId(requestId);
+            cse.setStatusCode(200);
+
+            throw cse;
+        }
+
+        CopyPartResult copyPartResult = new CopyPartResult();
+        copyPartResult.setETag(copyObjectResultHandler.getETag());
+        copyPartResult.setPartNumber(copyPartRequest.getPartNumber());
+        copyPartResult.setLastModifiedDate(copyObjectResultHandler.getLastModified());
+        copyPartResult.setVersionId(copyObjectResultHandler.getVersionId());
+
+        return copyPartResult;
+    }
+
+    @Override
     public void setBucketLifecycleConfiguration(String bucketName,
             BucketLifecycleConfiguration bucketLifecycleConfiguration)
                     throws CosClientException, CosServiceException {
@@ -1934,5 +2178,101 @@ public class COSClient implements COS {
         invoke(request, voidCosResponseHandler);
     }
 
+    @Override
+    public URL generatePresignedUrl(String bucketName, String key, Date expiration)
+            throws CosClientException {
+        return generatePresignedUrl(bucketName, key, expiration, HttpMethodName.GET);
+    }
+
+    @Override
+    public URL generatePresignedUrl(String bucketName, String key, Date expiration,
+            HttpMethodName method) throws CosClientException {
+        GeneratePresignedUrlRequest request =
+                new GeneratePresignedUrlRequest(bucketName, key, method);
+        request.setExpiration(expiration);
+
+        return generatePresignedUrl(request);
+    }
+
+    @Override
+    public URL generatePresignedUrl(GeneratePresignedUrlRequest req) throws CosClientException {
+
+        rejectNull(req, "The request parameter must be specified when generating a pre-signed URL");
+        req.rejectIllegalArguments();
+
+        final String bucketName = req.getBucketName();
+        final String key = req.getKey();
+
+        if (req.getExpiration() == null) {
+            req.setExpiration(new Date(
+                    System.currentTimeMillis() + this.clientConfig.getSignExpired() * 1000));
+        }
+
+        HttpMethodName httpMethod = req.getMethod();
+
+        CosHttpRequest<GeneratePresignedUrlRequest> request =
+                createRequest(bucketName, key, req, httpMethod);
+
+        if (req.getVersionId() != null) {
+            request.addParameter("versionId", req.getVersionId());
+        }
+
+        for (Entry<String, String> entry : req.getRequestParameters().entrySet()) {
+            request.addParameter(entry.getKey(), entry.getValue());
+        }
+
+        addHeaderIfNotNull(request, Headers.CONTENT_TYPE, req.getContentType());
+        addHeaderIfNotNull(request, Headers.CONTENT_MD5, req.getContentMd5());
+
+        // Custom headers that open up the possibility of supporting unexpected
+        // cases.
+        Map<String, String> customHeaders = req.getCustomRequestHeaders();
+        if (customHeaders != null) {
+            for (Map.Entry<String, String> e : customHeaders.entrySet()) {
+                request.addHeader(e.getKey(), e.getValue());
+            }
+        }
+
+        addResponseHeaderParameters(request, req.getResponseHeaders());
+
+        COSSigner cosSigner = new COSSigner();
+        String authStr =
+                cosSigner.buildAuthorizationStr(request.getHttpMethod(), request.getResourcePath(),
+                        request.getHeaders(), request.getParameters(), cred, req.getExpiration());
+        StringBuilder strBuilder = new StringBuilder();
+
+        strBuilder.append("http://").append(formatBucket(bucketName, cred.getCOSAppId()))
+                .append(".").append(formatRegion(clientConfig.getRegion().getRegionName()))
+                .append(".myqcloud.com")
+                .append(UrlEncoderUtils.encodeEscapeDelimiter(formatKey(key)));
+        
+        boolean hasAppendFirstParameter = false;
+        if (authStr != null) {
+            strBuilder.append("?sign=").append(UrlEncoderUtils.encode(authStr));
+            hasAppendFirstParameter = true;
+        }
+
+        for (Entry<String, String> entry : request.getParameters().entrySet()) {
+            String paramKey = entry.getKey();
+            String paramValue = entry.getValue();
+
+            if (!hasAppendFirstParameter) {
+                strBuilder.append("?");
+                hasAppendFirstParameter = true;
+            } else {
+                strBuilder.append("&");
+            }
+            strBuilder.append(UrlEncoderUtils.encode(paramKey));
+            if (paramValue != null) {
+                strBuilder.append("=").append(UrlEncoderUtils.encode(paramValue));
+            }
+        }
+
+        try {
+            return new URL(strBuilder.toString());
+        } catch (MalformedURLException e) {
+            throw new CosClientException(e.toString());
+        }
+    }
 }
 

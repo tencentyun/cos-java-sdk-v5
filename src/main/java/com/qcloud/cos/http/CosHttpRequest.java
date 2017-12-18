@@ -5,6 +5,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.qcloud.cos.event.ProgressListener;
 import com.qcloud.cos.internal.CosServiceRequest;
 
 public class CosHttpRequest<T extends CosServiceRequest> {
@@ -28,7 +29,9 @@ public class CosHttpRequest<T extends CosServiceRequest> {
     /** An optional stream from which to read the request payload. */
     private InputStream content;
 
-    T originRequest;
+    private T originRequest;
+    
+    private ProgressListener progressListener;
 
     public CosHttpRequest(T originRequest) {
         this.originRequest = originRequest;
@@ -107,6 +110,14 @@ public class CosHttpRequest<T extends CosServiceRequest> {
 
     public T getOriginalRequest() {
         return originRequest;
+    }
+    
+    public ProgressListener getProgressListener() {
+        return progressListener;
+    }
+
+    public void setProgressListener(ProgressListener progressListener) {
+        this.progressListener = progressListener;
     }
 
     @Override

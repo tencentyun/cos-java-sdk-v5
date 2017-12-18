@@ -16,6 +16,7 @@ public interface Headers {
     public static final String CONTENT_LENGTH = "Content-Length";
     public static final String CONTENT_MD5 = "Content-MD5";
     public static final String CONTENT_TYPE = "Content-Type";
+    public static final String CONTENT_LANGUAGE = "Content-Language";
     public static final String DATE = "Date";
     public static final String ETAG = "ETag";
     public static final String LAST_MODIFIED = "Last-Modified";
@@ -63,13 +64,13 @@ public interface Headers {
     public static final String SERVER_SIDE_ENCRYPTION = "x-cos-server-side-encryption";
     
     /** Header for the encryption algorithm used when encrypting the object with customer-provided keys */
-    public static final String SERVER_SIDE_ENCRYPTION_CUSTOMER_ALGORITHM = "x-amz-server-side-encryption-customer-algorithm";
+    public static final String SERVER_SIDE_ENCRYPTION_CUSTOMER_ALGORITHM = "x-cos-server-side-encryption-customer-algorithm";
 
     /** Header for the customer-provided key for server-side encryption */
-    public static final String SERVER_SIDE_ENCRYPTION_CUSTOMER_KEY = "x-amz-server-side-encryption-customer-key";
+    public static final String SERVER_SIDE_ENCRYPTION_CUSTOMER_KEY = "x-cos-server-side-encryption-customer-key";
 
     /** Header for the MD5 digest of the customer-provided key for server-side encryption */
-    public static final String SERVER_SIDE_ENCRYPTION_CUSTOMER_KEY_MD5 = "x-amz-server-side-encryption-customer-key-MD5";
+    public static final String SERVER_SIDE_ENCRYPTION_CUSTOMER_KEY_MD5 = "x-cos-server-side-encryption-customer-key-MD5";
 
     /** Header for optional object expiration */
     public static final String EXPIRATION = "x-cos-expiration";

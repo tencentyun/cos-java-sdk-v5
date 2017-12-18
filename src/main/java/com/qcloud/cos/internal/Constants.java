@@ -24,4 +24,7 @@ public class Constants {
     public static final int BUCKET_ACCESS_FORBIDDEN_STATUS_CODE = 403;
 
     public static final int BUCKET_REDIRECT_STATUS_CODE = 301;
+    
+    /** Represents a null version ID */
+    public static final String NULL_VERSION_ID = "null";
 }

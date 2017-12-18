@@ -22,6 +22,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
 
 import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.exception.CosServiceException;
+import com.qcloud.cos.exception.MultiObjectDeleteException.DeleteError;
 import com.qcloud.cos.model.AbortIncompleteMultipartUpload;
 import com.qcloud.cos.model.AccessControlList;
 import com.qcloud.cos.model.Bucket;
@@ -37,6 +38,7 @@ import com.qcloud.cos.model.CORSRule.AllowedMethods;
 import com.qcloud.cos.model.COSObjectSummary;
 import com.qcloud.cos.model.CompleteMultipartUploadResult;
 import com.qcloud.cos.model.CopyObjectResult;
+import com.qcloud.cos.model.DeleteObjectsResult.DeletedObject;
 import com.qcloud.cos.model.Grantee;
 import com.qcloud.cos.model.InitiateMultipartUploadResult;
 import com.qcloud.cos.model.MultipartUpload;
@@ -369,13 +371,13 @@ public class XmlResponsesSaxParser {
     // return handler;
     // }
     //
-    // public DeleteObjectsHandler parseDeletedObjectsResult(InputStream inputStream)
-    // throws IOException {
-    // DeleteObjectsHandler handler = new DeleteObjectsHandler();
-    // parseXmlInputStream(handler, inputStream);
-    // return handler;
-    // }
-    //
+    public DeleteObjectsHandler parseDeletedObjectsResult(InputStream inputStream)
+            throws IOException {
+        DeleteObjectsHandler handler = new DeleteObjectsHandler();
+        parseXmlInputStream(handler, inputStream);
+        return handler;
+    }
+
     public CopyObjectResultHandler parseCopyObjectResponse(InputStream inputStream)
             throws IOException {
         CopyObjectResultHandler handler = new CopyObjectResultHandler();
@@ -1688,78 +1690,72 @@ public class XmlResponsesSaxParser {
     // }
 
 
-    // public static class DeleteObjectsHandler extends AbstractHandler {
-    //
-    // private final DeleteObjectsResponse response =
-    // new DeleteObjectsResponse();
-    //
-    // private DeletedObject currentDeletedObject = null;
-    // private DeleteError currentError = null;
-    //
-    // public DeleteObjectsResponse getDeleteObjectResult() {
-    // return response;
-    // }
-    //
-    // @Override
-    // protected void doStartElement(
-    // String uri,
-    // String name,
-    // String qName,
-    // Attributes attrs) {
-    //
-    // if (in("DeleteResult")) {
-    // if (name.equals("Deleted")) {
-    // currentDeletedObject = new DeletedObject();
-    // } else if (name.equals("Error")) {
-    // currentError = new DeleteError();
-    // }
-    // }
-    // }
-    //
-    // @Override
-    // protected void doEndElement(String uri, String name, String qName) {
-    // if (in("DeleteResult")) {
-    // if (name.equals("Deleted")) {
-    // response.getDeletedObjects().add(currentDeletedObject);
-    // currentDeletedObject = null;
-    // } else if (name.equals("Error")) {
-    // response.getErrors().add(currentError);
-    // currentError = null;
-    // }
-    // }
-    //
-    // else if (in("DeleteResult", "Deleted")) {
-    // if (name.equals("Key")) {
-    // currentDeletedObject.setKey(getText());
-    //
-    // } else if (name.equals("VersionId")) {
-    // currentDeletedObject.setVersionId(getText());
-    //
-    // } else if (name.equals("DeleteMarker")) {
-    // currentDeletedObject.setDeleteMarker(
-    // getText().equals("true"));
-    //
-    // } else if (name.equals("DeleteMarkerVersionId")) {
-    // currentDeletedObject.setDeleteMarkerVersionId(getText());
-    // }
-    // }
-    //
-    // else if (in("DeleteResult", "Error")) {
-    // if (name.equals("Key")) {
-    // currentError.setKey(getText());
-    //
-    // } else if (name.equals("VersionId")) {
-    // currentError.setVersionId(getText());
-    //
-    // } else if (name.equals("Code")) {
-    // currentError.setCode(getText());
-    //
-    // } else if (name.equals("Message")) {
-    // currentError.setMessage(getText());
-    // }
-    // }
-    // }
-    // }
+    public static class DeleteObjectsHandler extends AbstractHandler {
+
+        private final DeleteObjectsResponse response = new DeleteObjectsResponse();
+
+        private DeletedObject currentDeletedObject = null;
+        private DeleteError currentError = null;
+
+        public DeleteObjectsResponse getDeleteObjectResult() {
+            return response;
+        }
+
+        @Override
+        protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
+
+            if (in("DeleteResult")) {
+                if (name.equals("Deleted")) {
+                    currentDeletedObject = new DeletedObject();
+                } else if (name.equals("Error")) {
+                    currentError = new DeleteError();
+                }
+            }
+        }
+
+        @Override
+        protected void doEndElement(String uri, String name, String qName) {
+            if (in("DeleteResult")) {
+                if (name.equals("Deleted")) {
+                    response.getDeletedObjects().add(currentDeletedObject);
+                    currentDeletedObject = null;
+                } else if (name.equals("Error")) {
+                    response.getErrors().add(currentError);
+                    currentError = null;
+                }
+            }
+
+            else if (in("DeleteResult", "Deleted")) {
+                if (name.equals("Key")) {
+                    currentDeletedObject.setKey(getText());
+
+                } else if (name.equals("VersionId")) {
+                    currentDeletedObject.setVersionId(getText());
+
+                } else if (name.equals("DeleteMarker")) {
+                    currentDeletedObject.setDeleteMarker(getText().equals("true"));
+
+                } else if (name.equals("DeleteMarkerVersionId")) {
+                    currentDeletedObject.setDeleteMarkerVersionId(getText());
+                }
+            }
+
+            else if (in("DeleteResult", "Error")) {
+                if (name.equals("Key")) {
+                    currentError.setKey(getText());
+
+                } else if (name.equals("VersionId")) {
+                    currentError.setVersionId(getText());
+
+                } else if (name.equals("Code")) {
+                    currentError.setCode(getText());
+
+                } else if (name.equals("Message")) {
+                    currentError.setMessage(getText());
+                }
+            }
+        }
+    }
 
     /**
      * <LifecycleConfiguration> <Rule> <ID>logs-rule</ID> <Prefix>logs/</Prefix>

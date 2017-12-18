@@ -13,8 +13,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import com.qcloud.cos.model.BucketLifecycleConfiguration;
-import com.qcloud.cos.model.DeleteBucketLifecycleConfigurationRequest;
-import com.qcloud.cos.model.GetBucketLifecycleConfigurationRequest;
 import com.qcloud.cos.model.SetBucketLifecycleConfigurationRequest;
 import com.qcloud.cos.model.SetBucketVersioningConfigurationRequest;
 import com.qcloud.cos.model.StorageClass;
@@ -72,8 +70,7 @@ public class PutGetLifeCycleConfigTest extends AbstractCOSClientTest {
         cosclient.deleteBucketLifecycleConfiguration(bucket);
     }
 
-    // TODO CGI这里对时间戳的校验格式有误
-    @Ignore
+    @Test
     public void testPutGetDelExpirationDateLifeCycle() throws Exception {
         if (!judgeUserInfoValid()) {
             return;
@@ -90,7 +87,7 @@ public class PutGetLifeCycleConfigTest extends AbstractCOSClientTest {
         testPutGetDelRules(rules);
     }
 
-    @Ignore
+    @Test
     public void testPutGetDelLifeCycleForNormalBucket() {
         if (!judgeUserInfoValid()) {
             return;
@@ -136,7 +133,7 @@ public class PutGetLifeCycleConfigTest extends AbstractCOSClientTest {
         testPutGetDelRules(rules);
     }
 
-    @Ignore
+    @Test
     public void testPutGetDelLifeCycleForBucketWithVersions() {
         if (!judgeUserInfoValid()) {
             return;

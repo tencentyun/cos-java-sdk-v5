@@ -13,10 +13,8 @@ public class UrlEncoderUtils {
 
     public static String encode(String originUrl) {
         try {
-            return URLEncoder.encode(originUrl, "UTF-8")
-                             .replace("+", "%20")
-                             .replace("*", "%2A")
-                             .replace("%7E", "~");
+            return URLEncoder.encode(originUrl, "UTF-8").replace("+", "%20").replace("*", "%2A")
+                    .replace("%7E", "~");
         } catch (UnsupportedEncodingException e) {
             log.error("URLEncoder error, encode utf8, exception: {}", e);
         }
@@ -28,8 +26,12 @@ public class UrlEncoderUtils {
         StringBuilder pathBuilder = new StringBuilder();
         String[] pathSegmentsArr = urlPath.split(PATH_DELIMITER);
 
+        boolean isFirstSegMent = true;
         for (String pathSegment : pathSegmentsArr) {
-            if (!pathSegment.isEmpty()) {
+            if (isFirstSegMent) {
+                pathBuilder.append(encode(pathSegment));
+                isFirstSegMent = false;
+            } else {
                 pathBuilder.append(PATH_DELIMITER).append(encode(pathSegment));
             }
         }
