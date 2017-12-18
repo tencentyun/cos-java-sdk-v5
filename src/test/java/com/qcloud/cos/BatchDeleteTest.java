@@ -37,6 +37,9 @@ public class BatchDeleteTest extends AbstractCOSClientTest {
 
     @Test
     public void batchDeleteAllExistFile() throws IOException {
+        if (!judgeUserInfoValid()) {
+            return;
+        }
         DeleteObjectsRequest deleteObjectsRequest = new DeleteObjectsRequest(bucket);
         ArrayList<KeyVersion> keyList = new ArrayList<>();
 
@@ -55,6 +58,9 @@ public class BatchDeleteTest extends AbstractCOSClientTest {
 
     @Test
     public void batchDeletePartExistFile() throws IOException {
+        if (!judgeUserInfoValid()) {
+            return;
+        }
         DeleteObjectsRequest deleteObjectsRequest = new DeleteObjectsRequest(bucket);
         ArrayList<KeyVersion> keyList = new ArrayList<>();
 
