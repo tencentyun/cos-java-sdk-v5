@@ -49,6 +49,7 @@ public class CreateDeleteHeadBucketTest extends AbstractCOSClientTest {
 
         cosclient.deleteBucket(bucketName);
         // 删除bucket后, 由于server端有缓存 需要稍后查询, 这里sleep 5 秒
+        Thread.sleep(5000L);
         assertFalse(cosclient.doesBucketExist(bucketName));
     }
 
@@ -75,6 +76,7 @@ public class CreateDeleteHeadBucketTest extends AbstractCOSClientTest {
 
         cosclient.deleteBucket(bucketName);
         // 删除bucket后, 由于server端有缓存 需要稍后查询, 这里sleep 5 秒
+        Thread.sleep(5000L);
         assertFalse(cosclient.doesBucketExist(bucketName));
     }
 
