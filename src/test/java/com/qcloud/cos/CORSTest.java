@@ -26,7 +26,7 @@ public class CORSTest extends AbstractCOSClientTest {
     }
 
     @Test
-    public void setBucketCORSTest() {
+    public void setBucketCORSTest() throws InterruptedException {
         if (!judgeUserInfoValid()) {
             return;
         }
@@ -43,6 +43,8 @@ public class CORSTest extends AbstractCOSClientTest {
         corsRules.add(corsRule);
         bucketCORS.setRules(corsRules);
         cosclient.setBucketCrossOriginConfiguration(bucket, bucketCORS);
+        
+        Thread.sleep(5000L);
 
         BucketCrossOriginConfiguration corsGet =
                 cosclient.getBucketCrossOriginConfiguration(bucket);
