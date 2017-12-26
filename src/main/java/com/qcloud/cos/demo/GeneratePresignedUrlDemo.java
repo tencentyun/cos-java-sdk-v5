@@ -10,6 +10,7 @@ import java.util.Date;
 
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.ClientConfig;
+import com.qcloud.cos.auth.AnonymousCOSCredentials;
 import com.qcloud.cos.auth.BasicCOSCredentials;
 import com.qcloud.cos.auth.COSCredentials;
 import com.qcloud.cos.http.HttpMethodName;
@@ -86,8 +87,8 @@ public class GeneratePresignedUrlDemo {
 
     // 获取预签名的下载链接， 用于匿名bucket, 匿名bucket生成的预下载链接不包含签名
     public static void GeneratePresignedDownloadUrlAnonymous() {
-        // 1 初始化用户身份信息(secretId, secretKey)
-        COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
+        // 1 初始化用户身份信息, 匿名身份不用传入ak sk
+        COSCredentials cred = new AnonymousCOSCredentials();
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
         ClientConfig clientConfig = new ClientConfig(new Region("ap-beijing-1"));
         // 3 生成cos客户端
@@ -101,6 +102,8 @@ public class GeneratePresignedUrlDemo {
         URL url = cosclient.generatePresignedUrl(req);
 
         System.out.println(url.toString());
+        
+        cosclient.shutdown();
     }
 
     // 生成预签名的上传连接
