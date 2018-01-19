@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
+import com.qcloud.cos.utils.StringUtils;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.codec.digest.HmacUtils;
 
@@ -67,6 +68,15 @@ public class COSSigner {
                 new HashMap<String, String>(), cred, expiredTime);
     }
 
+    private String prefixMustBeSlash(String picturePath) {
+        if (StringUtils.isNullOrEmpty(picturePath)) {
+            picturePath = "/";
+        } else if (!picturePath.startsWith("/")) {
+            picturePath = "/" + picturePath;
+        }
+        return picturePath;
+    }
+
     public String buildAuthorizationStr(HttpMethodName methodName, String resouce_path,
             Map<String, String> headerMap, Map<String, String> paramMap, COSCredentials cred,
             Date expiredTime) {
@@ -74,6 +84,8 @@ public class COSSigner {
         if (isAnonymous(cred)) {
             return null;
         }
+
+        resouce_path = prefixMustBeSlash(resouce_path);
 
         Map<String, String> signHeaders = buildSignHeaders(headerMap);
         // 签名中的参数和http 头部 都要进行字符串排序
