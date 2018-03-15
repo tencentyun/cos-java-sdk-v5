@@ -131,6 +131,8 @@ public class ListObjectsDemo {
                 // 文件的存储类型
                 String storageClasses = cosObjectSummary.getStorageClass();
             }
+            String nextMarker = objectListing.getNextMarker();
+            listObjectsRequest.setMarker(nextMarker);
         } while (objectListing.isTruncated());
 
         cosclient.shutdown();
