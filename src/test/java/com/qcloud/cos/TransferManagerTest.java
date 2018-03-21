@@ -221,7 +221,7 @@ public class TransferManagerTest extends AbstractCOSClientTest {
     }
 
     // transfer manager对不同园区5G以上文件进行分块拷贝
-    @Test
+    @Ignore
     public void testTransferManagerCopyBigFileFromDiffRegion()
             throws CosServiceException, CosClientException, InterruptedException {
         if (!judgeUserInfoValid()) {
@@ -242,7 +242,7 @@ public class TransferManagerTest extends AbstractCOSClientTest {
     }
 
     // transfer manager对不同园区5G以下文件进行使用put object copy
-    @Test
+    @Ignore
     public void testTransferManagerCopySmallFileFromDiffRegion()
             throws CosServiceException, CosClientException, InterruptedException {
         if (!judgeUserInfoValid()) {
