@@ -185,8 +185,8 @@ public class TransferManagerTest extends AbstractCOSClientTest {
         if (!downloaddir.exists()) {
             downloaddir.mkdir();
         }
-        File downloadFile1 = new File(downloadDirName + folderPrefix + localFile1.getName());
-        File downloadFile2 = new File(downloadDirName + folderPrefix + localFile2.getName());
+        File downloadFile1 = new File(downloadDirName + "/" +  folderPrefix + localFile1.getName());
+        File downloadFile2 = new File(downloadDirName + "/" + folderPrefix + localFile2.getName());
         try {
             MultipleFileUpload multipleFileUpload =
                     transferManager.uploadDirectory(bucket, folderPrefix, tmpDir, true);
