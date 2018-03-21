@@ -37,20 +37,13 @@ public final class PersistableDownload extends PersistableTransfer {
     private final ResponseHeaderOverrides responseHeaders;
 
     /**
-     * If enabled, the requester is charged for downloading the data from
-     * Requester Pays Buckets.
-     */
-    @JsonProperty
-    private final boolean isRequesterPays;
-
-    /**
      * File where the downloaded data is written.
      */
     @JsonProperty
     private final String file;
 
     public PersistableDownload() {
-        this(null, null, null, null, null, false, null);
+        this(null, null, null, null, null, null);
     }
 
     public PersistableDownload(
@@ -59,14 +52,12 @@ public final class PersistableDownload extends PersistableTransfer {
             @JsonProperty(value = "versionId") String versionId,
             @JsonProperty(value = "range") long[] range,
             @JsonProperty(value = "responseHeaders") ResponseHeaderOverrides responseHeaders,
-            @JsonProperty(value = "isRequesterPays") boolean isRequesterPays,
             @JsonProperty(value = "file") String file) {
         this.bucketName = bucketName;
         this.key = key;
         this.versionId = versionId;
         this.range = range  == null ? null : range.clone();
         this.responseHeaders = responseHeaders;
-        this.isRequesterPays = isRequesterPays;
         this.file = file;
     }
 
@@ -103,14 +94,6 @@ public final class PersistableDownload extends PersistableTransfer {
      */
     ResponseHeaderOverrides getResponseHeaders() {
         return responseHeaders;
-    }
-
-    /**
-     * Returns true if RequesterPays is enabled on the Qcloud COS bucket else
-     * false.
-     */
-    boolean isRequesterPays() {
-        return isRequesterPays;
     }
 
     /**

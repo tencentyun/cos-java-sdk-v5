@@ -27,9 +27,9 @@ public abstract class AbstractCosResponseHandler<T>
 
     static {
         ignoredHeaders = new HashSet<String>();
-        ignoredHeaders.add(Headers.DATE);
+//        ignoredHeaders.add(Headers.DATE);
         ignoredHeaders.add(Headers.SERVER);
-        ignoredHeaders.add(Headers.REQUEST_ID);
+//        ignoredHeaders.add(Headers.REQUEST_ID);
         ignoredHeaders.add(Headers.TRACE_ID);
     }
 
@@ -43,13 +43,12 @@ public abstract class AbstractCosResponseHandler<T>
     }
 
     /**
-     * Parses the COS response metadata (ex: COS request ID) from the specified response, and returns
-     * a CosServiceResponse<T> object ready for the result to be plugged in.
+     * Parses the COS response metadata (ex: COS request ID) from the specified response, and
+     * returns a CosServiceResponse<T> object ready for the result to be plugged in.
      *
      * @param response The response containing the response metadata to pull out.
      *
-     * @return A new, populated CosServiceResponse<T> object, ready for the result to be
-     *         plugged in.
+     * @return A new, populated CosServiceResponse<T> object, ready for the result to be plugged in.
      */
     protected CosServiceResponse<T> parseResponseMetadata(CosHttpResponse response) {
         CosServiceResponse<T> cosResponse = new CosServiceResponse<T>();
@@ -91,6 +90,8 @@ public abstract class AbstractCosResponseHandler<T>
                 } catch (NumberFormatException nfe) {
                     log.warn("Unable to parse content length: " + header.getValue(), nfe);
                 }
+            } else if (key.equals(Headers.DELETE_MARKER)) {
+                metadata.setDeleteMarker(Boolean.parseBoolean(header.getValue()));
             } else if (key.equals(Headers.ETAG)) {
                 metadata.setHeader(key, StringUtils.removeQuotes(header.getValue()));
             } else if (key.equals(Headers.EXPIRES)) {
@@ -101,6 +102,8 @@ public abstract class AbstractCosResponseHandler<T>
                 }
             } else if (key.equals(Headers.EXPIRATION)) {
                 new ObjectExpirationHeaderHandler<ObjectMetadata>().handle(metadata, response);
+            } else if (key.equalsIgnoreCase(Headers.RESTORE)) {
+                new ObjectRestoreHeaderHandler<ObjectRestoreResult>().handle(metadata, response);
             } else {
                 metadata.setHeader(key, header.getValue());
             }

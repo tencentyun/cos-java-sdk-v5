@@ -19,7 +19,7 @@ public class ListObjectTest extends AbstractCOSClientTest {
 
     private static final int arrayNum = 10;
     private static File[] localFileArray = new File[arrayNum];
-    private static String keyPrefix = "ut/list";
+    private static String keyPrefix = "ut/list测试中文";
     private static String[] keyArray = new String[arrayNum];
 
 
@@ -83,11 +83,23 @@ public class ListObjectTest extends AbstractCOSClientTest {
             return;
         }
         ListObjectsRequest listObjectsRequest =
-                new ListObjectsRequest(bucket, "/" + keyPrefix, null, "/", 100);
+                new ListObjectsRequest(bucket, keyPrefix, null, "/", 100);
         ObjectListing objectListing = cosclient.listObjects(listObjectsRequest);
         assertEquals(1L, objectListing.getCommonPrefixes().size());
         assertEquals(0L, objectListing.getObjectSummaries().size());
     }
+    
+    @Test
+    public void ListObjectStartWithNoMaxKey() {
+        if (!judgeUserInfoValid()) {
+            return;
+        }
+        ListObjectsRequest listObjectsRequest =
+                new ListObjectsRequest().withBucketName(bucket).withDelimiter("/");
+        ObjectListing objectListing = cosclient.listObjects(listObjectsRequest);
+        assertEquals(1L, objectListing.getCommonPrefixes().size());
+        assertEquals(0L, objectListing.getObjectSummaries().size());
+    }    
 
     @Test
     public void ListNextBatchObjectWithNoTrunCated() {

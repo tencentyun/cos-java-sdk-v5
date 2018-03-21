@@ -46,6 +46,8 @@ public class GeneratePresignedUrlDemo {
 
         URL url = cosclient.generatePresignedUrl(req);
         System.out.println(url.toString());
+        
+        cosclient.shutdown();
     }
 
     // 获取预签名的下载链接, 并设置返回的content-type, cache-control等http头
@@ -83,6 +85,8 @@ public class GeneratePresignedUrlDemo {
         URL url = cosclient.generatePresignedUrl(req);
 
         System.out.println(url.toString());
+        
+        cosclient.shutdown();
     }
 
     // 获取预签名的下载链接， 用于匿名bucket, 匿名bucket生成的预下载链接不包含签名
@@ -135,6 +139,9 @@ public class GeneratePresignedUrlDemo {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        
+        cosclient.shutdown();
     }
+    
 
 }

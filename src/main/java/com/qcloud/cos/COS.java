@@ -33,6 +33,7 @@ import com.qcloud.cos.model.DeleteBucketRequest;
 import com.qcloud.cos.model.DeleteObjectRequest;
 import com.qcloud.cos.model.DeleteObjectsRequest;
 import com.qcloud.cos.model.DeleteObjectsResult;
+import com.qcloud.cos.model.DeleteVersionRequest;
 import com.qcloud.cos.model.GeneratePresignedUrlRequest;
 import com.qcloud.cos.model.GetBucketAclRequest;
 import com.qcloud.cos.model.GetBucketCrossOriginConfigurationRequest;
@@ -50,14 +51,17 @@ import com.qcloud.cos.model.InitiateMultipartUploadResult;
 import com.qcloud.cos.model.ListBucketsRequest;
 import com.qcloud.cos.model.ListMultipartUploadsRequest;
 import com.qcloud.cos.model.ListNextBatchOfObjectsRequest;
+import com.qcloud.cos.model.ListNextBatchOfVersionsRequest;
 import com.qcloud.cos.model.ListObjectsRequest;
 import com.qcloud.cos.model.ListPartsRequest;
+import com.qcloud.cos.model.ListVersionsRequest;
 import com.qcloud.cos.model.MultipartUploadListing;
 import com.qcloud.cos.model.ObjectListing;
 import com.qcloud.cos.model.ObjectMetadata;
 import com.qcloud.cos.model.PartListing;
 import com.qcloud.cos.model.PutObjectRequest;
 import com.qcloud.cos.model.PutObjectResult;
+import com.qcloud.cos.model.RestoreObjectRequest;
 import com.qcloud.cos.model.SetBucketAclRequest;
 import com.qcloud.cos.model.SetBucketCrossOriginConfigurationRequest;
 import com.qcloud.cos.model.SetBucketLifecycleConfigurationRequest;
@@ -66,15 +70,18 @@ import com.qcloud.cos.model.SetBucketVersioningConfigurationRequest;
 import com.qcloud.cos.model.SetObjectAclRequest;
 import com.qcloud.cos.model.UploadPartRequest;
 import com.qcloud.cos.model.UploadPartResult;
+import com.qcloud.cos.model.VersionListing;
 
 public interface COS {
 
     /**
-     * return the client config. client config include the region info, default expired sign time, etc.
+     * return the client config. client config include the region info, default expired sign time,
+     * etc.
+     * 
      * @return ClientConfig.
      */
     public ClientConfig getClientConfig();
-    
+
     /**
      * <p>
      * Uploads a new object to the specified bucket. The <code>PutObjectRequest</code> contains all
@@ -466,6 +473,66 @@ public interface COS {
             throws CosClientException, CosServiceException;
 
     /**
+     * <p>
+     * Deletes a specific version of the specified object in the specified bucket. Once deleted,
+     * there is no method to restore or undelete an object version. This is the only way to
+     * permanently delete object versions that are protected by versioning.
+     * </p>
+     * <p>
+     * Deleting an object version is permanent and irreversible. It is a privileged operation that
+     * only the owner of the bucket containing the version can perform.
+     * </p>
+     * <p>
+     * Users can only delete a version of an object if versioning is enabled for the bucket. For
+     * more information about enabling versioning for a bucket, see
+     * {@link #setBucketVersioningConfiguration(SetBucketVersioningConfigurationRequest)}.
+     * </p>
+     * <p>
+     * If attempting to delete an object that does not exist, COS will return a success message
+     * instead of an error message.
+     * </p>
+     * 
+     * @param bucketName The name of the COS bucket containing the object to delete.
+     * @param key The key of the object to delete.
+     * @param versionId The version of the object to delete.
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * @throws CosServiceException If any errors occurred in while processing the request.
+     */
+    public void deleteVersion(String bucketName, String key, String versionId)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * <p>
+     * Deletes a specific version of the specified object in the specified bucket. Once deleted,
+     * there is no method to restore or undelete an object version. This is the only way to
+     * permanently delete object versions that are protected by versioning.
+     * </p>
+     * <p>
+     * Deleting an object version is permanent and irreversible. It is a privileged operation that
+     * only the owner of the bucket containing the version can perform.
+     * </p>
+     * <p>
+     * Users can only delete a version of an object if versioning is enabled for the bucket. For
+     * more information about enabling versioning for a bucket, see
+     * {@link #setBucketVersioningConfiguration(SetBucketVersioningConfigurationRequest)}.
+     * </p>
+     * <p>
+     * If attempting to delete an object that does not exist, COS will return a success message
+     * instead of an error message.
+     * </p>
+     * 
+     * @param deleteVersionRequest The request object containing all options for deleting a specific
+     *        version of an COS object.
+     * 
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * @throws CosServiceException If any errors occurred in while processing the request.
+     */
+    public void deleteVersion(DeleteVersionRequest deleteVersionRequest)
+            throws CosClientException, CosServiceException;;
+
+    /**
      * Deletes multiple objects in a single bucket from COS.
      * <p>
      * In some cases, some objects will be successfully deleted, while some attempts will cause an
@@ -481,6 +548,8 @@ public interface COS {
      */
     public DeleteObjectsResult deleteObjects(DeleteObjectsRequest deleteObjectsRequest)
             throws MultiObjectDeleteException, CosClientException, CosServiceException;
+
+
 
     /**
      * <p>
@@ -1069,6 +1138,242 @@ public interface COS {
      */
     public ObjectListing listNextBatchOfObjects(
             ListNextBatchOfObjectsRequest listNextBatchOfObjectsRequest)
+                    throws CosClientException, CosServiceException;
+
+    /**
+     * <p>
+     * Returns a list of summary information about the versions in the specified bucket.
+     * </p>
+     * <p>
+     * The returned version summaries are ordered first by key and then by version. Keys are sorted
+     * lexicographically (alphabetically) while versions are sorted from most recent to least
+     * recent. Both versions with data and delete markers are included in the results.
+     * </p>
+     * <p>
+     * Because buckets can contain a virtually unlimited number of versions, the complete results of
+     * a list query can be extremely large. To manage large result sets, COS uses pagination to
+     * split them into multiple responses. Always check the {@link VersionListing#isTruncated()}
+     * method to determine if the returned listing is complete or if additional calls are needed to
+     * get more results. Callers are encouraged to use
+     * {@link COS#listNextBatchOfVersions(VersionListing)} as an easy way to get the next page of
+     * results.
+     * </p>
+     * <p>
+     * For more information about enabling versioning for a bucket, see
+     * {@link #setBucketVersioningConfiguration(SetBucketVersioningConfigurationRequest)}.
+     * </p>
+     *
+     * @param bucketName The name of the COS bucket whose versions are to be listed.
+     * @param prefix An optional parameter restricting the response to keys beginning with the
+     *        specified prefix. Use prefixes to separate a bucket into different sets of keys,
+     *        similar to how a file system organizes files into directories.
+     *
+     * @return A listing of the versions in the specified bucket, along with any other associated
+     *         information and original request parameters.
+     *
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * 
+     * @throws CosServiceException If any errors occurred in while processing the request.
+     *
+     * @see COS#listVersions(ListVersionsRequest)
+     * @see COS#listVersions(String, String, String, String, String, Integer)
+     */
+    public VersionListing listVersions(String bucketName, String prefix)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * <p>
+     * Returns a list of summary information about the versions in the specified bucket.
+     * </p>
+     * <p>
+     * The returned version summaries are ordered first by key and then by version. Keys are sorted
+     * lexicographically (alphabetically) while versions are sorted from most recent to least
+     * recent. Both versions with data and delete markers are included in the results.
+     * </p>
+     * <p>
+     * Because buckets can contain a virtually unlimited number of versions, the complete results of
+     * a list query can be extremely large. To manage large result sets, COS uses pagination to
+     * split them into multiple responses. Always check the {@link VersionListing#isTruncated()}
+     * method to determine if the returned listing is complete or if additional calls are needed to
+     * get more results. Callers are encouraged to use
+     * {@link COS#listNextBatchOfVersions(VersionListing)} as an easy way to get the next page of
+     * results.
+     * </p>
+     * <p>
+     * For more information about enabling versioning for a bucket, see
+     * {@link #setBucketVersioningConfiguration(SetBucketVersioningConfigurationRequest)}.
+     * </p>
+     * 
+     * @param bucketName The name of the QCloud COS bucket whose versions are to be listed.
+     * @param prefix An optional parameter restricting the response to keys that begin with the
+     *        specified prefix. Use prefixes to separate a bucket into different sets of keys,
+     *        similar to how a file system organizes files into directories.
+     * @param keyMarker Optional parameter indicating where in the sorted list of all versions in
+     *        the specified bucket to begin returning results. Results are always ordered first
+     *        lexicographically (i.e. alphabetically) and then from most recent version to least
+     *        recent version. If a keyMarker is used without a versionIdMarker, results begin
+     *        immediately after that key's last version. When a keyMarker is used with a
+     *        versionIdMarker, results begin immediately after the version with the specified key
+     *        and version ID.
+     *        <p>
+     *        This enables pagination; to get the next page of results use the next key marker and
+     *        next version ID marker (from {@link VersionListing#getNextKeyMarker()} and
+     *        {@link VersionListing#getNextVersionIdMarker()}) as the markers for the next request
+     *        to list versions, or use the convenience method
+     *        {@link COS#listNextBatchOfVersions(VersionListing)}
+     * @param versionIdMarker Optional parameter indicating where in the sorted list of all versions
+     *        in the specified bucket to begin returning results. Results are always ordered first
+     *        lexicographically (i.e. alphabetically) and then from most recent version to least
+     *        recent version. A keyMarker must be specified when specifying a versionIdMarker.
+     *        Results begin immediately after the version with the specified key and version ID.
+     *        <p>
+     *        This enables pagination; to get the next page of results use the next key marker and
+     *        next version ID marker (from {@link VersionListing#getNextKeyMarker()} and
+     *        {@link VersionListing#getNextVersionIdMarker()}) as the markers for the next request
+     *        to list versions, or use the convenience method
+     *        {@link COS#listNextBatchOfVersions(VersionListing)}
+     * @param delimiter Optional parameter that causes keys that contain the same string between the
+     *        prefix and the first occurrence of the delimiter to be rolled up into a single result
+     *        element in the {@link VersionListing#getCommonPrefixes()} list. These rolled-up keys
+     *        are not returned elsewhere in the response. The most commonly used delimiter is "/",
+     *        which simulates a hierarchical organization similar to a file system directory
+     *        structure.
+     * @param maxResults Optional parameter indicating the maximum number of results to include in
+     *        the response. QCloud COS might return fewer than this, but will not return more. Even
+     *        if maxKeys is not specified, QCloud COS will limit the number of results in the
+     *        response.
+     *
+     * @return A listing of the versions in the specified bucket, along with any other associated
+     *         information and original request parameters.
+     *
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * 
+     * @throws CosServiceException If any errors occurred in while processing the request.
+     *
+     * @see COS#listVersions(ListVersionsRequest)
+     * @see COS#listVersions(String, String)
+     */
+    public VersionListing listVersions(String bucketName, String prefix, String keyMarker,
+            String versionIdMarker, String delimiter, Integer maxResults)
+                    throws CosClientException, CosServiceException;
+
+    /**
+     * <p>
+     * Returns a list of summary information about the versions in the specified bucket.
+     * </p>
+     * <p>
+     * The returned version summaries are ordered first by key and then by version. Keys are sorted
+     * lexicographically (alphabetically) while versions are sorted from most recent to least
+     * recent. Both versions with data and delete markers are included in the results.
+     * </p>
+     * <p>
+     * Because buckets can contain a virtually unlimited number of versions, the complete results of
+     * a list query can be extremely large. To manage large result sets, COS uses pagination to
+     * split them into multiple responses. Always check the {@link VersionListing#isTruncated()}
+     * method to determine if the returned listing is complete or if additional calls are needed to
+     * get more results. Callers are encouraged to use
+     * {@link COS#listNextBatchOfVersions(VersionListing)} as an easy way to get the next page of
+     * results.
+     * </p>
+     * <p>
+     * For more information about enabling versioning for a bucket, see
+     * {@link #setBucketVersioningConfiguration(SetBucketVersioningConfigurationRequest)}.
+     * </p>
+     * 
+     * @param listVersionsRequest The request object containing all options for listing the versions
+     *        in a specified bucket.
+     *
+     * @return A listing of the versions in the specified bucket, along with any other associated
+     *         information and original request parameters.
+     *
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * 
+     * @throws CosServiceException If any errors occurred in while processing the request.
+     *
+     * @see COS#listVersions(String, String, String, String, String, Integer)
+     * @see COS#listVersions(String, String)
+     */
+    public VersionListing listVersions(ListVersionsRequest listVersionsRequest)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * <p>
+     * Provides an easy way to continue a truncated {@link VersionListing} and retrieve the next
+     * page of results.
+     * </p>
+     * <p>
+     * Obtain the initial <code>VersionListing</code> from one of the <code>listVersions</code>
+     * methods. If the result is truncated (indicated when {@link VersionListing#isTruncated()}
+     * returns <code>true</code>), pass the <code>VersionListing</code> back into this method in
+     * order to retrieve the next page of results. From there, continue using this method to
+     * retrieve more results until the returned <code>VersionListing</code> indicates that it is not
+     * truncated.
+     * </p>
+     * <p>
+     * For more information about enabling versioning for a bucket, see
+     * {@link #setBucketVersioningConfiguration(SetBucketVersioningConfigurationRequest)}.
+     * </p>
+     *
+     * @param previousVersionListing The previous truncated <code>VersionListing</code>. If a
+     *        non-truncated <code>VersionListing</code> is passed in, an empty
+     *        <code>VersionListing</code> is returned without ever contacting COS.
+     *
+     * @return The next set of <code>VersionListing</code> results, beginning immediately after the
+     *         last result in the specified previous <code>VersionListing</code>.
+     *
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * 
+     * @throws CosServiceException If any errors occurred in while processing the request.
+     * @see COS#listVersions(String, String)
+     * @see COS#listVersions(ListVersionsRequest)
+     * @see COS#listVersions(String, String, String, String, String, Integer)
+     * @see COS#listNextBatchOfVersions(ListNextBatchOfVersionsRequest)
+     */
+    public VersionListing listNextBatchOfVersions(VersionListing previousVersionListing)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * <p>
+     * Provides an easy way to continue a truncated {@link VersionListing} and retrieve the next
+     * page of results.
+     * </p>
+     * <p>
+     * Obtain the initial <code>VersionListing</code> from one of the <code>listVersions</code>
+     * methods. If the result is truncated (indicated when {@link VersionListing#isTruncated()}
+     * returns <code>true</code>), pass the <code>VersionListing</code> back into this method in
+     * order to retrieve the next page of results. From there, continue using this method to
+     * retrieve more results until the returned <code>VersionListing</code> indicates that it is not
+     * truncated.
+     * </p>
+     * <p>
+     * For more information about enabling versioning for a bucket, see
+     * {@link #setBucketVersioningConfiguration(SetBucketVersioningConfigurationRequest)}.
+     * </p>
+     *
+     * @param listNextBatchOfVersionsRequest The request object for listing next batch of versions
+     *        using the previous truncated <code>VersionListing</code>. If a non-truncated
+     *        <code>VersionListing</code> is passed in by the request object, an empty
+     *        <code>VersionListing</code> is returned without ever contacting COS.
+     *
+     *
+     * @return The next set of <code>VersionListing</code> results, beginning immediately after the
+     *         last result in the specified previous <code>VersionListing</code>.
+     *
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * 
+     * @throws CosServiceException If any errors occurred in while processing the request.
+     * @see COS#listVersions(String, String)
+     * @see COS#listVersions(ListVersionsRequest)
+     * @see COS#listVersions(String, String, String, String, String, Integer)
+     * @see COS#listNextBatchOfVersions(VersionListing)
+     */
+    public VersionListing listNextBatchOfVersions(
+            ListNextBatchOfVersionsRequest listNextBatchOfVersionsRequest)
                     throws CosClientException, CosServiceException;
 
     /**
@@ -1818,12 +2123,12 @@ public interface COS {
      *         user of the URL to know the account's credentials.
      * @throws CosClientException If any errors are encountered in the client while making the
      *         request or handling the response.
-     *         
+     * 
      * @see COS#generatePresignedUrl(String, String, Date)
      * @see COS#generatePresignedUrl(String, String, Date, HttpMethodName)
      */
-    public URL generatePresignedUrl(String bucketName, String key, Date expiration, HttpMethodName method)
-            throws CosClientException;
+    public URL generatePresignedUrl(String bucketName, String key, Date expiration,
+            HttpMethodName method) throws CosClientException;
 
     /**
      * <p>
@@ -1859,6 +2164,44 @@ public interface COS {
      */
     public URL generatePresignedUrl(GeneratePresignedUrlRequest generatePresignedUrlRequest)
             throws CosClientException;
+
+    /**
+     * Restore an object, which was transitioned to CAS from COS when it was expired, into COS
+     * again. This copy is by nature temporary and is always stored as temporary copy in COS. The
+     * customer will be able to set / re-adjust the lifetime of this copy. By re-adjust we mean the
+     * customer can call this API to shorten or extend the lifetime of the copy. Note the request
+     * will only be accepted when there is no ongoing restore request. One needs to have the new
+     * cos:RestoreObject permission to perform this operation.
+     *
+     * @param request The request object containing all the options for restoring an COS object.
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * @throws CosServiceException If any errors occurred in COS while processing the request.
+     */
+    public void restoreObject(RestoreObjectRequest request)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * Restore an object, which was transitioned to CAS from COS when it was expired, into COS
+     * again. This copy is by nature temporary and is always stored as temporary copy in COS. The
+     * customer will be able to set / re-adjust the lifetime of this copy. By re-adjust we mean the
+     * customer can call this API to shorten or extend the lifetime of the copy. Note the request
+     * will only be accepted when there is no ongoing restore request. One needs to have the new
+     * cos:RestoreObject permission to perform this operation.
+     *
+     * @param bucketName
+     *            The name of an existing bucket.
+     * @param key
+     *            The key under which to store the specified file.
+     * @param expirationInDays
+     *            The number of days after which the object will expire.
+     *            
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * @throws CosServiceException If any errors occurred in COS while processing the request.
+     */
+    public void restoreObject(String bucketName, String key, int expirationInDays)
+            throws CosClientException, CosServiceException;
 
 }
 

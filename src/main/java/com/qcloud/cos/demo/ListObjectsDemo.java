@@ -1,9 +1,6 @@
 package com.qcloud.cos.demo;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.List;
-
 
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.ClientConfig;
@@ -22,26 +19,23 @@ import com.qcloud.cos.region.Region;
 public class ListObjectsDemo {
 
     public static void listObjectsDemo() {
-        // 1 初始化用户身份信息(secretId, secretKey)
+        // 1 初始化用户身份信息(appid, secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
         ClientConfig clientConfig = new ClientConfig(new Region("ap-beijing-1"));
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
-        // bucket名需包含appid
+        // bucket名称, 需包含appid
         String bucketName = "mybucket-1251668577";
 
         ListObjectsRequest listObjectsRequest = new ListObjectsRequest();
         // 设置bucket名称
         listObjectsRequest.setBucketName(bucketName);
         // prefix表示列出的object的key以prefix开始
-        listObjectsRequest.setPrefix("aaa/bbb");
-        // deliter表示分隔符, 设置为/表示列出当前目录下的object, 设置为空表示列出所有的object
-        listObjectsRequest.setDelimiter("");
-        // 如果object的路径中含有特殊字符, 建议使用url编码方式, 得到object的key后, 需要进行url decode
-        listObjectsRequest.setEncodingType("url");
+        listObjectsRequest.setPrefix("");
         // 设置最大遍历出多少个对象, 一次listobject最大支持1000
         listObjectsRequest.setMaxKeys(1000);
+        // listObjectsRequest.setDelimiter("/");
         ObjectListing objectListing = null;
         try {
             objectListing = cosclient.listObjects(listObjectsRequest);
@@ -58,18 +52,14 @@ public class ListObjectsDemo {
         for (COSObjectSummary cosObjectSummary : cosObjectSummaries) {
             // 文件的路径key
             String key = cosObjectSummary.getKey();
-            // 如果使用的encodingtype是url, 则进行url decode
-            try {
-                key = URLDecoder.decode(key, "utf-8");
-            } catch (UnsupportedEncodingException e) {
-                continue;
-            }
             // 文件的etag
             String etag = cosObjectSummary.getETag();
             // 文件的长度
             long fileSize = cosObjectSummary.getSize();
             // 文件的存储类型
             String storageClasses = cosObjectSummary.getStorageClass();
+
+            System.out.println("key: " + key);
         }
 
         cosclient.shutdown();
@@ -91,11 +81,9 @@ public class ListObjectsDemo {
         // 设置bucket名称
         listObjectsRequest.setBucketName(bucketName);
         // prefix表示列出的object的key以prefix开始
-        listObjectsRequest.setPrefix("aaa/bbb");
+        listObjectsRequest.setPrefix("");
         // deliter表示分隔符, 设置为/表示列出当前目录下的object, 设置为空表示列出所有的object
         listObjectsRequest.setDelimiter("");
-        // 如果object的路径中含有特殊字符, 建议使用url编码方式, 得到object的key后, 需要进行url decode
-        listObjectsRequest.setEncodingType("url");
         // 设置最大遍历出多少个对象, 一次listobject最大支持1000
         listObjectsRequest.setMaxKeys(1000);
         ObjectListing objectListing = null;
@@ -118,12 +106,6 @@ public class ListObjectsDemo {
             for (COSObjectSummary cosObjectSummary : cosObjectSummaries) {
                 // 文件的路径key
                 String key = cosObjectSummary.getKey();
-                // 如果使用的encodingtype是url, 则进行url decode
-                try {
-                    key = URLDecoder.decode(key, "utf-8");
-                } catch (UnsupportedEncodingException e) {
-                    continue;
-                }
                 // 文件的etag
                 String etag = cosObjectSummary.getETag();
                 // 文件的长度
@@ -131,10 +113,16 @@ public class ListObjectsDemo {
                 // 文件的存储类型
                 String storageClasses = cosObjectSummary.getStorageClass();
             }
+
             String nextMarker = objectListing.getNextMarker();
             listObjectsRequest.setMarker(nextMarker);
         } while (objectListing.isTruncated());
 
         cosclient.shutdown();
     }
+
+    public static void main(String[] args) {
+        listAllObjects();
+    }
+
 }

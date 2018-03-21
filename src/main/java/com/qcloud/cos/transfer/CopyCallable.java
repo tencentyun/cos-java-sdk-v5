@@ -30,8 +30,7 @@ import com.qcloud.cos.transfer.Transfer.TransferState;
 public class CopyCallable implements Callable<CopyResult> {
 
     /**
-     * A reference to the COS client using which copy or copy part
-     * requests are initiated.
+     * A reference to the COS client using which copy or copy part requests are initiated.
      */
     private final COS cos;
     /** Thread pool used during multi-part copy is performed. */
@@ -46,20 +45,18 @@ public class CopyCallable implements Callable<CopyResult> {
 
     private static final Log log = LogFactory.getLog(CopyCallable.class);
     /**
-     * <code>TransferManager</code> configuration that provides details on when
-     * to use multi-part copy, part size etc.,
+     * <code>TransferManager</code> configuration that provides details on when to use multi-part
+     * copy, part size etc.,
      */
     private final TransferManagerConfiguration configuration;
     /**
-     * A list of future objects to be returned when multi-part copy is
-     * initiated.
+     * A list of future objects to be returned when multi-part copy is initiated.
      */
     private final List<Future<PartETag>> futures = new ArrayList<Future<PartETag>>();
 
     private final ProgressListenerChain listenerChain;
 
-    public CopyCallable(TransferManager transferManager,
-            ExecutorService threadPool, CopyImpl copy,
+    public CopyCallable(TransferManager transferManager, ExecutorService threadPool, CopyImpl copy,
             CopyObjectRequest copyObjectRequest, ObjectMetadata metadata,
             ProgressListenerChain progressListenerChain) {
         this.cos = transferManager.getCOSClient();
@@ -96,8 +93,7 @@ public class CopyCallable implements Callable<CopyResult> {
                 return false;
             }
         }
-        return (metadata.getContentLength() > configuration
-                .getMultipartCopyThreshold());
+        return (metadata.getContentLength() > configuration.getMultipartCopyThreshold());
     }
 
     public CopyResult call() throws Exception {
@@ -112,9 +108,8 @@ public class CopyCallable implements Callable<CopyResult> {
     }
 
     /**
-     * Performs the copy of the COS object from source bucket to
-     * destination bucket. The COS object is copied to destination in one
-     * single request.
+     * Performs the copy of the COS object from source bucket to destination bucket. The COS object
+     * is copied to destination in one single request.
      *
      * @returns CopyResult response information from the server.
      */
@@ -124,22 +119,21 @@ public class CopyCallable implements Callable<CopyResult> {
         CopyResult copyResult = new CopyResult();
         copyResult.setSourceBucketName(copyObjectRequest.getSourceBucketName());
         copyResult.setSourceKey(copyObjectRequest.getSourceKey());
-        copyResult.setDestinationBucketName(copyObjectRequest
-                .getDestinationBucketName());
+        copyResult.setDestinationBucketName(copyObjectRequest.getDestinationBucketName());
         copyResult.setDestinationKey(copyObjectRequest.getDestinationKey());
         copyResult.setETag(copyObjectResult.getETag());
         copyResult.setVersionId(copyObjectResult.getVersionId());
+        copyResult.setRequestId(copyObjectResult.getRequestId());
+        copyResult.setDateStr(copyObjectResult.getDateStr());
         return copyResult;
     }
 
     /**
-     * Performs the copy of an COS object from source bucket to
-     * destination bucket as multiple copy part requests. The information about
-     * the part to be copied is specified in the request as a byte range
-     * (first-last)
+     * Performs the copy of an COS object from source bucket to destination bucket as multiple copy
+     * part requests. The information about the part to be copied is specified in the request as a
+     * byte range (first-last)
      *
-     * @throws Exception
-     *             Any Exception that occurs while carrying out the request.
+     * @throws Exception Any Exception that occurs while carrying out the request.
      */
     private void copyInParts() throws Exception {
         multipartUploadId = initiateMultipartUpload(copyObjectRequest);
@@ -147,9 +141,8 @@ public class CopyCallable implements Callable<CopyResult> {
         long optimalPartSize = getOptimalPartSize(metadata.getContentLength());
 
         try {
-            CopyPartRequestFactory requestFactory = new CopyPartRequestFactory(
-                    copyObjectRequest, multipartUploadId, optimalPartSize,
-                    metadata.getContentLength());
+            CopyPartRequestFactory requestFactory = new CopyPartRequestFactory(copyObjectRequest,
+                    multipartUploadId, optimalPartSize, metadata.getContentLength());
             copyPartsInParallel(requestFactory);
         } catch (Exception e) {
             publishProgress(listenerChain, ProgressEventType.TRANSFER_FAILED_EVENT);
@@ -163,22 +156,20 @@ public class CopyCallable implements Callable<CopyResult> {
      */
     private long getOptimalPartSize(long contentLengthOfSource) {
 
-        long optimalPartSize = TransferManagerUtils
-                .calculateOptimalPartSizeForCopy(copyObjectRequest,
-                        configuration, contentLengthOfSource);
+        long optimalPartSize = TransferManagerUtils.calculateOptimalPartSizeForCopy(
+                copyObjectRequest, configuration, contentLengthOfSource);
         log.debug("Calculated optimal part size: " + optimalPartSize);
         return optimalPartSize;
     }
 
     /**
-     * Submits a callable for each part to be copied to our thread pool and
-     * records its corresponding Future.
+     * Submits a callable for each part to be copied to our thread pool and records its
+     * corresponding Future.
      */
     private void copyPartsInParallel(CopyPartRequestFactory requestFactory) {
         while (requestFactory.hasMoreRequests()) {
             if (threadPool.isShutdown())
-                throw new CancellationException(
-                        "TransferManager has been shutdown");
+                throw new CancellationException("TransferManager has been shutdown");
             CopyPartRequest request = requestFactory.getNextCopyPartRequest();
             futures.add(threadPool.submit(new CopyPartCallable(cos, request)));
         }
@@ -189,20 +180,19 @@ public class CopyCallable implements Callable<CopyResult> {
      */
     private String initiateMultipartUpload(CopyObjectRequest origReq) {
 
-        InitiateMultipartUploadRequest req = new InitiateMultipartUploadRequest(
-                origReq.getDestinationBucketName(),
-                origReq.getDestinationKey()).withCannedACL(
-                origReq.getCannedAccessControlList())
-                .withAccessControlList(origReq.getAccessControlList())
-                .withStorageClass(origReq.getStorageClass())
-                .withGeneralProgressListener(origReq.getGeneralProgressListener())
-           ;
+        InitiateMultipartUploadRequest req =
+                new InitiateMultipartUploadRequest(origReq.getDestinationBucketName(),
+                        origReq.getDestinationKey())
+                                .withCannedACL(origReq.getCannedAccessControlList())
+                                .withAccessControlList(origReq.getAccessControlList())
+                                .withStorageClass(origReq.getStorageClass())
+                                .withGeneralProgressListener(origReq.getGeneralProgressListener());
 
         ObjectMetadata newObjectMetadata = origReq.getNewObjectMetadata();
-        if (newObjectMetadata == null){
+        if (newObjectMetadata == null) {
             newObjectMetadata = new ObjectMetadata();
         }
-        if (newObjectMetadata.getContentType() == null){
+        if (newObjectMetadata.getContentType() == null) {
             newObjectMetadata.setContentType(metadata.getContentType());
         }
 
@@ -217,14 +207,15 @@ public class CopyCallable implements Callable<CopyResult> {
 
     private void abortMultipartCopy() {
         try {
-            AbortMultipartUploadRequest abortRequest = new AbortMultipartUploadRequest(
-                    copyObjectRequest.getDestinationBucketName(),
-                    copyObjectRequest.getDestinationKey(), multipartUploadId);
+            AbortMultipartUploadRequest abortRequest =
+                    new AbortMultipartUploadRequest(copyObjectRequest.getDestinationBucketName(),
+                            copyObjectRequest.getDestinationKey(), multipartUploadId);
             cos.abortMultipartUpload(abortRequest);
         } catch (Exception e) {
             log.info(
                     "Unable to abort multipart upload, you may need to manually remove uploaded parts: "
-                            + e.getMessage(), e);
+                            + e.getMessage(),
+                    e);
         }
     }
 }

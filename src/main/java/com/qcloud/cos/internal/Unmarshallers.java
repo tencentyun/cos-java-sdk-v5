@@ -15,6 +15,7 @@ import com.qcloud.cos.model.InitiateMultipartUploadResult;
 import com.qcloud.cos.model.MultipartUploadListing;
 import com.qcloud.cos.model.ObjectListing;
 import com.qcloud.cos.model.PartListing;
+import com.qcloud.cos.model.VersionListing;
 
 
 /*** Collection of unmarshallers for COS XML responses. */
@@ -47,22 +48,35 @@ public class Unmarshallers {
      */
     public static final class ListObjectsUnmarshaller
             implements Unmarshaller<ObjectListing, InputStream> {
+        private final boolean shouldSDKDecodeResponse;
+
+        public ListObjectsUnmarshaller(final boolean shouldSDKDecodeResponse) {
+            this.shouldSDKDecodeResponse = shouldSDKDecodeResponse;
+        }
+
         public ObjectListing unmarshall(InputStream in) throws Exception {
-            return new XmlResponsesSaxParser().parseListBucketObjectsResponse(in)
-                    .getObjectListing();
+            return new XmlResponsesSaxParser()
+                    .parseListBucketObjectsResponse(in, shouldSDKDecodeResponse).getObjectListing();
         }
     }
-    //
-    // /**
-    // * Unmarshaller for the ListVersions XML response.
-    // */
-    // public static final class VersionListUnmarshaller
-    // implements Unmarshaller<VersionListing, InputStream> {
-    // public VersionListing unmarshall(InputStream in) throws Exception {
-    // return new XmlResponsesSaxParser().parseListVersionsResponse(in).getListing();
-    // }
-    // }
-    //
+
+    /**
+     * Unmarshaller for the ListVersions XML response.
+     */
+    public static final class VersionListUnmarshaller
+            implements Unmarshaller<VersionListing, InputStream> {
+        
+        private final boolean shouldSDKDecodeResponse;
+
+        public VersionListUnmarshaller(final boolean shouldSDKDecodeResponse) {
+            this.shouldSDKDecodeResponse = shouldSDKDecodeResponse;
+        }
+        
+        public VersionListing unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser().parseListVersionsResponse(in, shouldSDKDecodeResponse).getListing();
+        }
+    }
+
     /**
      * Unmarshaller for the AccessControlList XML response.
      */

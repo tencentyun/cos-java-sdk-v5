@@ -62,6 +62,7 @@ import com.qcloud.cos.internal.ServiceClientHolderInputStream;
 import com.qcloud.cos.internal.SkipMd5CheckStrategy;
 import com.qcloud.cos.internal.Unmarshaller;
 import com.qcloud.cos.internal.Unmarshallers;
+import com.qcloud.cos.internal.VIDResultHandler;
 import com.qcloud.cos.internal.VoidCosResponseHandler;
 import com.qcloud.cos.internal.XmlResponsesSaxParser.CompleteMultipartUploadHandler;
 import com.qcloud.cos.internal.XmlResponsesSaxParser.CopyObjectResultHandler;
@@ -92,6 +93,7 @@ import com.qcloud.cos.model.DeleteBucketRequest;
 import com.qcloud.cos.model.DeleteObjectRequest;
 import com.qcloud.cos.model.DeleteObjectsRequest;
 import com.qcloud.cos.model.DeleteObjectsResult;
+import com.qcloud.cos.model.DeleteVersionRequest;
 import com.qcloud.cos.model.GeneratePresignedUrlRequest;
 import com.qcloud.cos.model.GenericBucketRequest;
 import com.qcloud.cos.model.GetBucketAclRequest;
@@ -113,8 +115,10 @@ import com.qcloud.cos.model.InitiateMultipartUploadResult;
 import com.qcloud.cos.model.ListBucketsRequest;
 import com.qcloud.cos.model.ListMultipartUploadsRequest;
 import com.qcloud.cos.model.ListNextBatchOfObjectsRequest;
+import com.qcloud.cos.model.ListNextBatchOfVersionsRequest;
 import com.qcloud.cos.model.ListObjectsRequest;
 import com.qcloud.cos.model.ListPartsRequest;
+import com.qcloud.cos.model.ListVersionsRequest;
 import com.qcloud.cos.model.MultipartUploadListing;
 import com.qcloud.cos.model.ObjectListing;
 import com.qcloud.cos.model.ObjectMetadata;
@@ -123,6 +127,7 @@ import com.qcloud.cos.model.Permission;
 import com.qcloud.cos.model.PutObjectRequest;
 import com.qcloud.cos.model.PutObjectResult;
 import com.qcloud.cos.model.ResponseHeaderOverrides;
+import com.qcloud.cos.model.RestoreObjectRequest;
 import com.qcloud.cos.model.SetBucketAclRequest;
 import com.qcloud.cos.model.SetBucketCrossOriginConfigurationRequest;
 import com.qcloud.cos.model.SetBucketLifecycleConfigurationRequest;
@@ -131,6 +136,7 @@ import com.qcloud.cos.model.SetBucketVersioningConfigurationRequest;
 import com.qcloud.cos.model.SetObjectAclRequest;
 import com.qcloud.cos.model.UploadPartRequest;
 import com.qcloud.cos.model.UploadPartResult;
+import com.qcloud.cos.model.VersionListing;
 import com.qcloud.cos.region.Region;
 import com.qcloud.cos.utils.Base64;
 import com.qcloud.cos.utils.BinaryUtils;
@@ -396,7 +402,7 @@ public class COSClient implements COS {
     // 格式化bucket, 是bucket返回带appid
     private String formatBucket(String bucketName, String appid) throws CosClientException {
         if (appid == null) {
-            String parrtern = ".*-(125|100)[0-9]{3,}$";
+            String parrtern = ".*-(125|100|20)[0-9]{3,}$";
             if (Pattern.matches(parrtern, bucketName)) {
                 return bucketName;
             } else {
@@ -460,11 +466,27 @@ public class COSClient implements COS {
 
     private static PutObjectResult createPutObjectResult(ObjectMetadata metadata) {
         final PutObjectResult result = new PutObjectResult();
+        result.setRequestId((String)metadata.getRawMetadataValue(Headers.REQUEST_ID));
+        result.setDateStr((String)metadata.getRawMetadataValue(Headers.DATE));
         result.setVersionId(metadata.getVersionId());
         result.setETag(metadata.getETag());
         result.setExpirationTime(metadata.getExpirationTime());
         result.setMetadata(metadata);
         return result;
+    }
+
+    /**
+     * Adds the specified parameter to the specified request, if the parameter value is not null.
+     *
+     * @param request The request to add the parameter to.
+     * @param paramName The parameter name.
+     * @param paramValue The parameter value.
+     */
+    private static void addParameterIfNotNull(CosHttpRequest<?> request, String paramName,
+            String paramValue) {
+        if (paramValue != null) {
+            request.addParameter(paramName, paramValue);
+        }
     }
 
     /**
@@ -746,9 +768,7 @@ public class COSClient implements COS {
 
         CosHttpRequest<GetObjectRequest> request = createRequest(getObjectRequest.getBucketName(),
                 getObjectRequest.getKey(), getObjectRequest, HttpMethodName.GET);
-        if (getObjectRequest.getVersionId() != null) {
-            request.addParameter("versionId", getObjectRequest.getVersionId());
-        }
+        addParameterIfNotNull(request, "versionId", getObjectRequest.getVersionId());
 
         // Range
         long[] range = getObjectRequest.getRange();
@@ -876,7 +896,6 @@ public class COSClient implements COS {
 
         String bucketName = getObjectMetadataRequest.getBucketName();
         String key = getObjectMetadataRequest.getKey();
-        String versionId = getObjectMetadataRequest.getVersionId();
 
         rejectNull(bucketName,
                 "The bucket name parameter must be specified when requesting an object's metadata");
@@ -884,8 +903,7 @@ public class COSClient implements COS {
 
         CosHttpRequest<GetObjectMetadataRequest> request =
                 createRequest(bucketName, key, getObjectMetadataRequest, HttpMethodName.HEAD);
-        if (versionId != null)
-            request.addParameter("versionId", versionId);
+        addParameterIfNotNull(request, "versionId", getObjectMetadataRequest.getVersionId());
         return invoke(request, new CosMetadataResponseHandler());
     }
 
@@ -957,6 +975,33 @@ public class COSClient implements COS {
         DeleteObjectsResult result = new DeleteObjectsResult(response.getDeletedObjects());
 
         return result;
+    }
+
+    @Override
+    public void deleteVersion(String bucketName, String key, String versionId)
+            throws CosClientException, CosServiceException {
+        deleteVersion(new DeleteVersionRequest(bucketName, key, versionId));
+    }
+
+    @Override
+    public void deleteVersion(DeleteVersionRequest deleteVersionRequest)
+            throws CosClientException, CosServiceException {
+        rejectNull(deleteVersionRequest,
+                "The delete version request object must be specified when deleting a version");
+
+        String bucketName = deleteVersionRequest.getBucketName();
+        String key = deleteVersionRequest.getKey();
+        String versionId = deleteVersionRequest.getVersionId();
+
+        rejectNull(bucketName, "The bucket name must be specified when deleting a version");
+        rejectNull(key, "The key must be specified when deleting a version");
+        rejectNull(versionId, "The version ID must be specified when deleting a version");
+
+        CosHttpRequest<DeleteVersionRequest> request =
+                createRequest(bucketName, key, deleteVersionRequest, HttpMethodName.DELETE);
+        request.addParameter("versionId", versionId);
+
+        invoke(request, voidCosResponseHandler);
     }
 
     @Override
@@ -1327,7 +1372,8 @@ public class COSClient implements COS {
                             new Unmarshallers.CompleteMultipartUploadResultUnmarshaller(),
                             // header handlers
                             new ServerSideEncryptionHeaderHandler<CompleteMultipartUploadHandler>(),
-                            new ObjectExpirationHeaderHandler<CompleteMultipartUploadHandler>());
+                            new ObjectExpirationHeaderHandler<CompleteMultipartUploadHandler>(),
+                            new VIDResultHandler<CompleteMultipartUploadHandler>());
             handler = invoke(request, responseHandler);
             if (handler.getCompleteMultipartUploadResult() != null) {
                 String versionId = responseHandler.getResponseHeaders().get(Headers.COS_VERSION_ID);
@@ -1391,23 +1437,23 @@ public class COSClient implements COS {
         rejectNull(listObjectsRequest.getBucketName(),
                 "The bucket name parameter must be specified when listing objects in a bucket");
 
+        final boolean shouldSDKDecodeResponse = listObjectsRequest.getEncodingType() == null;
+
         CosHttpRequest<ListObjectsRequest> request = createRequest(
                 listObjectsRequest.getBucketName(), "/", listObjectsRequest, HttpMethodName.GET);
 
         // 兼容prefix以/开始, 以为COS V4的prefix等可以以斜杠开始
-        if (listObjectsRequest.getPrefix() != null)
-            request.addParameter("prefix", leftStripPathDelimiter(listObjectsRequest.getPrefix()));
-        if (listObjectsRequest.getMarker() != null)
-            request.addParameter("marker", listObjectsRequest.getMarker());
-        if (listObjectsRequest.getDelimiter() != null)
-            request.addParameter("delimiter", listObjectsRequest.getDelimiter());
+        addParameterIfNotNull(request, "prefix",
+                leftStripPathDelimiter(listObjectsRequest.getPrefix()));
+        addParameterIfNotNull(request, "marker", listObjectsRequest.getMarker());
+        addParameterIfNotNull(request, "delimiter", listObjectsRequest.getDelimiter());
+        request.addParameter("encoding-type", shouldSDKDecodeResponse ? Constants.URL_ENCODING
+                : listObjectsRequest.getEncodingType());
         if (listObjectsRequest.getMaxKeys() != null
                 && listObjectsRequest.getMaxKeys().intValue() >= 0)
             request.addParameter("max-keys", listObjectsRequest.getMaxKeys().toString());
-        if (listObjectsRequest.getEncodingType() != null)
-            request.addParameter("encoding-type", listObjectsRequest.getEncodingType());
 
-        return invoke(request, new Unmarshallers.ListObjectsUnmarshaller());
+        return invoke(request, new Unmarshallers.ListObjectsUnmarshaller(shouldSDKDecodeResponse));
     }
 
     @Override
@@ -1438,6 +1484,80 @@ public class COSClient implements COS {
             return emptyListing;
         }
         return listObjects(listNextBatchOfObjectsRequest.toListObjectsRequest());
+    }
+
+    @Override
+    public VersionListing listVersions(String bucketName, String prefix)
+            throws CosClientException, CosServiceException {
+        return listVersions(new ListVersionsRequest(bucketName, prefix, null, null, null, null));
+    }
+
+    @Override
+    public VersionListing listVersions(String bucketName, String prefix, String keyMarker,
+            String versionIdMarker, String delimiter, Integer maxResults)
+                    throws CosClientException, CosServiceException {
+        ListVersionsRequest request = new ListVersionsRequest().withBucketName(bucketName)
+                .withPrefix(prefix).withDelimiter(delimiter).withKeyMarker(keyMarker)
+                .withVersionIdMarker(versionIdMarker).withMaxResults(maxResults);
+        return listVersions(request);
+    }
+
+    @Override
+    public VersionListing listVersions(ListVersionsRequest listVersionsRequest)
+            throws CosClientException, CosServiceException {
+        rejectNull(listVersionsRequest.getBucketName(),
+                "The bucket name parameter must be specified when listing versions in a bucket");
+
+        final boolean shouldSDKDecodeResponse = listVersionsRequest.getEncodingType() == null;
+
+        CosHttpRequest<ListVersionsRequest> request = createRequest(
+                listVersionsRequest.getBucketName(), null, listVersionsRequest, HttpMethodName.GET);
+        request.addParameter("versions", null);
+
+        addParameterIfNotNull(request, "prefix", listVersionsRequest.getPrefix());
+        addParameterIfNotNull(request, "key-marker", listVersionsRequest.getKeyMarker());
+        addParameterIfNotNull(request, "version-id-marker",
+                listVersionsRequest.getVersionIdMarker());
+        addParameterIfNotNull(request, "delimiter", listVersionsRequest.getDelimiter());
+        request.addParameter("encoding-type", shouldSDKDecodeResponse ? Constants.URL_ENCODING
+                : listVersionsRequest.getEncodingType());
+
+        if (listVersionsRequest.getMaxResults() != null && listVersionsRequest.getMaxResults() >= 0)
+            request.addParameter("max-keys", listVersionsRequest.getMaxResults().toString());
+
+        return invoke(request, new Unmarshallers.VersionListUnmarshaller(shouldSDKDecodeResponse));
+    }
+
+    @Override
+    public VersionListing listNextBatchOfVersions(VersionListing previousVersionListing)
+            throws CosClientException, CosServiceException {
+        return listNextBatchOfVersions(new ListNextBatchOfVersionsRequest(previousVersionListing));
+    }
+
+    @Override
+    public VersionListing listNextBatchOfVersions(
+            ListNextBatchOfVersionsRequest listNextBatchOfVersionsRequest)
+                    throws CosClientException, CosServiceException {
+        rejectNull(listNextBatchOfVersionsRequest,
+                "The request object parameter must be specified when listing the next batch of versions in a bucket");
+        VersionListing previousVersionListing =
+                listNextBatchOfVersionsRequest.getPreviousVersionListing();
+
+        if (!previousVersionListing.isTruncated()) {
+            VersionListing emptyListing = new VersionListing();
+            emptyListing.setBucketName(previousVersionListing.getBucketName());
+            emptyListing.setDelimiter(previousVersionListing.getDelimiter());
+            emptyListing.setKeyMarker(previousVersionListing.getNextKeyMarker());
+            emptyListing.setVersionIdMarker(previousVersionListing.getNextVersionIdMarker());
+            emptyListing.setMaxKeys(previousVersionListing.getMaxKeys());
+            emptyListing.setPrefix(previousVersionListing.getPrefix());
+            emptyListing.setEncodingType(previousVersionListing.getEncodingType());
+            emptyListing.setTruncated(false);
+
+            return emptyListing;
+        }
+
+        return listVersions(listNextBatchOfVersionsRequest.toListVersionsRequest());
     }
 
     @Override
@@ -1483,7 +1603,8 @@ public class COSClient implements COS {
                             // header handlers
                             new ServerSideEncryptionHeaderHandler<CopyObjectResultHandler>(),
                             new COSVersionHeaderHandler(),
-                            new ObjectExpirationHeaderHandler<CopyObjectResultHandler>());
+                            new ObjectExpirationHeaderHandler<CopyObjectResultHandler>(),
+                            new VIDResultHandler<CopyObjectResultHandler>());
             copyObjectResultHandler = invoke(request, handler);
         } catch (CosServiceException cse) {
             /*
@@ -1531,6 +1652,8 @@ public class COSClient implements COS {
         copyObjectResult.setSSECustomerKeyMd5(copyObjectResultHandler.getSSECustomerKeyMd5());
         copyObjectResult.setExpirationTime(copyObjectResultHandler.getExpirationTime());
         copyObjectResult.setExpirationTimeRuleId(copyObjectResultHandler.getExpirationTimeRuleId());
+        copyObjectResult.setDateStr(copyObjectResultHandler.getDateStr());
+        copyObjectResult.setRequestId(copyObjectResultHandler.getRequestId());
 
         return copyObjectResult;
     }
@@ -2213,9 +2336,7 @@ public class COSClient implements COS {
         CosHttpRequest<GeneratePresignedUrlRequest> request =
                 createRequest(bucketName, key, req, httpMethod);
 
-        if (req.getVersionId() != null) {
-            request.addParameter("versionId", req.getVersionId());
-        }
+        addParameterIfNotNull(request, "versionId", req.getVersionId());
 
         for (Entry<String, String> entry : req.getRequestParameters().entrySet()) {
             request.addParameter(entry.getKey(), entry.getValue());
@@ -2245,7 +2366,7 @@ public class COSClient implements COS {
                 .append(".").append(formatRegion(clientConfig.getRegion().getRegionName()))
                 .append(".myqcloud.com")
                 .append(UrlEncoderUtils.encodeEscapeDelimiter(formatKey(key)));
-        
+
         boolean hasAppendFirstParameter = false;
         if (authStr != null) {
             strBuilder.append("?sign=").append(UrlEncoderUtils.encode(authStr));
@@ -2273,6 +2394,50 @@ public class COSClient implements COS {
         } catch (MalformedURLException e) {
             throw new CosClientException(e.toString());
         }
+    }
+
+    @Override
+    public void restoreObject(String bucketName, String key, int expirationInDays)
+            throws CosClientException, CosServiceException {
+        restoreObject(new RestoreObjectRequest(bucketName, key, expirationInDays));
+    }
+
+    @Override
+    public void restoreObject(RestoreObjectRequest restoreObjectRequest)
+            throws CosClientException, CosServiceException {
+
+        String bucketName = restoreObjectRequest.getBucketName();
+        String key = restoreObjectRequest.getKey();
+        String versionId = restoreObjectRequest.getVersionId();
+        int expirationIndays = restoreObjectRequest.getExpirationInDays();
+
+        rejectNull(bucketName,
+                "The bucket name parameter must be specified when copying a cas object");
+        rejectNull(key, "The key parameter must be specified when copying a cas object");
+        if (expirationIndays == -1) {
+            throw new IllegalArgumentException(
+                    "The expiration in days parameter must be specified when copying a cas object");
+        }
+
+        CosHttpRequest<RestoreObjectRequest> request =
+                createRequest(bucketName, key, restoreObjectRequest, HttpMethodName.POST);
+        request.addParameter("restore", null);
+        addParameterIfNotNull(request, "versionId", versionId);
+
+
+        byte[] content = RequestXmlFactory.convertToXmlByteArray(restoreObjectRequest);
+        request.addHeader("Content-Length", String.valueOf(content.length));
+        request.addHeader("Content-Type", "application/xml");
+        request.setContent(new ByteArrayInputStream(content));
+        try {
+            byte[] md5 = Md5Utils.computeMD5Hash(content);
+            String md5Base64 = BinaryUtils.toBase64(md5);
+            request.addHeader("Content-MD5", md5Base64);
+        } catch (Exception e) {
+            throw new CosClientException("Couldn't compute md5 sum", e);
+        }
+
+        invoke(request, voidCosResponseHandler);
     }
 }
 

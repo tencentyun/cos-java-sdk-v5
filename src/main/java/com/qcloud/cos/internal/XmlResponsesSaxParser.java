@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +35,7 @@ import com.qcloud.cos.model.BucketVersioningConfiguration;
 import com.qcloud.cos.model.CORSRule;
 import com.qcloud.cos.model.CORSRule.AllowedMethods;
 import com.qcloud.cos.model.COSObjectSummary;
+import com.qcloud.cos.model.COSVersionSummary;
 import com.qcloud.cos.model.CompleteMultipartUploadResult;
 import com.qcloud.cos.model.CopyObjectResult;
 import com.qcloud.cos.model.DeleteObjectsResult.DeletedObject;
@@ -51,6 +51,7 @@ import com.qcloud.cos.model.Permission;
 import com.qcloud.cos.model.ReplicationDestinationConfig;
 import com.qcloud.cos.model.ReplicationRule;
 import com.qcloud.cos.model.UinGrantee;
+import com.qcloud.cos.model.VersionListing;
 import com.qcloud.cos.model.Tag.LifecycleTagPredicate;
 import com.qcloud.cos.model.Tag.Tag;
 import com.qcloud.cos.model.lifecycle.LifecycleAndOperator;
@@ -59,6 +60,7 @@ import com.qcloud.cos.model.lifecycle.LifecycleFilterPredicate;
 import com.qcloud.cos.model.lifecycle.LifecyclePrefixPredicate;
 import com.qcloud.cos.utils.DateUtils;
 import com.qcloud.cos.utils.StringUtils;
+import com.qcloud.cos.utils.UrlEncoderUtils;
 
 
 /**
@@ -188,23 +190,6 @@ public class XmlResponsesSaxParser {
     }
 
     /**
-     * Checks if the specified string is empty or null and if so, returns null. Otherwise simply
-     * returns the string.
-     *
-     * @param s The string to check.
-     * @return Null if the specified string was null, or empty, otherwise returns the string the
-     *         caller passed in.
-     */
-    private static String checkForEmptyString(String s) {
-        if (s == null)
-            return null;
-        if (s.length() == 0)
-            return null;
-
-        return s;
-    }
-
-    /**
      * Safely parses the specified string as an integer and returns the value. If a
      * NumberFormatException occurs while parsing the integer, an error is logged and -1 is
      * returned.
@@ -244,34 +229,59 @@ public class XmlResponsesSaxParser {
     }
 
     /**
+     * Checks if the specified string is empty or null and if so, returns null. Otherwise simply
+     * returns the string.
+     *
+     * @param s The string to check.
+     * @return Null if the specified string was null, or empty, otherwise returns the string the
+     *         caller passed in.
+     */
+    private static String checkForEmptyString(String s) {
+        if (s == null)
+            return null;
+        if (s.length() == 0)
+            return null;
+
+        return s;
+    }
+
+    /**
+     * Perform a url decode on the given value if specified. Return value by default;
+     */
+    private static String decodeIfSpecified(String value, boolean decode) {
+        return decode ? UrlEncoderUtils.urlDecode(value) : value;
+    }
+
+    /**
      * Parses a ListBucket response XML document from an input stream.
      *
      * @param inputStream XML data input stream.
      * @return the XML handler object populated with data parsed from the XML stream.
      * @throws CosClientException
      */
-    public ListBucketHandler parseListBucketObjectsResponse(InputStream inputStream)
-            throws IOException {
-        ListBucketHandler handler = new ListBucketHandler();
+    public ListBucketHandler parseListBucketObjectsResponse(InputStream inputStream,
+            final boolean shouldSDKDecodeResponse) throws IOException {
+        ListBucketHandler handler = new ListBucketHandler(shouldSDKDecodeResponse);
         parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
         return handler;
     }
 
-    //
-    // /**
-    // * Parses a ListVersions response XML document from an input stream.
-    // *
-    // * @param inputStream XML data input stream.
-    // * @return the XML handler object populated with data parsed from the XML stream.
-    // * @throws CosClientException
-    // */
-    // public ListVersionsHandler parseListVersionsResponse(InputStream inputStream)
-    // throws IOException {
-    // ListVersionsHandler handler = new ListVersionsHandler();
-    // parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
-    // return handler;
-    // }
-    //
+
+    /**
+     * Parses a ListVersions response XML document from an input stream.
+     *
+     * @param inputStream XML data input stream.
+     * @param shouldSDKDecodeResponse
+     * @return the XML handler object populated with data parsed from the XML stream.
+     * @throws CosClientException
+     */
+    public ListVersionsHandler parseListVersionsResponse(InputStream inputStream,
+            boolean shouldSDKDecodeResponse) throws IOException {
+        ListVersionsHandler handler = new ListVersionsHandler(shouldSDKDecodeResponse);
+        parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
+        return handler;
+    }
+
     /**
      * Parses a ListAllMyBuckets response XML document from an input stream.
      *
@@ -436,11 +446,17 @@ public class XmlResponsesSaxParser {
      * Handler for ListBucket response XML documents. //
      */
     public static class ListBucketHandler extends AbstractHandler {
+
         private final ObjectListing objectListing = new ObjectListing();
+        private final boolean shouldSDKDecodeResponse;
 
         private COSObjectSummary currentObject = null;
         private Owner currentOwner = null;
         private String lastKey = null;
+
+        public ListBucketHandler(final boolean shouldSDKDecodeResponse) {
+            this.shouldSDKDecodeResponse = shouldSDKDecodeResponse;
+        }
 
         public ObjectListing getObjectListing() {
             return objectListing;
@@ -468,9 +484,10 @@ public class XmlResponsesSaxParser {
             if (atTopLevel()) {
                 if (name.equals("ListBucketResult")) {
                     /*
-                     * COS only includes the NextMarker XML element if the request specified a
-                     * delimiter, but for consistency we'd like to always give easy access to the
-                     * next marker if we're returning a list of results that's truncated.
+                     * S3 only includes the NextMarker XML element if the
+                     * request specified a delimiter, but for consistency we'd
+                     * like to always give easy access to the next marker if
+                     * we're returning a list of results that's truncated.
                      */
                     if (objectListing.isTruncated() && objectListing.getNextMarker() == null) {
 
@@ -483,7 +500,7 @@ public class XmlResponsesSaxParser {
                             nextMarker = objectListing.getCommonPrefixes()
                                     .get(objectListing.getCommonPrefixes().size() - 1);
                         } else {
-                            log.error("COS response indicates truncated results, "
+                            log.error("S3 response indicates truncated results, "
                                     + "but contains no object summaries or " + "common prefixes.");
                         }
 
@@ -500,25 +517,29 @@ public class XmlResponsesSaxParser {
                     }
 
                 } else if (name.equals("Prefix")) {
-                    objectListing.setPrefix(checkForEmptyString(getText()));
+                    objectListing.setPrefix(decodeIfSpecified(checkForEmptyString(getText()),
+                            shouldSDKDecodeResponse));
 
                 } else if (name.equals("Marker")) {
-                    objectListing.setMarker(checkForEmptyString(getText()));
+                    objectListing.setMarker(decodeIfSpecified(checkForEmptyString(getText()),
+                            shouldSDKDecodeResponse));
 
                 } else if (name.equals("NextMarker")) {
-                    objectListing.setNextMarker(getText());
+                    objectListing
+                            .setNextMarker(decodeIfSpecified(getText(), shouldSDKDecodeResponse));
 
                 } else if (name.equals("MaxKeys")) {
                     objectListing.setMaxKeys(parseInt(getText()));
 
                 } else if (name.equals("Delimiter")) {
-                    objectListing.setDelimiter(checkForEmptyString(getText()));
+                    objectListing.setDelimiter(decodeIfSpecified(checkForEmptyString(getText()),
+                            shouldSDKDecodeResponse));
 
                 } else if (name.equals("EncodingType")) {
-                    objectListing.setEncodingType(checkForEmptyString(getText()));
-
+                    objectListing.setEncodingType(
+                            shouldSDKDecodeResponse ? null : checkForEmptyString(getText()));
                 } else if (name.equals("IsTruncated")) {
-                    String isTruncatedStr = getText().toLowerCase(Locale.getDefault());
+                    String isTruncatedStr = getText();
 
                     if (isTruncatedStr.startsWith("false")) {
                         objectListing.setTruncated(false);
@@ -538,8 +559,7 @@ public class XmlResponsesSaxParser {
             else if (in("ListBucketResult", "Contents")) {
                 if (name.equals("Key")) {
                     lastKey = getText();
-                    currentObject.setKey(lastKey);
-
+                    currentObject.setKey(decodeIfSpecified(lastKey, shouldSDKDecodeResponse));
                 } else if (name.equals("LastModified")) {
                     currentObject.setLastModified(DateUtils.parseISO8601Date(getText()));
 
@@ -569,10 +589,12 @@ public class XmlResponsesSaxParser {
 
             else if (in("ListBucketResult", "CommonPrefixes")) {
                 if (name.equals("Prefix")) {
-                    objectListing.getCommonPrefixes().add(getText());
+                    objectListing.getCommonPrefixes()
+                            .add(decodeIfSpecified(getText(), shouldSDKDecodeResponse));
                 }
             }
         }
+
     }
 
     /**
@@ -810,7 +832,7 @@ public class XmlResponsesSaxParser {
 
 
     public static class CopyObjectResultHandler extends AbstractSSEHandler
-            implements ObjectExpirationResult {
+            implements ObjectExpirationResult, VIDResult {
 
         // Data items for successful copy
         private final CopyObjectResult result = new CopyObjectResult();
@@ -821,6 +843,26 @@ public class XmlResponsesSaxParser {
         private String errorRequestId = null;
         private String errorHostId = null;
         private boolean receivedErrorResponse = false;
+
+        @Override
+        public void setDateStr(String dateStr) {
+            result.setDateStr(dateStr);
+        }
+
+        @Override
+        public String getDateStr() {
+            return result.getDateStr();
+        }
+
+        @Override
+        public void setRequestId(String requestId) {
+            result.setRequestId(requestId);
+        }
+
+        @Override
+        public String getRequestId() {
+            return result.getRequestId();
+        }
 
         @Override
         protected ServerSideEncryptionResult sseResult() {
@@ -952,148 +994,142 @@ public class XmlResponsesSaxParser {
     // }
     // }
     //
-    // /**
-    // * Handler for ListVersionsResult XML document.
-    // */
-    // public static class ListVersionsHandler extends AbstractHandler {
-    //
-    // private final VersionListing versionListing = new VersionListing();
-    //
-    // private COSVersionSummary currentVersionSummary;
-    // private Owner currentOwner;
-    //
-    // public VersionListing getListing() {
-    // return versionListing;
-    // }
-    //
-    // @Override
-    // protected void doStartElement(
-    // String uri,
-    // String name,
-    // String qName,
-    // Attributes attrs) {
-    //
-    // if (in("ListVersionsResult")) {
-    // if (name.equals("Version")) {
-    // currentVersionSummary = new COSVersionSummary();
-    // currentVersionSummary.setBucketName(
-    // versionListing.getBucketName());
-    //
-    // } else if (name.equals("DeleteMarker")) {
-    // currentVersionSummary = new COSVersionSummary();
-    // currentVersionSummary.setBucketName(
-    // versionListing.getBucketName());
-    // currentVersionSummary.setIsDeleteMarker(true);
-    // }
-    // }
-    //
-    // else if (in("ListVersionsResult", "Version")
-    // || in("ListVersionsResult", "DeleteMarker")) {
-    // if (name.equals("Owner")) {
-    // currentOwner = new Owner();
-    // }
-    // }
-    // }
-    //
-    // @Override
-    // protected void doEndElement(
-    // String uri,
-    // String name,
-    // String qName) {
-    //
-    // if (in("ListVersionsResult")) {
-    // if (name.equals("Name")) {
-    // versionListing.setBucketName(getText());
-    //
-    // } else if (name.equals("Prefix")) {
-    // versionListing.setPrefix(checkForEmptyString(getText()));
-    //
-    // } else if (name.equals("KeyMarker")) {
-    // versionListing.setKeyMarker(checkForEmptyString(getText()));
-    //
-    // } else if (name.equals("VersionIdMarker")) {
-    // versionListing.setVersionIdMarker(checkForEmptyString(
-    // getText()));
-    //
-    // } else if (name.equals("MaxKeys")) {
-    // versionListing.setMaxKeys(Integer.parseInt(getText()));
-    //
-    // } else if (name.equals("Delimiter")) {
-    // versionListing.setDelimiter(checkForEmptyString(getText()));
-    //
-    // } else if (name.equals("EncodingType")) {
-    // versionListing.setEncodingType(checkForEmptyString(
-    // getText()));
-    //
-    // } else if (name.equals("NextKeyMarker")) {
-    // versionListing.setNextKeyMarker(getText());
-    //
-    // } else if (name.equals("NextVersionIdMarker")) {
-    // versionListing.setNextVersionIdMarker(getText());
-    //
-    // } else if (name.equals("IsTruncated")) {
-    // versionListing.setTruncated("true".equals(getText()));
-    //
-    // } else if (name.equals("Version")
-    // || name.equals("DeleteMarker")) {
-    //
-    // versionListing.getVersionSummaries()
-    // .add(currentVersionSummary);
-    //
-    // currentVersionSummary = null;
-    // }
-    // }
-    //
-    // else if (in("ListVersionsResult", "CommonPrefixes")) {
-    // if (name.equals("Prefix")) {
-    // versionListing.getCommonPrefixes()
-    // .add(checkForEmptyString(getText()));
-    // }
-    // }
-    //
-    // else if (in("ListVersionsResult", "Version")
-    // || in("ListVersionsResult", "DeleteMarker")) {
-    //
-    // if (name.equals("Key")) {
-    // currentVersionSummary.setKey(getText());
-    //
-    // } else if (name.equals("VersionId")) {
-    // currentVersionSummary.setVersionId(getText());
-    //
-    // } else if (name.equals("IsLatest")) {
-    // currentVersionSummary.setIsLatest("true".equals(getText()));
-    //
-    // } else if (name.equals("LastModified")) {
-    // currentVersionSummary.setLastModified(
-    // ServiceUtils.parseIso8601Date(getText()));
-    //
-    // } else if (name.equals("ETag")) {
-    // currentVersionSummary.setETag(
-    // ServiceUtils.removeQuotes(getText()));
-    //
-    // } else if (name.equals("Size")) {
-    // currentVersionSummary.setSize(Long.parseLong(getText()));
-    //
-    // } else if (name.equals("Owner")) {
-    // currentVersionSummary.setOwner(currentOwner);
-    // currentOwner = null;
-    //
-    // } else if (name.equals("StorageClass")) {
-    // currentVersionSummary.setStorageClass(getText());
-    // }
-    // }
-    //
-    // else if (in("ListVersionsResult", "Version", "Owner")
-    // || in("ListVersionsResult", "DeleteMarker", "Owner")) {
-    //
-    // if (name.equals("ID")) {
-    // currentOwner.setId(getText());
-    // } else if (name.equals("DisplayName")) {
-    // currentOwner.setDisplayName(getText());
-    // }
-    // }
-    // }
-    // }
+    /**
+     * Handler for ListVersionsResult XML document.
+     */
+    public static class ListVersionsHandler extends AbstractHandler {
+
+        private final VersionListing versionListing = new VersionListing();
+        private final boolean shouldSDKDecodeResponse;
+
+        private COSVersionSummary currentVersionSummary;
+        private Owner currentOwner;
+
+        public ListVersionsHandler(final boolean shouldSDKDecodeResponse) {
+            this.shouldSDKDecodeResponse = shouldSDKDecodeResponse;
+        }
+
+        public VersionListing getListing() {
+            return versionListing;
+        }
+
+        @Override
+        protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
+
+            if (in("ListVersionsResult")) {
+                if (name.equals("Version")) {
+                    currentVersionSummary = new COSVersionSummary();
+                    currentVersionSummary.setBucketName(versionListing.getBucketName());
+
+                } else if (name.equals("DeleteMarker")) {
+                    currentVersionSummary = new COSVersionSummary();
+                    currentVersionSummary.setBucketName(versionListing.getBucketName());
+                    currentVersionSummary.setIsDeleteMarker(true);
+                }
+            }
+
+            else if (in("ListVersionsResult", "Version")
+                    || in("ListVersionsResult", "DeleteMarker")) {
+                if (name.equals("Owner")) {
+                    currentOwner = new Owner();
+                }
+            }
+        }
+
+        @Override
+        protected void doEndElement(String uri, String name, String qName) {
+
+            if (in("ListVersionsResult")) {
+                if (name.equals("Name")) {
+                    versionListing.setBucketName(getText());
+
+                } else if (name.equals("Prefix")) {
+                    versionListing.setPrefix(decodeIfSpecified(checkForEmptyString(getText()),
+                            shouldSDKDecodeResponse));
+                } else if (name.equals("KeyMarker")) {
+                    versionListing.setKeyMarker(decodeIfSpecified(checkForEmptyString(getText()),
+                            shouldSDKDecodeResponse));
+                } else if (name.equals("VersionIdMarker")) {
+                    versionListing.setVersionIdMarker(checkForEmptyString(getText()));
+
+                } else if (name.equals("MaxKeys")) {
+                    versionListing.setMaxKeys(Integer.parseInt(getText()));
+
+                } else if (name.equals("Delimiter")) {
+                    versionListing.setDelimiter(decodeIfSpecified(checkForEmptyString(getText()),
+                            shouldSDKDecodeResponse));
+
+                } else if (name.equals("EncodingType")) {
+                    versionListing.setEncodingType(
+                            shouldSDKDecodeResponse ? null : checkForEmptyString(getText()));
+                } else if (name.equals("NextKeyMarker")) {
+                    versionListing.setNextKeyMarker(decodeIfSpecified(
+                            checkForEmptyString(getText()), shouldSDKDecodeResponse));
+
+                } else if (name.equals("NextVersionIdMarker")) {
+                    versionListing.setNextVersionIdMarker(getText());
+
+                } else if (name.equals("IsTruncated")) {
+                    versionListing.setTruncated("true".equals(getText()));
+
+                } else if (name.equals("Version") || name.equals("DeleteMarker")) {
+
+                    versionListing.getVersionSummaries().add(currentVersionSummary);
+
+                    currentVersionSummary = null;
+                }
+            }
+
+            else if (in("ListVersionsResult", "CommonPrefixes")) {
+                if (name.equals("Prefix")) {
+                    final String commonPrefix = checkForEmptyString(getText());
+                    versionListing.getCommonPrefixes().add(shouldSDKDecodeResponse
+                            ? UrlEncoderUtils.urlDecode(commonPrefix) : commonPrefix);
+                }
+            }
+
+            else if (in("ListVersionsResult", "Version")
+                    || in("ListVersionsResult", "DeleteMarker")) {
+
+                if (name.equals("Key")) {
+                    currentVersionSummary
+                            .setKey(decodeIfSpecified(getText(), shouldSDKDecodeResponse));
+
+                } else if (name.equals("VersionId")) {
+                    currentVersionSummary.setVersionId(getText());
+
+                } else if (name.equals("IsLatest")) {
+                    currentVersionSummary.setIsLatest("true".equals(getText()));
+
+                } else if (name.equals("LastModified")) {
+                    currentVersionSummary.setLastModified(DateUtils.parseISO8601Date(getText()));
+
+                } else if (name.equals("ETag")) {
+                    currentVersionSummary.setETag(StringUtils.removeQuotes(getText()));
+
+                } else if (name.equals("Size")) {
+                    currentVersionSummary.setSize(Long.parseLong(getText()));
+
+                } else if (name.equals("Owner")) {
+                    currentVersionSummary.setOwner(currentOwner);
+                    currentOwner = null;
+
+                } else if (name.equals("StorageClass")) {
+                    currentVersionSummary.setStorageClass(getText());
+                }
+            }
+
+            else if (in("ListVersionsResult", "Version", "Owner")
+                    || in("ListVersionsResult", "DeleteMarker", "Owner")) {
+
+                if (name.equals("ID")) {
+                    currentOwner.setId(getText());
+                } else if (name.equals("DisplayName")) {
+                    currentOwner.setDisplayName(getText());
+                }
+            }
+        }
+    }
     //
     // public static class BucketWebsiteConfigurationHandler extends AbstractHandler {
     //
@@ -1244,7 +1280,7 @@ public class XmlResponsesSaxParser {
      * <HostId>Uuag1LuByRx9e6j5Onimru9pO4ZVKnJ2Qz7/C1NPcfTWAtRPfTaOFg==</HostId> </Error>
      */
     public static class CompleteMultipartUploadHandler extends AbstractSSEHandler
-            implements ObjectExpirationResult {
+            implements ObjectExpirationResult, VIDResult {
         // Successful completion
         private CompleteMultipartUploadResult result;
 
@@ -1287,6 +1323,30 @@ public class XmlResponsesSaxParser {
         public void setExpirationTimeRuleId(String expirationTimeRuleId) {
             if (result != null) {
                 result.setExpirationTimeRuleId(expirationTimeRuleId);
+            }
+        }
+
+        @Override
+        public String getRequestId() {
+            return result == null ? null : result.getRequestId();
+        }
+
+        @Override
+        public void setRequestId(String requestId) {
+            if (result != null) {
+                result.setRequestId(requestId);
+            }
+        }
+
+        @Override
+        public String getDateStr() {
+            return result == null ? null : result.getDateStr();
+        }
+
+        @Override
+        public void setDateStr(String dateStr) {
+            if (result != null) {
+                result.setDateStr(dateStr);
             }
         }
 
@@ -1761,16 +1821,16 @@ public class XmlResponsesSaxParser {
      * <LifecycleConfiguration> <Rule> <ID>logs-rule</ID> <Prefix>logs/</Prefix>
      * <Status>Enabled</Status> <Transition> <Days>30</Days>
      * <StorageClass>STANDARD_IA</StorageClass> </Transition> <Transition> <Days>90</Days>
-     * <StorageClass>GLACIER</StorageClass> </Transition>
+     * <StorageClass>ARCHIVE</StorageClass> </Transition>
      * <Expiration> <Days>365</Days> </Expiration>
      * <NoncurrentVersionTransition> <NoncurrentDays>7</NoncurrentDays>
      * <StorageClass>STANDARD_IA</StorageClass> </NoncurrentVersionTransition>
      * <NoncurrentVersionTransition> <NoncurrentDays>14</NoncurrentDays>
-     * <StorageClass>GLACIER</StorageClass> </NoncurrentVersionTransition>
+     * <StorageClass>ARCHIVE</StorageClass> </NoncurrentVersionTransition>
      * <NoncurrentVersionExpiration> <NoncurrentDays>365</NoncurrentDays>
      * </NoncurrentVersionExpiration> </Rule> <Rule> <ID>image-rule</ID> <Prefix>image/</Prefix>
      * <Status>Enabled</Status> <Transition> <Date>2012-12-31T00:00:00.000Z</Date>
-     * <StorageClass>GLACIER</StorageClass> </Transition>
+     * <StorageClass>ARCHIVE</StorageClass> </Transition>
      * <Expiration> <Date>2020-12-31T00:00:00.000Z</Date> </Expiration> </Rule>
      * </LifecycleConfiguration>
      */

@@ -131,6 +131,9 @@ public interface Headers {
 
     /** Header for the optional restore information of an object */
     public static String RESTORE = "x-cos-restore";
+    
+    /** Header for the optional delete marker information of an object */
+    public static String DELETE_MARKER = "x-cos-delete-marker";
 
     /**
      * Key wrapping algorithm such as "AESWrap" and "RSA/ECB/OAEPWithSHA-256AndMGF1Padding".
@@ -147,4 +150,5 @@ public interface Headers {
     
     /** Region where the bucket is located. This header is returned only in HEAD bucket and ListObjects response. */
     public static final String COS_BUCKET_REGION = "x-cos-bucket-region";
+    
 }

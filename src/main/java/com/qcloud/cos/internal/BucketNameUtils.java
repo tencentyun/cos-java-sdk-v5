@@ -17,6 +17,9 @@ public enum BucketNameUtils {
 
         for (int i = 0; i < bucketName.length(); ++i) {
             char next = bucketName.charAt(i);
+            if (i == 0 && next == '-') { 
+                throw new IllegalArgumentException("Bucket name can not start with -");
+            }
             if (next == '-') 
                 continue;
             if (next >= 'a' && next <= 'z')

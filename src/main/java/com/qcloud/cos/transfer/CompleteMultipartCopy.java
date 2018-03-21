@@ -77,6 +77,8 @@ public class CompleteMultipartCopy implements Callable<CopyResult> {
         copyResult.setDestinationKey(res.getKey());
         copyResult.setETag(res.getETag());
         copyResult.setVersionId(res.getVersionId());
+        copyResult.setRequestId(res.getRequestId());
+        copyResult.setDateStr(res.getDateStr());
 
         monitor.copyComplete();
 

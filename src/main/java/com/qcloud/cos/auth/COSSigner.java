@@ -115,9 +115,12 @@ public class COSSigner {
     private Map<String, String> buildSignHeaders(Map<String, String> originHeaders) {
         Map<String, String> signHeaders = new HashMap<>();
         for (String key : originHeaders.keySet()) {
-            if (key.equalsIgnoreCase("host") || key.equalsIgnoreCase("content-type")
-                    || key.equalsIgnoreCase("content-md5") || key.startsWith("x")
-                    || key.startsWith("X")) {
+//            if (key.equalsIgnoreCase("host") || key.equalsIgnoreCase("content-type")
+//                    || key.equalsIgnoreCase("content-md5") || key.startsWith("x")
+//                    || key.startsWith("X")) {
+                if (key.equalsIgnoreCase("content-type")
+                        || key.equalsIgnoreCase("content-md5") || key.startsWith("x")
+                        || key.startsWith("X")) {
                 String lowerKey = key.toLowerCase();
                 String value = originHeaders.get(key);
                 signHeaders.put(lowerKey, value);

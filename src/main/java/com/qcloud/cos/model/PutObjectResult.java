@@ -11,6 +11,12 @@ public class PutObjectResult implements ObjectExpirationResult, Serializable {
      */
     private static final long serialVersionUID = -2210897720269365495L;
 
+    /** x-cos-requestid **/
+    private String requestId;
+    
+    /** date **/
+    private String dateStr;
+
     /**
      * The version ID of the new, uploaded object. This field will only be present if object
      * versioning has been enabled for the bucket to which the object was uploaded.
@@ -31,6 +37,42 @@ public class PutObjectResult implements ObjectExpirationResult, Serializable {
 
     /** The metadata returned as a result of PutObject operation. */
     private ObjectMetadata metadata;
+
+
+    /**
+     * get requestid for this upload
+     * 
+     * @return requestid
+     */
+    public String getRequestId() {
+        return requestId;
+    }
+
+    /**
+     * set requestId for this upload
+     * 
+     * @param requestId the requestId for the upload
+     */
+
+    public void setRequestId(String requestId) {
+        this.requestId = requestId;
+    }
+    
+    /**
+     * get date header for this upload
+     * @return date str
+     */
+    public String getDateStr() {
+        return dateStr;
+    }
+
+    /**
+     * set date str for this upload
+     * @param dateStr  date str header
+     */
+    public void setDateStr(String dateStr) {
+        this.dateStr = dateStr;
+    }
 
     /**
      * Gets the optional version ID of the newly uploaded object. This field will be set only if
@@ -132,16 +174,16 @@ public class PutObjectResult implements ObjectExpirationResult, Serializable {
     }
 
     /**
-     * Returns the metadata retrieved as a response to
-     * {@link COSClient#putObject(PutObjectRequest)} operation.
+     * Returns the metadata retrieved as a response to {@link COSClient#putObject(PutObjectRequest)}
+     * operation.
      */
     public ObjectMetadata getMetadata() {
         return metadata;
     }
 
     /**
-     * Sets the metadata retrieved as a response to
-     * {@link COSClient#putObject(PutObjectRequest)} operation.
+     * Sets the metadata retrieved as a response to {@link COSClient#putObject(PutObjectRequest)}
+     * operation.
      */
     public void setMetadata(ObjectMetadata metadata) {
         this.metadata = metadata;

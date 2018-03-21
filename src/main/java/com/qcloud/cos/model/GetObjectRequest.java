@@ -51,21 +51,14 @@ public class GetObjectRequest extends CosServiceRequest
      * modified since the specified date.
      */
     private Date modifiedSinceConstraint;
-    
+
     /**
      * Optional field that overrides headers on the response.
      */
     private ResponseHeaderOverrides responseHeaders;
-    
-    /**
-     * If enabled, the requester is charged for downloading the data from
-     * Requester Pays Buckets.
-     */
-    private boolean isRequesterPays;
 
     /**
-     * The optional customer-provided server-side encryption key to use to
-     * decrypt this object.
+     * The optional customer-provided server-side encryption key to use to decrypt this object.
      */
     private SSECustomerKey sseCustomerKey;
 
@@ -545,7 +538,7 @@ public class GetObjectRequest extends CosServiceRequest
         setModifiedSinceConstraint(date);
         return this;
     }
-    
+
     /**
      * Returns the headers to be overridden in the service response.
      *
@@ -558,19 +551,17 @@ public class GetObjectRequest extends CosServiceRequest
     /**
      * Sets the headers to be overridden in the service response.
      *
-     * @param responseHeaders
-     *            The headers to be overridden in the service response.
+     * @param responseHeaders The headers to be overridden in the service response.
      */
     public void setResponseHeaders(ResponseHeaderOverrides responseHeaders) {
         this.responseHeaders = responseHeaders;
     }
 
     /**
-     * Sets the headers to be overridden in the service response and returns
-     * this object, for method chaining.
+     * Sets the headers to be overridden in the service response and returns this object, for method
+     * chaining.
      *
-     * @param responseHeaders
-     *            The headers to be overridden in the service response.
+     * @param responseHeaders The headers to be overridden in the service response.
      *
      * @return This {@link GetObjectRequest} for method chaining.
      */
@@ -579,74 +570,31 @@ public class GetObjectRequest extends CosServiceRequest
         return this;
     }
 
-    /**
-     * Returns true if the user has enabled Requester Pays option when
-     * downloading an object from Requester Pays Bucket; else false.
-     *
-     * <p>
-     * If a bucket is enabled for Requester Pays, then any attempt to read an
-     * object from it without Requester Pays enabled will result in a 403 error
-     * and the bucket owner will be charged for the request.
-     *
-     * <p>
-     * Enabling Requester Pays disables the ability to have anonymous access to
-     * this bucket
-     *
-     * @return true if the user has enabled Requester Pays option for
-     *         downloading an object from Requester Pays Bucket.
-     */
-    public boolean isRequesterPays() {
-        return isRequesterPays;
-    }
-
-    /**
-     * Used for downloading an Qcloud COS Object from a Requester Pays Bucket. If
-     * set the requester is charged for downloading the data from the bucket.
-     *
-     * <p>
-     * If a bucket is enabled for Requester Pays, then any attempt to read an
-     * object from it without Requester Pays enabled will result in a 403 error
-     * and the bucket owner will be charged for the request.
-     *
-     * <p>
-     * Enabling Requester Pays disables the ability to have anonymous access to
-     * this bucket
-     *
-     * @param isRequesterPays
-     *            Enable Requester Pays option for the operation.
-     */
-    public void setRequesterPays(boolean isRequesterPays) {
-        this.isRequesterPays = isRequesterPays;
-    }
-    
     @Override
     public SSECustomerKey getSSECustomerKey() {
         return sseCustomerKey;
     }
 
     /**
-     * Sets the optional customer-provided server-side encryption key to use to
-     * decrypt this object.
+     * Sets the optional customer-provided server-side encryption key to use to decrypt this object.
      *
-     * @param sseKey
-     *            The optional customer-provided server-side encryption key to
-     *            use to decrypt this object.
+     * @param sseKey The optional customer-provided server-side encryption key to use to decrypt
+     *        this object.
      */
     public void setSSECustomerKey(SSECustomerKey sseKey) {
         this.sseCustomerKey = sseKey;
     }
 
     /**
-     * Sets the optional customer-provided server-side encryption key to use to
-     * decrypt this object, and returns the updated GetObjectRequest so that
-     * additional method calls may be chained together.
+     * Sets the optional customer-provided server-side encryption key to use to decrypt this object,
+     * and returns the updated GetObjectRequest so that additional method calls may be chained
+     * together.
      *
-     * @param sseKey
-     *            The optional customer-provided server-side encryption key to
-     *            use to decrypt this object.
+     * @param sseKey The optional customer-provided server-side encryption key to use to decrypt
+     *        this object.
      *
-     * @return The optional customer-provided server-side encryption key to use
-     *         to decrypt this object.
+     * @return The optional customer-provided server-side encryption key to use to decrypt this
+     *         object.
      */
     public GetObjectRequest withSSECustomerKey(SSECustomerKey sseKey) {
         setSSECustomerKey(sseKey);

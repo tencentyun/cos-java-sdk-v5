@@ -10,6 +10,12 @@ package com.qcloud.cos.model;
  */
 public class CopyResult {
 
+    /** x-cos-requestid **/
+    private String requestId;
+
+    /** date **/
+    private String dateStr;
+    
     /** The name of the bucket containing the object to be copied */
     private String sourceBucketName;
 
@@ -39,6 +45,43 @@ public class CopyResult {
      * enabled for the bucket.
      */
     private String versionId;
+    
+    /**
+     * get requestid for this upload
+     * 
+     * @return requestid
+     */
+    public String getRequestId() {
+        return requestId;
+    }
+
+    /**
+     * set requestId for this upload
+     * 
+     * @param requestId the requestId for the upload
+     */
+
+    public void setRequestId(String requestId) {
+        this.requestId = requestId;
+    }
+
+    /**
+     * get date header for this upload
+     * 
+     * @return date str
+     */
+    public String getDateStr() {
+        return dateStr;
+    }
+
+    /**
+     * set date str for this upload
+     * 
+     * @param dateStr date str header
+     */
+    public void setDateStr(String dateStr) {
+        this.dateStr = dateStr;
+    }
 
     /**
      * Gets the name of the bucket containing the source object to be copied.

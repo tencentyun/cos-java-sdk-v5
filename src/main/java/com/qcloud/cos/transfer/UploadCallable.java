@@ -52,16 +52,15 @@ public class UploadCallable implements Callable<UploadResult> {
     private final TransferProgress transferProgress;
 
     /**
-     * ETags retrieved from Qcloud COS for a multi-part upload id. These parts
-     * will be skipped while resuming a paused upload.
+     * ETags retrieved from Qcloud COS for a multi-part upload id. These parts will be skipped while
+     * resuming a paused upload.
      */
     private final List<PartETag> eTagsToSkip = new ArrayList<PartETag>();
 
     private PersistableUpload persistableUpload;
 
-    public UploadCallable(TransferManager transferManager,
-            ExecutorService threadPool, UploadImpl upload,
-            PutObjectRequest origReq,
+    public UploadCallable(TransferManager transferManager, ExecutorService threadPool,
+            UploadImpl upload, PutObjectRequest origReq,
             ProgressListenerChain progressListenerChain, String uploadId,
             TransferProgress transferProgress) {
         this.cos = transferManager.getCOSClient();
@@ -80,8 +79,8 @@ public class UploadCallable implements Callable<UploadResult> {
     }
 
     /**
-     * Returns the ETags retrieved from Qcloud COS for a multi-part upload id.
-     * These parts will be skipped while resuming a paused upload.
+     * Returns the ETags retrieved from Qcloud COS for a multi-part upload id. These parts will be
+     * skipped while resuming a paused upload.
      */
     List<PartETag> getETags() {
         return eTagsToSkip;
@@ -93,6 +92,7 @@ public class UploadCallable implements Callable<UploadResult> {
 
     /**
      * Returns true if this UploadCallable is processing a multipart upload.
+     * 
      * @return True if this UploadCallable is processing a multipart upload.
      */
     public boolean isMultipartUpload() {
@@ -101,7 +101,7 @@ public class UploadCallable implements Callable<UploadResult> {
 
     public UploadResult call() throws Exception {
         upload.setState(TransferState.InProgress);
-        if ( isMultipartUpload() ) {
+        if (isMultipartUpload()) {
             publishProgress(listener, ProgressEventType.TRANSFER_STARTED_EVENT);
             return uploadInParts();
         } else {
@@ -120,6 +120,8 @@ public class UploadCallable implements Callable<UploadResult> {
         uploadResult.setKey(origReq.getKey());
         uploadResult.setETag(putObjectResult.getETag());
         uploadResult.setVersionId(putObjectResult.getVersionId());
+        uploadResult.setRequestId(putObjectResult.getRequestId());
+        uploadResult.setDateStr(putObjectResult.getDateStr());
         return uploadResult;
     }
 
@@ -128,9 +130,8 @@ public class UploadCallable implements Callable<UploadResult> {
      */
     private void captureUploadStateIfPossible() {
         if (origReq.getSSECustomerKey() == null) {
-            persistableUpload = new PersistableUpload(origReq.getBucketName(),
-                    origReq.getKey(), origReq.getFile()
-                            .getAbsolutePath(), multipartUploadId,
+            persistableUpload = new PersistableUpload(origReq.getBucketName(), origReq.getKey(),
+                    origReq.getFile().getAbsolutePath(), multipartUploadId,
                     configuration.getMinimumUploadPartSize(),
                     configuration.getMultipartUploadThreshold());
             notifyPersistableTransferAvailability();
@@ -145,14 +146,12 @@ public class UploadCallable implements Callable<UploadResult> {
      * Notifies to the callbacks that state is available
      */
     private void notifyPersistableTransferAvailability() {
-        COSProgressPublisher.publishTransferPersistable(
-                listener, persistableUpload);
+        COSProgressPublisher.publishTransferPersistable(listener, persistableUpload);
     }
 
     /**
-     * Uploads the request in multiple chunks, submitting each upload chunk task
-     * to the thread pool and recording its corresponding Future object, as well
-     * as the multipart upload id.
+     * Uploads the request in multiple chunks, submitting each upload chunk task to the thread pool
+     * and recording its corresponding Future object, as well as the multipart upload id.
      */
     private UploadResult uploadInParts() throws Exception {
         boolean isUsingEncryption = cos instanceof COSEncryption;
@@ -160,11 +159,11 @@ public class UploadCallable implements Callable<UploadResult> {
 
         try {
             if (multipartUploadId == null) {
-                multipartUploadId = initiateMultipartUpload(origReq,
-                        isUsingEncryption);
+                multipartUploadId = initiateMultipartUpload(origReq, isUsingEncryption);
             }
 
-            UploadPartRequestFactory requestFactory = new UploadPartRequestFactory(origReq, multipartUploadId, optimalPartSize);
+            UploadPartRequestFactory requestFactory =
+                    new UploadPartRequestFactory(origReq, multipartUploadId, optimalPartSize);
 
             if (TransferManagerUtils.isUploadParallelizable(origReq, isUsingEncryption)) {
                 captureUploadStateIfPossible();
@@ -179,7 +178,9 @@ public class UploadCallable implements Callable<UploadResult> {
             throw e;
         } finally {
             if (origReq.getInputStream() != null) {
-                try {origReq.getInputStream().close(); } catch (Exception e) {
+                try {
+                    origReq.getInputStream().close();
+                } catch (Exception e) {
                     log.warn("Unable to cleanly close input stream: " + e.getMessage(), e);
                 }
             }
@@ -187,20 +188,19 @@ public class UploadCallable implements Callable<UploadResult> {
     }
 
     /**
-     * Performs an
-     * {@link COS#abortMultipartUpload(AbortMultipartUploadRequest)}
-     * operation for the given multi-part upload.
+     * Performs an {@link COS#abortMultipartUpload(AbortMultipartUploadRequest)} operation for the
+     * given multi-part upload.
      */
     void performAbortMultipartUpload() {
         try {
             if (multipartUploadId != null)
-                cos.abortMultipartUpload(new AbortMultipartUploadRequest(
-                        origReq.getBucketName(), origReq
-                                .getKey(), multipartUploadId));
+                cos.abortMultipartUpload(new AbortMultipartUploadRequest(origReq.getBucketName(),
+                        origReq.getKey(), multipartUploadId));
         } catch (Exception e2) {
             log.info(
                     "Unable to abort multipart upload, you may need to manually remove uploaded parts: "
-                            + e2.getMessage(), e2);
+                            + e2.getMessage(),
+                    e2);
         }
     }
 
@@ -208,25 +208,27 @@ public class UploadCallable implements Callable<UploadResult> {
      * Computes and returns the optimal part size for the upload.
      */
     private long getOptimalPartSize(boolean isUsingEncryption) {
-        long optimalPartSize = TransferManagerUtils.calculateOptimalPartSize(origReq, configuration);
+        long optimalPartSize =
+                TransferManagerUtils.calculateOptimalPartSize(origReq, configuration);
         if (isUsingEncryption && optimalPartSize % 32 > 0) {
             // When using encryption, parts must line up correctly along cipher block boundaries
-            optimalPartSize = optimalPartSize - (optimalPartSize % 32) + 32 ;
+            optimalPartSize = optimalPartSize - (optimalPartSize % 32) + 32;
         }
         log.debug("Calculated optimal part size: " + optimalPartSize);
         return optimalPartSize;
     }
 
     /**
-     * Uploads all parts in the request in serial in this thread, then completes
-     * the upload and returns the result.
+     * Uploads all parts in the request in serial in this thread, then completes the upload and
+     * returns the result.
      */
     private UploadResult uploadPartsInSeries(UploadPartRequestFactory requestFactory) {
 
         final List<PartETag> partETags = new ArrayList<PartETag>();
 
         while (requestFactory.hasMoreRequests()) {
-            if (threadPool.isShutdown()) throw new CancellationException("TransferManager has been shutdown");
+            if (threadPool.isShutdown())
+                throw new CancellationException("TransferManager has been shutdown");
             UploadPartRequest uploadPartRequest = requestFactory.getNextUploadPartRequest();
             // Mark the stream in case we need to reset it
             InputStream inputStream = uploadPartRequest.getInputStream();
@@ -234,18 +236,16 @@ public class UploadCallable implements Callable<UploadResult> {
                 if (uploadPartRequest.getPartSize() >= Integer.MAX_VALUE) {
                     inputStream.mark(Integer.MAX_VALUE);
                 } else {
-                    inputStream.mark((int)uploadPartRequest.getPartSize());
+                    inputStream.mark((int) uploadPartRequest.getPartSize());
                 }
             }
             partETags.add(cos.uploadPart(uploadPartRequest).getPartETag());
         }
 
         CompleteMultipartUploadRequest req =
-            new CompleteMultipartUploadRequest(
-                origReq.getBucketName(), origReq.getKey(), multipartUploadId,
-                    partETags)
-            .withGeneralProgressListener(origReq.getGeneralProgressListener())            
-            ;
+                new CompleteMultipartUploadRequest(origReq.getBucketName(), origReq.getKey(),
+                        multipartUploadId, partETags)
+                                .withGeneralProgressListener(origReq.getGeneralProgressListener());
         CompleteMultipartUploadResult res = cos.completeMultipartUpload(req);
 
         UploadResult uploadResult = new UploadResult();
@@ -253,24 +253,26 @@ public class UploadCallable implements Callable<UploadResult> {
         uploadResult.setKey(res.getKey());
         uploadResult.setETag(res.getETag());
         uploadResult.setVersionId(res.getVersionId());
+        uploadResult.setRequestId(res.getRequestId());
+        uploadResult.setDateStr(res.getDateStr());
         return uploadResult;
     }
 
     /**
-     * Submits a callable for each part to upload to our thread pool and records its corresponding Future.
+     * Submits a callable for each part to upload to our thread pool and records its corresponding
+     * Future.
      */
-    private void uploadPartsInParallel(UploadPartRequestFactory requestFactory,
-            String uploadId) {
+    private void uploadPartsInParallel(UploadPartRequestFactory requestFactory, String uploadId) {
 
-        Map<Integer,PartSummary> partNumbers = identifyExistingPartsForResume(uploadId);
+        Map<Integer, PartSummary> partNumbers = identifyExistingPartsForResume(uploadId);
 
         while (requestFactory.hasMoreRequests()) {
-            if (threadPool.isShutdown()) throw new CancellationException("TransferManager has been shutdown");
+            if (threadPool.isShutdown())
+                throw new CancellationException("TransferManager has been shutdown");
             UploadPartRequest request = requestFactory.getNextUploadPartRequest();
             if (partNumbers.containsKey(request.getPartNumber())) {
                 PartSummary summary = partNumbers.get(request.getPartNumber());
-                eTagsToSkip.add(new PartETag(request.getPartNumber(), summary
-                        .getETag()));
+                eTagsToSkip.add(new PartETag(request.getPartNumber(), summary.getETag()));
                 transferProgress.updateProgress(summary.getSize());
                 continue;
             }
@@ -278,8 +280,7 @@ public class UploadCallable implements Callable<UploadResult> {
         }
     }
 
-    private Map<Integer, PartSummary> identifyExistingPartsForResume(
-            String uploadId) {
+    private Map<Integer, PartSummary> identifyExistingPartsForResume(String uploadId) {
         Map<Integer, PartSummary> partNumbers = new HashMap<Integer, PartSummary>();
         if (uploadId == null) {
             return partNumbers;
@@ -287,10 +288,9 @@ public class UploadCallable implements Callable<UploadResult> {
         int partNumber = 0;
 
         while (true) {
-            PartListing parts = cos.listParts(new ListPartsRequest(
-                    origReq.getBucketName(),
-                    origReq.getKey(), uploadId)
-                    .withPartNumberMarker(partNumber));
+            PartListing parts = cos.listParts(
+                    new ListPartsRequest(origReq.getBucketName(), origReq.getKey(), uploadId)
+                            .withPartNumberMarker(partNumber));
             for (PartSummary partSummary : parts.getParts()) {
                 partNumbers.put(partSummary.getPartNumber(), partSummary);
             }
@@ -303,32 +303,32 @@ public class UploadCallable implements Callable<UploadResult> {
 
     /**
      * Initiates a multipart upload and returns the upload id
+     * 
      * @param isUsingEncryption
      */
     private String initiateMultipartUpload(PutObjectRequest origReq, boolean isUsingEncryption) {
 
         InitiateMultipartUploadRequest req = null;
         if (isUsingEncryption && origReq instanceof EncryptedPutObjectRequest) {
-            req = new EncryptedInitiateMultipartUploadRequest(
-                    origReq.getBucketName(), origReq.getKey()).withCannedACL(
-                    origReq.getCannedAcl()).withObjectMetadata(origReq.getMetadata());
-            ((EncryptedInitiateMultipartUploadRequest) req)
-                    .setMaterialsDescription(((EncryptedPutObjectRequest) origReq).getMaterialsDescription());
+            req = new EncryptedInitiateMultipartUploadRequest(origReq.getBucketName(),
+                    origReq.getKey()).withCannedACL(origReq.getCannedAcl())
+                            .withObjectMetadata(origReq.getMetadata());
+            ((EncryptedInitiateMultipartUploadRequest) req).setMaterialsDescription(
+                    ((EncryptedPutObjectRequest) origReq).getMaterialsDescription());
         } else {
             req = new InitiateMultipartUploadRequest(origReq.getBucketName(), origReq.getKey())
-                .withCannedACL(origReq.getCannedAcl())
-                .withObjectMetadata(origReq.getMetadata());
+                    .withCannedACL(origReq.getCannedAcl())
+                    .withObjectMetadata(origReq.getMetadata());
         }
 
         TransferManager.appendMultipartUserAgent(req);
 
         req.withAccessControlList(origReq.getAccessControlList())
-           .withStorageClass(origReq.getStorageClass())
-           .withRedirectLocation(origReq.getRedirectLocation())
-           .withSSECustomerKey(origReq.getSSECustomerKey())
-           .withSSECOSKeyManagementParams(origReq.getSSECOSKeyManagementParams())
-           .withGeneralProgressListener(origReq.getGeneralProgressListener())
-           ;
+                .withStorageClass(origReq.getStorageClass())
+                .withRedirectLocation(origReq.getRedirectLocation())
+                .withSSECustomerKey(origReq.getSSECustomerKey())
+                .withSSECOSKeyManagementParams(origReq.getSSECOSKeyManagementParams())
+                .withGeneralProgressListener(origReq.getGeneralProgressListener());
 
         String uploadId = cos.initiateMultipartUpload(req).getUploadId();
         log.debug("Initiated new multipart upload: " + uploadId);

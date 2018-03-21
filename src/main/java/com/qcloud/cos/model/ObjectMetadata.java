@@ -7,14 +7,15 @@ import java.util.Map;
 
 import com.qcloud.cos.Headers;
 import com.qcloud.cos.internal.ObjectExpirationResult;
+import com.qcloud.cos.internal.ObjectRestoreResult;
 
 
 /**
  * Represents the object metadata that is stored with Qcloud COS. This includes custom user-supplied
- * metadata, as well as the standard HTTP headers that Qcloud COS sends and receives (Content-Length,
- * ETag, Content-MD5, etc.).
+ * metadata, as well as the standard HTTP headers that Qcloud COS sends and receives
+ * (Content-Length, ETag, Content-MD5, etc.).
  */
-public class ObjectMetadata implements ObjectExpirationResult, Cloneable {
+public class ObjectMetadata implements ObjectExpirationResult, ObjectRestoreResult, Cloneable {
     /*
      * TODO: Might be nice to get as many of the internal use only methods out of here so users
      * never even see them. Example: we could set the ETag header directly through the raw metadata
@@ -49,6 +50,23 @@ public class ObjectMetadata implements ObjectExpirationResult, Cloneable {
      * The expiration rule id for this object.
      */
     private String expirationTimeRuleId;
+
+    /**
+     * Boolean value indicating whether there is an ongoing request to restore an archived copy of
+     * this object from CAS.
+     */
+    private Boolean ongoingRestore;
+
+    /**
+     * The time at which an object that has been temporarily restored from CAS will expire, and will
+     * need to be restored again in order to be accessed. Null if this object has not been restored
+     * from CAS.
+     */
+    private Date restoreExpirationTime;
+
+
+    /** True if this object represents a delete marker */
+    private boolean isDeleteMarker;
 
     /**
      * <p>
@@ -159,12 +177,11 @@ public class ObjectMetadata implements ObjectExpirationResult, Cloneable {
     public Map<String, Object> getRawMetadata() {
         return Collections.unmodifiableMap(metadata);
     }
-    
-    
-    
+
+
+
     /**
-     * For internal use only. Returns the raw value of the metadata/headers
-     * for the specified key.
+     * For internal use only. Returns the raw value of the metadata/headers for the specified key.
      */
     public Object getRawMetadataValue(String key) {
         return metadata.get(key);
@@ -252,9 +269,9 @@ public class ObjectMetadata implements ObjectExpirationResult, Cloneable {
      * associated object. The value of this header is a standard MIME type.
      * </p>
      * <p>
-     * When uploading files, the COS Java client will attempt to determine the correct content
-     * type if one hasn't been set yet. Users are responsible for ensuring a suitable content type
-     * is set when uploading streams. If no content type is provided and cannot be determined by the
+     * When uploading files, the COS Java client will attempt to determine the correct content type
+     * if one hasn't been set yet. Users are responsible for ensuring a suitable content type is set
+     * when uploading streams. If no content type is provided and cannot be determined by the
      * filename, the default content type, "application/octet-stream", will be used.
      * </p>
      * <p>
@@ -278,9 +295,9 @@ public class ObjectMetadata implements ObjectExpirationResult, Cloneable {
      * object. The value of this header is a standard MIME type.
      * </p>
      * <p>
-     * When uploading files, the COS Java client will attempt to determine the correct content
-     * type if one hasn't been set yet. Users are responsible for ensuring a suitable content type
-     * is set when uploading streams. If no content type is provided and cannot be determined by the
+     * When uploading files, the COS Java client will attempt to determine the correct content type
+     * if one hasn't been set yet. Users are responsible for ensuring a suitable content type is set
+     * when uploading streams. If no content type is provided and cannot be determined by the
      * filename, the default content type "application/octet-stream" will be used.
      * </p>
      * <p>
@@ -297,7 +314,7 @@ public class ObjectMetadata implements ObjectExpirationResult, Cloneable {
     public void setContentType(String contentType) {
         metadata.put(Headers.CONTENT_TYPE, contentType);
     }
-    
+
     /**
      * <p>
      * Gets the Content-Language HTTP header, which describes the natural language(s) of the
@@ -305,13 +322,13 @@ public class ObjectMetadata implements ObjectExpirationResult, Cloneable {
      * </p>
      */
     public String getContentLanguage() {
-        return (String)metadata.get(Headers.CONTENT_LANGUAGE);
+        return (String) metadata.get(Headers.CONTENT_LANGUAGE);
     }
-    
+
     /**
      * <p>
-     * Sets the Content-Language HTTP header which describes the natural language(s) of the
-     * intended audience for the enclosed entity.
+     * Sets the Content-Language HTTP header which describes the natural language(s) of the intended
+     * audience for the enclosed entity.
      * </p>
      */
     public void setContentLanguage(String contentLanguage) {
@@ -406,8 +423,8 @@ public class ObjectMetadata implements ObjectExpirationResult, Cloneable {
      * <p>
      * Sets the base64 encoded 128-bit MD5 digest of the associated object (content - not including
      * headers) according to RFC 1864. This data is used as a message integrity check to verify that
-     * the data received by Qcloud COS is the same data that the caller sent. If set to null,then the
-     * MD5 digest is removed from the metadata.
+     * the data received by Qcloud COS is the same data that the caller sent. If set to null,then
+     * the MD5 digest is removed from the metadata.
      * </p>
      * <p>
      * This field represents the base64 encoded 128-bit MD5 digest digest of an object's content as
@@ -415,8 +432,8 @@ public class ObjectMetadata implements ObjectExpirationResult, Cloneable {
      * MD5 digest as computed by Qcloud COS.
      * </p>
      * <p>
-     * The COS Java client will attempt to calculate this field automatically when uploading
-     * files to Qcloud COS.
+     * The COS Java client will attempt to calculate this field automatically when uploading files
+     * to Qcloud COS.
      * </p>
      *
      * @param md5Base64 The base64 encoded MD5 hash of the content for the object associated with
@@ -445,8 +462,8 @@ public class ObjectMetadata implements ObjectExpirationResult, Cloneable {
      * MD5 digest as computed by Qcloud COS.
      * </p>
      * <p>
-     * The COS Java client will attempt to calculate this field automatically when uploading
-     * files to Qcloud COS.
+     * The COS Java client will attempt to calculate this field automatically when uploading files
+     * to Qcloud COS.
      * </p>
      *
      * @return The base64 encoded MD5 hash of the content for the associated object. Returns
@@ -600,6 +617,48 @@ public class ObjectMetadata implements ObjectExpirationResult, Cloneable {
      */
     public Date getHttpExpiresDate() {
         return httpExpiresDate;
+    }
+
+    /**
+     * Returns the time at which an object that has been temporarily restored from CAS will expire,
+     * and will need to be restored again in order to be accessed. Returns null if this is not a
+     * temporary copy of an object restored from CAS.
+     */
+    public Date getRestoreExpirationTime() {
+        return restoreExpirationTime;
+    }
+
+    /**
+     * only used to set the value in the object after receiving the value in a response from COS.
+     *
+     * @param restoreExpirationTime The new restore expiration time for the object.
+     */
+    public void setRestoreExpirationTime(Date restoreExpirationTime) {
+        this.restoreExpirationTime = restoreExpirationTime;
+    }
+
+    /**
+     * For internal use only. Sets the boolean value which indicates whether there is ongoing
+     * restore request. Not intended to be called by external code.
+     */
+    public void setOngoingRestore(boolean ongoingRestore) {
+        this.ongoingRestore = Boolean.valueOf(ongoingRestore);
+    }
+
+
+    /**
+     * Returns the boolean value which indicates whether there is ongoing restore request.
+     */
+    public Boolean getOngoingRestore() {
+        return this.ongoingRestore;
+    }
+    
+    public boolean isDeleteMarker() {
+        return isDeleteMarker;
+    }
+
+    public void setDeleteMarker(boolean isDeleteMarker) {
+        this.isDeleteMarker = isDeleteMarker;
     }
 
     /**

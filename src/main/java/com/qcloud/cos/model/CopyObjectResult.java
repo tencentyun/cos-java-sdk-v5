@@ -6,7 +6,13 @@ import java.util.Date;
 import com.qcloud.cos.internal.ObjectExpirationResult;
 import com.qcloud.cos.internal.SSEResultBase;
 
-public class CopyObjectResult extends SSEResultBase implements ObjectExpirationResult,Serializable {
+public class CopyObjectResult extends SSEResultBase
+        implements ObjectExpirationResult, Serializable {
+    /** x-cos-requestid **/
+    private String requestId;
+
+    /** date **/
+    private String dateStr;
 
     /** The ETag value of the new object */
     private String etag;
@@ -15,9 +21,8 @@ public class CopyObjectResult extends SSEResultBase implements ObjectExpirationR
     private Date lastModifiedDate;
 
     /**
-     * The version ID of the new, copied object. This field will only be present
-     * if object versioning has been enabled for the bucket to which the object
-     * was copied.
+     * The version ID of the new, copied object. This field will only be present if object
+     * versioning has been enabled for the bucket to which the object was copied.
      */
     private String versionId;
 
@@ -28,8 +33,45 @@ public class CopyObjectResult extends SSEResultBase implements ObjectExpirationR
     private String expirationTimeRuleId;
 
     /**
-     * Gets the ETag value for the new object that was created in the
-     * associated {@link CopyObjectRequest}.
+     * get requestid for this upload
+     * 
+     * @return requestid
+     */
+    public String getRequestId() {
+        return requestId;
+    }
+
+    /**
+     * set requestId for this upload
+     * 
+     * @param requestId the requestId for the upload
+     */
+
+    public void setRequestId(String requestId) {
+        this.requestId = requestId;
+    }
+
+    /**
+     * get date header for this upload
+     * 
+     * @return date str
+     */
+    public String getDateStr() {
+        return dateStr;
+    }
+
+    /**
+     * set date str for this upload
+     * 
+     * @param dateStr date str header
+     */
+    public void setDateStr(String dateStr) {
+        this.dateStr = dateStr;
+    }
+
+    /**
+     * Gets the ETag value for the new object that was created in the associated
+     * {@link CopyObjectRequest}.
      *
      * @return The ETag value for the new object.
      *
@@ -40,11 +82,10 @@ public class CopyObjectResult extends SSEResultBase implements ObjectExpirationR
     }
 
     /**
-     * Sets the ETag value for the new object that was created from the
-     * associated copy object request.
+     * Sets the ETag value for the new object that was created from the associated copy object
+     * request.
      *
-     * @param etag
-     *            The ETag value for the new object.
+     * @param etag The ETag value for the new object.
      *
      * @see CopyObjectResult#getETag()
      */
@@ -66,8 +107,7 @@ public class CopyObjectResult extends SSEResultBase implements ObjectExpirationR
     /**
      * Sets the date the newly copied object was last modified.
      *
-     * @param lastModifiedDate
-     *            The date the new, copied object was last modified.
+     * @param lastModifiedDate The date the new, copied object was last modified.
      *
      * @see CopyObjectResult#getLastModifiedDate()
      */
@@ -76,9 +116,8 @@ public class CopyObjectResult extends SSEResultBase implements ObjectExpirationR
     }
 
     /**
-     * Gets the version ID of the newly copied object. This field is only
-     * present if object versioning has been enabled for the bucket the
-     * object was copied to.
+     * Gets the version ID of the newly copied object. This field is only present if object
+     * versioning has been enabled for the bucket the object was copied to.
      *
      * @return The version ID of the newly copied object.
      *
@@ -91,8 +130,7 @@ public class CopyObjectResult extends SSEResultBase implements ObjectExpirationR
     /**
      * Sets the version ID of the newly copied object.
      *
-     * @param versionId
-     *            The version ID of the newly copied object.
+     * @param versionId The version ID of the newly copied object.
      *
      * @see CopyObjectResult#getVersionId()
      */
@@ -110,27 +148,24 @@ public class CopyObjectResult extends SSEResultBase implements ObjectExpirationR
     /**
      * Sets the expiration time for the object.
      *
-     * @param expirationTime
-     *            The expiration time for the object.
+     * @param expirationTime The expiration time for the object.
      */
     public void setExpirationTime(Date expirationTime) {
         this.expirationTime = expirationTime;
     }
 
     /**
-     * Returns the {@link BucketLifecycleConfiguration} rule ID for this
-     * object's expiration, or null if it doesn't expire.
+     * Returns the {@link BucketLifecycleConfiguration} rule ID for this object's expiration, or
+     * null if it doesn't expire.
      */
     public String getExpirationTimeRuleId() {
         return expirationTimeRuleId;
     }
 
     /**
-     * Sets the {@link BucketLifecycleConfiguration} rule ID for this object's
-     * expiration
+     * Sets the {@link BucketLifecycleConfiguration} rule ID for this object's expiration
      *
-     * @param expirationTimeRuleId
-     *            The rule ID for this object's expiration
+     * @param expirationTimeRuleId The rule ID for this object's expiration
      */
     public void setExpirationTimeRuleId(String expirationTimeRuleId) {
         this.expirationTimeRuleId = expirationTimeRuleId;

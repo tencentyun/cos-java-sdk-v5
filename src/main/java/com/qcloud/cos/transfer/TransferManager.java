@@ -1198,7 +1198,6 @@ public class TransferManager {
             long[] range = persistableDownload.getRange();
             request.setRange(range[0], range[1]);
         }
-        request.setRequesterPays(persistableDownload.isRequesterPays());
         request.setResponseHeaders(persistableDownload.getResponseHeaders());
 
         return doDownload(request, new File(persistableDownload.getFile()), null, null,

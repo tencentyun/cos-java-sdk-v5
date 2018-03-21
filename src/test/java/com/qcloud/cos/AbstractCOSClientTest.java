@@ -8,16 +8,23 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Date;
+import java.util.Map;
 import java.util.Properties;
+import java.util.Map.Entry;
 import java.util.concurrent.ThreadLocalRandom;
 
 import com.qcloud.cos.auth.BasicCOSCredentials;
 import com.qcloud.cos.auth.COSCredentials;
+import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.internal.SkipMd5CheckStrategy;
 import com.qcloud.cos.model.AccessControlList;
+import com.qcloud.cos.model.Bucket;
+import com.qcloud.cos.model.BucketVersioningConfiguration;
 import com.qcloud.cos.model.CannedAccessControlList;
+import com.qcloud.cos.model.CreateBucketRequest;
 import com.qcloud.cos.model.GetObjectMetadataRequest;
 import com.qcloud.cos.model.GetObjectRequest;
+import com.qcloud.cos.model.HeadBucketRequest;
 import com.qcloud.cos.model.ObjectMetadata;
 import com.qcloud.cos.model.Permission;
 import com.qcloud.cos.model.PutObjectRequest;
@@ -68,7 +75,21 @@ public class AbstractCOSClientTest {
         return tmpFile;
     }
 
+    protected static boolean deleteDir(File dir) {
+        if (dir.isDirectory()) {
+            String[] children = dir.list();
+            for (int i = 0; i < children.length; i++) {
+                boolean success = deleteDir(new File(dir, children[i]));
+                if (!success) {
+                    return false;
+                }
+            }
+        }
+        return dir.delete();
+    }
+
     public static void initCosClient() throws Exception {
+        appid = System.getenv("appid");
         secretId = System.getenv("secretId");
         secretKey = System.getenv("secretKey");
         region = System.getenv("region");
@@ -81,6 +102,7 @@ public class AbstractCOSClientTest {
             try {
                 fis = new FileInputStream(propFile);
                 prop.load(fis);
+                appid = prop.getProperty("appid");
                 secretId = prop.getProperty("secretId");
                 secretKey = prop.getProperty("secretKey");
                 region = prop.getProperty("region");
@@ -95,8 +117,7 @@ public class AbstractCOSClientTest {
             }
         }
 
-        if (secretId == null || secretKey == null || bucket == null
-                || region == null) {
+        if (secretId == null || secretKey == null || bucket == null || region == null) {
             System.out.println("cos ut user info missing. skip all test");
             return;
         }
@@ -107,14 +128,42 @@ public class AbstractCOSClientTest {
         if (!tmpDir.exists()) {
             tmpDir.mkdirs();
         }
+        createBucket();
+    }
+
+    private static void createBucket() throws Exception {
+        try {
+            String bucketName = bucket;
+            CreateBucketRequest createBucketRequest = new CreateBucketRequest(bucketName);
+            createBucketRequest.setCannedAcl(CannedAccessControlList.PublicRead);
+            Bucket createdBucket = cosclient.createBucket(createBucketRequest);
+            assertEquals(bucketName, createdBucket.getName());
+            Thread.sleep(5000L);
+            assertTrue(cosclient.doesBucketExist(bucketName));
+        } catch (CosServiceException cse) {
+            fail(cse.toString());
+        }
+    }
+
+    private static void deleteBucket() throws Exception {
+        try {
+            String bucketName = bucket;
+            cosclient.deleteBucket(bucketName);
+            // 删除bucket后, 由于server端有缓存 需要稍后查询, 这里sleep 5 秒
+            Thread.sleep(5000L);
+            assertFalse(cosclient.doesBucketExist(bucketName));
+        } catch (CosServiceException cse) {
+            fail(cse.toString());
+        }
     }
 
     public static void destoryCosClient() throws Exception {
         if (cosclient != null) {
+            deleteBucket();
             cosclient.shutdown();
         }
         if (tmpDir != null) {
-            tmpDir.delete();
+            deleteDir(tmpDir);
         }
     }
 
@@ -123,9 +172,9 @@ public class AbstractCOSClientTest {
     }
 
     // 从本地上传
-    protected static void putObjectFromLocalFile(File localFile, String key) {
+    protected static PutObjectResult putObjectFromLocalFile(File localFile, String key) {
         if (!judgeUserInfoValid()) {
-            return;
+            return null;
         }
 
         AccessControlList acl = new AccessControlList();
@@ -137,6 +186,8 @@ public class AbstractCOSClientTest {
         // putObjectRequest.setAccessControlList(acl);
 
         PutObjectResult putObjectResult = cosclient.putObject(putObjectRequest);
+        assertNotNull(putObjectResult.getRequestId());
+        assertNotNull(putObjectResult.getDateStr());
         String etag = putObjectResult.getETag();
         String expectEtag = null;
         try {
@@ -145,7 +196,7 @@ public class AbstractCOSClientTest {
             fail(e.toString());
         }
         assertEquals(expectEtag, etag);
-
+        return putObjectResult;
     }
 
     // 流式上传
@@ -221,17 +272,18 @@ public class AbstractCOSClientTest {
         System.setProperty(SkipMd5CheckStrategy.DISABLE_GET_OBJECT_MD5_VALIDATION_PROPERTY, "true");
         GetObjectRequest getObjectRequest = new GetObjectRequest(bucket, key);
         ResponseHeaderOverrides responseHeaders = new ResponseHeaderOverrides();
-        String responseContentType="image/x-icon";
+        String responseContentType = "image/x-icon";
         String responseContentLanguage = "zh-CN";
         String responseContentDispositon = "filename=\"abc.txt\"";
         String responseCacheControl = "no-cache";
-        String expireStr = DateUtils.formatRFC822Date(new Date(System.currentTimeMillis() + 24 * 3600 * 1000));
+        String expireStr =
+                DateUtils.formatRFC822Date(new Date(System.currentTimeMillis() + 24 * 3600 * 1000));
         responseHeaders.setContentType(responseContentType);
         responseHeaders.setContentLanguage(responseContentLanguage);
         responseHeaders.setContentDisposition(responseContentDispositon);
         responseHeaders.setCacheControl(responseCacheControl);
         responseHeaders.setExpires(expireStr);
-        
+
         getObjectRequest.setResponseHeaders(responseHeaders);
         try {
             ObjectMetadata objectMetadata = cosclient.getObject(getObjectRequest, localDownFile);
@@ -244,6 +296,14 @@ public class AbstractCOSClientTest {
         }
     }
 
+    protected void checkMetaData(ObjectMetadata originMetaData, ObjectMetadata queryMetaData) {
+        Map<String, Object> originRawMeta = originMetaData.getRawMetadata();
+        Map<String, Object> queryRawMeta = queryMetaData.getRawMetadata();
+        for (Entry<String, Object> entry : originRawMeta.entrySet()) {
+            assertTrue(queryRawMeta.containsKey(entry.getKey()));
+            assertEquals(entry.getValue(), queryRawMeta.get(entry.getKey()));
+        }
+    }
 
     // 删除COS上的object
     protected static void clearObject(String key) {

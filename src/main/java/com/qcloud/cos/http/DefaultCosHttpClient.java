@@ -1,5 +1,6 @@
 package com.qcloud.cos.http;
 
+import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -88,6 +89,7 @@ public class DefaultCosHttpClient implements CosHttpClient {
                         .setConnectTimeout(this.clientConfig.getConnectionTimeout())
                         .setSocketTimeout(this.clientConfig.getSocketTimeout()).build();
         this.idleConnectionMonitor = new IdleConnectionMonitorThread(this.connectionManager);
+        this.idleConnectionMonitor.setDaemon(true);
         this.idleConnectionMonitor.start();
     }
 
@@ -227,10 +229,16 @@ public class DefaultCosHttpClient implements CosHttpClient {
     private <X extends CosServiceRequest> CosHttpResponse createResponse(
             HttpRequestBase httpRequestBase, CosHttpRequest<X> request,
             org.apache.http.HttpResponse apacheHttpResponse) throws IOException {
+        ProgressListener progressListener = request.getProgressListener();
         CosHttpResponse httpResponse = new CosHttpResponse(request, httpRequestBase);
 
         if (apacheHttpResponse.getEntity() != null) {
-            httpResponse.setContent(apacheHttpResponse.getEntity().getContent());
+            InputStream oriIn = apacheHttpResponse.getEntity().getContent();
+            InputStream progressIn = null;
+            if (oriIn != null) {
+                progressIn = ProgressInputStream.inputStreamForResponse(oriIn, progressListener);
+                httpResponse.setContent(progressIn);
+            }
         }
 
         httpResponse.setStatusCode(apacheHttpResponse.getStatusLine().getStatusCode());
@@ -326,7 +334,7 @@ public class DefaultCosHttpClient implements CosHttpClient {
         if (originalContent != null) {
             request.setContent(monitorStreamProgress(progressListener, originalContent));
         }
-        if (originalContent != null && originalContent.markSupported()) {
+        if (originalContent != null && originalContent.markSupported() && !(originalContent instanceof BufferedInputStream)) {
             final int readLimit = clientConfig.getReadLimit();
             originalContent.mark(readLimit);
         }
@@ -335,6 +343,11 @@ public class DefaultCosHttpClient implements CosHttpClient {
         while (retryIndex < kMaxRetryCnt) {
             try {
                 checkInterrupted();
+                if (originalContent instanceof BufferedInputStream && originalContent.markSupported()) {
+                    // Mark everytime for BufferedInputStream, since the marker could have been invalidated
+                    final int readLimit = clientConfig.getReadLimit();
+                    originalContent.mark(readLimit);
+                }
                 // 如果是重试的则恢复流
                 if (retryIndex != 0 && originalContent != null) {
                     originalContent.reset();

@@ -7,6 +7,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.model.BucketCrossOriginConfiguration;
 import com.qcloud.cos.model.CORSRule;
 import com.qcloud.cos.model.CORSRule.AllowedMethods;
@@ -57,5 +58,26 @@ public class CORSTest extends AbstractCOSClientTest {
         assertEquals(60, corsRuleGet.getMaxAgeSeconds());
         
         cosclient.deleteBucketCrossOriginConfiguration(bucket);
+    }
+    
+    @Test
+    public void putAndGetNotExistBucketCORSTest() {
+        if (!judgeUserInfoValid()) {
+            return;
+        }
+        String bucketName = "not-exist-" + bucket;
+        BucketCrossOriginConfiguration bucketCORS = new BucketCrossOriginConfiguration();
+        List<CORSRule> corsRules = new ArrayList<>();
+        bucketCORS.setRules(corsRules);
+        try {
+            cosclient.setBucketCrossOriginConfiguration(bucketName, bucketCORS);
+        } catch (CosServiceException cse) {
+            assertEquals(4, cse.getStatusCode() / 100);
+        }
+        try {
+            cosclient.getBucketCrossOriginConfiguration(bucketName);
+        } catch (CosServiceException cse) {
+            assertEquals(404, cse.getStatusCode() / 100);
+        }
     }
 }

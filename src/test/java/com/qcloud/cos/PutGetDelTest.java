@@ -2,14 +2,16 @@ package com.qcloud.cos;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -18,6 +20,8 @@ import org.junit.Test;
 
 import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.http.HttpProtocol;
+import com.qcloud.cos.model.COSObject;
+import com.qcloud.cos.model.GetObjectRequest;
 import com.qcloud.cos.model.ObjectMetadata;
 import com.qcloud.cos.utils.Md5Utils;
 import com.qcloud.cos.utils.UrlEncoderUtils;
@@ -41,7 +45,7 @@ public class PutGetDelTest extends AbstractCOSClientTest {
         }
         File localFile = buildTestFile(size);
         File downLoadFile = new File(localFile.getAbsolutePath() + ".down");
-        String key = "/ut/" + localFile.getName();
+        String key = "ut/" + localFile.getName();
         testPutGetObjectAndClear(key, localFile, downLoadFile);
     }
 
@@ -50,7 +54,7 @@ public class PutGetDelTest extends AbstractCOSClientTest {
         if (!judgeUserInfoValid()) {
             return;
         }
-        
+
         try {
             // put object
             putObjectFromLocalFile(localFile, key);
@@ -89,7 +93,7 @@ public class PutGetDelTest extends AbstractCOSClientTest {
         }
         File localFile = buildTestFile(size);
         File downLoadFile = new File(localFile.getAbsolutePath() + ".down");
-        String key = "/ut/" + localFile.getName();
+        String key = "ut/" + localFile.getName();
         originMetaData.setContentLength(size);
         try {
             // put object
@@ -117,15 +121,6 @@ public class PutGetDelTest extends AbstractCOSClientTest {
         }
     }
 
-    private void checkMetaData(ObjectMetadata originMetaData, ObjectMetadata queryMetaData) {
-        Map<String, Object> originRawMeta = originMetaData.getRawMetadata();
-        Map<String, Object> queryRawMeta = queryMetaData.getRawMetadata();
-        for (Entry<String, Object> entry : originRawMeta.entrySet()) {
-            assertTrue(queryRawMeta.containsKey(entry.getKey()));
-            assertEquals(entry.getValue(), queryRawMeta.get(entry.getKey()));
-        }
-    }
-
     public void testPutObjectByTruncateDiffSize(long originSize, long truncateSize)
             throws IOException {
         if (!judgeUserInfoValid()) {
@@ -133,7 +128,7 @@ public class PutGetDelTest extends AbstractCOSClientTest {
         }
         File localFile = buildTestFile(originSize);
         File downLoadFile = new File(localFile.getAbsolutePath() + ".down");
-        String key = "/ut/" + localFile.getName();
+        String key = "ut/" + localFile.getName();
         try {
             byte[] partByte = getFilePartByte(localFile, 0, new Long(truncateSize).intValue());
             String uploadEtag = Md5Utils.md5Hex(partByte);
@@ -178,13 +173,13 @@ public class PutGetDelTest extends AbstractCOSClientTest {
         return content;
     }
 
-    @Ignore
+    @Test
     public void testPutGetDelObjectNameContainSpecialLetter() throws IOException {
         File localFile = buildTestFile(0L);
         File downLoadFile = new File(localFile.getAbsolutePath() + ".down");
         // 目前server端有bug, 不支持冒号，问号，待修复后添加上
         String key =
-                "/→↓←→↖↗↙↘!? //////\"#$%&()*+',-./0123456789;<=>@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
+                "→↓←→↖↗↙↘!? /\"#$%&()*+',-./0123456789;<=>@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
         testPutGetObjectAndClear(key, localFile, downLoadFile);
     }
 
@@ -195,7 +190,7 @@ public class PutGetDelTest extends AbstractCOSClientTest {
         }
         File localFile = buildTestFile(1L);
         File downLoadFile = new File(localFile.getAbsolutePath() + ".down");
-        String key = "/ut/" + "测试文件.png";
+        String key = "ut/" + "测试文件.png";
         testPutGetObjectAndClear(key, localFile, downLoadFile);
     }
 
@@ -236,7 +231,7 @@ public class PutGetDelTest extends AbstractCOSClientTest {
         testPutGetDelObjectDiffSize(32 * 1024 * 1024L);
     }
 
-    @Test
+    @Ignore
     public void testPutGetDelObject100M() throws CosServiceException, IOException {
         testPutGetDelObjectDiffSize(100 * 1024 * 1024L);
     }
@@ -267,7 +262,7 @@ public class PutGetDelTest extends AbstractCOSClientTest {
         testPutObjectByStreamDiffSize(32 * 1024 * 1024L);
     }
 
-    @Test
+    @Ignore
     public void testPutObjectByStream100M() throws IOException {
         testPutObjectByStreamDiffSize(100 * 1024 * 1024L);
     }
@@ -292,12 +287,12 @@ public class PutGetDelTest extends AbstractCOSClientTest {
     @Test
     public void testPutObjectWithChineseContentDisposition() throws IOException {
         ObjectMetadata originObjectMeta = new ObjectMetadata();
-        String disposition =
-                "attachment;filename=\"" + UrlEncoderUtils.encode(new String("测试文件.txt".getBytes(), "UTF-8")) + ".jpg\"";
+        String disposition = "attachment;filename=\""
+                + UrlEncoderUtils.encode(new String("测试文件.txt".getBytes(), "UTF-8")) + ".jpg\"";
         originObjectMeta.setContentDisposition(disposition);
         testPutObjectByStreamDiffSize(0L, originObjectMeta);
     }
-    
+
     @Test
     public void testPutObjectWithContentType() throws IOException {
         ObjectMetadata originObjectMeta = new ObjectMetadata();
@@ -305,4 +300,142 @@ public class PutGetDelTest extends AbstractCOSClientTest {
         testPutObjectByStreamDiffSize(0L, originObjectMeta);
     }
 
+    @Test
+    public void testPutObjectWithServerSideEncryption() throws IOException {
+        ObjectMetadata originObjectMeta = new ObjectMetadata();
+        originObjectMeta.setServerSideEncryption("AES256");
+        testPutObjectByStreamDiffSize(1L, originObjectMeta);
+    }
+
+    @Test
+    public void testGetObjectIfMatchWrongEtag() throws IOException {
+        if (!judgeUserInfoValid()) {
+            return;
+        }
+        File localFile = buildTestFile(1024);
+        String key = "ut/" + localFile.getName();
+        cosclient.putObject(bucket, key, localFile);
+        try {
+            String fileEtag = Md5Utils.md5Hex(localFile);
+            // 打乱一下，得到一个错误的etag
+            String wrongEtag = fileEtag.substring(5) + fileEtag.substring(0, 5);
+            GetObjectRequest getObjectRequest = new GetObjectRequest(bucket, key);
+            List<String> eTagList = new ArrayList<>();
+            eTagList.add(wrongEtag);
+            getObjectRequest.setMatchingETagConstraints(eTagList);
+
+            COSObject cosObject = cosclient.getObject(getObjectRequest);
+            assertNull(cosObject);
+        }catch(CosServiceException cse) {
+            fail(cse.toString());
+        } finally {
+            cosclient.deleteObject(bucket, key);
+            assertTrue(localFile.delete());
+        }
+    }
+    
+    @Test
+    public void testGetObjectIfMatchRightEtag() throws IOException {
+        if (!judgeUserInfoValid()) {
+            return;
+        }
+        File localFile = buildTestFile(1024);
+        String key = "ut/" + localFile.getName();
+        cosclient.putObject(bucket, key, localFile);
+        try {
+            String fileEtag = Md5Utils.md5Hex(localFile);
+            GetObjectRequest getObjectRequest = new GetObjectRequest(bucket, key);
+            List<String> eTagList = new ArrayList<>();
+            eTagList.add("\"" + fileEtag + "\"");
+            getObjectRequest.setMatchingETagConstraints(eTagList);
+
+            COSObject cosObject = cosclient.getObject(getObjectRequest);
+            assertNotNull(cosObject);
+        }catch(CosServiceException cse) {
+            fail(cse.toString());
+        } finally {
+            cosclient.deleteObject(bucket, key);
+            assertTrue(localFile.delete());
+        }
+    }
+
+    @Ignore
+    public void testGetObjectIfMatchContainRightEtag() throws IOException {
+        if (!judgeUserInfoValid()) {
+            return;
+        }
+        File localFile = buildTestFile(1024);
+        String key = "ut/" + localFile.getName();
+        cosclient.putObject(bucket, key, localFile);
+        try {
+            String fileEtag = Md5Utils.md5Hex(localFile);
+            String wrongEtag = fileEtag.substring(5) + fileEtag.substring(0, 5);
+            GetObjectRequest getObjectRequest = new GetObjectRequest(bucket, key);
+            List<String> eTagList = new ArrayList<>();
+            eTagList.add("\"" + wrongEtag + "\"");
+            eTagList.add("\"" + fileEtag + "\"");
+            getObjectRequest.setMatchingETagConstraints(eTagList);
+
+            COSObject cosObject = cosclient.getObject(getObjectRequest);
+            assertNotNull(cosObject);
+        }catch(CosServiceException cse) {
+            fail(cse.toString());
+        } finally {
+            cosclient.deleteObject(bucket, key);
+            assertTrue(localFile.delete());
+        }
+    }
+    
+    @Test
+    public void testGetObjectIfNoneMatchRightEtag() throws IOException {
+        if (!judgeUserInfoValid()) {
+            return;
+        }
+        File localFile = buildTestFile(1024);
+        String key = "ut/" + localFile.getName();
+        cosclient.putObject(bucket, key, localFile);
+        try {
+            String fileEtag = Md5Utils.md5Hex(localFile);
+            String wrongEtag = fileEtag.substring(5) + fileEtag.substring(0, 5);
+            GetObjectRequest getObjectRequest = new GetObjectRequest(bucket, key);
+            List<String> eTagList = new ArrayList<>();
+            eTagList.add("\"" + fileEtag + "\"");
+            getObjectRequest.setNonmatchingETagConstraints(eTagList);
+
+            COSObject cosObject = cosclient.getObject(getObjectRequest);
+            assertNull(cosObject);
+        }catch(CosServiceException cse) {
+            fail(cse.toString());
+        } finally {
+            cosclient.deleteObject(bucket, key);
+            assertTrue(localFile.delete());
+        }
+    }
+    
+    @Test
+    public void testGetObjectIfNoneMatchWrongEtag() throws IOException {
+        if (!judgeUserInfoValid()) {
+            return;
+        }
+        File localFile = buildTestFile(1024);
+        String key = "ut/" + localFile.getName();
+        cosclient.putObject(bucket, key, localFile);
+        try {
+            String fileEtag = Md5Utils.md5Hex(localFile);
+            String wrongEtag = fileEtag.substring(5) + fileEtag.substring(0, 5);
+            GetObjectRequest getObjectRequest = new GetObjectRequest(bucket, key);
+            List<String> eTagList = new ArrayList<>();
+            eTagList.add("\"" + wrongEtag + "\"");
+            getObjectRequest.setNonmatchingETagConstraints(eTagList);
+
+            COSObject cosObject = cosclient.getObject(getObjectRequest);
+            assertNotNull(cosObject);
+        }catch(CosServiceException cse) {
+            fail(cse.toString());
+        } finally {
+            cosclient.deleteObject(bucket, key);
+            assertTrue(localFile.delete());
+        }
+    }
+    
 }

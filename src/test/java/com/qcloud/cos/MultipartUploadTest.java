@@ -93,6 +93,8 @@ public class MultipartUploadTest extends AbstractCOSClientTest {
                 new CompleteMultipartUploadRequest(bucket, key, uploadId, partETags);
         CompleteMultipartUploadResult completeResult =
                 cosclient.completeMultipartUpload(completeMultipartUploadRequest);
+        assertNotNull(completeResult.getRequestId());
+        assertNotNull(completeResult.getDateStr());
         String etag = completeResult.getETag();
         assertTrue(etag.contains("-"));
         try {
@@ -142,7 +144,7 @@ public class MultipartUploadTest extends AbstractCOSClientTest {
 
     @Test
     public void testMultipartUploadObjectSize_32M_Part_1M() throws IOException {
-        testMultiPartUploadObject(32 * 1024 * 1024L, 1 * 1024 * 1024L);
+        testMultiPartUploadObject(1 * 1024 * 1024L, 1 * 1024 * 1024L);
     }
 
     // 测试分块上传

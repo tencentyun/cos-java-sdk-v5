@@ -13,6 +13,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.slf4j.Logger;
 
@@ -46,7 +47,7 @@ public class GeneratePresignedUrlTest extends AbstractCOSClientTest {
         }
         long localFileLen = 1024;
         File localFile = buildTestFile(1024);
-        String key = "/ut/" + localFile.getName();
+        String key = "ut/" + localFile.getName();
 
         putObjectFromLocalFile(localFile, key);
 
@@ -78,7 +79,7 @@ public class GeneratePresignedUrlTest extends AbstractCOSClientTest {
         assertEquals(responseCacheControl, connection.getHeaderField("Cache-Control"));
 
         clearObject(key);
-        localFile.delete();
+        assertTrue(localFile.delete());
     }
 
     @Test
@@ -110,7 +111,7 @@ public class GeneratePresignedUrlTest extends AbstractCOSClientTest {
 
         headSimpleObject(key, localFile.length(), Md5Utils.md5Hex(localFile));
         clearObject(key);
-        localFile.delete();
+        assertTrue(localFile.delete());
     }
     
     @Test

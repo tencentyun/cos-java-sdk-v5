@@ -27,4 +27,10 @@ public class Constants {
     
     /** Represents a null version ID */
     public static final String NULL_VERSION_ID = "null";
+    
+    /** URL encoding for object keys when list object */
+    public static final String URL_ENCODING = "url";
+    
+    /** Default encoding used for url encode */
+    public static final String DEFAULT_ENCODING = "UTF-8";
 }
