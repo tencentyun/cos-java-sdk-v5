@@ -85,6 +85,8 @@ public class CompleteMultipartUpload implements Callable<UploadResult> {
         uploadResult.setKey(origReq.getKey());
         uploadResult.setETag(res.getETag());
         uploadResult.setVersionId(res.getVersionId());
+        uploadResult.setRequestId(res.getRequestId());
+        uploadResult.setDateStr(res.getDateStr());
 
         monitor.uploadComplete();
 

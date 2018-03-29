@@ -71,6 +71,8 @@ public class TransferManagerTest extends AbstractCOSClientTest {
             // head object
             headSimpleObject(key, localFile.length(), Md5Utils.md5Hex(localFile));
             assertEquals(Md5Utils.md5Hex(localFile), uploadResult.getETag());
+            assertNotNull(uploadResult.getRequestId());
+            assertNotNull(uploadResult.getDateStr());
             GetObjectRequest getObjectRequest = new GetObjectRequest(bucket, key);
             Download download = transferManager.download(getObjectRequest, downFile);
             download.waitForCompletion();
@@ -116,6 +118,8 @@ public class TransferManagerTest extends AbstractCOSClientTest {
             Upload upload = transferManager.upload(putObjectRequest);
             UploadResult uploadResult = upload.waitForUploadResult();
             assertTrue(uploadResult.getETag().contains("-"));
+            assertNotNull(uploadResult.getRequestId());
+            assertNotNull(uploadResult.getDateStr());
             GetObjectRequest getObjectRequest = new GetObjectRequest(bucket, key);
             Download download = transferManager.download(getObjectRequest, downFile);
             download.waitForCompletion();
