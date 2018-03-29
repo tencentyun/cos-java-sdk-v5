@@ -189,8 +189,8 @@ public class TransferManagerTest extends AbstractCOSClientTest {
         if (!downloaddir.exists()) {
             downloaddir.mkdir();
         }
-        File downloadFile1 = new File(downloadDirName + folderPrefix + localFile1.getName());
-        File downloadFile2 = new File(downloadDirName + folderPrefix + localFile2.getName());
+        File downloadFile1 = new File(downloadDirName + "/" +  folderPrefix + localFile1.getName());
+        File downloadFile2 = new File(downloadDirName + "/" + folderPrefix + localFile2.getName());
         try {
             MultipleFileUpload multipleFileUpload =
                     transferManager.uploadDirectory(bucket, folderPrefix, tmpDir, true);
@@ -225,7 +225,7 @@ public class TransferManagerTest extends AbstractCOSClientTest {
     }
 
     // transfer manager对不同园区5G以上文件进行分块拷贝
-    @Test
+    @Ignore
     public void testTransferManagerCopyBigFileFromDiffRegion()
             throws CosServiceException, CosClientException, InterruptedException {
         if (!judgeUserInfoValid()) {
@@ -246,7 +246,7 @@ public class TransferManagerTest extends AbstractCOSClientTest {
     }
 
     // transfer manager对不同园区5G以下文件进行使用put object copy
-    @Test
+    @Ignore
     public void testTransferManagerCopySmallFileFromDiffRegion()
             throws CosServiceException, CosClientException, InterruptedException {
         if (!judgeUserInfoValid()) {

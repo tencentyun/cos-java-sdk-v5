@@ -484,7 +484,7 @@ public class XmlResponsesSaxParser {
             if (atTopLevel()) {
                 if (name.equals("ListBucketResult")) {
                     /*
-                     * S3 only includes the NextMarker XML element if the
+                     * COS only includes the NextMarker XML element if the
                      * request specified a delimiter, but for consistency we'd
                      * like to always give easy access to the next marker if
                      * we're returning a list of results that's truncated.
@@ -500,7 +500,7 @@ public class XmlResponsesSaxParser {
                             nextMarker = objectListing.getCommonPrefixes()
                                     .get(objectListing.getCommonPrefixes().size() - 1);
                         } else {
-                            log.error("S3 response indicates truncated results, "
+                            log.error("COS response indicates truncated results, "
                                     + "but contains no object summaries or " + "common prefixes.");
                         }
 
