@@ -12,6 +12,8 @@ import com.qcloud.cos.model.UploadResult;
 
 
 public class UploadImpl extends AbstractTransfer implements Upload {
+    private boolean isResumeableMultipartUploadAfterFailed = false;
+    private PersistableUpload persistableUploadInfo = null;
 
     public UploadImpl(String description, TransferProgress transferProgressInternalState,
             ProgressListenerChain progressListenerChain, TransferStateChangeListener listener) {
@@ -19,22 +21,18 @@ public class UploadImpl extends AbstractTransfer implements Upload {
     }
 
     /**
-     * Waits for this upload to complete and returns the result of this upload.
-     * This is a blocking call. Be prepared to handle errors when calling this
-     * method. Any errors that occurred during the asynchronous transfer will be
-     * re-thrown through this method.
+     * Waits for this upload to complete and returns the result of this upload. This is a blocking
+     * call. Be prepared to handle errors when calling this method. Any errors that occurred during
+     * the asynchronous transfer will be re-thrown through this method.
      *
      * @return The result of this transfer.
      *
-     * @throws CosClientException
-     *             If any errors were encountered in the client while making the
-     *             request or handling the response.
-     * @throws CosServiceException
-     *             If any errors occurred in Qcloud COS while processing the
-     *             request.
-     * @throws InterruptedException
-     *             If this thread is interrupted while waiting for the upload to
-     *             complete.
+     * @throws CosClientException If any errors were encountered in the client while making the
+     *         request or handling the response.
+     * @throws CosServiceException If any errors occurred in Qcloud COS while processing the
+     *         request.
+     * @throws InterruptedException If this thread is interrupted while waiting for the upload to
+     *         complete.
      */
     public UploadResult waitForUploadResult()
             throws CosClientException, CosServiceException, InterruptedException {
@@ -42,7 +40,7 @@ public class UploadImpl extends AbstractTransfer implements Upload {
             UploadResult result = null;
             while (!monitor.isDone() || result == null) {
                 Future<?> f = monitor.getFuture();
-                result = (UploadResult)f.get();
+                result = (UploadResult) f.get();
             }
             return result;
         } catch (ExecutionException e) {
@@ -61,11 +59,10 @@ public class UploadImpl extends AbstractTransfer implements Upload {
     }
 
     /**
-     * Tries to pause and return the information required to resume the upload
-     * operation.
+     * Tries to pause and return the information required to resume the upload operation.
      */
-    private PauseResult<PersistableUpload> pause(
-            final boolean forceCancelTransfers) throws CosClientException {
+    private PauseResult<PersistableUpload> pause(final boolean forceCancelTransfers)
+            throws CosClientException {
         UploadMonitor uploadMonitor = (UploadMonitor) monitor;
         return uploadMonitor.pause(forceCancelTransfers);
     }
@@ -79,5 +76,31 @@ public class UploadImpl extends AbstractTransfer implements Upload {
     public void abort() {
         UploadMonitor uploadMonitor = (UploadMonitor) monitor;
         uploadMonitor.performAbort();
+    }
+
+    @Override
+    public boolean isResumeableMultipartUploadAfterFailed() {
+        return this.isResumeableMultipartUploadAfterFailed;
+    }
+
+    @Override
+    public PersistableUpload getResumeableMultipartUploadId() {
+        if (this.isResumeableMultipartUploadAfterFailed) {
+            return persistableUploadInfo;
+        } else {
+            return null;
+        }
+    }
+
+    PersistableUpload getPersistableUploadInfo() {
+        return persistableUploadInfo;
+    }
+
+    void setPersistableUploadInfo(PersistableUpload persistableUploadInfo) {
+        this.persistableUploadInfo = persistableUploadInfo;
+    }
+
+    void setResumeableMultipartUploadAfterFailed(boolean isResumeableMultipartUploadAfterFailed) {
+        this.isResumeableMultipartUploadAfterFailed = isResumeableMultipartUploadAfterFailed;
     }
 }

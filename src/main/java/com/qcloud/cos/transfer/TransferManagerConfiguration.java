@@ -23,7 +23,7 @@ public class TransferManagerConfiguration {
 
     /** Default minimum size of each part for multi-part copy. */
     private static final long DEFAULT_MINIMUM_COPY_PART_SIZE = 100 * MB;
-
+    
     /**
      * The minimum part size for upload parts. Decreasing the minimum part size will cause multipart
      * uploads to be split into a larger number of smaller parts. Setting this value too low can
@@ -57,7 +57,7 @@ public class TransferManagerConfiguration {
      * initiated.
      */
     private long multipartCopyPartSize = DEFAULT_MINIMUM_COPY_PART_SIZE;
-
+    
     /**
      * Returns the minimum part size for upload parts. Decreasing the minimum part size causes
      * multipart uploads to be split into a larger number of smaller parts. Setting this value too
@@ -155,4 +155,5 @@ public class TransferManagerConfiguration {
     public void setMultipartCopyThreshold(long multipartCopyThreshold) {
         this.multipartCopyThreshold = multipartCopyThreshold;
     }
+
 }

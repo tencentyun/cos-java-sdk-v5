@@ -2,7 +2,9 @@ package com.qcloud.cos;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -71,6 +73,8 @@ public class TransferManagerTest extends AbstractCOSClientTest {
             // head object
             headSimpleObject(key, localFile.length(), Md5Utils.md5Hex(localFile));
             assertEquals(Md5Utils.md5Hex(localFile), uploadResult.getETag());
+            assertFalse(upload.isResumeableMultipartUploadAfterFailed());
+            assertNull(upload.getResumeableMultipartUploadId());
             assertNotNull(uploadResult.getRequestId());
             assertNotNull(uploadResult.getDateStr());
             GetObjectRequest getObjectRequest = new GetObjectRequest(bucket, key);
@@ -118,6 +122,8 @@ public class TransferManagerTest extends AbstractCOSClientTest {
             Upload upload = transferManager.upload(putObjectRequest);
             UploadResult uploadResult = upload.waitForUploadResult();
             assertTrue(uploadResult.getETag().contains("-"));
+            assertTrue(upload.isResumeableMultipartUploadAfterFailed());
+            assertNotNull(upload.getResumeableMultipartUploadId());
             assertNotNull(uploadResult.getRequestId());
             assertNotNull(uploadResult.getDateStr());
             GetObjectRequest getObjectRequest = new GetObjectRequest(bucket, key);
