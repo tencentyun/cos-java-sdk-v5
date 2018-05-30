@@ -87,7 +87,7 @@ public class BatchDeleteTest extends AbstractCOSClientTest {
             PutObjectResult putObjectResult = putObjectFromLocalFile(localFile, key);
             keyList.add(new KeyVersion(key, putObjectResult.getVersionId()));
         }
-        keyList.add(new KeyVersion("ut/not_exist_key.txt"));
+        keyList.add(new KeyVersion("ut/not_exist_key.txt", "null"));
         deleteObjectsRequest.setKeys(keyList);
 
         try {

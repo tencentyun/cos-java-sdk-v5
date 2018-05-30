@@ -39,10 +39,12 @@ public class ListObjectTest extends AbstractCOSClientTest {
     @AfterClass
     public static void tearDownAfterClass() throws Exception {
         for (int i = 0; i < arrayNum; ++i) {
-            if (localFileArray[i] != null) {
+            if (localFileArray[i] != null && localFileArray[i].exists()) {
                 assertTrue(localFileArray[i].delete());
             }
-            clearObject(keyArray[i]);
+            if (keyArray[i] != null) {
+                clearObject(keyArray[i]);
+            }
         }
         AbstractCOSClientTest.destoryCosClient();
     }
@@ -76,7 +78,7 @@ public class ListObjectTest extends AbstractCOSClientTest {
         assertEquals(1L, objectListing.getCommonPrefixes().size());
         assertEquals(0L, objectListing.getObjectSummaries().size());
     }
-    
+
     @Test
     public void ListObjectStartWithDelimiterTest() {
         if (!judgeUserInfoValid()) {
@@ -88,7 +90,7 @@ public class ListObjectTest extends AbstractCOSClientTest {
         assertEquals(1L, objectListing.getCommonPrefixes().size());
         assertEquals(0L, objectListing.getObjectSummaries().size());
     }
-    
+
     @Test
     public void ListObjectStartWithNoMaxKey() {
         if (!judgeUserInfoValid()) {
@@ -99,7 +101,7 @@ public class ListObjectTest extends AbstractCOSClientTest {
         ObjectListing objectListing = cosclient.listObjects(listObjectsRequest);
         assertEquals(1L, objectListing.getCommonPrefixes().size());
         assertEquals(0L, objectListing.getObjectSummaries().size());
-    }    
+    }
 
     @Test
     public void ListNextBatchObjectWithNoTrunCated() {
@@ -152,5 +154,5 @@ public class ListObjectTest extends AbstractCOSClientTest {
         assertEquals(0L, objectListingNext.getCommonPrefixes().size());
         assertEquals(0L, objectListingNext.getObjectSummaries().size());
     }
-    
+
 }
