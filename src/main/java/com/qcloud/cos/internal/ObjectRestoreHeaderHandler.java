@@ -40,7 +40,7 @@ public class ObjectRestoreHeaderHandler<T extends ObjectRestoreResult> implement
             try {
                 return DateUtils.parseRFC822Date(date);
             } catch (Exception exception) {
-                log.warn("Error parsing expiry-date from x-amz-restore " + "header.", exception);
+                log.warn("Error parsing expiry-date from x-cos-restore " + "header.", exception);
             }
         }
 

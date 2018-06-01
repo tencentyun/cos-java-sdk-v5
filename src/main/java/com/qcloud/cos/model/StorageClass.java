@@ -24,14 +24,7 @@ public enum StorageClass {
     /**
      * STANDARD_IA
      */
-    Standard_IA("Standard_IA"),
-
-    /**
-     * The Qcloud NEARLINE storage class.
-     * This storage class means your object's data is stored in Qcloud NEARLINE,
-     * and Qcloud COS stores a reference to the data in the NEARLINE COS bucket.
-     */
-    NearLine("Nearline");
+    Standard_IA("Standard_IA");
 
     /**
      * Returns the Qcloud COS {@link StorageClass} enumeration value representing the

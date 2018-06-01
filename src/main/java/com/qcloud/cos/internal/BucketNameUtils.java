@@ -34,7 +34,7 @@ public enum BucketNameUtils {
             }
 
             if (next == ' ' || next == '\t' || next == '\r' || next == '\n') {
-                throw new IllegalArgumentException("Bucket name should not contain white space");
+                throw new IllegalArgumentException("Bucket name should not contain whitespace");
             }
             
             throw new IllegalArgumentException(

@@ -14,6 +14,7 @@ import static com.qcloud.cos.auth.COSSignerConstants.SIGN_EXPIRED_TIME;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.apache.commons.codec.digest.DigestUtils;
@@ -114,15 +115,12 @@ public class COSSigner {
 
     private Map<String, String> buildSignHeaders(Map<String, String> originHeaders) {
         Map<String, String> signHeaders = new HashMap<>();
-        for (String key : originHeaders.keySet()) {
-//            if (key.equalsIgnoreCase("host") || key.equalsIgnoreCase("content-type")
-//                    || key.equalsIgnoreCase("content-md5") || key.startsWith("x")
-//                    || key.startsWith("X")) {
-                if (key.equalsIgnoreCase("content-type")
-                        || key.equalsIgnoreCase("content-md5") || key.startsWith("x")
-                        || key.startsWith("X")) {
+        for (Entry<String, String> headerEntry : originHeaders.entrySet()) {
+            String key = headerEntry.getKey();
+            if (key.equalsIgnoreCase("content-type") || key.equalsIgnoreCase("content-md5")
+                    || key.startsWith("x") || key.startsWith("X")) {
                 String lowerKey = key.toLowerCase();
-                String value = originHeaders.get(key);
+                String value = headerEntry.getValue();
                 signHeaders.put(lowerKey, value);
             }
         }
@@ -147,12 +145,14 @@ public class COSSigner {
     private String formatMapToStr(Map<String, String> kVMap) {
         StringBuilder strBuilder = new StringBuilder();
         boolean seeOne = false;
-        for (String key : kVMap.keySet()) {
+        for (Entry<String, String> entry : kVMap.entrySet()) {
+            String key = entry.getKey();
+            String value = entry.getValue();
             String lowerKey = key.toLowerCase();
             String encodeKey = UrlEncoderUtils.encode(lowerKey);
             String encodedValue = "";
-            if (kVMap.get(key) != null) {
-                encodedValue = UrlEncoderUtils.encode(kVMap.get(key));
+            if (value != null) {
+                encodedValue = UrlEncoderUtils.encode(value);
             }
             if (!seeOne) {
                 seeOne = true;

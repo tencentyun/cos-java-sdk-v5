@@ -101,4 +101,19 @@ public enum IOUtils {
         }
         return count;
     }
+    
+    /**
+     * Read all remaining data in the stream.
+     *
+     * @param in InputStream to read.
+     */
+    public static void drainInputStream(InputStream in) {
+        try {
+            while (in.read() != -1) {
+                // Do nothing.
+            }
+        } catch (IOException ignored) {
+            // Stream may be self closed by HTTP client so we ignore any failures.
+        }
+    }
 }

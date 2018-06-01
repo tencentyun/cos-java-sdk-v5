@@ -4,8 +4,9 @@ import java.io.Serializable;
 import java.util.Date;
 
 import com.qcloud.cos.internal.ObjectExpirationResult;
+import com.qcloud.cos.internal.SSEResultBase;
 
-public class PutObjectResult implements ObjectExpirationResult, Serializable {
+public class PutObjectResult extends SSEResultBase implements ObjectExpirationResult, Serializable {
     /**
      * 
      */

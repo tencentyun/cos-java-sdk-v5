@@ -4,6 +4,7 @@ import java.util.concurrent.Callable;
 
 import com.qcloud.cos.COS;
 import com.qcloud.cos.model.CopyPartRequest;
+import com.qcloud.cos.model.CopyPartResult;
 import com.qcloud.cos.model.PartETag;
 
 /**
@@ -24,6 +25,7 @@ public class CopyPartCallable implements Callable<PartETag> {
     }
 
     public PartETag call() throws Exception {
-        return cos.copyPart(request).getPartETag();
+        CopyPartResult copyPartResult = cos.copyPart(request);
+        return copyPartResult == null ? null : copyPartResult.getPartETag();
     }
 }

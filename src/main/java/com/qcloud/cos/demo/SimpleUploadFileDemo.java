@@ -35,7 +35,7 @@ public class SimpleUploadFileDemo {
         String key = "/aaa/bbb.txt";
         File localFile = new File("src/test/resources/len10M.txt");
         PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, key, localFile);
-        // 设置存储类型, 默认是标准(Standard), 低频(standard_ia), 近线(nearline) 
+        // 设置存储类型, 默认是标准(Standard), 低频(standard_ia)
         putObjectRequest.setStorageClass(StorageClass.Standard_IA);
         try {
             PutObjectResult putObjectResult = cosclient.putObject(putObjectRequest);
@@ -74,7 +74,7 @@ public class SimpleUploadFileDemo {
         
         PutObjectRequest putObjectRequest =
                 new PutObjectRequest(bucketName, key, input, objectMetadata);
-        // 设置存储类型, 默认是标准(Standard), 低频(standard_ia), 近线(nearline) 
+        // 设置存储类型, 默认是标准(Standard), 低频(standard_ia)
         putObjectRequest.setStorageClass(StorageClass.Standard_IA);
         try {
             PutObjectResult putObjectResult = cosclient.putObject(putObjectRequest);

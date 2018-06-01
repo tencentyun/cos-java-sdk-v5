@@ -128,6 +128,8 @@ import com.qcloud.cos.model.PutObjectRequest;
 import com.qcloud.cos.model.PutObjectResult;
 import com.qcloud.cos.model.ResponseHeaderOverrides;
 import com.qcloud.cos.model.RestoreObjectRequest;
+import com.qcloud.cos.model.SSECOSKeyManagementParams;
+import com.qcloud.cos.model.SSECustomerKey;
 import com.qcloud.cos.model.SetBucketAclRequest;
 import com.qcloud.cos.model.SetBucketCrossOriginConfigurationRequest;
 import com.qcloud.cos.model.SetBucketLifecycleConfigurationRequest;
@@ -155,7 +157,7 @@ public class COSClient implements COS {
 
     private COSCredentials cred;
 
-    private ClientConfig clientConfig;
+    protected ClientConfig clientConfig;
 
     private CosHttpClient cosHttpClient;
 
@@ -322,6 +324,9 @@ public class COSClient implements COS {
             populateRequestMetadata(request, newObjectMetadata);
         }
 
+        // Populate the SSE-C parameters for the source and destination object
+        populateSSE_C(request, copyObjectRequest.getDestinationSSECustomerKey());
+        populateSourceSSE_C(request, copyObjectRequest.getSourceSSECustomerKey());
     }
 
     private void populateRequestWithCopyPartParameters(
@@ -360,6 +365,10 @@ public class COSClient implements COS {
                     "bytes=" + copyPartRequest.getFirstByte() + "-" + copyPartRequest.getLastByte();
             request.addHeader(Headers.COPY_PART_RANGE, range);
         }
+
+        // Populate the SSE-C parameters for the source and destination object
+        populateSSE_C(request, copyPartRequest.getDestinationSSECustomerKey());
+        populateSourceSSE_C(request, copyPartRequest.getSourceSSECustomerKey());
 
     }
 
@@ -401,6 +410,7 @@ public class COSClient implements COS {
 
     // 格式化bucket, 是bucket返回带appid
     private String formatBucket(String bucketName, String appid) throws CosClientException {
+        BucketNameUtils.validateBucketName(bucketName);
         if (appid == null) {
             String parrtern = ".*-(125|100|20)[0-9]{3,}$";
             if (Pattern.matches(parrtern, bucketName)) {
@@ -459,6 +469,7 @@ public class COSClient implements COS {
                     throws CosClientException, CosServiceException {
 
         COSSigner cosSigner = new COSSigner();
+        cosSigner.setSignExpiredTime(clientConfig.getSignExpired());
         cosSigner.sign(request, cred);
         return this.cosHttpClient.exeute(request, responseHandler);
 
@@ -466,11 +477,14 @@ public class COSClient implements COS {
 
     private static PutObjectResult createPutObjectResult(ObjectMetadata metadata) {
         final PutObjectResult result = new PutObjectResult();
-        result.setRequestId((String)metadata.getRawMetadataValue(Headers.REQUEST_ID));
-        result.setDateStr((String)metadata.getRawMetadataValue(Headers.DATE));
+        result.setRequestId((String) metadata.getRawMetadataValue(Headers.REQUEST_ID));
+        result.setDateStr((String) metadata.getRawMetadataValue(Headers.DATE));
         result.setVersionId(metadata.getVersionId());
         result.setETag(metadata.getETag());
         result.setExpirationTime(metadata.getExpirationTime());
+        result.setSSEAlgorithm(metadata.getSSEAlgorithm());
+        result.setSSECustomerAlgorithm(metadata.getSSECustomerAlgorithm());
+        result.setSSECustomerKeyMd5(metadata.getSSECustomerKeyMd5());
         result.setMetadata(metadata);
         return result;
     }
@@ -583,6 +597,67 @@ public class COSClient implements COS {
         }
     }
 
+    /**
+     * <p>
+     * Populates the specified request with the numerous attributes available in
+     * <code>SSEWithCustomerKeyRequest</code>.
+     * </p>
+     *
+     * @param request The request to populate with headers to represent all the options expressed in
+     *        the <code>ServerSideEncryptionWithCustomerKeyRequest</code> object.
+     * @param sseKey The request object for an COS operation that allows server-side encryption
+     *        using customer-provided keys.
+     */
+    private static void populateSSE_C(CosHttpRequest<?> request, SSECustomerKey sseKey) {
+        if (sseKey == null)
+            return;
+
+        addHeaderIfNotNull(request, Headers.SERVER_SIDE_ENCRYPTION_CUSTOMER_ALGORITHM,
+                sseKey.getAlgorithm());
+        addHeaderIfNotNull(request, Headers.SERVER_SIDE_ENCRYPTION_CUSTOMER_KEY, sseKey.getKey());
+        addHeaderIfNotNull(request, Headers.SERVER_SIDE_ENCRYPTION_CUSTOMER_KEY_MD5,
+                sseKey.getMd5());
+        // Calculate the MD5 hash of the encryption key and fill it in the
+        // header, if the user didn't specify it in the metadata
+        if (sseKey.getKey() != null && sseKey.getMd5() == null) {
+            String encryptionKey_b64 = sseKey.getKey();
+            byte[] encryptionKey = Base64.decode(encryptionKey_b64);
+            request.addHeader(Headers.SERVER_SIDE_ENCRYPTION_CUSTOMER_KEY_MD5,
+                    Md5Utils.md5AsBase64(encryptionKey));
+        }
+    }
+
+    private static void populateSourceSSE_C(CosHttpRequest<?> request, SSECustomerKey sseKey) {
+        if (sseKey == null)
+            return;
+
+        // Populate the SSE-C parameters for the source object
+        addHeaderIfNotNull(request, Headers.COPY_SOURCE_SERVER_SIDE_ENCRYPTION_CUSTOMER_ALGORITHM,
+                sseKey.getAlgorithm());
+        addHeaderIfNotNull(request, Headers.COPY_SOURCE_SERVER_SIDE_ENCRYPTION_CUSTOMER_KEY,
+                sseKey.getKey());
+        addHeaderIfNotNull(request, Headers.COPY_SOURCE_SERVER_SIDE_ENCRYPTION_CUSTOMER_KEY_MD5,
+                sseKey.getMd5());
+        // Calculate the MD5 hash of the encryption key and fill it in the
+        // header, if the user didn't specify it in the metadata
+        if (sseKey.getKey() != null && sseKey.getMd5() == null) {
+            String encryptionKey_b64 = sseKey.getKey();
+            byte[] encryptionKey = Base64.decode(encryptionKey_b64);
+            request.addHeader(Headers.COPY_SOURCE_SERVER_SIDE_ENCRYPTION_CUSTOMER_KEY_MD5,
+                    Md5Utils.md5AsBase64(encryptionKey));
+        }
+    }
+
+    private static void populateSSE_KMS(CosHttpRequest<?> request,
+            SSECOSKeyManagementParams sseParams) {
+
+        if (sseParams != null) {
+            addHeaderIfNotNull(request, Headers.SERVER_SIDE_ENCRYPTION, sseParams.getEncryption());
+            addHeaderIfNotNull(request, Headers.SERVER_SIDE_ENCRYPTION_CUSTOMER_KEY,
+                    sseParams.getCOSKmsKeyId());
+        }
+    }
+
     @Override
     public PutObjectResult putObject(PutObjectRequest putObjectRequest)
             throws CosClientException, CosServiceException {
@@ -609,6 +684,13 @@ public class COSClient implements COS {
         } else {
             // Always set the content length, even if it's already set
             metadata.setContentLength(file.length());
+            final long maxAllowdSingleFileSize = 5 * 1024L * 1024L * 1024L;
+            if (file.length() > maxAllowdSingleFileSize) {
+                throw new CosClientException(
+                        "max size 5GB is allowed by putObject Method, your filesize is "
+                                + file.length()
+                                + ", please use transferManager to upload big file!");
+            }
             final boolean calculateMD5 = metadata.getContentMD5() == null;
 
             if (calculateMD5 && !skipMd5CheckStrategy.skipServerSideValidation(putObjectRequest)) {
@@ -648,6 +730,12 @@ public class COSClient implements COS {
                 }
             }
 
+            // Populate the SSE-C parameters to the request header
+            populateSSE_C(request, putObjectRequest.getSSECustomerKey());
+
+            // Populate the SSE KMS parameters to the request header
+            populateSSE_KMS(request, putObjectRequest.getSSECOSKeyManagementParams());
+
             // Use internal interface to differentiate 0 from unset.
             final Long contentLength = (Long) metadata.getRawMetadataValue(Headers.CONTENT_LENGTH);
             if (contentLength == null) {
@@ -662,6 +750,13 @@ public class COSClient implements COS {
                         + "out of memory errors.");
             } else {
                 final long expectedLength = contentLength.longValue();
+                final long maxAllowdSingleFileSize = 5 * 1024L * 1024L * 1024L;
+                if (expectedLength > maxAllowdSingleFileSize) {
+                    throw new CosClientException(
+                            "max size 5GB is allowed by putObject Method, your filesize is "
+                                    + expectedLength
+                                    + ", please use transferManager to upload big file!");
+                }
                 if (expectedLength >= 0) {
                     // Performs length check on the underlying data stream.
                     // For COS encryption client, the underlying data stream here
@@ -787,6 +882,9 @@ public class COSClient implements COS {
         addStringListHeader(request, Headers.GET_OBJECT_IF_NONE_MATCH,
                 getObjectRequest.getNonmatchingETagConstraints());
 
+        // Populate the SSE-C parameters to the request header
+        populateSSE_C(request, getObjectRequest.getSSECustomerKey());
+
         try {
             COSObject cosObject = invoke(request, new COSObjectResponseHandler());
             cosObject.setBucketName(getObjectRequest.getBucketName());
@@ -904,6 +1002,8 @@ public class COSClient implements COS {
         CosHttpRequest<GetObjectMetadataRequest> request =
                 createRequest(bucketName, key, getObjectMetadataRequest, HttpMethodName.HEAD);
         addParameterIfNotNull(request, "versionId", getObjectMetadataRequest.getVersionId());
+        // Populate the SSE-C parameters to the request header
+        populateSSE_C(request, getObjectMetadataRequest.getSSECustomerKey());
         return invoke(request, new CosMetadataResponseHandler());
     }
 
@@ -1165,6 +1265,12 @@ public class COSClient implements COS {
             populateRequestMetadata(request, initiateMultipartUploadRequest.objectMetadata);
         }
 
+        // Populate the SSE-C parameters to the request header
+        populateSSE_C(request, initiateMultipartUploadRequest.getSSECustomerKey());
+
+        // Populate the SSE KMS parameters to the request header
+        populateSSE_KMS(request, initiateMultipartUploadRequest.getSSECOSKeyManagementParams());
+
         @SuppressWarnings("unchecked")
         ResponseHeaderHandlerChain<InitiateMultipartUploadResult> responseHandler =
                 new ResponseHeaderHandlerChain<InitiateMultipartUploadResult>(
@@ -1203,6 +1309,9 @@ public class COSClient implements COS {
 
         addHeaderIfNotNull(request, Headers.CONTENT_MD5, uploadPartRequest.getMd5Digest());
         request.addHeader(Headers.CONTENT_LENGTH, Long.toString(partSize));
+
+        // Populate the SSE-C parameters to the request header
+        populateSSE_C(request, uploadPartRequest.getSSECustomerKey());
 
         InputStream isCurr = isOrig;
         try {
@@ -1273,6 +1382,9 @@ public class COSClient implements COS {
             UploadPartResult result = new UploadPartResult();
             result.setETag(etag);
             result.setPartNumber(partNumber);
+            result.setSSEAlgorithm(metadata.getSSEAlgorithm());
+            result.setSSECustomerAlgorithm(metadata.getSSECustomerAlgorithm());
+            result.setSSECustomerKeyMd5(metadata.getSSECustomerKeyMd5());
 
             return result;
         } catch (Throwable t) {
@@ -1748,6 +1860,9 @@ public class COSClient implements COS {
         copyPartResult.setPartNumber(copyPartRequest.getPartNumber());
         copyPartResult.setLastModifiedDate(copyObjectResultHandler.getLastModified());
         copyPartResult.setVersionId(copyObjectResultHandler.getVersionId());
+        copyPartResult.setSSEAlgorithm(copyObjectResultHandler.getSSEAlgorithm());
+        copyPartResult.setSSECustomerAlgorithm(copyObjectResultHandler.getSSECustomerAlgorithm());
+        copyPartResult.setSSECustomerKeyMd5(copyObjectResultHandler.getSSECustomerKeyMd5());
 
         return copyPartResult;
     }
@@ -2438,6 +2553,15 @@ public class COSClient implements COS {
         }
 
         invoke(request, voidCosResponseHandler);
+    }
+
+    @Override
+    public void updateObjectMetaData(String bucketName, String key, ObjectMetadata objectMetadata)
+            throws CosClientException, CosServiceException {
+        CopyObjectRequest copyObjectRequest =
+                new CopyObjectRequest(bucketName, key, bucketName, key);
+        copyObjectRequest.setNewObjectMetadata(objectMetadata);
+        copyObject(copyObjectRequest);
     }
 }
 

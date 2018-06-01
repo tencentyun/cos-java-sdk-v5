@@ -1,7 +1,5 @@
 package com.qcloud.cos.internal;
 
-import org.xml.sax.Attributes;
-
 /**
  * Package private abstract base for all abstract handler that has server side
  * encryption (SSE) information.

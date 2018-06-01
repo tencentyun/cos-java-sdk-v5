@@ -1,8 +1,11 @@
 package com.qcloud.cos.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class MultipartUpload {
+public class MultipartUpload implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     /** The key by which this upload is stored. */
     private String key;
 

@@ -3,7 +3,12 @@ package com.qcloud.cos.model;
 import java.io.Serializable;
 import java.util.Date;
 
-public class CopyPartResult implements Serializable {
+import com.qcloud.cos.internal.SSEResultBase;
+
+
+public class CopyPartResult extends SSEResultBase implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     /** The ETag value of the new part */
     private String etag;

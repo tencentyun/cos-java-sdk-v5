@@ -115,21 +115,8 @@ public class PutGetLifeCycleConfigTest extends AbstractCOSClientTest {
         standardIaRule.setStatus(BucketLifecycleConfiguration.DISABLED);
         standardIaRule.setExpirationInDays(120);
 
-        Rule nearlineRule = new Rule();
-        nearlineRule.setId("nearline transition");
-        nearlineRule.setFilter(new LifecycleFilter(new LifecyclePrefixPredicate("nearline/")));
-        List<Transition> nearlineTransitions = new ArrayList<>();
-        Transition nearlineTransition = new Transition();
-        nearlineTransition.setDays(20);
-        nearlineTransition.setStorageClass(StorageClass.NearLine.toString());
-        nearlineTransitions.add(nearlineTransition);
-        nearlineRule.setTransitions(nearlineTransitions);
-        nearlineRule.setStatus(BucketLifecycleConfiguration.ENABLED);
-        nearlineRule.setExpirationInDays(365);
-
         rules.add(deletePrefixRule);
         rules.add(standardIaRule);
-        rules.add(nearlineRule);
         testPutGetDelRules(rules);
     }
 
@@ -163,22 +150,8 @@ public class PutGetLifeCycleConfigTest extends AbstractCOSClientTest {
         noncurrentVersionTransition.setStorageClass(StorageClass.Standard_IA);
         standardIaRule.setNoncurrentVersionTransitions(noncurrentVersionTransitions);
         standardIaRule.setExpirationInDays(120);
-
-        Rule nearlineRule = new Rule();
-        nearlineRule.setId("nearline transition for version");
-        nearlineRule.setFilter(new LifecycleFilter(new LifecyclePrefixPredicate("nearline/")));
-        List<Transition> nearlineTransitions = new ArrayList<>();
-        Transition nearlineTransition = new Transition();
-        nearlineTransition.setDays(20);
-        nearlineTransition.setStorageClass(StorageClass.NearLine.toString());
-        nearlineTransitions.add(nearlineTransition);
-        nearlineRule.setTransitions(nearlineTransitions);
-        nearlineRule.setNoncurrentVersionExpirationInDays(180);
-        nearlineRule.setStatus(BucketLifecycleConfiguration.ENABLED);
-        nearlineRule.setExpiredObjectDeleteMarker(true);
         
         rules.add(standardIaRule);
-        rules.add(nearlineRule);
         testPutGetDelRules(rules);
 
         bucketVersionConfig.setStatus(BucketVersioningConfiguration.SUSPENDED);

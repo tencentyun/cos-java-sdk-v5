@@ -1,6 +1,9 @@
 package com.qcloud.cos.region;
 
-public class Region {
+import java.io.Serializable;
+
+public class Region implements Serializable {
+    private static final long serialVersionUID = 1L;
     private String regionName;
     private String displayName;
 

@@ -16,12 +16,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.qcloud.cos.COS;
+import com.qcloud.cos.COSEncryptionClient;
 import com.qcloud.cos.event.COSProgressPublisher;
 import com.qcloud.cos.event.ProgressEventType;
 import com.qcloud.cos.event.ProgressListenerChain;
 import com.qcloud.cos.internal.UploadPartRequestFactory;
 import com.qcloud.cos.model.AbortMultipartUploadRequest;
-import com.qcloud.cos.model.COSEncryption;
 import com.qcloud.cos.model.CompleteMultipartUploadRequest;
 import com.qcloud.cos.model.CompleteMultipartUploadResult;
 import com.qcloud.cos.model.EncryptedInitiateMultipartUploadRequest;
@@ -154,9 +154,8 @@ public class UploadCallable implements Callable<UploadResult> {
      * and recording its corresponding Future object, as well as the multipart upload id.
      */
     private UploadResult uploadInParts() throws Exception {
-        boolean isUsingEncryption = cos instanceof COSEncryption;
+        boolean isUsingEncryption = cos instanceof COSEncryptionClient;
         long optimalPartSize = getOptimalPartSize(isUsingEncryption);
-
         try {
             if (multipartUploadId == null) {
                 multipartUploadId = initiateMultipartUpload(origReq, isUsingEncryption);

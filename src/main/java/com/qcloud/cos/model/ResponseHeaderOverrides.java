@@ -1,5 +1,7 @@
 package com.qcloud.cos.model;
 
+import java.io.Serializable;
+
 import com.qcloud.cos.internal.CosServiceRequest;
 
 /**
@@ -29,8 +31,9 @@ import com.qcloud.cos.internal.CosServiceRequest;
  * @see GetObjectRequest#setResponseHeaders(ResponseHeaderOverrides)
  * @see GeneratePresignedUrlRequest#setResponseHeaders(ResponseHeaderOverrides)
  */
-public class ResponseHeaderOverrides extends CosServiceRequest {
+public class ResponseHeaderOverrides implements Serializable {
 
+    private static final long serialVersionUID = 1L;
     private String contentType;
     private String contentLanguage;
     private String expires;

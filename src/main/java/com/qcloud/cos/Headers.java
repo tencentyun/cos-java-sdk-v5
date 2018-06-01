@@ -14,6 +14,7 @@ public interface Headers {
     public static final String CONTENT_DISPOSITION = "Content-Disposition";
     public static final String CONTENT_ENCODING = "Content-Encoding";
     public static final String CONTENT_LENGTH = "Content-Length";
+    public static final String CONTENT_RANGE = "Content-Range";
     public static final String CONTENT_MD5 = "Content-MD5";
     public static final String CONTENT_TYPE = "Content-Type";
     public static final String CONTENT_LANGUAGE = "Content-Language";
@@ -72,6 +73,15 @@ public interface Headers {
     /** Header for the MD5 digest of the customer-provided key for server-side encryption */
     public static final String SERVER_SIDE_ENCRYPTION_CUSTOMER_KEY_MD5 = "x-cos-server-side-encryption-customer-key-MD5";
 
+    /** Header for the encryption algorithm used when encrypting the object with customer-provided keys */
+    public static final String COPY_SOURCE_SERVER_SIDE_ENCRYPTION_CUSTOMER_ALGORITHM = "x-cos-copy-source-server-side-encryption-customer-algorithm";
+
+    /** Header for the customer-provided key for server-side encryption */
+    public static final String COPY_SOURCE_SERVER_SIDE_ENCRYPTION_CUSTOMER_KEY = "x-cos-copy-source-server-side-encryption-customer-key";
+
+    /** Header for the MD5 digest of the customer-provided key for server-side encryption */
+    public static final String COPY_SOURCE_SERVER_SIDE_ENCRYPTION_CUSTOMER_KEY_MD5 = "x-cos-copy-source-server-side-encryption-customer-key-MD5";
+    
     /** Header for optional object expiration */
     public static final String EXPIRATION = "x-cos-expiration";
 
@@ -111,6 +121,15 @@ public interface Headers {
     /** Encrypted symmetric key header that is used in the envelope encryption mechanism */
     public static final String CRYPTO_KEY = "x-cos-key";
 
+    /**
+     * Encrypted symmetric key header that is used in the Authenticated
+     * Encryption (AE) cryptographic module. Older versions of COS encryption
+     * client with encryption-only capability would not be able to recognize
+     * this AE key, and therefore will be prevented from mistakenly decrypting
+     * ciphertext in AE format.
+     */
+    public static final String CRYPTO_KEY_V2 = "x-cos-key-v2";
+    
     /** Initialization vector (IV) header that is used in the symmetric and envelope encryption mechanisms */
     public static final String CRYPTO_IV = "x-cos-iv";
 
@@ -125,6 +144,12 @@ public interface Headers {
 
     /** Header for the optional original unencrypted Content MD5 of an encrypted object */
     public static final String UNENCRYPTED_CONTENT_MD5 = "x-cos-unencrypted-content-md5";
+    
+    /**
+     * Header in the request and response indicating the QCLOUD Key Management
+     * System key id used for Server Side Encryption.
+     */
+    public static final String SERVER_SIDE_ENCRYPTION_QCLOUD_KMS_KEYID = "x-cos-server-side-encryption-qcloud-kms-key-id";
 
     /** Header for optional redirect location of an object */
     public static final String REDIRECT_LOCATION = "x-cos-website-redirect-location";

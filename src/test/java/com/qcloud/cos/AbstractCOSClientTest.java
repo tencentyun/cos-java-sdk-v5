@@ -2,12 +2,16 @@ package com.qcloud.cos;
 
 import static org.junit.Assert.*;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -16,27 +20,45 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import com.qcloud.cos.auth.BasicCOSCredentials;
 import com.qcloud.cos.auth.COSCredentials;
+import com.qcloud.cos.auth.COSStaticCredentialsProvider;
 import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.internal.SkipMd5CheckStrategy;
+import com.qcloud.cos.internal.crypto.CryptoConfiguration;
+import com.qcloud.cos.internal.crypto.CryptoMode;
+import com.qcloud.cos.internal.crypto.EncryptionMaterials;
+import com.qcloud.cos.internal.crypto.QCLOUDKMS;
+import com.qcloud.cos.internal.crypto.StaticEncryptionMaterialsProvider;
 import com.qcloud.cos.model.AbortMultipartUploadRequest;
 import com.qcloud.cos.model.AccessControlList;
 import com.qcloud.cos.model.Bucket;
 import com.qcloud.cos.model.COSVersionSummary;
 import com.qcloud.cos.model.CannedAccessControlList;
+import com.qcloud.cos.model.CompleteMultipartUploadRequest;
+import com.qcloud.cos.model.CompleteMultipartUploadResult;
 import com.qcloud.cos.model.CreateBucketRequest;
 import com.qcloud.cos.model.GetObjectMetadataRequest;
 import com.qcloud.cos.model.GetObjectRequest;
+import com.qcloud.cos.model.InitiateMultipartUploadRequest;
+import com.qcloud.cos.model.InitiateMultipartUploadResult;
 import com.qcloud.cos.model.ListMultipartUploadsRequest;
+import com.qcloud.cos.model.ListPartsRequest;
 import com.qcloud.cos.model.ListVersionsRequest;
 import com.qcloud.cos.model.MultipartUpload;
 import com.qcloud.cos.model.MultipartUploadListing;
 import com.qcloud.cos.model.ObjectMetadata;
+import com.qcloud.cos.model.PartETag;
+import com.qcloud.cos.model.PartListing;
+import com.qcloud.cos.model.PartSummary;
 import com.qcloud.cos.model.Permission;
 import com.qcloud.cos.model.PutObjectRequest;
 import com.qcloud.cos.model.PutObjectResult;
 import com.qcloud.cos.model.ResponseHeaderOverrides;
+import com.qcloud.cos.model.SSECOSKeyManagementParams;
+import com.qcloud.cos.model.SSECustomerKey;
 import com.qcloud.cos.model.StorageClass;
 import com.qcloud.cos.model.UinGrantee;
+import com.qcloud.cos.model.UploadPartRequest;
+import com.qcloud.cos.model.UploadPartResult;
 import com.qcloud.cos.model.VersionListing;
 import com.qcloud.cos.region.Region;
 import com.qcloud.cos.utils.DateUtils;
@@ -51,6 +73,12 @@ public class AbstractCOSClientTest {
     protected static ClientConfig clientConfig = null;
     protected static COSClient cosclient = null;
     protected static File tmpDir = null;
+
+    protected static boolean useClientEncryption = false;
+    protected static boolean useServerEncryption = false;
+    protected static QCLOUDKMS qcloudkms = null;
+    protected static EncryptionMaterials encryptionMaterials = null;
+    protected static CryptoConfiguration cryptoConfiguration = null;
 
     protected static File buildTestFile(long fileSize) throws IOException {
         String prefix = String.format("ut_size_%d_time_%d_", fileSize, System.currentTimeMillis());
@@ -94,7 +122,7 @@ public class AbstractCOSClientTest {
         return dir.delete();
     }
 
-    public static void initCosClient() throws Exception {
+    protected static boolean initConfig() throws IOException {
         appid = System.getenv("appid");
         secretId = System.getenv("secretId");
         secretKey = System.getenv("secretKey");
@@ -125,11 +153,38 @@ public class AbstractCOSClientTest {
 
         if (secretId == null || secretKey == null || bucket == null || region == null) {
             System.out.println("cos ut user info missing. skip all test");
-            return;
+            return false;
         }
+        return true;
+    }
+
+    protected static void initCustomCosClient() {
+        if (useClientEncryption) {
+            initEncryptionClient();
+        } else {
+            initNormalCOSClient();
+        }
+    }
+
+    protected static void initNormalCOSClient() {
         COSCredentials cred = new BasicCOSCredentials(secretId, secretKey);
         clientConfig = new ClientConfig(new Region(region));
         cosclient = new COSClient(cred, clientConfig);
+    }
+
+    protected static void initEncryptionClient() {
+        COSCredentials cred = new BasicCOSCredentials(secretId, secretKey);
+        clientConfig = new ClientConfig(new Region(region));
+        cosclient = new COSEncryptionClient(qcloudkms, new COSStaticCredentialsProvider(cred),
+                new StaticEncryptionMaterialsProvider(encryptionMaterials), clientConfig,
+                cryptoConfiguration);
+    }
+
+    public static void initCosClient() throws Exception {
+        if (!initConfig()) {
+            return;
+        }
+        initCustomCosClient();
         tmpDir = new File("ut_test_tmp_data");
         if (!tmpDir.exists()) {
             tmpDir.mkdirs();
@@ -150,7 +205,7 @@ public class AbstractCOSClientTest {
             fail(cse.toString());
         }
     }
-    
+
     private static void abortAllNotFinishedMultipartUpload() throws Exception {
         ListMultipartUploadsRequest listMultipartUploadsRequest =
                 new ListMultipartUploadsRequest(bucket);
@@ -197,15 +252,14 @@ public class AbstractCOSClientTest {
         abortAllNotFinishedMultipartUpload();
         clearObjectVersions();
     }
-    
+
     private static void deleteBucket() throws Exception {
         try {
-            String bucketName = bucket;
             clearBucket();
-            cosclient.deleteBucket(bucketName);
+            cosclient.deleteBucket(bucket);
             // 删除bucket后, 由于server端有缓存 需要稍后查询, 这里sleep 5 秒
             Thread.sleep(5000L);
-            assertFalse(cosclient.doesBucketExist(bucketName));
+            assertFalse(cosclient.doesBucketExist(bucket));
         } catch (CosServiceException cse) {
             fail(cse.toString());
         }
@@ -225,8 +279,13 @@ public class AbstractCOSClientTest {
         return cosclient != null;
     }
 
-    // 从本地上传
     protected static PutObjectResult putObjectFromLocalFile(File localFile, String key) {
+        return putObjectFromLocalFile(localFile, key, null, null);
+    }
+
+    // 从本地上传
+    protected static PutObjectResult putObjectFromLocalFile(File localFile, String key,
+            SSECustomerKey sseCKey, SSECOSKeyManagementParams params) {
         if (!judgeUserInfoValid()) {
             return null;
         }
@@ -236,6 +295,12 @@ public class AbstractCOSClientTest {
         acl.grantPermission(uinGrantee, Permission.Read);
         PutObjectRequest putObjectRequest = new PutObjectRequest(bucket, key, localFile);
         putObjectRequest.setStorageClass(StorageClass.Standard_IA);
+        if (sseCKey != null) {
+            putObjectRequest.setSSECustomerKey(sseCKey);
+        }
+        if (params != null) {
+            putObjectRequest.setSSECOSKeyManagementParams(params);
+        }
         // putObjectRequest.setCannedAcl(CannedAccessControlList.PublicRead);
         // putObjectRequest.setAccessControlList(acl);
 
@@ -249,7 +314,11 @@ public class AbstractCOSClientTest {
         } catch (IOException e) {
             fail(e.toString());
         }
-        assertEquals(expectEtag, etag);
+        if (useClientEncryption || useServerEncryption) {
+            // assertEquals(false, expectEtag.equals(etag));
+        } else {
+            assertEquals(true, expectEtag.equals(etag));
+        }
         return putObjectResult;
     }
 
@@ -278,7 +347,11 @@ public class AbstractCOSClientTest {
             putObjectRequest.setStorageClass(StorageClass.Standard_IA);
             PutObjectResult putObjectResult = cosclient.putObject(putObjectRequest);
             String etag = putObjectResult.getETag();
-            assertEquals(uploadEtag, etag);
+            if (useClientEncryption || useServerEncryption) {
+                assertEquals(false, uploadEtag.equals(etag));
+            } else {
+                assertEquals(true, uploadEtag.equals(etag));
+            }
         } catch (IOException e) {
             fail(e.toString());
         } finally {
@@ -298,8 +371,20 @@ public class AbstractCOSClientTest {
             String expectedEtag) {
         ObjectMetadata objectMetadata =
                 cosclient.getObjectMetadata(new GetObjectMetadataRequest(bucket, key));
-        assertEquals(expectedLength, objectMetadata.getContentLength());
-        assertEquals(expectedEtag, objectMetadata.getETag());
+        if (!useClientEncryption) {
+            assertEquals(expectedLength, objectMetadata.getContentLength());
+        } else {
+            assertEquals(expectedLength,
+                    Long.valueOf(
+                            objectMetadata.getUserMetaDataOf(Headers.UNENCRYPTED_CONTENT_LENGTH))
+                    .longValue());
+        }
+        if (useClientEncryption || useServerEncryption) {
+            // server端的bug还未修复
+            assertEquals(false, expectedEtag.equals(objectMetadata.getETag()));
+        } else {
+            assertEquals(true, expectedEtag.equals(objectMetadata.getETag()));
+        }
         assertNotNull(objectMetadata.getLastModified());
         return objectMetadata;
     }
@@ -308,7 +393,9 @@ public class AbstractCOSClientTest {
             int expectedPartNum) {
         ObjectMetadata objectMetadata =
                 cosclient.getObjectMetadata(new GetObjectMetadataRequest(bucket, key));
-        assertEquals(expectedLength, objectMetadata.getContentLength());
+        if (!useClientEncryption) {
+            assertEquals(expectedLength, objectMetadata.getContentLength());
+        }
         String etag = objectMetadata.getETag();
         assertTrue(etag.contains("-"));
         try {
@@ -322,7 +409,8 @@ public class AbstractCOSClientTest {
     }
 
     // 下载COS的object
-    protected static void getObject(String key, File localDownFile) {
+    protected static void getObject(String key, File localDownFile, long[] range,
+            long expectedLength, String expectedMd5) {
         System.setProperty(SkipMd5CheckStrategy.DISABLE_GET_OBJECT_MD5_VALIDATION_PROPERTY, "true");
         GetObjectRequest getObjectRequest = new GetObjectRequest(bucket, key);
         ResponseHeaderOverrides responseHeaders = new ResponseHeaderOverrides();
@@ -339,12 +427,31 @@ public class AbstractCOSClientTest {
         responseHeaders.setExpires(expireStr);
 
         getObjectRequest.setResponseHeaders(responseHeaders);
+        if (range != null) {
+            if (range[1] == range[0] && range[1] == 0) {
+                assertEquals(expectedLength, 0);
+                getObjectRequest.setRange(range[0], range[1]);
+            } else {
+                assertEquals(expectedLength, range[1] - range[0] + 1);
+                getObjectRequest.setRange(range[0], range[1]);
+            }
+        }
         try {
             ObjectMetadata objectMetadata = cosclient.getObject(getObjectRequest, localDownFile);
             assertEquals(responseContentType, objectMetadata.getContentType());
             assertEquals(responseContentLanguage, objectMetadata.getContentLanguage());
             assertEquals(responseContentDispositon, objectMetadata.getContentDisposition());
             assertEquals(responseCacheControl, objectMetadata.getCacheControl());
+            assertEquals(expectedLength, localDownFile.length());
+            assertEquals(expectedMd5, Md5Utils.md5Hex(localDownFile));
+        } catch (SecurityException se) {
+            if (cosclient instanceof COSEncryptionClient && cryptoConfiguration != null
+                    && cryptoConfiguration
+                            .getCryptoMode() == CryptoMode.StrictAuthenticatedEncryption
+                    && range != null) {
+                return;
+            }
+            fail(se.toString());
         } catch (Exception e) {
             fail(e.toString());
         }
@@ -353,10 +460,32 @@ public class AbstractCOSClientTest {
     protected void checkMetaData(ObjectMetadata originMetaData, ObjectMetadata queryMetaData) {
         Map<String, Object> originRawMeta = originMetaData.getRawMetadata();
         Map<String, Object> queryRawMeta = queryMetaData.getRawMetadata();
+
+        Map<String, String> originRawUserMeta = originMetaData.getUserMetadata();
+        Map<String, String> queryRawUserMeta = queryMetaData.getUserMetadata();
+
         for (Entry<String, Object> entry : originRawMeta.entrySet()) {
-            assertTrue(queryRawMeta.containsKey(entry.getKey()));
-            assertEquals(entry.getValue(), queryRawMeta.get(entry.getKey()));
+            String key = entry.getKey();
+            if (key.equals(Headers.CONTENT_LENGTH)) {
+                if (useClientEncryption) {
+                    assertTrue(queryRawUserMeta.containsKey(Headers.UNENCRYPTED_CONTENT_LENGTH));
+                    assertEquals(entry.getValue(),
+                            Long.valueOf(queryRawUserMeta.get(Headers.UNENCRYPTED_CONTENT_LENGTH)));
+                } else {
+                    assertTrue(queryRawMeta.containsKey(key));
+                    assertEquals(entry.getValue(), queryRawMeta.get(key));
+                }
+            } else {
+                assertTrue(queryRawMeta.containsKey(key));
+                assertEquals(entry.getValue(), queryRawMeta.get(key));
+            }
         }
+
+        for (Entry<String, String> entry : originRawUserMeta.entrySet()) {
+            assertTrue(queryRawUserMeta.containsKey(entry.getKey()));
+            assertEquals(entry.getValue(), queryRawUserMeta.get(entry.getKey()));
+        }
+
     }
 
     // 删除COS上的object
@@ -367,5 +496,275 @@ public class AbstractCOSClientTest {
 
         cosclient.deleteObject(bucket, key);
         assertFalse(cosclient.doesObjectExist(bucket, key));
+    }
+
+    // 流式上传不同尺寸的文件
+    protected void testPutObjectByStreamDiffSize(long size, ObjectMetadata originMetaData)
+            throws IOException {
+        if (!judgeUserInfoValid()) {
+            return;
+        }
+        File localFile = buildTestFile(size);
+        String localFileMd5 = Md5Utils.md5Hex(localFile);
+        File downLoadFile = new File(localFile.getAbsolutePath() + ".down");
+        String key = "ut/" + localFile.getName();
+        originMetaData.setContentLength(size);
+        try {
+            // put object
+            putObjectFromLocalFileByInputStream(localFile, localFile.length(),
+                    Md5Utils.md5Hex(localFile), key, originMetaData);
+            // get object
+            getObject(key, downLoadFile, null, size, localFileMd5);
+            // head object
+            ObjectMetadata queryObjectMeta = headSimpleObject(key, size, localFileMd5);
+            // check meta data
+            checkMetaData(originMetaData, queryObjectMeta);
+        } finally {
+            // delete file on cos
+            clearObject(key);
+            // delete local file
+            if (localFile.exists()) {
+                assertTrue(localFile.delete());
+            }
+            if (downLoadFile.exists()) {
+                assertTrue(downLoadFile.delete());
+            }
+        }
+    }
+
+    private byte[] getFilePartByte(File localFile, int offset, int len) {
+        byte[] content = new byte[len];
+        BufferedInputStream bis = null;
+        try {
+            bis = new BufferedInputStream(new FileInputStream(localFile));
+            bis.skip(offset);
+            bis.read(content);
+        } catch (IOException e) {
+            fail(e.toString());
+        } finally {
+            if (bis != null) {
+                try {
+                    bis.close();
+                } catch (IOException e) {
+                }
+            }
+        }
+        return content;
+    }
+
+    protected void testPutObjectByTruncateDiffSize(long originSize, long truncateSize)
+            throws IOException {
+        if (!judgeUserInfoValid()) {
+            return;
+        }
+        File localFile = buildTestFile(originSize);
+        File downLoadFile = new File(localFile.getAbsolutePath() + ".down");
+        String key = "ut/" + localFile.getName();
+        try {
+            byte[] partByte = getFilePartByte(localFile, 0, new Long(truncateSize).intValue());
+            String originMd5 = Md5Utils.md5Hex(partByte);
+            String uploadEtag = Md5Utils.md5Hex(partByte);
+            // put object
+            putObjectFromLocalFileByInputStream(localFile, truncateSize, uploadEtag, key);
+            // head object
+            headSimpleObject(key, truncateSize, uploadEtag);
+            // get object
+            getObject(key, downLoadFile, new long[] {0, truncateSize - 1}, truncateSize, originMd5);
+            // check file
+            assertEquals(uploadEtag, Md5Utils.md5Hex(downLoadFile));
+        } finally {
+            // delete file on cos
+            clearObject(key);
+            // delete local file
+            if (localFile.exists()) {
+                assertTrue(localFile.delete());
+            }
+            if (downLoadFile.exists()) {
+                assertTrue(downLoadFile.delete());
+            }
+        }
+    }
+
+    // 在本地生成不同大小的文件, 并上传， 下载，删除
+    protected void testPutGetDelObjectDiffSize(long size) throws CosServiceException, IOException {
+        if (!judgeUserInfoValid()) {
+            return;
+        }
+        File localFile = buildTestFile(size);
+        File downLoadFile = new File(localFile.getAbsolutePath() + ".down");
+        String key = "ut/" + localFile.getName();
+        testPutGetObjectAndClear(key, localFile, downLoadFile);
+    }
+
+    protected void testPutGetObjectAndClear(String key, File localFile, File downLoadFile)
+            throws CosServiceException, IOException {
+        testPutGetObjectAndClear(key, localFile, downLoadFile, null, null);
+    }
+
+    protected void testPutGetObjectAndClear(String key, File localFile, File downLoadFile,
+            SSECustomerKey sseCKey, SSECOSKeyManagementParams params)
+                    throws CosServiceException, IOException {
+        if (!judgeUserInfoValid()) {
+            return;
+        }
+
+        try {
+            // put object
+            putObjectFromLocalFile(localFile, key, sseCKey, params);
+            // head object
+            headSimpleObject(key, localFile.length(), Md5Utils.md5Hex(localFile));
+            long range[] = null;
+            if (localFile.length() > 0) {
+                range = new long[] {0, localFile.length() - 1};
+            }
+            // get object
+            getObject(key, downLoadFile, range, localFile.length(), Md5Utils.md5Hex(localFile));
+        } finally {
+            // delete file on cos
+            clearObject(key);
+            // delete local file
+            if (localFile.exists()) {
+                assertTrue(localFile.delete());
+            }
+            if (downLoadFile.exists()) {
+                assertTrue(downLoadFile.delete());
+            }
+        }
+    }
+
+    protected String testInitMultipart(String key) {
+        InitiateMultipartUploadRequest request = new InitiateMultipartUploadRequest(bucket, key);
+        request.setStorageClass(StorageClass.Standard_IA);
+        InitiateMultipartUploadResult initResult = cosclient.initiateMultipartUpload(request);
+        return initResult.getUploadId();
+    }
+
+    protected void testUploadPart(String key, String uploadId, int partNumber, byte[] data,
+            String dataMd5, boolean isLastPart) {
+        UploadPartRequest uploadPartRequest = new UploadPartRequest();
+        uploadPartRequest.setBucketName(bucket);
+        uploadPartRequest.setKey(key);
+        uploadPartRequest.setUploadId(uploadId);
+        uploadPartRequest.setInputStream(new ByteArrayInputStream(data));
+        uploadPartRequest.setPartSize(data.length);
+        uploadPartRequest.setPartNumber(partNumber);
+        uploadPartRequest.setLastPart(isLastPart);
+
+        UploadPartResult uploadPartResult = cosclient.uploadPart(uploadPartRequest);
+        if (useClientEncryption || useServerEncryption) {
+            assertEquals(false, dataMd5.equals(uploadPartResult.getETag()));
+        } else {
+            assertEquals(true, dataMd5.equals(uploadPartResult.getETag()));
+        }
+        assertEquals(partNumber, uploadPartResult.getPartNumber());
+    }
+
+    protected List<PartETag> testListMultipart(String key, String uploadId, int expectedPartNum,
+            List<String> originDataMd5Array) {
+        List<PartETag> partETags = new LinkedList<>();
+        PartListing partListing = null;
+        ListPartsRequest listPartsRequest = new ListPartsRequest(bucket, key, uploadId);
+        int currentPartNum = 0;
+        do {
+            partListing = cosclient.listParts(listPartsRequest);
+            for (PartSummary partSummary : partListing.getParts()) {
+                ++currentPartNum;
+                assertEquals(currentPartNum, partSummary.getPartNumber());
+                if (useClientEncryption || useServerEncryption) {
+                    assertEquals(false, partSummary.getETag()
+                            .equals(originDataMd5Array.get(currentPartNum - 1)));
+                } else {
+                    assertEquals(true, partSummary.getETag()
+                            .equals(originDataMd5Array.get(currentPartNum - 1)));
+                }
+                partETags.add(new PartETag(partSummary.getPartNumber(), partSummary.getETag()));
+            }
+            listPartsRequest.setPartNumberMarker(partListing.getNextPartNumberMarker());
+        } while (partListing.isTruncated());
+        assertEquals(expectedPartNum, currentPartNum);
+        return partETags;
+    }
+
+    protected void testCompleteMultiPart(String key, String uploadId, List<PartETag> partETags,
+            int expectedPartNum) {
+        CompleteMultipartUploadRequest completeMultipartUploadRequest =
+                new CompleteMultipartUploadRequest(bucket, key, uploadId, partETags);
+        CompleteMultipartUploadResult completeResult =
+                cosclient.completeMultipartUpload(completeMultipartUploadRequest);
+        assertNotNull(completeResult.getRequestId());
+        assertNotNull(completeResult.getDateStr());
+        String etag = completeResult.getETag();
+        assertTrue(etag.contains("-"));
+        try {
+            int etagPartNum = Integer.valueOf(etag.substring(etag.indexOf("-") + 1));
+            assertEquals(expectedPartNum, etagPartNum);
+        } catch (NumberFormatException e) {
+            fail("part number in etag is invalid. etag: " + etag);
+        }
+    }
+
+    protected void testGetEachPart(String key, long partSize, long fileSize,
+            List<PartETag> partETags, List<String> originDataMd5Array) throws IOException {
+        File downloadFile = buildTestFile(0L);
+        long partBegin = 0;
+        long partEnd = 0;
+        assertEquals(partETags.size(), originDataMd5Array.size());
+        try {
+            for (PartETag partETag : partETags) {
+                int partNumber = partETag.getPartNumber();
+                partBegin = (partNumber - 1) * partSize;
+                partEnd = partNumber * partSize - 1;
+                if (partEnd >= fileSize) {
+                    partEnd = fileSize - 1;
+                }
+                long range[] = new long[] {partBegin, partEnd};
+                getObject(key, downloadFile, range, partEnd - partBegin + 1,
+                        originDataMd5Array.get(partNumber - 1));
+                assertEquals(partEnd - partBegin + 1, downloadFile.length());
+                assertEquals(originDataMd5Array.get(partNumber - 1), Md5Utils.md5Hex(downloadFile));
+                assertEquals(!useClientEncryption,
+                        originDataMd5Array.get(partNumber - 1).equals(partETag.getETag()));
+            }
+        } catch (Exception e) {
+            downloadFile.delete();
+        }
+    }
+
+    protected void testMultiPartUploadObject(long filesize, long partSize) throws IOException {
+        if (!judgeUserInfoValid()) {
+            return;
+        }
+        assertTrue(partSize >= 1024 * 1024L);
+        assertTrue(filesize >= partSize);
+        String key = String.format("ut_multipart_size_%d_part_%d_time_%d_random_%d", filesize,
+                partSize, System.currentTimeMillis(), ThreadLocalRandom.current().nextLong());
+
+        try {
+            String uploadId = testInitMultipart(key);
+            assertNotNull(uploadId);
+            int partNum = 0;
+            long byteUploaded = 0;
+            List<String> dataMd5Array = new ArrayList<>();
+            while (byteUploaded < filesize) {
+                ++partNum;
+                long currentPartSize = Math.min(filesize - byteUploaded, partSize);
+                byte[] dataUploaded = new byte[new Long(currentPartSize).intValue()];
+                ThreadLocalRandom.current().nextBytes(dataUploaded);
+                boolean isLastPart = false;
+                if (byteUploaded + currentPartSize == filesize) {
+                    isLastPart = true;
+                }
+                String dataMd5 = Md5Utils.md5Hex(dataUploaded);
+                testUploadPart(key, uploadId, partNum, dataUploaded, dataMd5, isLastPart);
+                dataMd5Array.add(dataMd5);
+                byteUploaded += currentPartSize;
+            }
+            List<PartETag> partETags = testListMultipart(key, uploadId, partNum, dataMd5Array);
+            testCompleteMultiPart(key, uploadId, partETags, partNum);
+            headMultiPartObject(key, filesize, partNum);
+            testGetEachPart(key, partSize, filesize, partETags, dataMd5Array);
+        } finally {
+            clearObject(key);
+        }
     }
 }

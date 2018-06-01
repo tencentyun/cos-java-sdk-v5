@@ -57,9 +57,13 @@ public final class TransferProgress {
     public synchronized double getPercentTransferred() {
         if (getBytesTransferred() < 0)
             return 0;
-
-        return totalBytesToTransfer < 0 ? -1.0
-                : ((double) bytesTransferred / (double) totalBytesToTransfer) * (double) 100;
+        if (totalBytesToTransfer < 0) {
+            return -1.0;
+        } else if (totalBytesToTransfer == 0) {
+            return 100.0;
+        } else {
+            return ((double) bytesTransferred / (double) totalBytesToTransfer) * (double) 100;
+        }
     }
 
     public synchronized void updateProgress(long bytes) {

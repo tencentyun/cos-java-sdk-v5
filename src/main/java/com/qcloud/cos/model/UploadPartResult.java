@@ -2,7 +2,9 @@ package com.qcloud.cos.model;
 
 import java.io.Serializable;
 
-public class UploadPartResult implements Serializable {
+import com.qcloud.cos.internal.SSEResultBase;
+
+public class UploadPartResult extends SSEResultBase implements Serializable {
     /** The part number of the newly uploaded part */
     private int partNumber;
 

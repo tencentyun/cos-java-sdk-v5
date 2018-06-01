@@ -62,6 +62,10 @@ public class GetObjectRequest extends CosServiceRequest
      */
     private SSECustomerKey sseCustomerKey;
 
+    public GetObjectRequest(COSObjectId cosObjectId) {
+        this(cosObjectId.getBucket(), cosObjectId.getKey(), cosObjectId.getVersionId());
+    }
+
     /**
      * Constructs a new {@link GetObjectRequest} with all the required parameters.
      *
@@ -599,5 +603,9 @@ public class GetObjectRequest extends CosServiceRequest
     public GetObjectRequest withSSECustomerKey(SSECustomerKey sseKey) {
         setSSECustomerKey(sseKey);
         return this;
+    }
+    
+    public COSObjectId getCOSObjectId() {
+        return new COSObjectId(bucketName, key, versionId);
     }
 }

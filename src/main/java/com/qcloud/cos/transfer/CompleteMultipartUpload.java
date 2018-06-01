@@ -75,7 +75,7 @@ public class CompleteMultipartUpload implements Callable<UploadResult> {
                 ;
             res = cos.completeMultipartUpload(req);
         } catch (Exception e) {
-            publishProgress(listener, ProgressEventType.TRANSFER_FAILED_EVENT);
+            monitor.uploadFailed();
             throw e;
         }
 

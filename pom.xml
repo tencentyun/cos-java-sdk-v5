@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.qcloud</groupId>
 	<artifactId>cos_api</artifactId>
-	<version>5.4.2</version>
+	<version>5.4.3</version>
 	<packaging>jar</packaging>
 	<name>cos-java-sdk</name>
 	<description>java sdk for qcloud cos </description>
@@ -71,7 +71,11 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.12</version>
-			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcprov-jdk15on</artifactId>
+			<version>1.59</version>
 		</dependency>
 	</dependencies>
 	<distributionManagement>

@@ -152,7 +152,7 @@ public class DefaultCosHttpClient implements CosHttpClient {
             URI uri = new URI(urlBuffer.toString());
             return uri;
         } catch (URISyntaxException e) {
-            throw new CosClientException("build uri error! CosHttpRequest: " + request.toString(),
+            throw new CosClientException("build uri error! url: " + urlBuffer.toString() + ", CosHttpRequest: " + request.toString(),
                     e);
         }
     }
@@ -171,6 +171,8 @@ public class DefaultCosHttpClient implements CosHttpClient {
             httpRequestBase = new HttpPost();
         } else if (httpMethodName.equals(HttpMethodName.HEAD)) {
             httpRequestBase = new HttpHead();
+        } else {
+            throw new CosClientException("unsupported http method " + httpMethodName);
         }
 
 

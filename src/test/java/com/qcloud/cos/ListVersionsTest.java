@@ -52,7 +52,6 @@ public class ListVersionsTest extends AbstractCOSClientTest {
                 File localFile = buildTestFile(localFileSize);
                 localFileArray[i * eachFileVersionNum + j] = localFile;
                 keyArray[i * eachFileVersionNum + j] = key;
-                int localFileIndex = i * eachFileVersionNum + j;
                 PutObjectResult putObjectResult = putObjectFromLocalFile(localFile, key);
                 if (retVersionFlag) {
                     assertNotNull("put object for version enalbed bucket should return versonId",

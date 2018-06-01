@@ -133,7 +133,7 @@ public class UploadMonitor implements Callable<UploadResult>, TransferMonitor {
             publishProgress(listener, ProgressEventType.TRANSFER_CANCELED_EVENT);
             throw new CosClientException("Upload canceled");
         } catch (Exception e) {
-            transfer.setState(TransferState.Failed);
+            uploadFailed();
             throw e;
         }
     }
@@ -146,6 +146,13 @@ public class UploadMonitor implements Callable<UploadResult>, TransferMonitor {
         // so we only need to send a completed event for multipart uploads.
         if (multipartUploadCallable.isMultipartUpload()) {
             publishProgress(listener, ProgressEventType.TRANSFER_COMPLETED_EVENT);
+        }
+    }
+    
+    void uploadFailed() {
+        transfer.setState(TransferState.Failed);
+        if (multipartUploadCallable.isMultipartUpload()) {
+            publishProgress(listener, ProgressEventType.TRANSFER_FAILED_EVENT);
         }
     }
 

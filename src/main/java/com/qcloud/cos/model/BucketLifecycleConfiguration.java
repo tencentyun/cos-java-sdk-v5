@@ -12,7 +12,9 @@ import com.qcloud.cos.model.lifecycle.LifecycleFilter;
 /**
  * Container for bucket lifecycle configuration operations.
  */
-public class BucketLifecycleConfiguration {
+public class BucketLifecycleConfiguration implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     /**
      * Constant for an enabled rule.
@@ -74,8 +76,9 @@ public class BucketLifecycleConfiguration {
         super();
     }
 
-    public static class Rule {
+    public static class Rule  implements Serializable {
 
+        private static final long serialVersionUID = 1L;
         private String id;
         private String status;
         private LifecycleFilter filter;
@@ -409,7 +412,9 @@ public class BucketLifecycleConfiguration {
      * The transition attribute of the rule describing how this object will move between different
      * storage classes in Qcloud COS.
      */
-    public static class Transition {
+    public static class Transition implements Serializable {
+
+        private static final long serialVersionUID = 1L;
 
         /**
          * The time, in days, between when the object is uploaded to the bucket and when it expires.

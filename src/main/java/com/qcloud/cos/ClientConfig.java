@@ -13,9 +13,9 @@ public class ClientConfig {
     // 默认的维护最大HTTP连接数
     private static final int DEFAULT_MAX_CONNECTIONS_COUNT = 1024;
     // 多次签名的默认过期时间,单位秒
-    private static final int DEFAULT_SIGN_EXPIRED = 300;
+    private static final long DEFAULT_SIGN_EXPIRED = 3600;
     // 默认的user_agent标识
-    private static final String DEFAULT_USER_AGENT = "cos-java-sdk-v5.4.0";
+    private static final String DEFAULT_USER_AGENT = "cos-java-sdk-v5.4.3";
     // Read Limit
     private static final int DEFAULT_READ_LIMIT = (2 << 17) + 1;
     
@@ -26,7 +26,7 @@ public class ClientConfig {
     // http proxy代理，如果使用http proxy代理，需要设置IP与端口
     private String httpProxyIp = null;
     private int httpProxyPort = 0;
-    private int signExpired = DEFAULT_SIGN_EXPIRED;
+    private long signExpired = DEFAULT_SIGN_EXPIRED;
     private int connectionRequestTimeout = DEFAULT_CONNECTION_REQUEST_TIMEOUT;
     private int connectionTimeout = DEFAULT_CONNECTION_TIMEOUT;
     private int socketTimeout = DEFAULT_SOCKET_TIMEOUT;
@@ -71,11 +71,11 @@ public class ClientConfig {
         this.httpProxyPort = httpProxyPort;
     }
 
-    public int getSignExpired() {
+    public long getSignExpired() {
         return signExpired;
     }
 
-    public void setSignExpired(int signExpired) {
+    public void setSignExpired(long signExpired) {
         this.signExpired = signExpired;
     }
 

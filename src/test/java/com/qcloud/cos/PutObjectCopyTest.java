@@ -69,6 +69,32 @@ public class PutObjectCopyTest extends AbstractCOSClientTest {
             }
         }
     }
+    
+    private void testUpdateDiffSize(long fileSize, ObjectMetadata newObjectMetaData) throws IOException {
+        if (!judgeUserInfoValid()) {
+            return;
+        }
+        File localFile = buildTestFile(fileSize);
+        String srcEtag = Md5Utils.md5Hex(localFile);
+
+        String srcKey = String.format("ut/src_len_%d.txt", fileSize);
+        try {
+            putObjectFromLocalFile(localFile, srcKey);
+            cosclient.updateObjectMetaData(bucket, srcKey, newObjectMetaData);
+            ObjectMetadata destObjectMetadata = headSimpleObject(srcKey, fileSize, srcEtag);
+            if (newObjectMetaData != null) {
+                checkMetaData(newObjectMetaData, destObjectMetadata);
+            }
+            
+        } finally {
+            // delete file on cos
+            clearObject(srcKey);
+            // delete local file
+            if (localFile.exists()) {
+                assertTrue(localFile.delete());
+            }
+        }
+    }
 
     @Test
     public void testCopySameRegionEmpty() throws IOException {
@@ -103,15 +129,15 @@ public class PutObjectCopyTest extends AbstractCOSClientTest {
     }
     
     @Test
-    public void testDeleteNotExistObject() throws IOException {
-        if (!judgeUserInfoValid()) {
-            return;
-        }
-        String key = "ut/not-exist.txt";
-        try {
-            cosclient.deleteObject(bucket, key);
-        } catch (CosServiceException e) {
-            fail(e.toString());
-        }
+    public void testUpdateObjectAttr() throws IOException {
+        ObjectMetadata newMetadata = new ObjectMetadata();
+        newMetadata.setContentType("application/json");
+        newMetadata.setContentDisposition("filename=\"abc.txt\"");
+        newMetadata.setCacheControl("no-cache");
+        newMetadata.setContentEncoding("gzip");
+        newMetadata.addUserMetadata("school", "football sport");
+        testUpdateDiffSize(0, newMetadata);
     }
+
+    
 }

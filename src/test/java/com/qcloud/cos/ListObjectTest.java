@@ -32,7 +32,7 @@ public class ListObjectTest extends AbstractCOSClientTest {
             File localFile = buildTestFile(localFileSize);
             localFileArray[i] = localFile;
             keyArray[i] = key;
-            putObjectFromLocalFile(localFile, key);
+            putObjectFromLocalFile(localFile, key, null, null);
         }
     }
 

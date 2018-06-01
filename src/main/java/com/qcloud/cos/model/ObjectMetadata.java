@@ -1,5 +1,6 @@
 package com.qcloud.cos.model;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -8,6 +9,7 @@ import java.util.Map;
 import com.qcloud.cos.Headers;
 import com.qcloud.cos.internal.ObjectExpirationResult;
 import com.qcloud.cos.internal.ObjectRestoreResult;
+import com.qcloud.cos.internal.ServerSideEncryptionResult;
 
 
 /**
@@ -15,12 +17,10 @@ import com.qcloud.cos.internal.ObjectRestoreResult;
  * metadata, as well as the standard HTTP headers that Qcloud COS sends and receives
  * (Content-Length, ETag, Content-MD5, etc.).
  */
-public class ObjectMetadata implements ObjectExpirationResult, ObjectRestoreResult, Cloneable {
-    /*
-     * TODO: Might be nice to get as many of the internal use only methods out of here so users
-     * never even see them. Example: we could set the ETag header directly through the raw metadata
-     * map instead of having a setter for it.
-     */
+public class ObjectMetadata implements ServerSideEncryptionResult, ObjectExpirationResult,
+        ObjectRestoreResult, Cloneable, Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     /**
      * Custom user metadata, represented in responses with the x-cos-meta- header prefix
@@ -236,6 +236,20 @@ public class ObjectMetadata implements ObjectExpirationResult, ObjectRestoreResu
         if (contentLength == null)
             return 0;
         return contentLength.longValue();
+    }
+
+    /**
+     * Returns the physical length of the entire object stored in COS. This is useful during, for
+     * example, a range get operation.
+     */
+    public long getInstanceLength() {
+        String contentRange = (String) metadata.get(Headers.CONTENT_RANGE);
+        if (contentRange != null) {
+            int pos = contentRange.lastIndexOf("/");
+            if (pos >= 0)
+                return Long.parseLong(contentRange.substring(pos + 1));
+        }
+        return getContentLength();
     }
 
     /**
@@ -652,7 +666,7 @@ public class ObjectMetadata implements ObjectExpirationResult, ObjectRestoreResu
     public Boolean getOngoingRestore() {
         return this.ongoingRestore;
     }
-    
+
     public boolean isDeleteMarker() {
         return isDeleteMarker;
     }
@@ -667,6 +681,8 @@ public class ObjectMetadata implements ObjectExpirationResult, ObjectRestoreResu
     public String getUserMetaDataOf(String key) {
         return userMetadata == null ? null : userMetadata.get(key);
     }
+
+
 
     public ObjectMetadata() {
         userMetadata = new HashMap<String, String>();
@@ -685,5 +701,45 @@ public class ObjectMetadata implements ObjectExpirationResult, ObjectRestoreResu
 
     public ObjectMetadata clone() {
         return new ObjectMetadata(this);
+    }
+
+    @Override
+    public String getSSEAlgorithm() {
+        return (String) metadata.get(Headers.SERVER_SIDE_ENCRYPTION);
+    }
+
+    @Override
+    public void setSSEAlgorithm(String algorithm) {
+        metadata.put(Headers.SERVER_SIDE_ENCRYPTION, algorithm);
+    }
+
+    @Override
+    public String getSSECustomerAlgorithm() {
+        return (String) metadata.get(Headers.SERVER_SIDE_ENCRYPTION_CUSTOMER_ALGORITHM);
+    }
+
+    @Override
+    public void setSSECustomerAlgorithm(String algorithm) {
+        metadata.put(Headers.SERVER_SIDE_ENCRYPTION_CUSTOMER_ALGORITHM, algorithm);
+
+    }
+
+    @Override
+    public String getSSECustomerKeyMd5() {
+        return (String) metadata.get(Headers.SERVER_SIDE_ENCRYPTION_CUSTOMER_KEY_MD5);
+    }
+
+    @Override
+    public void setSSECustomerKeyMd5(String md5Digest) {
+        metadata.put(Headers.SERVER_SIDE_ENCRYPTION_CUSTOMER_KEY_MD5, md5Digest);
+
+    }
+
+    /**
+     * Returns the Key Management System key id used for Server Side Encryption of the COS
+     * object.
+     */
+    public String getSSECOSKmsKeyId() {
+        return (String) metadata.get(Headers.SERVER_SIDE_ENCRYPTION_QCLOUD_KMS_KEYID);
     }
 }

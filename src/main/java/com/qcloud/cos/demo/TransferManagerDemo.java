@@ -35,7 +35,7 @@ public class TransferManagerDemo {
         System.out.println(transfer.getDescription());
         do {
             try {
-                Thread.sleep(100);
+                Thread.sleep(2000);
             } catch (InterruptedException e) {
                 return;
             }
@@ -45,8 +45,7 @@ public class TransferManagerDemo {
             double pct = progress.getPercentTransferred();
             System.out.printf("[%d / %d]\n", so_far, total);
         } while (transfer.isDone() == false);
-        TransferState xfer_state = transfer.getState();
-        System.out.println(xfer_state);
+        System.out.println(transfer.getState());
     }
 
     // 上传文件, 根据文件大小自动选择简单上传或者分块上传。

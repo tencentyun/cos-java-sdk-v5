@@ -8,7 +8,8 @@ import java.io.Serializable;
  * @see Grant#Grant(Grantee, Permission)
  */
 public class Grant implements Serializable {
-    private Grantee grantee = null;
+    private static final long serialVersionUID = 1L;
+    private transient Grantee grantee = null;
     private Permission permission = null;
 
     /**

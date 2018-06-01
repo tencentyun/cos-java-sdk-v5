@@ -115,6 +115,9 @@ public class CopyCallable implements Callable<CopyResult> {
      */
     private CopyResult copyInOneChunk() {
         CopyObjectResult copyObjectResult = cos.copyObject(copyObjectRequest);
+        if (copyObjectResult == null) {
+            return null;
+        }
 
         CopyResult copyResult = new CopyResult();
         copyResult.setSourceBucketName(copyObjectRequest.getSourceBucketName());

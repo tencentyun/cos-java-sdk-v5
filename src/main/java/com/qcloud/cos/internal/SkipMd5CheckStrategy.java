@@ -118,8 +118,7 @@ public class SkipMd5CheckStrategy {
         if (isPutObjectMd5ValidationDisabledByProperty()) {
             return true;
         }
-        return false;
-        // return putRequestInvolvesSse(request) || metadataInvolvesSse(request.getMetadata());
+        return putRequestInvolvesSse(request) || metadataInvolvesSse(request.getMetadata());
     }
 
     /**
@@ -137,8 +136,7 @@ public class SkipMd5CheckStrategy {
         if (isPutObjectMd5ValidationDisabledByProperty()) {
             return true;
         }
-        return false;
-        // return request.getSSECustomerKey() != null;
+        return request.getSSECustomerKey() != null;
     }
 
     /**
@@ -235,10 +233,8 @@ public class SkipMd5CheckStrategy {
         if (metadata == null) {
             return false;
         }
-        // return containsNonNull(metadata.getSSECustomerAlgorithm(),
-        // metadata.getSSECustomerKeyMd5(),
-        // metadata.getSSECOSKmsKeyId());
-        return true;
+        return containsNonNull(metadata.getSSECustomerAlgorithm(), metadata.getSSECustomerKeyMd5(),
+                metadata.getSSECOSKmsKeyId());
     }
 
     /**
@@ -246,9 +242,7 @@ public class SkipMd5CheckStrategy {
      * @return True if {@link PutObjectRequest} has been configured to use SSE-C or SSE-KMS
      */
     private boolean putRequestInvolvesSse(PutObjectRequest request) {
-        // return containsNonNull(request.getSSECustomerKey(),
-        // request.getSSECOSKeyManagementParams());
-        return true;
+        return containsNonNull(request.getSSECustomerKey(), request.getSSECOSKeyManagementParams());
     }
 
     /**

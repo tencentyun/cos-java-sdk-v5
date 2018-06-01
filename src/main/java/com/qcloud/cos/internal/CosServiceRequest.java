@@ -27,6 +27,11 @@ public class CosServiceRequest implements Cloneable, ReadLimitInfo  {
     private final RequestClientOptions requestClientOptions = new RequestClientOptions();
     
     /**
+     * The source object from which the current object was cloned; or null if there isn't one.
+     */
+    private CosServiceRequest cloneSource;
+    
+    /**
      * Sets the optional progress listener for receiving updates about the progress of the request.
      *
      * @param progressListener
@@ -169,6 +174,49 @@ public class CosServiceRequest implements Cloneable, ReadLimitInfo  {
     @Override
     public int getReadLimit() {
         return requestClientOptions.getReadLimit();
+    }
+    
+    /**
+     * Returns the source object from which the current object was cloned; or null if there isn't
+     * one.
+     */
+    public CosServiceRequest getCloneSource() {
+        return cloneSource;
+    }
+
+    /**
+     * Returns the root object from which the current object was cloned; or null if there isn't one.
+     */
+    public CosServiceRequest getCloneRoot() {
+        CosServiceRequest cloneRoot = cloneSource;
+        if (cloneRoot != null) {
+            while (cloneRoot.getCloneSource() != null) {
+                cloneRoot = cloneRoot.getCloneSource();
+            }
+        }
+        return cloneRoot;
+    }
+
+    private void setCloneSource(CosServiceRequest cloneSource) {
+        this.cloneSource = cloneSource;
+    }
+    
+    /**
+     * Creates a shallow clone of this object for all fields except the handler context. Explicitly does <em>not</em> clone the
+     * deep structure of the other fields in the message.
+     *
+     * @see Object#clone()
+     */
+    @Override
+    public CosServiceRequest clone() {
+        try {
+            CosServiceRequest cloned = (CosServiceRequest) super.clone();
+            cloned.setCloneSource(this);
+            return cloned;
+        } catch (CloneNotSupportedException e) {
+            throw new IllegalStateException(
+                    "Got a CloneNotSupportedException from Object.clone() " + "even though we're Cloneable!", e);
+        }
     }
 
 }

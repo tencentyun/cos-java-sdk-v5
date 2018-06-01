@@ -10,6 +10,7 @@ import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.exception.MultiObjectDeleteException;
 import com.qcloud.cos.http.HttpMethodName;
+import com.qcloud.cos.internal.COSDirectSpi;
 import com.qcloud.cos.model.AbortMultipartUploadRequest;
 import com.qcloud.cos.model.AccessControlList;
 import com.qcloud.cos.model.Bucket;
@@ -72,7 +73,7 @@ import com.qcloud.cos.model.UploadPartRequest;
 import com.qcloud.cos.model.UploadPartResult;
 import com.qcloud.cos.model.VersionListing;
 
-public interface COS {
+public interface COS extends COSDirectSpi {
 
     /**
      * return the client config. client config include the region info, default expired sign time,
@@ -2189,18 +2190,29 @@ public interface COS {
      * will only be accepted when there is no ongoing restore request. One needs to have the new
      * cos:RestoreObject permission to perform this operation.
      *
-     * @param bucketName
-     *            The name of an existing bucket.
-     * @param key
-     *            The key under which to store the specified file.
-     * @param expirationInDays
-     *            The number of days after which the object will expire.
-     *            
+     * @param bucketName The name of an existing bucket.
+     * @param key The key under which to store the specified file.
+     * @param expirationInDays The number of days after which the object will expire.
+     * 
      * @throws CosClientException If any errors are encountered in the client while making the
      *         request or handling the response.
      * @throws CosServiceException If any errors occurred in COS while processing the request.
      */
     public void restoreObject(String bucketName, String key, int expirationInDays)
+            throws CosClientException, CosServiceException;
+
+
+    /**
+     * update the object meta.
+     * 
+     * @param bucketName The name of an existing bucket.
+     * @param key The key under which to store the specified file.
+     * @param objectMetadata object new metadata for the specified object
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * @throws CosServiceException If any errors occurred in COS while processing the request.
+     */
+    public void updateObjectMetaData(String bucketName, String key, ObjectMetadata objectMetadata)
             throws CosClientException, CosServiceException;
 
 }

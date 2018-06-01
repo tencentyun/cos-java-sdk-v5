@@ -13,9 +13,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.qcloud.cos.utils.Jackson;
 
 /**
- * Abstract base class for the information of a pausible upload or download; such
- * information can be used to resume the upload or download later on, and can be
- * serialized/deserialized for persistence purposes.
+ * Abstract base class for the information of a pausible upload or download; such information can be
+ * used to resume the upload or download later on, and can be serialized/deserialized for
+ * persistence purposes.
  */
 public abstract class PersistableTransfer {
 
@@ -29,9 +29,9 @@ public abstract class PersistableTransfer {
     }
 
     /**
-     * Writes the serialized representation of the paused transfer state to the
-     * given <code>OutputStream</code>. Caller of this method should explicitly
-     * close the <code>OutputStream</code>.
+     * Writes the serialized representation of the paused transfer state to the given
+     * <code>OutputStream</code>. Caller of this method should explicitly close the
+     * <code>OutputStream</code>.
      */
     public final void serialize(OutputStream out) throws IOException {
         out.write(Jackson.toJsonString(this).getBytes(UTF8));
@@ -39,23 +39,23 @@ public abstract class PersistableTransfer {
     }
 
     /**
-     * Returns the deserialized transfer state of the given serialized
-     * representation. Caller of this method should explicitly close the
-     * <code>InputStream</code>.
+     * Returns the deserialized transfer state of the given serialized representation. Caller of
+     * this method should explicitly close the <code>InputStream</code>.
      *
-     * @throws UnsupportedOperationException
-     *             if the paused transfer type extracted from the serialized
-     *             representation is not supported.
+     * @throws UnsupportedOperationException if the paused transfer type extracted from the
+     *         serialized representation is not supported.
      */
     public static <T extends PersistableTransfer> T deserializeFrom(InputStream in) {
         String type;
         JsonNode tree;
         try {
             tree = MAPPER.readTree(in);
+            if (tree == null) {
+                throw new IllegalArgumentException("Unrecognized input stream");
+            }
             JsonNode pauseType = tree.get("pauseType");
             if (pauseType == null)
-                throw new IllegalArgumentException(
-                        "Unrecognized serialized state");
+                throw new IllegalArgumentException("Unrecognized serialized state");
             type = pauseType.asText();
         } catch (Exception e) {
             throw new IllegalArgumentException(e);
@@ -66,8 +66,7 @@ public abstract class PersistableTransfer {
         } else if (PersistableUpload.TYPE.equals(type)) {
             clazz = PersistableUpload.class;
         } else {
-            throw new UnsupportedOperationException(
-                    "Unsupported paused transfer type: " + type);
+            throw new UnsupportedOperationException("Unsupported paused transfer type: " + type);
         }
         try {
             @SuppressWarnings("unchecked")
@@ -79,23 +78,22 @@ public abstract class PersistableTransfer {
     }
 
     /**
-     * Returns the deserialized transfer state of the given serialized
-     * representation.
+     * Returns the deserialized transfer state of the given serialized representation.
      *
-     * @throws UnsupportedOperationException
-     *             if the paused transfer type extracted from the serialized
-     *             representation is not supported.
+     * @throws UnsupportedOperationException if the paused transfer type extracted from the
+     *         serialized representation is not supported.
      */
-    public static <T extends PersistableTransfer> T deserializeFrom(
-            String serialized) {
+    public static <T extends PersistableTransfer> T deserializeFrom(String serialized) {
         if (serialized == null)
             return null;
-        ByteArrayInputStream byteStream = new ByteArrayInputStream(
-                serialized.getBytes(UTF8));
-        try{
+        ByteArrayInputStream byteStream = new ByteArrayInputStream(serialized.getBytes(UTF8));
+        try {
             return deserializeFrom(byteStream);
-        }finally{
-            try { byteStream.close(); } catch(IOException ioe) { } ;
+        } finally {
+            try {
+                byteStream.close();
+            } catch (IOException ioe) {
+            };
         }
     }
 }

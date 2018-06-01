@@ -1,9 +1,12 @@
 package com.qcloud.cos.model;
 
+import static com.qcloud.cos.model.InstructionFileId.DEFAULT_INSTRUCTION_FILE_SUFFIX;
+import static com.qcloud.cos.model.InstructionFileId.DOT;
+
 import java.io.Serializable;
 
-
 public class COSObjectId implements Serializable {
+    private static final long serialVersionUID = 1L;
     private final String bucket;
     private final String key;
     /**
@@ -51,9 +54,29 @@ public class COSObjectId implements Serializable {
     public String getVersionId() {
         return versionId;
     }
+    /**
+     * Returns the instruction file id of the default instruction file.
+     */
+    public InstructionFileId instructionFileId() {
+        return instructionFileId(null);
+    }
+
+    /**
+     * Returns the instruction file id of an instruction file with the given
+     * suffix.
+     */
+    public InstructionFileId instructionFileId(String suffix) {
+        String ifileKey = key + DOT;
+        ifileKey += (suffix == null || suffix.trim().length() == 0)
+                  ? DEFAULT_INSTRUCTION_FILE_SUFFIX
+                  : suffix
+                  ;
+         return new InstructionFileId(bucket, ifileKey, versionId);
+    }
 
     @Override
     public String toString() {
-        return "bucket: " + bucket + ", key: " + key + ", versionId: " + versionId;
+        return "bucket: " + bucket + ", key: " + key + ", versionId: "
+                + versionId;
     }
 }

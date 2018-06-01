@@ -7,13 +7,13 @@ import java.io.Serializable;
 import com.qcloud.cos.internal.CosServiceRequest;
 
 
-public abstract class AbstractPutObjectRequest extends CosServiceRequest
-        implements Cloneable, SSECustomerKeyProvider, SSECOSKeyManagementParamsProvider, CosDataSource, Serializable {
-    
+public abstract class AbstractPutObjectRequest extends CosServiceRequest implements Cloneable,
+        SSECustomerKeyProvider, SSECOSKeyManagementParamsProvider, CosDataSource, Serializable {
+
     /**
-     * The name of an existing bucket, to which this request will upload a new
-     * object. You must have {@link Permission#Write} permission granted to you
-     * in order to upload new objects to a bucket.
+     * The name of an existing bucket, to which this request will upload a new object. You must have
+     * {@link Permission#Write} permission granted to you in order to upload new objects to a
+     * bucket.
      */
     private String bucketName;
 
@@ -23,47 +23,44 @@ public abstract class AbstractPutObjectRequest extends CosServiceRequest
     private String key;
 
     /**
-     * The file containing the data to be uploaded to Qcloud COS. You must either
-     * specify a file or an InputStream containing the data to be uploaded to
-     * Qcloud COS.
+     * The file containing the data to be uploaded to Qcloud COS. You must either specify a file or
+     * an InputStream containing the data to be uploaded to Qcloud COS.
      */
     private File file;
 
     /**
-     * The InputStream containing the data to be uploaded to Qcloud COS. You must
-     * either specify a file or an InputStream containing the data to be
-     * uploaded to Qcloud COS.
+     * The InputStream containing the data to be uploaded to Qcloud COS. You must either specify a
+     * file or an InputStream containing the data to be uploaded to Qcloud COS.
      */
     private transient InputStream inputStream;
 
     /**
-     * Optional metadata instructing Qcloud COS how to handle the uploaded data
-     * (e.g. custom user metadata, hooks for specifying content type, etc.). If
-     * you are uploading from an InputStream, you <bold>should always</bold>
-     * specify metadata with the content size set, otherwise the contents of the
-     * InputStream will have to be buffered in memory before they can be sent to
+     * Optional metadata instructing Qcloud COS how to handle the uploaded data (e.g. custom user
+     * metadata, hooks for specifying content type, etc.). If you are uploading from an InputStream,
+     * you <bold>should always</bold> specify metadata with the content size set, otherwise the
+     * contents of the InputStream will have to be buffered in memory before they can be sent to
      * Qcloud COS, which can have very negative performance impacts.
      */
     private ObjectMetadata metadata;
 
     /**
-     * An optional pre-configured access control policy to use for the new
-     * object.  Ignored in favor of accessControlList, if present.
+     * An optional pre-configured access control policy to use for the new object. Ignored in favor
+     * of accessControlList, if present.
      */
     private CannedAccessControlList cannedAcl;
 
     /**
-     * An optional access control list to apply to the new object. If specified,
-     * cannedAcl will be ignored.
+     * An optional access control list to apply to the new object. If specified, cannedAcl will be
+     * ignored.
      */
     private AccessControlList accessControlList;
 
     /**
-     * The optional Qcloud COS storage class to use when storing the new object.
-     * If not specified, the default, standard storage class will be used.
+     * The optional Qcloud COS storage class to use when storing the new object. If not specified,
+     * the default, standard storage class will be used.
      * <p>
-     * For more information on Qcloud COS storage classes and available values,
-     * see the {@link StorageClass} enumeration.
+     * For more information on Qcloud COS storage classes and available values, see the
+     * {@link StorageClass} enumeration.
      */
     private String storageClass;
 
@@ -71,30 +68,25 @@ public abstract class AbstractPutObjectRequest extends CosServiceRequest
     private String redirectLocation;
 
     /**
-     * The optional customer-provided server-side encryption key to use to
-     * encrypt the uploaded object.
+     * The optional customer-provided server-side encryption key to use to encrypt the uploaded
+     * object.
      */
     private SSECustomerKey sseCustomerKey;
 
     /**
-     * The optional COS Key Management system parameters to be used to encrypt
-     * the the object on the server side.
+     * The optional COS Key Management system parameters to be used to encrypt the the object on the
+     * server side.
      */
     private SSECOSKeyManagementParams sseCOSKeyManagementParams;
 
     /**
-     * Constructs a new
-     * {@link AbstractPutObjectRequest} object to upload a file to the
-     * specified bucket and key. After constructing the request,
-     * users may optionally specify object metadata or a canned ACL as well.
+     * Constructs a new {@link AbstractPutObjectRequest} object to upload a file to the specified
+     * bucket and key. After constructing the request, users may optionally specify object metadata
+     * or a canned ACL as well.
      *
-     * @param bucketName
-     *            The name of an existing bucket to which the new object will be
-     *            uploaded.
-     * @param key
-     *            The key under which to store the new object.
-     * @param file
-     *            The path of the file to upload to Qcloud COS.
+     * @param bucketName The name of an existing bucket to which the new object will be uploaded.
+     * @param key The key under which to store the new object.
+     * @param file The path of the file to upload to Qcloud COS.
      */
     public AbstractPutObjectRequest(String bucketName, String key, File file) {
         this.bucketName = bucketName;
@@ -103,52 +95,39 @@ public abstract class AbstractPutObjectRequest extends CosServiceRequest
     }
 
     /**
-     * Constructs a new {@link AbstractPutObjectRequest} object with redirect location.
-     * After constructing the request, users may optionally specify object
-     * metadata or a canned ACL as well.
+     * Constructs a new {@link AbstractPutObjectRequest} object with redirect location. After
+     * constructing the request, users may optionally specify object metadata or a canned ACL as
+     * well.
      *
-     * @param bucketName
-     *            The name of an existing bucket to which the new object will be
-     *            uploaded.
-     * @param key
-     *            The key under which to store the new object.
-     * @param redirectLocation
-     *            The redirect location of this new object.
+     * @param bucketName The name of an existing bucket to which the new object will be uploaded.
+     * @param key The key under which to store the new object.
+     * @param redirectLocation The redirect location of this new object.
      */
-    public AbstractPutObjectRequest(String bucketName, String key,
-            String redirectLocation) {
+    public AbstractPutObjectRequest(String bucketName, String key, String redirectLocation) {
         this.bucketName = bucketName;
         this.key = key;
         this.redirectLocation = redirectLocation;
     }
 
     /**
-     * Constructs a new
-     * {@link AbstractPutObjectRequest} object to upload a stream of data to
-     * the specified bucket and key. After constructing the request,
-     * users may optionally specify object metadata or a canned ACL as well.
+     * Constructs a new {@link AbstractPutObjectRequest} object to upload a stream of data to the
+     * specified bucket and key. After constructing the request, users may optionally specify object
+     * metadata or a canned ACL as well.
      * <p>
-     * Content length for the data stream <b>must</b> be
-     * specified in the object metadata parameter; Qcloud COS requires it
-     * be passed in before the data is uploaded. Failure to specify a content
-     * length will cause the entire contents of the input stream to be buffered
-     * locally in memory so that the content length can be calculated, which can
-     * result in negative performance problems.
+     * Content length for the data stream <b>must</b> be specified in the object metadata parameter;
+     * Qcloud COS requires it be passed in before the data is uploaded. Failure to specify a content
+     * length will cause the entire contents of the input stream to be buffered locally in memory so
+     * that the content length can be calculated, which can result in negative performance problems.
      * </p>
      *
-     * @param bucketName
-     *            The name of an existing bucket to which the new object will be
-     *            uploaded.
-     * @param key
-     *            The key under which to store the new object.
-     * @param input
-     *            The stream of data to upload to Qcloud COS.
-     * @param metadata
-     *            The object metadata. At minimum this specifies the
-     *            content length for the stream of data being uploaded.
+     * @param bucketName The name of an existing bucket to which the new object will be uploaded.
+     * @param key The key under which to store the new object.
+     * @param input The stream of data to upload to Qcloud COS.
+     * @param metadata The object metadata. At minimum this specifies the content length for the
+     *        stream of data being uploaded.
      */
-    protected AbstractPutObjectRequest(String bucketName, String key,
-            InputStream input, ObjectMetadata metadata) {
+    protected AbstractPutObjectRequest(String bucketName, String key, InputStream input,
+            ObjectMetadata metadata) {
         this.bucketName = bucketName;
         this.key = key;
         this.inputStream = input;
@@ -156,13 +135,10 @@ public abstract class AbstractPutObjectRequest extends CosServiceRequest
     }
 
     /**
-     * Gets the name of the existing bucket where this request will
-     * upload a new object to.
-     * In order to upload the object,
-     * users must have {@link Permission#Write} permission granted.
+     * Gets the name of the existing bucket where this request will upload a new object to. In order
+     * to upload the object, users must have {@link Permission#Write} permission granted.
      *
-     * @return The name of an existing bucket where this request will
-     * upload a new object to.
+     * @return The name of an existing bucket where this request will upload a new object to.
      *
      * @see AbstractPutObjectRequest#setBucketName(String)
      * @see AbstractPutObjectRequest#withBucketName(String)
@@ -172,15 +148,12 @@ public abstract class AbstractPutObjectRequest extends CosServiceRequest
     }
 
     /**
-     * Sets the name of an existing bucket where this request will
-     * upload a new object to. In order to upload the object,
-     * users must have {@link Permission#Write} permission granted.
+     * Sets the name of an existing bucket where this request will upload a new object to. In order
+     * to upload the object, users must have {@link Permission#Write} permission granted.
      *
-     * @param bucketName
-     *            The name of an existing bucket where this request will
-     *            upload a new object to.
-     *            In order to upload the object,
-     *            users must have {@link Permission#Write} permission granted.
+     * @param bucketName The name of an existing bucket where this request will upload a new object
+     *        to. In order to upload the object, users must have {@link Permission#Write} permission
+     *        granted.
      *
      * @see AbstractPutObjectRequest#getBucketName()
      * @see AbstractPutObjectRequest#withBucketName(String)
@@ -190,29 +163,25 @@ public abstract class AbstractPutObjectRequest extends CosServiceRequest
     }
 
     /**
-     * Sets the name of the bucket where this request will upload a new
-     * object to. Returns this object, enabling additional method calls to be
-     * chained together.
+     * Sets the name of the bucket where this request will upload a new object to. Returns this
+     * object, enabling additional method calls to be chained together.
      * <p>
-     * In order to upload the object,
-     * users must have {@link Permission#Write} permission granted.
+     * In order to upload the object, users must have {@link Permission#Write} permission granted.
      *
-     * @param bucketName
-     *            The name of an existing bucket where this request will
-     *            upload a new object to.
-     *            In order to upload the object,
-     *            users must have {@link Permission#Write} permission granted.
+     * @param bucketName The name of an existing bucket where this request will upload a new object
+     *        to. In order to upload the object, users must have {@link Permission#Write} permission
+     *        granted.
      *
-     * @return This {@link AbstractPutObjectRequest}, enabling additional method calls to be
-     *         chained together.
+     * @return This {@link AbstractPutObjectRequest}, enabling additional method calls to be chained
+     *         together.
      *
      * @see AbstractPutObjectRequest#getBucketName()
      * @see AbstractPutObjectRequest#setBucketName(String)
      */
-    public <T extends AbstractPutObjectRequest> T withBucketName(
-            String bucketName) {
+    public <T extends AbstractPutObjectRequest> T withBucketName(String bucketName) {
         setBucketName(bucketName);
-        @SuppressWarnings("unchecked") T t = (T)this;
+        @SuppressWarnings("unchecked")
+        T t = (T) this;
         return t;
     }
 
@@ -231,8 +200,7 @@ public abstract class AbstractPutObjectRequest extends CosServiceRequest
     /**
      * Sets the key under which to store the new object.
      *
-     * @param key
-     *            The key under which to store the new object.
+     * @param key The key under which to store the new object.
      *
      * @see AbstractPutObjectRequest#getKey()
      * @see AbstractPutObjectRequest#withKey(String)
@@ -242,35 +210,33 @@ public abstract class AbstractPutObjectRequest extends CosServiceRequest
     }
 
     /**
-     * Sets the key under which to store the new object. Returns this object,
-     * enabling additional method calls to be chained together.
+     * Sets the key under which to store the new object. Returns this object, enabling additional
+     * method calls to be chained together.
      *
-     * @param key
-     *            The key under which to store the new object.
+     * @param key The key under which to store the new object.
      *
-     * @return This {@link AbstractPutObjectRequest}, enabling additional method calls to be
-     *         chained together.
+     * @return This {@link AbstractPutObjectRequest}, enabling additional method calls to be chained
+     *         together.
      *
      * @see AbstractPutObjectRequest#getKey()
      * @see AbstractPutObjectRequest#setKey(String)
      */
     public <T extends AbstractPutObjectRequest> T withKey(String key) {
         setKey(key);
-        @SuppressWarnings("unchecked") T t = (T)this;
+        @SuppressWarnings("unchecked")
+        T t = (T) this;
         return t;
     }
 
     /**
-     * Gets the optional Qcloud COS storage class to use when storing the new
-     * object. If not specified, the default standard storage class is
-     * used when storing the object.
+     * Gets the optional Qcloud COS storage class to use when storing the new object. If not
+     * specified, the default standard storage class is used when storing the object.
      * <p>
-     * For more information on available Qcloud COS storage classes, see the
-     * {@link StorageClass} enumeration.
+     * For more information on available Qcloud COS storage classes, see the {@link StorageClass}
+     * enumeration.
      * </p>
      *
-     * @return The Qcloud COS storage class to use when storing the newly copied
-     *         object.
+     * @return The Qcloud COS storage class to use when storing the newly copied object.
      *
      * @see AbstractPutObjectRequest#setStorageClass(String)
      * @see AbstractPutObjectRequest#setStorageClass(StorageClass)
@@ -282,16 +248,14 @@ public abstract class AbstractPutObjectRequest extends CosServiceRequest
     }
 
     /**
-     * Sets the optional Qcloud COS storage class to use when storing the new
-     * object. If not specified, the default standard storage class will be
-     * used when storing the new object.
+     * Sets the optional Qcloud COS storage class to use when storing the new object. If not
+     * specified, the default standard storage class will be used when storing the new object.
      * <p>
-     * For more information on Qcloud COS storage classes and available values,
-     * see the {@link StorageClass} enumeration.
+     * For more information on Qcloud COS storage classes and available values, see the
+     * {@link StorageClass} enumeration.
      * </p>
      *
-     * @param storageClass
-     *         The storage class to use when storing the new object.
+     * @param storageClass The storage class to use when storing the new object.
      *
      * @see #getStorageClass()
      * @see #setStorageClass(String)
@@ -303,44 +267,40 @@ public abstract class AbstractPutObjectRequest extends CosServiceRequest
     }
 
     /**
-     * Sets the optional Qcloud COS storage class to use when storing the new
-     * object. Returns this {@link AbstractPutObjectRequest}, enabling additional method
-     * calls to be chained together. If not specified, the default standard
-     * storage class will be used when storing the object.
+     * Sets the optional Qcloud COS storage class to use when storing the new object. Returns this
+     * {@link AbstractPutObjectRequest}, enabling additional method calls to be chained together. If
+     * not specified, the default standard storage class will be used when storing the object.
      * <p>
-     * For more information on Qcloud COS storage classes and available values,
-     * see the {@link StorageClass} enumeration.
+     * For more information on Qcloud COS storage classes and available values, see the
+     * {@link StorageClass} enumeration.
      * </p>
      *
-     * @param storageClass
-     *         The storage class to use when storing the new object.
+     * @param storageClass The storage class to use when storing the new object.
      *
-     * @return This {@link AbstractPutObjectRequest}, enabling additional method calls to be
-     *         chained together.
+     * @return This {@link AbstractPutObjectRequest}, enabling additional method calls to be chained
+     *         together.
      *
      * @see AbstractPutObjectRequest#getStorageClass()
      * @see AbstractPutObjectRequest#setStorageClass(StorageClass)
      * @see AbstractPutObjectRequest#setStorageClass(String)
      * @see AbstractPutObjectRequest#withStorageClass(StorageClass)
      */
-    public <T extends AbstractPutObjectRequest> T withStorageClass(
-            String storageClass) {
+    public <T extends AbstractPutObjectRequest> T withStorageClass(String storageClass) {
         setStorageClass(storageClass);
-        @SuppressWarnings("unchecked") T t = (T)this;
+        @SuppressWarnings("unchecked")
+        T t = (T) this;
         return t;
     }
 
     /**
-     * Sets the optional Qcloud COS storage class to use when storing the new
-     * object. If not specified, the default standard storage class will be
-     * used when storing the object.
+     * Sets the optional Qcloud COS storage class to use when storing the new object. If not
+     * specified, the default standard storage class will be used when storing the object.
      * <p>
-     * For more information on Qcloud COS storage classes and available values,
-     * see the {@link StorageClass} enumeration.
+     * For more information on Qcloud COS storage classes and available values, see the
+     * {@link StorageClass} enumeration.
      * </p>
      *
-     * @param storageClass
-     *         The storage class to use when storing the new object.
+     * @param storageClass The storage class to use when storing the new object.
      *
      * @see #getStorageClass()
      * @see #setStorageClass(String)
@@ -350,41 +310,37 @@ public abstract class AbstractPutObjectRequest extends CosServiceRequest
     }
 
     /**
-     * Sets the optional Qcloud COS storage class to use when storing the new
-     * object. Returns this {@link AbstractPutObjectRequest}, enabling additional method
-     * calls to be chained together. If not specified, the default standard
-     * storage class will be used when storing the object.
+     * Sets the optional Qcloud COS storage class to use when storing the new object. Returns this
+     * {@link AbstractPutObjectRequest}, enabling additional method calls to be chained together. If
+     * not specified, the default standard storage class will be used when storing the object.
      * <p>
-     * For more information on Qcloud COS storage classes and available values,
-     * see the {@link StorageClass} enumeration.
+     * For more information on Qcloud COS storage classes and available values, see the
+     * {@link StorageClass} enumeration.
      * </p>
      *
-     * @param storageClass
-     *         The storage class to use when storing the new object.
+     * @param storageClass The storage class to use when storing the new object.
      *
-     * @return This {@link AbstractPutObjectRequest}, enabling additional method calls to be
-     *         chained together.
+     * @return This {@link AbstractPutObjectRequest}, enabling additional method calls to be chained
+     *         together.
      *
      * @see AbstractPutObjectRequest#getStorageClass()
      * @see AbstractPutObjectRequest#setStorageClass(StorageClass)
      * @see AbstractPutObjectRequest#setStorageClass(String)
      * @see AbstractPutObjectRequest#withStorageClass(String)
      */
-    public <T extends AbstractPutObjectRequest> T withStorageClass(
-            StorageClass storageClass) {
+    public <T extends AbstractPutObjectRequest> T withStorageClass(StorageClass storageClass) {
         setStorageClass(storageClass);
-        @SuppressWarnings("unchecked") T t = (T)this;
+        @SuppressWarnings("unchecked")
+        T t = (T) this;
         return t;
     }
 
     /**
-     * Gets the path and name of the file
-     * containing the data to be uploaded to Qcloud COS.
-     * Either specify a file or an input stream containing the data to be
-     * uploaded to Qcloud COS; both cannot be specified.
+     * Gets the path and name of the file containing the data to be uploaded to Qcloud COS. Either
+     * specify a file or an input stream containing the data to be uploaded to Qcloud COS; both
+     * cannot be specified.
      *
-     * @return The path and name of the file
-     *         containing the data to be uploaded to Qcloud COS.
+     * @return The path and name of the file containing the data to be uploaded to Qcloud COS.
      *
      * @see AbstractPutObjectRequest#setFile(File)
      * @see AbstractPutObjectRequest#withFile(File)
@@ -397,14 +353,11 @@ public abstract class AbstractPutObjectRequest extends CosServiceRequest
     }
 
     /**
-     * Sets the path and name of the file
-     * containing the data to be uploaded to Qcloud COS.
-     * Either specify a file or an input stream containing the data to be
-     * uploaded to Qcloud COS; both cannot be specified.
+     * Sets the path and name of the file containing the data to be uploaded to Qcloud COS. Either
+     * specify a file or an input stream containing the data to be uploaded to Qcloud COS; both
+     * cannot be specified.
      *
-     * @param file
-     *            The path and name of the
-     *            file containing the data to be uploaded to Qcloud COS.
+     * @param file The path and name of the file containing the data to be uploaded to Qcloud COS.
      *
      * @see AbstractPutObjectRequest#getFile()
      * @see AbstractPutObjectRequest#withFile(File)
@@ -417,18 +370,16 @@ public abstract class AbstractPutObjectRequest extends CosServiceRequest
     }
 
     /**
-     * Sets the file containing the data to be uploaded to Qcloud COS.
-     * Returns this {@link AbstractPutObjectRequest}, enabling additional method
-     * calls to be chained together.
+     * Sets the file containing the data to be uploaded to Qcloud COS. Returns this
+     * {@link AbstractPutObjectRequest}, enabling additional method calls to be chained together.
      * <p>
-     * Either specify a file or an input stream containing the data to
-     * be uploaded to Qcloud COS; both cannot be specified.
+     * Either specify a file or an input stream containing the data to be uploaded to Qcloud COS;
+     * both cannot be specified.
      *
-     * @param file
-     *            The file containing the data to be uploaded to Qcloud COS.
+     * @param file The file containing the data to be uploaded to Qcloud COS.
      *
-     * @return This {@link AbstractPutObjectRequest}, enabling additional method
-     *         calls to be chained together.
+     * @return This {@link AbstractPutObjectRequest}, enabling additional method calls to be chained
+     *         together.
      *
      * @see AbstractPutObjectRequest#getFile()
      * @see AbstractPutObjectRequest#setFile(File)
@@ -437,25 +388,22 @@ public abstract class AbstractPutObjectRequest extends CosServiceRequest
      */
     public <T extends AbstractPutObjectRequest> T withFile(File file) {
         setFile(file);
-        @SuppressWarnings("unchecked") T t = (T)this;
+        @SuppressWarnings("unchecked")
+        T t = (T) this;
         return t;
     }
 
     /**
-     * Gets the optional metadata instructing Qcloud COS how to handle the
-     * uploaded data (e.g. custom user metadata, hooks for specifying content
-     * type, etc.).
+     * Gets the optional metadata instructing Qcloud COS how to handle the uploaded data (e.g.
+     * custom user metadata, hooks for specifying content type, etc.).
      * <p>
-     * If uploading from an input stream,
-     * <b>always</b> specify metadata with the content size set. Otherwise the
-     * contents of the input stream have to be buffered in memory before
-     * being sent to Qcloud COS. This can cause very negative performance
-     * impacts.
+     * If uploading from an input stream, <b>always</b> specify metadata with the content size set.
+     * Otherwise the contents of the input stream have to be buffered in memory before being sent to
+     * Qcloud COS. This can cause very negative performance impacts.
      * </p>
      *
-     * @return The optional metadata instructing Qcloud COS how to handle the
-     *         uploaded data (e.g. custom user metadata, hooks for specifying
-     *         content type, etc.).
+     * @return The optional metadata instructing Qcloud COS how to handle the uploaded data (e.g.
+     *         custom user metadata, hooks for specifying content type, etc.).
      *
      * @see AbstractPutObjectRequest#setMetadata(ObjectMetadata)
      * @see AbstractPutObjectRequest#withMetadata(ObjectMetadata)
@@ -465,21 +413,16 @@ public abstract class AbstractPutObjectRequest extends CosServiceRequest
     }
 
     /**
-     * Sets the optional metadata instructing Qcloud COS how to handle the
-     * uploaded data (e.g. custom user metadata, hooks for specifying content
-     * type, etc.).
+     * Sets the optional metadata instructing Qcloud COS how to handle the uploaded data (e.g.
+     * custom user metadata, hooks for specifying content type, etc.).
      * <p>
-     * If uploading from an input stream,
-     * <b>always</b> specify metadata with the content size set. Otherwise the
-     * contents of the input stream have to be buffered in memory before
-     * being sent to Qcloud COS. This can cause very negative performance
-     * impacts.
+     * If uploading from an input stream, <b>always</b> specify metadata with the content size set.
+     * Otherwise the contents of the input stream have to be buffered in memory before being sent to
+     * Qcloud COS. This can cause very negative performance impacts.
      * </p>
      *
-     * @param metadata
-     *            The optional metadata instructing Qcloud COS how to handle the
-     *            uploaded data (e.g. custom user metadata, hooks for specifying
-     *            content type, etc.).
+     * @param metadata The optional metadata instructing Qcloud COS how to handle the uploaded data
+     *        (e.g. custom user metadata, hooks for specifying content type, etc.).
      *
      * @see AbstractPutObjectRequest#getMetadata()
      * @see AbstractPutObjectRequest#withMetadata(ObjectMetadata)
@@ -489,42 +432,35 @@ public abstract class AbstractPutObjectRequest extends CosServiceRequest
     }
 
     /**
-     * Sets the optional metadata instructing Qcloud COS how to handle the
-     * uploaded data (e.g. custom user metadata, hooks for specifying content
-     * type, etc.). Returns this {@link AbstractPutObjectRequest}, enabling additional method
-     * calls to be chained together.
+     * Sets the optional metadata instructing Qcloud COS how to handle the uploaded data (e.g.
+     * custom user metadata, hooks for specifying content type, etc.). Returns this
+     * {@link AbstractPutObjectRequest}, enabling additional method calls to be chained together.
      * <p>
-     * If uploading from an input stream,
-     * <b>always</b> specify metadata with the content size set. Otherwise the
-     * contents of the input stream have to be buffered in memory before
-     * being sent to Qcloud COS. This can cause very negative performance
-     * impacts.
+     * If uploading from an input stream, <b>always</b> specify metadata with the content size set.
+     * Otherwise the contents of the input stream have to be buffered in memory before being sent to
+     * Qcloud COS. This can cause very negative performance impacts.
      * </p>
      *
-     * @param metadata
-     *            The optional metadata instructing Qcloud COS how to handle the
-     *            uploaded data (e.g. custom user metadata, hooks for specifying
-     *            content type, etc.).
+     * @param metadata The optional metadata instructing Qcloud COS how to handle the uploaded data
+     *        (e.g. custom user metadata, hooks for specifying content type, etc.).
      *
-     * @return This {@link AbstractPutObjectRequest}, enabling additional method
-     *         calls to be chained together.
+     * @return This {@link AbstractPutObjectRequest}, enabling additional method calls to be chained
+     *         together.
      *
      * @see AbstractPutObjectRequest#getMetadata()
      * @see AbstractPutObjectRequest#setMetadata(ObjectMetadata)
      */
-    public <T extends AbstractPutObjectRequest> T withMetadata(
-            ObjectMetadata metadata) {
+    public <T extends AbstractPutObjectRequest> T withMetadata(ObjectMetadata metadata) {
         setMetadata(metadata);
-        @SuppressWarnings("unchecked") T t = (T)this;
+        @SuppressWarnings("unchecked")
+        T t = (T) this;
         return t;
     }
 
     /**
-     * Gets the optional pre-configured access control policy to use for the
-     * new object.
+     * Gets the optional pre-configured access control policy to use for the new object.
      *
-     * @return The optional pre-configured access control policy to use for the
-     *         new object.
+     * @return The optional pre-configured access control policy to use for the new object.
      *
      * @see AbstractPutObjectRequest#setCannedAcl(CannedAccessControlList)
      * @see AbstractPutObjectRequest#withCannedAcl(CannedAccessControlList)
@@ -534,12 +470,9 @@ public abstract class AbstractPutObjectRequest extends CosServiceRequest
     }
 
     /**
-     * Sets the optional pre-configured access control policy to use for the new
-     * object.
+     * Sets the optional pre-configured access control policy to use for the new object.
      *
-     * @param cannedAcl
-     *            The optional pre-configured access control policy to use for
-     *            the new object.
+     * @param cannedAcl The optional pre-configured access control policy to use for the new object.
      *
      * @see AbstractPutObjectRequest#getCannedAcl()
      * @see AbstractPutObjectRequest#withCannedAcl(CannedAccessControlList)
@@ -549,70 +482,65 @@ public abstract class AbstractPutObjectRequest extends CosServiceRequest
     }
 
     /**
-     * Sets the optional pre-configured access control policy to use for the new
-     * object. Returns this {@link AbstractPutObjectRequest}, enabling additional method
-     * calls to be chained together.
+     * Sets the optional pre-configured access control policy to use for the new object. Returns
+     * this {@link AbstractPutObjectRequest}, enabling additional method calls to be chained
+     * together.
      *
-     * @param cannedAcl
-     *            The optional pre-configured access control policy to use for
-     *            the new object.
+     * @param cannedAcl The optional pre-configured access control policy to use for the new object.
      *
-     * @return This {@link AbstractPutObjectRequest}, enabling additional method
-     *         calls to be chained together.
+     * @return This {@link AbstractPutObjectRequest}, enabling additional method calls to be chained
+     *         together.
      *
      * @see AbstractPutObjectRequest#getCannedAcl()
      * @see AbstractPutObjectRequest#setCannedAcl(CannedAccessControlList)
      */
-    public <T extends AbstractPutObjectRequest> T withCannedAcl(
-            CannedAccessControlList cannedAcl) {
+    public <T extends AbstractPutObjectRequest> T withCannedAcl(CannedAccessControlList cannedAcl) {
         setCannedAcl(cannedAcl);
-        @SuppressWarnings("unchecked") T t = (T) this;
+        @SuppressWarnings("unchecked")
+        T t = (T) this;
         return t;
     }
 
     /**
-     * Returns the optional access control list for the new object. If
-     * specified, cannedAcl will be ignored.
+     * Returns the optional access control list for the new object. If specified, cannedAcl will be
+     * ignored.
      */
     public AccessControlList getAccessControlList() {
         return accessControlList;
     }
 
     /**
-     * Sets the optional access control list for the new object. If specified,
-     * cannedAcl will be ignored.
+     * Sets the optional access control list for the new object. If specified, cannedAcl will be
+     * ignored.
      *
-     * @param accessControlList
-     *            The access control list for the new object.
+     * @param accessControlList The access control list for the new object.
      */
     public void setAccessControlList(AccessControlList accessControlList) {
         this.accessControlList = accessControlList;
     }
 
     /**
-     * Sets the optional access control list for the new object. If specified,
-     * cannedAcl will be ignored. Returns this {@link AbstractPutObjectRequest},
-     * enabling additional method calls to be chained together.
+     * Sets the optional access control list for the new object. If specified, cannedAcl will be
+     * ignored. Returns this {@link AbstractPutObjectRequest}, enabling additional method calls to
+     * be chained together.
      *
-     * @param accessControlList
-     *            The access control list for the new object.
+     * @param accessControlList The access control list for the new object.
      */
     public <T extends AbstractPutObjectRequest> T withAccessControlList(
             AccessControlList accessControlList) {
         setAccessControlList(accessControlList);
-        @SuppressWarnings("unchecked") T t = (T)this;
+        @SuppressWarnings("unchecked")
+        T t = (T) this;
         return t;
     }
 
     /**
-     * Gets the input stream containing the data to be uploaded to Qcloud COS.
-     * The user of this request
-     * must either specify a file or an input stream containing the data to be
-     * uploaded to Qcloud COS; both cannot be specified.
+     * Gets the input stream containing the data to be uploaded to Qcloud COS. The user of this
+     * request must either specify a file or an input stream containing the data to be uploaded to
+     * Qcloud COS; both cannot be specified.
      *
-     * @return The input stream containing the data to be uploaded to Qcloud COS.
-     *         Either specify a file or an input stream containing the
-     *         data to be uploaded to Qcloud COS, not both.
+     * @return The input stream containing the data to be uploaded to Qcloud COS. Either specify a
+     *         file or an input stream containing the data to be uploaded to Qcloud COS, not both.
      *
      * @see AbstractPutObjectRequest#setInputStream(InputStream)
      * @see AbstractPutObjectRequest#withInputStream(InputStream)
@@ -625,14 +553,13 @@ public abstract class AbstractPutObjectRequest extends CosServiceRequest
     }
 
     /**
-     * Sets the input stream containing the data to be uploaded to Qcloud COS.
-     * Either specify a file or an input stream containing the data to be
-     * uploaded to Qcloud COS; both cannot be specified.
+     * Sets the input stream containing the data to be uploaded to Qcloud COS. Either specify a file
+     * or an input stream containing the data to be uploaded to Qcloud COS; both cannot be
+     * specified.
      *
-     * @param inputStream
-     *            The input stream containing the data to be uploaded to Qcloud
-     *            COS. Either specify a file or an input stream containing the
-     *            data to be uploaded to Qcloud COS, not both.
+     * @param inputStream The input stream containing the data to be uploaded to Qcloud COS. Either
+     *        specify a file or an input stream containing the data to be uploaded to Qcloud COS,
+     *        not both.
      *
      * @see AbstractPutObjectRequest#getInputStream()
      * @see AbstractPutObjectRequest#withInputStream(InputStream)
@@ -645,38 +572,33 @@ public abstract class AbstractPutObjectRequest extends CosServiceRequest
     }
 
     /**
-     * Sets the input stream containing the data to be uploaded to Qcloud COS.
-     * Returns this {@link AbstractPutObjectRequest}, enabling additional method
-     * calls to be chained together.
+     * Sets the input stream containing the data to be uploaded to Qcloud COS. Returns this
+     * {@link AbstractPutObjectRequest}, enabling additional method calls to be chained together.
      * <p>
-     * Either specify a file or an input stream containing the data to be
-     * uploaded to Qcloud COS; both cannot be specified.
+     * Either specify a file or an input stream containing the data to be uploaded to Qcloud COS;
+     * both cannot be specified.
      * </p>
      *
-     * @param inputStream
-     *            The InputStream containing the data to be uploaded to Qcloud
-     *            COS.
+     * @param inputStream The InputStream containing the data to be uploaded to Qcloud COS.
      *
-     * @return This PutObjectRequest, so that additional method calls can be
-     *         chained together.
+     * @return This PutObjectRequest, so that additional method calls can be chained together.
      *
      * @see AbstractPutObjectRequest#getInputStream()
      * @see AbstractPutObjectRequest#setInputStream(InputStream)
      * @see AbstractPutObjectRequest#getFile()
      * @see AbstractPutObjectRequest#setFile(File)
      */
-    public <T extends AbstractPutObjectRequest> T withInputStream(
-            InputStream inputStream) {
+    public <T extends AbstractPutObjectRequest> T withInputStream(InputStream inputStream) {
         setInputStream(inputStream);
-        @SuppressWarnings("unchecked") T t = (T)this;
+        @SuppressWarnings("unchecked")
+        T t = (T) this;
         return t;
     }
 
     /**
      * Sets the optional redirect location for the new object.
      *
-     * @param redirectLocation
-     *            The redirect location for the new object.
+     * @param redirectLocation The redirect location for the new object.
      */
     public void setRedirectLocation(String redirectLocation) {
         this.redirectLocation = redirectLocation;
@@ -691,15 +613,14 @@ public abstract class AbstractPutObjectRequest extends CosServiceRequest
 
     /**
      * Sets the optional redirect location for the new object.Returns this
-     * {@link AbstractPutObjectRequest}, enabling additional method calls to be chained
-     * together.
-     * @param redirectLocation
-     *            The redirect location for the new object.
+     * {@link AbstractPutObjectRequest}, enabling additional method calls to be chained together.
+     * 
+     * @param redirectLocation The redirect location for the new object.
      */
-    public <T extends AbstractPutObjectRequest> T withRedirectLocation(
-            String redirectLocation) {
+    public <T extends AbstractPutObjectRequest> T withRedirectLocation(String redirectLocation) {
         this.redirectLocation = redirectLocation;
-        @SuppressWarnings("unchecked") T t = (T)this;
+        @SuppressWarnings("unchecked")
+        T t = (T) this;
         return t;
     }
 
@@ -709,43 +630,39 @@ public abstract class AbstractPutObjectRequest extends CosServiceRequest
     }
 
     /**
-     * Sets the optional customer-provided server-side encryption key to use to
-     * encrypt the uploaded object.
+     * Sets the optional customer-provided server-side encryption key to use to encrypt the uploaded
+     * object.
      *
-     * @param sseKey
-     *            The optional customer-provided server-side encryption key to
-     *            use to encrypt the uploaded object.
+     * @param sseKey The optional customer-provided server-side encryption key to use to encrypt the
+     *        uploaded object.
      */
     public void setSSECustomerKey(SSECustomerKey sseKey) {
         if (sseKey != null && this.sseCOSKeyManagementParams != null) {
             throw new IllegalArgumentException(
-                "Either SSECustomerKey or SSECOSKeyManagementParams must not be set at the same time.");
+                    "Either SSECustomerKey or SSECOSKeyManagementParams must not be set at the same time.");
         }
         this.sseCustomerKey = sseKey;
     }
 
     /**
-     * Sets the optional customer-provided server-side encryption key to use to
-     * encrypt the uploaded object, and returns the updated request object so
-     * that additional method calls can be chained together.
+     * Sets the optional customer-provided server-side encryption key to use to encrypt the uploaded
+     * object, and returns the updated request object so that additional method calls can be chained
+     * together.
      *
-     * @param sseKey
-     *            The optional customer-provided server-side encryption key to
-     *            use to encrypt the uploaded object.
+     * @param sseKey The optional customer-provided server-side encryption key to use to encrypt the
+     *        uploaded object.
      *
-     * @return This updated request object so that additional method calls can
-     *         be chained together.
+     * @return This updated request object so that additional method calls can be chained together.
      */
-    public <T extends AbstractPutObjectRequest> T withSSECustomerKey(
-            SSECustomerKey sseKey) {
+    public <T extends AbstractPutObjectRequest> T withSSECustomerKey(SSECustomerKey sseKey) {
         setSSECustomerKey(sseKey);
-        @SuppressWarnings("unchecked") T t = (T)this;
+        @SuppressWarnings("unchecked")
+        T t = (T) this;
         return t;
     }
 
     /**
-     * Returns the COS Key Management System parameters used to encrypt the
-     * object on server side.
+     * Returns the COS Key Management System parameters used to encrypt the object on server side.
      */
     @Override
     public SSECOSKeyManagementParams getSSECOSKeyManagementParams() {
@@ -753,45 +670,42 @@ public abstract class AbstractPutObjectRequest extends CosServiceRequest
     }
 
     /**
-     * Sets the COS Key Management System parameters used to encrypt the object
-     * on server side.
+     * Sets the COS Key Management System parameters used to encrypt the object on server side.
      */
     public void setSSECOSKeyManagementParams(SSECOSKeyManagementParams params) {
         if (params != null && this.sseCustomerKey != null) {
             throw new IllegalArgumentException(
-                "Either SSECustomerKey or SSECOSKeyManagementParams must not be set at the same time.");
+                    "Either SSECustomerKey or SSECOSKeyManagementParams must not be set at the same time.");
         }
         this.sseCOSKeyManagementParams = params;
     }
 
     /**
-     * Sets the COS Key Management System parameters used to encrypt the object
-     * on server side.
+     * Sets the COS Key Management System parameters used to encrypt the object on server side.
      *
      * @return returns the update PutObjectRequest
      */
     public <T extends AbstractPutObjectRequest> T withSSECOSKeyManagementParams(
             SSECOSKeyManagementParams sseCOSKeyManagementParams) {
         setSSECOSKeyManagementParams(sseCOSKeyManagementParams);
-        @SuppressWarnings("unchecked") T t = (T)this;
+        @SuppressWarnings("unchecked")
+        T t = (T) this;
         return t;
     }
 
     @Override
-    public abstract AbstractPutObjectRequest clone();
+    public AbstractPutObjectRequest clone() {
+        return (AbstractPutObjectRequest) super.clone();
+    }
 
-    protected final <T extends AbstractPutObjectRequest> T copyPutObjectBaseTo(
-            T target) {
+    protected final <T extends AbstractPutObjectRequest> T copyPutObjectBaseTo(T target) {
         copyBaseTo(target);
         final ObjectMetadata metadata = getMetadata();
-        return target.withAccessControlList(getAccessControlList())
-            .withCannedAcl(getCannedAcl())
-            .withInputStream(getInputStream())
-            .withMetadata(metadata == null ? null : metadata.clone())
-            .withRedirectLocation(getRedirectLocation())
-            .withStorageClass(getStorageClass())
-            .withSSECOSKeyManagementParams(getSSECOSKeyManagementParams())
-            .withSSECustomerKey(getSSECustomerKey())
-            ;
+        return target.withAccessControlList(getAccessControlList()).withCannedAcl(getCannedAcl())
+                .withInputStream(getInputStream())
+                .withMetadata(metadata == null ? null : metadata.clone())
+                .withRedirectLocation(getRedirectLocation()).withStorageClass(getStorageClass())
+                .withSSECOSKeyManagementParams(getSSECOSKeyManagementParams())
+                .withSSECustomerKey(getSSECustomerKey());
     }
 }

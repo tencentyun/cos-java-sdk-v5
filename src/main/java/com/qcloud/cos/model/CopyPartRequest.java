@@ -10,6 +10,8 @@ import com.qcloud.cos.region.Region;
 
 public class CopyPartRequest extends CosServiceRequest implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * The upload id of the multipart upload into which to copy this part.
      *
@@ -50,6 +52,18 @@ public class CopyPartRequest extends CosServiceRequest implements Serializable {
      * The key in the destination bucket under which the source object will be copied
      */
     private String destinationKey;
+    
+    /**
+     * The optional customer-provided server-side encryption key to use to decrypt the source object
+     * being copied.
+     */
+    private SSECustomerKey sourceSSECustomerKey;
+
+    /**
+     * The optional customer-provided server-side encryption key to use to encrypt the destination
+     * object being copied.
+     */
+    private SSECustomerKey destinationSSECustomerKey;
 
 
     /**
@@ -399,6 +413,23 @@ public class CopyPartRequest extends CosServiceRequest implements Serializable {
     public CopyPartRequest withDestinationKey(String destinationKey) {
         setDestinationKey(destinationKey);
         return this;
+    }
+    
+    
+    public SSECustomerKey getSourceSSECustomerKey() {
+        return sourceSSECustomerKey;
+    }
+
+    public void setSourceSSECustomerKey(SSECustomerKey sourceSSECustomerKey) {
+        this.sourceSSECustomerKey = sourceSSECustomerKey;
+    }
+
+    public SSECustomerKey getDestinationSSECustomerKey() {
+        return destinationSSECustomerKey;
+    }
+
+    public void setDestinationSSECustomerKey(SSECustomerKey destinationSSECustomerKey) {
+        this.destinationSSECustomerKey = destinationSSECustomerKey;
     }
 
 

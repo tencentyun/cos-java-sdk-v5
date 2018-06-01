@@ -35,11 +35,11 @@ public class Md5Utils {
     public static String md5AsBase64(byte[] input) {
         return Base64.encodeAsString(computeMD5Hash(input));
     }
-    
+
     public static String md5Hex(File file) throws FileNotFoundException, IOException {
         return Hex.encodeHexString(computeMD5Hash(file));
     }
-    
+
     public static String md5Hex(byte[] input) {
         return Hex.encodeHexString(computeMD5Hash(input));
     }
@@ -53,11 +53,8 @@ public class Md5Utils {
             input = new FileInputStream(file);
             return computeMD5Hash(input);
         } finally {
-            try {
-                if (input != null) {
-                    input.close();
-                }
-            } catch (Exception e) {
+            if (input != null) {
+                input.close();
             }
         }
     }
