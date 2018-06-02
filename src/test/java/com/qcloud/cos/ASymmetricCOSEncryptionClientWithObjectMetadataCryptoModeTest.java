@@ -7,12 +7,14 @@ import java.security.SecureRandom;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 
 import com.qcloud.cos.internal.crypto.CryptoConfiguration;
 import com.qcloud.cos.internal.crypto.CryptoMode;
 import com.qcloud.cos.internal.crypto.CryptoStorageMode;
 import com.qcloud.cos.internal.crypto.EncryptionMaterials;
 
+@Ignore
 public class ASymmetricCOSEncryptionClientWithObjectMetadataCryptoModeTest
         extends AbstractCOSEncryptionClientTest {
 

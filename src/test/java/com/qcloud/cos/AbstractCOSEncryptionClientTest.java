@@ -38,6 +38,7 @@ public abstract class AbstractCOSEncryptionClientTest extends AbstractCOSClientT
     @AfterClass
     public static void tearDownAfterClass() throws Exception {
         AbstractCOSClientTest.destoryCosClient();
+        useClientEncryption = false;
     }
     
     

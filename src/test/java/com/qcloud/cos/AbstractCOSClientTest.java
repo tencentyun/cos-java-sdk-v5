@@ -429,7 +429,7 @@ public class AbstractCOSClientTest {
         getObjectRequest.setResponseHeaders(responseHeaders);
         if (range != null) {
             if (range[1] == range[0] && range[1] == 0) {
-                assertEquals(expectedLength, 0);
+                assertEquals(expectedLength, 1);
                 getObjectRequest.setRange(range[0], range[1]);
             } else {
                 assertEquals(expectedLength, range[1] - range[0] + 1);
@@ -569,7 +569,11 @@ public class AbstractCOSClientTest {
             // head object
             headSimpleObject(key, truncateSize, uploadEtag);
             // get object
-            getObject(key, downLoadFile, new long[] {0, truncateSize - 1}, truncateSize, originMd5);
+            long[] range = null;
+            if (truncateSize > 0) {
+                range = new long[] {0, truncateSize - 1};
+            }
+            getObject(key, downLoadFile, range, truncateSize, originMd5);
             // check file
             assertEquals(uploadEtag, Md5Utils.md5Hex(downLoadFile));
         } finally {
