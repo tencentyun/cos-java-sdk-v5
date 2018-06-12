@@ -333,9 +333,9 @@ public class PutInstructionFileRequest extends CosServiceRequest
                     "cosObject passed inconsistent with the instruction file being created");
         }
         InstructionFileId ifid = cosObjectId.instructionFileId(suffix);
-        return new PutObjectRequest(ifid.getBucket(), ifid.getKey(), redirectLocation)
-                .withAccessControlList(accessControlList).withCannedAcl(cannedAcl)
-                .withStorageClass(storageClass)
+        return new PutObjectRequest(ifid.getBucket(), ifid.getKey(), null)
+                .withRedirectLocation(redirectLocation).withAccessControlList(accessControlList)
+                .withCannedAcl(cannedAcl).withStorageClass(storageClass)
                 .withGeneralProgressListener(getGeneralProgressListener());
     }
 }

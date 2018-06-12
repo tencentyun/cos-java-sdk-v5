@@ -665,6 +665,8 @@ public class XmlResponsesSaxParser {
                 } else if (name.equals("CreateDate")) {
                     Date creationDate = DateUtils.parseISO8601Date(getText());
                     currentBucket.setCreationDate(creationDate);
+                } else if (name.equals("Location")) {
+                    currentBucket.setLocation(getText());
                 }
             }
         }

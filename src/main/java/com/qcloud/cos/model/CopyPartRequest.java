@@ -25,7 +25,7 @@ public class CopyPartRequest extends CosServiceRequest implements Serializable {
      * @see COS#uploadPart(UploadPartRequest)
      */
     private int partNumber;
-    
+
     // The Srouce Appid. if not set, equal to the appid of cosclient.
     private String sourceAppid;
     // The Soure Bucket Region
@@ -52,7 +52,7 @@ public class CopyPartRequest extends CosServiceRequest implements Serializable {
      * The key in the destination bucket under which the source object will be copied
      */
     private String destinationKey;
-    
+
     /**
      * The optional customer-provided server-side encryption key to use to decrypt the source object
      * being copied.
@@ -64,6 +64,9 @@ public class CopyPartRequest extends CosServiceRequest implements Serializable {
      * object being copied.
      */
     private SSECustomerKey destinationSSECustomerKey;
+
+    // set copy source endpoint suffix
+    private String sourceEndpointSuffix;
 
 
     /**
@@ -173,7 +176,7 @@ public class CopyPartRequest extends CosServiceRequest implements Serializable {
         this.partNumber = partNumber;
         return this;
     }
-    
+
     public String getSourceAppid() {
         return sourceAppid;
     }
@@ -181,7 +184,7 @@ public class CopyPartRequest extends CosServiceRequest implements Serializable {
     public void setSourceAppid(String sourceAppid) {
         this.sourceAppid = sourceAppid;
     }
-    
+
     public CopyPartRequest withSourceAppid(String sourceAppid) {
         this.sourceAppid = sourceAppid;
         return this;
@@ -194,7 +197,7 @@ public class CopyPartRequest extends CosServiceRequest implements Serializable {
     public void setSourceBucketRegion(Region sourceBucketRegion) {
         this.sourceBucketRegion = sourceBucketRegion;
     }
-    
+
     public CopyPartRequest withSourceBucketRegion(Region sourceBucketRegion) {
         this.sourceBucketRegion = sourceBucketRegion;
         return this;
@@ -414,8 +417,8 @@ public class CopyPartRequest extends CosServiceRequest implements Serializable {
         setDestinationKey(destinationKey);
         return this;
     }
-    
-    
+
+
     public SSECustomerKey getSourceSSECustomerKey() {
         return sourceSSECustomerKey;
     }
@@ -432,6 +435,18 @@ public class CopyPartRequest extends CosServiceRequest implements Serializable {
         this.destinationSSECustomerKey = destinationSSECustomerKey;
     }
 
+    public String getSourceEndpointSuffix() {
+        return sourceEndpointSuffix;
+    }
+
+    public void setSourceEndpointSuffix(String sourceEndpointSuffix) {
+        this.sourceEndpointSuffix = sourceEndpointSuffix;
+    }
+    
+    public CopyPartRequest withSourceEndpointSuffix(String sourceEndpointSuffix) {
+        setSourceEndpointSuffix(sourceEndpointSuffix);
+        return this;
+    }
 
     /**
      * Returns the optional start range to copy from the source object.

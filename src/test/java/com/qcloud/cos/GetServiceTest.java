@@ -3,6 +3,7 @@ package com.qcloud.cos;
 import java.util.List;
 
 import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -29,6 +30,7 @@ public class GetServiceTest extends AbstractCOSClientTest {
         List<Bucket> buckets = cosclient.listBuckets();
         for (Bucket bucketElement : buckets) {
             if (bucketElement.getName().equals(bucket)) {
+                assertEquals(clientConfig.getRegion().getRegionName(), bucketElement.getLocation());
                 return;
             }
         }

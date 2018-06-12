@@ -70,6 +70,7 @@ public class TransferManagerDemo {
             // 返回一个异步结果Upload, 可同步的调用waitForUploadResult等待upload结束, 成功返回UploadResult, 失败抛出异常.
             long startTime = System.currentTimeMillis();
             Upload upload = transferManager.upload(putObjectRequest);
+            showTransferProgress(upload);
             UploadResult uploadResult = upload.waitForUploadResult();
             long endTime = System.currentTimeMillis();
             System.out.println("used time: " + (endTime - startTime) / 1000);
@@ -110,6 +111,7 @@ public class TransferManagerDemo {
             Thread.sleep(10000);
             PersistableUpload persistableUpload = upload.pause();
             upload = transferManager.resumeUpload(persistableUpload);
+            showTransferProgress(upload);
             UploadResult uploadResult = upload.waitForUploadResult();
             System.out.println(uploadResult.getETag());
         } catch (CosServiceException e) {
@@ -182,6 +184,7 @@ public class TransferManagerDemo {
             Thread.sleep(5000L);
             PersistableDownload persistableDownload = download.pause();
             download = transferManager.resumeDownload(persistableDownload);
+            showTransferProgress(download);
             download.waitForCompletion();
         } catch (CosServiceException e) {
             e.printStackTrace();

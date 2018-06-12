@@ -18,10 +18,6 @@ public class EncryptedPutObjectRequest extends PutObjectRequest
         super(bucketName, key, file);
     }
 
-    public EncryptedPutObjectRequest(String bucketName, String key, String redirectLocation) {
-        super(bucketName, key, redirectLocation);
-    }
-
     public EncryptedPutObjectRequest(String bucketName, String key, InputStream input,
             ObjectMetadata metadata) {
         super(bucketName, key, input, metadata);

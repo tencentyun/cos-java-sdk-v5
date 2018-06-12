@@ -13,6 +13,9 @@ public class Bucket implements Serializable {
     /** The date this bucket was created */
     private Date creationDate = null;
 
+    /** The location of the bucket */
+    private String location = null;
+
     /**
      * Constructs a bucket without any name specified.
      * 
@@ -21,14 +24,12 @@ public class Bucket implements Serializable {
     public Bucket() {}
 
     /**
-     * Creates a bucket with a name. 
-     * All buckets in Qcloud COS share a single namespace;
-     * ensure the bucket is given a unique name.
+     * Creates a bucket with a name. All buckets in Qcloud COS share a single namespace; ensure the
+     * bucket is given a unique name.
      *
-     * @param name
-     *            The name for the bucket.
-     *            
-     * @see Bucket#Bucket()        
+     * @param name The name for the bucket.
+     * 
+     * @see Bucket#Bucket()
      */
     public Bucket(String name) {
         this.name = name;
@@ -38,31 +39,26 @@ public class Bucket implements Serializable {
      * @see java.lang.Object#toString()
      */
     public String toString() {
-        return "COSBucket [name=" + getName()
-                + ", creationDate=" + getCreationDate()
-                + ", owner=" + getOwner() + "]";
+        return "COSBucket [name=" + getName() + ", creationDate=" + getCreationDate()
+                + ", location=" + getLocation() + ", owner=" + getOwner() + "]";
     }
 
     /**
-     * Gets the bucket's owner.  Returns <code>null</code>
-     * if the bucket's owner is unknown.
+     * Gets the bucket's owner. Returns <code>null</code> if the bucket's owner is unknown.
      * 
-     * @return 
-     *  The bucket's owner, or <code>null</code> if it is unknown.
-     *  
-     *  @see Bucket#setOwner(Owner)
+     * @return The bucket's owner, or <code>null</code> if it is unknown.
+     * 
+     * @see Bucket#setOwner(Owner)
      */
     public Owner getOwner() {
         return owner;
     }
 
     /**
-     * For internal use only.
-     * Sets the bucket's owner in Qcloud COS. This should only be used internally by
-     * the COS Java client methods that retrieve information directly from Qcloud COS.
+     * For internal use only. Sets the bucket's owner in Qcloud COS. This should only be used
+     * internally by the COS Java client methods that retrieve information directly from Qcloud COS.
      *
-     * @param owner
-     *          The bucket's owner.
+     * @param owner The bucket's owner.
      * 
      * @see Bucket#getOwner()
      */
@@ -71,24 +67,19 @@ public class Bucket implements Serializable {
     }
 
     /**
-     * Gets the bucket's creation date. Returns <code>null</code>
-     * if the creation date is not known.
+     * Gets the bucket's creation date. Returns <code>null</code> if the creation date is not known.
      *
-     * @return The bucket's creation date, or <code>null</code> 
-     * if not known.
+     * @return The bucket's creation date, or <code>null</code> if not known.
      */
     public Date getCreationDate() {
         return creationDate;
     }
 
     /**
-     * For internal use only.
-     * Sets the bucket's creation date in COS. This should only be used
-     * internally by COS Java client methods that retrieve information directly
-     * from Qcloud COS.
+     * For internal use only. Sets the bucket's creation date in COS. This should only be used
+     * internally by COS Java client methods that retrieve information directly from Qcloud COS.
      *
-     * @param creationDate
-     *          The bucket's creation date.
+     * @param creationDate The bucket's creation date.
      */
     public void setCreationDate(Date creationDate) {
         this.creationDate = creationDate;
@@ -106,14 +97,22 @@ public class Bucket implements Serializable {
     }
 
     /**
-     * Sets the name of the bucket. 
-     * All buckets in Qcloud COS share a single namespace;
-     * ensure the bucket is given a unique name.
+     * Sets the name of the bucket. All buckets in Qcloud COS share a single namespace; ensure the
+     * bucket is given a unique name.
      *
-     * @param name
-     *            The name for the bucket.
+     * @param name The name for the bucket.
      */
     public void setName(String name) {
         this.name = name;
     }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+
 }

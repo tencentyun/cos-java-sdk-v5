@@ -92,10 +92,10 @@ public class PutObjectRequest extends AbstractPutObjectRequest implements Serial
      * @param key
      *            The key under which to store the new object.
      * @param redirectLocation
-     */
-    public PutObjectRequest(String bucketName, String key, String redirectLocation) {
+     public PutObjectRequest(String bucketName, String key, String redirectLocation) {
         super(bucketName, key, redirectLocation);
-    }
+     }
+     */ 
 
     /**
      * Constructs a new

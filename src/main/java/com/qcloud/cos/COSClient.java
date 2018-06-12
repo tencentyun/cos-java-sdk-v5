@@ -285,8 +285,14 @@ public class COSClient implements COS {
         String sourceBucket = formatBucket(copyObjectRequest.getSourceBucketName(),
                 (copyObjectRequest.getSourceAppid() != null) ? copyObjectRequest.getSourceAppid()
                         : this.cred.getCOSAppId());
-        String copySourceHeader = String.format("%s.%s.myqcloud.com%s", sourceBucket,
-                formatRegion(sourceRegion.getRegionName()),
+        String srcEndpointSuffix = copyObjectRequest.getSourceEndpointSuffix();
+        if (srcEndpointSuffix == null) {
+            srcEndpointSuffix = String.format(".%s.myqcloud.com", formatRegion(sourceRegion.getRegionName()));
+        }
+        if (!srcEndpointSuffix.startsWith(".")) {
+            srcEndpointSuffix = "." + srcEndpointSuffix;
+        }
+        String copySourceHeader = String.format("%s%s%s", sourceBucket, srcEndpointSuffix.trim(),
                 UrlEncoderUtils.encodeEscapeDelimiter(sourceKey));
         if (copyObjectRequest.getSourceVersionId() != null) {
             copySourceHeader += "?versionId=" + copyObjectRequest.getSourceVersionId();
@@ -341,10 +347,15 @@ public class COSClient implements COS {
         String sourceBucket = formatBucket(copyPartRequest.getSourceBucketName(),
                 (copyPartRequest.getSourceAppid() != null) ? copyPartRequest.getSourceAppid()
                         : this.cred.getCOSAppId());
-        String copySourceHeader = String.format("%s.%s.myqcloud.com%s", sourceBucket,
-                formatRegion(sourceRegion.getRegionName()),
+        String srcEndpointSuffix = copyPartRequest.getSourceEndpointSuffix();
+        if (srcEndpointSuffix == null) {
+            srcEndpointSuffix = String.format(".%s.myqcloud.com", formatRegion(sourceRegion.getRegionName()));
+        }
+        if (!srcEndpointSuffix.startsWith(".")) {
+            srcEndpointSuffix = "." + srcEndpointSuffix;
+        }
+        String copySourceHeader = String.format("%s%s%s", sourceBucket, srcEndpointSuffix.trim(),
                 UrlEncoderUtils.encodeEscapeDelimiter(sourceKey));
-
         if (copyPartRequest.getSourceVersionId() != null) {
             copySourceHeader += "?versionId=" + copyPartRequest.getSourceVersionId();
         }
@@ -434,21 +445,23 @@ public class COSClient implements COS {
         key = formatKey(key);
         request.setResourcePath(key);
         String host = "";
+        String endPointSuffix = this.clientConfig.getEndPointSuffix();
+        if (endPointSuffix == null) {
+            if (isServiceRequest) {
+                endPointSuffix = ".cos.myqcloud.com";
+            } else {
+                endPointSuffix = String.format(".%s.myqcloud.com",
+                        formatRegion(clientConfig.getRegion().getRegionName()));
+            }
+        }
+        if (!endPointSuffix.startsWith(".")) {
+            endPointSuffix = "." + endPointSuffix;
+        }
         if (isServiceRequest) {
-            host = "service.cos.myqcloud.com";
+            host = "service" + endPointSuffix;
         } else {
             bucket = formatBucket(bucket, cred.getCOSAppId());
-            host = String.format("%s.%s.myqcloud.com", bucket,
-                    formatRegion(clientConfig.getRegion().getRegionName()));
-
-            if (this.clientConfig.getEndPointSuffix() != null) {
-                String endPointSuffix = clientConfig.getEndPointSuffix();
-                if (endPointSuffix.startsWith(".")) {
-                    host = String.format("%s%s", bucket, endPointSuffix);
-                } else {
-                    host = String.format("%s.%s", bucket, endPointSuffix);
-                }
-            }
+            host = bucket + endPointSuffix;
         }
 
         request.addHeader(Headers.HOST, host);
@@ -2476,10 +2489,19 @@ public class COSClient implements COS {
                 cosSigner.buildAuthorizationStr(request.getHttpMethod(), request.getResourcePath(),
                         request.getHeaders(), request.getParameters(), cred, req.getExpiration());
         StringBuilder strBuilder = new StringBuilder();
+        strBuilder.append("http://").append(formatBucket(bucketName, cred.getCOSAppId()));
 
-        strBuilder.append("http://").append(formatBucket(bucketName, cred.getCOSAppId()))
-                .append(".").append(formatRegion(clientConfig.getRegion().getRegionName()))
-                .append(".myqcloud.com")
+        String endpointSuffix = clientConfig.getEndPointSuffix();
+
+        if (endpointSuffix == null) {
+            endpointSuffix = String.format(".%s.myqcloud.com",
+                    formatRegion(clientConfig.getRegion().getRegionName()));
+        }
+        if (!endpointSuffix.startsWith(".")) {
+            endpointSuffix = "." + endpointSuffix;
+        }
+
+        strBuilder.append(endpointSuffix)
                 .append(UrlEncoderUtils.encodeEscapeDelimiter(formatKey(key)));
 
         boolean hasAppendFirstParameter = false;
