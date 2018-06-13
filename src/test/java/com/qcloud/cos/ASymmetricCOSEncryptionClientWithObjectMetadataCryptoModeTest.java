@@ -14,7 +14,6 @@ import com.qcloud.cos.internal.crypto.CryptoMode;
 import com.qcloud.cos.internal.crypto.CryptoStorageMode;
 import com.qcloud.cos.internal.crypto.EncryptionMaterials;
 
-@Ignore
 public class ASymmetricCOSEncryptionClientWithObjectMetadataCryptoModeTest
         extends AbstractCOSEncryptionClientTest {
 
