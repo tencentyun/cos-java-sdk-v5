@@ -18,9 +18,4 @@ JSON API 请参照 https://github.com/tencentyun/cos-java-sdk-v4
 下的示例代码
 
 ## 常见问题:
-
-1 引入SDK运行后，出现 java.lang.NoSuchMethodError的异常。
-
-原因: 一般是发生了JAR包冲突，比如用户的工程中的http的JAR包版本没有A方法，但是SDK依赖的JAR包有A方法。此时运行时加载顺序的问题，加载了用户工程中的http库，运行时便会抛出NoSuchMethodError的异常。
-
-解决方法: 将已包含的工程中引起NoSuchMethodError的包的版本和SDK中pom.xml里的对应库的版本改成一致。
+请参考[FAQ](https://cloud.tencent.com/document/product/436/12263#faq)
