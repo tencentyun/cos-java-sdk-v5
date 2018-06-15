@@ -63,9 +63,11 @@ import com.qcloud.cos.internal.SkipMd5CheckStrategy;
 import com.qcloud.cos.internal.Unmarshaller;
 import com.qcloud.cos.internal.Unmarshallers;
 import com.qcloud.cos.internal.VIDResultHandler;
+import com.qcloud.cos.internal.ObjectMetadataHandler;
 import com.qcloud.cos.internal.VoidCosResponseHandler;
 import com.qcloud.cos.internal.XmlResponsesSaxParser.CompleteMultipartUploadHandler;
 import com.qcloud.cos.internal.XmlResponsesSaxParser.CopyObjectResultHandler;
+import com.qcloud.cos.internal.XmlResponsesSaxParser.PutObjectHandler;
 import com.qcloud.cos.model.AbortMultipartUploadRequest;
 import com.qcloud.cos.model.AccessControlList;
 import com.qcloud.cos.model.AclXmlFactory;
@@ -394,7 +396,7 @@ public class COSClient implements COS {
     }
 
     private String formatRegion(String regionName) {
-        if (regionName.startsWith("cos.")) {
+        if (regionName.startsWith("pic.")) {
             return regionName;
         } else {
             if (regionName.equals("cn-east") || regionName.equals("cn-south")
@@ -402,7 +404,7 @@ public class COSClient implements COS {
                     || regionName.equals("cn-southwest") || regionName.equals("sg")) {
                 return regionName;
             } else {
-                return "cos." + regionName;
+                return "pic." + regionName;
             }
         }
     }
@@ -719,7 +721,7 @@ public class COSClient implements COS {
                     "Unable to find file to upload");
         }
 
-        final ObjectMetadata returnedMetadata;
+        PutObjectHandler handler;
         MD5DigestCalculatingInputStream md5DigestStream = null;
         try {
             CosHttpRequest<PutObjectRequest> request =
@@ -743,6 +745,11 @@ public class COSClient implements COS {
                 }
             }
 
+            if (putObjectRequest.getImageProcessRule() != null) {
+                request.addHeader(Headers.PIC_OPERATIONS,
+                        putObjectRequest.getImageProcessRule().toJson());
+            }
+            
             // Populate the SSE-C parameters to the request header
             populateSSE_C(request, putObjectRequest.getSSECustomerKey());
 
@@ -799,10 +806,20 @@ public class COSClient implements COS {
 
             populateRequestMetadata(request, metadata);
             request.setContent(input);
-            try {
-                returnedMetadata = invoke(request, new CosMetadataResponseHandler());
-            } catch (Throwable t) {
-                throw Throwables.failure(t);
+
+            @SuppressWarnings("unchecked")
+            ResponseHeaderHandlerChain<PutObjectHandler> responseHandler =
+                new ResponseHeaderHandlerChain<PutObjectHandler>(
+                        // xml payload unmarshaller
+                        new Unmarshallers.PutObjectResultUnmarshaller(),
+                        // header handlers
+                        new ServerSideEncryptionHeaderHandler<PutObjectHandler>(),
+                        new ObjectExpirationHeaderHandler<PutObjectHandler>(),
+                        new VIDResultHandler<PutObjectHandler>(),
+                        new ObjectMetadataHandler<PutObjectHandler>());
+            handler = invoke(request, responseHandler);
+            if (handler.getPutObjectResult() == null) {
+                throw handler.getCOSException();
             }
         } finally {
             CosDataSource.Utils.cleanupDataSource(putObjectRequest, file, isOrig, input, log);
@@ -813,6 +830,7 @@ public class COSClient implements COS {
             contentMd5 = Base64.encodeAsString(md5DigestStream.getMd5Digest());
         }
 
+        final ObjectMetadata returnedMetadata = handler.getPutObjectResult().getMetadata();
         final String etag = returnedMetadata.getETag();
         if (contentMd5 != null
                 && !skipMd5CheckStrategy.skipClientSideValidationPerPutResponse(returnedMetadata)) {
@@ -840,9 +858,8 @@ public class COSClient implements COS {
                         + ")");
             }
         }
-        PutObjectResult result = createPutObjectResult(returnedMetadata);
-        result.setContentMd5(contentMd5);
-        return result;
+        handler.getPutObjectResult().setContentMd5(contentMd5);
+        return handler.getPutObjectResult();
     }
 
     @Override
@@ -1487,6 +1504,11 @@ public class COSClient implements COS {
 
             request.addHeader("Content-Type", "text/plain");
             request.addHeader("Content-Length", String.valueOf(xml.length));
+
+            if (completeMultipartUploadRequest.getImageProcessRule() != null) {
+                request.addHeader(Headers.PIC_OPERATIONS,
+                		completeMultipartUploadRequest.getImageProcessRule().toJson());
+            }
 
             request.setContent(new ByteArrayInputStream(xml));
 

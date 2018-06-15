@@ -29,6 +29,11 @@ public class UploadResult {
     private String eTag;
 
     /**
+     * An optional image process rule to apply to the new object.
+     */
+    private ImageProcessResult imageProcessResult;
+
+    /**
      * The version ID of the new object, only present if versioning has been enabled for the bucket.
      */
     private String versionId;
@@ -121,6 +126,21 @@ public class UploadResult {
     public void setETag(String etag) {
         this.eTag = etag;
     }
+
+    /**
+     * Returns the imageProcessResult
+     */
+    public ImageProcessResult getImageProcessResult() {
+        return imageProcessResult;
+    }
+
+    /**
+     * Sets the imageProcessResult.
+     */
+    public void setImageProcessResult(ImageProcessResult imageProcessResult) {
+        this.imageProcessResult = imageProcessResult;
+    }
+
 
     /**
      * Returns the version ID of the new object. The version ID is only set if versioning has been

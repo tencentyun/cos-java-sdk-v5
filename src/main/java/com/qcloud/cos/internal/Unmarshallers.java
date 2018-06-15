@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.util.List;
 
 import com.qcloud.cos.internal.XmlResponsesSaxParser.CompleteMultipartUploadHandler;
+import com.qcloud.cos.internal.XmlResponsesSaxParser.PutObjectHandler;
 import com.qcloud.cos.internal.XmlResponsesSaxParser.CopyObjectResultHandler;
 import com.qcloud.cos.model.AccessControlList;
 import com.qcloud.cos.model.Bucket;
@@ -175,6 +176,13 @@ public class Unmarshallers {
             implements Unmarshaller<CopyObjectResultHandler, InputStream> {
         public CopyObjectResultHandler unmarshall(InputStream in) throws Exception {
             return new XmlResponsesSaxParser().parseCopyObjectResponse(in);
+        }
+    }
+
+    public static final class PutObjectResultUnmarshaller
+            implements Unmarshaller<PutObjectHandler, InputStream> {
+        public PutObjectHandler unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser().parsePutObjectResponse(in);
         }
     }
 

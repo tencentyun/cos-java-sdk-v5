@@ -5,6 +5,7 @@ import java.util.Date;
 
 import com.qcloud.cos.internal.ObjectExpirationResult;
 import com.qcloud.cos.internal.SSEResultBase;
+import com.qcloud.cos.model.ImageProcessResult;
 
 public class PutObjectResult extends SSEResultBase implements ObjectExpirationResult, Serializable {
     /**
@@ -39,6 +40,8 @@ public class PutObjectResult extends SSEResultBase implements ObjectExpirationRe
     /** The metadata returned as a result of PutObject operation. */
     private ObjectMetadata metadata;
 
+    /** The image process result returned as a result of PutObject operation. */
+    private ImageProcessResult imageProcessResult;
 
     /**
      * get requestid for this upload
@@ -188,5 +191,21 @@ public class PutObjectResult extends SSEResultBase implements ObjectExpirationRe
      */
     public void setMetadata(ObjectMetadata metadata) {
         this.metadata = metadata;
+    }
+
+    /**
+     * Returns the imageProcessResult retrieved as a response to {@link COSClient#putObject(PutObjectRequest)}
+     * operation.
+     */
+    public ImageProcessResult getImageProcessResult() {
+        return imageProcessResult;
+    }
+
+    /**
+     * Sets the imageProcessResult retrieved as a response to {@link COSClient#putObject(PutObjectRequest)}
+     * operation.
+     */
+    public void setImageProcessResult(ImageProcessResult imageProcessResult) {
+        this.imageProcessResult = imageProcessResult;
     }
 }
