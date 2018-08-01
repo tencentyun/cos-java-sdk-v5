@@ -247,6 +247,7 @@ public class CompleteMultipartUploadRequest extends CosServiceRequest implements
      */
     public void setImageProcessRule(ImageProcessRule imageProcessRule) {
         this.imageProcessRule = imageProcessRule;
+        super.setUseCIDomain(imageProcessRule!=null);
     }
 
     /**

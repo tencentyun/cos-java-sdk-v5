@@ -289,7 +289,7 @@ public class COSClient implements COS {
                         : this.cred.getCOSAppId());
         String srcEndpointSuffix = copyObjectRequest.getSourceEndpointSuffix();
         if (srcEndpointSuffix == null) {
-            srcEndpointSuffix = String.format(".%s.myqcloud.com", formatRegion(sourceRegion.getRegionName()));
+            srcEndpointSuffix = String.format(".%s.myqcloud.com", formatRegion(sourceRegion.getRegionName(), copyObjectRequest.getUseCIDomain()));
         }
         if (!srcEndpointSuffix.startsWith(".")) {
             srcEndpointSuffix = "." + srcEndpointSuffix;
@@ -351,7 +351,7 @@ public class COSClient implements COS {
                         : this.cred.getCOSAppId());
         String srcEndpointSuffix = copyPartRequest.getSourceEndpointSuffix();
         if (srcEndpointSuffix == null) {
-            srcEndpointSuffix = String.format(".%s.myqcloud.com", formatRegion(sourceRegion.getRegionName()));
+            srcEndpointSuffix = String.format(".%s.myqcloud.com", formatRegion(sourceRegion.getRegionName(), copyPartRequest.getUseCIDomain()));
         }
         if (!srcEndpointSuffix.startsWith(".")) {
             srcEndpointSuffix = "." + srcEndpointSuffix;
@@ -395,8 +395,10 @@ public class COSClient implements COS {
         return key;
     }
 
-    private String formatRegion(String regionName) {
-        if (regionName.startsWith("pic.")) {
+    private String formatRegion(String regionName, boolean useCIDomain) {
+    	String segment = (useCIDomain?"pic.":"cos.");
+    	
+        if (regionName.startsWith(segment)) {
             return regionName;
         } else {
             if (regionName.equals("cn-east") || regionName.equals("cn-south")
@@ -404,7 +406,7 @@ public class COSClient implements COS {
                     || regionName.equals("cn-southwest") || regionName.equals("sg")) {
                 return regionName;
             } else {
-                return "pic." + regionName;
+                return segment + regionName;
             }
         }
     }
@@ -453,7 +455,7 @@ public class COSClient implements COS {
                 endPointSuffix = ".cos.myqcloud.com";
             } else {
                 endPointSuffix = String.format(".%s.myqcloud.com",
-                        formatRegion(clientConfig.getRegion().getRegionName()));
+                        formatRegion(clientConfig.getRegion().getRegionName(), request.getOriginalRequest().getUseCIDomain()));
             }
         }
         if (!endPointSuffix.startsWith(".")) {
@@ -721,7 +723,9 @@ public class COSClient implements COS {
                     "Unable to find file to upload");
         }
 
+        PutObjectResult result;
         PutObjectHandler handler;
+        final ObjectMetadata returnedMetadata;
         MD5DigestCalculatingInputStream md5DigestStream = null;
         try {
             CosHttpRequest<PutObjectRequest> request =
@@ -807,19 +811,30 @@ public class COSClient implements COS {
             populateRequestMetadata(request, metadata);
             request.setContent(input);
 
-            @SuppressWarnings("unchecked")
-            ResponseHeaderHandlerChain<PutObjectHandler> responseHandler =
-                new ResponseHeaderHandlerChain<PutObjectHandler>(
-                        // xml payload unmarshaller
-                        new Unmarshallers.PutObjectResultUnmarshaller(),
-                        // header handlers
-                        new ServerSideEncryptionHeaderHandler<PutObjectHandler>(),
-                        new ObjectExpirationHeaderHandler<PutObjectHandler>(),
-                        new VIDResultHandler<PutObjectHandler>(),
-                        new ObjectMetadataHandler<PutObjectHandler>());
-            handler = invoke(request, responseHandler);
-            if (handler.getPutObjectResult() == null) {
-                throw handler.getCOSException();
+            if (putObjectRequest.getUseCIDomain()) {
+                @SuppressWarnings("unchecked")
+                ResponseHeaderHandlerChain<PutObjectHandler> responseHandler =
+                    new ResponseHeaderHandlerChain<PutObjectHandler>(
+                            // xml payload unmarshaller
+                            new Unmarshallers.PutObjectResultUnmarshaller(),
+                            // header handlers
+                            new ServerSideEncryptionHeaderHandler<PutObjectHandler>(),
+                            new ObjectExpirationHeaderHandler<PutObjectHandler>(),
+                            new VIDResultHandler<PutObjectHandler>(),
+                            new ObjectMetadataHandler<PutObjectHandler>());
+                handler = invoke(request, responseHandler);
+                if (handler.getPutObjectResult() == null) {
+                	throw handler.getCOSException();
+                }
+                result = handler.getPutObjectResult();
+                returnedMetadata = handler.getPutObjectResult().getMetadata();
+            } else {
+            	try {
+                    returnedMetadata = invoke(request, new CosMetadataResponseHandler());
+                    result = createPutObjectResult(returnedMetadata);
+                } catch (Throwable t) {
+                    throw Throwables.failure(t);
+                }
             }
         } finally {
             CosDataSource.Utils.cleanupDataSource(putObjectRequest, file, isOrig, input, log);
@@ -830,7 +845,6 @@ public class COSClient implements COS {
             contentMd5 = Base64.encodeAsString(md5DigestStream.getMd5Digest());
         }
 
-        final ObjectMetadata returnedMetadata = handler.getPutObjectResult().getMetadata();
         final String etag = returnedMetadata.getETag();
         if (contentMd5 != null
                 && !skipMd5CheckStrategy.skipClientSideValidationPerPutResponse(returnedMetadata)) {
@@ -858,8 +872,9 @@ public class COSClient implements COS {
                         + ")");
             }
         }
-        handler.getPutObjectResult().setContentMd5(contentMd5);
-        return handler.getPutObjectResult();
+        
+        result.setContentMd5(contentMd5);
+        return result;
     }
 
     @Override
@@ -2517,7 +2532,7 @@ public class COSClient implements COS {
 
         if (endpointSuffix == null) {
             endpointSuffix = String.format(".%s.myqcloud.com",
-                    formatRegion(clientConfig.getRegion().getRegionName()));
+                    formatRegion(clientConfig.getRegion().getRegionName(), req.getUseCIDomain()));
         }
         if (!endpointSuffix.startsWith(".")) {
             endpointSuffix = "." + endpointSuffix;

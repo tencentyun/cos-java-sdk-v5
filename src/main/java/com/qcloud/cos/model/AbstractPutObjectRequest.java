@@ -554,6 +554,7 @@ public abstract class AbstractPutObjectRequest extends CosServiceRequest impleme
      */
     public void setImageProcessRule(ImageProcessRule imageProcessRule) {
         this.imageProcessRule = imageProcessRule;
+        super.setUseCIDomain(imageProcessRule!=null);
     }
 
     /**

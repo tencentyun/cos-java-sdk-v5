@@ -1387,6 +1387,10 @@ public class XmlResponsesSaxParser {
         public PutObjectResult getPutObjectResult() {
             return result;
         }
+        
+        public void setPutObjectResult(PutObjectResult res) {
+            this.result = res;
+        }
 
         public CosServiceException getCOSException() {
             return cse;
@@ -1588,6 +1592,11 @@ public class XmlResponsesSaxParser {
         protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
 
             if (atTopLevel()) {
+            	// for cos response
+                if (name.equals("CompleteMultipartUploadResult")) {
+                    result = new CompleteMultipartUploadResult();
+                }
+                // end
                 if (name.equals("UploadResult")) {
                     imageProcessResult = new ImageProcessResult();
                 }
@@ -1661,7 +1670,21 @@ public class XmlResponsesSaxParser {
                     currentObject.setSize(Long.parseLong(getText()));
                 }
             }
-
+            
+            // for cos response
+            else if (in("CompleteMultipartUploadResult")) {
+                if (name.equals("Location")) {
+                    result.setLocation(getText());
+                } else if (name.equals("Bucket")) {
+                    result.setBucketName(getText());
+                } else if (name.equals("Key")) {
+                    result.setKey(getText());
+                } else if (name.equals("ETag")) {
+                    result.setETag(StringUtils.removeQuotes(getText()));
+                }
+            }
+            // end
+            
             else if (in("Error")) {
                 if (name.equals("Code")) {
                     errorCode = getText();
