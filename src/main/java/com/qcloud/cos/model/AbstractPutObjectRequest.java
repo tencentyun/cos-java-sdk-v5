@@ -56,6 +56,11 @@ public abstract class AbstractPutObjectRequest extends CosServiceRequest impleme
     private AccessControlList accessControlList;
 
     /**
+     * An optional image process rule to apply to the new object.
+     */
+    private ImageProcessRule imageProcessRule;
+
+    /**
      * The optional Qcloud COS storage class to use when storing the new object. If not specified,
      * the default, standard storage class will be used.
      * <p>
@@ -531,6 +536,39 @@ public abstract class AbstractPutObjectRequest extends CosServiceRequest impleme
         setAccessControlList(accessControlList);
         @SuppressWarnings("unchecked")
         T t = (T) this;
+        return t;
+    }
+
+    /**
+     * Returns the optional image process rule for the new object.
+     */
+    public ImageProcessRule getImageProcessRule() {
+        return imageProcessRule;
+    }
+
+    /**
+     * Sets the optional image process rule for the new object.
+     *
+     * @param imageProcessRule
+     *            The image process rule for the new object.
+     */
+    public void setImageProcessRule(ImageProcessRule imageProcessRule) {
+        this.imageProcessRule = imageProcessRule;
+        super.setUseCIDomain(imageProcessRule!=null);
+    }
+
+    /**
+     * Sets the optional image process rule for the new object.
+     * Returns this {@link AbstractPutObjectRequest},
+     * enabling additional method calls to be chained together.
+     *
+     * @param imageProcessRule
+     *            The image process rule for the new object.
+     */
+    public <T extends AbstractPutObjectRequest> T withImageProcessRule(
+            ImageProcessRule imageProcessRule) {
+        setImageProcessRule(imageProcessRule);
+        @SuppressWarnings("unchecked") T t = (T)this;
         return t;
     }
 

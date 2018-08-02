@@ -188,6 +188,13 @@ public class PutObjectRequest extends AbstractPutObjectRequest implements Serial
 
     @Override
     @SuppressWarnings("unchecked")
+    public PutObjectRequest withImageProcessRule(
+            ImageProcessRule imageProcessRule) {
+        return super.withImageProcessRule(imageProcessRule);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
     public PutObjectRequest  withInputStream(InputStream inputStream) {
         return super.withInputStream(inputStream);
     }

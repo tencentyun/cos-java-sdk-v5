@@ -21,6 +21,10 @@ public class CompleteMultipartUploadRequest extends CosServiceRequest implements
     /** The list of part numbers and ETags to use when completing the multipart upload */
     private List<PartETag> partETags = new ArrayList<PartETag>();
 
+    /**
+     * An optional image process rule to apply to the new object.
+     */
+    private ImageProcessRule imageProcessRule;
 
     public CompleteMultipartUploadRequest() {}
     /**
@@ -225,6 +229,38 @@ public class CompleteMultipartUploadRequest extends CosServiceRequest implements
         for (UploadPartResult result : uploadPartResultsCollection) {
             this.partETags.add(new PartETag(result.getPartNumber(), result.getETag()));
         }
+        return this;
+    }
+    
+    /**
+     * Returns the optional image process rule for the new object.
+     */
+    public ImageProcessRule getImageProcessRule() {
+        return imageProcessRule;
+    }
+
+    /**
+     * Sets the optional image process rule for the new object.
+     *
+     * @param imageProcessRule
+     *            The image process rule for the new object.
+     */
+    public void setImageProcessRule(ImageProcessRule imageProcessRule) {
+        this.imageProcessRule = imageProcessRule;
+        super.setUseCIDomain(imageProcessRule!=null);
+    }
+
+    /**
+     * Sets the optional image process rule for the new object.
+     * Returns this {@link CompleteMultipartUploadRequest},
+     * enabling additional method calls to be chained together.
+     *
+     * @param imageProcessRule
+     *            The image process rule for the new object.
+     */
+    public CompleteMultipartUploadRequest withImageProcessRule(
+            ImageProcessRule imageProcessRule) {
+        setImageProcessRule(imageProcessRule);
         return this;
     }
 }

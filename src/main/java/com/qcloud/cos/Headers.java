@@ -160,6 +160,9 @@ public interface Headers {
     /** Header for the optional delete marker information of an object */
     public static String DELETE_MARKER = "x-cos-delete-marker";
 
+    /** Header for the image process rule. */
+    public static final String PIC_OPERATIONS = "pic-operations";
+
     /**
      * Key wrapping algorithm such as "AESWrap" and "RSA/ECB/OAEPWithSHA-256AndMGF1Padding".
      */

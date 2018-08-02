@@ -122,6 +122,7 @@ public class UploadCallable implements Callable<UploadResult> {
         uploadResult.setVersionId(putObjectResult.getVersionId());
         uploadResult.setRequestId(putObjectResult.getRequestId());
         uploadResult.setDateStr(putObjectResult.getDateStr());
+        uploadResult.setImageProcessResult(putObjectResult.getImageProcessResult());
         return uploadResult;
     }
 
@@ -244,6 +245,7 @@ public class UploadCallable implements Callable<UploadResult> {
         CompleteMultipartUploadRequest req =
                 new CompleteMultipartUploadRequest(origReq.getBucketName(), origReq.getKey(),
                         multipartUploadId, partETags)
+                                .withImageProcessRule(origReq.getImageProcessRule())
                                 .withGeneralProgressListener(origReq.getGeneralProgressListener());
         CompleteMultipartUploadResult res = cos.completeMultipartUpload(req);
 
@@ -254,6 +256,7 @@ public class UploadCallable implements Callable<UploadResult> {
         uploadResult.setVersionId(res.getVersionId());
         uploadResult.setRequestId(res.getRequestId());
         uploadResult.setDateStr(res.getDateStr());
+        uploadResult.setImageProcessResult(res.getImageProcessResult());
         return uploadResult;
     }
 

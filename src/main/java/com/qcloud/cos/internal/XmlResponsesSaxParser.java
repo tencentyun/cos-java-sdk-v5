@@ -58,6 +58,9 @@ import com.qcloud.cos.model.lifecycle.LifecycleAndOperator;
 import com.qcloud.cos.model.lifecycle.LifecycleFilter;
 import com.qcloud.cos.model.lifecycle.LifecycleFilterPredicate;
 import com.qcloud.cos.model.lifecycle.LifecyclePrefixPredicate;
+import com.qcloud.cos.model.PutObjectResult;
+import com.qcloud.cos.model.ImageProcessResult;
+import com.qcloud.cos.model.ImageProcessResult.ImageObject;
 import com.qcloud.cos.utils.DateUtils;
 import com.qcloud.cos.utils.StringUtils;
 import com.qcloud.cos.utils.UrlEncoderUtils;
@@ -391,6 +394,13 @@ public class XmlResponsesSaxParser {
     public CopyObjectResultHandler parseCopyObjectResponse(InputStream inputStream)
             throws IOException {
         CopyObjectResultHandler handler = new CopyObjectResultHandler();
+        parseXmlInputStream(handler, inputStream);
+        return handler;
+    }
+
+    public PutObjectHandler parsePutObjectResponse(
+            InputStream inputStream) throws IOException {
+        PutObjectHandler handler = new PutObjectHandler();
         parseXmlInputStream(handler, inputStream);
         return handler;
     }
@@ -1267,6 +1277,221 @@ public class XmlResponsesSaxParser {
         }
     }
 
+    /*
+     * <?xml version="1.0" encoding="UTF-8"?> <UploadResult>
+     * <OriginalInfo>
+     *   <Key> filename.jpg</Key>
+     *   <Location>xxxx-123456.cos.ap-chengdu.myqcloud.com/ filename.jpg</Location>
+     *   <ImageInfo>
+     *     <Format>JPEG</Format>
+     *     <Width>640</Width>
+     *     <Height>427</Height>
+     *     <Quality>100</Quality>
+     *     <Ave>0xa18454</Ave>
+     *     <Orientation>1</Orientation>
+     *   </ImageInfo>
+     * </OriginalInfo>
+     * <ProcessResults>
+     *   <Object>
+     *     <Key>test.jpg</Key>
+     *     <Location> xxxx-123456.cos.ap-chengdu.myqcloud.com/test.jpg</Location>
+     *     <Format>png</Format>
+     *     <Width>640</Width>
+     *     <Height>427</Height>
+     *     <Size>463092</Size>
+     *     <Quality>100</Quality>
+     *   </Object>
+     * </ProcessResults> </UploadResult>
+     *
+     * Or if an error occurred while completing:
+     *
+     * <?xml version="1.0" encoding="UTF-8"?> <Error> <Code>InternalError</Code> <Message>We
+     * encountered an internal error. Please try again.</Message>
+     * <RequestId>656c76696e6727732072657175657374</RequestId>
+     * <HostId>Uuag1LuByRx9e6j5Onimru9pO4ZVKnJ2Qz7/C1NPcfTWAtRPfTaOFg==</HostId> </Error>
+     */
+    public static class PutObjectHandler extends AbstractSSEHandler
+            implements ObjectExpirationResult, VIDResult {
+        // Successful completion
+        private PutObjectResult result;
+        private ImageProcessResult imageProcessResult;
+
+        // Error during completion
+        private CosServiceException cse;
+        private String traceId;
+        private String requestId;
+        private String errorCode;
+
+        private ImageObject currentObject;
+
+        /**
+         * @see com.qcloud.cos.model.PutObjectResult#getExpirationTime()
+         */
+        @Override
+        public Date getExpirationTime() {
+            return result == null ? null : result.getExpirationTime();
+        }
+
+        /**
+         * @see com.qcloud.cos.model.PutObjectResult#setExpirationTime(java.util.Date)
+         */
+        @Override
+        public void setExpirationTime(Date expirationTime) {
+            if (result != null) {
+                result.setExpirationTime(expirationTime);
+            }
+        }
+
+        /**
+         * @see com.qcloud.cos.model.PutObjectResult#getExpirationTimeRuleId()
+         */
+        @Override
+        public String getExpirationTimeRuleId() {
+            return result == null ? null : result.getExpirationTimeRuleId();
+        }
+
+        /**
+         * @see com.qcloud.cos.model.PutObjectResult#setExpirationTimeRuleId(java.lang.String)
+         */
+        @Override
+        public void setExpirationTimeRuleId(String expirationTimeRuleId) {
+            if (result != null) {
+                result.setExpirationTimeRuleId(expirationTimeRuleId);
+            }
+        }
+
+        @Override
+        public String getRequestId() {
+            return result == null ? null : result.getRequestId();
+        }
+
+        @Override
+        public void setRequestId(String requestId) {
+            if (result != null) {
+                result.setRequestId(requestId);
+            }
+        }
+
+        @Override
+        public String getDateStr() {
+            return result == null ? null : result.getDateStr();
+        }
+
+        @Override
+        public void setDateStr(String dateStr) {
+            if (result != null) {
+                result.setDateStr(dateStr);
+            }
+        }
+
+        public PutObjectResult getPutObjectResult() {
+            return result;
+        }
+        
+        public void setPutObjectResult(PutObjectResult res) {
+            this.result = res;
+        }
+
+        public CosServiceException getCOSException() {
+            return cse;
+        }
+
+        @Override
+        protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
+
+            if (atTopLevel()) {
+                if (name.equals("UploadResult")) {
+                    imageProcessResult = new ImageProcessResult();
+                }
+            } else if (in("UploadResult", "ProcessResults")) {
+                if (name.equals("Object")) {
+                    currentObject = new ImageObject();
+                }
+            }
+        }
+
+        @Override
+        protected void doEndElement(String uri, String name, String qName) {
+            if (atTopLevel()) {
+                if (name.equals("Error")) {
+                    if (cse != null) {
+                        cse.setErrorCode(errorCode);
+                        cse.setRequestId(requestId);
+                        cse.setTraceId(traceId);
+                    }
+                } else if (name.equals("UploadResult")) {
+                    result = new PutObjectResult();
+                    result.setImageProcessResult(imageProcessResult);
+                }
+            }
+
+            else if (in("UploadResult", "OriginalInfo")) {
+                if (name.equals("Location")) {
+                    imageProcessResult.getOriginalInfo().setLocation(getText());
+                } else if (name.equals("Key")) {
+                    imageProcessResult.getOriginalInfo().setKey(getText());
+                }
+            }
+
+            else if (in("UploadResult", "OriginalInfo", "ImageInfo")) {
+                if (name.equals("Format")) {
+                    imageProcessResult.getOriginalInfo().getImageInfo().setFormat(getText());
+                } else if (name.equals("Ave")) {
+                    imageProcessResult.getOriginalInfo().getImageInfo().setAve(getText());
+                } else if (name.equals("Width")) {
+                    imageProcessResult.getOriginalInfo().getImageInfo().setWidth(Integer.parseInt(getText()));
+                } else if (name.equals("Height")) {
+                    imageProcessResult.getOriginalInfo().getImageInfo().setHeight(Integer.parseInt(getText()));
+                } else if (name.equals("Quality")) {
+                    imageProcessResult.getOriginalInfo().getImageInfo().setQuality(Integer.parseInt(getText()));
+                } else if (name.equals("Orientation")) {
+                    imageProcessResult.getOriginalInfo().getImageInfo().setOrientation(Integer.parseInt(getText()));
+                }
+            }
+
+            else if (in("UploadResult", "ProcessResults")) {
+                if (name.equals("Object")) {
+                    imageProcessResult.addProcessResult(currentObject);
+                    currentObject = null;
+                }
+            }
+
+            else if (in("UploadResult", "ProcessResults", "Object")) {
+                if (name.equals("Location")) {
+                    currentObject.setLocation(getText());
+                } else if (name.equals("Key")) {
+                    currentObject.setKey(getText());
+                } else if (name.equals("Format")) {
+                    currentObject.setFormat(getText());
+                } else if (name.equals("Width")) {
+                    currentObject.setWidth(Integer.parseInt(getText()));
+                } else if (name.equals("Height")) {
+                    currentObject.setHeight(Integer.parseInt(getText()));
+                } else if (name.equals("Quality")) {
+                    currentObject.setQuality(Integer.parseInt(getText()));
+                } else if (name.equals("Size")) {
+                    currentObject.setSize(Long.parseLong(getText()));
+                }
+            }
+
+            else if (in("Error")) {
+                if (name.equals("Code")) {
+                    errorCode = getText();
+                } else if (name.equals("Message")) {
+                    cse = new CosServiceException(getText());
+                } else if (name.equals("RequestId")) {
+                    requestId = getText();
+                } else if (name.equals("HostId")) {
+                    traceId = getText();
+                }
+            }
+        }
+
+        @Override
+        protected ServerSideEncryptionResult sseResult() {
+            return result;
+        }
+    }
 
     /*
      * <?xml version="1.0" encoding="UTF-8"?> <CompleteMultipartUploadResult>
@@ -1285,12 +1510,15 @@ public class XmlResponsesSaxParser {
             implements ObjectExpirationResult, VIDResult {
         // Successful completion
         private CompleteMultipartUploadResult result;
+        private ImageProcessResult imageProcessResult;
 
         // Error during completion
         private CosServiceException cse;
         private String traceId;
         private String requestId;
         private String errorCode;
+
+        private ImageObject currentObject;
 
         /**
          * @see com.qcloud.cos.model.CompleteMultipartUploadResult#getExpirationTime()
@@ -1364,8 +1592,17 @@ public class XmlResponsesSaxParser {
         protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
 
             if (atTopLevel()) {
+            	// for cos response
                 if (name.equals("CompleteMultipartUploadResult")) {
                     result = new CompleteMultipartUploadResult();
+                }
+                // end
+                if (name.equals("UploadResult")) {
+                    imageProcessResult = new ImageProcessResult();
+                }
+            } else if (in("UploadResult", "ProcessResults")) {
+                if (name.equals("Object")) {
+                    currentObject = new ImageObject();
                 }
             }
         }
@@ -1379,9 +1616,62 @@ public class XmlResponsesSaxParser {
                         cse.setRequestId(requestId);
                         cse.setTraceId(traceId);
                     }
+                } else if (name.equals("UploadResult")) {
+                    result = new CompleteMultipartUploadResult();
+                    result.setImageProcessResult(imageProcessResult);
                 }
             }
 
+            else if (in("UploadResult", "OriginalInfo")) {
+                if (name.equals("Location")) {
+                    imageProcessResult.getOriginalInfo().setLocation(getText());
+                } else if (name.equals("Key")) {
+                    imageProcessResult.getOriginalInfo().setKey(getText());
+                }
+            }
+
+            else if (in("UploadResult", "OriginalInfo", "ImageInfo")) {
+                if (name.equals("Format")) {
+                    imageProcessResult.getOriginalInfo().getImageInfo().setFormat(getText());
+                } else if (name.equals("Ave")) {
+                    imageProcessResult.getOriginalInfo().getImageInfo().setAve(getText());
+                } else if (name.equals("Width")) {
+                    imageProcessResult.getOriginalInfo().getImageInfo().setWidth(Integer.parseInt(getText()));
+                } else if (name.equals("Height")) {
+                    imageProcessResult.getOriginalInfo().getImageInfo().setHeight(Integer.parseInt(getText()));
+                } else if (name.equals("Quality")) {
+                    imageProcessResult.getOriginalInfo().getImageInfo().setQuality(Integer.parseInt(getText()));
+                } else if (name.equals("Orientation")) {
+                    imageProcessResult.getOriginalInfo().getImageInfo().setOrientation(Integer.parseInt(getText()));
+                }
+            }
+
+            else if (in("UploadResult", "ProcessResults")) {
+                if (name.equals("Object")) {
+                    imageProcessResult.addProcessResult(currentObject);
+                    currentObject = null;
+                }
+            }
+
+            else if (in("UploadResult", "ProcessResults", "Object")) {
+                if (name.equals("Location")) {
+                    currentObject.setLocation(getText());
+                } else if (name.equals("Key")) {
+                    currentObject.setKey(getText());
+                } else if (name.equals("Format")) {
+                    currentObject.setFormat(getText());
+                } else if (name.equals("Width")) {
+                    currentObject.setWidth(Integer.parseInt(getText()));
+                } else if (name.equals("Height")) {
+                    currentObject.setHeight(Integer.parseInt(getText()));
+                } else if (name.equals("Quality")) {
+                    currentObject.setQuality(Integer.parseInt(getText()));
+                } else if (name.equals("Size")) {
+                    currentObject.setSize(Long.parseLong(getText()));
+                }
+            }
+            
+            // for cos response
             else if (in("CompleteMultipartUploadResult")) {
                 if (name.equals("Location")) {
                     result.setLocation(getText());
@@ -1393,7 +1683,8 @@ public class XmlResponsesSaxParser {
                     result.setETag(StringUtils.removeQuotes(getText()));
                 }
             }
-
+            // end
+            
             else if (in("Error")) {
                 if (name.equals("Code")) {
                     errorCode = getText();

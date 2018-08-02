@@ -13,6 +13,7 @@ import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.model.CopyObjectRequest;
 import com.qcloud.cos.model.CopyResult;
 import com.qcloud.cos.model.GetObjectRequest;
+import com.qcloud.cos.model.ImageProcessRule;
 import com.qcloud.cos.model.PutObjectRequest;
 import com.qcloud.cos.model.UploadResult;
 import com.qcloud.cos.region.Region;
@@ -53,19 +54,23 @@ public class TransferManagerDemo {
         // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
-        ClientConfig clientConfig = new ClientConfig(new Region("ap-beijing-1"));
+        ClientConfig clientConfig = new ClientConfig(new Region("ap-chengdu"));
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名需包含appid
-        String bucketName = "mybucket-1251668577";
+        String bucketName = "processtest-1254139626";
 
         ExecutorService threadPool = Executors.newFixedThreadPool(32);
         // 传入一个threadpool, 若不传入线程池, 默认TransferManager中会生成一个单线程的线程池。
         TransferManager transferManager = new TransferManager(cosclient, threadPool);
 
-        String key = "/aaa/bbb.txt";
-        File localFile = new File("src/test/resources/len30M.txt");
+        String key = "/aaa/ccc.jpg";
+        File localFile = new File("C:\\Users\\Public\\Pictures\\Sample Pictures\\Koala.jpg");
         PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, key, localFile);
+        ImageProcessRule rule = new ImageProcessRule();
+        rule.setObtainImageInfo(false);
+        rule.appendRule("/aaa/ccc.png", "imageView2/format/png");
+        putObjectRequest.setImageProcessRule(rule);
         try {
             // 返回一个异步结果Upload, 可同步的调用waitForUploadResult等待upload结束, 成功返回UploadResult, 失败抛出异常.
             long startTime = System.currentTimeMillis();
@@ -75,6 +80,10 @@ public class TransferManagerDemo {
             long endTime = System.currentTimeMillis();
             System.out.println("used time: " + (endTime - startTime) / 1000);
             System.out.println(uploadResult.getETag());
+            System.out.println(uploadResult.getImageProcessResult().getOriginalInfo().getKey());
+            System.out.println(uploadResult.getImageProcessResult().getOriginalInfo().getImageInfo().getHeight());
+            System.out.println(uploadResult.getImageProcessResult().getProcessResults().get(0).getKey());
+            System.out.println(uploadResult.getImageProcessResult().getProcessResults().get(0).getHeight());
         } catch (CosServiceException e) {
             e.printStackTrace();
         } catch (CosClientException e) {
@@ -288,5 +297,9 @@ public class TransferManagerDemo {
 
         transferManager.shutdownNow();
         cosclient.shutdown();
+    }
+    
+    public static void main(String[] args) {
+    	uploadFile();
     }
 }

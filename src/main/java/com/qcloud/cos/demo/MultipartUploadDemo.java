@@ -15,6 +15,7 @@ import com.qcloud.cos.model.CompleteMultipartUploadRequest;
 import com.qcloud.cos.model.CompleteMultipartUploadResult;
 import com.qcloud.cos.model.CopyPartRequest;
 import com.qcloud.cos.model.CopyPartResult;
+import com.qcloud.cos.model.ImageProcessRule;
 import com.qcloud.cos.model.InitiateMultipartUploadRequest;
 import com.qcloud.cos.model.InitiateMultipartUploadResult;
 import com.qcloud.cos.model.ListPartsRequest;
@@ -37,20 +38,21 @@ public class MultipartUploadDemo {
         // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
-        ClientConfig clientConfig = new ClientConfig(new Region("ap-beijing-1"));
+        ClientConfig clientConfig = new ClientConfig(new Region("ap-chengdu"));
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名需包含appid
-        String bucketName = "mybucket-1251668577";
+        String bucketName = "processtest-1254139626";
         
-        String key = "aaa/bbb.txt";
+        String key = "aaa/bbbb.jpg";
         InitiateMultipartUploadRequest request = new InitiateMultipartUploadRequest(bucketName, key);
-        // 设置存储类型, 默认是标准(Standard), 低频(standard_ia), 近线(nearline) 
-        request.setStorageClass(StorageClass.Standard_IA);
+        // 设置存储类型, 默认是标准(Standard), 低频(standard_ia)
+        request.setStorageClass(StorageClass.Standard);
         try {
             InitiateMultipartUploadResult initResult = cosclient.initiateMultipartUpload(request);
             // 获取uploadid
             String uploadId =  initResult.getUploadId();
+            System.out.println("uploadId: " + uploadId);
         } catch (CosServiceException e) {
             e.printStackTrace();
         } catch (CosClientException e) {
@@ -100,17 +102,17 @@ public class MultipartUploadDemo {
         // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
-        ClientConfig clientConfig = new ClientConfig(new Region("ap-beijing-1"));
+        ClientConfig clientConfig = new ClientConfig(new Region("ap-chengdu"));
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名需包含appid
-        String bucketName = "mybucket-1251668577";
-        String key = "aaa/bbb.txt";
+        String bucketName = "processtest-1254139626";
+        String key = "aaa/bbbb.jpg";
         // uploadid(通过initiateMultipartUpload或者ListMultipartUploads获取)
-        String uploadId = "1512380198aecfed004aeaaca195d08232f718f7b52a91b8f6e9d36c7dfead2b3d1c917a6f";
+        String uploadId = "1526447209304d47dd054b9db62a441420a9635123b832632cde92005d0320f53d175fd1d8";
         
         // 生成要上传的数据, 这里初始化一个1M的数据
-        byte data[] = new byte[1024 * 1024];
+        byte data[] = new byte[10 * 1024];
         UploadPartRequest uploadPartRequest = new UploadPartRequest();
         uploadPartRequest.setBucketName(bucketName);
         uploadPartRequest.setKey(key);
@@ -119,11 +121,13 @@ public class MultipartUploadDemo {
         uploadPartRequest.setInputStream(new ByteArrayInputStream(data));
         // 设置分块的长度
         uploadPartRequest.setPartSize(data.length); // 设置数据长度
-        uploadPartRequest.setPartNumber(10);     // 假设要上传的part编号是10
+        uploadPartRequest.setPartNumber(1);     // 假设要上传的part编号是10
 
         try {
             UploadPartResult uploadPartResult = cosclient.uploadPart(uploadPartRequest);
             PartETag partETag = uploadPartResult.getPartETag();
+            System.out.println(partETag.getPartNumber());
+            System.out.println(partETag.getETag());
         } catch (CosServiceException e) {
             e.printStackTrace();
         } catch (CosClientException e) {
@@ -138,25 +142,33 @@ public class MultipartUploadDemo {
         // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
-        ClientConfig clientConfig = new ClientConfig(new Region("ap-beijing-1"));
+        ClientConfig clientConfig = new ClientConfig(new Region("ap-chengdu"));
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名需包含appid
-        String bucketName = "mybucket-1251668577";
-        String key = "aaa/bbb.txt";
+        String bucketName = "processtest-1254139626";
+        String key = "aaa/bbbb.jpg";
         // uploadid(通过initiateMultipartUpload或者ListMultipartUploads获取)
-        String uploadId = "1512380198aecfed004aeaaca195d08232f718f7b52a91b8f6e9d36c7dfead2b3d1c917a6f";
+        String uploadId = "1526447209304d47dd054b9db62a441420a9635123b832632cde92005d0320f53d175fd1d8";
         
         // 这里初始化一个空的队列， 用于保存已上传的分片信息, 代码不能直接运行， 需要通过之前的uploadpart或者list parts的结果获取,加入到partEtags队列中 
         List<PartETag> partETags = new LinkedList<>();
+        partETags.add(new PartETag(1, "1276481102f218c981e0324180bafd9f"));
         
         // 分片上传结束后，调用complete完成分片上传
         CompleteMultipartUploadRequest completeMultipartUploadRequest =
                 new CompleteMultipartUploadRequest(bucketName, key, uploadId, partETags);
+        ImageProcessRule rule = new ImageProcessRule();
+        rule.setObtainImageInfo(true);
+        rule.appendRule("/aaa/bbbb.png", "imageView2/format/png");
+        //completeMultipartUploadRequest.setImageProcessRule(rule);
         try {
             CompleteMultipartUploadResult completeResult =
                     cosclient.completeMultipartUpload(completeMultipartUploadRequest);
             String etag = completeResult.getETag();
+            System.out.println("etag:"+etag);
+            System.out.println(completeResult.getImageProcessResult().getOriginalInfo().getKey());
+            System.out.println(completeResult.getImageProcessResult().getOriginalInfo().getImageInfo().getHeight());
         } catch (CosServiceException e) {
             e.printStackTrace();
         } catch (CosClientException e) {
@@ -233,6 +245,12 @@ public class MultipartUploadDemo {
         }
         
         cosclient.shutdown();
+    }
+    
+    public static void main(String[] args) {
+    	//InitMultipartUploadDemo();
+    	//UploadPartDemo();
+    	completePartDemo();
     }
     
 }

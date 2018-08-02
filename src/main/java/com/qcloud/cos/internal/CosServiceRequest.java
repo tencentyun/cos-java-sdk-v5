@@ -27,6 +27,11 @@ public class CosServiceRequest implements Cloneable, ReadLimitInfo  {
     private final RequestClientOptions requestClientOptions = new RequestClientOptions();
     
     /**
+     * whether use the cloud image domain
+     */
+    private boolean useCIDomain = false;
+    
+    /**
      * The source object from which the current object was cloned; or null if there isn't one.
      */
     private CosServiceRequest cloneSource;
@@ -217,6 +222,14 @@ public class CosServiceRequest implements Cloneable, ReadLimitInfo  {
             throw new IllegalStateException(
                     "Got a CloneNotSupportedException from Object.clone() " + "even though we're Cloneable!", e);
         }
+    }
+    
+    public void setUseCIDomain(boolean use) {
+    	this.useCIDomain = use;
+    }
+    
+    public boolean getUseCIDomain() {
+    	return this.useCIDomain;
     }
 
 }

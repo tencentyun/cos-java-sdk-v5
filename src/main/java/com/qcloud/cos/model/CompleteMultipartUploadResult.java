@@ -40,6 +40,9 @@ public class CompleteMultipartUploadResult extends SSEResultBase
 
     /** The expiration rule for this object */
     private String expirationTimeRuleId;
+    
+    /** The image process result returned as a result of CompleteMltipartUpload operation. */
+    private ImageProcessResult imageProcessResult;
 
     /**
      * get requestid for this upload
@@ -203,4 +206,17 @@ public class CompleteMultipartUploadResult extends SSEResultBase
         this.expirationTimeRuleId = expirationTimeRuleId;
     }
 
+    /**
+     * Returns the imageProcessResult
+     */
+    public ImageProcessResult getImageProcessResult() {
+        return imageProcessResult;
+    }
+
+    /**
+     * Sets the imageProcessResult
+     */
+    public void setImageProcessResult(ImageProcessResult imageProcessResult) {
+        this.imageProcessResult = imageProcessResult;
+    }
 }

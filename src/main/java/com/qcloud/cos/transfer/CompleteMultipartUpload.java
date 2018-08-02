@@ -68,6 +68,7 @@ public class CompleteMultipartUpload implements Callable<UploadResult> {
             CompleteMultipartUploadRequest req = new CompleteMultipartUploadRequest(
                     origReq.getBucketName(), origReq.getKey(), uploadId,
                     collectPartETags())
+                .withImageProcessRule(origReq.getImageProcessRule())
                 .withGeneralProgressListener(origReq.getGeneralProgressListener())
                 ;
             res = cos.completeMultipartUpload(req);
@@ -84,6 +85,7 @@ public class CompleteMultipartUpload implements Callable<UploadResult> {
         uploadResult.setVersionId(res.getVersionId());
         uploadResult.setRequestId(res.getRequestId());
         uploadResult.setDateStr(res.getDateStr());
+        uploadResult.setImageProcessResult(res.getImageProcessResult());
 
         monitor.uploadComplete();
 
