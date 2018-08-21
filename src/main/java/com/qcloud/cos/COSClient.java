@@ -447,21 +447,17 @@ public class COSClient implements COS {
         String host = "";
         String endPointSuffix = this.clientConfig.getEndPointSuffix();
         if (endPointSuffix == null) {
-            if (isServiceRequest) {
-                endPointSuffix = ".cos.myqcloud.com";
-            } else {
-                endPointSuffix = String.format(".%s.myqcloud.com",
-                        formatRegion(clientConfig.getRegion().getRegionName()));
-            }
+            endPointSuffix = ".myqcloud.com";
         }
         if (!endPointSuffix.startsWith(".")) {
             endPointSuffix = "." + endPointSuffix;
         }
         if (isServiceRequest) {
-            host = "service" + endPointSuffix;
+            host = "service.cos" + endPointSuffix;
         } else {
             bucket = formatBucket(bucket, cred.getCOSAppId());
-            host = bucket + endPointSuffix;
+            host = bucket + "." + formatRegion(clientConfig.getRegion().getRegionName())
+                + endPointSuffix;
         }
 
         request.addHeader(Headers.HOST, host);
