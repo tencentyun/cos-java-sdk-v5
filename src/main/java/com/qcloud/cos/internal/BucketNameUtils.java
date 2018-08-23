@@ -9,14 +9,18 @@ public enum BucketNameUtils {
         if (bucketName == null) {
             throw new IllegalArgumentException("Bucket Name cannot be null");
         }
-        if (bucketName.length() < MIN_BUCKET_NAME_LENGTH
-                || bucketName.length() > MAX_BUCKET_NAME_LENGTH) {
+        String bucketNameNotContainAppid = bucketName;
+        if (bucketName.contains("-") && bucketName.lastIndexOf("-") != 0) {
+            bucketNameNotContainAppid = bucketName.substring(0, bucketName.lastIndexOf("-"));
+        }
+        if (bucketNameNotContainAppid.length() < MIN_BUCKET_NAME_LENGTH
+                || bucketNameNotContainAppid.length() > MAX_BUCKET_NAME_LENGTH) {
             throw new IllegalArgumentException(
                     "bucketName length must between 1 and 40 characters long");
         }
 
-        for (int i = 0; i < bucketName.length(); ++i) {
-            char next = bucketName.charAt(i);
+        for (int i = 0; i < bucketNameNotContainAppid.length(); ++i) {
+            char next = bucketNameNotContainAppid.charAt(i);
             if (i == 0 && next == '-') { 
                 throw new IllegalArgumentException("Bucket name can not start with -");
             }

@@ -203,6 +203,12 @@ public class DefaultCosHttpClient implements CosHttpClient {
                 httpRequestBase.addHeader(headerKey, headerValue);
             }
         }
+        
+        if (log.isDebugEnabled()) {
+            httpRequestBase.addHeader(Headers.SDK_LOG_DEBUG, "on");
+        } else {
+            httpRequestBase.addHeader(Headers.SDK_LOG_DEBUG, "off");
+        }
 
 
         if (request.getContent() != null) {

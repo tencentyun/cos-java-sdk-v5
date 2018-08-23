@@ -40,6 +40,7 @@ import com.qcloud.cos.http.HttpMethodName;
 import com.qcloud.cos.http.HttpResponseHandler;
 import com.qcloud.cos.internal.BucketNameUtils;
 import com.qcloud.cos.internal.COSObjectResponseHandler;
+import com.qcloud.cos.internal.COSStringResponseHandler;
 import com.qcloud.cos.internal.COSVersionHeaderHandler;
 import com.qcloud.cos.internal.COSXmlResponseHandler;
 import com.qcloud.cos.internal.Constants;
@@ -48,6 +49,7 @@ import com.qcloud.cos.internal.CosServiceRequest;
 import com.qcloud.cos.internal.CosServiceResponse;
 import com.qcloud.cos.internal.DeleteObjectsResponse;
 import com.qcloud.cos.internal.DigestValidationInputStream;
+import com.qcloud.cos.internal.UrlComponentUtils;
 import com.qcloud.cos.internal.InputSubstream;
 import com.qcloud.cos.internal.LengthCheckInputStream;
 import com.qcloud.cos.internal.MD5DigestCalculatingInputStream;
@@ -73,6 +75,7 @@ import com.qcloud.cos.model.Bucket;
 import com.qcloud.cos.model.BucketConfigurationXmlFactory;
 import com.qcloud.cos.model.BucketCrossOriginConfiguration;
 import com.qcloud.cos.model.BucketLifecycleConfiguration;
+import com.qcloud.cos.model.BucketPolicy;
 import com.qcloud.cos.model.BucketReplicationConfiguration;
 import com.qcloud.cos.model.BucketVersioningConfiguration;
 import com.qcloud.cos.model.COSObject;
@@ -88,6 +91,7 @@ import com.qcloud.cos.model.CosDataSource;
 import com.qcloud.cos.model.CreateBucketRequest;
 import com.qcloud.cos.model.DeleteBucketCrossOriginConfigurationRequest;
 import com.qcloud.cos.model.DeleteBucketLifecycleConfigurationRequest;
+import com.qcloud.cos.model.DeleteBucketPolicyRequest;
 import com.qcloud.cos.model.DeleteBucketReplicationConfigurationRequest;
 import com.qcloud.cos.model.DeleteBucketRequest;
 import com.qcloud.cos.model.DeleteObjectRequest;
@@ -100,6 +104,7 @@ import com.qcloud.cos.model.GetBucketAclRequest;
 import com.qcloud.cos.model.GetBucketCrossOriginConfigurationRequest;
 import com.qcloud.cos.model.GetBucketLifecycleConfigurationRequest;
 import com.qcloud.cos.model.GetBucketLocationRequest;
+import com.qcloud.cos.model.GetBucketPolicyRequest;
 import com.qcloud.cos.model.GetBucketReplicationConfigurationRequest;
 import com.qcloud.cos.model.GetBucketVersioningConfigurationRequest;
 import com.qcloud.cos.model.GetObjectAclRequest;
@@ -133,6 +138,7 @@ import com.qcloud.cos.model.SSECustomerKey;
 import com.qcloud.cos.model.SetBucketAclRequest;
 import com.qcloud.cos.model.SetBucketCrossOriginConfigurationRequest;
 import com.qcloud.cos.model.SetBucketLifecycleConfigurationRequest;
+import com.qcloud.cos.model.SetBucketPolicyRequest;
 import com.qcloud.cos.model.SetBucketReplicationConfigurationRequest;
 import com.qcloud.cos.model.SetBucketVersioningConfigurationRequest;
 import com.qcloud.cos.model.SetObjectAclRequest;
@@ -287,7 +293,10 @@ public class COSClient implements COS {
                         : this.cred.getCOSAppId());
         String srcEndpointSuffix = copyObjectRequest.getSourceEndpointSuffix();
         if (srcEndpointSuffix == null) {
-            srcEndpointSuffix = String.format(".%s.myqcloud.com", formatRegion(sourceRegion.getRegionName()));
+            srcEndpointSuffix =
+                    String.format(".%s.myqcloud.com", formatRegion(sourceRegion.getRegionName()));
+        } else {
+            UrlComponentUtils.validateSrcEndPointSuffix(srcEndpointSuffix);
         }
         if (!srcEndpointSuffix.startsWith(".")) {
             srcEndpointSuffix = "." + srcEndpointSuffix;
@@ -349,7 +358,10 @@ public class COSClient implements COS {
                         : this.cred.getCOSAppId());
         String srcEndpointSuffix = copyPartRequest.getSourceEndpointSuffix();
         if (srcEndpointSuffix == null) {
-            srcEndpointSuffix = String.format(".%s.myqcloud.com", formatRegion(sourceRegion.getRegionName()));
+            srcEndpointSuffix =
+                    String.format(".%s.myqcloud.com", formatRegion(sourceRegion.getRegionName()));
+        } else {
+            UrlComponentUtils.validateSrcEndPointSuffix(srcEndpointSuffix);
         }
         if (!srcEndpointSuffix.startsWith(".")) {
             srcEndpointSuffix = "." + srcEndpointSuffix;
@@ -393,7 +405,8 @@ public class COSClient implements COS {
         return key;
     }
 
-    private String formatRegion(String regionName) {
+    private String formatRegion(String regionName) throws CosClientException {
+        UrlComponentUtils.validateRegionName(regionName);
         if (regionName.startsWith("cos.")) {
             return regionName;
         } else {
@@ -448,17 +461,17 @@ public class COSClient implements COS {
         String endPointSuffix = this.clientConfig.getEndPointSuffix();
         if (endPointSuffix == null) {
             if (isServiceRequest) {
-                endPointSuffix = ".cos.myqcloud.com";
+                endPointSuffix = "service.cos.myqcloud.com";
             } else {
                 endPointSuffix = String.format(".%s.myqcloud.com",
                         formatRegion(clientConfig.getRegion().getRegionName()));
             }
+        } else {
+            UrlComponentUtils.validateEndPointSuffix(endPointSuffix);
         }
-        if (!endPointSuffix.startsWith(".")) {
-            endPointSuffix = "." + endPointSuffix;
-        }
+
         if (isServiceRequest) {
-            host = "service" + endPointSuffix;
+            host = endPointSuffix;
         } else {
             bucket = formatBucket(bucket, cred.getCOSAppId());
             host = bucket + endPointSuffix;
@@ -2584,6 +2597,86 @@ public class COSClient implements COS {
                 new CopyObjectRequest(bucketName, key, bucketName, key);
         copyObjectRequest.setNewObjectMetadata(objectMetadata);
         copyObject(copyObjectRequest);
+    }
+
+    @Override
+    public void setBucketPolicy(String bucketName, String policyText)
+            throws CosClientException, CosServiceException {
+        setBucketPolicy(new SetBucketPolicyRequest(bucketName, policyText));
+    }
+
+    @Override
+    public void setBucketPolicy(SetBucketPolicyRequest setBucketPolicyRequest)
+            throws CosClientException, CosServiceException {
+        rejectNull(setBucketPolicyRequest,
+                "The request object must be specified when setting a bucket policy");
+
+        String bucketName = setBucketPolicyRequest.getBucketName();
+        String policyText = setBucketPolicyRequest.getPolicyText();
+
+        rejectNull(bucketName, "The bucket name must be specified when setting a bucket policy");
+        rejectNull(policyText, "The policy text must be specified when setting a bucket policy");
+
+        CosHttpRequest<SetBucketPolicyRequest> request =
+                createRequest(bucketName, null, setBucketPolicyRequest, HttpMethodName.PUT);
+        request.addParameter("policy", null);
+        request.setContent(new ByteArrayInputStream(policyText.getBytes(StringUtils.UTF8)));
+
+        invoke(request, voidCosResponseHandler);
+    }
+
+    @Override
+    public BucketPolicy getBucketPolicy(String bucketName)
+            throws CosClientException, CosServiceException {
+        return getBucketPolicy(new GetBucketPolicyRequest(bucketName));
+    }
+
+    @Override
+    public BucketPolicy getBucketPolicy(GetBucketPolicyRequest getBucketPolicyRequest)
+            throws CosClientException, CosServiceException {
+        rejectNull(getBucketPolicyRequest,
+                "The request object must be specified when getting a bucket policy");
+
+        String bucketName = getBucketPolicyRequest.getBucketName();
+        rejectNull(bucketName, "The bucket name must be specified when getting a bucket policy");
+
+        CosHttpRequest<GetBucketPolicyRequest> request =
+                createRequest(bucketName, null, getBucketPolicyRequest, HttpMethodName.GET);
+        request.addParameter("policy", null);
+
+        BucketPolicy result = new BucketPolicy();
+        try {
+            String policyText = invoke(request, new COSStringResponseHandler());
+            result.setPolicyText(policyText);
+            return result;
+        } catch (CosServiceException cse) {
+            if (cse.getErrorCode().equals("NoSuchBucketPolicy"))
+                return result;
+            throw cse;
+        }
+    }
+
+
+    @Override
+    public void deleteBucketPolicy(String bucketName)
+            throws CosClientException, CosServiceException {
+        deleteBucketPolicy(new DeleteBucketPolicyRequest(bucketName));
+    }
+
+    @Override
+    public void deleteBucketPolicy(DeleteBucketPolicyRequest deleteBucketPolicyRequest)
+            throws CosClientException, CosServiceException {
+        rejectNull(deleteBucketPolicyRequest,
+                "The request object must be specified when deleting a bucket policy");
+
+        String bucketName = deleteBucketPolicyRequest.getBucketName();
+        rejectNull(bucketName, "The bucket name must be specified when deleting a bucket policy");
+
+        CosHttpRequest<DeleteBucketPolicyRequest> request =
+                createRequest(bucketName, null, deleteBucketPolicyRequest, HttpMethodName.DELETE);
+        request.addParameter("policy", null);
+
+        invoke(request, voidCosResponseHandler);
     }
 }
 

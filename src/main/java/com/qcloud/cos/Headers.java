@@ -23,6 +23,7 @@ public interface Headers {
     public static final String LAST_MODIFIED = "Last-Modified";
     public static final String SERVER = "Server";
     public static final String USER_AGENT = "User-Agent";
+    public static final String SDK_LOG_DEBUG = "x-cos-sdk-log-debug";
 
     /*
      * Cos HTTP Headers

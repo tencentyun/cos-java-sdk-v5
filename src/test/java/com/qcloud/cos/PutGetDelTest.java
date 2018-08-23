@@ -180,9 +180,11 @@ public class PutGetDelTest extends AbstractCOSClientTest {
 
     @Test
     public void testPutObjectWithServerSideEncryption() throws IOException {
+        useServerEncryption = true;
         ObjectMetadata originObjectMeta = new ObjectMetadata();
         originObjectMeta.setServerSideEncryption("AES256");
         testPutObjectByStreamDiffSize(1L, originObjectMeta);
+        useServerEncryption = false;
     }
     
     @Test

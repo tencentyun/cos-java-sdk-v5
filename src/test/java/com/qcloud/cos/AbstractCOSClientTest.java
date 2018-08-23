@@ -314,8 +314,8 @@ public class AbstractCOSClientTest {
         } catch (IOException e) {
             fail(e.toString());
         }
-        if (useClientEncryption || useServerEncryption) {
-            // assertEquals(false, expectEtag.equals(etag));
+        if (useClientEncryption) {
+            assertEquals(false, expectEtag.equals(etag));
         } else {
             assertEquals(true, expectEtag.equals(etag));
         }
@@ -347,7 +347,7 @@ public class AbstractCOSClientTest {
             putObjectRequest.setStorageClass(StorageClass.Standard_IA);
             PutObjectResult putObjectResult = cosclient.putObject(putObjectRequest);
             String etag = putObjectResult.getETag();
-            if (useClientEncryption || useServerEncryption) {
+            if (useClientEncryption) {
                 assertEquals(false, uploadEtag.equals(etag));
             } else {
                 assertEquals(true, uploadEtag.equals(etag));
@@ -655,7 +655,7 @@ public class AbstractCOSClientTest {
         uploadPartRequest.setLastPart(isLastPart);
 
         UploadPartResult uploadPartResult = cosclient.uploadPart(uploadPartRequest);
-        if (useClientEncryption || useServerEncryption) {
+        if (useClientEncryption) {
             assertEquals(false, dataMd5.equals(uploadPartResult.getETag()));
         } else {
             assertEquals(true, dataMd5.equals(uploadPartResult.getETag()));
@@ -674,7 +674,7 @@ public class AbstractCOSClientTest {
             for (PartSummary partSummary : partListing.getParts()) {
                 ++currentPartNum;
                 assertEquals(currentPartNum, partSummary.getPartNumber());
-                if (useClientEncryption || useServerEncryption) {
+                if (useClientEncryption) {
                     assertEquals(false, partSummary.getETag()
                             .equals(originDataMd5Array.get(currentPartNum - 1)));
                 } else {

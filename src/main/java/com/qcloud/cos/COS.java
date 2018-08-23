@@ -16,6 +16,7 @@ import com.qcloud.cos.model.AccessControlList;
 import com.qcloud.cos.model.Bucket;
 import com.qcloud.cos.model.BucketCrossOriginConfiguration;
 import com.qcloud.cos.model.BucketLifecycleConfiguration;
+import com.qcloud.cos.model.BucketPolicy;
 import com.qcloud.cos.model.BucketReplicationConfiguration;
 import com.qcloud.cos.model.BucketVersioningConfiguration;
 import com.qcloud.cos.model.COSObject;
@@ -29,6 +30,7 @@ import com.qcloud.cos.model.CopyPartResult;
 import com.qcloud.cos.model.CreateBucketRequest;
 import com.qcloud.cos.model.DeleteBucketCrossOriginConfigurationRequest;
 import com.qcloud.cos.model.DeleteBucketLifecycleConfigurationRequest;
+import com.qcloud.cos.model.DeleteBucketPolicyRequest;
 import com.qcloud.cos.model.DeleteBucketReplicationConfigurationRequest;
 import com.qcloud.cos.model.DeleteBucketRequest;
 import com.qcloud.cos.model.DeleteObjectRequest;
@@ -40,6 +42,7 @@ import com.qcloud.cos.model.GetBucketAclRequest;
 import com.qcloud.cos.model.GetBucketCrossOriginConfigurationRequest;
 import com.qcloud.cos.model.GetBucketLifecycleConfigurationRequest;
 import com.qcloud.cos.model.GetBucketLocationRequest;
+import com.qcloud.cos.model.GetBucketPolicyRequest;
 import com.qcloud.cos.model.GetBucketReplicationConfigurationRequest;
 import com.qcloud.cos.model.GetBucketVersioningConfigurationRequest;
 import com.qcloud.cos.model.GetObjectAclRequest;
@@ -66,6 +69,7 @@ import com.qcloud.cos.model.RestoreObjectRequest;
 import com.qcloud.cos.model.SetBucketAclRequest;
 import com.qcloud.cos.model.SetBucketCrossOriginConfigurationRequest;
 import com.qcloud.cos.model.SetBucketLifecycleConfigurationRequest;
+import com.qcloud.cos.model.SetBucketPolicyRequest;
 import com.qcloud.cos.model.SetBucketReplicationConfigurationRequest;
 import com.qcloud.cos.model.SetBucketVersioningConfigurationRequest;
 import com.qcloud.cos.model.SetObjectAclRequest;
@@ -1677,6 +1681,98 @@ public interface COS extends COSDirectSpi {
     public BucketVersioningConfiguration getBucketVersioningConfiguration(
             GetBucketVersioningConfigurationRequest getBucketVersioningConfigurationRequest)
                     throws CosClientException, CosServiceException;
+
+    /**
+     * <p>
+     * Sets the policy associated with the specified bucket. Only the owner of the bucket can set a
+     * bucket policy. If a policy already exists for the specified bucket, the new policy replaces
+     * the existing policy.
+     * </p>
+     * 
+     * @param bucketName the bucket name
+     * @param policyText The policy to apply to the specified bucket.
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * 
+     * @throws CosServiceException If any errors occurred in while processing the request.
+     */
+    public void setBucketPolicy(String bucketName, String policyText)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * <p>
+     * Sets the policy associated with the specified bucket. Only the owner of the bucket can set a
+     * bucket policy. If a policy already exists for the specified bucket, the new policy replaces
+     * the existing policy.
+     * </p>
+     * 
+     * @param setBucketPolicyRequest The request object containing the details of the bucket and
+     *        policy to update.
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * 
+     * @throws CosServiceException If any errors occurred in while processing the request.
+     */
+    public void setBucketPolicy(SetBucketPolicyRequest setBucketPolicyRequest)
+            throws CosClientException, CosServiceException;
+    /**
+     * <p>
+     * Gets the policy for the specified bucket. Only the owner of the
+     * bucket can retrieve the policy. If no policy has been set for the bucket,
+     * then an empty result object with a <code>null</code> policy text field will be
+     * returned.
+     * </p>
+     * @param bucketName the bucket name
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * 
+     * @throws CosServiceException If any errors occurred in while processing the request.
+     */
+    public BucketPolicy getBucketPolicy(String bucketName) throws CosClientException, CosServiceException;
+    /**
+     * <p>
+     * Gets the policy for the specified bucket. Only the owner of the
+     * bucket can retrieve the policy. If no policy has been set for the bucket,
+     * then an empty result object with a <code>null</code> policy text field will be
+     * returned.
+     * </p>
+     * @param getBucketPolicyRequest get bucket policy request
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * 
+     * @throws CosServiceException If any errors occurred in while processing the request.
+     */   
+    public BucketPolicy getBucketPolicy(GetBucketPolicyRequest getBucketPolicyRequest) throws CosClientException, CosServiceException;
+
+    /**
+     * <p>
+     * Deletes the policy associated with the specified bucket. Only the owner of the bucket can
+     * delete the bucket policy.
+     * </p>
+     * 
+     * @param bucketName the bucket name
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * 
+     * @throws CosServiceException If any errors occurred in while processing the request.
+     */
+    public void deleteBucketPolicy(String bucketName)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * <p>
+     * Deletes the policy associated with the specified bucket. Only the owner of the bucket can
+     * delete the bucket policy.
+     * </p>
+     * 
+     * @param bucketName the bucket name
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * 
+     * @throws CosServiceException If any errors occurred in while processing the request.
+     */
+    public void deleteBucketPolicy(DeleteBucketPolicyRequest deleteBucketPolicyRequest)
+            throws CosClientException, CosServiceException;
 
     /**
      * <p>

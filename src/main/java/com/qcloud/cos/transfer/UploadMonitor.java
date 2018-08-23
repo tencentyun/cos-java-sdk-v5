@@ -9,6 +9,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicReference;
 
 import com.qcloud.cos.COS;
 import com.qcloud.cos.event.ProgressEventType;
@@ -45,18 +46,14 @@ public class UploadMonitor implements Callable<UploadResult>, TransferMonitor {
      * State for clients wishing to poll for completion
      */
     private boolean isUploadDone = false;
-    private Future<UploadResult> future;
+    private AtomicReference<Future<UploadResult>> futureReference = new AtomicReference<Future<UploadResult>>(null);
 
-    public synchronized Future<UploadResult> getFuture() {
-        return future;
-    }
-
-    private synchronized void setFuture(Future<UploadResult> future) {
-        this.future = future;
+    public Future<UploadResult> getFuture() {
+        return futureReference.get();
     }
 
     private synchronized void cancelFuture() {
-        future.cancel(true);
+        futureReference.get().cancel(true);
     }
 
     public synchronized boolean isDone() {
@@ -84,7 +81,7 @@ public class UploadMonitor implements Callable<UploadResult>, TransferMonitor {
 
         UploadMonitor uploadMonitor = new UploadMonitor(manager, transfer, threadPool,
                 multipartUploadCallable, putObjectRequest, progressListenerChain);
-        uploadMonitor.setFuture(threadPool.submit(uploadMonitor));
+        uploadMonitor.futureReference.compareAndSet(null, threadPool.submit(uploadMonitor));
         return uploadMonitor;
     }
 
@@ -111,7 +108,7 @@ public class UploadMonitor implements Callable<UploadResult>, TransferMonitor {
              */
             if (result == null) {
                 futures.addAll(multipartUploadCallable.getFutures());
-                setFuture(threadPool.submit(new CompleteMultipartUpload(
+                futureReference.set(threadPool.submit(new CompleteMultipartUpload(
                         multipartUploadCallable.getMultipartUploadId(), cos, origReq, futures,
                         multipartUploadCallable.getETags(), listener, this)));
                 /**
