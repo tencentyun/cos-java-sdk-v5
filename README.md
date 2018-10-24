@@ -7,7 +7,7 @@
 ```xml
 <groupId>com.qcloud</groupId>
 <artifactId>cos_api</artifactId>
-<version>5.4.5</version>
+<version>5.4.6</version>
 ```
 
 cos-java-sdk-v5 适用于COS XML API https://www.qcloud.com/document/product/436/7751, 
