@@ -83,7 +83,7 @@ public class DefaultCosHttpClient implements CosHttpClient {
         }
         this.httpClient = httpClientBuilder.build();
         this.requestConfig =
-                RequestConfig.custom().setExpectContinueEnabled(true)
+                RequestConfig.custom()
                         .setContentCompressionEnabled(false)
                         .setConnectionRequestTimeout(
                                 this.clientConfig.getConnectionRequestTimeout())
