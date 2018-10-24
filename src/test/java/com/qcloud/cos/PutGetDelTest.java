@@ -177,6 +177,13 @@ public class PutGetDelTest extends AbstractCOSClientTest {
         originObjectMeta.setContentType("image/tiff");
         testPutObjectByStreamDiffSize(0L, originObjectMeta);
     }
+    
+    @Test
+    public void testPutObjectWithGzipEncoding() throws IOException {
+        ObjectMetadata originObjectMeta = new ObjectMetadata();
+        originObjectMeta.setContentEncoding("gzip");
+        testPutObjectByStreamDiffSize(1024 * 1024L, originObjectMeta);
+    }
 
     @Test
     public void testPutObjectWithServerSideEncryption() throws IOException {

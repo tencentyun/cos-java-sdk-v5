@@ -182,6 +182,10 @@ public class TransferManager {
         this.threadPool = threadPool;
         this.configuration = new TransferManagerConfiguration();
         this.shutDownThreadPools = shutDownThreadPools;
+        if (cos.getClientConfig().getRegion() == null) {
+            throw new IllegalArgumentException(
+                    "region in clientConfig of cosClient must be specified!");
+        }
     }
 
 
@@ -1379,13 +1383,13 @@ public class TransferManager {
         assertParameterNotNull(copyObjectRequest.getDestinationKey(),
                 "The destination object key must be specified when a copy request is initiated.");
         assertParameterNotNull(srcCOS, "The srcCOS parameter is mandatory");
-        
+
         String description = "Copying object from " + copyObjectRequest.getSourceBucketName() + "/"
                 + copyObjectRequest.getSourceKey() + " to "
                 + copyObjectRequest.getDestinationBucketName() + "/"
                 + copyObjectRequest.getDestinationKey();
-        
-        
+
+
 
         GetObjectMetadataRequest getObjectMetadataRequest =
                 new GetObjectMetadataRequest(copyObjectRequest.getSourceBucketName(),

@@ -92,7 +92,7 @@ public class AclTest extends AbstractCOSClientTest {
         }
     }
 
-    @Ignore
+    @Test
     public void setObjectCannedAclTest() throws IOException {
         if (!judgeUserInfoValid()) {
             return;
@@ -103,6 +103,10 @@ public class AclTest extends AbstractCOSClientTest {
         try {
             cosclient.setObjectAcl(bucket, key, CannedAccessControlList.PublicRead);
             cosclient.getObjectAcl(bucket, key);
+            
+            cosclient.setObjectAcl(bucket, key, CannedAccessControlList.Default);
+            cosclient.getObjectAcl(bucket, key);
+            
         } finally {
             assertTrue(localFile.delete());
             clearObject(key);
@@ -110,3 +114,4 @@ public class AclTest extends AbstractCOSClientTest {
     }
 
 }
+

@@ -10,6 +10,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.qcloud.cos.model.Bucket;
+import com.qcloud.cos.region.Region;
 
 public class GetServiceTest extends AbstractCOSClientTest {
     @BeforeClass
@@ -27,13 +28,40 @@ public class GetServiceTest extends AbstractCOSClientTest {
         if (!judgeUserInfoValid()) {
             return;
         }
+        
         List<Bucket> buckets = cosclient.listBuckets();
         for (Bucket bucketElement : buckets) {
+            String bucketName = bucketElement.getName();
+            String bucketLocation = bucketElement.getLocation();
             if (bucketElement.getName().equals(bucket)) {
                 assertEquals(clientConfig.getRegion().getRegionName(), bucketElement.getLocation());
                 return;
             }
         }
         fail("GetService result not contain bucket: " + bucket);
+    }
+    
+    @Test
+    public void testGetServiceForNullRegion() {
+        if (!judgeUserInfoValid()) {
+            return;
+        }
+        
+        Region oldRegion = clientConfig.getRegion();
+        clientConfig.setRegion(null);
+        
+        try {
+            List<Bucket> buckets = cosclient.listBuckets();
+            for (Bucket bucketElement : buckets) {
+                if (bucketElement.getName().equals(bucket)) {
+                    assertEquals(oldRegion.getRegionName(), bucketElement.getLocation());
+                    return;
+                }
+            }
+            fail("GetService result not contain bucket: " + bucket);            
+        } finally {
+            clientConfig.setRegion(oldRegion);
+        }
+
     }
 }

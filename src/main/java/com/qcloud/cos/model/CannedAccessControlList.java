@@ -39,7 +39,12 @@ public enum CannedAccessControlList {
      * This access policy is not recommended for general use.
      * </p>
      */
-    PublicReadWrite("public-read-write");    
+    PublicReadWrite("public-read-write"),
+    
+    /**
+     * inherit from bucket permission
+     */
+    Default("default");    
     
     /** The Qcloud COS x-cos-acl header value representing the canned acl */
     private final String cannedAclHeader;

@@ -83,11 +83,12 @@ public class DefaultCosHttpClient implements CosHttpClient {
         }
         this.httpClient = httpClientBuilder.build();
         this.requestConfig =
-                RequestConfig.custom()
+                RequestConfig.custom().setExpectContinueEnabled(true)
+                        .setContentCompressionEnabled(false)
                         .setConnectionRequestTimeout(
                                 this.clientConfig.getConnectionRequestTimeout())
-                        .setConnectTimeout(this.clientConfig.getConnectionTimeout())
-                        .setSocketTimeout(this.clientConfig.getSocketTimeout()).build();
+                .setConnectTimeout(this.clientConfig.getConnectionTimeout())
+                .setSocketTimeout(this.clientConfig.getSocketTimeout()).build();
         this.idleConnectionMonitor = new IdleConnectionMonitorThread(this.connectionManager);
         this.idleConnectionMonitor.setDaemon(true);
         this.idleConnectionMonitor.start();
@@ -152,8 +153,8 @@ public class DefaultCosHttpClient implements CosHttpClient {
             URI uri = new URI(urlBuffer.toString());
             return uri;
         } catch (URISyntaxException e) {
-            throw new CosClientException("build uri error! url: " + urlBuffer.toString() + ", CosHttpRequest: " + request.toString(),
-                    e);
+            throw new CosClientException("build uri error! url: " + urlBuffer.toString()
+                    + ", CosHttpRequest: " + request.toString(), e);
         }
     }
 
@@ -203,7 +204,7 @@ public class DefaultCosHttpClient implements CosHttpClient {
                 httpRequestBase.addHeader(headerKey, headerValue);
             }
         }
-        
+
         if (log.isDebugEnabled()) {
             httpRequestBase.addHeader(Headers.SDK_LOG_DEBUG, "on");
         } else {
@@ -342,7 +343,8 @@ public class DefaultCosHttpClient implements CosHttpClient {
         if (originalContent != null) {
             request.setContent(monitorStreamProgress(progressListener, originalContent));
         }
-        if (originalContent != null && originalContent.markSupported() && !(originalContent instanceof BufferedInputStream)) {
+        if (originalContent != null && originalContent.markSupported()
+                && !(originalContent instanceof BufferedInputStream)) {
             final int readLimit = clientConfig.getReadLimit();
             originalContent.mark(readLimit);
         }
@@ -351,8 +353,10 @@ public class DefaultCosHttpClient implements CosHttpClient {
         while (retryIndex < kMaxRetryCnt) {
             try {
                 checkInterrupted();
-                if (originalContent instanceof BufferedInputStream && originalContent.markSupported()) {
-                    // Mark everytime for BufferedInputStream, since the marker could have been invalidated
+                if (originalContent instanceof BufferedInputStream
+                        && originalContent.markSupported()) {
+                    // Mark everytime for BufferedInputStream, since the marker could have been
+                    // invalidated
                     final int readLimit = clientConfig.getReadLimit();
                     originalContent.mark(readLimit);
                 }
@@ -386,6 +390,12 @@ public class DefaultCosHttpClient implements CosHttpClient {
                         throw new CosClientException("operation has been interrupted!");
                     }
                 }
+            } catch (Exception e) {
+                String errMsg = String.format(
+                        "httpClient execute occur a unknown exception. httpRequest: %s, excep: %s",
+                        request.toString(), e);
+                log.error(errMsg);
+                throw new CosClientException(errMsg);
             }
         }
         if (!isRequestSuccessful(httpResponse)) {

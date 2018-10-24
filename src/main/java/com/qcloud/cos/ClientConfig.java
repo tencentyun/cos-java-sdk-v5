@@ -15,7 +15,7 @@ public class ClientConfig {
     // 多次签名的默认过期时间,单位秒
     private static final long DEFAULT_SIGN_EXPIRED = 3600;
     // 默认的user_agent标识
-    private static final String DEFAULT_USER_AGENT = "cos-java-sdk-v5.4.5";
+    private static final String DEFAULT_USER_AGENT = "cos-java-sdk-v5.4.6";
     // Read Limit
     private static final int DEFAULT_READ_LIMIT = (2 << 17) + 1;
     
@@ -34,6 +34,13 @@ public class ClientConfig {
     private String userAgent = DEFAULT_USER_AGENT;
     private int readLimit = DEFAULT_READ_LIMIT;
 
+    // 不传入region 用于后续调用List Buckets(获取所有的bucket信息)
+    public ClientConfig() {
+        super();
+        this.region = null;
+    }
+
+    // 除了List Buckets, 其他API需要传入region(比如上传，下载，遍历bucket文件)
     public ClientConfig(Region region) {
         super();
         this.region = region;
