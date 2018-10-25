@@ -102,7 +102,7 @@ public class TransferManagerDemo {
         // 传入一个threadpool, 若不传入线程池, 默认TransferManager中会生成一个单线程的线程池。
         TransferManager transferManager = new TransferManager(cosclient, threadPool);
 
-        String key = "/aaa/bbb.txt";
+        String key = "aaa/bbb.txt";
         File localFile = new File("src/test/resources/len30M.txt");
         PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, key, localFile);
         try {
