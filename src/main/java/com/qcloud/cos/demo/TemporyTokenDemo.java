@@ -35,7 +35,7 @@ public class TemporyTokenDemo {
         String bucketName = "rabbitliutj-1000000";
         // 上传object, 建议20M以下的文件使用该接口
         File localFile = new File("src/test/resources/len5M.txt");
-        String key = "/upload_single_demo5M.txt";
+        String key = "upload_single_demo5M.txt";
 
         // 上传
         PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, key, localFile);
