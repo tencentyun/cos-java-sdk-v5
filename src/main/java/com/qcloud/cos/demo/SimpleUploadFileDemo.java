@@ -32,7 +32,7 @@ public class SimpleUploadFileDemo {
         // bucket名需包含appid
         String bucketName = "mybucket-1251668577";
         
-        String key = "/aaa/bbb.txt";
+        String key = "aaa/bbb.txt";
         File localFile = new File("src/test/resources/len10M.txt");
         PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, key, localFile);
         // 设置存储类型, 默认是标准(Standard), 低频(standard_ia)
@@ -62,7 +62,7 @@ public class SimpleUploadFileDemo {
         // bucket名需包含appid
         String bucketName = "mybucket-1251668577";
         
-        String key = "/aaa/bbb.jpg";
+        String key = "aaa/bbb.jpg";
         File localFile = new File("src/test/resources/len10M.txt");
         
         InputStream input = new ByteArrayInputStream(new byte[10]);
