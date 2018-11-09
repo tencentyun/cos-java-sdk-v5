@@ -13,8 +13,4 @@ public class COSStaticCredentialsProvider implements COSCredentialsProvider {
     public COSCredentials getCredentials() {
         return cred;
     }
-
-    @Override
-    public void refresh() {}
-
 }

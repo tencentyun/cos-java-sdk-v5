@@ -943,9 +943,11 @@ public class XmlResponsesSaxParser {
         protected void doEndElement(String uri, String name, String qName) {
             if (in("CopyObjectResult") || in("CopyPartResult")) {
                 if (name.equals("LastModified")) {
-                    // result.setLastModifiedDate(DateUtils.parseISO8601Date(getText()));
+//                     result.setLastModifiedDate(DateUtils.parseISO8601Date(getText()));
                 } else if (name.equals("ETag")) {
                     result.setETag(StringUtils.removeQuotes(getText()));
+                } else if (name.equals("VersionId")) {
+                    result.setVersionId(getText());
                 }
             }
 

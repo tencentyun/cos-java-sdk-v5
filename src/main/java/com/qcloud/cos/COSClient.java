@@ -27,7 +27,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.qcloud.cos.auth.COSCredentials;
+import com.qcloud.cos.auth.COSCredentialsProvider;
 import com.qcloud.cos.auth.COSSigner;
+import com.qcloud.cos.auth.COSStaticCredentialsProvider;
 import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.exception.CosServiceException.ErrorType;
@@ -161,15 +163,19 @@ public class COSClient implements COS {
     private final SkipMd5CheckStrategy skipMd5CheckStrategy = SkipMd5CheckStrategy.INSTANCE;
     private final VoidCosResponseHandler voidCosResponseHandler = new VoidCosResponseHandler();
 
-    private COSCredentials cred;
+    private COSCredentialsProvider credProvider;
 
     protected ClientConfig clientConfig;
 
     private CosHttpClient cosHttpClient;
 
     public COSClient(COSCredentials cred, ClientConfig clientConfig) {
+        this(new COSStaticCredentialsProvider(cred), clientConfig);
+    }
+
+    public COSClient(COSCredentialsProvider credProvider, ClientConfig clientConfig) {
         super();
-        this.cred = cred;
+        this.credProvider = credProvider;
         this.clientConfig = clientConfig;
         this.cosHttpClient = new DefaultCosHttpClient(clientConfig);
     }
@@ -181,6 +187,20 @@ public class COSClient implements COS {
     @Override
     public ClientConfig getClientConfig() {
         return clientConfig;
+    }
+
+    private COSCredentials fetchCredential() throws CosClientException {
+        if (credProvider == null) {
+            throw new CosClientException(
+                    "credentials Provider is null, you must set legal Credentials info when init cosClient.");
+        }
+
+        COSCredentials cred = credProvider.getCredentials();
+        if (cred == null) {
+            throw new CosClientException(
+                    "credentials from Provider is null. please check your credentials provider");
+        }
+        return cred;
     }
 
     /**
@@ -290,9 +310,11 @@ public class COSClient implements COS {
         }
         String sourceKey = formatKey(copyObjectRequest.getSourceKey());
 
-        String sourceBucket = formatBucket(copyObjectRequest.getSourceBucketName(),
-                (copyObjectRequest.getSourceAppid() != null) ? copyObjectRequest.getSourceAppid()
-                        : this.cred.getCOSAppId());
+        String sourceBucket =
+                formatBucket(copyObjectRequest.getSourceBucketName(),
+                        (copyObjectRequest.getSourceAppid() != null)
+                                ? copyObjectRequest.getSourceAppid()
+                                : fetchCredential().getCOSAppId());
         String srcEndpointSuffix = copyObjectRequest.getSourceEndpointSuffix();
         if (srcEndpointSuffix == null) {
             srcEndpointSuffix =
@@ -355,9 +377,11 @@ public class COSClient implements COS {
         }
         String sourceKey = formatKey(copyPartRequest.getSourceKey());
 
-        String sourceBucket = formatBucket(copyPartRequest.getSourceBucketName(),
-                (copyPartRequest.getSourceAppid() != null) ? copyPartRequest.getSourceAppid()
-                        : this.cred.getCOSAppId());
+        String sourceBucket =
+                formatBucket(copyPartRequest.getSourceBucketName(),
+                        (copyPartRequest.getSourceAppid() != null)
+                                ? copyPartRequest.getSourceAppid()
+                                : fetchCredential().getCOSAppId());
         String srcEndpointSuffix = copyPartRequest.getSourceEndpointSuffix();
         if (srcEndpointSuffix == null) {
             srcEndpointSuffix =
@@ -475,7 +499,10 @@ public class COSClient implements COS {
         if (isServiceRequest) {
             host = endPointSuffix;
         } else {
-            bucket = formatBucket(bucket, cred.getCOSAppId());
+            bucket = formatBucket(bucket, fetchCredential().getCOSAppId());
+            if (!endPointSuffix.startsWith(".")) {
+                endPointSuffix = "." + endPointSuffix;
+            }
             host = bucket + endPointSuffix;
         }
 
@@ -487,20 +514,20 @@ public class COSClient implements COS {
 
     private <X, Y extends CosServiceRequest> X invoke(CosHttpRequest<Y> request,
             Unmarshaller<X, InputStream> unmarshaller)
-                    throws CosClientException, CosServiceException {
+            throws CosClientException, CosServiceException {
         return invoke(request, new COSXmlResponseHandler<X>(unmarshaller));
 
     }
 
     private <X, Y extends CosServiceRequest> X invoke(CosHttpRequest<Y> request,
             HttpResponseHandler<CosServiceResponse<X>> responseHandler)
-                    throws CosClientException, CosServiceException {
+            throws CosClientException, CosServiceException {
 
         COSSigner cosSigner = new COSSigner();
-        cosSigner.setSignExpiredTime(clientConfig.getSignExpired());
-        cosSigner.sign(request, cred);
+        Date expiredTime =
+                new Date(System.currentTimeMillis() + clientConfig.getSignExpired() * 1000);
+        cosSigner.sign(request, fetchCredential(), expiredTime);
         return this.cosHttpClient.exeute(request, responseHandler);
-
     }
 
     private static PutObjectResult createPutObjectResult(ObjectMetadata metadata) {
@@ -692,8 +719,8 @@ public class COSClient implements COS {
         rejectNull(putObjectRequest,
                 "The PutObjectRequest parameter must be specified when uploading an object");
         rejectNull(clientConfig.getRegion(),
-                "region is null, region in clientConfig must be specified when uploading an object"); 
-        
+                "region is null, region in clientConfig must be specified when uploading an object");
+
         final File file = putObjectRequest.getFile();
         final InputStream isOrig = putObjectRequest.getInputStream();
         final String bucketName = putObjectRequest.getBucketName();
@@ -892,8 +919,8 @@ public class COSClient implements COS {
         rejectNull(getObjectRequest.getKey(),
                 "The key parameter must be specified when requesting an object");
         rejectNull(clientConfig.getRegion(),
-                "region is null, region in clientConfig must be specified when requesting an object"); 
-        
+                "region is null, region in clientConfig must be specified when requesting an object");
+
 
         CosHttpRequest<GetObjectRequest> request = createRequest(getObjectRequest.getBucketName(),
                 getObjectRequest.getKey(), getObjectRequest, HttpMethodName.GET);
@@ -980,8 +1007,8 @@ public class COSClient implements COS {
         rejectNull(destinationFile,
                 "The destination file parameter must be specified when downloading an object directly to a file");
         rejectNull(clientConfig.getRegion(),
-                "region is null, region in clientConfig must be specified when downloading an object directly to a file"); 
-        
+                "region is null, region in clientConfig must be specified when downloading an object directly to a file");
+
         COSObject cosObject = ServiceUtils.retryableDownloadCOSObjectToFile(destinationFile,
                 new ServiceUtils.RetryableCOSDownloadTask() {
 
@@ -1029,7 +1056,7 @@ public class COSClient implements COS {
         rejectNull(getObjectMetadataRequest,
                 "The GetObjectMetadataRequest parameter must be specified when requesting an object's metadata");
         rejectNull(clientConfig.getRegion(),
-                "region is null, region in clientConfig must be specified when requesting an object's metadata"); 
+                "region is null, region in clientConfig must be specified when requesting an object's metadata");
 
         String bucketName = getObjectMetadataRequest.getBucketName();
         String key = getObjectMetadataRequest.getKey();
@@ -1058,7 +1085,7 @@ public class COSClient implements COS {
         rejectNull(deleteObjectRequest,
                 "The delete object request must be specified when deleting an object");
         rejectNull(clientConfig.getRegion(),
-                "region is null, region in clientConfig must be specified when deleting an object"); 
+                "region is null, region in clientConfig must be specified when deleting an object");
 
         rejectNull(deleteObjectRequest.getBucketName(),
                 "The bucket name must be specified when deleting an object");
@@ -1075,8 +1102,8 @@ public class COSClient implements COS {
     public DeleteObjectsResult deleteObjects(DeleteObjectsRequest deleteObjectsRequest)
             throws MultiObjectDeleteException, CosClientException, CosServiceException {
         rejectNull(clientConfig.getRegion(),
-                "region is null, region in clientConfig must be specified when deleting objects"); 
-        
+                "region is null, region in clientConfig must be specified when deleting objects");
+
         CosHttpRequest<DeleteObjectsRequest> request =
                 createRequest(deleteObjectsRequest.getBucketName(), null, deleteObjectsRequest,
                         HttpMethodName.POST);
@@ -1134,7 +1161,7 @@ public class COSClient implements COS {
                 "The delete version request object must be specified when deleting a version");
         rejectNull(clientConfig.getRegion(),
                 "region is null, region in clientConfig must be specified when deleting a version");
-        
+
 
         String bucketName = deleteVersionRequest.getBucketName();
         String key = deleteVersionRequest.getKey();
@@ -1286,7 +1313,7 @@ public class COSClient implements COS {
     @Override
     public InitiateMultipartUploadResult initiateMultipartUpload(
             InitiateMultipartUploadRequest initiateMultipartUploadRequest)
-                    throws CosClientException, CosServiceException {
+            throws CosClientException, CosServiceException {
         rejectNull(initiateMultipartUploadRequest,
                 "The request parameter must be specified when initiating a multipart upload");
         rejectNull(initiateMultipartUploadRequest.getBucketName(),
@@ -1464,7 +1491,7 @@ public class COSClient implements COS {
                 "The upload ID parameter must be specified when listing parts");
         rejectNull(clientConfig.getRegion(),
                 "region is null, region in clientConfig must be specified when listing parts");
-        
+
 
         CosHttpRequest<ListPartsRequest> request = createRequest(listPartsRequest.getBucketName(),
                 listPartsRequest.getKey(), listPartsRequest, HttpMethodName.GET);
@@ -1511,7 +1538,7 @@ public class COSClient implements COS {
     @Override
     public CompleteMultipartUploadResult completeMultipartUpload(
             CompleteMultipartUploadRequest completeMultipartUploadRequest)
-                    throws CosClientException, CosServiceException {
+            throws CosClientException, CosServiceException {
         rejectNull(completeMultipartUploadRequest,
                 "The request parameter must be specified when completing a multipart upload");
 
@@ -1527,7 +1554,7 @@ public class COSClient implements COS {
                 "The part ETags parameter must be specified when completing a multipart upload");
         rejectNull(clientConfig.getRegion(),
                 "region is null, region in clientConfig must be specified when completing a multipart uploads");
-        
+
 
         int retries = 0;
         CompleteMultipartUploadHandler handler;
@@ -1568,13 +1595,13 @@ public class COSClient implements COS {
     @Override
     public MultipartUploadListing listMultipartUploads(
             ListMultipartUploadsRequest listMultipartUploadsRequest)
-                    throws CosClientException, CosServiceException {
+            throws CosClientException, CosServiceException {
         rejectNull(listMultipartUploadsRequest,
                 "The request parameter must be specified when listing multipart uploads");
 
         rejectNull(listMultipartUploadsRequest.getBucketName(),
                 "The bucket name parameter must be specified when listing multipart uploads");
-        
+
         rejectNull(clientConfig.getRegion(),
                 "region is null, region in clientConfig must be specified when listing multipart uploads");
 
@@ -1649,12 +1676,12 @@ public class COSClient implements COS {
     @Override
     public ObjectListing listNextBatchOfObjects(
             ListNextBatchOfObjectsRequest listNextBatchOfObjectsRequest)
-                    throws CosClientException, CosServiceException {
+            throws CosClientException, CosServiceException {
         rejectNull(listNextBatchOfObjectsRequest,
                 "The request object parameter must be specified when listing the next batch of objects in a bucket");
         rejectNull(clientConfig.getRegion(),
                 "region is null, region in clientConfig must be specified when listing the next batch of objects  in a bucket");
-        
+
         ObjectListing previousObjectListing =
                 listNextBatchOfObjectsRequest.getPreviousObjectListing();
 
@@ -1682,7 +1709,7 @@ public class COSClient implements COS {
     @Override
     public VersionListing listVersions(String bucketName, String prefix, String keyMarker,
             String versionIdMarker, String delimiter, Integer maxResults)
-                    throws CosClientException, CosServiceException {
+            throws CosClientException, CosServiceException {
         ListVersionsRequest request = new ListVersionsRequest().withBucketName(bucketName)
                 .withPrefix(prefix).withDelimiter(delimiter).withKeyMarker(keyMarker)
                 .withVersionIdMarker(versionIdMarker).withMaxResults(maxResults);
@@ -1726,12 +1753,12 @@ public class COSClient implements COS {
     @Override
     public VersionListing listNextBatchOfVersions(
             ListNextBatchOfVersionsRequest listNextBatchOfVersionsRequest)
-                    throws CosClientException, CosServiceException {
+            throws CosClientException, CosServiceException {
         rejectNull(listNextBatchOfVersionsRequest,
                 "The request object parameter must be specified when listing the next batch of versions in a bucket");
         rejectNull(clientConfig.getRegion(),
                 "region is null, region in clientConfig must be specified when listing the next batch of versions in a bucket");
-        
+
         VersionListing previousVersionListing =
                 listNextBatchOfVersionsRequest.getPreviousVersionListing();
 
@@ -1755,7 +1782,7 @@ public class COSClient implements COS {
     @Override
     public CopyObjectResult copyObject(String sourceBucketName, String sourceKey,
             String destinationBucketName, String destinationKey)
-                    throws CosClientException, CosServiceException {
+            throws CosClientException, CosServiceException {
         return copyObject(new CopyObjectRequest(sourceBucketName, sourceKey, destinationBucketName,
                 destinationKey));
     }
@@ -1954,7 +1981,7 @@ public class COSClient implements COS {
     @Override
     public void setBucketLifecycleConfiguration(String bucketName,
             BucketLifecycleConfiguration bucketLifecycleConfiguration)
-                    throws CosClientException, CosServiceException {
+            throws CosClientException, CosServiceException {
         setBucketLifecycleConfiguration(new SetBucketLifecycleConfigurationRequest(bucketName,
                 bucketLifecycleConfiguration));
     }
@@ -1962,7 +1989,7 @@ public class COSClient implements COS {
     @Override
     public void setBucketLifecycleConfiguration(
             SetBucketLifecycleConfigurationRequest setBucketLifecycleConfigurationRequest)
-                    throws CosClientException, CosServiceException {
+            throws CosClientException, CosServiceException {
         rejectNull(setBucketLifecycleConfigurationRequest,
                 "The set bucket lifecycle configuration request object must be specified.");
 
@@ -2042,7 +2069,7 @@ public class COSClient implements COS {
     @Override
     public void deleteBucketLifecycleConfiguration(
             DeleteBucketLifecycleConfigurationRequest deleteBucketLifecycleConfigurationRequest)
-                    throws CosClientException, CosServiceException {
+            throws CosClientException, CosServiceException {
         rejectNull(deleteBucketLifecycleConfigurationRequest,
                 "The delete bucket lifecycle configuration request object must be specified.");
         rejectNull(clientConfig.getRegion(),
@@ -2062,7 +2089,7 @@ public class COSClient implements COS {
     @Override
     public void setBucketVersioningConfiguration(
             SetBucketVersioningConfigurationRequest setBucketVersioningConfigurationRequest)
-                    throws CosClientException, CosServiceException {
+            throws CosClientException, CosServiceException {
         rejectNull(setBucketVersioningConfigurationRequest,
                 "The SetBucketVersioningConfigurationRequest object must be specified when setting versioning configuration");
 
@@ -2099,7 +2126,7 @@ public class COSClient implements COS {
     @Override
     public BucketVersioningConfiguration getBucketVersioningConfiguration(
             GetBucketVersioningConfigurationRequest getBucketVersioningConfigurationRequest)
-                    throws CosClientException, CosServiceException {
+            throws CosClientException, CosServiceException {
         rejectNull(getBucketVersioningConfigurationRequest,
                 "The request object parameter getBucketVersioningConfigurationRequest must be specified.");
         String bucketName = getBucketVersioningConfigurationRequest.getBucketName();
@@ -2308,7 +2335,7 @@ public class COSClient implements COS {
 
     private void setAcl(String bucketName, String key, String versionId,
             CannedAccessControlList cannedAcl, CosServiceRequest originalRequest)
-                    throws CosClientException, CosServiceException {
+            throws CosClientException, CosServiceException {
         if (originalRequest == null)
             originalRequest = new GenericBucketRequest(bucketName);
 
@@ -2332,7 +2359,7 @@ public class COSClient implements COS {
     @Override
     public BucketCrossOriginConfiguration getBucketCrossOriginConfiguration(
             GetBucketCrossOriginConfigurationRequest getBucketCrossOriginConfigurationRequest)
-                    throws CosClientException, CosServiceException {
+            throws CosClientException, CosServiceException {
         rejectNull(getBucketCrossOriginConfigurationRequest,
                 "The request object parameter getBucketCrossOriginConfigurationRequest must be specified.");
         String bucketName = getBucketCrossOriginConfigurationRequest.getBucketName();
@@ -2360,7 +2387,7 @@ public class COSClient implements COS {
     @Override
     public void setBucketCrossOriginConfiguration(String bucketName,
             BucketCrossOriginConfiguration bucketCrossOriginConfiguration)
-                    throws CosClientException, CosServiceException {
+            throws CosClientException, CosServiceException {
         setBucketCrossOriginConfiguration(new SetBucketCrossOriginConfigurationRequest(bucketName,
                 bucketCrossOriginConfiguration));;
     }
@@ -2368,7 +2395,7 @@ public class COSClient implements COS {
     @Override
     public void setBucketCrossOriginConfiguration(
             SetBucketCrossOriginConfigurationRequest setBucketCrossOriginConfigurationRequest)
-                    throws CosClientException, CosServiceException {
+            throws CosClientException, CosServiceException {
         rejectNull(setBucketCrossOriginConfigurationRequest,
                 "The set bucket cross origin configuration request object must be specified.");
         rejectNull(clientConfig.getRegion(),
@@ -2413,7 +2440,7 @@ public class COSClient implements COS {
     @Override
     public void deleteBucketCrossOriginConfiguration(
             DeleteBucketCrossOriginConfigurationRequest deleteBucketCrossOriginConfigurationRequest)
-                    throws CosClientException, CosServiceException {
+            throws CosClientException, CosServiceException {
         rejectNull(deleteBucketCrossOriginConfigurationRequest,
                 "The delete bucket cross origin configuration request object must be specified.");
         rejectNull(clientConfig.getRegion(),
@@ -2433,7 +2460,7 @@ public class COSClient implements COS {
     @Override
     public void setBucketReplicationConfiguration(String bucketName,
             BucketReplicationConfiguration configuration)
-                    throws CosClientException, CosServiceException {
+            throws CosClientException, CosServiceException {
         setBucketReplicationConfiguration(
                 new SetBucketReplicationConfigurationRequest(bucketName, configuration));
     }
@@ -2441,7 +2468,7 @@ public class COSClient implements COS {
     @Override
     public void setBucketReplicationConfiguration(
             SetBucketReplicationConfigurationRequest setBucketReplicationConfigurationRequest)
-                    throws CosClientException, CosServiceException {
+            throws CosClientException, CosServiceException {
         rejectNull(setBucketReplicationConfigurationRequest,
                 "The set bucket replication configuration request object must be specified.");
         rejectNull(clientConfig.getRegion(),
@@ -2490,7 +2517,7 @@ public class COSClient implements COS {
     @Override
     public BucketReplicationConfiguration getBucketReplicationConfiguration(
             GetBucketReplicationConfigurationRequest getBucketReplicationConfigurationRequest)
-                    throws CosClientException, CosServiceException {
+            throws CosClientException, CosServiceException {
         rejectNull(getBucketReplicationConfigurationRequest,
                 "The bucket request parameter must be specified when retrieving replication configuration");
         String bucketName = getBucketReplicationConfigurationRequest.getBucketName();
@@ -2516,7 +2543,7 @@ public class COSClient implements COS {
     @Override
     public void deleteBucketReplicationConfiguration(
             DeleteBucketReplicationConfigurationRequest deleteBucketReplicationConfigurationRequest)
-                    throws CosClientException, CosServiceException {
+            throws CosClientException, CosServiceException {
         final String bucketName = deleteBucketReplicationConfigurationRequest.getBucketName();
         rejectNull(bucketName,
                 "The bucket name parameter must be specified when deleting replication configuration");
@@ -2590,9 +2617,9 @@ public class COSClient implements COS {
         COSSigner cosSigner = new COSSigner();
         String authStr =
                 cosSigner.buildAuthorizationStr(request.getHttpMethod(), request.getResourcePath(),
-                        request.getHeaders(), request.getParameters(), cred, req.getExpiration());
+                        request.getHeaders(), request.getParameters(), fetchCredential(), req.getExpiration());
         StringBuilder strBuilder = new StringBuilder();
-        strBuilder.append("http://").append(formatBucket(bucketName, cred.getCOSAppId()));
+        strBuilder.append("http://").append(formatBucket(bucketName, fetchCredential().getCOSAppId()));
 
         String endpointSuffix = clientConfig.getEndPointSuffix();
 

@@ -11,5 +11,4 @@ public class COSSignerConstants {
     public static final String Q_HEADER_LIST = "q-header-list";
     public static final String Q_URL_PARAM_LIST = "q-url-param-list";
     public static final String Q_SIGNATURE = "q-signature";
-    public static final long SIGN_EXPIRED_TIME = 3600;
 }

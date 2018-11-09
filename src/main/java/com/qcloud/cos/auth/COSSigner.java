@@ -9,7 +9,6 @@ import static com.qcloud.cos.auth.COSSignerConstants.Q_SIGN_ALGORITHM_KEY;
 import static com.qcloud.cos.auth.COSSignerConstants.Q_SIGN_ALGORITHM_VALUE;
 import static com.qcloud.cos.auth.COSSignerConstants.Q_SIGN_TIME;
 import static com.qcloud.cos.auth.COSSignerConstants.Q_URL_PARAM_LIST;
-import static com.qcloud.cos.auth.COSSignerConstants.SIGN_EXPIRED_TIME;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -28,28 +27,15 @@ import com.qcloud.cos.utils.UrlEncoderUtils;
 
 public class COSSigner {
 
-    private long signExpiredTime = SIGN_EXPIRED_TIME;
-
-    // 获取签名有效期
-    public long getSignExpiredTime() {
-        return signExpiredTime;
-    }
-
-    // 设置签名有效期，单位为秒, 默认3600秒
-    public void setSignExpiredTime(long signExpiredTime) {
-        this.signExpiredTime = signExpiredTime;
-    }
-
     private boolean isAnonymous(COSCredentials cred) {
         return cred instanceof AnonymousCOSCredentials;
     }
 
-    public <X extends CosServiceRequest> void sign(CosHttpRequest<X> request, COSCredentials cred) {
+    public <X extends CosServiceRequest> void sign(CosHttpRequest<X> request, COSCredentials cred, Date expiredTime) {
         if (isAnonymous(cred)) {
             return;
         }
 
-        Date expiredTime = new Date(System.currentTimeMillis() + this.signExpiredTime * 1000);
         String authoriationStr =
                 buildAuthorizationStr(request.getHttpMethod(), request.getResourcePath(),
                         request.getHeaders(), request.getParameters(), cred, expiredTime);
