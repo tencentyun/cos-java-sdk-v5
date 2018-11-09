@@ -31,7 +31,6 @@ public class SimpleUploadFileDemo {
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名需包含appid
         String bucketName = "mybucket-1251668577";
-
         String key = "aaa/bbb.txt";
         File localFile = new File("src/test/resources/len10M.txt");
         PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, key, localFile);
@@ -61,9 +60,9 @@ public class SimpleUploadFileDemo {
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名需包含appid
         String bucketName = "mybucket-1251668577";
-
         String key = "aaa/bbb.jpg";
-
+        File localFile = new File("src/test/resources/len10M.txt");
+        
         InputStream input = new ByteArrayInputStream(new byte[10]);
         ObjectMetadata objectMetadata = new ObjectMetadata();
         // 从输入流上传必须制定content length, 否则http客户端可能会缓存所有数据，存在内存OOM的情况

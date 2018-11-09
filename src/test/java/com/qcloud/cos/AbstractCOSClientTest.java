@@ -379,8 +379,7 @@ public class AbstractCOSClientTest {
                             objectMetadata.getUserMetaDataOf(Headers.UNENCRYPTED_CONTENT_LENGTH))
                     .longValue());
         }
-        if (useClientEncryption || useServerEncryption) {
-            // server端的bug还未修复
+        if (useClientEncryption) {
             assertEquals(false, expectedEtag.equals(objectMetadata.getETag()));
         } else {
             assertEquals(true, expectedEtag.equals(objectMetadata.getETag()));
