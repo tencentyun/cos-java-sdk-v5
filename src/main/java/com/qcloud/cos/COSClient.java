@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import com.qcloud.cos.auth.COSCredentials;
 import com.qcloud.cos.auth.COSCredentialsProvider;
+import com.qcloud.cos.auth.COSSessionCredentials;
 import com.qcloud.cos.auth.COSSigner;
 import com.qcloud.cos.auth.COSStaticCredentialsProvider;
 import com.qcloud.cos.exception.CosClientException;
@@ -2615,11 +2616,12 @@ public class COSClient implements COS {
         addResponseHeaderParameters(request, req.getResponseHeaders());
 
         COSSigner cosSigner = new COSSigner();
+        COSCredentials cred = fetchCredential();
         String authStr =
                 cosSigner.buildAuthorizationStr(request.getHttpMethod(), request.getResourcePath(),
-                        request.getHeaders(), request.getParameters(), fetchCredential(), req.getExpiration());
+                        request.getHeaders(), request.getParameters(), cred, req.getExpiration());
         StringBuilder strBuilder = new StringBuilder();
-        strBuilder.append("http://").append(formatBucket(bucketName, fetchCredential().getCOSAppId()));
+        strBuilder.append("http://").append(formatBucket(bucketName, cred.getCOSAppId()));
 
         String endpointSuffix = clientConfig.getEndPointSuffix();
 
@@ -2637,6 +2639,9 @@ public class COSClient implements COS {
         boolean hasAppendFirstParameter = false;
         if (authStr != null) {
             strBuilder.append("?sign=").append(UrlEncoderUtils.encode(authStr));
+            if (cred instanceof COSSessionCredentials) {
+                strBuilder.append("?x-cos-security-token=").append(UrlEncoderUtils.encode(((COSSessionCredentials) cred).getSessionToken()));
+            }
             hasAppendFirstParameter = true;
         }
 
