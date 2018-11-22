@@ -2640,7 +2640,7 @@ public class COSClient implements COS {
         if (authStr != null) {
             strBuilder.append("?sign=").append(UrlEncoderUtils.encode(authStr));
             if (cred instanceof COSSessionCredentials) {
-                strBuilder.append("?x-cos-security-token=").append(UrlEncoderUtils.encode(((COSSessionCredentials) cred).getSessionToken()));
+                strBuilder.append("&x-cos-security-token=").append(UrlEncoderUtils.encode(((COSSessionCredentials) cred).getSessionToken()));
             }
             hasAppendFirstParameter = true;
         }
