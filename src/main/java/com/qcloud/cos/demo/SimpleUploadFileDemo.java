@@ -20,7 +20,7 @@ import com.qcloud.cos.region.Region;
  * SimpleUpload 给出了简单上传的示例
  */
 public class SimpleUploadFileDemo {
-
+    
     // 将本地文件上传到COS
     public static void SimpleUploadFileFromLocal() {
         // 1 初始化用户身份信息(secretId, secretKey)
@@ -31,6 +31,7 @@ public class SimpleUploadFileDemo {
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名需包含appid
         String bucketName = "mybucket-1251668577";
+        
         String key = "aaa/bbb.txt";
         File localFile = new File("src/test/resources/len10M.txt");
         PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, key, localFile);
@@ -45,11 +46,11 @@ public class SimpleUploadFileDemo {
         } catch (CosClientException e) {
             e.printStackTrace();
         }
-
+        
         // 关闭客户端
         cosclient.shutdown();
     }
-
+    
     // 从输入流进行读取并上传到COS
     public static void SimpleUploadFileFromStream() {
         // 1 初始化用户身份信息(secretId, secretKey)
@@ -60,6 +61,7 @@ public class SimpleUploadFileDemo {
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名需包含appid
         String bucketName = "mybucket-1251668577";
+        
         String key = "aaa/bbb.jpg";
         File localFile = new File("src/test/resources/len10M.txt");
         
@@ -69,7 +71,7 @@ public class SimpleUploadFileDemo {
         objectMetadata.setContentLength(10);
         // 默认下载时根据cos路径key的后缀返回响应的contenttype, 上传时设置contenttype会覆盖默认值
         objectMetadata.setContentType("image/jpeg");
-
+        
         PutObjectRequest putObjectRequest =
                 new PutObjectRequest(bucketName, key, input, objectMetadata);
         // 设置存储类型, 默认是标准(Standard), 低频(standard_ia)
@@ -83,9 +85,8 @@ public class SimpleUploadFileDemo {
         } catch (CosClientException e) {
             e.printStackTrace();
         }
-
-        // 关闭客户端
+        
+        // 关闭客户端        
         cosclient.shutdown();
     }
-
 }

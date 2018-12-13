@@ -15,13 +15,21 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.TreeMap;
 import java.util.Map.Entry;
 import java.util.concurrent.ThreadLocalRandom;
 
+import org.apache.commons.logging.Log;
+
+import com.qcloud.QcloudApiModuleCenter;
+import com.qcloud.Module.Sts;
+import com.qcloud.Utilities.Json.JSONObject;
 import com.qcloud.cos.auth.BasicCOSCredentials;
+import com.qcloud.cos.auth.BasicSessionCredentials;
 import com.qcloud.cos.auth.COSCredentials;
 import com.qcloud.cos.auth.COSStaticCredentialsProvider;
 import com.qcloud.cos.exception.CosServiceException;
+import com.qcloud.cos.http.HttpMethodName;
 import com.qcloud.cos.internal.SkipMd5CheckStrategy;
 import com.qcloud.cos.internal.crypto.CryptoConfiguration;
 import com.qcloud.cos.internal.crypto.CryptoMode;
@@ -170,6 +178,16 @@ public class AbstractCOSClientTest {
         COSCredentials cred = new BasicCOSCredentials(secretId, secretKey);
         clientConfig = new ClientConfig(new Region(region));
         cosclient = new COSClient(cred, clientConfig);
+    }
+
+    protected static COSClient buildTemporyCredentialsCOSClient(long tokenDuration) {
+        TemporyToken temporyToken = fetchTempToken(tokenDuration);
+        BasicSessionCredentials tempCred =
+                new BasicSessionCredentials(temporyToken.getTempSecretId(),
+                        temporyToken.getTempSecretKey(), temporyToken.getTempToken());;
+        clientConfig = new ClientConfig(new Region(region));
+        COSClient tempCOSClient = new COSClient(tempCred, clientConfig);
+        return tempCOSClient;
     }
 
     protected static void initEncryptionClient() {
@@ -365,8 +383,6 @@ public class AbstractCOSClientTest {
 
     }
 
-
-
     protected static ObjectMetadata headSimpleObject(String key, long expectedLength,
             String expectedEtag) {
         ObjectMetadata objectMetadata =
@@ -377,7 +393,7 @@ public class AbstractCOSClientTest {
             assertEquals(expectedLength,
                     Long.valueOf(
                             objectMetadata.getUserMetaDataOf(Headers.UNENCRYPTED_CONTENT_LENGTH))
-                    .longValue());
+                            .longValue());
         }
         if (useClientEncryption) {
             assertEquals(false, expectedEtag.equals(objectMetadata.getETag()));
@@ -606,7 +622,7 @@ public class AbstractCOSClientTest {
 
     protected void testPutGetObjectAndClear(String key, File localFile, File downLoadFile,
             SSECustomerKey sseCKey, SSECOSKeyManagementParams params)
-                    throws CosServiceException, IOException {
+            throws CosServiceException, IOException {
         if (!judgeUserInfoValid()) {
             return;
         }
@@ -769,5 +785,38 @@ public class AbstractCOSClientTest {
         } finally {
             clearObject(key);
         }
+    }
+
+    protected static TemporyToken fetchTempToken(long duratonSeconds) {
+        final String policy =
+                "{\"statement\": [{\"action\": [\"name/cos:*\"],\"effect\": \"allow\",\"resource\":\"*\"}],\"version\": \"2.0\"}";
+
+        TreeMap<String, Object> config = new TreeMap<String, Object>();
+
+        config.put("SecretId", secretId);
+        config.put("SecretKey", secretKey);
+        config.put("RequestMethod", "GET");
+        QcloudApiModuleCenter module = new QcloudApiModuleCenter(new Sts(), config);
+        TreeMap<String, Object> params = new TreeMap<String, Object>();
+        params.put("name", "tac-storage-sts-java");
+        params.put("policy", policy);
+        params.put("durationSeconds", duratonSeconds);
+        try {
+            /* call 方法正式向指定的接口名发送请求，并把请求参数 params 传入，返回即是接口的请求结果。 */
+            String resultStr = module.call("GetFederationToken", params);
+            JSONObject resultJson = new JSONObject(resultStr);
+            if (resultJson.getInt("code") != 0) {
+                fail("fetchTempToken failed: " + resultStr);
+            }
+            JSONObject credentialsJson =
+                    resultJson.getJSONObject("data").getJSONObject("credentials");
+            String tmpSecretId = credentialsJson.getString("tmpSecretId");
+            String tmpSecretKey = credentialsJson.getString("tmpSecretKey");
+            String sessionToken = credentialsJson.getString("sessionToken");
+            return new TemporyToken(tmpSecretId, tmpSecretKey, sessionToken);
+        } catch (Exception e) {
+            fail("fetchTempToken occur a exception: " + e.toString());
+        }
+        return null;
     }
 }

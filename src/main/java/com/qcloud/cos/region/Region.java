@@ -2,6 +2,9 @@ package com.qcloud.cos.region;
 
 import java.io.Serializable;
 
+import com.qcloud.cos.exception.CosClientException;
+import com.qcloud.cos.internal.UrlComponentUtils;
+
 public class Region implements Serializable {
     private static final long serialVersionUID = 1L;
     private String regionName;
@@ -34,5 +37,24 @@ public class Region implements Serializable {
             return anotherRegionName.equals(regionName);
         }
         return false;
+    }
+    
+    public static String formatRegion(Region region) throws CosClientException {
+        return formatRegion(region.getRegionName());
+    }
+    
+    public static String formatRegion(String regionName) throws CosClientException {
+        UrlComponentUtils.validateRegionName(regionName);
+        if (regionName.startsWith("cos.")) {
+            return regionName;
+        } else {
+            if (regionName.equals("cn-east") || regionName.equals("cn-south")
+                    || regionName.equals("cn-north") || regionName.equals("cn-south-2")
+                    || regionName.equals("cn-southwest") || regionName.equals("sg")) {
+                return regionName;
+            } else {
+                return "cos." + regionName;
+            }
+        }
     }
 }

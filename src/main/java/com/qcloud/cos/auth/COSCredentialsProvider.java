@@ -8,7 +8,4 @@ public interface COSCredentialsProvider {
      * @return COSCredentials which the caller can use to sign request.
      */
     public COSCredentials getCredentials();
-
-
-    public void refresh();
 }

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.qcloud.cos.endpoint.EndpointBuilder;
 import com.qcloud.cos.internal.CosServiceRequest;
 import com.qcloud.cos.region.Region;
 
@@ -44,6 +45,11 @@ public class CopyPartRequest extends CosServiceRequest implements Serializable {
      * the most recent version of the source object will be copied.
      */
     private String sourceVersionId;
+    
+    /**
+     * source endpoint builder to generate the source endpoint.
+     */
+    private EndpointBuilder sourceEndpointBuilder;
 
     /** The name of the bucket to contain the copy of the source object */
     private String destinationBucketName;
@@ -64,9 +70,6 @@ public class CopyPartRequest extends CosServiceRequest implements Serializable {
      * object being copied.
      */
     private SSECustomerKey destinationSSECustomerKey;
-
-    // set copy source endpoint suffix
-    private String sourceEndpointSuffix;
 
 
     /**
@@ -435,19 +438,6 @@ public class CopyPartRequest extends CosServiceRequest implements Serializable {
         this.destinationSSECustomerKey = destinationSSECustomerKey;
     }
 
-    public String getSourceEndpointSuffix() {
-        return sourceEndpointSuffix;
-    }
-
-    public void setSourceEndpointSuffix(String sourceEndpointSuffix) {
-        this.sourceEndpointSuffix = sourceEndpointSuffix;
-    }
-    
-    public CopyPartRequest withSourceEndpointSuffix(String sourceEndpointSuffix) {
-        setSourceEndpointSuffix(sourceEndpointSuffix);
-        return this;
-    }
-
     /**
      * Returns the optional start range to copy from the source object.
      *
@@ -763,6 +753,19 @@ public class CopyPartRequest extends CosServiceRequest implements Serializable {
      */
     public CopyPartRequest withModifiedSinceConstraint(Date date) {
         setModifiedSinceConstraint(date);
+        return this;
+    }
+
+    public EndpointBuilder getSourceEndpointBuilder() {
+        return sourceEndpointBuilder;
+    }
+
+    public void setSourceEndpointBuilder(EndpointBuilder sourceEndpointBuilder) {
+        this.sourceEndpointBuilder = sourceEndpointBuilder;
+    }
+    
+    public CopyPartRequest withSourceEndpointBuilder(EndpointBuilder sourceEndpointBuilder) {
+        setSourceEndpointBuilder(sourceEndpointBuilder);
         return this;
     }
 

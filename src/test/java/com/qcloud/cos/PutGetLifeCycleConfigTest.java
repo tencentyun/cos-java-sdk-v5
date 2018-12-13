@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNull;
 
 import com.qcloud.cos.model.BucketLifecycleConfiguration;
 import com.qcloud.cos.model.SetBucketLifecycleConfigurationRequest;
@@ -34,6 +35,7 @@ public class PutGetLifeCycleConfigTest extends AbstractCOSClientTest {
     public static void tearDownAfterClass() throws Exception {
         AbstractCOSClientTest.destoryCosClient();
     }
+    
 
     private void testPutGetDelRules(List<Rule> rules) {
         BucketLifecycleConfiguration bucketLifecycleConfiguration =
@@ -70,6 +72,16 @@ public class PutGetLifeCycleConfigTest extends AbstractCOSClientTest {
         cosclient.deleteBucketLifecycleConfiguration(bucket);
     }
 
+    @Test
+    public void testGetLifecycleBeforeSet() {
+        if (!judgeUserInfoValid()) {
+            return;
+        }
+        
+        BucketLifecycleConfiguration blcf = cosclient.getBucketLifecycleConfiguration(bucket);
+        assertNull(blcf);
+    }
+    
     @Test
     public void testPutGetDelExpirationDateLifeCycle() throws Exception {
         if (!judgeUserInfoValid()) {

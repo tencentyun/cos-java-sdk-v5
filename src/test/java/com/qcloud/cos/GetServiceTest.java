@@ -33,8 +33,8 @@ public class GetServiceTest extends AbstractCOSClientTest {
         for (Bucket bucketElement : buckets) {
             String bucketName = bucketElement.getName();
             String bucketLocation = bucketElement.getLocation();
-            if (bucketElement.getName().equals(bucket)) {
-                assertEquals(clientConfig.getRegion().getRegionName(), bucketElement.getLocation());
+            if (bucketName.equals(bucket)) {
+                assertEquals(clientConfig.getRegion().getRegionName(), bucketLocation);
                 return;
             }
         }

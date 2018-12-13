@@ -39,6 +39,7 @@ public class TemporyTokenDemo {
 
         // 上传
         PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, key, localFile);
+        ObjectMetadata objectMetadata = new ObjectMetadata();
         PutObjectResult putObjectResult = cosClient.putObject(putObjectRequest);
         System.out.println(putObjectResult.getMetadata());
 
