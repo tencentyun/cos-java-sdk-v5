@@ -233,6 +233,28 @@ public interface COS extends COSDirectSpi {
     public PutObjectResult putObject(String bucketName, String key, InputStream input,
             ObjectMetadata metadata) throws CosClientException, CosServiceException;
 
+    /**
+     * <p>
+     * upload string content to a cos object. content will be encoded to bytes with UTF-8 encoding
+     * </p>
+     * 
+     * @param bucketName The name of an existing bucket, to which you have {@link Permission#Write}
+     *        permission.
+     * @param key The key under which to store the specified file.
+     * @param content the object content, content will be encoded to bytes with UTF-8 encoding.
+     *
+     * @return A {@link PutObjectResult} object containing the information returned by for the newly
+     *         created object.
+     *
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *         request or handling the response.
+     * @throws CosServiceException If any errors occurred in while processing the request.
+     *
+     * @see COS#putObject(PutObjectRequest)
+     * @see COS#putObject(String, String, File)
+     */
+    public PutObjectResult putObject(String bucketName, String key, String content)
+            throws CosClientException, CosServiceException;
 
     /**
      * <p>
@@ -1143,7 +1165,7 @@ public interface COS extends COSDirectSpi {
      */
     public ObjectListing listNextBatchOfObjects(
             ListNextBatchOfObjectsRequest listNextBatchOfObjectsRequest)
-                    throws CosClientException, CosServiceException;
+            throws CosClientException, CosServiceException;
 
     /**
      * <p>
@@ -1262,7 +1284,7 @@ public interface COS extends COSDirectSpi {
      */
     public VersionListing listVersions(String bucketName, String prefix, String keyMarker,
             String versionIdMarker, String delimiter, Integer maxResults)
-                    throws CosClientException, CosServiceException;
+            throws CosClientException, CosServiceException;
 
     /**
      * <p>
@@ -1379,7 +1401,7 @@ public interface COS extends COSDirectSpi {
      */
     public VersionListing listNextBatchOfVersions(
             ListNextBatchOfVersionsRequest listNextBatchOfVersionsRequest)
-                    throws CosClientException, CosServiceException;
+            throws CosClientException, CosServiceException;
 
     /**
      * <p>
@@ -1411,7 +1433,7 @@ public interface COS extends COSDirectSpi {
 
     public CopyObjectResult copyObject(String sourceBucketName, String sourceKey,
             String destinationBucketName, String destinationKey)
-                    throws CosClientException, CosServiceException;
+            throws CosClientException, CosServiceException;
 
     /**
      * <p>
@@ -1474,7 +1496,7 @@ public interface COS extends COSDirectSpi {
 
     public void setBucketLifecycleConfiguration(String bucketName,
             BucketLifecycleConfiguration bucketLifecycleConfiguration)
-                    throws CosClientException, CosServiceException;
+            throws CosClientException, CosServiceException;
 
     /**
      * Sets the lifecycle configuration for the specified bucket.
@@ -1488,7 +1510,7 @@ public interface COS extends COSDirectSpi {
      */
     public void setBucketLifecycleConfiguration(
             SetBucketLifecycleConfigurationRequest setBucketLifecycleConfigurationRequest)
-                    throws CosClientException, CosServiceException;
+            throws CosClientException, CosServiceException;
 
     /**
      * Gets the lifecycle configuration for the specified bucket, or null if the specified bucket
@@ -1520,7 +1542,7 @@ public interface COS extends COSDirectSpi {
      */
     public BucketLifecycleConfiguration getBucketLifecycleConfiguration(
             GetBucketLifecycleConfigurationRequest getBucketLifecycleConfigurationRequest)
-                    throws CosClientException, CosServiceException;
+            throws CosClientException, CosServiceException;
 
     /**
      * Removes the lifecycle configuration for the bucket specified.
@@ -1546,7 +1568,7 @@ public interface COS extends COSDirectSpi {
      */
     public void deleteBucketLifecycleConfiguration(
             DeleteBucketLifecycleConfigurationRequest deleteBucketLifecycleConfigurationRequest)
-                    throws CosClientException, CosServiceException;;
+            throws CosClientException, CosServiceException;;
 
     /**
      * <p>
@@ -1595,7 +1617,7 @@ public interface COS extends COSDirectSpi {
      */
     public void setBucketVersioningConfiguration(
             SetBucketVersioningConfigurationRequest setBucketVersioningConfigurationRequest)
-                    throws CosClientException, CosServiceException;
+            throws CosClientException, CosServiceException;
 
 
     /**
@@ -1680,7 +1702,7 @@ public interface COS extends COSDirectSpi {
      */
     public BucketVersioningConfiguration getBucketVersioningConfiguration(
             GetBucketVersioningConfigurationRequest getBucketVersioningConfigurationRequest)
-                    throws CosClientException, CosServiceException;
+            throws CosClientException, CosServiceException;
 
     /**
      * <p>
@@ -1715,34 +1737,38 @@ public interface COS extends COSDirectSpi {
      */
     public void setBucketPolicy(SetBucketPolicyRequest setBucketPolicyRequest)
             throws CosClientException, CosServiceException;
+
     /**
      * <p>
-     * Gets the policy for the specified bucket. Only the owner of the
-     * bucket can retrieve the policy. If no policy has been set for the bucket,
-     * then an empty result object with a <code>null</code> policy text field will be
-     * returned.
+     * Gets the policy for the specified bucket. Only the owner of the bucket can retrieve the
+     * policy. If no policy has been set for the bucket, then an empty result object with a
+     * <code>null</code> policy text field will be returned.
      * </p>
+     * 
      * @param bucketName the bucket name
      * @throws CosClientException If any errors are encountered in the client while making the
      *         request or handling the response.
      * 
      * @throws CosServiceException If any errors occurred in while processing the request.
      */
-    public BucketPolicy getBucketPolicy(String bucketName) throws CosClientException, CosServiceException;
+    public BucketPolicy getBucketPolicy(String bucketName)
+            throws CosClientException, CosServiceException;
+
     /**
      * <p>
-     * Gets the policy for the specified bucket. Only the owner of the
-     * bucket can retrieve the policy. If no policy has been set for the bucket,
-     * then an empty result object with a <code>null</code> policy text field will be
-     * returned.
+     * Gets the policy for the specified bucket. Only the owner of the bucket can retrieve the
+     * policy. If no policy has been set for the bucket, then an empty result object with a
+     * <code>null</code> policy text field will be returned.
      * </p>
+     * 
      * @param getBucketPolicyRequest get bucket policy request
      * @throws CosClientException If any errors are encountered in the client while making the
      *         request or handling the response.
      * 
      * @throws CosServiceException If any errors occurred in while processing the request.
-     */   
-    public BucketPolicy getBucketPolicy(GetBucketPolicyRequest getBucketPolicyRequest) throws CosClientException, CosServiceException;
+     */
+    public BucketPolicy getBucketPolicy(GetBucketPolicyRequest getBucketPolicyRequest)
+            throws CosClientException, CosServiceException;
 
     /**
      * <p>
@@ -2022,7 +2048,7 @@ public interface COS extends COSDirectSpi {
      */
     public BucketCrossOriginConfiguration getBucketCrossOriginConfiguration(
             GetBucketCrossOriginConfigurationRequest getBucketCrossOriginConfigurationRequest)
-                    throws CosClientException, CosServiceException;
+            throws CosClientException, CosServiceException;
 
 
     /**
@@ -2037,7 +2063,7 @@ public interface COS extends COSDirectSpi {
      */
     public void setBucketCrossOriginConfiguration(String bucketName,
             BucketCrossOriginConfiguration bucketCrossOriginConfiguration)
-                    throws CosClientException, CosServiceException;
+            throws CosClientException, CosServiceException;
 
     /**
      * Sets the cross origin configuration for the specified bucket.
@@ -2050,7 +2076,7 @@ public interface COS extends COSDirectSpi {
      */
     public void setBucketCrossOriginConfiguration(
             SetBucketCrossOriginConfigurationRequest setBucketCrossOriginConfigurationRequest)
-                    throws CosClientException, CosServiceException;
+            throws CosClientException, CosServiceException;
 
     /**
      * Delete the cross origin configuration for the specified bucket.
@@ -2072,7 +2098,7 @@ public interface COS extends COSDirectSpi {
      */
     public void deleteBucketCrossOriginConfiguration(
             DeleteBucketCrossOriginConfigurationRequest deleteBucketCrossOriginConfigurationRequest)
-                    throws CosClientException, CosServiceException;
+            throws CosClientException, CosServiceException;
 
 
     /**
@@ -2086,7 +2112,7 @@ public interface COS extends COSDirectSpi {
      */
     public void setBucketReplicationConfiguration(String bucketName,
             BucketReplicationConfiguration configuration)
-                    throws CosClientException, CosServiceException;
+            throws CosClientException, CosServiceException;
 
     /**
      * Sets a replication configuration for the QCloud bucket.
@@ -2099,7 +2125,7 @@ public interface COS extends COSDirectSpi {
      */
     public void setBucketReplicationConfiguration(
             SetBucketReplicationConfigurationRequest setBucketReplicationConfigurationRequest)
-                    throws CosClientException, CosServiceException;
+            throws CosClientException, CosServiceException;
 
     /**
      * Retrieves the replication configuration for the given QCloud bucket.
@@ -2125,7 +2151,7 @@ public interface COS extends COSDirectSpi {
      */
     BucketReplicationConfiguration getBucketReplicationConfiguration(
             GetBucketReplicationConfigurationRequest getBucketReplicationConfigurationRequest)
-                    throws CosClientException, CosServiceException;;
+            throws CosClientException, CosServiceException;;
 
     /**
      * Deletes the replication configuration for the given QCloud bucket.
@@ -2149,7 +2175,7 @@ public interface COS extends COSDirectSpi {
      */
     void deleteBucketReplicationConfiguration(
             DeleteBucketReplicationConfigurationRequest deleteBucketReplicationConfigurationRequest)
-                    throws CosClientException, CosServiceException;
+            throws CosClientException, CosServiceException;
 
     /**
      * <p>

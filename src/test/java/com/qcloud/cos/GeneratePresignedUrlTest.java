@@ -4,6 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -13,13 +14,15 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
-import org.slf4j.Logger;
 
 import com.qcloud.cos.auth.AnonymousCOSCredentials;
 import com.qcloud.cos.auth.COSCredentials;
 import com.qcloud.cos.http.HttpMethodName;
+import com.qcloud.cos.http.HttpProtocol;
+import com.qcloud.cos.model.AccessControlList;
+import com.qcloud.cos.model.CannedAccessControlList;
 import com.qcloud.cos.model.GeneratePresignedUrlRequest;
 import com.qcloud.cos.model.ResponseHeaderOverrides;
 import com.qcloud.cos.region.Region;
@@ -27,8 +30,6 @@ import com.qcloud.cos.utils.DateUtils;
 import com.qcloud.cos.utils.Md5Utils;
 
 public class GeneratePresignedUrlTest extends AbstractCOSClientTest {
-    private static final Logger log = org.slf4j.LoggerFactory.getLogger(BatchDeleteTest.class);
-
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
         AbstractCOSClientTest.initCosClient();
@@ -38,8 +39,7 @@ public class GeneratePresignedUrlTest extends AbstractCOSClientTest {
     public static void tearDownAfterClass() throws Exception {
         AbstractCOSClientTest.destoryCosClient();
     }
-
-
+    
     @Test
     public void testGetFile() throws IOException {
         if (!judgeUserInfoValid()) {
@@ -82,19 +82,8 @@ public class GeneratePresignedUrlTest extends AbstractCOSClientTest {
         assertTrue(localFile.delete());
     }
 
-    @Test
-    public void testPutFile() throws IOException {
-        if (!judgeUserInfoValid()) {
-            return;
-        }
-        String key = "ut/generate_url_test_upload.txt";
-        File localFile = buildTestFile(1024);
-        Date expirationTime = new Date(System.currentTimeMillis() + 30 * 60 * 1000);
-        URL url = cosclient.generatePresignedUrl(bucket, key, expirationTime, HttpMethodName.PUT);
-
-        System.out.println(url.toString());
-
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+    private void testPutFileWithUrl(URL putUrl, File localFile) throws IOException {
+        HttpURLConnection connection = (HttpURLConnection) putUrl.openConnection();
         connection.setDoOutput(true);
         connection.setRequestMethod("PUT");
 
@@ -108,30 +97,154 @@ public class GeneratePresignedUrlTest extends AbstractCOSClientTest {
         bos.close();
         int responseCode = connection.getResponseCode();
         assertEquals(200, responseCode);
+    }
+    
+    private void testGetFileWithUrl(URL getUrl, File downloadFile) throws IOException {
+        HttpURLConnection connection = (HttpURLConnection) getUrl.openConnection();
+        connection.setDoOutput(false);
+        connection.setRequestMethod("GET");
 
-        headSimpleObject(key, localFile.length(), Md5Utils.md5Hex(localFile));
-        clearObject(key);
-        assertTrue(localFile.delete());
+        BufferedInputStream bis = new BufferedInputStream(connection.getInputStream());
+        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(downloadFile));
+        int readByte = -1;
+        while ((readByte = bis.read()) != -1) {
+            bos.write(readByte);
+        }
+        bis.close();
+        bos.close();
+        int responseCode = connection.getResponseCode();
+        assertEquals(200, responseCode);
+    }
+    
+    private void testDelFileWithUrl(URL delUrl) throws IOException {
+        HttpURLConnection connection = (HttpURLConnection) delUrl.openConnection();
+        connection.setDoOutput(false);
+        connection.setRequestMethod("DELETE");
+
+        int responseCode = connection.getResponseCode();
+        assertEquals(204, responseCode);
     }
     
     @Test
-    public void testAnonymousUrl() {
+    public void testGeneralUrl() throws IOException {
         if (!judgeUserInfoValid()) {
             return;
         }
-        COSCredentials cred = new AnonymousCOSCredentials();
-        ClientConfig clientConfig = new ClientConfig(new Region("ap-beijing-1"));
-        COSClient cosclient = new COSClient(cred, clientConfig);
-        String bucketName = "mybucket-125110000";
-        String key = "aaa.txt";
-
-        GeneratePresignedUrlRequest req =
-                new GeneratePresignedUrlRequest(bucketName, key, HttpMethodName.GET);
-        URL url = cosclient.generatePresignedUrl(req);
-        
-        String urlStr = url.toString();
-        // 匿名不包含签名
-        assertEquals(false, urlStr.contains("sign="));
+        String key = "ut/generate_url_test_upload.txt";
+        File localFile = buildTestFile(1024);
+        File downLoadFile = new File(localFile.getAbsolutePath() + ".down");
+        try {
+            clientConfig.setHttpProtocol(HttpProtocol.https);
+            Date expirationTime = new Date(System.currentTimeMillis() + 30 * 60 * 1000);
+            URL putUrl = cosclient.generatePresignedUrl(bucket, key, expirationTime, HttpMethodName.PUT);
+            URL getUrl = cosclient.generatePresignedUrl(bucket, key, expirationTime, HttpMethodName.GET);
+            URL delUrl = cosclient.generatePresignedUrl(bucket, key, expirationTime, HttpMethodName.DELETE);
+            assertTrue(putUrl.toString().startsWith("https://"));
+            assertTrue(getUrl.toString().startsWith("https://"));
+            assertTrue(delUrl.toString().startsWith("https://"));
+            assertTrue(putUrl.toString().contains("sign="));
+            assertTrue(getUrl.toString().contains("sign="));
+            assertTrue(delUrl.toString().contains("sign="));
+            testPutFileWithUrl(putUrl, localFile);
+            headSimpleObject(key, localFile.length(), Md5Utils.md5Hex(localFile));
+            testGetFileWithUrl(getUrl, downLoadFile);
+            assertEquals(localFile.length(), downLoadFile.length());
+            assertEquals(Md5Utils.md5Hex(localFile), Md5Utils.md5Hex(downLoadFile));
+            testDelFileWithUrl(delUrl);
+            assertFalse(cosclient.doesObjectExist(bucket, key));          
+        } finally {
+            clearObject(key);
+            assertTrue(localFile.delete());
+            assertTrue(downLoadFile.delete()); 
+            clientConfig.setHttpProtocol(HttpProtocol.http);
+        }
     }
+    
+    
+    
+    @Test
+    public void testAnonymousUrl() throws InterruptedException, IOException {
+        if (!judgeUserInfoValid()) {
+            return;
+        }
+        AccessControlList oldAcl = cosclient.getBucketAcl(bucket);
+        cosclient.setBucketAcl(bucket, CannedAccessControlList.PublicReadWrite);
+        Thread.sleep(5000L);
+        COSCredentials cred = new AnonymousCOSCredentials();
+        ClientConfig clientConfig = new ClientConfig(new Region(region));
+        COSClient anoyCOSClient = new COSClient(cred, clientConfig);
 
+
+        String key = "ut/generate_url_test_upload.txt";
+        File localFile = buildTestFile(1024);
+        File downLoadFile = new File(localFile.getAbsolutePath() + ".down");
+        try {
+            Date expirationTime = new Date(System.currentTimeMillis() + 30 * 60 * 1000);
+            URL putUrl = anoyCOSClient.generatePresignedUrl(bucket, key, expirationTime, HttpMethodName.PUT);
+            URL getUrl = anoyCOSClient.generatePresignedUrl(bucket, key, expirationTime, HttpMethodName.GET);
+            URL delUrl = anoyCOSClient.generatePresignedUrl(bucket, key, expirationTime, HttpMethodName.DELETE);
+            assertTrue(putUrl.toString().startsWith("http://"));
+            assertTrue(getUrl.toString().startsWith("http://"));
+            assertTrue(delUrl.toString().startsWith("http://"));
+            assertFalse(putUrl.toString().contains("sign="));
+            assertFalse(getUrl.toString().contains("sign="));
+            assertFalse(delUrl.toString().contains("sign="));
+            testPutFileWithUrl(putUrl, localFile);
+            headSimpleObject(key, localFile.length(), Md5Utils.md5Hex(localFile));
+            testGetFileWithUrl(getUrl, downLoadFile);
+            assertEquals(localFile.length(), downLoadFile.length());
+            assertEquals(Md5Utils.md5Hex(localFile), Md5Utils.md5Hex(downLoadFile));
+            testDelFileWithUrl(delUrl);
+            assertFalse(cosclient.doesObjectExist(bucket, key));          
+        } finally {
+            clearObject(key);
+            assertTrue(localFile.delete());
+            assertTrue(downLoadFile.delete()); 
+            anoyCOSClient.shutdown();
+            cosclient.setBucketAcl(bucket, oldAcl);
+            Thread.sleep(5000L);
+        }
+    }
+    
+    @Test
+    public void testTemporyTokenUrl() throws InterruptedException, IOException {
+        if (!judgeUserInfoValid()) {
+            return;
+        }
+        COSClient temporyCOSClient = buildTemporyCredentialsCOSClient(1800);
+        String key = "ut/generate_url_test_upload.txt";
+        File localFile = buildTestFile(1024);
+        File downLoadFile = new File(localFile.getAbsolutePath() + ".down");
+        try {
+            Date expirationTime = new Date(System.currentTimeMillis() + 30 * 60 * 1000);
+            URL putUrl = temporyCOSClient.generatePresignedUrl(bucket, key, expirationTime, HttpMethodName.PUT);
+            URL getUrl = temporyCOSClient.generatePresignedUrl(bucket, key, expirationTime, HttpMethodName.GET);
+            URL delUrl = temporyCOSClient.generatePresignedUrl(bucket, key, expirationTime, HttpMethodName.DELETE);
+            System.out.println("puturl: " + putUrl.toString());
+            System.out.println("getUrl: " + putUrl.toString());
+            System.out.println("deleteUrl: " + putUrl.toString());
+            assertTrue(putUrl.toString().startsWith("http://"));
+            assertTrue(getUrl.toString().startsWith("http://"));
+            assertTrue(delUrl.toString().startsWith("http://"));
+            assertTrue(putUrl.toString().contains("sign="));
+            assertTrue(getUrl.toString().contains("sign="));
+            assertTrue(delUrl.toString().contains("sign="));
+            assertTrue(putUrl.toString().contains("&" + Headers.SECURITY_TOKEN));
+            assertTrue(getUrl.toString().contains("&" + Headers.SECURITY_TOKEN));
+            assertTrue(delUrl.toString().contains("&" + Headers.SECURITY_TOKEN));
+            testPutFileWithUrl(putUrl, localFile);
+            headSimpleObject(key, localFile.length(), Md5Utils.md5Hex(localFile));
+            testGetFileWithUrl(getUrl, downLoadFile);
+            assertEquals(localFile.length(), downLoadFile.length());
+            assertEquals(Md5Utils.md5Hex(localFile), Md5Utils.md5Hex(downLoadFile));
+            testDelFileWithUrl(delUrl);
+            assertFalse(cosclient.doesObjectExist(bucket, key));          
+        } finally {
+            clearObject(key);
+            assertTrue(localFile.delete());
+            assertTrue(downLoadFile.delete()); 
+            cosclient.shutdown();
+            temporyCOSClient.shutdown();
+        }
+    }
 }

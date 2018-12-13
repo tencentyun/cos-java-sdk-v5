@@ -47,7 +47,7 @@ public class CopyPartRequestFactory {
 
         CopyPartRequest req = new CopyPartRequest().withSourceAppid(origReq.getSourceAppid())
                 .withSourceBucketRegion(origReq.getSourceBucketRegion())
-                .withSourceEndpointSuffix(origReq.getSourceEndpointSuffix())
+                .withSourceEndpointBuilder(origReq.getSourceEndpointBuilder())
                 .withSourceBucketName(origReq.getSourceBucketName())
                 .withSourceKey(origReq.getSourceKey()).withUploadId(uploadId)
                 .withPartNumber(partNumber++)

@@ -4,20 +4,18 @@ import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.internal.XmlWriter;
 
 /**
- * Factory for creating XML fragments from AccessControlList objects that can be
- * sent to COS as part of requests.
+ * Factory for creating XML fragments from AccessControlList objects that can be sent to COS as part
+ * of requests.
  */
 public class AclXmlFactory {
 
     /**
-     * Converts the specified AccessControlList object to an XML fragment that
-     * can be sent to COS.
+     * Converts the specified AccessControlList object to an XML fragment that can be sent to COS.
      *
-     * @param acl
-     *            The AccessControlList to convert to XML.
+     * @param acl The AccessControlList to convert to XML.
      *
-     * @return an XML representation of the Access Control List object, suitable
-     *         to send in a request to COS.
+     * @return an XML representation of the Access Control List object, suitable to send in a
+     *         request to COS.
      */
     public byte[] convertToXmlByteArray(AccessControlList acl) throws CosClientException {
         Owner owner = acl.getOwner();
@@ -51,20 +49,19 @@ public class AclXmlFactory {
     /**
      * Returns an XML fragment representing the specified Grantee.
      *
-     * @param grantee
-     *            The grantee to convert to an XML representation that can be
-     *            sent to COS as part of a request.
-     * @param xml
-     *            The XmlWriter to which to concatenate this node to.
+     * @param grantee The grantee to convert to an XML representation that can be sent to COS as
+     *        part of a request.
+     * @param xml The XmlWriter to which to concatenate this node to.
      *
      * @return The given XmlWriter containing the specified grantee.
      *
-     * @throws CosClientException
-     *             If the specified grantee type isn't recognized.
+     * @throws CosClientException If the specified grantee type isn't recognized.
      */
     protected XmlWriter convertToXml(Grantee grantee, XmlWriter xml) throws CosClientException {
         if (grantee instanceof UinGrantee) {
-            return convertToXml((UinGrantee)grantee, xml);
+            return convertToXml((UinGrantee) grantee, xml);
+        } else if (grantee instanceof GroupGrantee) {
+            return convertToXml((GroupGrantee) grantee, xml);
         } else {
             throw new CosClientException("Unknown Grantee type: " + grantee.getClass().getName());
         }
@@ -73,18 +70,25 @@ public class AclXmlFactory {
     /**
      * Returns an XML fragment representing the specified canonical grantee.
      *
-     * @param grantee
-     *            The canonical grantee to convert to an XML representation that
-     *            can be sent to COS as part of request.
-     * @param xml
-     *            The XmlWriter to which to concatenate this node to.
+     * @param grantee The canonical grantee to convert to an XML representation that can be sent to
+     *        COS as part of request.
+     * @param xml The XmlWriter to which to concatenate this node to.
      *
      * @return The given XmlWriter containing the specified canonical grantee.
      */
     protected XmlWriter convertToXml(UinGrantee grantee, XmlWriter xml) {
-        xml.start("Grantee", new String[] {"xmlns:xsi" , "xsi:type"},
+        xml.start("Grantee", new String[] {"xmlns:xsi", "xsi:type"},
                 new String[] {"http://www.w3.org/2001/XMLSchema-instance", "RootAccount"});
         xml.start("ID").value(grantee.getIdentifier()).end();
+        xml.end();
+
+        return xml;
+    }
+    
+    protected XmlWriter convertToXml(GroupGrantee grantee, XmlWriter xml) {
+        xml.start("Grantee", new String[] {"xmlns:xsi" , "xsi:type"},
+                new String[] {"http://www.w3.org/2001/XMLSchema-instance", "Group"});
+        xml.start("URI").value(grantee.getIdentifier()).end();
         xml.end();
 
         return xml;

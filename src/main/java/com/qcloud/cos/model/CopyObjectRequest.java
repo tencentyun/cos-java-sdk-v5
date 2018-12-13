@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.qcloud.cos.endpoint.EndpointBuilder;
 import com.qcloud.cos.internal.CosServiceRequest;
 import com.qcloud.cos.region.Region;
 
@@ -28,6 +29,11 @@ public class CopyObjectRequest extends CosServiceRequest
      * the most recent version of the source object will be copied.
      */
     private String sourceVersionId;
+    
+    /**
+     * source endpoint builder to generate the source endpoint.
+     */
+    private EndpointBuilder sourceEndpointBuilder;
 
     /** The name of the bucket to contain the copy of the source object */
     private String destinationBucketName;
@@ -98,9 +104,6 @@ public class CopyObjectRequest extends CosServiceRequest
     private SSECustomerKey destinationSSECustomerKey;
 
     private SSECOSKeyManagementParams sseCOSKeyManagementParams;
-
-    // set copy source endpoint suffix
-    private String sourceEndpointSuffix;
 
     /**
      * <p>
@@ -950,11 +953,12 @@ public class CopyObjectRequest extends CosServiceRequest
         return this.sseCOSKeyManagementParams;
     }
 
-    public String getSourceEndpointSuffix() {
-        return sourceEndpointSuffix;
+    public EndpointBuilder getSourceEndpointBuilder() {
+        return sourceEndpointBuilder;
     }
 
-    public void setSourceEndpointSuffix(String sourceEndpointSuffix) {
-        this.sourceEndpointSuffix = sourceEndpointSuffix;
+    public void setSourceEndpointBuilder(EndpointBuilder sourceEndpointBuilder) {
+        this.sourceEndpointBuilder = sourceEndpointBuilder;
     }
+    
 }

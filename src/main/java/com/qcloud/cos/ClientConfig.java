@@ -1,5 +1,10 @@
 package com.qcloud.cos;
 
+import com.qcloud.cos.endpoint.DefaultEndpointResolver;
+import com.qcloud.cos.endpoint.EndpointBuilder;
+import com.qcloud.cos.endpoint.EndpointResolver;
+import com.qcloud.cos.endpoint.RegionEndpointBuilder;
+import com.qcloud.cos.endpoint.SuffixEndpointBuilder;
 import com.qcloud.cos.http.HttpProtocol;
 import com.qcloud.cos.region.Region;
 
@@ -15,13 +20,15 @@ public class ClientConfig {
     // 多次签名的默认过期时间,单位秒
     private static final long DEFAULT_SIGN_EXPIRED = 3600;
     // 默认的user_agent标识
-    private static final String DEFAULT_USER_AGENT = "cos-java-sdk-v5.4.9";
+    private static final String DEFAULT_USER_AGENT = "cos-java-sdk-v5.4.10";
     // Read Limit
     private static final int DEFAULT_READ_LIMIT = (2 << 17) + 1;
     
     private Region region;
     private HttpProtocol httpProtocol = HttpProtocol.http;
     private String endPointSuffix = null;
+    private EndpointBuilder endpointBuilder = null;
+    private EndpointResolver endpointResolver = new DefaultEndpointResolver();
     
     // http proxy代理，如果使用http proxy代理，需要设置IP与端口
     private String httpProxyIp = null;
@@ -38,12 +45,14 @@ public class ClientConfig {
     public ClientConfig() {
         super();
         this.region = null;
+        this.endpointBuilder = new RegionEndpointBuilder(this.region);
     }
 
     // 除了List Buckets, 其他API需要传入region(比如上传，下载，遍历bucket文件)
     public ClientConfig(Region region) {
         super();
         this.region = region;
+        this.endpointBuilder = new RegionEndpointBuilder(this.region);
     }
 
     public Region getRegion() {
@@ -52,6 +61,7 @@ public class ClientConfig {
 
     public void setRegion(Region region) {
         this.region = region;
+        this.endpointBuilder = new RegionEndpointBuilder(this.region);
     }
 
     public HttpProtocol getHttpProtocol() {
@@ -126,12 +136,23 @@ public class ClientConfig {
         return userAgent;
     }
 
+    /**
+     * 
+     * @return
+     */
+    @Deprecated
     public String getEndPointSuffix() {
         return endPointSuffix;
     }
 
+    /**
+     * @param endPointSuffix
+     * @deprecated please use {@link #setEndpointBuilder(EndpointBuilder)} and ${SuffixEndpointBuilder}
+     */
+    @Deprecated
     public void setEndPointSuffix(String endPointSuffix) {
         this.endPointSuffix = endPointSuffix;
+        this.endpointBuilder = new SuffixEndpointBuilder(endPointSuffix);
     }
 
     public int getReadLimit() {
@@ -142,4 +163,19 @@ public class ClientConfig {
         this.readLimit = readLimit;
     }
 
+    public EndpointBuilder getEndpointBuilder() {
+        return endpointBuilder;
+    }
+
+    public void setEndpointBuilder(EndpointBuilder endpointBuilder) {
+        this.endpointBuilder = endpointBuilder;
+    }
+
+    public EndpointResolver getEndpointResolver() {
+        return endpointResolver;
+    }
+
+    public void setEndpointResolver(EndpointResolver endpointResolver) {
+        this.endpointResolver = endpointResolver;
+    }
 }

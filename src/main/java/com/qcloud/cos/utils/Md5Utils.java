@@ -40,6 +40,11 @@ public class Md5Utils {
         return Hex.encodeHexString(computeMD5Hash(file));
     }
 
+    public static String md5Hex(String utf8Content) {
+        return Hex.encodeHexString(computeMD5Hash(utf8Content.getBytes(StringUtils.UTF8)));
+    }
+    
+
     public static String md5Hex(byte[] input) {
         return Hex.encodeHexString(computeMD5Hash(input));
     }

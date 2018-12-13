@@ -51,6 +51,7 @@ import com.qcloud.cos.model.Permission;
 import com.qcloud.cos.model.ReplicationDestinationConfig;
 import com.qcloud.cos.model.ReplicationRule;
 import com.qcloud.cos.model.UinGrantee;
+import com.qcloud.cos.model.GroupGrantee;
 import com.qcloud.cos.model.VersionListing;
 import com.qcloud.cos.model.Tag.LifecycleTagPredicate;
 import com.qcloud.cos.model.Tag.Tag;
@@ -745,7 +746,8 @@ public class XmlResponsesSaxParser {
             else if (in("AccessControlPolicy", "AccessControlList", "Grant", "Grantee")) {
                 if (name.equals("ID")) {
                     currentGrantee.setIdentifier(getText());
-
+                } else if (name.equals("URI")) {
+                    currentGrantee = GroupGrantee.parseGroupGrantee(getText());
                 } else if (name.equals("DisplayName")) {
                     ((UinGrantee) currentGrantee).setDisplayName(getText());
                 }

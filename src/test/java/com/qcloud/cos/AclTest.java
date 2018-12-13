@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,6 +16,7 @@ import java.util.List;
 import com.qcloud.cos.model.AccessControlList;
 import com.qcloud.cos.model.CannedAccessControlList;
 import com.qcloud.cos.model.Grant;
+import com.qcloud.cos.model.GroupGrantee;
 import com.qcloud.cos.model.Owner;
 import com.qcloud.cos.model.Permission;
 import com.qcloud.cos.model.UinGrantee;
@@ -28,6 +30,26 @@ public class AclTest extends AbstractCOSClientTest {
     @AfterClass
     public static void tearDownAfterClass() throws Exception {
         AbstractCOSClientTest.destoryCosClient();
+    }
+    
+    @Test
+    public void GetAclForCurrentBucket() {
+        if (!judgeUserInfoValid()) {
+            return;
+        }
+        AccessControlList aclGet = cosclient.getBucketAcl(bucket);
+        assertNotNull(aclGet.getOwner());
+        assertNotNull(aclGet.getOwner().getId());
+        assertNotNull(aclGet.getOwner().getDisplayName());
+        
+        assertEquals(2, aclGet.getGrantsAsList().size());
+        Grant firstGrant = aclGet.getGrantsAsList().get(0);
+        assertEquals(Permission.Read.toString(), firstGrant.getPermission().toString());
+        assertTrue(firstGrant.getGrantee() instanceof GroupGrantee);
+        
+        Grant secondGrant = aclGet.getGrantsAsList().get(1);
+        assertEquals(Permission.FullControl.toString(), secondGrant.getPermission().toString());
+        assertTrue(secondGrant.getGrantee() instanceof UinGrantee);
     }
 
     @Test

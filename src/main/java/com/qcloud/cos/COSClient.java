@@ -31,6 +31,8 @@ import com.qcloud.cos.auth.COSCredentialsProvider;
 import com.qcloud.cos.auth.COSSessionCredentials;
 import com.qcloud.cos.auth.COSSigner;
 import com.qcloud.cos.auth.COSStaticCredentialsProvider;
+import com.qcloud.cos.endpoint.EndpointBuilder;
+import com.qcloud.cos.endpoint.RegionEndpointBuilder;
 import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.exception.CosServiceException.ErrorType;
@@ -52,7 +54,6 @@ import com.qcloud.cos.internal.CosServiceRequest;
 import com.qcloud.cos.internal.CosServiceResponse;
 import com.qcloud.cos.internal.DeleteObjectsResponse;
 import com.qcloud.cos.internal.DigestValidationInputStream;
-import com.qcloud.cos.internal.UrlComponentUtils;
 import com.qcloud.cos.internal.InputSubstream;
 import com.qcloud.cos.internal.LengthCheckInputStream;
 import com.qcloud.cos.internal.MD5DigestCalculatingInputStream;
@@ -164,12 +165,12 @@ public class COSClient implements COS {
     private final SkipMd5CheckStrategy skipMd5CheckStrategy = SkipMd5CheckStrategy.INSTANCE;
     private final VoidCosResponseHandler voidCosResponseHandler = new VoidCosResponseHandler();
 
-    private COSCredentialsProvider credProvider;
+    private volatile COSCredentialsProvider credProvider;
 
     protected ClientConfig clientConfig;
 
     private CosHttpClient cosHttpClient;
-
+    
     public COSClient(COSCredentials cred, ClientConfig clientConfig) {
         this(new COSStaticCredentialsProvider(cred), clientConfig);
     }
@@ -180,10 +181,21 @@ public class COSClient implements COS {
         this.clientConfig = clientConfig;
         this.cosHttpClient = new DefaultCosHttpClient(clientConfig);
     }
-
+    
     public void shutdown() {
         this.cosHttpClient.shutdown();
     }
+    
+    public void setCOSCredentials(COSCredentials cred) {
+        rejectNull(cred, "cred must not be null");
+        this.credProvider = new COSStaticCredentialsProvider(cred);
+    }
+    
+    public void setCOSCredentialsProvider(COSCredentialsProvider credProvider) {
+        rejectNull(credProvider, "credProvider must not be null");
+        this.credProvider = credProvider;
+    }
+    
 
     @Override
     public ClientConfig getClientConfig() {
@@ -305,29 +317,26 @@ public class COSClient implements COS {
             CosHttpRequest<? extends CosServiceRequest> request,
             CopyObjectRequest copyObjectRequest) {
         Region sourceRegion = copyObjectRequest.getSourceBucketRegion();
+        EndpointBuilder srcEndpointBuilder = null;
         // 如果用户没有设置源region, 则默认和目的region一致
         if (sourceRegion == null) {
-            sourceRegion = this.clientConfig.getRegion();
+            srcEndpointBuilder = this.clientConfig.getEndpointBuilder();
+        } else {
+            srcEndpointBuilder = new RegionEndpointBuilder(sourceRegion);
         }
-        String sourceKey = formatKey(copyObjectRequest.getSourceKey());
+        if (copyObjectRequest.getSourceEndpointBuilder() != null) {
+            srcEndpointBuilder = copyObjectRequest.getSourceEndpointBuilder();
+        }
 
+        String sourceKey = formatKey(copyObjectRequest.getSourceKey());
         String sourceBucket =
                 formatBucket(copyObjectRequest.getSourceBucketName(),
                         (copyObjectRequest.getSourceAppid() != null)
                                 ? copyObjectRequest.getSourceAppid()
                                 : fetchCredential().getCOSAppId());
-        String srcEndpointSuffix = copyObjectRequest.getSourceEndpointSuffix();
-        if (srcEndpointSuffix == null) {
-            srcEndpointSuffix =
-                    String.format(".%s.myqcloud.com", formatRegion(sourceRegion.getRegionName()));
-        } else {
-            UrlComponentUtils.validateSrcEndPointSuffix(srcEndpointSuffix);
-        }
-        if (!srcEndpointSuffix.startsWith(".")) {
-            srcEndpointSuffix = "." + srcEndpointSuffix;
-        }
-        String copySourceHeader = String.format("%s%s%s", sourceBucket, srcEndpointSuffix.trim(),
-                UrlEncoderUtils.encodeEscapeDelimiter(sourceKey));
+        String copySourceHeader =
+                String.format("%s%s", srcEndpointBuilder.buildGeneralApiEndpoint(sourceBucket),
+                        UrlEncoderUtils.encodeEscapeDelimiter(sourceKey));
         if (copyObjectRequest.getSourceVersionId() != null) {
             copySourceHeader += "?versionId=" + copyObjectRequest.getSourceVersionId();
         }
@@ -372,9 +381,15 @@ public class COSClient implements COS {
     private void populateRequestWithCopyPartParameters(
             CosHttpRequest<? extends CosServiceRequest> request, CopyPartRequest copyPartRequest) {
         Region sourceRegion = copyPartRequest.getSourceBucketRegion();
+        EndpointBuilder srcEndpointBuilder = null;
         // 如果用户没有设置源region, 则默认和目的region一致
         if (sourceRegion == null) {
-            sourceRegion = this.clientConfig.getRegion();
+            srcEndpointBuilder = this.clientConfig.getEndpointBuilder();
+        } else {
+            srcEndpointBuilder = new RegionEndpointBuilder(sourceRegion);
+        }
+        if (copyPartRequest.getSourceEndpointBuilder() != null) {
+            srcEndpointBuilder = copyPartRequest.getSourceEndpointBuilder();
         }
         String sourceKey = formatKey(copyPartRequest.getSourceKey());
 
@@ -383,18 +398,9 @@ public class COSClient implements COS {
                         (copyPartRequest.getSourceAppid() != null)
                                 ? copyPartRequest.getSourceAppid()
                                 : fetchCredential().getCOSAppId());
-        String srcEndpointSuffix = copyPartRequest.getSourceEndpointSuffix();
-        if (srcEndpointSuffix == null) {
-            srcEndpointSuffix =
-                    String.format(".%s.myqcloud.com", formatRegion(sourceRegion.getRegionName()));
-        } else {
-            UrlComponentUtils.validateSrcEndPointSuffix(srcEndpointSuffix);
-        }
-        if (!srcEndpointSuffix.startsWith(".")) {
-            srcEndpointSuffix = "." + srcEndpointSuffix;
-        }
-        String copySourceHeader = String.format("%s%s%s", sourceBucket, srcEndpointSuffix.trim(),
-                UrlEncoderUtils.encodeEscapeDelimiter(sourceKey));
+        String copySourceHeader =
+                String.format("%s%s", srcEndpointBuilder.buildGeneralApiEndpoint(sourceBucket),
+                        UrlEncoderUtils.encodeEscapeDelimiter(sourceKey));
         if (copyPartRequest.getSourceVersionId() != null) {
             copySourceHeader += "?versionId=" + copyPartRequest.getSourceVersionId();
         }
@@ -430,21 +436,6 @@ public class COSClient implements COS {
             key = "/" + key;
         }
         return key;
-    }
-
-    private String formatRegion(String regionName) throws CosClientException {
-        UrlComponentUtils.validateRegionName(regionName);
-        if (regionName.startsWith("cos.")) {
-            return regionName;
-        } else {
-            if (regionName.equals("cn-east") || regionName.equals("cn-south")
-                    || regionName.equals("cn-north") || regionName.equals("cn-south-2")
-                    || regionName.equals("cn-southwest") || regionName.equals("sg")) {
-                return regionName;
-            } else {
-                return "cos." + regionName;
-            }
-        }
     }
 
     // 格式化一些路径, 去掉开始时的分隔符/, 比如list prefix.
@@ -484,32 +475,29 @@ public class COSClient implements COS {
             String bucket, String key, boolean isServiceRequest) throws CosClientException {
         key = formatKey(key);
         request.setResourcePath(key);
-        String host = "";
-        String endPointSuffix = this.clientConfig.getEndPointSuffix();
-        if (endPointSuffix == null) {
-            if (isServiceRequest) {
-                endPointSuffix = "service.cos.myqcloud.com";
-            } else {
-                endPointSuffix = String.format(".%s.myqcloud.com",
-                        formatRegion(clientConfig.getRegion().getRegionName()));
-            }
-        } else {
-            UrlComponentUtils.validateEndPointSuffix(endPointSuffix);
-        }
-
+        String endpoint = "";
+        String endpointAddr = "";
         if (isServiceRequest) {
-            host = endPointSuffix;
+            endpoint = clientConfig.getEndpointBuilder().buildGetServiceApiEndpoint();
+            endpointAddr =
+                    clientConfig.getEndpointResolver().resolveGetServiceApiEndpoint(endpoint);
         } else {
             bucket = formatBucket(bucket, fetchCredential().getCOSAppId());
-            if (!endPointSuffix.startsWith(".")) {
-                endPointSuffix = "." + endPointSuffix;
-            }
-            host = bucket + endPointSuffix;
+            endpoint = clientConfig.getEndpointBuilder().buildGeneralApiEndpoint(bucket);
+            endpointAddr = clientConfig.getEndpointResolver().resolveGeneralApiEndpoint(endpoint);
         }
 
-        request.addHeader(Headers.HOST, host);
+        if (endpoint == null) {
+            throw new CosClientException("endpoint is null, please check your endpoint builder");
+        }
+        if (endpointAddr == null) {
+            throw new CosClientException(
+                    "endpointAddr is null, please check your endpoint resolver");
+        }
+
+        request.addHeader(Headers.HOST, endpoint);
         request.setProtocol(clientConfig.getHttpProtocol());
-        request.setEndpoint(host);
+        request.setEndpoint(endpointAddr);
         request.setResourcePath(key);
     }
 
@@ -902,6 +890,27 @@ public class COSClient implements COS {
     public PutObjectResult putObject(String bucketName, String key, InputStream input,
             ObjectMetadata metadata) throws CosClientException, CosServiceException {
         return putObject(new PutObjectRequest(bucketName, key, input, metadata));
+    }
+
+    @Override
+    public PutObjectResult putObject(String bucketName, String key, String content)
+            throws CosClientException, CosServiceException {
+        rejectNull(bucketName,
+                "The bucket name parameter must be specified when uploading an object");
+        rejectNull(key, "The key parameter must be specified when uploading an object");
+        rejectNull(content,
+                "The content with utf-8 encoding must be specified when uploading an object");
+
+        byte[] contentByteArray = content.getBytes(StringUtils.UTF8);
+        String contentMd5 = Md5Utils.md5AsBase64(contentByteArray);
+
+        InputStream contentInput = new ByteArrayInputStream(contentByteArray);
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentType("text/plain");
+        metadata.setContentLength(contentByteArray.length);
+        metadata.setContentMD5(contentMd5);
+
+        return putObject(new PutObjectRequest(bucketName, key, contentInput, metadata));
     }
 
     @Override
@@ -2621,26 +2630,17 @@ public class COSClient implements COS {
                 cosSigner.buildAuthorizationStr(request.getHttpMethod(), request.getResourcePath(),
                         request.getHeaders(), request.getParameters(), cred, req.getExpiration());
         StringBuilder strBuilder = new StringBuilder();
-        strBuilder.append("http://").append(formatBucket(bucketName, cred.getCOSAppId()));
-
-        String endpointSuffix = clientConfig.getEndPointSuffix();
-
-        if (endpointSuffix == null) {
-            endpointSuffix = String.format(".%s.myqcloud.com",
-                    formatRegion(clientConfig.getRegion().getRegionName()));
-        }
-        if (!endpointSuffix.startsWith(".")) {
-            endpointSuffix = "." + endpointSuffix;
-        }
-
-        strBuilder.append(endpointSuffix)
-                .append(UrlEncoderUtils.encodeEscapeDelimiter(formatKey(key)));
+        strBuilder.append(clientConfig.getHttpProtocol().toString()).append("://");
+        strBuilder.append(clientConfig.getEndpointBuilder()
+                .buildGeneralApiEndpoint(formatBucket(bucketName, cred.getCOSAppId())));
+        strBuilder.append(UrlEncoderUtils.encodeEscapeDelimiter(formatKey(key)));
 
         boolean hasAppendFirstParameter = false;
         if (authStr != null) {
             strBuilder.append("?sign=").append(UrlEncoderUtils.encode(authStr));
             if (cred instanceof COSSessionCredentials) {
-                strBuilder.append("&x-cos-security-token=").append(UrlEncoderUtils.encode(((COSSessionCredentials) cred).getSessionToken()));
+                strBuilder.append("&").append(Headers.SECURITY_TOKEN).append("=").append(
+                        UrlEncoderUtils.encode(((COSSessionCredentials) cred).getSessionToken()));
             }
             hasAppendFirstParameter = true;
         }

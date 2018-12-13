@@ -373,16 +373,15 @@ public class DefaultCosHttpClient implements CosHttpClient {
                 ++retryIndex;
                 if (retryIndex >= kMaxRetryCnt) {
                     String errMsg = String.format(
-                            "httpClient execute occur a IOexcepiton. httpRequest: %s, excep: %s",
-                            request.toString(), e);
-                    log.error(errMsg);
-                    throw new CosClientException(errMsg);
+                            "httpClient execute occur a IOexcepiton. httpRequest: %s",
+                            request.toString());
+                    log.error(errMsg, e);
+                    throw new CosClientException(errMsg, e);
                 } else {
                     String warnMsg = String.format(
-                            "httpClient execute occur a IOexcepiton, ready to retry[%d/%d]. httpRequest: %s, excep: %s",
-                            retryIndex, kMaxRetryCnt, request.toString(), e);
-                    log.warn(warnMsg);
-                    // 加入sleep 避免雪崩
+                            "httpClient execute occur a IOexcepiton, ready to retry[%d/%d]. httpRequest: %s",
+                            retryIndex, kMaxRetryCnt, request.toString());
+                    log.warn(warnMsg, e);
                     int threadSleepMs = ThreadLocalRandom.current().nextInt(10, 100);
                     try {
                         Thread.sleep(threadSleepMs);
@@ -392,17 +391,17 @@ public class DefaultCosHttpClient implements CosHttpClient {
                 }
             } catch (Exception e) {
                 String errMsg = String.format(
-                        "httpClient execute occur a unknown exception. httpRequest: %s, excep: %s",
-                        request.toString(), e);
-                log.error(errMsg);
-                throw new CosClientException(errMsg);
+                        "httpClient execute occur a unknown exception. httpRequest: %s",
+                        request.toString());
+                log.error(errMsg, e);
+                throw new CosClientException(errMsg, e);
             }
         }
         if (!isRequestSuccessful(httpResponse)) {
             try {
                 throw handlerErrorMessage(request, httpRequest, httpResponse);
             } catch (IOException ioe) {
-                log.info("Unable to execute HTTP request: " + ioe.getMessage(), ioe);
+                log.error("Unable to execute HTTP request: " + ioe.getMessage(), ioe);
                 CosServiceException cse = new CosServiceException(
                         "Unable to execute HTTP request: " + ioe.getMessage(), ioe);
                 throw cse;

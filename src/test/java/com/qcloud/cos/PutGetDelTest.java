@@ -2,6 +2,7 @@ package com.qcloud.cos;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
@@ -14,19 +15,24 @@ import java.util.List;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
+import org.apache.http.client.CredentialsProvider;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import com.qcloud.cos.auth.COSCredentialsProvider;
 import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.http.HttpProtocol;
 import com.qcloud.cos.model.COSObject;
 import com.qcloud.cos.model.GetObjectRequest;
 import com.qcloud.cos.model.ObjectMetadata;
+import com.qcloud.cos.model.PutObjectResult;
 import com.qcloud.cos.model.SSECOSKeyManagementParams;
 import com.qcloud.cos.model.SSECustomerKey;
+import com.qcloud.cos.region.Region;
 import com.qcloud.cos.utils.Md5Utils;
+import com.qcloud.cos.utils.StringUtils;
 import com.qcloud.cos.utils.UrlEncoderUtils;
 
 public class PutGetDelTest extends AbstractCOSClientTest {
@@ -177,7 +183,7 @@ public class PutGetDelTest extends AbstractCOSClientTest {
         originObjectMeta.setContentType("image/tiff");
         testPutObjectByStreamDiffSize(0L, originObjectMeta);
     }
-    
+
     @Test
     public void testPutObjectWithGzipEncoding() throws IOException {
         ObjectMetadata originObjectMeta = new ObjectMetadata();
@@ -193,7 +199,7 @@ public class PutGetDelTest extends AbstractCOSClientTest {
         testPutObjectByStreamDiffSize(1L, originObjectMeta);
         useServerEncryption = false;
     }
-    
+
     @Test
     public void testDeleteNotExistObject() throws IOException {
         if (!judgeUserInfoValid()) {
@@ -353,6 +359,124 @@ public class PutGetDelTest extends AbstractCOSClientTest {
             testPutGetObjectAndClear(key, localFile, downLoadFile, sseCKey, null);
         } finally {
             useServerEncryption = false;
+        }
+    }
+
+    @Test
+    public void testTemporyTokenPutGetDel() throws CosServiceException, IOException {
+        COSClient normalClient = cosclient;
+        COSClient temporyCOSClient = buildTemporyCredentialsCOSClient(1800L);
+        try {
+            cosclient = temporyCOSClient;
+            testPutGetDelObjectEmpty();
+            testPutGetDelObject256k();
+            testPutGetDelObject32M();
+            testPutGetDelHttps();
+            testPutGetDelObjectNameContainChinese();
+        } finally {
+            cosclient = normalClient;
+            temporyCOSClient.shutdown();
+        }
+    }
+    
+    @Test
+    public void testTemporyTokenExpired() throws CosServiceException, IOException, InterruptedException {
+        COSClient normalClient = cosclient;
+        COSClient temporyCOSClient = buildTemporyCredentialsCOSClient(10L);
+        try {
+            cosclient = temporyCOSClient;
+            try {
+                testPutGetDelObjectEmpty();
+            } catch (Exception e) {
+                fail(e.toString());
+            }
+            Thread.sleep(15000L);
+            try {
+                testPutGetDelObject256k();
+            } catch (CosServiceException cse) {
+                assertEquals(403, cse.getStatusCode());
+                return;
+            } catch (Exception e) {
+                fail(e.toString());
+            }
+            fail();
+        } finally {
+            cosclient = normalClient;
+            temporyCOSClient.shutdown();
+        }
+    }
+
+    private void putObjectFromString(String key, String content) throws IOException {
+        if (!judgeUserInfoValid()) {
+            return;
+        }
+        File downloadFile = buildTestFile(0L);
+        try {
+            String contentEtag = Md5Utils.md5Hex(content);
+            PutObjectResult putObjectResult = cosclient.putObject(bucket, key, content);
+            String etag = putObjectResult.getETag();
+            assertEquals(!useClientEncryption, contentEtag.equals(etag));
+            headSimpleObject(key, content.getBytes(StringUtils.UTF8).length, contentEtag);
+            getObject(key, downloadFile, null, content.getBytes(StringUtils.UTF8).length,
+                    contentEtag);
+            cosclient.getObjectMetadata(bucket, key);
+        } finally {
+            cosclient.deleteObject(bucket, key);
+            assertTrue(downloadFile.delete());
+        }
+
+    }
+
+    @Test
+    public void testPutObjectWithContent() throws CosServiceException, IOException {
+        putObjectFromString("ut/content_put_empty", "");
+        putObjectFromString("ut/content_put_chinese中文", "中文做个测试*xxfafa///   \\\\cafa* ==++ --^%$#@#!()*测试结束");
+    }
+
+    @Test
+    public void testPutObjectWithNullParam() throws CosServiceException, IOException {
+        try {
+            cosclient.putObject(null, "xxx/key.txt", "");
+        } catch (IllegalArgumentException iae) {
+            return;
+        } catch (Exception e) {
+            fail(e.toString());
+        }
+
+        try {
+            cosclient.putObject(bucket, null, "");
+        } catch (IllegalArgumentException iae) {
+            return;
+        } catch (Exception e) {
+            fail(e.toString());
+        }
+
+        try {
+            String content = null;
+            cosclient.putObject(bucket, "ut/xx", content);
+        } catch (IllegalArgumentException iae) {
+            return;
+        } catch (Exception e) {
+            fail(e.toString());
+        }
+    }
+    
+    @Test
+    public void testCachedTemporyTokenCredentialsProviderPutGetDel() throws CosServiceException, IOException, InterruptedException {
+        COSClient normalClient = cosclient;
+        CachedTemporyTokenCredentialsProvider credentialsProvider = new CachedTemporyTokenCredentialsProvider(5, 10);
+        COSClient temporyCOSClient = new COSClient(credentialsProvider, new ClientConfig(new Region(region)));
+        try {
+            cosclient = temporyCOSClient;
+            testPutGetDelObjectEmpty();
+            Thread.sleep(15000L);
+            testPutGetDelObject256k();
+            testPutGetDelHttps();
+            testPutGetDelObjectNameContainChinese();
+        } finally {
+            cosclient = normalClient;
+            temporyCOSClient.shutdown();
+            credentialsProvider.close();
         }
     }
 
