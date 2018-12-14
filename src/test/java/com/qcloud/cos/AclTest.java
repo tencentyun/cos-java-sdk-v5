@@ -1,6 +1,8 @@
 package com.qcloud.cos;
 
+import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -12,9 +14,11 @@ import static org.junit.Assert.assertNotNull;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Random;
 
 import com.qcloud.cos.model.AccessControlList;
 import com.qcloud.cos.model.CannedAccessControlList;
+import com.qcloud.cos.model.CreateBucketRequest;
 import com.qcloud.cos.model.Grant;
 import com.qcloud.cos.model.GroupGrantee;
 import com.qcloud.cos.model.Owner;
@@ -22,6 +26,7 @@ import com.qcloud.cos.model.Permission;
 import com.qcloud.cos.model.UinGrantee;
 
 public class AclTest extends AbstractCOSClientTest {
+
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
         AbstractCOSClientTest.initCosClient();
@@ -31,25 +36,38 @@ public class AclTest extends AbstractCOSClientTest {
     public static void tearDownAfterClass() throws Exception {
         AbstractCOSClientTest.destoryCosClient();
     }
-    
+
     @Test
-    public void GetAclForCurrentBucket() {
+    public void GetAclForNewPubReadBucket() {
         if (!judgeUserInfoValid()) {
             return;
         }
-        AccessControlList aclGet = cosclient.getBucketAcl(bucket);
-        assertNotNull(aclGet.getOwner());
-        assertNotNull(aclGet.getOwner().getId());
-        assertNotNull(aclGet.getOwner().getDisplayName());
-        
-        assertEquals(2, aclGet.getGrantsAsList().size());
-        Grant firstGrant = aclGet.getGrantsAsList().get(0);
-        assertEquals(Permission.Read.toString(), firstGrant.getPermission().toString());
-        assertTrue(firstGrant.getGrantee() instanceof GroupGrantee);
-        
-        Grant secondGrant = aclGet.getGrantsAsList().get(1);
-        assertEquals(Permission.FullControl.toString(), secondGrant.getPermission().toString());
-        assertTrue(secondGrant.getGrantee() instanceof UinGrantee);
+        String aclTestBucketName = null;
+        try {
+            aclTestBucketName = "javasdkacltest-" + appid;
+            CreateBucketRequest createBucketRequest = new CreateBucketRequest(aclTestBucketName);
+            createBucketRequest.setCannedAcl(CannedAccessControlList.PublicRead);
+            cosclient.createBucket(createBucketRequest);
+            AccessControlList aclGet = cosclient.getBucketAcl(aclTestBucketName);
+            assertNotNull(aclGet.getOwner());
+            assertNotNull(aclGet.getOwner().getId());
+            assertNotNull(aclGet.getOwner().getDisplayName());
+            
+            assertEquals(2, aclGet.getGrantsAsList().size());
+            Grant firstGrant = aclGet.getGrantsAsList().get(0);
+            assertEquals(Permission.Read.toString(), firstGrant.getPermission().toString());
+            assertTrue(firstGrant.getGrantee() instanceof GroupGrantee);
+            
+            Grant secondGrant = aclGet.getGrantsAsList().get(1);
+            assertEquals(Permission.FullControl.toString(), secondGrant.getPermission().toString());
+            assertTrue(secondGrant.getGrantee() instanceof UinGrantee);
+        } finally {
+            if (aclTestBucketName != null) {
+                cosclient.deleteBucket(aclTestBucketName);
+                aclTestBucketName = null;
+            }
+        }
+
     }
 
     @Test
@@ -81,7 +99,7 @@ public class AclTest extends AbstractCOSClientTest {
         }
         cosclient.setBucketAcl(bucket, CannedAccessControlList.Private);
         AccessControlList acl = cosclient.getBucketAcl(bucket);
-        
+
     }
 
     @Test
@@ -125,10 +143,10 @@ public class AclTest extends AbstractCOSClientTest {
         try {
             cosclient.setObjectAcl(bucket, key, CannedAccessControlList.PublicRead);
             cosclient.getObjectAcl(bucket, key);
-            
+
             cosclient.setObjectAcl(bucket, key, CannedAccessControlList.Default);
             cosclient.getObjectAcl(bucket, key);
-            
+
         } finally {
             assertTrue(localFile.delete());
             clearObject(key);

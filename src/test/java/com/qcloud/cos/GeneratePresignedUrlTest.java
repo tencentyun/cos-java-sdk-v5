@@ -171,8 +171,8 @@ public class GeneratePresignedUrlTest extends AbstractCOSClientTest {
         cosclient.setBucketAcl(bucket, CannedAccessControlList.PublicReadWrite);
         Thread.sleep(5000L);
         COSCredentials cred = new AnonymousCOSCredentials();
-        ClientConfig clientConfig = new ClientConfig(new Region(region));
-        COSClient anoyCOSClient = new COSClient(cred, clientConfig);
+        ClientConfig anoyClientConfig = new ClientConfig(new Region(region));
+        COSClient anoyCOSClient = new COSClient(cred, anoyClientConfig);
 
 
         String key = "ut/generate_url_test_upload.txt";
@@ -220,9 +220,6 @@ public class GeneratePresignedUrlTest extends AbstractCOSClientTest {
             URL putUrl = temporyCOSClient.generatePresignedUrl(bucket, key, expirationTime, HttpMethodName.PUT);
             URL getUrl = temporyCOSClient.generatePresignedUrl(bucket, key, expirationTime, HttpMethodName.GET);
             URL delUrl = temporyCOSClient.generatePresignedUrl(bucket, key, expirationTime, HttpMethodName.DELETE);
-            System.out.println("puturl: " + putUrl.toString());
-            System.out.println("getUrl: " + putUrl.toString());
-            System.out.println("deleteUrl: " + putUrl.toString());
             assertTrue(putUrl.toString().startsWith("http://"));
             assertTrue(getUrl.toString().startsWith("http://"));
             assertTrue(delUrl.toString().startsWith("http://"));
@@ -243,7 +240,6 @@ public class GeneratePresignedUrlTest extends AbstractCOSClientTest {
             clearObject(key);
             assertTrue(localFile.delete());
             assertTrue(downLoadFile.delete()); 
-            cosclient.shutdown();
             temporyCOSClient.shutdown();
         }
     }

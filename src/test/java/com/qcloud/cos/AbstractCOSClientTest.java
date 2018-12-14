@@ -185,8 +185,8 @@ public class AbstractCOSClientTest {
         BasicSessionCredentials tempCred =
                 new BasicSessionCredentials(temporyToken.getTempSecretId(),
                         temporyToken.getTempSecretKey(), temporyToken.getTempToken());;
-        clientConfig = new ClientConfig(new Region(region));
-        COSClient tempCOSClient = new COSClient(tempCred, clientConfig);
+        ClientConfig temporyClientConfig = new ClientConfig(new Region(region));
+        COSClient tempCOSClient = new COSClient(tempCred, temporyClientConfig);
         return tempCOSClient;
     }
 
