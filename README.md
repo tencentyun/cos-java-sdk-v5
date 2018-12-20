@@ -5,9 +5,11 @@
 ## maven坐标
 
 ```xml
-<groupId>com.qcloud</groupId>
-<artifactId>cos_api</artifactId>
-<version>5.4.7</version>
+<dependency>
+    <groupId>com.qcloud</groupId>
+    <artifactId>cos_api</artifactId>
+    <version>5.4.10</version>
+</dependency>
 ```
 
 cos-java-sdk-v5 适用于COS XML API https://www.qcloud.com/document/product/436/7751, 
