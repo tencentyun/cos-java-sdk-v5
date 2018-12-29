@@ -48,7 +48,6 @@ public class PutGetDelTest extends AbstractCOSClientTest {
     }
 
 
-
     private void testPutObjectByStreamDiffSize(long size) throws IOException {
         if (!judgeUserInfoValid()) {
             return;
@@ -378,11 +377,11 @@ public class PutGetDelTest extends AbstractCOSClientTest {
             temporyCOSClient.shutdown();
         }
     }
-    
+
     @Test
     public void testTemporyTokenExpired() throws CosServiceException, IOException, InterruptedException {
         COSClient normalClient = cosclient;
-        COSClient temporyCOSClient = buildTemporyCredentialsCOSClient(10L);
+        COSClient temporyCOSClient = buildTemporyCredentialsCOSClient(10);
         try {
             cosclient = temporyCOSClient;
             try {
@@ -390,7 +389,7 @@ public class PutGetDelTest extends AbstractCOSClientTest {
             } catch (Exception e) {
                 fail(e.toString());
             }
-            Thread.sleep(15000L);
+            Thread.sleep(20000L);
             try {
                 testPutGetDelObject256k();
             } catch (CosServiceException cse) {
@@ -460,7 +459,7 @@ public class PutGetDelTest extends AbstractCOSClientTest {
             fail(e.toString());
         }
     }
-    
+
     @Test
     public void testCachedTemporyTokenCredentialsProviderPutGetDel() throws CosServiceException, IOException, InterruptedException {
         COSClient normalClient = cosclient;

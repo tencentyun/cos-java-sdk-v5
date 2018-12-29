@@ -65,7 +65,7 @@ public class BucketReplicationTest extends AbstractCOSClientTest {
         } catch (InterruptedException e) {
             fail(e.toString());
         }
-        
+
         BucketReplicationConfiguration replicaConfigGet =
                 cosclient.getBucketReplicationConfiguration(bucket);
         assertEquals(ruleName, replicaConfigGet.getRoleName());
@@ -76,10 +76,9 @@ public class BucketReplicationTest extends AbstractCOSClientTest {
                 replicationRule2.getDestinationConfig().getStorageClass());
         assertEquals(ReplicationRuleStatus.Enabled.toString(), replicationRule2.getStatus());
         assertEquals(prefix, replicationRule2.getPrefix());
-        
+
         cosclient.deleteBucketReplicationConfiguration(bucket);
     }
-
 
 
 }

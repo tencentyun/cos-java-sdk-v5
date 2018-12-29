@@ -19,7 +19,7 @@ import java.util.TreeMap;
 import java.util.Map.Entry;
 import java.util.concurrent.ThreadLocalRandom;
 
-import org.apache.commons.logging.Log;
+import com.qcloud.cos.model.*;
 
 import com.qcloud.QcloudApiModuleCenter;
 import com.qcloud.Module.Sts;
@@ -36,38 +36,6 @@ import com.qcloud.cos.internal.crypto.CryptoMode;
 import com.qcloud.cos.internal.crypto.EncryptionMaterials;
 import com.qcloud.cos.internal.crypto.QCLOUDKMS;
 import com.qcloud.cos.internal.crypto.StaticEncryptionMaterialsProvider;
-import com.qcloud.cos.model.AbortMultipartUploadRequest;
-import com.qcloud.cos.model.AccessControlList;
-import com.qcloud.cos.model.Bucket;
-import com.qcloud.cos.model.COSVersionSummary;
-import com.qcloud.cos.model.CannedAccessControlList;
-import com.qcloud.cos.model.CompleteMultipartUploadRequest;
-import com.qcloud.cos.model.CompleteMultipartUploadResult;
-import com.qcloud.cos.model.CreateBucketRequest;
-import com.qcloud.cos.model.GetObjectMetadataRequest;
-import com.qcloud.cos.model.GetObjectRequest;
-import com.qcloud.cos.model.InitiateMultipartUploadRequest;
-import com.qcloud.cos.model.InitiateMultipartUploadResult;
-import com.qcloud.cos.model.ListMultipartUploadsRequest;
-import com.qcloud.cos.model.ListPartsRequest;
-import com.qcloud.cos.model.ListVersionsRequest;
-import com.qcloud.cos.model.MultipartUpload;
-import com.qcloud.cos.model.MultipartUploadListing;
-import com.qcloud.cos.model.ObjectMetadata;
-import com.qcloud.cos.model.PartETag;
-import com.qcloud.cos.model.PartListing;
-import com.qcloud.cos.model.PartSummary;
-import com.qcloud.cos.model.Permission;
-import com.qcloud.cos.model.PutObjectRequest;
-import com.qcloud.cos.model.PutObjectResult;
-import com.qcloud.cos.model.ResponseHeaderOverrides;
-import com.qcloud.cos.model.SSECOSKeyManagementParams;
-import com.qcloud.cos.model.SSECustomerKey;
-import com.qcloud.cos.model.StorageClass;
-import com.qcloud.cos.model.UinGrantee;
-import com.qcloud.cos.model.UploadPartRequest;
-import com.qcloud.cos.model.UploadPartResult;
-import com.qcloud.cos.model.VersionListing;
 import com.qcloud.cos.region.Region;
 import com.qcloud.cos.utils.DateUtils;
 import com.qcloud.cos.utils.Md5Utils;
@@ -184,7 +152,7 @@ public class AbstractCOSClientTest {
         TemporyToken temporyToken = fetchTempToken(tokenDuration);
         BasicSessionCredentials tempCred =
                 new BasicSessionCredentials(temporyToken.getTempSecretId(),
-                        temporyToken.getTempSecretKey(), temporyToken.getTempToken());;
+                        temporyToken.getTempSecretKey(), temporyToken.getTempToken());
         ClientConfig temporyClientConfig = new ClientConfig(new Region(region));
         COSClient tempCOSClient = new COSClient(tempCred, temporyClientConfig);
         return tempCOSClient;
@@ -246,6 +214,7 @@ public class AbstractCOSClientTest {
         }
     }
 
+
     private static void clearObjectVersions() throws Exception {
         ListVersionsRequest listVersionsReq = new ListVersionsRequest();
         listVersionsReq.setBucketName(bucket);
@@ -268,7 +237,34 @@ public class AbstractCOSClientTest {
 
     private static void clearBucket() throws Exception {
         abortAllNotFinishedMultipartUpload();
-        clearObjectVersions();
+        // 先判断bucket是否开启了版本控制
+        GetBucketVersioningConfigurationRequest getBucketVersioningConfigurationRequest =
+                new GetBucketVersioningConfigurationRequest(bucket);
+        BucketVersioningConfiguration bucketVersioningConfiguration = cosclient.getBucketVersioningConfiguration(
+                getBucketVersioningConfigurationRequest
+        );
+        if (bucketVersioningConfiguration.getStatus().compareToIgnoreCase(BucketVersioningConfiguration.ENABLED) == 0) {
+            clearObjectVersions();
+        } else {
+            String nextMarker = "";
+            boolean isTruncated = false;
+            do {
+                ListObjectsRequest listObjectsRequest = new ListObjectsRequest();
+                listObjectsRequest.setBucketName(bucket);
+                listObjectsRequest.setMaxKeys(1000);
+                listObjectsRequest.setPrefix("");
+                listObjectsRequest.setDelimiter("");
+                listObjectsRequest.setMarker(nextMarker);
+                ObjectListing objectListing = cosclient.listObjects(listObjectsRequest);
+                for (COSObjectSummary cosObjectSummary : objectListing.getObjectSummaries()) {
+                    String key = cosObjectSummary.getKey();
+                    // 删除这个key
+                    cosclient.deleteObject(bucket, key);
+                }
+                nextMarker = objectListing.getNextMarker();
+                isTruncated = objectListing.isTruncated();
+            } while (isTruncated);
+        }
     }
 
     private static void deleteBucket() throws Exception {
@@ -303,7 +299,7 @@ public class AbstractCOSClientTest {
 
     // 从本地上传
     protected static PutObjectResult putObjectFromLocalFile(File localFile, String key,
-            SSECustomerKey sseCKey, SSECOSKeyManagementParams params) {
+                                                            SSECustomerKey sseCKey, SSECOSKeyManagementParams params) {
         if (!judgeUserInfoValid()) {
             return null;
         }
@@ -342,7 +338,7 @@ public class AbstractCOSClientTest {
 
     // 流式上传
     protected static void putObjectFromLocalFileByInputStream(File localFile, long uploadSize,
-            String uploadEtag, String key) {
+                                                              String uploadEtag, String key) {
         if (!judgeUserInfoValid()) {
             return;
         }
@@ -352,7 +348,7 @@ public class AbstractCOSClientTest {
     }
 
     protected static void putObjectFromLocalFileByInputStream(File localFile, long uploadSize,
-            String uploadEtag, String key, ObjectMetadata objectMetadata) {
+                                                              String uploadEtag, String key, ObjectMetadata objectMetadata) {
         if (!judgeUserInfoValid()) {
             return;
         }
@@ -384,7 +380,7 @@ public class AbstractCOSClientTest {
     }
 
     protected static ObjectMetadata headSimpleObject(String key, long expectedLength,
-            String expectedEtag) {
+                                                     String expectedEtag) {
         ObjectMetadata objectMetadata =
                 cosclient.getObjectMetadata(new GetObjectMetadataRequest(bucket, key));
         if (!useClientEncryption) {
@@ -405,7 +401,7 @@ public class AbstractCOSClientTest {
     }
 
     protected static ObjectMetadata headMultiPartObject(String key, long expectedLength,
-            int expectedPartNum) {
+                                                        int expectedPartNum) {
         ObjectMetadata objectMetadata =
                 cosclient.getObjectMetadata(new GetObjectMetadataRequest(bucket, key));
         if (!useClientEncryption) {
@@ -425,7 +421,7 @@ public class AbstractCOSClientTest {
 
     // 下载COS的object
     protected static void getObject(String key, File localDownFile, long[] range,
-            long expectedLength, String expectedMd5) {
+                                    long expectedLength, String expectedMd5) {
         System.setProperty(SkipMd5CheckStrategy.DISABLE_GET_OBJECT_MD5_VALIDATION_PROPERTY, "true");
         GetObjectRequest getObjectRequest = new GetObjectRequest(bucket, key);
         ResponseHeaderOverrides responseHeaders = new ResponseHeaderOverrides();
@@ -462,7 +458,7 @@ public class AbstractCOSClientTest {
         } catch (SecurityException se) {
             if (cosclient instanceof COSEncryptionClient && cryptoConfiguration != null
                     && cryptoConfiguration
-                            .getCryptoMode() == CryptoMode.StrictAuthenticatedEncryption
+                    .getCryptoMode() == CryptoMode.StrictAuthenticatedEncryption
                     && range != null) {
                 return;
             }
@@ -586,7 +582,7 @@ public class AbstractCOSClientTest {
             // get object
             long[] range = null;
             if (truncateSize > 0) {
-                range = new long[] {0, truncateSize - 1};
+                range = new long[]{0, truncateSize - 1};
             }
             getObject(key, downLoadFile, range, truncateSize, originMd5);
             // check file
@@ -621,7 +617,7 @@ public class AbstractCOSClientTest {
     }
 
     protected void testPutGetObjectAndClear(String key, File localFile, File downLoadFile,
-            SSECustomerKey sseCKey, SSECOSKeyManagementParams params)
+                                            SSECustomerKey sseCKey, SSECOSKeyManagementParams params)
             throws CosServiceException, IOException {
         if (!judgeUserInfoValid()) {
             return;
@@ -634,7 +630,7 @@ public class AbstractCOSClientTest {
             headSimpleObject(key, localFile.length(), Md5Utils.md5Hex(localFile));
             long range[] = null;
             if (localFile.length() > 0) {
-                range = new long[] {0, localFile.length() - 1};
+                range = new long[]{0, localFile.length() - 1};
             }
             // get object
             getObject(key, downLoadFile, range, localFile.length(), Md5Utils.md5Hex(localFile));
@@ -659,7 +655,7 @@ public class AbstractCOSClientTest {
     }
 
     protected void testUploadPart(String key, String uploadId, int partNumber, byte[] data,
-            String dataMd5, boolean isLastPart) {
+                                  String dataMd5, boolean isLastPart) {
         UploadPartRequest uploadPartRequest = new UploadPartRequest();
         uploadPartRequest.setBucketName(bucket);
         uploadPartRequest.setKey(key);
@@ -679,7 +675,7 @@ public class AbstractCOSClientTest {
     }
 
     protected List<PartETag> testListMultipart(String key, String uploadId, int expectedPartNum,
-            List<String> originDataMd5Array) {
+                                               List<String> originDataMd5Array) {
         List<PartETag> partETags = new LinkedList<>();
         PartListing partListing = null;
         ListPartsRequest listPartsRequest = new ListPartsRequest(bucket, key, uploadId);
@@ -705,7 +701,7 @@ public class AbstractCOSClientTest {
     }
 
     protected void testCompleteMultiPart(String key, String uploadId, List<PartETag> partETags,
-            int expectedPartNum) {
+                                         int expectedPartNum) {
         CompleteMultipartUploadRequest completeMultipartUploadRequest =
                 new CompleteMultipartUploadRequest(bucket, key, uploadId, partETags);
         CompleteMultipartUploadResult completeResult =
@@ -723,7 +719,7 @@ public class AbstractCOSClientTest {
     }
 
     protected void testGetEachPart(String key, long partSize, long fileSize,
-            List<PartETag> partETags, List<String> originDataMd5Array) throws IOException {
+                                   List<PartETag> partETags, List<String> originDataMd5Array) throws IOException {
         File downloadFile = buildTestFile(0L);
         long partBegin = 0;
         long partEnd = 0;
@@ -736,7 +732,7 @@ public class AbstractCOSClientTest {
                 if (partEnd >= fileSize) {
                     partEnd = fileSize - 1;
                 }
-                long range[] = new long[] {partBegin, partEnd};
+                long range[] = new long[]{partBegin, partEnd};
                 getObject(key, downloadFile, range, partEnd - partBegin + 1,
                         originDataMd5Array.get(partNumber - 1));
                 assertEquals(partEnd - partBegin + 1, downloadFile.length());
@@ -792,6 +788,7 @@ public class AbstractCOSClientTest {
                 "{\"statement\": [{\"action\": [\"name/cos:*\"],\"effect\": \"allow\",\"resource\":\"*\"}],\"version\": \"2.0\"}";
 
         TreeMap<String, Object> config = new TreeMap<String, Object>();
+
 
         config.put("SecretId", secretId);
         config.put("SecretKey", secretKey);
