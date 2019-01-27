@@ -245,26 +245,25 @@ public class AbstractCOSClientTest {
         );
         if (bucketVersioningConfiguration.getStatus().compareToIgnoreCase(BucketVersioningConfiguration.ENABLED) == 0) {
             clearObjectVersions();
-        } else {
-            String nextMarker = "";
-            boolean isTruncated = false;
-            do {
-                ListObjectsRequest listObjectsRequest = new ListObjectsRequest();
-                listObjectsRequest.setBucketName(bucket);
-                listObjectsRequest.setMaxKeys(1000);
-                listObjectsRequest.setPrefix("");
-                listObjectsRequest.setDelimiter("");
-                listObjectsRequest.setMarker(nextMarker);
-                ObjectListing objectListing = cosclient.listObjects(listObjectsRequest);
-                for (COSObjectSummary cosObjectSummary : objectListing.getObjectSummaries()) {
-                    String key = cosObjectSummary.getKey();
-                    // 删除这个key
-                    cosclient.deleteObject(bucket, key);
-                }
-                nextMarker = objectListing.getNextMarker();
-                isTruncated = objectListing.isTruncated();
-            } while (isTruncated);
         }
+        String nextMarker = "";
+        boolean isTruncated = false;
+        do {
+            ListObjectsRequest listObjectsRequest = new ListObjectsRequest();
+            listObjectsRequest.setBucketName(bucket);
+            listObjectsRequest.setMaxKeys(1000);
+            listObjectsRequest.setPrefix("");
+            listObjectsRequest.setDelimiter("");
+            listObjectsRequest.setMarker(nextMarker);
+            ObjectListing objectListing = cosclient.listObjects(listObjectsRequest);
+            for (COSObjectSummary cosObjectSummary : objectListing.getObjectSummaries()) {
+                String key = cosObjectSummary.getKey();
+                // 删除这个key
+                cosclient.deleteObject(bucket, key);
+            }
+            nextMarker = objectListing.getNextMarker();
+            isTruncated = objectListing.isTruncated();
+        } while (isTruncated);
     }
 
     private static void deleteBucket() throws Exception {
