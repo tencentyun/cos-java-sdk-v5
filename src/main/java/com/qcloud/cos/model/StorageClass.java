@@ -24,7 +24,12 @@ public enum StorageClass {
     /**
      * STANDARD_IA
      */
-    Standard_IA("Standard_IA");
+    Standard_IA("Standard_IA"),
+
+    /**
+     * Archive
+     */
+    Archive("Archive");
 
     /**
      * Returns the Qcloud COS {@link StorageClass} enumeration value representing the
@@ -32,15 +37,11 @@ public enum StorageClass {
      * If the specified string doesn't map to a known Qcloud COS storage class,
      * an <code>IllegalArgumentException</code> is thrown.
      *
-     * @param Cos StorageClassString
-     *            The Qcloud COS storage class ID string.
-     *
+     * @param cosStorageClassString The Qcloud COS storage class ID string.
      * @return The Qcloud COS <code>StorageClass</code> enumeration value representing the
-     *         specified Qcloud COS storage class ID.
-     *
-     * @throws IllegalArgumentException
-     *             If the specified value does not map to one of the known
-     *             Qcloud COS storage classes.
+     * specified Qcloud COS storage class ID.
+     * @throws IllegalArgumentException If the specified value does not map to one of the known
+     *                                  Qcloud COS storage classes.
      */
     public static StorageClass fromValue(String cosStorageClassString) throws IllegalArgumentException {
         for (StorageClass storageClass : StorageClass.values()) {

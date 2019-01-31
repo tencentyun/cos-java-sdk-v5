@@ -20,16 +20,16 @@ public class ClientConfig {
     // 多次签名的默认过期时间,单位秒
     private static final long DEFAULT_SIGN_EXPIRED = 3600;
     // 默认的user_agent标识
-    private static final String DEFAULT_USER_AGENT = "cos-java-sdk-v5.4.10";
+    private static final String DEFAULT_USER_AGENT = "cos-java-sdk-v5.5.0";
     // Read Limit
     private static final int DEFAULT_READ_LIMIT = (2 << 17) + 1;
-    
+
     private Region region;
     private HttpProtocol httpProtocol = HttpProtocol.http;
     private String endPointSuffix = null;
     private EndpointBuilder endpointBuilder = null;
     private EndpointResolver endpointResolver = new DefaultEndpointResolver();
-    
+
     // http proxy代理，如果使用http proxy代理，需要设置IP与端口
     private String httpProxyIp = null;
     private int httpProxyPort = 0;
@@ -127,7 +127,7 @@ public class ClientConfig {
     public void setMaxConnectionsCount(int maxConnectionsCount) {
         this.maxConnectionsCount = maxConnectionsCount;
     }
-    
+
     public void setUserAgent(String userAgent) {
         this.userAgent = userAgent;
     }
@@ -137,7 +137,6 @@ public class ClientConfig {
     }
 
     /**
-     * 
      * @return
      */
     @Deprecated

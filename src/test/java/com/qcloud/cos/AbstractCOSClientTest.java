@@ -175,7 +175,8 @@ public class AbstractCOSClientTest {
         if (!tmpDir.exists()) {
             tmpDir.mkdirs();
         }
-        createBucket();
+        deleteBucket();             // 先清理掉原先的bucket
+        createBucket();             // 然后再重新创建
     }
 
     private static void createBucket() throws Exception {
@@ -259,6 +260,7 @@ public class AbstractCOSClientTest {
             for (COSObjectSummary cosObjectSummary : objectListing.getObjectSummaries()) {
                 String key = cosObjectSummary.getKey();
                 // 删除这个key
+                System.out.println(key);
                 cosclient.deleteObject(bucket, key);
             }
             nextMarker = objectListing.getNextMarker();
@@ -267,6 +269,10 @@ public class AbstractCOSClientTest {
     }
 
     private static void deleteBucket() throws Exception {
+        if (!cosclient.doesBucketExist(bucket)) {
+            return;
+        }
+
         try {
             clearBucket();
             cosclient.deleteBucket(bucket);
@@ -375,7 +381,6 @@ public class AbstractCOSClientTest {
                 }
             }
         }
-
     }
 
     protected static ObjectMetadata headSimpleObject(String key, long expectedLength,
