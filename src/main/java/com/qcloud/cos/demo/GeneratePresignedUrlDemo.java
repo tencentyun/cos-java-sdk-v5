@@ -39,7 +39,7 @@ public class GeneratePresignedUrlDemo {
         String key = "aaa.txt";
         GeneratePresignedUrlRequest req =
                 new GeneratePresignedUrlRequest(bucketName, key, HttpMethodName.GET);
-        // 设置签名过期时间(可选), 若未进行设置则默认使用ClientConfig中的签名过期时间(5分钟)
+        // 设置签名过期时间(可选), 若未进行设置则默认使用ClientConfig中的签名过期时间(1小时)
         // 这里设置签名在半个小时后过期
         Date expirationDate = new Date(System.currentTimeMillis() + 30 * 60 * 1000);
         req.setExpiration(expirationDate);
@@ -78,7 +78,7 @@ public class GeneratePresignedUrlDemo {
         responseHeaders.setCacheControl(responseCacheControl);
         responseHeaders.setExpires(cacheExpireStr);
         req.setResponseHeaders(responseHeaders);
-        // 设置签名过期时间(可选), 若未进行设置则默认使用ClientConfig中的签名过期时间(5分钟)
+        // 设置签名过期时间(可选), 若未进行设置则默认使用ClientConfig中的签名过期时间(1小时)
         // 这里设置签名在半个小时后过期
         Date expirationDate = new Date(System.currentTimeMillis() + 30 * 60 * 1000);
         req.setExpiration(expirationDate);
