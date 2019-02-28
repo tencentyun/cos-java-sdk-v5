@@ -20,7 +20,7 @@ public class ClientConfig {
     // 多次签名的默认过期时间,单位秒
     private static final long DEFAULT_SIGN_EXPIRED = 3600;
     // 默认的user_agent标识
-    private static final String DEFAULT_USER_AGENT = "cos-java-sdk-v5.5.0";
+    private static final String DEFAULT_USER_AGENT = "cos-java-sdk-v5.5.1";
     // Read Limit
     private static final int DEFAULT_READ_LIMIT = (2 << 17) + 1;
 
