@@ -8,6 +8,7 @@ notifications:
     recipients:
       - chengwu@tencent.com
       - iainyu@tencent.com
+      - yongqingliu@tencent.com
     on_success: always # default: change
     on_failure: always # default: always
   
