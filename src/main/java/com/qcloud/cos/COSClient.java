@@ -231,6 +231,11 @@ public class COSClient implements COS {
             throw new IllegalArgumentException(errorMessage);
     }
 
+    private void rejectEmpty(String parameterValue, String errorMessage) {
+        if (parameterValue.isEmpty())
+            throw new IllegalArgumentException(errorMessage);
+    }
+
     protected <X extends CosServiceRequest> CosHttpRequest<X> createRequest(String bucketName,
             String key, X originalRequest, HttpMethodName httpMethod) {
         CosHttpRequest<X> httpRequest = new CosHttpRequest<X>(originalRequest);
@@ -1102,6 +1107,8 @@ public class COSClient implements COS {
         rejectNull(deleteObjectRequest.getKey(),
                 "The key must be specified when deleting an object");
 
+        rejectEmpty(deleteObjectRequest.getKey(),
+                                "The length of the key must be greater than 0");
         CosHttpRequest<DeleteObjectRequest> request =
                 createRequest(deleteObjectRequest.getBucketName(), deleteObjectRequest.getKey(),
                         deleteObjectRequest, HttpMethodName.DELETE);

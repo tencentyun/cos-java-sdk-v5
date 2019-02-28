@@ -33,6 +33,16 @@ public class DelFileDemo {
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名需包含appid
         String bucketName = "mybucket-1251668577";
+        try {
+            String key = ""; // 空key值
+            cosclient.deleteObject(bucketName, key);
+        } catch (CosServiceException e) { // 如果是其他错误, 比如参数错误， 身份验证不过等会抛出CosServiceException
+            e.printStackTrace();
+        } catch (CosClientException e) { // 如果是客户端错误，比如连接不上COS
+            e.printStackTrace();
+        } catch(IllegalArgumentException e) { // 该测试用例的预期结果
+            e.printStackTrace();
+        }
 
         try {
             String key = "aaa/bbb.txt";
@@ -121,5 +131,7 @@ public class DelFileDemo {
         cosclient.shutdown();
     }
 
-
+    public static void main(String[] args) {
+        DelSingleFile();
+    }
 }
