@@ -1,9 +1,10 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.qcloud</groupId>
     <artifactId>cos_api</artifactId>
-    <version>5.5.0</version>
+    <version>5.5.1</version>
     <packaging>jar</packaging>
     <name>cos-java-sdk</name>
     <description>java sdk for qcloud cos</description>
@@ -24,8 +25,11 @@
     </developers>
 
     <scm>
-        <connection>scm:git:https://github.com/tencentyun/cos-java-sdk-v5.git</connection>
-        <developerConnection>scm:git:https://github.com/tencentyun/cos-java-sdk-v5.git</developerConnection>
+        <connection>scm:git:https://github.com/tencentyun/cos-java-sdk-v5.git
+        </connection>
+        <developerConnection>
+            scm:git:https://github.com/tencentyun/cos-java-sdk-v5.git
+        </developerConnection>
         <url>https://github.com/tencentyun/cos-java-sdk-v5</url>
     </scm>
 
@@ -86,7 +90,7 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-    
+
     <distributionManagement>
         <repository>
             <id>oss</id>
@@ -200,7 +204,9 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.qcloud.cos.demo.SimpleUploadFileDemo</mainClass>
+                            <mainClass>
+                                com.qcloud.cos.demo.SimpleUploadFileDemo
+                            </mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

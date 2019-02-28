@@ -8,7 +8,7 @@
 <dependency>
     <groupId>com.qcloud</groupId>
     <artifactId>cos_api</artifactId>
-    <version>5.4.10</version>
+    <version>5.5.1</version>
 </dependency>
 ```
 
