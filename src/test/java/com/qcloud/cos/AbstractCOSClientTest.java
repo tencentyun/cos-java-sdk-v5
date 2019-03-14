@@ -28,6 +28,7 @@ import com.qcloud.cos.auth.BasicCOSCredentials;
 import com.qcloud.cos.auth.BasicSessionCredentials;
 import com.qcloud.cos.auth.COSCredentials;
 import com.qcloud.cos.auth.COSStaticCredentialsProvider;
+import com.qcloud.cos.endpoint.UserSpecifiedEndpointBuilder;
 import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.http.HttpMethodName;
 import com.qcloud.cos.internal.SkipMd5CheckStrategy;
@@ -46,6 +47,8 @@ public class AbstractCOSClientTest {
     protected static String secretKey = null;
     protected static String region = null;
     protected static String bucket = null;
+    protected static String generalApiEndpoint = null;
+    protected static String serviceApiEndpoint = null;
     protected static ClientConfig clientConfig = null;
     protected static COSClient cosclient = null;
     protected static File tmpDir = null;
@@ -104,6 +107,8 @@ public class AbstractCOSClientTest {
         secretKey = System.getenv("secretKey");
         region = System.getenv("region");
         bucket = System.getenv("bucket");
+        generalApiEndpoint = System.getenv("generalApiEndpoint");
+        serviceApiEndpoint = System.getenv("serviceApiEndpoint");
 
         File propFile = new File("ut_account.prop");
         if (propFile.exists() && propFile.canRead()) {
@@ -117,6 +122,8 @@ public class AbstractCOSClientTest {
                 secretKey = prop.getProperty("secretKey");
                 region = prop.getProperty("region");
                 bucket = prop.getProperty("bucket");
+                generalApiEndpoint = prop.getProperty("generalApiEndpoint");
+                serviceApiEndpoint = prop.getProperty("serviceApiEndpoint");
             } finally {
                 if (fis != null) {
                     try {
@@ -145,6 +152,11 @@ public class AbstractCOSClientTest {
     protected static void initNormalCOSClient() {
         COSCredentials cred = new BasicCOSCredentials(secretId, secretKey);
         clientConfig = new ClientConfig(new Region(region));
+        if (generalApiEndpoint != null && generalApiEndpoint.trim().length() > 0 && 
+                serviceApiEndpoint != null && serviceApiEndpoint.trim().length() > 0) {
+            UserSpecifiedEndpointBuilder userSpecifiedEndpointBuilder = new UserSpecifiedEndpointBuilder(generalApiEndpoint, serviceApiEndpoint);
+            clientConfig.setEndpointBuilder(userSpecifiedEndpointBuilder);
+        }
         cosclient = new COSClient(cred, clientConfig);
     }
 
@@ -161,6 +173,11 @@ public class AbstractCOSClientTest {
     protected static void initEncryptionClient() {
         COSCredentials cred = new BasicCOSCredentials(secretId, secretKey);
         clientConfig = new ClientConfig(new Region(region));
+        if (generalApiEndpoint != null && generalApiEndpoint.trim().length() > 0 && 
+                serviceApiEndpoint != null && serviceApiEndpoint.trim().length() > 0) {
+            UserSpecifiedEndpointBuilder userSpecifiedEndpointBuilder = new UserSpecifiedEndpointBuilder(generalApiEndpoint, serviceApiEndpoint);
+            clientConfig.setEndpointBuilder(userSpecifiedEndpointBuilder);
+        }
         cosclient = new COSEncryptionClient(qcloudkms, new COSStaticCredentialsProvider(cred),
                 new StaticEncryptionMaterialsProvider(encryptionMaterials), clientConfig,
                 cryptoConfiguration);
