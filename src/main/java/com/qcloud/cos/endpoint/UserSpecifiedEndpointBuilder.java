@@ -11,7 +11,7 @@ public class UserSpecifiedEndpointBuilder implements EndpointBuilder {
     
     public UserSpecifiedEndpointBuilder(String generalApiEndpoint, String getServiceApiEndpoint) {
         super();
-        if (this.generalApiEndpoint == null || getServiceApiEndpoint == null) {
+        if (generalApiEndpoint == null || getServiceApiEndpoint == null) {
             throw new IllegalArgumentException("endpoint must not be null");
         }
         this.generalApiEndpoint = generalApiEndpoint;
