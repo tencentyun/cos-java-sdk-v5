@@ -26,6 +26,7 @@ import com.qcloud.cos.model.ObjectMetadata;
 import com.qcloud.cos.model.PartETag;
 import com.qcloud.cos.region.Region;
 import com.qcloud.cos.transfer.Transfer.TransferState;
+import com.qcloud.cos.Headers;
 
 public class CopyCallable implements Callable<CopyResult> {
 
@@ -84,15 +85,18 @@ public class CopyCallable implements Callable<CopyResult> {
     public boolean isMultipartCopy() {
         Region sourceRegion = copyObjectRequest.getSourceBucketRegion();
         Region destRegion = cos.getClientConfig().getRegion();
-        // 如果没有设置source region, 表示使用的和clientconfig里面同一region, 这里不适用分块copy，使用put object copy即可
-        if (sourceRegion == null) {
-            return false;
-        } else {
-            // 如果设置了source region, 且和目的region相同, 则也是用put object copy.
-            if (sourceRegion.equals(destRegion)) {
+        String sourceStorageClass = (String)metadata.getRawMetadataValue(Headers.STORAGE_CLASS);
+        String destStorageClass = copyObjectRequest.getStorageClass();
+
+        // 如果源和目的对象的存储类型相同
+        if(sourceStorageClass != null && destStorageClass != null && sourceStorageClass.equals(destStorageClass)) {
+            // 如果没有设置source region, 表示使用的和clientconfig里面同一region,
+            // 或者设置了相同的region，使用put object copy即可
+            if(sourceRegion == null || sourceRegion.equals(destRegion)) {
                 return false;
             }
         }
+
         return (metadata.getContentLength() > configuration.getMultipartCopyThreshold());
     }
 
