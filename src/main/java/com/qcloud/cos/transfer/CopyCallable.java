@@ -26,6 +26,7 @@ import com.qcloud.cos.model.ObjectMetadata;
 import com.qcloud.cos.model.PartETag;
 import com.qcloud.cos.region.Region;
 import com.qcloud.cos.transfer.Transfer.TransferState;
+import com.qcloud.cos.Headers;
 
 public class CopyCallable implements Callable<CopyResult> {
 
