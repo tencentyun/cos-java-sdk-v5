@@ -1025,6 +1025,8 @@ public class COSClient implements COS {
     @Override
     public ObjectMetadata getObject(final GetObjectRequest getObjectRequest, File destinationFile)
             throws CosClientException, CosServiceException {
+        rejectNull(getObjectRequest,
+                "The GetObjectRequest parameter must be specified when requesting an object");
         rejectNull(destinationFile,
                 "The destination file parameter must be specified when downloading an object directly to a file");
         rejectNull(clientConfig.getRegion(),
@@ -1124,6 +1126,8 @@ public class COSClient implements COS {
     @Override
     public DeleteObjectsResult deleteObjects(DeleteObjectsRequest deleteObjectsRequest)
             throws MultiObjectDeleteException, CosClientException, CosServiceException {
+        rejectNull(deleteObjectsRequest,
+                "The DeleteObjectsRequest parameter must be specified when deleting objects");
         rejectNull(clientConfig.getRegion(),
                 "region is null, region in clientConfig must be specified when deleting objects");
 
@@ -1181,7 +1185,7 @@ public class COSClient implements COS {
     public void deleteVersion(DeleteVersionRequest deleteVersionRequest)
             throws CosClientException, CosServiceException {
         rejectNull(deleteVersionRequest,
-                "The delete version request object must be specified when deleting a version");
+                "The DeleteVersionRequest parameter must be specified when deleting a version");
         rejectNull(clientConfig.getRegion(),
                 "region is null, region in clientConfig must be specified when deleting a version");
 
@@ -1282,6 +1286,8 @@ public class COSClient implements COS {
     @Override
     public HeadBucketResult headBucket(HeadBucketRequest headBucketRequest)
             throws CosClientException, CosServiceException {
+        rejectNull(headBucketRequest,
+                "The HeadBucketRequest parameter must be specified when head a bucket");
         String bucketName = headBucketRequest.getBucketName();
 
         rejectNull(bucketName, "The bucketName parameter must be specified.");
@@ -1666,6 +1672,8 @@ public class COSClient implements COS {
     @Override
     public ObjectListing listObjects(ListObjectsRequest listObjectsRequest)
             throws CosClientException, CosServiceException {
+        rejectNull(listObjectsRequest,
+                "The ListObjectsRequest parameter must be specified when listing objects in a bucket");
         rejectNull(listObjectsRequest.getBucketName(),
                 "The bucket name parameter must be specified when listing objects in a bucket");
         rejectNull(clientConfig.getRegion(),
@@ -1742,6 +1750,8 @@ public class COSClient implements COS {
     @Override
     public VersionListing listVersions(ListVersionsRequest listVersionsRequest)
             throws CosClientException, CosServiceException {
+        rejectNull(listVersionsRequest,
+                "The ListVersionsRequest parameter must be specified when listing versions in a bucket");
         rejectNull(listVersionsRequest.getBucketName(),
                 "The bucket name parameter must be specified when listing versions in a bucket");
         rejectNull(clientConfig.getRegion(),
@@ -1813,6 +1823,8 @@ public class COSClient implements COS {
     @Override
     public CopyObjectResult copyObject(CopyObjectRequest copyObjectRequest)
             throws CosClientException, CosServiceException {
+        rejectNull(copyObjectRequest,
+                "The CopyObjectRequest parameter must be specified when copying an object");
         rejectNull(copyObjectRequest.getSourceBucketName(),
                 "The source bucket name must be specified when copying an object");
         rejectNull(copyObjectRequest.getSourceKey(),
@@ -1905,6 +1917,8 @@ public class COSClient implements COS {
     @Override
     public CopyPartResult copyPart(CopyPartRequest copyPartRequest)
             throws CosClientException, CosServiceException {
+        rejectNull(copyPartRequest,
+                "The CopyPartRequest parameter must be specified when copying a part");
         rejectNull(copyPartRequest.getSourceBucketName(),
                 "The source bucket name must be specified when copying a part");
         rejectNull(copyPartRequest.getSourceKey(),
@@ -2245,6 +2259,8 @@ public class COSClient implements COS {
     @Override
     public void setBucketAcl(SetBucketAclRequest setBucketAclRequest)
             throws CosClientException, CosServiceException {
+        rejectNull(setBucketAclRequest,
+                "The SetBucketAclRequest parameter must be specified when setting a bucket's ACL");
         String bucketName = setBucketAclRequest.getBucketName();
         rejectNull(bucketName,
                 "The bucket name parameter must be specified when setting a bucket's ACL");
@@ -2279,6 +2295,8 @@ public class COSClient implements COS {
     @Override
     public AccessControlList getBucketAcl(GetBucketAclRequest getBucketAclRequest)
             throws CosClientException, CosServiceException {
+        rejectNull(getBucketAclRequest,
+                "The bucket name parameter must be specified when requesting a bucket's ACL");
         String bucketName = getBucketAclRequest.getBucketName();
         rejectNull(bucketName,
                 "The bucket name parameter must be specified when requesting a bucket's ACL");
@@ -2567,6 +2585,8 @@ public class COSClient implements COS {
     public void deleteBucketReplicationConfiguration(
             DeleteBucketReplicationConfigurationRequest deleteBucketReplicationConfigurationRequest)
             throws CosClientException, CosServiceException {
+        rejectNull(deleteBucketReplicationConfigurationRequest,
+                "The DeleteBucketReplicationConfigurationRequest parameter must be specified when deleting replication configuration");
         final String bucketName = deleteBucketReplicationConfigurationRequest.getBucketName();
         rejectNull(bucketName,
                 "The bucket name parameter must be specified when deleting replication configuration");
@@ -2690,7 +2710,8 @@ public class COSClient implements COS {
     @Override
     public void restoreObject(RestoreObjectRequest restoreObjectRequest)
             throws CosClientException, CosServiceException {
-
+        rejectNull(restoreObjectRequest,
+                "The RestoreObjectRequest parameter must be specified when restore a object.");
         String bucketName = restoreObjectRequest.getBucketName();
         String key = restoreObjectRequest.getKey();
         String versionId = restoreObjectRequest.getVersionId();
