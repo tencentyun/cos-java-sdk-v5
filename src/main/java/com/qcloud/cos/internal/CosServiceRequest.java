@@ -15,6 +15,11 @@ public class CosServiceRequest implements Cloneable, ReadLimitInfo  {
      */
     private ProgressListener progressListener = ProgressListener.NOOP;
     /**
+     * The mannually set cos server ip and port, format is ip:port
+     */
+    private String fixedEndpointAddr;
+
+    /**
      * A map of custom header names to header values.
      */
     private Map<String, String> customRequestHeaders;
@@ -51,7 +56,25 @@ public class CosServiceRequest implements Cloneable, ReadLimitInfo  {
     public ProgressListener getGeneralProgressListener() {
         return progressListener;
     }
-    
+
+    /**
+     * Sets the cos server ip and port .
+     *
+     * @param fixedEndpointAddr
+     *              ip and port string, format is ip:port
+     */
+    public void setFixedEndpointAddr(String fixedEndpointAddr) {
+        this.fixedEndpointAddr = fixedEndpointAddr;
+    }
+
+    /**
+     * Returns the setted server ip and port.
+     *
+     * @return The setted ip and port string
+     */
+    public String getFixedEndpointAddr() {
+        return fixedEndpointAddr;
+    }
     /**
      * Sets the optional progress listener for receiving updates about the progress of the request,
      * and returns a reference to this object so that method calls can be chained together.

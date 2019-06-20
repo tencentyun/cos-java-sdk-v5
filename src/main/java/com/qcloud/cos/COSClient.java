@@ -502,7 +502,13 @@ public class COSClient implements COS {
 
         request.addHeader(Headers.HOST, endpoint);
         request.setProtocol(clientConfig.getHttpProtocol());
-        request.setEndpoint(endpointAddr);
+        String fixedEndpointAddr = request.getOriginalRequest().getFixedEndpointAddr();
+        if(fixedEndpointAddr != null) {
+            request.setEndpoint(fixedEndpointAddr);
+        } else {
+            request.setEndpoint(endpointAddr);
+        }
+
         request.setResourcePath(key);
     }
 
