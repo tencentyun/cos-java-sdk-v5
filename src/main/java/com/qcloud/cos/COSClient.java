@@ -459,7 +459,7 @@ public class COSClient implements COS {
     private String formatBucket(String bucketName, String appid) throws CosClientException {
         BucketNameUtils.validateBucketName(bucketName);
         if (appid == null) {
-            String parrtern = ".*-(125|100|20)[0-9]{3,}$";
+            String parrtern = ".*-[0-9]{3,}$";
             if (Pattern.matches(parrtern, bucketName)) {
                 return bucketName;
             } else {
