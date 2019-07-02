@@ -12,6 +12,7 @@ import com.qcloud.cos.internal.Constants;
 public class UrlEncoderUtils {
 
     private static final String PATH_DELIMITER = "/";
+    private static final String ENCODE_DELIMITER = "%2F";
     private static final Logger log = LoggerFactory.getLogger(UrlEncoderUtils.class);
 
     public static String encode(String originUrl) {
@@ -40,6 +41,32 @@ public class UrlEncoderUtils {
         }
         if (urlPath.endsWith(PATH_DELIMITER)) {
             pathBuilder.append(PATH_DELIMITER);
+        }
+        return pathBuilder.toString();
+    }
+    
+    // encode url path, replace the continuous slash with %2F except the first slash
+    public static String encodeUrlPath(String urlPath) {
+        if(urlPath.length() <= 1) {
+            return urlPath;
+        }
+
+        StringBuilder pathBuilder = new StringBuilder();
+        pathBuilder.append(PATH_DELIMITER);
+        int start = 1, end = 1;
+        while(end < urlPath.length()) {
+            if('/' == urlPath.charAt(end)) {
+                if('/' == urlPath.charAt(end - 1)) {
+                    pathBuilder.append(ENCODE_DELIMITER);
+                } else {
+                    pathBuilder.append(encode(urlPath.substring(start, end))).append(PATH_DELIMITER);
+                }
+                start = end + 1;
+            }
+            end++;
+        }
+        if(start < end) {
+            pathBuilder.append(encode(urlPath.substring(start, end)));
         }
         return pathBuilder.toString();
     }
