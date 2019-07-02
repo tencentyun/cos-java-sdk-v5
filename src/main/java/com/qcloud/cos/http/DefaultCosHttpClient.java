@@ -104,7 +104,7 @@ public class DefaultCosHttpClient implements CosHttpClient {
         StringBuffer urlBuffer = new StringBuffer();
         urlBuffer.append(request.getProtocol().toString()).append("://")
                 .append(request.getEndpoint());
-        String encodedPath = UrlEncoderUtils.encodeEscapeDelimiter(request.getResourcePath());
+        String encodedPath = UrlEncoderUtils.encodeUrlPath(request.getResourcePath());
         urlBuffer.append(encodedPath);
 
         StringBuffer paramBuffer = new StringBuffer();

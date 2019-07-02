@@ -2666,7 +2666,7 @@ public class COSClient implements COS {
         strBuilder.append(clientConfig.getHttpProtocol().toString()).append("://");
         strBuilder.append(clientConfig.getEndpointBuilder()
                 .buildGeneralApiEndpoint(formatBucket(bucketName, cred.getCOSAppId())));
-        strBuilder.append(UrlEncoderUtils.encodeEscapeDelimiter(formatKey(key)));
+        strBuilder.append(UrlEncoderUtils.encodeUrlPath(formatKey(key)));
 
         boolean hasAppendFirstParameter = false;
         if (authStr != null) {
