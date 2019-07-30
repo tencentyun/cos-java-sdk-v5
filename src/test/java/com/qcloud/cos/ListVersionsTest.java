@@ -57,7 +57,7 @@ public class ListVersionsTest extends AbstractCOSClientTest {
                     assertNotNull("put object for version enalbed bucket should return versonId",
                             putObjectResult.getVersionId());
                 } else {
-                    assertEquals("null", putObjectResult.getVersionId());
+                    assertEquals(null, putObjectResult.getVersionId());
                 }
             }
         }
