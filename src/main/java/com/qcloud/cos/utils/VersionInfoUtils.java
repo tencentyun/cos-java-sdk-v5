@@ -63,7 +63,14 @@ public class VersionInfoUtils {
      *         The User Agent encapsulates SDK, Java, OS and region information.
      */
     public static String getUserAgent() {
-        return "cos-java-sdk";
+        if (userAgent == null) {
+            synchronized(VersionInfoUtils.class) {
+                if (userAgent == null) {
+                    userAgent = "cos-java-sdk-v" + getVersion();
+                } 
+            }
+        }
+        return userAgent;
     }
 
     /**
@@ -79,7 +86,6 @@ public class VersionInfoUtils {
 
             versionInfoProperties.load(inputStream);
             version = versionInfoProperties.getProperty("version");
-            platform = versionInfoProperties.getProperty("platform");
         } catch (Exception e) {
             log.info("Unable to load version information for the running SDK: " + e.getMessage());
             version = "unknown-version";
