@@ -47,7 +47,7 @@ public class BucketReplicationTest extends AbstractCOSClientTest {
 
         ReplicationDestinationConfig replicationDestinationConfig =
                 new ReplicationDestinationConfig();
-        String bucketQCS = "qcs:id/0:cos:ap-guangzhou:appid/1251668577:chengwus3gz";
+        String bucketQCS = "qcs:id/0:cos:ap-chengdu:appid/1251668577:chengwus3cd";
         replicationDestinationConfig.setBucketQCS(bucketQCS);
         replicationDestinationConfig.setStorageClass(StorageClass.Standard);
         replicationRule.setDestinationConfig(replicationDestinationConfig);
