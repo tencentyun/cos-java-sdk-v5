@@ -200,11 +200,15 @@ public class SkipMd5CheckStrategy {
         // If Etag is not provided or was computed from a multipart upload then skip the check, the
         // etag won't be the MD5 of the original content
         if (metadata.getETag() == null || isMultipartUploadETag(metadata.getETag())
-                || isV4ETag(metadata.getETag())) {
+                || isV4ETag(metadata.getETag()) || isSSECustomerResponse(metadata)) {
             return true;
         }
         return false;
         // return metadataInvolvesSse(metadata);
+    }
+
+    private boolean isSSECustomerResponse(ObjectMetadata metadata) {
+        return null != metadata.getSSECustomerAlgorithm() && null != metadata.getSSECustomerKeyMd5();
     }
 
     private boolean isGetObjectMd5ValidationDisabledByProperty() {
