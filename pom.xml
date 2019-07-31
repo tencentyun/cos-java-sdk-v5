@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.qcloud</groupId>
     <artifactId>cos_api</artifactId>
-    <version>5.5.9</version>
+    <version>5.6.0</version>
     <packaging>jar</packaging>
     <name>cos-java-sdk</name>
     <description>java sdk for qcloud cos</description>
@@ -112,11 +112,11 @@
     <build>
         <resources>
             <resource>
-                <directory>${basedir}/src/main/java</directory>
+                <directory>src/main/resources</directory>
                 <includes>
                     <include>versionInfo.properties</include>
                 </includes>
-                <filtering>false</filtering>
+                <filtering>true</filtering>
             </resource>
         </resources>
         <plugins>

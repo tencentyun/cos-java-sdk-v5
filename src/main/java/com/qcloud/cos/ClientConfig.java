@@ -7,6 +7,7 @@ import com.qcloud.cos.endpoint.RegionEndpointBuilder;
 import com.qcloud.cos.endpoint.SuffixEndpointBuilder;
 import com.qcloud.cos.http.HttpProtocol;
 import com.qcloud.cos.region.Region;
+import com.qcloud.cos.utils.VersionInfoUtils;
 
 public class ClientConfig {
     // 默认的获取连接的超时时间, 单位ms
@@ -20,7 +21,7 @@ public class ClientConfig {
     // 多次签名的默认过期时间,单位秒
     private static final long DEFAULT_SIGN_EXPIRED = 3600;
     // 默认的user_agent标识
-    private static final String DEFAULT_USER_AGENT = "cos-java-sdk-v5.5.9";
+    private static final String DEFAULT_USER_AGENT = VersionInfoUtils.getUserAgent();
     // Read Limit
     private static final int DEFAULT_READ_LIMIT = (2 << 17) + 1;
 
