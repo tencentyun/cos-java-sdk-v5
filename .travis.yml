@@ -14,4 +14,4 @@ notifications:
   
 install: mvn install -DskipTests=true -Dmaven.javadoc.skip=true -Dgpg.skip=true
 
-script: travis_wait 90 mvn test
+script: travis_wait 90 mvn test -Dtest=com.qcloud.cos.SuiteTest
