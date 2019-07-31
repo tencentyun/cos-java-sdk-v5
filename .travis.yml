@@ -1,8 +1,10 @@
 language: java
 
 jdk:
+  - openjdk7
   - oraclejdk8
-  
+  - oraclejdk9
+
 notifications:
   email:
     recipients:
@@ -14,4 +16,7 @@ notifications:
   
 install: mvn install -DskipTests=true -Dmaven.javadoc.skip=true -Dgpg.skip=true
 
+dist: trusty
+
 script: travis_wait 90 mvn test -Dtest=com.qcloud.cos.SuiteTest
+
