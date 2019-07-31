@@ -66,7 +66,11 @@ public class VersionInfoUtils {
         if (userAgent == null) {
             synchronized(VersionInfoUtils.class) {
                 if (userAgent == null) {
-                    userAgent = "cos-java-sdk-v" + getVersion();
+                    userAgent =  String.format("cos-java-sdk-v%s(%s, %s, %s)",
+                                               getVersion(),
+                                               System.getProperty("os.name"),
+                                               System.getProperty("java.version"),
+                                               System.getProperty("java.vm.name"));
                 } 
             }
         }
