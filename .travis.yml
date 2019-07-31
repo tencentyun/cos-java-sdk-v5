@@ -9,6 +9,8 @@ notifications:
       - chengwu@tencent.com
       - iainyu@tencent.com
       - yongqingliu@tencent.com
+      - wjielai@tencent.com
+      - fysntian@tencent.com
     on_success: always # default: change
     on_failure: always # default: always
   
