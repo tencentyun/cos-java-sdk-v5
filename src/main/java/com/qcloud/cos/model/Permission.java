@@ -27,7 +27,29 @@ public enum Permission {
      * This permission is not supported for objects.
      * </p>
      */
-    Write("WRITE", "x-cos-grant-write");
+    Write("WRITE", "x-cos-grant-write"),
+
+    /**
+     * Grants permission to read the ACL for the applicable bucket or object.
+     * <p>
+     * The owner of a bucket or object always implicitly has this permission.
+     * </p>
+     */
+    ReadAcp("READ_ACP", "x-cos-grant-read-acp"),
+
+    /**
+     * Gives permission to overwrite the ACP for the applicable bucket or
+     * object.
+     * <p>
+     * The owner of a bucket or object always has this permission implicitly.
+     * </p>
+     * <p>
+     * Granting this permission is equivalent to granting <code>FULL_CONTROL</code>because
+     * the grant recipient can make any changes to the ACP.
+     * </p>
+     */
+    WriteAcp("WRITE_ACP", "x-cos-grant-write-acp");
+
 
     private String permissionString;
     private String headerName;
