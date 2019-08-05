@@ -79,9 +79,37 @@ public class SSECustomerDemo {
         cosclient.shutdown();
     }
 
+    static void SSECustomerHead() {
+        // 1 初始化用户身份信息(secretId, secretKey)
+        COSCredentials cred = new BasicCOSCredentials("COS_SECRETID", "COS_SECRETKEY");
+        // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
+        ClientConfig clientConfig = new ClientConfig(new Region("ap-guangzhou"));
+        clientConfig.setHttpProtocol(HttpProtocol.https);
+        // 3 生成cos客户端
+        COSClient cosclient = new COSClient(cred, clientConfig);
+        // bucket名需包含appid
+        String bucketName = "examplebucket-1250000000";
+
+        String key = "aaa/bbb.txt";
+        try {
+            GetObjectMetadataRequest getObjectMetadataRequest = new GetObjectMetadataRequest(bucketName, key);
+            SSECustomerKey sseCustomerKey = new SSECustomerKey("MDEyMzQ1Njc4OUFCQ0RFRjAxMjM0NTY3ODlBQkNERUY=");
+            getObjectMetadataRequest.setSSECustomerKey(sseCustomerKey);
+            ObjectMetadata objectMetadata = cosclient.getObjectMetadata(getObjectMetadataRequest);
+            System.out.println(objectMetadata);
+        } catch (CosServiceException e) {
+            e.printStackTrace();
+        } catch (CosClientException e) {
+            e.printStackTrace();
+        }
+        // 关闭客户端
+        cosclient.shutdown();
+    }
+
     public static void main(String[] args) {
         SSECustomerUpload();
         SSECustomerDownload();
+        SSECustomerHead();
     }
 }
 

@@ -32,6 +32,10 @@ public class SSECustomerTest extends AbstractCOSClientTest {
         putObjectRequest.setSSECustomerKey(sseCustomerKey);
         cosclient.putObject(putObjectRequest);
 
+        GetObjectMetadataRequest getObjectMetadataRequest = new GetObjectMetadataRequest(bucket, key);
+        getObjectMetadataRequest.setSSECustomerKey(sseCustomerKey);
+        ObjectMetadata objectMetadata = cosclient.getObjectMetadata(getObjectMetadataRequest);
+
         File downloadFile = new File(localFile.getAbsolutePath() + ".down");
         GetObjectRequest getObjectRequest = new GetObjectRequest(bucket, key);
         getObjectRequest.setSSECustomerKey(sseCustomerKey);
