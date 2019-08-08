@@ -11,6 +11,7 @@ notifications:
       - yongqingliu@tencent.com
       - wjielai@tencent.com
       - fysntian@tencent.com
+      - burningzhan@tencent.com 
     on_success: always # default: change
     on_failure: always # default: always
   
