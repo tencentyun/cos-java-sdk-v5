@@ -10,6 +10,6 @@ import org.junit.runners.Suite.SuiteClasses;
         GeneratePresignedUrlTest.class, GetBucketLocationTest.class, GetServiceTest.class,
         ListObjectTest.class, ListVersionsTest.class, MultipartUploadTest.class,
         PutGetDelTest.class, PutGetLifeCycleConfigTest.class, PutObjectCopyTest.class, 
-        SSECustomerTest.class})
+        SSECustomerTest.class, TransferManagerTest.class})
 public class SuiteTest {
 }
