@@ -50,6 +50,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.protocol.HttpContext;
+import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -344,6 +345,12 @@ public class DefaultCosHttpClient implements CosHttpClient {
         return ProgressInputStream.inputStreamForRequest(content, listener);
     }
 
+    private void setBasicProxyAuthorization(HttpRequestBase httpRequest) {
+        String auth = clientConfig.getProxyUsername() + ":" + clientConfig.getProxyPassword();
+        String authHeader = "Basic " + new String(Base64.encodeBase64(auth.getBytes()));
+        httpRequest.addHeader("Proxy-Authorization", authHeader);
+    }
+
     @Override
     public <X, Y extends CosServiceRequest> X exeute(CosHttpRequest<Y> request,
             HttpResponseHandler<CosServiceResponse<X>> responseHandler)
@@ -384,6 +391,10 @@ public class DefaultCosHttpClient implements CosHttpClient {
                 }
                 HttpContext context = HttpClientContext.create();
                 httpRequest = buildHttpRequest(request);
+                if(clientConfig.useBasicAuth()) {
+                    // basic auth认证
+		    setBasicProxyAuthorization(httpRequest);
+                }
                 httpResponse = httpClient.execute(httpRequest, context);
                 break;
             } catch (IOException e) {

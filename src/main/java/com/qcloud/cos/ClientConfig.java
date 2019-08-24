@@ -52,6 +52,9 @@ public class ClientConfig {
     // http proxy代理，如果使用http proxy代理，需要设置IP与端口
     private String httpProxyIp = null;
     private int httpProxyPort = 0;
+    private String proxyUsername = null;
+    private String proxyPassword = null;
+    private boolean useBasicAuth = false;
     private long signExpired = DEFAULT_SIGN_EXPIRED;
     private int connectionRequestTimeout = DEFAULT_CONNECTION_REQUEST_TIMEOUT;
     private int connectionTimeout = DEFAULT_CONNECTION_TIMEOUT;
@@ -196,4 +199,16 @@ public class ClientConfig {
     public void setEndpointResolver(EndpointResolver endpointResolver) {
         this.endpointResolver = endpointResolver;
     }
+
+    public String getProxyUsername() { return proxyUsername; }
+
+    public void setProxyUsername(String proxyUsername) { this.proxyUsername = proxyUsername; }
+
+    public String getProxyPassword() { return proxyPassword; }
+
+    public void setProxyPassword(String proxyPassword) { this.proxyPassword = proxyPassword; }
+    
+    public void setUseBasicAuth(boolean useBasicAuth) { this.useBasicAuth = useBasicAuth; }
+
+    public boolean useBasicAuth() { return useBasicAuth; }
 }
