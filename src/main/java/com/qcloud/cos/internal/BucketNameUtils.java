@@ -21,7 +21,6 @@ package com.qcloud.cos.internal;
 public enum BucketNameUtils {
     ;
     private static final int MIN_BUCKET_NAME_LENGTH = 1;
-    private static final int MAX_BUCKET_NAME_LENGTH = 40;
 
     public static void validateBucketName(final String bucketName) throws IllegalArgumentException {
         if (bucketName == null) {
@@ -31,10 +30,9 @@ public enum BucketNameUtils {
         if (bucketName.contains("-") && bucketName.lastIndexOf("-") != 0) {
             bucketNameNotContainAppid = bucketName.substring(0, bucketName.lastIndexOf("-"));
         }
-        if (bucketNameNotContainAppid.length() < MIN_BUCKET_NAME_LENGTH
-                || bucketNameNotContainAppid.length() > MAX_BUCKET_NAME_LENGTH) {
+        if (bucketNameNotContainAppid.length() < MIN_BUCKET_NAME_LENGTH) {
             throw new IllegalArgumentException(
-                    "bucketName length must between 1 and 40 characters long");
+                    "bucketName length must at least 1 character long");
         }
 
         for (int i = 0; i < bucketNameNotContainAppid.length(); ++i) {
