@@ -105,6 +105,75 @@ public class BucketConfigurationXmlFactory {
         return xml.getBytes();
     }
 
+    /**
+     * Converts the specified website configuration into an XML byte array to
+     * send to S3.
+     *
+     * Sample XML:
+     * <WebsiteConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
+     *    <IndexDocument>
+     *      <Suffix>index.html</Suffix>
+     *    </IndexDocument>
+     *    <ErrorDocument>
+     *      <Key>404.html</Key>
+     *    </ErrorDocument>
+     *  </WebsiteConfiguration>
+     *
+     * @param websiteConfiguration
+     *            The configuration to convert.
+     * @return The XML byte array representation.
+     */
+    public byte[] convertToXmlByteArray(BucketWebsiteConfiguration websiteConfiguration) {
+        XmlWriter xml = new XmlWriter();
+        xml.start("WebsiteConfiguration");
+
+        if (websiteConfiguration.getIndexDocumentSuffix() != null) {
+            XmlWriter indexDocumentElement = xml.start("IndexDocument");
+            indexDocumentElement.start("Suffix").value(websiteConfiguration.getIndexDocumentSuffix()).end();
+            indexDocumentElement.end();
+        }
+
+        if (websiteConfiguration.getErrorDocument() != null) {
+            XmlWriter errorDocumentElement = xml.start("ErrorDocument");
+            errorDocumentElement.start("Key").value(websiteConfiguration.getErrorDocument()).end();
+            errorDocumentElement.end();
+        }
+
+        RedirectRule redirectAllRequestsTo = websiteConfiguration.getRedirectAllRequestsTo();
+        if (redirectAllRequestsTo != null) {
+            XmlWriter redirectAllRequestsElement = xml.start("RedirectAllRequestsTo");
+            if (redirectAllRequestsTo.getprotocol() != null) {
+                xml.start("Protocol").value(redirectAllRequestsTo.getprotocol()).end();
+            }
+
+            if (redirectAllRequestsTo.getHostName() != null) {
+                xml.start("HostName").value(redirectAllRequestsTo.getHostName()).end();
+            }
+
+            if (redirectAllRequestsTo.getReplaceKeyPrefixWith() != null) {
+                xml.start("ReplaceKeyPrefixWith").value(redirectAllRequestsTo.getReplaceKeyPrefixWith()).end();
+            }
+
+            if (redirectAllRequestsTo.getReplaceKeyWith() != null) {
+                xml.start("ReplaceKeyWith").value(redirectAllRequestsTo.getReplaceKeyWith()).end();
+            }
+            redirectAllRequestsElement.end();
+        }
+
+        if (websiteConfiguration.getRoutingRules() != null && websiteConfiguration.getRoutingRules().size() > 0) {
+
+            XmlWriter routingRules = xml.start("RoutingRules");
+            for (RoutingRule rule : websiteConfiguration.getRoutingRules()) {
+                writeRule(routingRules, rule);
+            }
+
+            routingRules.end();
+        }
+
+        xml.end();
+        return xml.getBytes();
+    }
+
     private void writeRule(XmlWriter xml, CORSRule rule) {
         xml.start("CORSRule");
         if (rule.getId() != null) {
@@ -181,6 +250,51 @@ public class BucketConfigurationXmlFactory {
         }
 
         xml.end(); // </Rule>
+    }
+
+    private void writeRule(XmlWriter xml, RoutingRule rule) {
+        xml.start("RoutingRule");
+        RoutingRuleCondition condition = rule.getCondition();
+        if (condition != null) {
+            xml.start("Condition");
+            xml.start("KeyPrefixEquals");
+            if (condition.getKeyPrefixEquals() != null) {
+                xml.value(condition.getKeyPrefixEquals());
+            }
+            xml.end(); // </KeyPrefixEquals">
+
+            if (condition.getHttpErrorCodeReturnedEquals() != null) {
+                xml.start("HttpErrorCodeReturnedEquals ").value(condition.getHttpErrorCodeReturnedEquals()).end();
+            }
+
+            xml.end(); // </Condition>
+        }
+
+        xml.start("Redirect");
+        RedirectRule redirect = rule.getRedirect();
+        if (redirect != null) {
+            if (redirect.getprotocol() != null) {
+                xml.start("Protocol").value(redirect.getprotocol()).end();
+            }
+
+            if (redirect.getHostName() != null) {
+                xml.start("HostName").value(redirect.getHostName()).end();
+            }
+
+            if (redirect.getReplaceKeyPrefixWith() != null) {
+                xml.start("ReplaceKeyPrefixWith").value(redirect.getReplaceKeyPrefixWith()).end();
+            }
+
+            if (redirect.getReplaceKeyWith() != null) {
+                xml.start("ReplaceKeyWith").value(redirect.getReplaceKeyWith()).end();
+            }
+
+            if (redirect.getHttpRedirectCode() != null) {
+                xml.start("HttpRedirectCode").value(redirect.getHttpRedirectCode()).end();
+            }
+        }
+        xml.end(); // </Redirect>
+        xml.end();// </CORSRule>
     }
 
 

@@ -94,6 +94,10 @@ import com.qcloud.cos.model.SetObjectAclRequest;
 import com.qcloud.cos.model.UploadPartRequest;
 import com.qcloud.cos.model.UploadPartResult;
 import com.qcloud.cos.model.VersionListing;
+import com.qcloud.cos.model.GetBucketWebsiteConfigurationRequest;
+import com.qcloud.cos.model.SetBucketWebsiteConfigurationRequest;
+import com.qcloud.cos.model.DeleteBucketWebsiteConfigurationRequest;
+import com.qcloud.cos.model.BucketWebsiteConfiguration;
 
 public interface COS extends COSDirectSpi {
 
@@ -1607,7 +1611,7 @@ public interface COS extends COSDirectSpi {
      * </p>
      * <p>
      * Objects created before versioning was enabled or when versioning is suspended will be given
-     * the default <code>null</code> version ID (see {@link Constants#NULL_VERSION_ID}). Note that
+     * the default <code>null</code> version ID. Note that
      * the <code>null</code> version ID is a valid version ID and is not the same as not having a
      * version ID.
      * </p>
@@ -2353,6 +2357,160 @@ public interface COS extends COSDirectSpi {
      * @throws CosServiceException If any errors occurred in COS while processing the request.
      */
     public void updateObjectMetaData(String bucketName, String key, ObjectMetadata objectMetadata)
+            throws CosClientException, CosServiceException;
+    /**
+     * Returns the website configuration for the specified bucket. Bucket
+     * website configuration allows you to host your static websites entirely
+     * out of COS. To host your website in COS, create a bucket,
+     * upload your files, and configure it as a website. Once your bucket has
+     * been configured as a website, you can access all your content via the
+     * COS website endpoint. To ensure that the existing COS REST
+     * API will continue to behave the same, regardless of whether or not your
+     * bucket has been configured to host a website, a new HTTP endpoint has
+     * been introduced where you can access your content. The bucket content you
+     * want to make available via the website must be publicly readable.
+     *
+     * @param bucketName
+     *            The name of the bucket whose website configuration is being
+     *            retrieved.
+     *
+     * @return The bucket website configuration for the specified bucket,
+     *         otherwise null if there is no website configuration set for the
+     *         specified bucket.
+     *
+     * @throws CosClientException
+     *             If any errors are encountered on the client while making the
+     *             request or handling the response.
+     * @throws CosServiceException
+     *             If any errors occurred in Amazon S3 while processing the
+     *             request.
+     */
+    public BucketWebsiteConfiguration getBucketWebsiteConfiguration(String bucketName)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * Returns the website configuration for the specified bucket. Bucket
+     * website configuration allows you to host your static websites entirely
+     * out of COS. To host your website in COS, create a bucket,
+     * upload your files, and configure it as a website. Once your bucket has
+     * been configured as a website, you can access all your content via the
+     * COS website endpoint. To ensure that the existing COS REST
+     * API will continue to behave the same, regardless of whether or not your
+     * bucket has been configured to host a website, a new HTTP endpoint has
+     * been introduced where you can access your content. The bucket content you
+     * want to make available via the website must be publicly readable.
+     *
+     * @param getBucketWebsiteConfigurationRequest
+     *            The request object for retrieving the bucket website configuration.
+     *
+     * @return The bucket website configuration for the specified bucket,
+     *         otherwise null if there is no website configuration set for the
+     *         specified bucket.
+     *
+     * @throws CosClientException
+     *             If any errors are encountered on the client while making the
+     *             request or handling the response.
+     * @throws CosServiceException
+     *             If any errors occurred in Amazon S3 while processing the
+     *             request.
+     */
+    public BucketWebsiteConfiguration getBucketWebsiteConfiguration(GetBucketWebsiteConfigurationRequest getBucketWebsiteConfigurationRequest)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * Sets the website configuration for the specified bucket. Bucket
+     * website configuration allows you to host your static websites entirely
+     * out COS. To host your website in COS, create a bucket,
+     * upload your files, and configure it as a website. Once your bucket has
+     * been configured as a website, you can access all your content via the
+     * COS website endpoint. To ensure that the existing COS REST
+     * API will continue to behave the same, regardless of whether or not your
+     * bucket has been configured to host a website, a new HTTP endpoint has
+     * been introduced where you can access your content. The bucket content you
+     * want to make available via the website must be publicly readable.
+     *
+     * @param bucketName
+     *            The name of the bucket whose website configuration is being
+     *            set.
+     * @param configuration
+     *            The configuration describing how the specified bucket will
+     *            serve web requests (i.e. default index page, error page).
+     *
+     * @throws CosClientException
+     *             If any errors are encountered on the client while making the
+     *             request or handling the response.
+     * @throws CosServiceException
+     *             If any errors occurred in COS while processing the
+     *             request.
+     */
+    public void setBucketWebsiteConfiguration(String bucketName, BucketWebsiteConfiguration configuration)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * Sets the website configuration for the specified bucket. Bucket website
+     * configuration allows you to host your static websites entirely out of
+     * COS. To host your website in COS, create a bucket, upload
+     * your files, and configure it as a website. Once your bucket has been
+     * configured as a website, you can access all your content via the COS
+     * website endpoint. To ensure that the existing COS REST API will
+     * continue to behave the same, regardless of whether or not your bucket has
+     * been configured to host a website, a new HTTP endpoint has been
+     * introduced where you can access your content. The bucket content you want
+     * to make available via the website must be publicly readable.
+     *
+     * @param setBucketWebsiteConfigurationRequest
+     *            The request object containing the name of the bucket whose
+     *            website configuration is being updated, and the new website
+     *            configuration values.
+     *
+     * @throws CosClientException
+     *             If any errors are encountered on the client while making the
+     *             request or handling the response.
+     * @throws CosServiceException
+     *             If any errors occurred in Amazon S3 while processing the
+     *             request.
+     */
+    public void setBucketWebsiteConfiguration(SetBucketWebsiteConfigurationRequest setBucketWebsiteConfigurationRequest)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * This operation removes the website configuration for a bucket. Calling
+     * this operation on a bucket with no website configuration does <b>not</b>
+     * throw an exception. Calling this operation a bucket that does not exist
+     * <b>will</b> throw an exception.
+     *
+     * @param bucketName
+     *            The name of the bucket whose website configuration is being
+     *            deleted.
+     *
+     * @throws CosClientException
+     *             If any errors are encountered on the client while making the
+     *             request or handling the response.
+     * @throws CosServiceException
+     *             If any errors occurred in COS while processing the
+     *             request.
+     */
+    public void deleteBucketWebsiteConfiguration(String bucketName)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * This operation removes the website configuration for a bucket. Calling
+     * this operation on a bucket with no website configuration does <b>not</b>
+     * throw an exception. Calling this operation a bucket that does not exist
+     * <b>will</b> throw an exception.
+     *
+     * @param deleteBucketWebsiteConfigurationRequest
+     *            The request object specifying the name of the bucket whose
+     *            website configuration is to be deleted.
+     *
+     * @throws CosClientException
+     *             If any errors are encountered on the client while making the
+     *             request or handling the response.
+     * @throws CosServiceException
+     *             If any errors occurred in COS while processing the
+     *             request.
+     */
+    public void deleteBucketWebsiteConfiguration(DeleteBucketWebsiteConfigurationRequest deleteBucketWebsiteConfigurationRequest)
             throws CosClientException, CosServiceException;
 
 }

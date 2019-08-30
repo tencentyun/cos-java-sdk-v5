@@ -175,6 +175,11 @@ import com.qcloud.cos.utils.Md5Utils;
 import com.qcloud.cos.utils.ServiceUtils;
 import com.qcloud.cos.utils.StringUtils;
 import com.qcloud.cos.utils.UrlEncoderUtils;
+import com.qcloud.cos.model.GetBucketWebsiteConfigurationRequest;
+import com.qcloud.cos.model.DeleteBucketWebsiteConfigurationRequest;
+import com.qcloud.cos.model.SetBucketWebsiteConfigurationRequest;
+import com.qcloud.cos.model.BucketWebsiteConfiguration;
+
 
 public class COSClient implements COS {
 
@@ -2849,6 +2854,84 @@ public class COSClient implements COS {
         CosHttpRequest<DeleteBucketPolicyRequest> request =
                 createRequest(bucketName, null, deleteBucketPolicyRequest, HttpMethodName.DELETE);
         request.addParameter("policy", null);
+
+        invoke(request, voidCosResponseHandler);
+    }
+
+    @Override
+    public BucketWebsiteConfiguration getBucketWebsiteConfiguration(String bucketName)
+            throws CosClientException, CosServiceException {
+        return getBucketWebsiteConfiguration(new GetBucketWebsiteConfigurationRequest(bucketName));
+    }
+
+    @Override
+    public BucketWebsiteConfiguration getBucketWebsiteConfiguration(GetBucketWebsiteConfigurationRequest getBucketWebsiteConfigurationRequest)
+            throws CosClientException, CosServiceException {
+        rejectNull(getBucketWebsiteConfigurationRequest, "The request object parameter getBucketWebsiteConfigurationRequest must be specified.");
+        String bucketName = getBucketWebsiteConfigurationRequest.getBucketName();
+        rejectNull(bucketName,
+                "The bucket name parameter must be specified when requesting a bucket's website configuration");
+
+        CosHttpRequest<GetBucketWebsiteConfigurationRequest> request = createRequest(bucketName, null, getBucketWebsiteConfigurationRequest, HttpMethodName.GET);
+        request.addParameter("website", null);
+        request.addHeader("Content-Type", "application/xml");
+
+        try {
+            return invoke(request, new Unmarshallers.BucketWebsiteConfigurationUnmarshaller());
+        } catch (CosServiceException ase) {
+            if (ase.getStatusCode() == 404) return null;
+            throw ase;
+        }
+    }
+
+    @Override
+    public void setBucketWebsiteConfiguration(String bucketName, BucketWebsiteConfiguration configuration)
+            throws CosClientException, CosServiceException {
+        setBucketWebsiteConfiguration(new SetBucketWebsiteConfigurationRequest(bucketName, configuration));
+    }
+
+    @Override
+    public void setBucketWebsiteConfiguration(SetBucketWebsiteConfigurationRequest setBucketWebsiteConfigurationRequest)
+            throws CosClientException, CosServiceException {
+        String bucketName = setBucketWebsiteConfigurationRequest.getBucketName();
+        BucketWebsiteConfiguration configuration = setBucketWebsiteConfigurationRequest.getConfiguration();
+
+        rejectNull(bucketName,
+                "The bucket name parameter must be specified when setting a bucket's website configuration");
+        rejectNull(configuration,
+                "The bucket website configuration parameter must be specified when setting a bucket's website configuration");
+        if (configuration.getRedirectAllRequestsTo() == null) {
+            rejectNull(configuration.getIndexDocumentSuffix(),
+                    "The bucket website configuration parameter must specify the index document suffix when setting a bucket's website configuration");
+        }
+
+        CosHttpRequest<SetBucketWebsiteConfigurationRequest> request = createRequest(bucketName, null, setBucketWebsiteConfigurationRequest, HttpMethodName.PUT);
+        request.addParameter("website", null);
+        request.addHeader("Content-Type", "application/xml");
+
+        byte[] bytes = new BucketConfigurationXmlFactory().convertToXmlByteArray(configuration);
+        request.setContent(new ByteArrayInputStream(bytes));
+
+        invoke(request, voidCosResponseHandler);
+    }
+
+    @Override
+    public void deleteBucketWebsiteConfiguration(String bucketName)
+            throws CosClientException, CosServiceException {
+        deleteBucketWebsiteConfiguration(new DeleteBucketWebsiteConfigurationRequest(bucketName));
+    }
+
+    @Override
+    public void deleteBucketWebsiteConfiguration(DeleteBucketWebsiteConfigurationRequest deleteBucketWebsiteConfigurationRequest)
+            throws CosClientException, CosServiceException {
+        String bucketName = deleteBucketWebsiteConfigurationRequest.getBucketName();
+
+        rejectNull(bucketName,
+                "The bucket name parameter must be specified when deleting a bucket's website configuration");
+
+        CosHttpRequest<DeleteBucketWebsiteConfigurationRequest> request = createRequest(bucketName, null, deleteBucketWebsiteConfigurationRequest, HttpMethodName.DELETE);
+        request.addParameter("website", null);
+        request.addHeader("Content-Type", "application/xml");
 
         invoke(request, voidCosResponseHandler);
     }

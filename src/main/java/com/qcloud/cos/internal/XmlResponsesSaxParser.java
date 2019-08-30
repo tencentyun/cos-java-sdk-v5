@@ -80,6 +80,10 @@ import com.qcloud.cos.model.lifecycle.LifecyclePrefixPredicate;
 import com.qcloud.cos.utils.DateUtils;
 import com.qcloud.cos.utils.StringUtils;
 import com.qcloud.cos.utils.UrlEncoderUtils;
+import com.qcloud.cos.model.BucketWebsiteConfiguration;
+import com.qcloud.cos.model.RoutingRuleCondition;
+import com.qcloud.cos.model.RedirectRule;
+import com.qcloud.cos.model.RoutingRule;
 
 
 /**
@@ -441,6 +445,12 @@ public class XmlResponsesSaxParser {
         return handler;
     }
 
+    public BucketWebsiteConfigurationHandler parseWebsiteConfigurationResponse(InputStream inputStream)
+            throws IOException {
+        BucketWebsiteConfigurationHandler handler = new BucketWebsiteConfigurationHandler();
+        parseXmlInputStream(handler, inputStream);
+        return handler;
+    }
 
     /**
      * @param inputStream
@@ -1644,6 +1654,115 @@ public class XmlResponsesSaxParser {
             if (text == null)
                 return null;
             return Integer.parseInt(text);
+        }
+    }
+
+    public static class BucketWebsiteConfigurationHandler extends AbstractHandler {
+
+        private final BucketWebsiteConfiguration configuration =
+                new BucketWebsiteConfiguration(null);
+
+        private RoutingRuleCondition currentCondition = null;
+        private RedirectRule currentRedirectRule = null;
+        private RoutingRule currentRoutingRule = null;
+
+        public BucketWebsiteConfiguration getConfiguration() {
+            return configuration;
+        }
+
+        @Override
+        protected  void doStartElement(
+                String uri,
+                String name,
+                String qName,
+                Attributes attrs) {
+
+            if (in("WebsiteConfiguration")) {
+                if (name.equals("RedirectAllRequestsTo")) {
+                    currentRedirectRule = new RedirectRule();
+                }
+            }
+
+            else if (in("WebsiteConfiguration", "RoutingRules")) {
+                if (name.equals("RoutingRule")) {
+                    currentRoutingRule = new RoutingRule();
+                }
+            }
+
+            else if (in("WebsiteConfiguration", "RoutingRules", "RoutingRule")) {
+                if (name.equals("Condition")) {
+                    currentCondition = new RoutingRuleCondition();
+                } else if (name.equals("Redirect")) {
+                    currentRedirectRule = new RedirectRule();
+                }
+            }
+        }
+
+        @Override
+        protected void doEndElement(String uri, String name, String qName) {
+            if (in("WebsiteConfiguration")) {
+                if (name.equals("RedirectAllRequestsTo")) {
+                    configuration.setRedirectAllRequestsTo(currentRedirectRule);
+                    currentRedirectRule = null;
+                }
+            }
+
+            else if (in("WebsiteConfiguration", "IndexDocument")) {
+                if (name.equals("Suffix")) {
+                    configuration.setIndexDocumentSuffix(getText());
+                }
+            }
+
+            else if (in("WebsiteConfiguration", "ErrorDocument")) {
+                if (name.equals("Key")) {
+                    configuration.setErrorDocument(getText());
+                }
+            }
+
+            else if (in("WebsiteConfiguration", "RoutingRules")) {
+                if (name.equals("RoutingRule")) {
+                    configuration.getRoutingRules().add(currentRoutingRule);
+                    currentRoutingRule = null;
+                }
+            }
+
+            else if (in("WebsiteConfiguration", "RoutingRules", "RoutingRule")) {
+                if (name.equals("Condition")) {
+                    currentRoutingRule.setCondition(currentCondition);
+                    currentCondition = null;
+                } else if (name.equals("Redirect")) {
+                    currentRoutingRule.setRedirect(currentRedirectRule);
+                    currentRedirectRule = null;
+                }
+            }
+
+            else if (in("WebsiteConfiguration", "RoutingRules", "RoutingRule", "Condition")) {
+                if (name.equals("KeyPrefixEquals")) {
+                    currentCondition.setKeyPrefixEquals(getText());
+                } else if (name.equals("HttpErrorCodeReturnedEquals")) {
+                    currentCondition.setHttpErrorCodeReturnedEquals(getText());
+                }
+            }
+
+            else if (in("WebsiteConfiguration", "RedirectAllRequestsTo")
+                    || in("WebsiteConfiguration", "RoutingRules", "RoutingRule", "Redirect")) {
+
+                if (name.equals("Protocol")) {
+                    currentRedirectRule.setProtocol(getText());
+
+                } else if (name.equals("HostName")) {
+                    currentRedirectRule.setHostName(getText());
+
+                } else if (name.equals("ReplaceKeyPrefixWith")) {
+                    currentRedirectRule.setReplaceKeyPrefixWith(getText());
+
+                } else if (name.equals("ReplaceKeyWith")) {
+                    currentRedirectRule.setReplaceKeyWith(getText());
+
+                } else if (name.equals("HttpRedirectCode")) {
+                    currentRedirectRule.setHttpRedirectCode(getText());
+                }
+            }
         }
     }
 

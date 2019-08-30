@@ -34,7 +34,7 @@ import com.qcloud.cos.model.MultipartUploadListing;
 import com.qcloud.cos.model.ObjectListing;
 import com.qcloud.cos.model.PartListing;
 import com.qcloud.cos.model.VersionListing;
-
+import com.qcloud.cos.model.BucketWebsiteConfiguration;
 
 /*** Collection of unmarshallers for COS XML responses. */
 
@@ -260,6 +260,17 @@ public class Unmarshallers {
         public BucketReplicationConfiguration unmarshall(InputStream in) throws Exception {
             return new XmlResponsesSaxParser().parseReplicationConfigurationResponse(in)
                     .getConfiguration();
+        }
+    }
+
+    /**
+     * Unmarshaller for the BucketWebsiteConfiguration XML response.
+     */
+    public static final class BucketWebsiteConfigurationUnmarshaller implements
+            Unmarshaller<BucketWebsiteConfiguration, InputStream> {
+        public BucketWebsiteConfiguration unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser()
+                    .parseWebsiteConfigurationResponse(in).getConfiguration();
         }
     }
 
