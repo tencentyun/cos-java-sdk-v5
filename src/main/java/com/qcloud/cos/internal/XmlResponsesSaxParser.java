@@ -84,6 +84,8 @@ import com.qcloud.cos.model.BucketWebsiteConfiguration;
 import com.qcloud.cos.model.RoutingRuleCondition;
 import com.qcloud.cos.model.RedirectRule;
 import com.qcloud.cos.model.RoutingRule;
+import com.qcloud.cos.model.BucketDomainConfiguration;
+import com.qcloud.cos.model.DomainRule;
 
 
 /**
@@ -366,6 +368,12 @@ public class XmlResponsesSaxParser {
         return handler;
     }
 
+    public BucketDomainConfigurationHandler parseBucketDomainConfigurationResponse(
+            InputStream inputStream) throws IOException {
+        BucketDomainConfigurationHandler handler = new BucketDomainConfigurationHandler();
+        parseXmlInputStream(handler, inputStream);
+        return handler;
+    }
 
     public String parseBucketLocationResponse(InputStream inputStream) throws IOException {
         BucketLocationHandler handler = new BucketLocationHandler();
@@ -2139,7 +2147,6 @@ public class XmlResponsesSaxParser {
         }
     }
 
-
     public static class BucketCrossOriginConfigurationHandler extends AbstractHandler {
 
         private final BucketCrossOriginConfiguration configuration =
@@ -2217,6 +2224,62 @@ public class XmlResponsesSaxParser {
 
                 } else if (name.equals("AllowedHeader")) {
                     allowedHeaders.add(getText());
+                }
+            }
+        }
+
+    }
+
+    public static class BucketDomainConfigurationHandler extends AbstractHandler {
+
+        private final BucketDomainConfiguration configuration =
+                new BucketDomainConfiguration();
+
+        private DomainRule currentRule;
+        private String status;
+        private String mname;
+        private String type;
+        private String forcedReplacement;
+
+        public BucketDomainConfiguration getConfiguration() {
+            return configuration;
+        }
+
+        @Override
+        protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
+
+            if (in("DomainConfiguration")) {
+                if (name.equals("DomainRule")) {
+                    currentRule = new DomainRule();
+                }
+            }
+        }
+
+        @Override
+        protected void doEndElement(String uri, String name, String qName) {
+            if (in("DomainConfiguration")) {
+                if (name.equals("DomainRule")) {
+                    currentRule.setStatus(status);
+                    currentRule.setName(mname);
+                    currentRule.setType(type);
+                    currentRule.setForcedReplacement(forcedReplacement);
+
+                    configuration.getDomainRules().add(currentRule);
+                    currentRule = null;
+                    status = null;
+                    mname = null;
+                    type = null;
+                    forcedReplacement = null;
+                }
+            } else if (in("DomainConfiguration", "DomainRule")) {
+                if (name.equals("Status")) {
+                    status = getText();
+                } else if(name.equals("Name")) {
+                    mname = getText();
+                } else if(name.equals("Type")) {
+                    type = getText();
+                } else if(name.equals("ForcedReplacement")) {
+                    forcedReplacement = getText();
                 }
             }
         }

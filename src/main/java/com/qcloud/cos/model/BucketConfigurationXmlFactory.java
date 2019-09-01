@@ -297,6 +297,16 @@ public class BucketConfigurationXmlFactory {
         xml.end();// </CORSRule>
     }
 
+    private void writeRule(XmlWriter xml, DomainRule rule) {
+        xml.start("DomainRule");
+        xml.start("Status").value(rule.getStatus()).end();
+        xml.start("Name").value(rule.getName()).end();
+        xml.start("Type").value(rule.getType()).end();
+        if(rule.getForcedReplacement() != null) {
+            xml.start("ForcedReplacement").value(rule.getForcedReplacement()).end();
+        }
+        xml.end();// </DomainRule>
+    }
 
     private void addTransitions(XmlWriter xml, List<Transition> transitions) {
         if (transitions == null || transitions.isEmpty()) {
@@ -417,6 +427,16 @@ public class BucketConfigurationXmlFactory {
             xml.end();
 
             xml.end();
+        }
+        xml.end();
+        return xml.getBytes();
+    }
+
+    public byte[] convertToXmlByteArray(BucketDomainConfiguration domainConfiguration) {
+        XmlWriter xml = new XmlWriter();
+        xml.start("DomainConfiguration");
+        for (DomainRule rule : domainConfiguration.getDomainRules()) {
+            writeRule(xml, rule);
         }
         xml.end();
         return xml.getBytes();

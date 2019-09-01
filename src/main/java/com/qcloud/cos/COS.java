@@ -98,6 +98,9 @@ import com.qcloud.cos.model.GetBucketWebsiteConfigurationRequest;
 import com.qcloud.cos.model.SetBucketWebsiteConfigurationRequest;
 import com.qcloud.cos.model.DeleteBucketWebsiteConfigurationRequest;
 import com.qcloud.cos.model.BucketWebsiteConfiguration;
+import com.qcloud.cos.model.BucketDomainConfiguration;
+import com.qcloud.cos.model.SetBucketDomainConfigurationRequest;
+import com.qcloud.cos.model.GetBucketDomainConfigurationRequest;
 
 public interface COS extends COSDirectSpi {
 
@@ -2382,7 +2385,7 @@ public interface COS extends COSDirectSpi {
      *             If any errors are encountered on the client while making the
      *             request or handling the response.
      * @throws CosServiceException
-     *             If any errors occurred in Amazon S3 while processing the
+     *             If any errors occurred in COS while processing the
      *             request.
      */
     public BucketWebsiteConfiguration getBucketWebsiteConfiguration(String bucketName)
@@ -2411,7 +2414,7 @@ public interface COS extends COSDirectSpi {
      *             If any errors are encountered on the client while making the
      *             request or handling the response.
      * @throws CosServiceException
-     *             If any errors occurred in Amazon S3 while processing the
+     *             If any errors occurred in COS while processing the
      *             request.
      */
     public BucketWebsiteConfiguration getBucketWebsiteConfiguration(GetBucketWebsiteConfigurationRequest getBucketWebsiteConfigurationRequest)
@@ -2467,7 +2470,7 @@ public interface COS extends COSDirectSpi {
      *             If any errors are encountered on the client while making the
      *             request or handling the response.
      * @throws CosServiceException
-     *             If any errors occurred in Amazon S3 while processing the
+     *             If any errors occurred in COS while processing the
      *             request.
      */
     public void setBucketWebsiteConfiguration(SetBucketWebsiteConfigurationRequest setBucketWebsiteConfigurationRequest)
@@ -2512,6 +2515,78 @@ public interface COS extends COSDirectSpi {
      */
     public void deleteBucketWebsiteConfiguration(DeleteBucketWebsiteConfigurationRequest deleteBucketWebsiteConfigurationRequest)
             throws CosClientException, CosServiceException;
+
+    /**
+     * Sets the domain configuration for the specified bucket.
+     *
+     * @param bucketName
+     *            The name of the bucket whose domain configuration is being set.
+     * @param configuration
+     *            The configuration describing the specified bucket custom domain
+     *
+     * @throws CosClientException
+     *             If any errors are encountered on the client while making the
+     *             request or handling the response.
+     * @throws CosServiceException
+     *             If any errors occurred in COS while processing the request.
+     */
+    public void setBucketDomainConfiguration(String bucketName, BucketDomainConfiguration configuration)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * Sets the domain configuration for the specified bucket.
+     *
+     * @param setBucketDomainConfigurationRequest
+     *             The request object containing the name of the bucket whose
+     *             domain configuration is being updated, and the new domain
+     *             configuration values.
+     * @throws CosClientException
+     *             If any errors are encountered on the client while making the
+     *             request or handling the response.
+     * @throws CosServiceException
+     *             If any errors occurred in COS while processing the request.
+     */
+    public void setBucketDomainConfiguration(SetBucketDomainConfigurationRequest setBucketDomainConfigurationRequest)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * Returns the domain configuration for the specified bucket.
+     *
+     * @param bucketName
+     *            The name of the bucket whose domain configuration is being retrieved.
+     *
+     * @return The bucket domain configuration for the specified bucket,
+     *         otherwise null if there is no domain configuration set for the
+     *         specified bucket.
+     *
+     * @throws CosClientException
+     *             If any errors are encountered on the client while making the
+     *             request or handling the response.
+     * @throws CosServiceException
+     *             If any errors occurred in COS while processing the request.
+     */
+    public BucketDomainConfiguration getBucketDomainConfiguration(String bucketName)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * Returns the domain configuration for the specified bucket.
+     *
+     * @param getBucketDomainConfigurationRequest
+     *            The request object for retrieving the bucket domain configuration.
+     *
+     * @return The bucket domain configuration for the specified bucket,
+     *         otherwise null if there is no domain configuration set for the
+     *         specified bucket.
+     *
+     * @throws CosClientException
+     *             If any errors are encountered on the client while making the
+     *             request or handling the response.
+     * @throws CosServiceException
+     *             If any errors occurred in COS while processing the request.
+     */
+    public BucketDomainConfiguration getBucketDomainConfiguration(GetBucketDomainConfigurationRequest getBucketDomainConfigurationRequest)
+            throws CosClientException, CosServiceException;
+
 
 }
 

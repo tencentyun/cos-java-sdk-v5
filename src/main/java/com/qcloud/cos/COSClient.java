@@ -179,6 +179,9 @@ import com.qcloud.cos.model.GetBucketWebsiteConfigurationRequest;
 import com.qcloud.cos.model.DeleteBucketWebsiteConfigurationRequest;
 import com.qcloud.cos.model.SetBucketWebsiteConfigurationRequest;
 import com.qcloud.cos.model.BucketWebsiteConfiguration;
+import com.qcloud.cos.model.BucketDomainConfiguration;
+import com.qcloud.cos.model.GetBucketDomainConfigurationRequest;
+import com.qcloud.cos.model.SetBucketDomainConfigurationRequest;
 
 
 public class COSClient implements COS {
@@ -2934,6 +2937,69 @@ public class COSClient implements COS {
         request.addHeader("Content-Type", "application/xml");
 
         invoke(request, voidCosResponseHandler);
+    }
+
+    @Override
+    public void setBucketDomainConfiguration(String bucketName, BucketDomainConfiguration configuration)
+            throws CosClientException, CosServiceException {
+        setBucketDomainConfiguration(new SetBucketDomainConfigurationRequest(bucketName, configuration));
+    }
+
+    @Override
+    public void setBucketDomainConfiguration(SetBucketDomainConfigurationRequest setBucketDomainConfigurationRequest)
+            throws CosClientException, CosServiceException {
+        rejectNull(setBucketDomainConfigurationRequest,
+                "The request object parameter setBucketDomainConfigurationRequest must be specified.");
+        String bucketName = setBucketDomainConfigurationRequest.getBucketName();
+        BucketDomainConfiguration configuration = setBucketDomainConfigurationRequest.getConfiguration();
+
+        rejectNull(bucketName,
+                "The bucket name parameter must be specified when setting a bucket's domain configuration");
+        rejectNull(configuration,
+                "The bucket domain configuration parameter must be specified when setting a bucket's domain configuration");
+        rejectNull(configuration.getDomainRules(),
+                "The bucket domain rules must specify the index document suffix when setting a bucket's domain configuration");
+
+        CosHttpRequest<SetBucketDomainConfigurationRequest> request = createRequest(bucketName,
+                null, setBucketDomainConfigurationRequest, HttpMethodName.PUT);
+        request.addParameter("domain", null);
+        request.addHeader("Content-Type", "application/xml");
+
+        byte[] bytes = new BucketConfigurationXmlFactory().convertToXmlByteArray(configuration);
+        request.setContent(new ByteArrayInputStream(bytes));
+
+        invoke(request, voidCosResponseHandler);
+    }
+
+    @Override
+    public BucketDomainConfiguration getBucketDomainConfiguration(String bucketName)
+            throws CosClientException, CosServiceException {
+        return getBucketDomainConfiguration(new GetBucketDomainConfigurationRequest(bucketName));
+    }
+
+    @Override
+    public BucketDomainConfiguration getBucketDomainConfiguration(GetBucketDomainConfigurationRequest getBucketDomainConfigurationRequest)
+            throws CosClientException, CosServiceException {
+        rejectNull(getBucketDomainConfigurationRequest,
+                "The request object parameter getBucketDomainConfigurationRequest must be specified.");
+        String bucketName = getBucketDomainConfigurationRequest.getBucketName();
+        rejectNull(bucketName,
+                "The bucket name must be specified when retrieving the bucket domain configuration.");
+
+        CosHttpRequest<GetBucketDomainConfigurationRequest> request = createRequest(bucketName,
+                null, getBucketDomainConfigurationRequest, HttpMethodName.GET);
+        request.addParameter("domain", null);
+
+        try {
+            return invoke(request, new Unmarshallers.BucketDomainConfigurationUnmarshaller());
+        } catch (CosServiceException cse) {
+            switch (cse.getStatusCode()) {
+                case 404:
+                    return null;
+                default:
+                    throw cse;
+            }
+        }
     }
 }
 
