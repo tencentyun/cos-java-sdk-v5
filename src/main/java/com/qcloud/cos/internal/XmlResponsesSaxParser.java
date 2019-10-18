@@ -27,6 +27,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.LinkedHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,7 +88,18 @@ import com.qcloud.cos.model.RedirectRule;
 import com.qcloud.cos.model.RoutingRule;
 import com.qcloud.cos.model.BucketDomainConfiguration;
 import com.qcloud.cos.model.DomainRule;
-
+import com.qcloud.cos.model.BucketLoggingConfiguration;
+import com.qcloud.cos.model.GetBucketInventoryConfigurationResult;
+import com.qcloud.cos.model.inventory.InventoryConfiguration;
+import com.qcloud.cos.model.inventory.InventoryDestination;
+import com.qcloud.cos.model.inventory.InventoryFilter;
+import com.qcloud.cos.model.inventory.InventoryCosBucketDestination;
+import com.qcloud.cos.model.inventory.ServerSideEncryptionCOS;
+import com.qcloud.cos.model.ListBucketInventoryConfigurationsResult;
+import com.qcloud.cos.model.inventory.InventoryPrefixPredicate;
+import com.qcloud.cos.model.inventory.InventorySchedule;
+import com.qcloud.cos.model.TagSet;
+import com.qcloud.cos.model.BucketTaggingConfiguration;
 
 /**
  * XML Sax parser to read XML documents returned by COS via the REST interface, converting these
@@ -404,6 +417,13 @@ public class XmlResponsesSaxParser {
         return handler;
     }
 
+    public BucketTaggingConfigurationHandler parseTaggingConfigurationResponse(InputStream inputStream)
+            throws IOException {
+        BucketTaggingConfigurationHandler handler = new BucketTaggingConfigurationHandler();
+        parseXmlInputStream(handler, inputStream);
+        return handler;
+    }
+
     //
     // public BucketTaggingConfigurationHandler parseTaggingConfigurationResponse(
     // InputStream inputStream) throws IOException {
@@ -460,6 +480,37 @@ public class XmlResponsesSaxParser {
         return handler;
     }
 
+    /**
+     * Parses a LoggingStatus response XML document for a bucket from an input
+     * stream.
+     *
+     * @param inputStream
+     *            XML data input stream.
+     * @return the XML handler object populated with data parsed from the XML
+     *         stream.
+     *
+     * @throws CosClientException
+     */
+
+    public BucketLoggingConfigurationHandler parseLoggingStatusResponse(InputStream inputStream)
+            throws IOException {
+        BucketLoggingConfigurationHandler handler = new BucketLoggingConfigurationHandler();
+        parseXmlInputStream(handler, inputStream);
+        return handler;
+    }
+    public GetBucketInventoryConfigurationHandler parseGetBucketInventoryConfigurationResponse(InputStream inputStream)
+            throws IOException {
+        GetBucketInventoryConfigurationHandler handler = new GetBucketInventoryConfigurationHandler();
+        parseXmlInputStream(handler, inputStream);
+        return handler;
+    }
+
+    public ListBucketInventoryConfigurationsHandler parseBucketListInventoryConfigurationsResponse(InputStream inputStream)
+            throws IOException {
+        ListBucketInventoryConfigurationsHandler handler = new ListBucketInventoryConfigurationsHandler();
+        parseXmlInputStream(handler, inputStream);
+        return handler;
+    }
     /**
      * @param inputStream
      *
@@ -2297,5 +2348,364 @@ public class XmlResponsesSaxParser {
 
         return null;
     }
+
+    /**
+     * Handler for LoggingStatus response XML documents for a bucket. The
+     * document is parsed into an {@link BucketLoggingConfiguration} object available
+     * via the {@link #getBucketLoggingConfiguration()} method.
+     */
+    public static class BucketLoggingConfigurationHandler extends AbstractHandler {
+
+        private final BucketLoggingConfiguration bucketLoggingConfiguration =
+                new BucketLoggingConfiguration();
+
+        /**
+         * @return
+         * an object representing the bucket's LoggingStatus document.
+         */
+        public BucketLoggingConfiguration getBucketLoggingConfiguration() {
+            return bucketLoggingConfiguration;
+        }
+
+        @Override
+        protected void doStartElement(
+                String uri,
+                String name,
+                String qName,
+                Attributes attrs) {
+
+        }
+
+        @Override
+        protected void doEndElement(String uri, String name, String qName) {
+            if (in("BucketLoggingStatus", "LoggingEnabled")) {
+                if (name.equals("TargetBucket")) {
+                    bucketLoggingConfiguration
+                            .setDestinationBucketName(getText());
+
+                } else if (name.equals("TargetPrefix")) {
+                    bucketLoggingConfiguration
+                            .setLogFilePrefix(getText());
+                }
+            }
+        }
+    }
+
+    public static class GetBucketInventoryConfigurationHandler extends AbstractHandler {
+
+        public static final String SSE_COS = "SSE-COS";
+        private final GetBucketInventoryConfigurationResult result = new GetBucketInventoryConfigurationResult();
+        private final InventoryConfiguration configuration = new InventoryConfiguration();
+
+        private List<String> optionalFields;
+        private InventoryDestination inventoryDestination;
+        private InventoryFilter filter;
+        private InventoryCosBucketDestination cosBucketDestination;
+        private InventorySchedule inventorySchedule;
+
+        public GetBucketInventoryConfigurationResult getResult() {
+            return result.withInventoryConfiguration(configuration);
+        }
+
+        @Override
+        protected void doStartElement(
+                String uri,
+                String name,
+                String qName,
+                Attributes attrs) {
+
+            if (in("InventoryConfiguration")) {
+                if (name.equals("Destination")) {
+                    inventoryDestination = new InventoryDestination();
+                } else if(name.equals("Filter")) {
+                    filter = new InventoryFilter();
+                } else if(name.equals("Schedule")) {
+                    inventorySchedule = new InventorySchedule();
+                } else if(name.equals("OptionalFields")) {
+                    optionalFields = new ArrayList<String>();
+                }
+
+            } else if (in("InventoryConfiguration", "Destination")) {
+                if (name.equals("COSBucketDestination")) {
+                    cosBucketDestination = new InventoryCosBucketDestination();
+                }
+            }
+        }
+
+        @Override
+        protected void doEndElement(String uri, String name, String qName) {
+
+            if (in("InventoryConfiguration")) {
+                if (name.equals("Id")) {
+                    configuration.setId(getText());
+
+                } else if (name.equals("Destination")) {
+                    configuration.setDestination(inventoryDestination);
+                    inventoryDestination = null;
+
+                } else if (name.equals("IsEnabled")) {
+                    configuration.setEnabled("true".equals(getText()));
+
+                } else if (name.equals("Filter")) {
+                    configuration.setInventoryFilter(filter);
+                    filter = null;
+
+                } else if (name.equals("IncludedObjectVersions")) {
+                    configuration.setIncludedObjectVersions(getText());
+
+                } else if (name.equals("Schedule")) {
+                    configuration.setSchedule(inventorySchedule);
+                    inventorySchedule = null;
+
+                } else if (name.equals("OptionalFields")) {
+                    configuration.setOptionalFields(optionalFields);
+                    optionalFields = null;
+                }
+
+            } else if (in("InventoryConfiguration", "Destination")) {
+                if ( name.equals("COSBucketDestination") ) {
+                    inventoryDestination.setCosBucketDestination(cosBucketDestination);
+                    cosBucketDestination = null;
+                }
+
+            } else if (in("InventoryConfiguration", "Destination", "COSBucketDestination")) {
+                if (name.equals("AccountId")) {
+                    cosBucketDestination.setAccountId(getText());
+                } else if (name.equals("Bucket")) {
+                    cosBucketDestination.setBucketArn(getText());
+                } else if (name.equals("Format")) {
+                    cosBucketDestination.setFormat(getText());
+                } else if (name.equals("Prefix")) {
+                    cosBucketDestination.setPrefix(getText());
+                }
+            } else if (in("InventoryConfiguration", "Destination", "COSBucketDestination", "Encryption")) {
+                if (name.equals(SSE_COS)) {
+                    cosBucketDestination.setEncryption(new ServerSideEncryptionCOS());
+                }
+            } else if (in("InventoryConfiguration", "Filter")) {
+                if (name.equals("Prefix")) {
+                    filter.setPredicate(new InventoryPrefixPredicate(getText()));
+                }
+
+            } else if (in("InventoryConfiguration", "Schedule")) {
+                if (name.equals("Frequency")) {
+                    inventorySchedule.setFrequency(getText());
+                }
+
+            } else if (in("InventoryConfiguration", "OptionalFields")) {
+                if (name.equals("Field")) {
+                    optionalFields.add(getText());
+                }
+            }
+        }
+
+    }
+    public static class BucketTaggingConfigurationHandler extends AbstractHandler {
+
+        private final BucketTaggingConfiguration configuration =
+                new BucketTaggingConfiguration();
+
+        private Map<String, String> currentTagSet;
+        private String currentTagKey;
+        private String currentTagValue;
+
+        public BucketTaggingConfiguration getConfiguration() {
+            return configuration;
+        }
+
+        @Override
+        protected void doStartElement(
+                String uri,
+                String name,
+                String qName,
+                Attributes attrs) {
+
+            if (in("Tagging")) {
+                if (name.equals("TagSet")) {
+                    currentTagSet = new LinkedHashMap<String, String>();
+                }
+            }
+        }
+
+        @Override
+        protected void doEndElement(String uri, String name, String qName) {
+            if (in("Tagging")) {
+                if (name.equals("TagSet")) {
+                    configuration.getAllTagSets()
+                            .add(new TagSet(currentTagSet));
+                    currentTagSet = null;
+                }
+            }
+
+            else if (in("Tagging", "TagSet")) {
+                if (name.equals("Tag")) {
+                    if (currentTagKey != null && currentTagValue != null) {
+                        currentTagSet.put(currentTagKey, currentTagValue);
+                    }
+                    currentTagKey = null;
+                    currentTagValue = null;
+                }
+            }
+
+            else if (in("Tagging", "TagSet", "Tag")) {
+                if (name.equals("Key")) {
+                    currentTagKey = getText();
+                } else if (name.equals("Value")) {
+                    currentTagValue = getText();
+                }
+            }
+        }
+    }
+    /*
+        HTTP/1.1 200 OK
+        x-amz-id-2: ITnGT1y4RyTmXa3rPi4hklTXouTf0hccUjo0iCPjz6FnfIutBj3M7fPGlWO2SEWp
+        x-amz-request-id: 51991C342C575321
+        Date: Wed, 14 May 2014 02:11:22 GMT
+        Content-Length: ...
+
+        <ListInventoryConfigurationsResult>
+          <InventoryConfiguration>
+            ...
+          </InventoryConfiguration>
+          <InventoryConfiguration>
+            ...
+          </InventoryConfiguration>
+          <IsTruncated>true</IsTruncated>
+          <ContinuationToken>token1</ContinuationToken>
+          <NextContinuationToken>token2</NextContinuationToken>
+        </ListInventoryConfigurationsResult>
+ */
+    public static class ListBucketInventoryConfigurationsHandler extends AbstractHandler {
+
+        public static final String SSE_COS = "SSE-COS";
+        private final ListBucketInventoryConfigurationsResult result = new ListBucketInventoryConfigurationsResult();
+
+        private InventoryConfiguration currentConfiguration;
+        private List<String> currentOptionalFieldsList;
+        private InventoryDestination currentDestination;
+        private InventoryFilter currentFilter;
+        private InventoryCosBucketDestination currentCosBucketDestination;
+        private InventorySchedule currentSchedule;
+
+        public ListBucketInventoryConfigurationsResult getResult() {
+            return result;
+        }
+
+        @Override
+        protected void doStartElement(
+                String uri,
+                String name,
+                String qName,
+                Attributes attrs) {
+
+            if (in("ListInventoryConfigurationResult")) {
+                if (name.equals("InventoryConfiguration")) {
+                    currentConfiguration = new InventoryConfiguration();
+                }
+
+            } else if (in("ListInventoryConfigurationResult", "InventoryConfiguration")) {
+                if (name.equals("Destination")) {
+                    currentDestination = new InventoryDestination();
+                } else if(name.equals("Filter")) {
+                    currentFilter = new InventoryFilter();
+                } else if(name.equals("Schedule")) {
+                    currentSchedule = new InventorySchedule();
+                } else if(name.equals("OptionalFields")) {
+                    currentOptionalFieldsList = new ArrayList<String>();
+                }
+
+            } else if (in("ListInventoryConfigurationResult", "InventoryConfiguration", "Destination")) {
+                if (name.equals("COSBucketDestination")) {
+                    currentCosBucketDestination = new InventoryCosBucketDestination();
+                }
+            }
+        }
+
+        @Override
+        protected void doEndElement(String uri, String name, String qName) {
+
+            if (in("ListInventoryConfigurationResult")) {
+                if (name.equals("InventoryConfiguration")) {
+                    if (result.getInventoryConfigurationList() == null) {
+                        result.setInventoryConfigurationList(new ArrayList<InventoryConfiguration>());
+                    }
+                    result.getInventoryConfigurationList().add(currentConfiguration);
+                    currentConfiguration = null;
+                } else if (name.equals("IsTruncated")) {
+                    result.setTruncated("true".equals(getText()));
+                } else if (name.equals("ContinuationToken")) {
+                    result.setContinuationToken(getText());
+                } else if (name.equals("NextContinuationToken")) {
+                    result.setNextContinuationToken(getText());
+                }
+            }
+
+            else if (in("ListInventoryConfigurationResult", "InventoryConfiguration")) {
+                if (name.equals("Id")) {
+                    currentConfiguration.setId(getText());
+
+                } else if (name.equals("Destination")) {
+                    currentConfiguration.setDestination(currentDestination);
+                    currentDestination = null;
+
+                } else if (name.equals("IsEnabled")) {
+                    currentConfiguration.setEnabled("true".equals(getText()));
+
+                } else if (name.equals("Filter")) {
+                    currentConfiguration.setInventoryFilter(currentFilter);
+                    currentFilter = null;
+
+                } else if (name.equals("IncludedObjectVersions")) {
+                    currentConfiguration.setIncludedObjectVersions(getText());
+
+                } else if (name.equals("Schedule")) {
+                    currentConfiguration.setSchedule(currentSchedule);
+                    currentSchedule = null;
+
+                } else if (name.equals("OptionalFields")) {
+                    currentConfiguration.setOptionalFields(currentOptionalFieldsList);
+                    currentOptionalFieldsList = null;
+                }
+
+            } else if (in("ListInventoryConfigurationResult", "InventoryConfiguration", "Destination")) {
+                if ( name.equals("COSBucketDestination") ) {
+                    currentDestination.setCosBucketDestination(currentCosBucketDestination);
+                    currentCosBucketDestination = null;
+                }
+
+            } else if (in("ListInventoryConfigurationResult", "InventoryConfiguration", "Destination", "COSBucketDestination")) {
+                if (name.equals("AccountId")) {
+                    currentCosBucketDestination.setAccountId(getText());
+                } else if (name.equals("Bucket")) {
+                    currentCosBucketDestination.setBucketArn(getText());
+                } else if (name.equals("Format")) {
+                    currentCosBucketDestination.setFormat(getText());
+                } else if (name.equals("Prefix")) {
+                    currentCosBucketDestination.setPrefix(getText());
+                }
+            } else if (in("ListInventoryConfigurationResult", "InventoryConfiguration", "Destination", "COSBucketDestination", "Encryption")) {
+                if (name.equals(SSE_COS)) {
+                    currentCosBucketDestination.setEncryption(new ServerSideEncryptionCOS());
+                }
+            } else if (in("ListInventoryConfigurationResult", "InventoryConfiguration", "Filter")) {
+                if (name.equals("Prefix")) {
+                    currentFilter.setPredicate(new InventoryPrefixPredicate(getText()));
+                }
+
+            } else if (in("ListInventoryConfigurationResult", "InventoryConfiguration", "Schedule")) {
+                if (name.equals("Frequency")) {
+                    currentSchedule.setFrequency(getText());
+                }
+
+            } else if (in("ListInventoryConfigurationResult", "InventoryConfiguration", "OptionalFields")) {
+                if (name.equals("Field")) {
+                    currentOptionalFieldsList.add(getText());
+                }
+            }
+        }
+
+    }
+
+
 }
 

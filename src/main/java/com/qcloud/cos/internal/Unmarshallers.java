@@ -36,6 +36,12 @@ import com.qcloud.cos.model.PartListing;
 import com.qcloud.cos.model.VersionListing;
 import com.qcloud.cos.model.BucketWebsiteConfiguration;
 import com.qcloud.cos.model.BucketDomainConfiguration;
+import com.qcloud.cos.model.BucketLoggingConfiguration;
+import com.qcloud.cos.model.DeleteBucketInventoryConfigurationResult;
+import com.qcloud.cos.model.GetBucketInventoryConfigurationResult;
+import com.qcloud.cos.model.SetBucketInventoryConfigurationResult;
+import com.qcloud.cos.model.ListBucketInventoryConfigurationsResult;
+import com.qcloud.cos.model.BucketTaggingConfiguration;
 
 /*** Collection of unmarshallers for COS XML responses. */
 
@@ -143,6 +149,18 @@ public class Unmarshallers {
                     .getConfiguration();
         }
     }
+
+    /**
+     * Unmarshaller for the BucketTaggingConfiguration XML response.
+     */
+    public static final class BucketTaggingConfigurationUnmarshaller implements
+            Unmarshaller<BucketTaggingConfiguration, InputStream> {
+        public BucketTaggingConfiguration unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser()
+                    .parseTaggingConfigurationResponse(in).getConfiguration();
+        }
+    }
+
     //
     // /**
     // * Unmarshaller for the BucketWebsiteConfiguration XML response.
@@ -283,4 +301,58 @@ public class Unmarshallers {
         }
     }
 
+    /**
+     * Unmarshaller for the BucketLoggingStatus XML response.
+     */
+    public static final class BucketLoggingConfigurationnmarshaller implements
+            Unmarshaller<BucketLoggingConfiguration, InputStream> {
+        public BucketLoggingConfiguration unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser()
+                    .parseLoggingStatusResponse(in).getBucketLoggingConfiguration();
+        }
+    }
+
+    /**
+     * Unmarshaller for the GetBucketInventoryConfiguration XML response.
+     */
+    public static final class GetBucketInventoryConfigurationUnmarshaller implements
+            Unmarshaller<GetBucketInventoryConfigurationResult, InputStream> {
+
+        public GetBucketInventoryConfigurationResult unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser().parseGetBucketInventoryConfigurationResponse(in).getResult();
+        }
+    }
+
+    /**
+     * Unmarshaller for the ListBucketInventoryConfigurations XML response.
+     */
+    public static final class ListBucketInventoryConfigurationsUnmarshaller implements
+            Unmarshaller<ListBucketInventoryConfigurationsResult, InputStream> {
+
+        public ListBucketInventoryConfigurationsResult unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser().parseBucketListInventoryConfigurationsResponse(in).getResult();
+        }
+    }
+
+    /**
+     * Unmarshaller for the DeleteBucketInventoryConfiguration XML response.
+     */
+    public static final class DeleteBucketInventoryConfigurationUnmarshaller implements
+            Unmarshaller<DeleteBucketInventoryConfigurationResult, InputStream> {
+
+        public DeleteBucketInventoryConfigurationResult unmarshall(InputStream in) throws Exception {
+            return new DeleteBucketInventoryConfigurationResult();
+        }
+    }
+
+    /**
+     * Unmarshaller for the SetBucketInventoryConfiguration XML response.
+     */
+    public static final class SetBucketInventoryConfigurationUnmarshaller implements
+            Unmarshaller<SetBucketInventoryConfigurationResult, InputStream> {
+
+        public SetBucketInventoryConfigurationResult unmarshall(InputStream in) throws Exception {
+            return new SetBucketInventoryConfigurationResult();
+        }
+    }
 }

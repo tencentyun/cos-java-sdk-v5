@@ -29,12 +29,23 @@ import com.qcloud.cos.model.BucketLifecycleConfiguration.Transition;
 import com.qcloud.cos.model.CORSRule.AllowedMethods;
 import com.qcloud.cos.model.Tag.LifecycleTagPredicate;
 import com.qcloud.cos.model.Tag.Tag;
+import com.qcloud.cos.model.inventory.InventoryConfiguration;
+import com.qcloud.cos.model.inventory.InventoryDestination;
+import com.qcloud.cos.model.inventory.InventoryCosBucketDestination;
+import com.qcloud.cos.model.inventory.InventoryEncryption;
+import com.qcloud.cos.model.inventory.ServerSideEncryptionCOS;
+import com.qcloud.cos.model.inventory.InventoryPrefixPredicate;
+import com.qcloud.cos.model.inventory.InventoryFilter;
+import com.qcloud.cos.model.inventory.InventorySchedule;
+import com.qcloud.cos.model.inventory.InventoryFilterPredicate;
+
 import com.qcloud.cos.model.lifecycle.LifecycleAndOperator;
 import com.qcloud.cos.model.lifecycle.LifecycleFilter;
 import com.qcloud.cos.model.lifecycle.LifecycleFilterPredicate;
 import com.qcloud.cos.model.lifecycle.LifecyclePredicateVisitor;
 import com.qcloud.cos.model.lifecycle.LifecyclePrefixPredicate;
 import com.qcloud.cos.utils.DateUtils;
+import com.qcloud.cos.utils.CollectionUtils;
 
 
 /**
@@ -74,6 +85,34 @@ public class BucketConfigurationXmlFactory {
     }
 
     /**
+     * Converts the specified logging configuration into an XML byte array.
+     *
+     * @param loggingConfiguration
+     *            The configuration to convert.
+     *
+     * @return The XML byte array representation.
+     */
+    public byte[] convertToXmlByteArray(BucketLoggingConfiguration loggingConfiguration) {
+        // Default log file prefix to the empty string if none is specified
+        String logFilePrefix = loggingConfiguration.getLogFilePrefix();
+        if (logFilePrefix == null)
+            logFilePrefix = "";
+
+        XmlWriter xml = new XmlWriter();
+        xml.start("BucketLoggingStatus");
+        if (loggingConfiguration.isLoggingEnabled()) {
+            xml.start("LoggingEnabled");
+            xml.start("TargetBucket").value(loggingConfiguration.getDestinationBucketName()).end();
+            xml.start("TargetPrefix").value(loggingConfiguration.getLogFilePrefix()).end();
+            xml.end();
+        }
+        xml.end();
+
+        return xml.getBytes();
+    }
+
+
+    /**
      * Converts the specified versioning configuration into an XML byte array.
      *
      * @param versioningConfiguration The configuration to convert.
@@ -88,6 +127,110 @@ public class BucketConfigurationXmlFactory {
         xml.end();
 
         return xml.getBytes();
+    }
+
+    public byte[] convertToXmlByteArray(InventoryConfiguration config) throws CosClientException {
+        XmlWriter xml = new XmlWriter();
+        xml.start("InventoryConfiguration");
+
+        xml.start("Id").value(config.getId()).end();
+        xml.start("IsEnabled").value(String.valueOf(config.isEnabled())).end();
+        xml.start("IncludedObjectVersions").value(config.getIncludedObjectVersions()).end();
+
+        writeInventoryDestination(xml, config.getDestination());
+        writeInventoryFilter(xml, config.getInventoryFilter());
+        addInventorySchedule(xml, config.getSchedule());
+        addInventoryOptionalFields(xml, config.getOptionalFields());
+
+        xml.end(); // </InventoryConfiguration>
+
+        return xml.getBytes();
+    }
+
+    public byte[] convertToXmlByteArray(BucketTaggingConfiguration config) throws CosClientException {
+
+        XmlWriter xml = new XmlWriter();
+        xml.start("Tagging");
+
+        for (TagSet tagset : config.getAllTagSets()) {
+            writeRule(xml, tagset);
+        }
+
+        xml.end();
+
+        return xml.getBytes();
+    }
+
+    private void writeInventoryDestination(XmlWriter xml, InventoryDestination destination) {
+        if (destination == null) {
+            return;
+        }
+
+        xml.start("Destination");
+        InventoryCosBucketDestination s3BucketDestination = destination.getCosBucketDestination();
+        if (s3BucketDestination != null) {
+            xml.start("COSBucketDestination");
+            addParameterIfNotNull(xml, "AccountId", s3BucketDestination.getAccountId());
+            addParameterIfNotNull(xml, "Bucket", s3BucketDestination.getBucketArn());
+            addParameterIfNotNull(xml, "Prefix", s3BucketDestination.getPrefix());
+            addParameterIfNotNull(xml, "Format", s3BucketDestination.getFormat());
+            writeInventoryEncryption(xml, s3BucketDestination.getEncryption());
+            xml.end(); // </COSBucketDestination>
+        }
+        xml.end(); // </Destination>
+    }
+
+    private void writeInventoryEncryption(XmlWriter xml, InventoryEncryption encryption) {
+        if (encryption == null) {
+            return;
+        }
+        xml.start("Encryption");
+        if (encryption instanceof ServerSideEncryptionCOS) {
+            xml.start("SSE-COS").end();
+        }
+        xml.end();
+    }
+
+    private void writeInventoryFilter(XmlWriter xml, InventoryFilter inventoryFilter) {
+        if (inventoryFilter == null) {
+            return;
+        }
+
+        xml.start("Filter");
+        writeInventoryFilterPredicate(xml, inventoryFilter.getPredicate());
+        xml.end();
+    }
+
+    private void writeInventoryFilterPredicate(XmlWriter xml, InventoryFilterPredicate predicate) {
+        if (predicate == null) {
+            return;
+        }
+
+        if (predicate instanceof InventoryPrefixPredicate) {
+            writePrefix(xml, ((InventoryPrefixPredicate) predicate).getPrefix());
+        }
+    }
+
+    private void addInventorySchedule(XmlWriter xml, InventorySchedule schedule) {
+        if (schedule == null) {
+            return;
+        }
+
+        xml.start("Schedule");
+        addParameterIfNotNull(xml, "Frequency", schedule.getFrequency());
+        xml.end();
+    }
+
+    private void addInventoryOptionalFields(XmlWriter xml, List<String> optionalFields) {
+        if (CollectionUtils.isNullOrEmpty(optionalFields)) {
+            return;
+        }
+
+        xml.start("OptionalFields");
+        for (String field : optionalFields) {
+            xml.start("Field").value(field).end();
+        }
+        xml.end();
     }
 
     public byte[] convertToXmlByteArray(BucketLifecycleConfiguration config)
@@ -306,6 +449,17 @@ public class BucketConfigurationXmlFactory {
             xml.start("ForcedReplacement").value(rule.getForcedReplacement()).end();
         }
         xml.end();// </DomainRule>
+    }
+
+    private void writeRule(XmlWriter xml, TagSet tagset) {
+        xml.start("TagSet");
+        for ( String key : tagset.getAllTags().keySet() ) {
+            xml.start("Tag");
+            xml.start("Key").value(key).end();
+            xml.start("Value").value(tagset.getTag(key)).end();
+            xml.end(); // </Tag>
+        }
+        xml.end(); // </TagSet>
     }
 
     private void addTransitions(XmlWriter xml, List<Transition> transitions) {

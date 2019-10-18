@@ -37,6 +37,9 @@ import com.qcloud.cos.model.BucketLifecycleConfiguration;
 import com.qcloud.cos.model.BucketPolicy;
 import com.qcloud.cos.model.BucketReplicationConfiguration;
 import com.qcloud.cos.model.BucketVersioningConfiguration;
+import com.qcloud.cos.model.SetBucketLoggingConfigurationRequest;
+import com.qcloud.cos.model.GetBucketLoggingConfigurationRequest;
+import com.qcloud.cos.model.BucketLoggingConfiguration;
 import com.qcloud.cos.model.COSObject;
 import com.qcloud.cos.model.CannedAccessControlList;
 import com.qcloud.cos.model.CompleteMultipartUploadRequest;
@@ -101,6 +104,20 @@ import com.qcloud.cos.model.BucketWebsiteConfiguration;
 import com.qcloud.cos.model.BucketDomainConfiguration;
 import com.qcloud.cos.model.SetBucketDomainConfigurationRequest;
 import com.qcloud.cos.model.GetBucketDomainConfigurationRequest;
+import com.qcloud.cos.model.DeleteBucketInventoryConfigurationResult;
+import com.qcloud.cos.model.DeleteBucketInventoryConfigurationRequest;
+import com.qcloud.cos.model.GetBucketInventoryConfigurationResult;
+import com.qcloud.cos.model.GetBucketInventoryConfigurationRequest;
+import com.qcloud.cos.model.inventory.InventoryConfiguration;
+import com.qcloud.cos.model.SetBucketInventoryConfigurationResult;
+import com.qcloud.cos.model.SetBucketInventoryConfigurationRequest;
+import com.qcloud.cos.model.ListBucketInventoryConfigurationsResult;
+import com.qcloud.cos.model.ListBucketInventoryConfigurationsRequest;
+import com.qcloud.cos.model.DeleteBucketTaggingConfigurationRequest;
+import com.qcloud.cos.model.GetBucketTaggingConfigurationRequest;
+import com.qcloud.cos.model.SetBucketTaggingConfigurationRequest;
+import com.qcloud.cos.model.BucketTaggingConfiguration;
+
 
 public interface COS extends COSDirectSpi {
 
@@ -2587,7 +2604,225 @@ public interface COS extends COSDirectSpi {
     public BucketDomainConfiguration getBucketDomainConfiguration(GetBucketDomainConfigurationRequest getBucketDomainConfigurationRequest)
             throws CosClientException, CosServiceException;
 
+    /**
+     * <p>
+     * Gets the logging configuration for the specified bucket.
+     * The bucket logging configuration object indicates if server access logging is
+     * enabled for the specified bucket, the destination bucket
+     * where server access logs are delivered, and the optional log file prefix.
+     * </p>
+     *
+     * @param bucketName
+     *            The name of the bucket whose bucket logging configuration is
+     *            being retrieved.
+     *
+     * @return The bucket logging configuration for the specified bucket.
+     *
+     * @throws CosClientException
+     *             If any errors are encountered in the client while making the
+     *             request or handling the response.
+     * @throws CosServiceException
+     *             If any errors occurred in COS while processing the
+     *             request.
+     */
+    public BucketLoggingConfiguration getBucketLoggingConfiguration(String bucketName)
+            throws CosClientException, CosServiceException;
 
+    /**
+     * <p>
+     * Gets the logging configuration for the specified bucket. The bucket
+     * logging configuration object indicates if server access logging is
+     * enabled for the specified bucket, the destination bucket where server access
+     * logs are delivered, and the optional log file prefix.
+     * </p>
+     *
+     * @param getBucketLoggingConfigurationRequest
+     *            The request object for retrieving the bucket logging
+     *            configuration.
+     *
+     * @return The bucket logging configuration for the specified bucket.
+     *
+     * @throws CosClientException
+     *             If any errors are encountered in the client while making the
+     *             request or handling the response.
+     * @throws CosServiceException
+     *             If any errors occurred in COS while processing the
+     *             request.
+     */
+    public BucketLoggingConfiguration getBucketLoggingConfiguration(
+            GetBucketLoggingConfigurationRequest getBucketLoggingConfigurationRequest)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * <p>
+     * Sets the logging configuration for the specified bucket.
+     * The bucket logging configuration object indicates whether server access logging is
+     * enabled or not for the specified bucket, the destination bucket
+     * where server access logs are delivered, and the optional log file prefix.
+     * </p>
+     *
+     * @param setBucketLoggingConfigurationRequest
+     *            The request object containing all options for setting the
+     *            bucket logging configuration.
+     *
+     * @throws CosClientException
+     *             If any errors are encountered in the client while making the
+     *             request or handling the response.
+     * @throws CosServiceException
+     *             If any errors occurred in COS while processing the
+     *             request.
+     */
+    public void setBucketLoggingConfiguration(SetBucketLoggingConfigurationRequest setBucketLoggingConfigurationRequest)
+            throws CosClientException, CosServiceException;
+    /**
+     * Deletes an inventory configuration (identified by the inventory ID) from the bucket.
+     *
+     * @param bucketName
+     *              The name of the bucket from which the inventory configuration is to be deleted.
+     * @param id
+     *              The ID of the inventory configuration to delete.
+     */
+    public DeleteBucketInventoryConfigurationResult deleteBucketInventoryConfiguration(
+            String bucketName, String id) throws CosClientException, CosServiceException;
+
+    /**
+     * Deletes an inventory configuration (identified by the inventory ID) from the bucket.
+     *
+     * @param deleteBucketInventoryConfigurationRequest
+     *              The request object for deleting an inventory configuration.
+     */
+    public DeleteBucketInventoryConfigurationResult deleteBucketInventoryConfiguration(
+            DeleteBucketInventoryConfigurationRequest deleteBucketInventoryConfigurationRequest)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * Returns an inventory configuration (identified by the inventory ID) from the bucket.
+     *
+     * @param bucketName
+     *              The name of the bucket to get the inventory configuration from.
+     * @param id
+     *              The ID of the inventory configuration to delete.
+     * @return
+     *              An {@link GetBucketInventoryConfigurationResult} object containing the inventory configuration.
+     */
+    public GetBucketInventoryConfigurationResult getBucketInventoryConfiguration(
+            String bucketName, String id) throws CosClientException, CosServiceException;
+
+    /**
+     * Returns an inventory configuration (identified by the inventory ID) from the bucket.
+     *
+     * @param getBucketInventoryConfigurationRequest
+     *              The request object to retreive an inventory configuration.
+     * @return
+     *              An {@link GetBucketInventoryConfigurationResult} object containing the inventory configuration.
+     */
+    public GetBucketInventoryConfigurationResult getBucketInventoryConfiguration(
+            GetBucketInventoryConfigurationRequest getBucketInventoryConfigurationRequest)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * Sets an inventory configuration (identified by the inventory ID) to the bucket.
+     *
+     * @param bucketName
+     *              The name of the bucket to set the inventory configuration to.
+     * @param inventoryConfiguration
+     *              The inventory configuration to set.
+     */
+    public SetBucketInventoryConfigurationResult setBucketInventoryConfiguration(
+            String bucketName, InventoryConfiguration inventoryConfiguration)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * Sets an inventory configuration (identified by the inventory ID) to the bucket.
+     *
+     * @param setBucketInventoryConfigurationRequest
+     *              The request object for setting an inventory configuration.
+     */
+    public SetBucketInventoryConfigurationResult setBucketInventoryConfiguration(
+            SetBucketInventoryConfigurationRequest setBucketInventoryConfigurationRequest)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * Returns the list of inventory configurations for the bucket.
+     *
+     * @param listBucketInventoryConfigurationsRequest
+     *              The request object to list the inventory configurations in a bucket.
+     * @return
+     *              An {@link ListBucketInventoryConfigurationsResult} object containing the list of {@link InventoryConfiguration}s.
+     */
+    public ListBucketInventoryConfigurationsResult listBucketInventoryConfigurations(
+            ListBucketInventoryConfigurationsRequest listBucketInventoryConfigurationsRequest)
+            throws CosClientException, CosServiceException;
+    /**
+     * Gets the tagging configuration for the specified bucket, or null if
+     * the specified bucket does not exist, or if no configuration has been established.
+     *
+     * @param bucketName
+     *            The name of the bucket for which to retrieve tagging
+     *            configuration.
+     *
+     * @see COSClient#getBucketTaggingConfiguration(GetBucketTaggingConfigurationRequest)
+     * @see <a href="http://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketTagging">AWS API Documentation</a>
+     */
+    public BucketTaggingConfiguration getBucketTaggingConfiguration(String bucketName);
+
+    /**
+     * Gets the tagging configuration for the specified bucket, or null if
+     * the specified bucket does not exist, or if no configuration has been established.
+     *
+     * @param getBucketTaggingConfigurationRequest
+     *            The request object for retrieving the bucket tagging
+     *            configuration.
+     *
+     * @see COSClient#getBucketTaggingConfiguration(String)
+     * @see <a href="http://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketTagging">AWS API Documentation</a>
+     */
+    public BucketTaggingConfiguration getBucketTaggingConfiguration(
+            GetBucketTaggingConfigurationRequest getBucketTaggingConfigurationRequest);
+
+    /**
+     * Sets the tagging configuration for the specified bucket.
+     *
+     * @param bucketName
+     *            The name of the bucket for which to set the tagging
+     *            configuration.
+     * @param bucketTaggingConfiguration
+     *            The new tagging configuration for this bucket, which
+     *            completely replaces any existing configuration.
+     * @see <a href="http://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketTagging">AWS API Documentation</a>
+     */
+    public void setBucketTaggingConfiguration(String bucketName, BucketTaggingConfiguration bucketTaggingConfiguration);
+
+    /**
+     * Sets the tagging configuration for the specified bucket.
+     *
+     * @param setBucketTaggingConfigurationRequest
+     *            The request object containing all options for setting the
+     *            bucket tagging configuration.
+     * @see <a href="http://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketTagging">AWS API Documentation</a>
+     */
+    public void setBucketTaggingConfiguration(SetBucketTaggingConfigurationRequest setBucketTaggingConfigurationRequest);
+
+    /**
+     * Removes the tagging configuration for the bucket specified.
+     *
+     * @param bucketName
+     *            The name of the bucket for which to remove the tagging
+     *            configuration.
+     * @see <a href="http://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketTagging">AWS API Documentation</a>
+     */
+    public void deleteBucketTaggingConfiguration(String bucketName);
+
+    /**
+     * Removes the tagging configuration for the bucket specified.
+     *
+     * @param deleteBucketTaggingConfigurationRequest
+     *            The request object containing all options for removing the
+     *            bucket tagging configuration.
+     * @see <a href="http://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketTagging">AWS API Documentation</a>
+     */
+    public void deleteBucketTaggingConfiguration(
+            DeleteBucketTaggingConfigurationRequest deleteBucketTaggingConfigurationRequest);
 }
 
 
