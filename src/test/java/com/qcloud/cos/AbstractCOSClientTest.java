@@ -198,6 +198,8 @@ public class AbstractCOSClientTest {
 
     private static void createBucket() throws Exception {
         try {
+            // 避免有查询缓存，导致创建bucket失败
+            Thread.sleep(5000L);
             String bucketName = bucket;
             CreateBucketRequest createBucketRequest = new CreateBucketRequest(bucketName);
             createBucketRequest.setCannedAcl(CannedAccessControlList.PublicRead);
