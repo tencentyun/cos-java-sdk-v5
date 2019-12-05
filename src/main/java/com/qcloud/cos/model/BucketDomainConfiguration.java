@@ -23,7 +23,8 @@ import java.util.List;
 
 public class BucketDomainConfiguration implements Serializable {
     private List<DomainRule> domainRules = new LinkedList<>();
-
+    /* the x-cos-domain-txt-verification reponse header value */
+    private String domainTxtVerification;
     public BucketDomainConfiguration() { }
 
     /**
@@ -57,5 +58,13 @@ public class BucketDomainConfiguration implements Serializable {
     public BucketDomainConfiguration withDomainRules(List<DomainRule> domainRules) {
         this.domainRules = domainRules;
         return this;
+    }
+
+    public String getDomainTxtVerification() {
+        return domainTxtVerification;
+    }
+
+    public void setDomainTxtVerification(String domainTxtVerification) {
+        this.domainTxtVerification = domainTxtVerification;
     }
 }

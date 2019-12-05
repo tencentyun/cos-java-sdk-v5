@@ -23,10 +23,11 @@ public class BucketDomainDemo {
         domainRule.setStatus(DomainRule.ENABLED);
         domainRule.setType(DomainRule.REST);
         domainRule.setName("qq.com");
-        //domainRule.setForcedReplacement(DomainRule.CNAME);
+        domainRule.setForcedReplacement(DomainRule.CNAME);
         bucketDomainConfiguration.getDomainRules().add(domainRule);
         cosclient.setBucketDomainConfiguration(bucketName, bucketDomainConfiguration);
         BucketDomainConfiguration bucketDomainConfiguration1 = cosclient.getBucketDomainConfiguration(bucketName);
+        System.out.println(bucketDomainConfiguration1.getDomainTxtVerification());
     }
 
     public static void main(String[] args) {
