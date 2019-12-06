@@ -20,9 +20,8 @@ import com.qcloud.cos.region.Region;
  * SimpleUpload 给出了简单上传的示例
  */
 public class SimpleUploadFileDemo {
-    
     // 将本地文件上传到COS
-    public static void SimpleUploadFileFromLocal() {
+    public static void SimpleUploadFileFromLocal(boolean useTrafficLimit) {
         // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -35,6 +34,12 @@ public class SimpleUploadFileDemo {
         String key = "aaa/bbb.txt";
         File localFile = new File("src/test/resources/len10M.txt");
         PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, key, localFile);
+        if(useTrafficLimit) {
+            ObjectMetadata objectMetadata = new ObjectMetadata();
+            // 限流使用的单位是bit, 这里测试1MB的上传带宽限制
+            objectMetadata.setHeader("x-cos-traffic-limit", 8*1024*1024);
+            putObjectRequest.setMetadata(objectMetadata);
+        }
         // 设置存储类型, 默认是标准(Standard), 低频(standard_ia)
         putObjectRequest.setStorageClass(StorageClass.Standard_IA);
         try {
