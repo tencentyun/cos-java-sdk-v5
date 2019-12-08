@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -42,7 +43,7 @@ public class InstanceCredentialsUtils {
         int retriesAttempted = 0;
         InputStream inputStream = null;
 
-        addDefaultHeader(headers);
+        headers = addDefaultHeader(headers);
 
         while (true) {
             try {
@@ -101,12 +102,16 @@ public class InstanceCredentialsUtils {
         }
     }
 
-    private void addDefaultHeader(Map<String, String> headers) {
-        if (null != headers) {
-            putIfAbsent(headers, "User-Agent", USER_AGENT);
-            putIfAbsent(headers, "Accept", "*/*");
-            putIfAbsent(headers, "Connection", "keep-alive");
+    private Map<String, String> addDefaultHeader(Map<String, String> headers) {
+        HashMap<String, String> map = new HashMap<String, String>();
+        if (headers != null) {
+            map.putAll(headers);
         }
+
+        putIfAbsent(map,"User-Agent", USER_AGENT);
+        putIfAbsent(map,"Accept", "*/*");
+        putIfAbsent(map,"Connection", "keep-alive");
+        return map;
     }
 
     private <K, V> void putIfAbsent(Map<K, V> map, K key, V value) {

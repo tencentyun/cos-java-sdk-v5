@@ -106,14 +106,15 @@ public class CPMInstanceProfileCredentialsProvider implements COSCredentialsProv
             String host = CPMMetadataUtils.getHostAddressForCPMMetadataService();
 
             String securityCredentialsList =
-                    InstanceCredentialsUtils.getInstance().readResource(new URI(host + CPMMetadataUtils.SECURITY_CREDENTIALS_RESOURCE));
+                    InstanceCredentialsUtils.getInstance().readResource(new URI(host + CPMMetadataUtils.CPM_METADATA_ROOT
+                            + CPMMetadataUtils.SECURITY_CREDENTIALS_RESOURCE));
             String[] securityCredentials = securityCredentialsList.trim().split("\n");
             if (0 == securityCredentials.length) {
                 throw new CosClientException("Unable to load the credentials path. No invalid security credentials " +
                         "were found.");
             }
 
-            return new URI(host + CPMMetadataUtils.SECURITY_CREDENTIALS_RESOURCE + "/" + securityCredentials[0]);
+            return new URI(host + CPMMetadataUtils.CPM_METADATA_ROOT + CPMMetadataUtils.SECURITY_CREDENTIALS_RESOURCE + "/" + securityCredentials[0]);
         }
     }
 }
