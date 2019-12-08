@@ -45,7 +45,6 @@ public enum Jackson {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
-    ;
     private static final ObjectWriter writer = objectMapper.writer();
     private static final ObjectWriter prettyWriter = objectMapper.writerWithDefaultPrettyPrinter();
 
