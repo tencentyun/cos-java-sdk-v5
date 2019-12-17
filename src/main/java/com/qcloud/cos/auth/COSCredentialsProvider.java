@@ -25,5 +25,7 @@ public interface COSCredentialsProvider {
      *
      * @return COSCredentials which the caller can use to sign request.
      */
-    public COSCredentials getCredentials();
+    COSCredentials getCredentials();
+
+    void refresh();
 }

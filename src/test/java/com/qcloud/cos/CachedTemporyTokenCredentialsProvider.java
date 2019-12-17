@@ -30,4 +30,7 @@ public class CachedTemporyTokenCredentialsProvider extends AbstractCOSCachedCred
         return credentials;
     }
 
+    @Override
+    public void refresh() {
+    }
 }

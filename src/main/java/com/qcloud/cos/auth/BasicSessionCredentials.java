@@ -59,7 +59,6 @@ public class BasicSessionCredentials implements COSSessionCredentials {
     }
 
     /**
-     * @param appId the appid which your resource belong to.
      * @param accessKey your accessKey(SecretId). you can get it by https://console.qcloud.com/capi
      * @param secretKey your secretKey. you can get it by https://console.qcloud.com/capi
      * @param sessionToken the sessionToken you get from cam.
@@ -107,6 +106,4 @@ public class BasicSessionCredentials implements COSSessionCredentials {
     private final String accessKey;
     private final String secretKey;
     private final String sessionToken;
-
-
 }
