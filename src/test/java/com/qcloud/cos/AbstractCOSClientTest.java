@@ -43,6 +43,7 @@ import com.qcloud.cos.utils.Md5Utils;
 
 public class AbstractCOSClientTest {
     protected static String appid = null;
+    protected static String accountId = null;
     protected static String secretId = null;
     protected static String secretKey = null;
     protected static String region = null;
@@ -103,6 +104,7 @@ public class AbstractCOSClientTest {
 
     protected static boolean initConfig() throws IOException {
         appid = System.getenv("appid");
+        accountId = System.getenv("accountId");
         secretId = System.getenv("secretId");
         secretKey = System.getenv("secretKey");
         region = System.getenv("region");
@@ -118,6 +120,7 @@ public class AbstractCOSClientTest {
                 fis = new FileInputStream(propFile);
                 prop.load(fis);
                 appid = prop.getProperty("appid");
+                accountId = prop.getProperty("accountId");
                 secretId = prop.getProperty("secretId");
                 secretKey = prop.getProperty("secretKey");
                 region = prop.getProperty("region");

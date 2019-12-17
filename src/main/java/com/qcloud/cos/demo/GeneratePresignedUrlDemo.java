@@ -24,7 +24,6 @@ import com.qcloud.cos.utils.DateUtils;
  * 用于可将生成的连接分发给移动端或者他人, 即可实现在签名有效期内上传或者下载文件.
  */
 public class GeneratePresignedUrlDemo {
-
     // 获取下载的预签名连接
     public static void GenerateSimplePresignedDownloadUrl() {
         // 1 初始化用户身份信息(secretId, secretKey)

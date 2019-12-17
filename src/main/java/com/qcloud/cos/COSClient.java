@@ -43,7 +43,6 @@ import org.apache.commons.codec.DecoderException;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.qcloud.cos.auth.COSCredentials;
 import com.qcloud.cos.auth.COSCredentialsProvider;
 import com.qcloud.cos.auth.COSSessionCredentials;
@@ -175,6 +174,31 @@ import com.qcloud.cos.utils.Md5Utils;
 import com.qcloud.cos.utils.ServiceUtils;
 import com.qcloud.cos.utils.StringUtils;
 import com.qcloud.cos.utils.UrlEncoderUtils;
+import com.qcloud.cos.model.GetBucketWebsiteConfigurationRequest;
+import com.qcloud.cos.model.DeleteBucketWebsiteConfigurationRequest;
+import com.qcloud.cos.model.SetBucketWebsiteConfigurationRequest;
+import com.qcloud.cos.model.BucketWebsiteConfiguration;
+import com.qcloud.cos.model.BucketDomainConfiguration;
+import com.qcloud.cos.model.GetBucketDomainConfigurationRequest;
+import com.qcloud.cos.model.SetBucketDomainConfigurationRequest;
+import com.qcloud.cos.model.BucketLoggingConfiguration;
+import com.qcloud.cos.model.SetBucketLoggingConfigurationRequest;
+import com.qcloud.cos.model.GetBucketLoggingConfigurationRequest;
+import com.qcloud.cos.model.DeleteBucketInventoryConfigurationRequest;
+import com.qcloud.cos.model.DeleteBucketInventoryConfigurationResult;
+import com.qcloud.cos.model.GetBucketInventoryConfigurationResult;
+import com.qcloud.cos.model.GetBucketInventoryConfigurationRequest;
+import com.qcloud.cos.model.SetBucketInventoryConfigurationResult;
+import com.qcloud.cos.model.inventory.InventoryConfiguration;
+import com.qcloud.cos.model.ListBucketInventoryConfigurationsResult;
+import com.qcloud.cos.model.SetBucketInventoryConfigurationRequest;
+import com.qcloud.cos.model.ListBucketInventoryConfigurationsRequest;
+import com.qcloud.cos.model.BucketTaggingConfiguration;
+import com.qcloud.cos.model.GetBucketTaggingConfigurationRequest;
+import com.qcloud.cos.model.SetBucketTaggingConfigurationRequest;
+import com.qcloud.cos.model.DeleteBucketTaggingConfigurationRequest;
+import com.qcloud.cos.model.GetBucketTaggingConfigurationRequest;
+
 
 public class COSClient implements COS {
 
@@ -208,7 +232,7 @@ public class COSClient implements COS {
         rejectNull(cred, "cred must not be null");
         this.credProvider = new COSStaticCredentialsProvider(cred);
     }
-    
+
     public void setCOSCredentialsProvider(COSCredentialsProvider credProvider) {
         rejectNull(credProvider, "credProvider must not be null");
         this.credProvider = credProvider;
@@ -2780,6 +2804,49 @@ public class COSClient implements COS {
     }
 
     @Override
+    public BucketLoggingConfiguration getBucketLoggingConfiguration(String bucketName)
+            throws CosClientException, CosServiceException {
+        return getBucketLoggingConfiguration(new GetBucketLoggingConfigurationRequest(bucketName));
+    }
+
+    @Override
+    public BucketLoggingConfiguration getBucketLoggingConfiguration(GetBucketLoggingConfigurationRequest getBucketLoggingConfigurationRequest)
+            throws CosClientException, CosServiceException {
+        rejectNull(getBucketLoggingConfigurationRequest, "The request object parameter getBucketLoggingConfigurationRequest must be specifed.");
+        String bucketName = getBucketLoggingConfigurationRequest.getBucketName();
+        rejectNull(bucketName,
+                "The bucket name parameter must be specified when requesting a bucket's logging status");
+
+        CosHttpRequest<GetBucketLoggingConfigurationRequest> request = createRequest(bucketName, null, getBucketLoggingConfigurationRequest, HttpMethodName.GET);
+        request.addParameter("logging", null);
+
+        return invoke(request, new Unmarshallers.BucketLoggingConfigurationnmarshaller());
+    }
+
+    @Override
+    public void setBucketLoggingConfiguration(SetBucketLoggingConfigurationRequest setBucketLoggingConfigurationRequest)
+            throws CosClientException, CosServiceException {
+        rejectNull(setBucketLoggingConfigurationRequest,
+                "The set bucket logging configuration request object must be specified when enabling server access logging");
+
+        String bucketName = setBucketLoggingConfigurationRequest.getBucketName();
+        BucketLoggingConfiguration loggingConfiguration = setBucketLoggingConfigurationRequest.getLoggingConfiguration();
+
+        rejectNull(bucketName,
+                "The bucket name parameter must be specified when enabling server access logging");
+        rejectNull(loggingConfiguration,
+                "The logging configuration parameter must be specified when enabling server access logging");
+
+        CosHttpRequest<SetBucketLoggingConfigurationRequest> request = createRequest(bucketName, null, setBucketLoggingConfigurationRequest, HttpMethodName.PUT);
+        request.addParameter("logging", null);
+
+        byte[] bytes = new BucketConfigurationXmlFactory().convertToXmlByteArray(loggingConfiguration);
+        request.setContent(new ByteArrayInputStream(bytes));
+
+        invoke(request, voidCosResponseHandler);
+    }
+
+    @Override
     public void setBucketPolicy(SetBucketPolicyRequest setBucketPolicyRequest)
             throws CosClientException, CosServiceException {
         rejectNull(setBucketPolicyRequest,
@@ -2849,6 +2916,324 @@ public class COSClient implements COS {
         CosHttpRequest<DeleteBucketPolicyRequest> request =
                 createRequest(bucketName, null, deleteBucketPolicyRequest, HttpMethodName.DELETE);
         request.addParameter("policy", null);
+
+        invoke(request, voidCosResponseHandler);
+    }
+
+    @Override
+    public BucketWebsiteConfiguration getBucketWebsiteConfiguration(String bucketName)
+            throws CosClientException, CosServiceException {
+        return getBucketWebsiteConfiguration(new GetBucketWebsiteConfigurationRequest(bucketName));
+    }
+
+    @Override
+    public BucketWebsiteConfiguration getBucketWebsiteConfiguration(GetBucketWebsiteConfigurationRequest getBucketWebsiteConfigurationRequest)
+            throws CosClientException, CosServiceException {
+        rejectNull(getBucketWebsiteConfigurationRequest, "The request object parameter getBucketWebsiteConfigurationRequest must be specified.");
+        String bucketName = getBucketWebsiteConfigurationRequest.getBucketName();
+        rejectNull(bucketName,
+                "The bucket name parameter must be specified when requesting a bucket's website configuration");
+
+        CosHttpRequest<GetBucketWebsiteConfigurationRequest> request = createRequest(bucketName, null, getBucketWebsiteConfigurationRequest, HttpMethodName.GET);
+        request.addParameter("website", null);
+        request.addHeader("Content-Type", "application/xml");
+
+        try {
+            return invoke(request, new Unmarshallers.BucketWebsiteConfigurationUnmarshaller());
+        } catch (CosServiceException ase) {
+            if (ase.getStatusCode() == 404) return null;
+            throw ase;
+        }
+    }
+
+    @Override
+    public void setBucketWebsiteConfiguration(String bucketName, BucketWebsiteConfiguration configuration)
+            throws CosClientException, CosServiceException {
+        setBucketWebsiteConfiguration(new SetBucketWebsiteConfigurationRequest(bucketName, configuration));
+    }
+
+    @Override
+    public void setBucketWebsiteConfiguration(SetBucketWebsiteConfigurationRequest setBucketWebsiteConfigurationRequest)
+            throws CosClientException, CosServiceException {
+        String bucketName = setBucketWebsiteConfigurationRequest.getBucketName();
+        BucketWebsiteConfiguration configuration = setBucketWebsiteConfigurationRequest.getConfiguration();
+
+        rejectNull(bucketName,
+                "The bucket name parameter must be specified when setting a bucket's website configuration");
+        rejectNull(configuration,
+                "The bucket website configuration parameter must be specified when setting a bucket's website configuration");
+        if (configuration.getRedirectAllRequestsTo() == null) {
+            rejectNull(configuration.getIndexDocumentSuffix(),
+                    "The bucket website configuration parameter must specify the index document suffix when setting a bucket's website configuration");
+        }
+
+        CosHttpRequest<SetBucketWebsiteConfigurationRequest> request = createRequest(bucketName, null, setBucketWebsiteConfigurationRequest, HttpMethodName.PUT);
+        request.addParameter("website", null);
+        request.addHeader("Content-Type", "application/xml");
+
+        byte[] bytes = new BucketConfigurationXmlFactory().convertToXmlByteArray(configuration);
+        request.setContent(new ByteArrayInputStream(bytes));
+
+        invoke(request, voidCosResponseHandler);
+    }
+
+    @Override
+    public void deleteBucketWebsiteConfiguration(String bucketName)
+            throws CosClientException, CosServiceException {
+        deleteBucketWebsiteConfiguration(new DeleteBucketWebsiteConfigurationRequest(bucketName));
+    }
+
+    @Override
+    public void deleteBucketWebsiteConfiguration(DeleteBucketWebsiteConfigurationRequest deleteBucketWebsiteConfigurationRequest)
+            throws CosClientException, CosServiceException {
+        String bucketName = deleteBucketWebsiteConfigurationRequest.getBucketName();
+
+        rejectNull(bucketName,
+                "The bucket name parameter must be specified when deleting a bucket's website configuration");
+
+        CosHttpRequest<DeleteBucketWebsiteConfigurationRequest> request = createRequest(bucketName, null, deleteBucketWebsiteConfigurationRequest, HttpMethodName.DELETE);
+        request.addParameter("website", null);
+        request.addHeader("Content-Type", "application/xml");
+
+        invoke(request, voidCosResponseHandler);
+    }
+
+    @Override
+    public void setBucketDomainConfiguration(String bucketName, BucketDomainConfiguration configuration)
+            throws CosClientException, CosServiceException {
+        setBucketDomainConfiguration(new SetBucketDomainConfigurationRequest(bucketName, configuration));
+    }
+
+    @Override
+    public void setBucketDomainConfiguration(SetBucketDomainConfigurationRequest setBucketDomainConfigurationRequest)
+            throws CosClientException, CosServiceException {
+        rejectNull(setBucketDomainConfigurationRequest,
+                "The request object parameter setBucketDomainConfigurationRequest must be specified.");
+        String bucketName = setBucketDomainConfigurationRequest.getBucketName();
+        BucketDomainConfiguration configuration = setBucketDomainConfigurationRequest.getConfiguration();
+
+        rejectNull(bucketName,
+                "The bucket name parameter must be specified when setting a bucket's domain configuration");
+        rejectNull(configuration,
+                "The bucket domain configuration parameter must be specified when setting a bucket's domain configuration");
+        rejectNull(configuration.getDomainRules(),
+                "The bucket domain rules must specify the index document suffix when setting a bucket's domain configuration");
+
+        CosHttpRequest<SetBucketDomainConfigurationRequest> request = createRequest(bucketName,
+                null, setBucketDomainConfigurationRequest, HttpMethodName.PUT);
+        request.addParameter("domain", null);
+        request.addHeader("Content-Type", "application/xml");
+
+        byte[] bytes = new BucketConfigurationXmlFactory().convertToXmlByteArray(configuration);
+        request.setContent(new ByteArrayInputStream(bytes));
+
+        invoke(request, voidCosResponseHandler);
+    }
+
+    @Override
+    public BucketDomainConfiguration getBucketDomainConfiguration(String bucketName)
+            throws CosClientException, CosServiceException {
+        return getBucketDomainConfiguration(new GetBucketDomainConfigurationRequest(bucketName));
+    }
+
+    @Override
+    public BucketDomainConfiguration getBucketDomainConfiguration(GetBucketDomainConfigurationRequest getBucketDomainConfigurationRequest)
+            throws CosClientException, CosServiceException {
+        rejectNull(getBucketDomainConfigurationRequest,
+                "The request object parameter getBucketDomainConfigurationRequest must be specified.");
+        String bucketName = getBucketDomainConfigurationRequest.getBucketName();
+        rejectNull(bucketName,
+                "The bucket name must be specified when retrieving the bucket domain configuration.");
+
+        CosHttpRequest<GetBucketDomainConfigurationRequest> request = createRequest(bucketName,
+                null, getBucketDomainConfigurationRequest, HttpMethodName.GET);
+        request.addParameter("domain", null);
+
+        try {
+            return invoke(request, new Unmarshallers.BucketDomainConfigurationUnmarshaller());
+        } catch (CosServiceException cse) {
+            switch (cse.getStatusCode()) {
+                case 404:
+                    return null;
+                default:
+                    throw cse;
+            }
+        }
+    }
+
+    @Override
+    public DeleteBucketInventoryConfigurationResult deleteBucketInventoryConfiguration(
+            String bucketName, String id) throws CosClientException, CosServiceException {
+        return deleteBucketInventoryConfiguration(
+                new DeleteBucketInventoryConfigurationRequest(bucketName, id));
+    }
+
+    @Override
+    public DeleteBucketInventoryConfigurationResult deleteBucketInventoryConfiguration(
+            DeleteBucketInventoryConfigurationRequest deleteBucketInventoryConfigurationRequest)
+            throws CosClientException, CosServiceException {
+        rejectNull(deleteBucketInventoryConfigurationRequest, "The request cannot be null");
+        rejectNull(deleteBucketInventoryConfigurationRequest.getBucketName(), "The bucketName cannot be null");
+        rejectNull(deleteBucketInventoryConfigurationRequest.getId(), "The id cannot be null");
+        String bucketName = deleteBucketInventoryConfigurationRequest.getBucketName();
+        String id = deleteBucketInventoryConfigurationRequest.getId();
+
+        CosHttpRequest<DeleteBucketInventoryConfigurationRequest> request = createRequest(bucketName, null, deleteBucketInventoryConfigurationRequest, HttpMethodName.DELETE);
+        request.addParameter("inventory", null);
+        request.addParameter("id", id);
+
+        return invoke(request, new Unmarshallers.DeleteBucketInventoryConfigurationUnmarshaller());
+    }
+
+    @Override
+    public GetBucketInventoryConfigurationResult getBucketInventoryConfiguration(
+            String bucketName, String id) throws CosClientException, CosServiceException {
+        return getBucketInventoryConfiguration(
+                new GetBucketInventoryConfigurationRequest(bucketName, id));
+    }
+
+    @Override
+    public GetBucketInventoryConfigurationResult getBucketInventoryConfiguration(
+            GetBucketInventoryConfigurationRequest getBucketInventoryConfigurationRequest)
+            throws CosClientException, CosServiceException {
+        rejectNull(getBucketInventoryConfigurationRequest, "The request cannot be null");
+        rejectNull(getBucketInventoryConfigurationRequest.getBucketName(), "The bucketName cannot be null");
+        rejectNull(getBucketInventoryConfigurationRequest.getId(), "The id cannot be null");
+        String bucketName = getBucketInventoryConfigurationRequest.getBucketName();
+        String id = getBucketInventoryConfigurationRequest.getId();
+
+        CosHttpRequest<GetBucketInventoryConfigurationRequest> request = createRequest(bucketName, null, getBucketInventoryConfigurationRequest, HttpMethodName.GET);
+        request.addParameter("inventory", null);
+        request.addParameter("id", id);
+
+        return invoke(request, new Unmarshallers.GetBucketInventoryConfigurationUnmarshaller());
+    }
+
+    @Override
+    public SetBucketInventoryConfigurationResult setBucketInventoryConfiguration(
+            String bucketName, InventoryConfiguration inventoryConfiguration)
+            throws CosClientException, CosServiceException {
+        return setBucketInventoryConfiguration(
+                new SetBucketInventoryConfigurationRequest(bucketName, inventoryConfiguration));
+    }
+
+    @Override
+    public SetBucketInventoryConfigurationResult setBucketInventoryConfiguration(
+            SetBucketInventoryConfigurationRequest setBucketInventoryConfigurationRequest)
+            throws CosClientException, CosServiceException {
+        rejectNull(setBucketInventoryConfigurationRequest, "The request cannot be null");
+        rejectNull(setBucketInventoryConfigurationRequest.getBucketName(), "The bucketName cannot be null");
+        rejectNull(setBucketInventoryConfigurationRequest.getInventoryConfiguration(), "The inventoryConfiguration cannot be null");
+        rejectNull(setBucketInventoryConfigurationRequest.getInventoryConfiguration().getId(), "The inventoryConfiguration.id cannot be null");
+        final String bucketName = setBucketInventoryConfigurationRequest.getBucketName();
+        final InventoryConfiguration inventoryConfiguration = setBucketInventoryConfigurationRequest.getInventoryConfiguration();
+        final String id = inventoryConfiguration.getId();
+
+        CosHttpRequest<SetBucketInventoryConfigurationRequest> request = createRequest(bucketName, null, setBucketInventoryConfigurationRequest, HttpMethodName.PUT);
+        request.addParameter("inventory", null);
+        request.addParameter("id", id);
+
+        final byte[] bytes = new BucketConfigurationXmlFactory().convertToXmlByteArray(inventoryConfiguration);
+        request.addHeader("Content-Length", String.valueOf(bytes.length));
+        request.addHeader("Content-Type", "application/xml");
+        request.setContent(new ByteArrayInputStream(bytes));
+
+        return invoke(request, new Unmarshallers.SetBucketInventoryConfigurationUnmarshaller());
+    }
+
+    @Override
+    public ListBucketInventoryConfigurationsResult listBucketInventoryConfigurations(ListBucketInventoryConfigurationsRequest listBucketInventoryConfigurationsRequest)
+            throws CosClientException, CosServiceException {
+        rejectNull(listBucketInventoryConfigurationsRequest, "The request cannot be null");
+        rejectNull(listBucketInventoryConfigurationsRequest.getBucketName(), "The bucketName cannot be null");
+        final String bucketName = listBucketInventoryConfigurationsRequest.getBucketName();
+
+        CosHttpRequest<ListBucketInventoryConfigurationsRequest> request = createRequest(bucketName, null, listBucketInventoryConfigurationsRequest, HttpMethodName.GET);
+        request.addParameter("inventory", null);
+        addParameterIfNotNull(request, "continuation-token", listBucketInventoryConfigurationsRequest.getContinuationToken());
+
+        return invoke(request, new Unmarshallers.ListBucketInventoryConfigurationsUnmarshaller());
+    }
+    @Override
+    public BucketTaggingConfiguration getBucketTaggingConfiguration(String bucketName) {
+        return getBucketTaggingConfiguration(new GetBucketTaggingConfigurationRequest(bucketName));
+    }
+
+    @Override
+    public BucketTaggingConfiguration getBucketTaggingConfiguration(GetBucketTaggingConfigurationRequest getBucketTaggingConfigurationRequest) {
+        rejectNull(getBucketTaggingConfigurationRequest, "The request object parameter getBucketTaggingConfigurationRequest must be specifed.");
+        String bucketName = getBucketTaggingConfigurationRequest.getBucketName();
+        rejectNull(bucketName, "The bucket name must be specified when retrieving the bucket tagging configuration.");
+
+        CosHttpRequest<GetBucketTaggingConfigurationRequest> request = createRequest(bucketName, null, getBucketTaggingConfigurationRequest, HttpMethodName.GET);
+        request.addParameter("tagging", null);
+
+        try {
+            return invoke(request, new Unmarshallers.BucketTaggingConfigurationUnmarshaller());
+        } catch (CosServiceException ase) {
+            switch (ase.getStatusCode()) {
+                case 404:
+                    return null;
+                default:
+                    throw ase;
+            }
+        }
+    }
+
+    @Override
+    public void setBucketTaggingConfiguration(String bucketName, BucketTaggingConfiguration bucketTaggingConfiguration) {
+        setBucketTaggingConfiguration(new SetBucketTaggingConfigurationRequest(bucketName, bucketTaggingConfiguration));
+    }
+
+    @Override
+    public void setBucketTaggingConfiguration(
+            SetBucketTaggingConfigurationRequest setBucketTaggingConfigurationRequest) {
+        rejectNull(setBucketTaggingConfigurationRequest,
+                "The set bucket tagging configuration request object must be specified.");
+
+        String bucketName = setBucketTaggingConfigurationRequest.getBucketName();
+        BucketTaggingConfiguration bucketTaggingConfiguration = setBucketTaggingConfigurationRequest.getTaggingConfiguration();
+
+        rejectNull(bucketName,
+                "The bucket name parameter must be specified when setting bucket tagging configuration.");
+        rejectNull(bucketTaggingConfiguration,
+                "The tagging configuration parameter must be specified when setting bucket tagging configuration.");
+
+        CosHttpRequest<SetBucketTaggingConfigurationRequest> request = createRequest(bucketName, null, setBucketTaggingConfigurationRequest, HttpMethodName.PUT);
+        request.addParameter("tagging", null);
+
+        byte[] content = new BucketConfigurationXmlFactory().convertToXmlByteArray(bucketTaggingConfiguration);
+        request.addHeader("Content-Length", String.valueOf(content.length));
+        request.addHeader("Content-Type", "application/xml");
+        request.setContent(new ByteArrayInputStream(content));
+        try {
+            byte[] md5 = Md5Utils.computeMD5Hash(content);
+            String md5Base64 = BinaryUtils.toBase64(md5);
+            request.addHeader("Content-MD5", md5Base64);
+        } catch ( Exception e ) {
+            throw new CosClientException("Couldn't compute md5 sum", e);
+        }
+
+        invoke(request, voidCosResponseHandler);
+    }
+
+    @Override
+    public void deleteBucketTaggingConfiguration(String bucketName) {
+        deleteBucketTaggingConfiguration(new DeleteBucketTaggingConfigurationRequest(bucketName));
+    }
+
+    @Override
+    public void deleteBucketTaggingConfiguration(
+            DeleteBucketTaggingConfigurationRequest deleteBucketTaggingConfigurationRequest) {
+        rejectNull(deleteBucketTaggingConfigurationRequest,
+                "The delete bucket tagging configuration request object must be specified.");
+
+        String bucketName = deleteBucketTaggingConfigurationRequest.getBucketName();
+        rejectNull(bucketName,
+                "The bucket name parameter must be specified when deleting bucket tagging configuration.");
+
+        CosHttpRequest<DeleteBucketTaggingConfigurationRequest> request = createRequest(bucketName, null, deleteBucketTaggingConfigurationRequest, HttpMethodName.DELETE);
+        request.addParameter("tagging", null);
 
         invoke(request, voidCosResponseHandler);
     }

@@ -51,4 +51,7 @@ public class Constants {
     
     /** Default encoding used for url encode */
     public static final String DEFAULT_ENCODING = "UTF-8";
+
+    public static final String ISO_8859_1_ENCODING = "ISO-8859-1";
+    public static final String UTF8_ENCODING = "UTF-8";
 }

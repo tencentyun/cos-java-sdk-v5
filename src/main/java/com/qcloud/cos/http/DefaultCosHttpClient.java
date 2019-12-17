@@ -18,6 +18,7 @@
 
 package com.qcloud.cos.http;
 
+
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -68,6 +69,8 @@ import com.qcloud.cos.internal.ReleasableInputStream;
 import com.qcloud.cos.internal.ResettableInputStream;
 import com.qcloud.cos.internal.SdkBufferedInputStream;
 import com.qcloud.cos.utils.UrlEncoderUtils;
+import com.qcloud.cos.utils.CodecUtils;
+
 
 public class DefaultCosHttpClient implements CosHttpClient {
 
@@ -207,11 +210,13 @@ public class DefaultCosHttpClient implements CosHttpClient {
                 content_length = Long.parseLong(headerValue);
                 continue;
             }
+            headerValue = CodecUtils.convertFromUtf8ToIso88591(headerValue);
             httpRequestBase.addHeader(headerKey, headerValue);
         }
 
         Map<String, String> customRequestHeaders =
                 request.getOriginalRequest().getCustomRequestHeaders();
+
         if (customRequestHeaders != null) {
             for (Entry<String, String> customHeaderEntry : customRequestHeaders.entrySet()) {
                 String headerKey = customHeaderEntry.getKey();
@@ -220,6 +225,7 @@ public class DefaultCosHttpClient implements CosHttpClient {
                     content_length = Long.parseLong(headerValue);
                     continue;
                 }
+                headerValue = CodecUtils.convertFromUtf8ToIso88591(headerValue);
                 httpRequestBase.addHeader(headerKey, headerValue);
             }
         }
@@ -229,7 +235,6 @@ public class DefaultCosHttpClient implements CosHttpClient {
         } else {
             httpRequestBase.addHeader(Headers.SDK_LOG_DEBUG, "off");
         }
-
 
         if (request.getContent() != null) {
             InputStreamEntity reqEntity =
@@ -272,7 +277,8 @@ public class DefaultCosHttpClient implements CosHttpClient {
         httpResponse.setStatusCode(apacheHttpResponse.getStatusLine().getStatusCode());
         httpResponse.setStatusText(apacheHttpResponse.getStatusLine().getReasonPhrase());
         for (Header header : apacheHttpResponse.getAllHeaders()) {
-            httpResponse.addHeader(header.getName(), header.getValue());
+            String value = CodecUtils.convertFromIso88591ToUtf8(header.getValue());
+            httpResponse.addHeader(header.getName(), value);
         }
 
         return httpResponse;
