@@ -623,6 +623,28 @@ public class AbstractCOSClientTest {
             }
         }
     }
+    protected void testAppendGetDelObjectDiffSize(long size, boolean isStream) throws IOException {
+        String key = "ut/" + size;
+        long nextAppendPosition = 0;
+        for(int i = 0; i < 3; i++) {
+            File localFile = buildTestFile(size);
+            AppendObjectRequest appendObjectRequest = null;
+            if(!isStream) {
+                appendObjectRequest = new AppendObjectRequest(bucket, key, localFile);
+            } else {
+                ObjectMetadata objectMetadata = new ObjectMetadata();
+                objectMetadata.setContentLength(size); 
+                appendObjectRequest = new AppendObjectRequest(bucket, key, new FileInputStream(localFile), objectMetadata);
+            }
+            appendObjectRequest.setPosition(nextAppendPosition);
+            AppendObjectResult appendObjectResult = cosclient.appendObject(appendObjectRequest);
+            nextAppendPosition = appendObjectResult.getNextAppendPosition();
+            localFile.delete();
+        }
+        ObjectMetadata objectMetadata = cosclient.getObjectMetadata(bucket, key);
+        assertEquals(objectMetadata.getContentLength(), size * 3);
+        cosclient.deleteObject(bucket, key);
+    }
 
     // 在本地生成不同大小的文件, 并上传， 下载，删除
     protected void testPutGetDelObjectDiffSize(long size) throws CosServiceException, IOException {

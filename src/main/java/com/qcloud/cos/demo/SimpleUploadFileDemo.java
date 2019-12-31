@@ -20,7 +20,6 @@ import com.qcloud.cos.region.Region;
  * SimpleUpload 给出了简单上传的示例
  */
 public class SimpleUploadFileDemo {
-    
     // 将本地文件上传到COS
     public static void SimpleUploadFileFromLocal() {
         // 1 初始化用户身份信息(secretId, secretKey)
@@ -31,7 +30,7 @@ public class SimpleUploadFileDemo {
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名需包含appid
         String bucketName = "mybucket-1251668577";
-        
+
         String key = "aaa/bbb.txt";
         File localFile = new File("src/test/resources/len10M.txt");
         PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, key, localFile);

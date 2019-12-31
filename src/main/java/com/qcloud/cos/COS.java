@@ -117,6 +117,8 @@ import com.qcloud.cos.model.DeleteBucketTaggingConfigurationRequest;
 import com.qcloud.cos.model.GetBucketTaggingConfigurationRequest;
 import com.qcloud.cos.model.SetBucketTaggingConfigurationRequest;
 import com.qcloud.cos.model.BucketTaggingConfiguration;
+import com.qcloud.cos.model.AppendObjectRequest;
+import com.qcloud.cos.model.AppendObjectResult;
 
 
 public interface COS extends COSDirectSpi {
@@ -2823,6 +2825,17 @@ public interface COS extends COSDirectSpi {
      */
     public void deleteBucketTaggingConfiguration(
             DeleteBucketTaggingConfigurationRequest deleteBucketTaggingConfigurationRequest);
+
+    /**
+     * append data to an COS object
+     *
+     * @param appendObjectRequest
+     * @return
+     * @throws CosServiceException
+     * @throws CosClientException
+     */
+    public AppendObjectResult appendObject(AppendObjectRequest appendObjectRequest)
+            throws CosServiceException, CosClientException;
 }
 
 

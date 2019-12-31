@@ -197,7 +197,10 @@ import com.qcloud.cos.model.BucketTaggingConfiguration;
 import com.qcloud.cos.model.GetBucketTaggingConfigurationRequest;
 import com.qcloud.cos.model.SetBucketTaggingConfigurationRequest;
 import com.qcloud.cos.model.DeleteBucketTaggingConfigurationRequest;
-import com.qcloud.cos.model.GetBucketTaggingConfigurationRequest;
+import com.qcloud.cos.model.AppendObjectRequest;
+import com.qcloud.cos.model.AppendObjectResult;
+import com.qcloud.cos.model.UploadMode;
+
 
 
 public class COSClient implements COS {
@@ -586,6 +589,15 @@ public class COSClient implements COS {
         return result;
     }
 
+    private static AppendObjectResult createAppendObjectResult(ObjectMetadata metadata) {
+        final AppendObjectResult result = new AppendObjectResult();
+        result.setNextAppendPosition(Long.valueOf(
+                (String)metadata.getRawMetadataValue(Headers.APPEND_OBJECT_NEXT_POSISTION)));
+        result.setMetadata(metadata);
+        return result;
+    }
+
+
     /**
      * Adds the specified parameter to the specified request, if the parameter value is not null.
      *
@@ -758,16 +770,34 @@ public class COSClient implements COS {
     @Override
     public PutObjectResult putObject(PutObjectRequest putObjectRequest)
             throws CosClientException, CosServiceException {
-        rejectNull(putObjectRequest,
+        ObjectMetadata returnedMetadata = uploadObjectInternal(UploadMode.PUT_OBJECT, putObjectRequest);
+        PutObjectResult result = createPutObjectResult(returnedMetadata);
+        result.setContentMd5(returnedMetadata.getETag());
+        return result;
+    }
+
+    @Override
+    public AppendObjectResult appendObject(AppendObjectRequest appendObjectRequest)
+            throws CosServiceException, CosClientException {
+        rejectNull(appendObjectRequest, "The append object request must be specified");
+        rejectNull(appendObjectRequest.getPosition(), "The position parameter must be specified");
+        ObjectMetadata returnedMetadata = uploadObjectInternal(UploadMode.APPEND_OBJECT, appendObjectRequest);
+        return createAppendObjectResult(returnedMetadata);
+    }
+
+    protected <UploadObjectRequest extends PutObjectRequest>
+        ObjectMetadata uploadObjectInternal(UploadMode uploadMode, UploadObjectRequest uploadObjectRequest)
+            throws CosClientException, CosServiceException {
+        rejectNull(uploadObjectRequest,
                 "The PutObjectRequest parameter must be specified when uploading an object");
         rejectNull(clientConfig.getRegion(),
                 "region is null, region in clientConfig must be specified when uploading an object");
 
-        final File file = putObjectRequest.getFile();
-        final InputStream isOrig = putObjectRequest.getInputStream();
-        final String bucketName = putObjectRequest.getBucketName();
-        final String key = putObjectRequest.getKey();
-        ObjectMetadata metadata = putObjectRequest.getMetadata();
+        final File file = uploadObjectRequest.getFile();
+        final InputStream isOrig = uploadObjectRequest.getInputStream();
+        final String bucketName = uploadObjectRequest.getBucketName();
+        final String key = uploadObjectRequest.getKey();
+        ObjectMetadata metadata = uploadObjectRequest.getMetadata();
         InputStream input = isOrig;
         if (metadata == null)
             metadata = new ObjectMetadata();
@@ -793,7 +823,7 @@ public class COSClient implements COS {
             }
             final boolean calculateMD5 = metadata.getContentMD5() == null;
 
-            if (calculateMD5 && !skipMd5CheckStrategy.skipServerSideValidation(putObjectRequest)) {
+            if (calculateMD5 && !skipMd5CheckStrategy.skipServerSideValidation(uploadObjectRequest)) {
                 try {
                     String contentMd5_b64 = Md5Utils.md5AsBase64(file);
                     metadata.setContentMD5(contentMd5_b64);
@@ -809,32 +839,40 @@ public class COSClient implements COS {
         final ObjectMetadata returnedMetadata;
         MD5DigestCalculatingInputStream md5DigestStream = null;
         try {
-            CosHttpRequest<PutObjectRequest> request =
-                    createRequest(bucketName, key, putObjectRequest, HttpMethodName.PUT);
-            if (putObjectRequest.getAccessControlList() != null) {
-                addAclHeaders(request, putObjectRequest.getAccessControlList());
-            } else if (putObjectRequest.getCannedAcl() != null) {
+            CosHttpRequest<UploadObjectRequest> request = null;
+            if(uploadMode.equals(UploadMode.PUT_OBJECT)) {
+                request = createRequest(bucketName, key, uploadObjectRequest, HttpMethodName.PUT);
+            } else if(uploadMode.equals(UploadMode.APPEND_OBJECT)){
+                request = createRequest(bucketName, key, uploadObjectRequest, HttpMethodName.POST);
+                AppendObjectRequest appendObjectRequest = (AppendObjectRequest)uploadObjectRequest;
+                String positionStr = String.valueOf(appendObjectRequest.getPosition());
+                request.addParameter("append", null);
+                request.addParameter("position", positionStr);
+            }
+            if (uploadObjectRequest.getAccessControlList() != null) {
+                addAclHeaders(request, uploadObjectRequest.getAccessControlList());
+            } else if (uploadObjectRequest.getCannedAcl() != null) {
                 request.addHeader(Headers.COS_CANNED_ACL,
-                        putObjectRequest.getCannedAcl().toString());
+                        uploadObjectRequest.getCannedAcl().toString());
             }
 
-            if (putObjectRequest.getStorageClass() != null) {
-                request.addHeader(Headers.STORAGE_CLASS, putObjectRequest.getStorageClass());
+            if (uploadObjectRequest.getStorageClass() != null) {
+                request.addHeader(Headers.STORAGE_CLASS, uploadObjectRequest.getStorageClass());
             }
 
-            if (putObjectRequest.getRedirectLocation() != null) {
+            if (uploadObjectRequest.getRedirectLocation() != null) {
                 request.addHeader(Headers.REDIRECT_LOCATION,
-                        putObjectRequest.getRedirectLocation());
+                        uploadObjectRequest.getRedirectLocation());
                 if (input == null) {
                     input = new ByteArrayInputStream(new byte[0]);
                 }
             }
 
             // Populate the SSE-C parameters to the request header
-            populateSSE_C(request, putObjectRequest.getSSECustomerKey());
+            populateSSE_C(request, uploadObjectRequest.getSSECustomerKey());
 
             // Populate the SSE KMS parameters to the request header
-            populateSSE_KMS(request, putObjectRequest.getSSECOSKeyManagementParams());
+            populateSSE_KMS(request, uploadObjectRequest.getSSECOSKeyManagementParams());
 
             // Use internal interface to differentiate 0 from unset.
             final Long contentLength = (Long) metadata.getRawMetadataValue(Headers.CONTENT_LENGTH);
@@ -875,7 +913,7 @@ public class COSClient implements COS {
             }
 
             if (metadata.getContentMD5() == null
-                    && !skipMd5CheckStrategy.skipClientSideValidationPerRequest(putObjectRequest)) {
+                    && !skipMd5CheckStrategy.skipClientSideValidationPerRequest(uploadObjectRequest)) {
                 /*
                  * If the user hasn't set the content MD5, then we don't want to buffer the whole
                  * stream in memory just to calculate it. Instead, we can calculate it on the fly
@@ -892,7 +930,7 @@ public class COSClient implements COS {
                 throw Throwables.failure(t);
             }
         } finally {
-            CosDataSource.Utils.cleanupDataSource(putObjectRequest, file, isOrig, input, log);
+            CosDataSource.Utils.cleanupDataSource(uploadObjectRequest, file, isOrig, input, log);
         }
 
         String contentMd5 = metadata.getContentMD5();
@@ -901,8 +939,8 @@ public class COSClient implements COS {
         }
 
         final String etag = returnedMetadata.getETag();
-        if (contentMd5 != null
-                && !skipMd5CheckStrategy.skipClientSideValidationPerPutResponse(returnedMetadata)) {
+        if (contentMd5 != null && uploadMode.equals(UploadMode.PUT_OBJECT)
+                && !skipMd5CheckStrategy.skipClientSideValidationPerPutResponse(returnedMetadata) ) {
             byte[] clientSideHash = BinaryUtils.fromBase64(contentMd5);
             byte[] serverSideHash = null;
             try {
@@ -927,9 +965,7 @@ public class COSClient implements COS {
                         + ")");
             }
         }
-        PutObjectResult result = createPutObjectResult(returnedMetadata);
-        result.setContentMd5(contentMd5);
-        return result;
+        return returnedMetadata;
     }
 
     @Override
