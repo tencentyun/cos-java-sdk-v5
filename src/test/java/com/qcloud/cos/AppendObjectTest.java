@@ -17,17 +17,11 @@ public class AppendObjectTest extends AbstractCOSClientTest{
     public static void tearDownAfterClass() throws Exception {
         AbstractCOSClientTest.destoryCosClient();
     }
-    // 测试上传文件，append大小为1
+    // 测试上传文件，append大小为4K
     @Test
-    public void testAppendGetDelObjectEmpty() throws CosServiceException, IOException {
-        testAppendGetDelObjectDiffSize(1L, false);
-        testAppendGetDelObjectDiffSize(1L, true);
-    }
-    // 测试上传文件，append大小为1K
-    @Test
-    public void testAppendGetDelObject1K() throws CosServiceException, IOException {
-        testAppendGetDelObjectDiffSize(1024, false);
-        testAppendGetDelObjectDiffSize(1024, true);
+    public void testAppendGetDelObject4K() throws CosServiceException, IOException {
+        testAppendGetDelObjectDiffSize(4096, false);
+        testAppendGetDelObjectDiffSize(4096, true);
     }
     // 测试上传文件,append的大小为1M
     @Test
