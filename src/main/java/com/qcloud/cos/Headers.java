@@ -140,6 +140,7 @@ public interface Headers {
     /** Encrypted symmetric key header that is used in the envelope encryption mechanism */
     public static final String CRYPTO_KEY = "x-cos-key";
 
+    public static final String APPEND_OBJECT_NEXT_POSISTION = "x-cos-next-append-position";
     /**
      * Encrypted symmetric key header that is used in the Authenticated
      * Encryption (AE) cryptographic module. Older versions of COS encryption
