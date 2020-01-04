@@ -29,6 +29,8 @@ public class UploadPartResult extends SSEResultBase implements Serializable {
     /** The entity tag generated from the content of the upload part */
     private String eTag;
 
+    private String crc64Ecma;
+
     /**
      * Returns the part number of the newly uploaded part.
      *
@@ -78,5 +80,14 @@ public class UploadPartResult extends SSEResultBase implements Serializable {
      */
     public PartETag getPartETag() {
         return new PartETag(partNumber, eTag);
+    }
+
+
+    public String getCrc64Ecma() {
+        return crc64Ecma;
+    }
+
+    public void setCrc64Ecma(String crc64Ecma) {
+        this.crc64Ecma = crc64Ecma;
     }
 }

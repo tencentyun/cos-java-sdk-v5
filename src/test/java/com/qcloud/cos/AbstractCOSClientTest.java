@@ -717,6 +717,7 @@ public class AbstractCOSClientTest {
         } else {
             assertEquals(true, dataMd5.equals(uploadPartResult.getETag()));
         }
+        assertNotNull(uploadPartResult.getCrc64Ecma());
         assertEquals(partNumber, uploadPartResult.getPartNumber());
     }
 
@@ -756,6 +757,7 @@ public class AbstractCOSClientTest {
         assertNotNull(completeResult.getDateStr());
         String etag = completeResult.getETag();
         assertTrue(etag.contains("-"));
+        assertNotNull(completeResult.getCrc64Ecma());
         try {
             int etagPartNum = Integer.valueOf(etag.substring(etag.indexOf("-") + 1));
             assertEquals(expectedPartNum, etagPartNum);

@@ -56,6 +56,9 @@ public interface Headers {
     /** Cos's alternative date header: x-cos-date */
     public static final String COS_ALTERNATE_DATE = "x-cos-date";
 
+    /** part or object crc64 */
+    public static final String COS_HASH_CRC64_ECMA = "x-cos-hash-crc64ecma";
+
     /** Prefix for COS user metadata: x-cos-meta- */
     public static final String COS_USER_METADATA_PREFIX = "x-cos-meta-";
 

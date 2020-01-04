@@ -1578,6 +1578,7 @@ public class COSClient implements COS {
             result.setSSEAlgorithm(metadata.getSSEAlgorithm());
             result.setSSECustomerAlgorithm(metadata.getSSECustomerAlgorithm());
             result.setSSECustomerKeyMd5(metadata.getSSECustomerKeyMd5());
+            result.setCrc64Ecma(metadata.getCrc64Ecma());
 
             return result;
         } catch (Throwable t) {
@@ -1689,8 +1690,11 @@ public class COSClient implements COS {
                             new VIDResultHandler<CompleteMultipartUploadHandler>());
             handler = invoke(request, responseHandler);
             if (handler.getCompleteMultipartUploadResult() != null) {
-                String versionId = responseHandler.getResponseHeaders().get(Headers.COS_VERSION_ID);
+                Map<String, String> responseHeaders = responseHandler.getResponseHeaders();
+                String versionId = responseHeaders.get(Headers.COS_VERSION_ID);
+                String crc64Ecma = responseHeaders.get(Headers.COS_HASH_CRC64_ECMA);
                 handler.getCompleteMultipartUploadResult().setVersionId(versionId);
+                handler.getCompleteMultipartUploadResult().setCrc64Ecma(crc64Ecma);
                 return handler.getCompleteMultipartUploadResult();
             }
         } while (shouldRetryCompleteMultipartUpload(completeMultipartUploadRequest,

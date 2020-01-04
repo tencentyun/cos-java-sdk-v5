@@ -40,11 +40,11 @@ public class MultipartUploadDemo {
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名需包含appid
-        String bucketName = "test-xxx";
+        String bucketName = "mybucket-1251668577";
 
         String key = "aaa/bbb.txt";
         InitiateMultipartUploadRequest request = new InitiateMultipartUploadRequest(bucketName, key);
-        // 设置存储类型, 默认是标准(Standard), 低频(standard_ia), 近线(nearline)
+        // 设置存储类型, 默认是标准(Standard), 低频(Standard_IA), 归档(Archive)
         request.setStorageClass(StorageClass.Standard);
         try {
             InitiateMultipartUploadResult initResult = cosclient.initiateMultipartUpload(request);
@@ -70,7 +70,7 @@ public class MultipartUploadDemo {
         COSClient cosclient = new COSClient(cred, clientConfig);
 
         // bucket名需包含appid
-        String bucketName = "test-xxx";
+        String bucketName = "mybucket-1251668577";
         String key = "aaa/bbb.txt";
         // uploadid(通过initiateMultipartUpload或者ListMultipartUploads获取)
 
@@ -104,7 +104,7 @@ public class MultipartUploadDemo {
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名需包含appid
-        String bucketName = "test-xxx";
+        String bucketName = "mybucket-1251668577";
         String key = "aaa/bbb.txt";
         // uploadid(通过initiateMultipartUpload或者ListMultipartUploads获取)
 
@@ -127,6 +127,7 @@ public class MultipartUploadDemo {
                 UploadPartResult uploadPartResult = cosclient.uploadPart(uploadPartRequest);
                 PartETag partETag = uploadPartResult.getPartETag();
                 partETags.add(partETag);
+                String crc64 = uploadPartResult.getCrc64Ecma();
             } catch (CosServiceException e) {
                 throw e;
             } catch (CosClientException e) {
@@ -146,7 +147,7 @@ public class MultipartUploadDemo {
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名需包含appid
-        String bucketName = "test-xxx";
+        String bucketName = "mybucket-1251668577";
         String key = "aaa/bbb.txt";
         // uploadid(通过initiateMultipartUpload或者ListMultipartUploads获取)
 
@@ -158,6 +159,7 @@ public class MultipartUploadDemo {
             CompleteMultipartUploadResult completeResult =
                     cosclient.completeMultipartUpload(completeMultipartUploadRequest);
             String etag = completeResult.getETag();
+            String crc64 = completeResult.getCrc64Ecma();
         } catch (CosServiceException e) {
             throw e;
         } catch (CosClientException e) {
@@ -176,7 +178,7 @@ public class MultipartUploadDemo {
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名需包含appid
-        String bucketName = "test-xxx";
+        String bucketName = "mybucket-1251668577";
         String key = "aaa/bbb.txt";
         // uploadid(通过initiateMultipartUpload或者ListMultipartUploads获取)
 
@@ -201,7 +203,7 @@ public class MultipartUploadDemo {
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名需包含appid
-        String bucketName = "test-xxx";
+        String bucketName = "mybucket-1251668577";
         String key = "aaa/bbb.txt";
 
         CopyPartRequest copyPartRequest = new CopyPartRequest();
