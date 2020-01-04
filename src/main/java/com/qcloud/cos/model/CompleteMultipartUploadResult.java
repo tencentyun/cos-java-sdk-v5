@@ -59,6 +59,9 @@ public class CompleteMultipartUploadResult extends SSEResultBase
     /** The expiration rule for this object */
     private String expirationTimeRuleId;
 
+    /** The crc64ecma value for this object */
+    private String crc64Ecma;
+
     /**
      * get requestid for this upload
      * 
@@ -221,4 +224,11 @@ public class CompleteMultipartUploadResult extends SSEResultBase
         this.expirationTimeRuleId = expirationTimeRuleId;
     }
 
+    public String getCrc64Ecma() {
+        return crc64Ecma;
+    }
+
+    public void setCrc64Ecma(String crc64Ecma) {
+        this.crc64Ecma = crc64Ecma;
+    }
 }

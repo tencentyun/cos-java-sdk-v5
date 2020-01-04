@@ -58,6 +58,7 @@ public class PutObjectResult extends SSEResultBase implements ObjectExpirationRe
     private ObjectMetadata metadata;
 
 
+
     /**
      * get requestid for this upload
      * 
@@ -207,4 +208,5 @@ public class PutObjectResult extends SSEResultBase implements ObjectExpirationRe
     public void setMetadata(ObjectMetadata metadata) {
         this.metadata = metadata;
     }
+
 }
