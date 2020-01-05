@@ -1,45 +1,24 @@
 package com.qcloud.cos;
 
-import static org.junit.Assert.*;
-
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.TreeMap;
-import java.util.Map.Entry;
-import java.util.concurrent.ThreadLocalRandom;
-
-import com.qcloud.cos.model.*;
-
-import com.qcloud.QcloudApiModuleCenter;
 import com.qcloud.Module.Sts;
+import com.qcloud.QcloudApiModuleCenter;
 import com.qcloud.Utilities.Json.JSONObject;
-import com.qcloud.cos.auth.BasicCOSCredentials;
-import com.qcloud.cos.auth.BasicSessionCredentials;
-import com.qcloud.cos.auth.COSCredentials;
-import com.qcloud.cos.auth.COSStaticCredentialsProvider;
+import com.qcloud.cos.auth.*;
 import com.qcloud.cos.endpoint.UserSpecifiedEndpointBuilder;
 import com.qcloud.cos.exception.CosServiceException;
-import com.qcloud.cos.http.HttpMethodName;
 import com.qcloud.cos.internal.SkipMd5CheckStrategy;
-import com.qcloud.cos.internal.crypto.CryptoConfiguration;
-import com.qcloud.cos.internal.crypto.CryptoMode;
-import com.qcloud.cos.internal.crypto.EncryptionMaterials;
-import com.qcloud.cos.internal.crypto.QCLOUDKMS;
-import com.qcloud.cos.internal.crypto.StaticEncryptionMaterialsProvider;
+import com.qcloud.cos.internal.crypto.*;
+import com.qcloud.cos.model.*;
 import com.qcloud.cos.region.Region;
 import com.qcloud.cos.utils.DateUtils;
 import com.qcloud.cos.utils.Md5Utils;
+
+import java.io.*;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.concurrent.ThreadLocalRandom;
+
+import static org.junit.Assert.*;
 
 public class AbstractCOSClientTest {
     protected static String appid = null;
@@ -58,6 +37,8 @@ public class AbstractCOSClientTest {
     protected static QCLOUDKMS qcloudkms = null;
     protected static EncryptionMaterials encryptionMaterials = null;
     protected static CryptoConfiguration cryptoConfiguration = null;
+    protected static boolean useCVMInstanceCredentials = false;
+    protected static boolean useCPMInstanceCredentials = false;
 
     protected static File buildTestFile(long fileSize) throws IOException {
         String prefix = String.format("ut_size_%d_time_%d_", fileSize, System.currentTimeMillis());
@@ -124,6 +105,9 @@ public class AbstractCOSClientTest {
                 bucket = prop.getProperty("bucket");
                 generalApiEndpoint = prop.getProperty("generalApiEndpoint");
                 serviceApiEndpoint = prop.getProperty("serviceApiEndpoint");
+                useCPMInstanceCredentials = Boolean.parseBoolean(prop.getProperty("useCPMInstanceCredentials", "false"
+                ));
+                useCVMInstanceCredentials = Boolean.parseBoolean(prop.getProperty("useCVMInstanceCredentials", "false"));
             } finally {
                 if (fis != null) {
                     try {
@@ -150,14 +134,21 @@ public class AbstractCOSClientTest {
     }
 
     protected static void initNormalCOSClient() {
-        COSCredentials cred = new BasicCOSCredentials(secretId, secretKey);
-        clientConfig = new ClientConfig(new Region(region));
-        if (generalApiEndpoint != null && generalApiEndpoint.trim().length() > 0 && 
-                serviceApiEndpoint != null && serviceApiEndpoint.trim().length() > 0) {
-            UserSpecifiedEndpointBuilder userSpecifiedEndpointBuilder = new UserSpecifiedEndpointBuilder(generalApiEndpoint, serviceApiEndpoint);
-            clientConfig.setEndpointBuilder(userSpecifiedEndpointBuilder);
+        if(useCVMInstanceCredentials) {
+            cosclient = buildCVMInstanceCredentialsCOSClient();
+        }else if (useCPMInstanceCredentials){
+            cosclient = buildCPMInstanceCredentialsCOSClient();
+        }else {
+            COSCredentials cred = new BasicCOSCredentials(secretId, secretKey);
+            clientConfig = new ClientConfig(new Region(region));
+            if (generalApiEndpoint != null && generalApiEndpoint.trim().length() > 0 &&
+                    serviceApiEndpoint != null && serviceApiEndpoint.trim().length() > 0) {
+                UserSpecifiedEndpointBuilder userSpecifiedEndpointBuilder =
+                        new UserSpecifiedEndpointBuilder(generalApiEndpoint, serviceApiEndpoint);
+                clientConfig.setEndpointBuilder(userSpecifiedEndpointBuilder);
+            }
+            cosclient = new COSClient(cred, clientConfig);
         }
-        cosclient = new COSClient(cred, clientConfig);
     }
 
     protected static COSClient buildTemporyCredentialsCOSClient(long tokenDuration) {
@@ -170,10 +161,30 @@ public class AbstractCOSClientTest {
         return tempCOSClient;
     }
 
+    protected static COSClient buildCVMInstanceCredentialsCOSClient() {
+        InstanceMetadataCredentialsEndpointProvider endpointProvider =
+                new InstanceMetadataCredentialsEndpointProvider(InstanceMetadataCredentialsEndpointProvider.Instance.CVM);
+
+        InstanceCredentialsFetcher instanceCredentialsFetcher = new InstanceCredentialsFetcher(endpointProvider);
+        COSCredentialsProvider cosCredentialsProvider = new InstanceCredentialsProvider(instanceCredentialsFetcher);
+        clientConfig = new ClientConfig(new Region(region));
+        return new COSClient(cosCredentialsProvider, clientConfig);
+    }
+
+    protected static COSClient buildCPMInstanceCredentialsCOSClient() {
+        InstanceMetadataCredentialsEndpointProvider endpointProvider =
+                new InstanceMetadataCredentialsEndpointProvider(InstanceMetadataCredentialsEndpointProvider.Instance.CPM);
+
+        InstanceCredentialsFetcher instanceCredentialsFetcher = new InstanceCredentialsFetcher(endpointProvider);
+        COSCredentialsProvider cosCredentialsProvider = new InstanceCredentialsProvider(instanceCredentialsFetcher);
+        clientConfig = new ClientConfig(new Region(region));
+        return new COSClient(cosCredentialsProvider, clientConfig);
+    }
+
     protected static void initEncryptionClient() {
         COSCredentials cred = new BasicCOSCredentials(secretId, secretKey);
         clientConfig = new ClientConfig(new Region(region));
-        if (generalApiEndpoint != null && generalApiEndpoint.trim().length() > 0 && 
+        if (generalApiEndpoint != null && generalApiEndpoint.trim().length() > 0 &&
                 serviceApiEndpoint != null && serviceApiEndpoint.trim().length() > 0) {
             UserSpecifiedEndpointBuilder userSpecifiedEndpointBuilder = new UserSpecifiedEndpointBuilder(generalApiEndpoint, serviceApiEndpoint);
             clientConfig.setEndpointBuilder(userSpecifiedEndpointBuilder);

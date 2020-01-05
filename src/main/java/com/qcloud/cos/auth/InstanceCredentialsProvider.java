@@ -9,7 +9,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class InstanceCredentialsProvider implements COSCredentialsProvider {
     private static final Logger LOG = LoggerFactory.getLogger(InstanceCredentialsProvider.class);
 
-    private static final long DEFAULT_REFRESH_INTERVAL_MILLISECONDS = 60 * 1000;
+    private static final long DEFAULT_REFRESH_INTERVAL_MILLISECONDS = 30 * 1000;
     private static final int DEFAULT_MAX_FETCH_RETRY_TIMES = 3;
 
     private InstanceProfileCredentials credentials;
@@ -53,7 +53,7 @@ public class InstanceCredentialsProvider implements COSCredentialsProvider {
             try {
                 this.lock.lock();
                 try {
-                    this.credentials = (InstanceProfileCredentials) this.fetcher.fetch(this.fetchRetryTimes);
+                    this.credentials = (InstanceProfileCredentials) this.fetcher.fetch();
                 } catch (CosClientException e) {
                     this.lastFailedRefreshTimeInMilliseconds = System.currentTimeMillis();
                     LOG.warn("The InstanceCredentials fetch an exception. Wait for the next round to retry", e);

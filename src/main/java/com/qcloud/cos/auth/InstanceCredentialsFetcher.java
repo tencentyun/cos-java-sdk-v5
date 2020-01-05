@@ -18,7 +18,7 @@ public class InstanceCredentialsFetcher extends HttpCredentialsFetcher {
         mapper.setPropertyNamingStrategy(PropertyNamingStrategy.PASCAL_CASE_TO_CAMEL_CASE);
     }
 
-    public static class CAMSecurityCredentials {
+    private static class CAMSecurityCredentials {
         public String tmpSecretId;
         public String tmpSecretKey;
         public String token;
