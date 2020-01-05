@@ -79,7 +79,6 @@ import java.io.InputStream;
  *      ObjectMetadata)
  */
 public class PutObjectRequest extends AbstractPutObjectRequest implements Serializable {
-
     /**
      * Constructs a new
      * {@link PutObjectRequest} object to upload a file to the

@@ -760,4 +760,8 @@ public class ObjectMetadata implements ServerSideEncryptionResult, ObjectExpirat
     public String getSSECOSKmsKeyId() {
         return (String) metadata.get(Headers.SERVER_SIDE_ENCRYPTION_QCLOUD_KMS_KEYID);
     }
+
+    public String getCrc64Ecma() {
+        return (String)metadata.get(Headers.COS_HASH_CRC64_ECMA);
+    }
 }

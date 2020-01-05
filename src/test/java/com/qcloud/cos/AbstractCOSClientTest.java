@@ -22,6 +22,7 @@ import static org.junit.Assert.*;
 
 public class AbstractCOSClientTest {
     protected static String appid = null;
+    protected static String accountId = null;
     protected static String secretId = null;
     protected static String secretKey = null;
     protected static String region = null;
@@ -84,6 +85,7 @@ public class AbstractCOSClientTest {
 
     protected static boolean initConfig() throws IOException {
         appid = System.getenv("appid");
+        accountId = System.getenv("accountId");
         secretId = System.getenv("secretId");
         secretKey = System.getenv("secretKey");
         region = System.getenv("region");
@@ -99,6 +101,7 @@ public class AbstractCOSClientTest {
                 fis = new FileInputStream(propFile);
                 prop.load(fis);
                 appid = prop.getProperty("appid");
+                accountId = prop.getProperty("accountId");
                 secretId = prop.getProperty("secretId");
                 secretKey = prop.getProperty("secretKey");
                 region = prop.getProperty("region");
@@ -633,6 +636,28 @@ public class AbstractCOSClientTest {
             }
         }
     }
+    protected void testAppendGetDelObjectDiffSize(long size, boolean isStream) throws IOException {
+        String key = "ut/" + size;
+        long nextAppendPosition = 0;
+        for(int i = 0; i < 3; i++) {
+            File localFile = buildTestFile(size);
+            AppendObjectRequest appendObjectRequest = null;
+            if(!isStream) {
+                appendObjectRequest = new AppendObjectRequest(bucket, key, localFile);
+            } else {
+                ObjectMetadata objectMetadata = new ObjectMetadata();
+                objectMetadata.setContentLength(size); 
+                appendObjectRequest = new AppendObjectRequest(bucket, key, new FileInputStream(localFile), objectMetadata);
+            }
+            appendObjectRequest.setPosition(nextAppendPosition);
+            AppendObjectResult appendObjectResult = cosclient.appendObject(appendObjectRequest);
+            nextAppendPosition = appendObjectResult.getNextAppendPosition();
+            localFile.delete();
+        }
+        ObjectMetadata objectMetadata = cosclient.getObjectMetadata(bucket, key);
+        assertEquals(objectMetadata.getContentLength(), size * 3);
+        cosclient.deleteObject(bucket, key);
+    }
 
     // 在本地生成不同大小的文件, 并上传， 下载，删除
     protected void testPutGetDelObjectDiffSize(long size) throws CosServiceException, IOException {
@@ -705,6 +730,7 @@ public class AbstractCOSClientTest {
         } else {
             assertEquals(true, dataMd5.equals(uploadPartResult.getETag()));
         }
+        assertNotNull(uploadPartResult.getCrc64Ecma());
         assertEquals(partNumber, uploadPartResult.getPartNumber());
     }
 
@@ -744,6 +770,7 @@ public class AbstractCOSClientTest {
         assertNotNull(completeResult.getDateStr());
         String etag = completeResult.getETag();
         assertTrue(etag.contains("-"));
+        assertNotNull(completeResult.getCrc64Ecma());
         try {
             int etagPartNum = Integer.valueOf(etag.substring(etag.indexOf("-") + 1));
             assertEquals(expectedPartNum, etagPartNum);

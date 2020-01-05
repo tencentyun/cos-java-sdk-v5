@@ -21,6 +21,7 @@ package com.qcloud.cos.internal;
 import java.io.InputStream;
 import java.util.Map;
 
+import com.qcloud.cos.model.BucketDomainConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,6 +57,11 @@ public class COSXmlResponseHandler<T> extends AbstractCosResponseHandler<T> {
         if (responseUnmarshaller != null) {
             log.trace("Beginning to parse service response XML");
             T result = responseUnmarshaller.unmarshall(response.getContent());
+            if(result instanceof BucketDomainConfiguration &&
+                    responseHeaders.containsKey("x-cos-domain-txt-verification")) {
+                ((BucketDomainConfiguration) result).setDomainTxtVerification(
+                        responseHeaders.get("x-cos-domain-txt-verification"));
+            }
             log.trace("Done parsing service response XML");
             cosResponse.setResult(result);
         }

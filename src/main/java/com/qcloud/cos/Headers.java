@@ -56,6 +56,9 @@ public interface Headers {
     /** Cos's alternative date header: x-cos-date */
     public static final String COS_ALTERNATE_DATE = "x-cos-date";
 
+    /** part or object crc64 */
+    public static final String COS_HASH_CRC64_ECMA = "x-cos-hash-crc64ecma";
+
     /** Prefix for COS user metadata: x-cos-meta- */
     public static final String COS_USER_METADATA_PREFIX = "x-cos-meta-";
 
@@ -140,6 +143,7 @@ public interface Headers {
     /** Encrypted symmetric key header that is used in the envelope encryption mechanism */
     public static final String CRYPTO_KEY = "x-cos-key";
 
+    public static final String APPEND_OBJECT_NEXT_POSISTION = "x-cos-next-append-position";
     /**
      * Encrypted symmetric key header that is used in the Authenticated
      * Encryption (AE) cryptographic module. Older versions of COS encryption

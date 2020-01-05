@@ -37,6 +37,9 @@ import com.qcloud.cos.model.BucketLifecycleConfiguration;
 import com.qcloud.cos.model.BucketPolicy;
 import com.qcloud.cos.model.BucketReplicationConfiguration;
 import com.qcloud.cos.model.BucketVersioningConfiguration;
+import com.qcloud.cos.model.SetBucketLoggingConfigurationRequest;
+import com.qcloud.cos.model.GetBucketLoggingConfigurationRequest;
+import com.qcloud.cos.model.BucketLoggingConfiguration;
 import com.qcloud.cos.model.COSObject;
 import com.qcloud.cos.model.CannedAccessControlList;
 import com.qcloud.cos.model.CompleteMultipartUploadRequest;
@@ -94,6 +97,29 @@ import com.qcloud.cos.model.SetObjectAclRequest;
 import com.qcloud.cos.model.UploadPartRequest;
 import com.qcloud.cos.model.UploadPartResult;
 import com.qcloud.cos.model.VersionListing;
+import com.qcloud.cos.model.GetBucketWebsiteConfigurationRequest;
+import com.qcloud.cos.model.SetBucketWebsiteConfigurationRequest;
+import com.qcloud.cos.model.DeleteBucketWebsiteConfigurationRequest;
+import com.qcloud.cos.model.BucketWebsiteConfiguration;
+import com.qcloud.cos.model.BucketDomainConfiguration;
+import com.qcloud.cos.model.SetBucketDomainConfigurationRequest;
+import com.qcloud.cos.model.GetBucketDomainConfigurationRequest;
+import com.qcloud.cos.model.DeleteBucketInventoryConfigurationResult;
+import com.qcloud.cos.model.DeleteBucketInventoryConfigurationRequest;
+import com.qcloud.cos.model.GetBucketInventoryConfigurationResult;
+import com.qcloud.cos.model.GetBucketInventoryConfigurationRequest;
+import com.qcloud.cos.model.inventory.InventoryConfiguration;
+import com.qcloud.cos.model.SetBucketInventoryConfigurationResult;
+import com.qcloud.cos.model.SetBucketInventoryConfigurationRequest;
+import com.qcloud.cos.model.ListBucketInventoryConfigurationsResult;
+import com.qcloud.cos.model.ListBucketInventoryConfigurationsRequest;
+import com.qcloud.cos.model.DeleteBucketTaggingConfigurationRequest;
+import com.qcloud.cos.model.GetBucketTaggingConfigurationRequest;
+import com.qcloud.cos.model.SetBucketTaggingConfigurationRequest;
+import com.qcloud.cos.model.BucketTaggingConfiguration;
+import com.qcloud.cos.model.AppendObjectRequest;
+import com.qcloud.cos.model.AppendObjectResult;
+
 
 public interface COS extends COSDirectSpi {
 
@@ -1607,7 +1633,7 @@ public interface COS extends COSDirectSpi {
      * </p>
      * <p>
      * Objects created before versioning was enabled or when versioning is suspended will be given
-     * the default <code>null</code> version ID (see {@link Constants#NULL_VERSION_ID}). Note that
+     * the default <code>null</code> version ID. Note that
      * the <code>null</code> version ID is a valid version ID and is not the same as not having a
      * version ID.
      * </p>
@@ -2354,7 +2380,462 @@ public interface COS extends COSDirectSpi {
      */
     public void updateObjectMetaData(String bucketName, String key, ObjectMetadata objectMetadata)
             throws CosClientException, CosServiceException;
+    /**
+     * Returns the website configuration for the specified bucket. Bucket
+     * website configuration allows you to host your static websites entirely
+     * out of COS. To host your website in COS, create a bucket,
+     * upload your files, and configure it as a website. Once your bucket has
+     * been configured as a website, you can access all your content via the
+     * COS website endpoint. To ensure that the existing COS REST
+     * API will continue to behave the same, regardless of whether or not your
+     * bucket has been configured to host a website, a new HTTP endpoint has
+     * been introduced where you can access your content. The bucket content you
+     * want to make available via the website must be publicly readable.
+     *
+     * @param bucketName
+     *            The name of the bucket whose website configuration is being
+     *            retrieved.
+     *
+     * @return The bucket website configuration for the specified bucket,
+     *         otherwise null if there is no website configuration set for the
+     *         specified bucket.
+     *
+     * @throws CosClientException
+     *             If any errors are encountered on the client while making the
+     *             request or handling the response.
+     * @throws CosServiceException
+     *             If any errors occurred in COS while processing the
+     *             request.
+     */
+    public BucketWebsiteConfiguration getBucketWebsiteConfiguration(String bucketName)
+            throws CosClientException, CosServiceException;
 
+    /**
+     * Returns the website configuration for the specified bucket. Bucket
+     * website configuration allows you to host your static websites entirely
+     * out of COS. To host your website in COS, create a bucket,
+     * upload your files, and configure it as a website. Once your bucket has
+     * been configured as a website, you can access all your content via the
+     * COS website endpoint. To ensure that the existing COS REST
+     * API will continue to behave the same, regardless of whether or not your
+     * bucket has been configured to host a website, a new HTTP endpoint has
+     * been introduced where you can access your content. The bucket content you
+     * want to make available via the website must be publicly readable.
+     *
+     * @param getBucketWebsiteConfigurationRequest
+     *            The request object for retrieving the bucket website configuration.
+     *
+     * @return The bucket website configuration for the specified bucket,
+     *         otherwise null if there is no website configuration set for the
+     *         specified bucket.
+     *
+     * @throws CosClientException
+     *             If any errors are encountered on the client while making the
+     *             request or handling the response.
+     * @throws CosServiceException
+     *             If any errors occurred in COS while processing the
+     *             request.
+     */
+    public BucketWebsiteConfiguration getBucketWebsiteConfiguration(GetBucketWebsiteConfigurationRequest getBucketWebsiteConfigurationRequest)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * Sets the website configuration for the specified bucket. Bucket
+     * website configuration allows you to host your static websites entirely
+     * out COS. To host your website in COS, create a bucket,
+     * upload your files, and configure it as a website. Once your bucket has
+     * been configured as a website, you can access all your content via the
+     * COS website endpoint. To ensure that the existing COS REST
+     * API will continue to behave the same, regardless of whether or not your
+     * bucket has been configured to host a website, a new HTTP endpoint has
+     * been introduced where you can access your content. The bucket content you
+     * want to make available via the website must be publicly readable.
+     *
+     * @param bucketName
+     *            The name of the bucket whose website configuration is being
+     *            set.
+     * @param configuration
+     *            The configuration describing how the specified bucket will
+     *            serve web requests (i.e. default index page, error page).
+     *
+     * @throws CosClientException
+     *             If any errors are encountered on the client while making the
+     *             request or handling the response.
+     * @throws CosServiceException
+     *             If any errors occurred in COS while processing the
+     *             request.
+     */
+    public void setBucketWebsiteConfiguration(String bucketName, BucketWebsiteConfiguration configuration)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * Sets the website configuration for the specified bucket. Bucket website
+     * configuration allows you to host your static websites entirely out of
+     * COS. To host your website in COS, create a bucket, upload
+     * your files, and configure it as a website. Once your bucket has been
+     * configured as a website, you can access all your content via the COS
+     * website endpoint. To ensure that the existing COS REST API will
+     * continue to behave the same, regardless of whether or not your bucket has
+     * been configured to host a website, a new HTTP endpoint has been
+     * introduced where you can access your content. The bucket content you want
+     * to make available via the website must be publicly readable.
+     *
+     * @param setBucketWebsiteConfigurationRequest
+     *            The request object containing the name of the bucket whose
+     *            website configuration is being updated, and the new website
+     *            configuration values.
+     *
+     * @throws CosClientException
+     *             If any errors are encountered on the client while making the
+     *             request or handling the response.
+     * @throws CosServiceException
+     *             If any errors occurred in COS while processing the
+     *             request.
+     */
+    public void setBucketWebsiteConfiguration(SetBucketWebsiteConfigurationRequest setBucketWebsiteConfigurationRequest)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * This operation removes the website configuration for a bucket. Calling
+     * this operation on a bucket with no website configuration does <b>not</b>
+     * throw an exception. Calling this operation a bucket that does not exist
+     * <b>will</b> throw an exception.
+     *
+     * @param bucketName
+     *            The name of the bucket whose website configuration is being
+     *            deleted.
+     *
+     * @throws CosClientException
+     *             If any errors are encountered on the client while making the
+     *             request or handling the response.
+     * @throws CosServiceException
+     *             If any errors occurred in COS while processing the
+     *             request.
+     */
+    public void deleteBucketWebsiteConfiguration(String bucketName)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * This operation removes the website configuration for a bucket. Calling
+     * this operation on a bucket with no website configuration does <b>not</b>
+     * throw an exception. Calling this operation a bucket that does not exist
+     * <b>will</b> throw an exception.
+     *
+     * @param deleteBucketWebsiteConfigurationRequest
+     *            The request object specifying the name of the bucket whose
+     *            website configuration is to be deleted.
+     *
+     * @throws CosClientException
+     *             If any errors are encountered on the client while making the
+     *             request or handling the response.
+     * @throws CosServiceException
+     *             If any errors occurred in COS while processing the
+     *             request.
+     */
+    public void deleteBucketWebsiteConfiguration(DeleteBucketWebsiteConfigurationRequest deleteBucketWebsiteConfigurationRequest)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * Sets the domain configuration for the specified bucket.
+     *
+     * @param bucketName
+     *            The name of the bucket whose domain configuration is being set.
+     * @param configuration
+     *            The configuration describing the specified bucket custom domain
+     *
+     * @throws CosClientException
+     *             If any errors are encountered on the client while making the
+     *             request or handling the response.
+     * @throws CosServiceException
+     *             If any errors occurred in COS while processing the request.
+     */
+    public void setBucketDomainConfiguration(String bucketName, BucketDomainConfiguration configuration)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * Sets the domain configuration for the specified bucket.
+     *
+     * @param setBucketDomainConfigurationRequest
+     *             The request object containing the name of the bucket whose
+     *             domain configuration is being updated, and the new domain
+     *             configuration values.
+     * @throws CosClientException
+     *             If any errors are encountered on the client while making the
+     *             request or handling the response.
+     * @throws CosServiceException
+     *             If any errors occurred in COS while processing the request.
+     */
+    public void setBucketDomainConfiguration(SetBucketDomainConfigurationRequest setBucketDomainConfigurationRequest)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * Returns the domain configuration for the specified bucket.
+     *
+     * @param bucketName
+     *            The name of the bucket whose domain configuration is being retrieved.
+     *
+     * @return The bucket domain configuration for the specified bucket,
+     *         otherwise null if there is no domain configuration set for the
+     *         specified bucket.
+     *
+     * @throws CosClientException
+     *             If any errors are encountered on the client while making the
+     *             request or handling the response.
+     * @throws CosServiceException
+     *             If any errors occurred in COS while processing the request.
+     */
+    public BucketDomainConfiguration getBucketDomainConfiguration(String bucketName)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * Returns the domain configuration for the specified bucket.
+     *
+     * @param getBucketDomainConfigurationRequest
+     *            The request object for retrieving the bucket domain configuration.
+     *
+     * @return The bucket domain configuration for the specified bucket,
+     *         otherwise null if there is no domain configuration set for the
+     *         specified bucket.
+     *
+     * @throws CosClientException
+     *             If any errors are encountered on the client while making the
+     *             request or handling the response.
+     * @throws CosServiceException
+     *             If any errors occurred in COS while processing the request.
+     */
+    public BucketDomainConfiguration getBucketDomainConfiguration(GetBucketDomainConfigurationRequest getBucketDomainConfigurationRequest)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * <p>
+     * Gets the logging configuration for the specified bucket.
+     * The bucket logging configuration object indicates if server access logging is
+     * enabled for the specified bucket, the destination bucket
+     * where server access logs are delivered, and the optional log file prefix.
+     * </p>
+     *
+     * @param bucketName
+     *            The name of the bucket whose bucket logging configuration is
+     *            being retrieved.
+     *
+     * @return The bucket logging configuration for the specified bucket.
+     *
+     * @throws CosClientException
+     *             If any errors are encountered in the client while making the
+     *             request or handling the response.
+     * @throws CosServiceException
+     *             If any errors occurred in COS while processing the
+     *             request.
+     */
+    public BucketLoggingConfiguration getBucketLoggingConfiguration(String bucketName)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * <p>
+     * Gets the logging configuration for the specified bucket. The bucket
+     * logging configuration object indicates if server access logging is
+     * enabled for the specified bucket, the destination bucket where server access
+     * logs are delivered, and the optional log file prefix.
+     * </p>
+     *
+     * @param getBucketLoggingConfigurationRequest
+     *            The request object for retrieving the bucket logging
+     *            configuration.
+     *
+     * @return The bucket logging configuration for the specified bucket.
+     *
+     * @throws CosClientException
+     *             If any errors are encountered in the client while making the
+     *             request or handling the response.
+     * @throws CosServiceException
+     *             If any errors occurred in COS while processing the
+     *             request.
+     */
+    public BucketLoggingConfiguration getBucketLoggingConfiguration(
+            GetBucketLoggingConfigurationRequest getBucketLoggingConfigurationRequest)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * <p>
+     * Sets the logging configuration for the specified bucket.
+     * The bucket logging configuration object indicates whether server access logging is
+     * enabled or not for the specified bucket, the destination bucket
+     * where server access logs are delivered, and the optional log file prefix.
+     * </p>
+     *
+     * @param setBucketLoggingConfigurationRequest
+     *            The request object containing all options for setting the
+     *            bucket logging configuration.
+     *
+     * @throws CosClientException
+     *             If any errors are encountered in the client while making the
+     *             request or handling the response.
+     * @throws CosServiceException
+     *             If any errors occurred in COS while processing the
+     *             request.
+     */
+    public void setBucketLoggingConfiguration(SetBucketLoggingConfigurationRequest setBucketLoggingConfigurationRequest)
+            throws CosClientException, CosServiceException;
+    /**
+     * Deletes an inventory configuration (identified by the inventory ID) from the bucket.
+     *
+     * @param bucketName
+     *              The name of the bucket from which the inventory configuration is to be deleted.
+     * @param id
+     *              The ID of the inventory configuration to delete.
+     */
+    public DeleteBucketInventoryConfigurationResult deleteBucketInventoryConfiguration(
+            String bucketName, String id) throws CosClientException, CosServiceException;
+
+    /**
+     * Deletes an inventory configuration (identified by the inventory ID) from the bucket.
+     *
+     * @param deleteBucketInventoryConfigurationRequest
+     *              The request object for deleting an inventory configuration.
+     */
+    public DeleteBucketInventoryConfigurationResult deleteBucketInventoryConfiguration(
+            DeleteBucketInventoryConfigurationRequest deleteBucketInventoryConfigurationRequest)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * Returns an inventory configuration (identified by the inventory ID) from the bucket.
+     *
+     * @param bucketName
+     *              The name of the bucket to get the inventory configuration from.
+     * @param id
+     *              The ID of the inventory configuration to delete.
+     * @return
+     *              An {@link GetBucketInventoryConfigurationResult} object containing the inventory configuration.
+     */
+    public GetBucketInventoryConfigurationResult getBucketInventoryConfiguration(
+            String bucketName, String id) throws CosClientException, CosServiceException;
+
+    /**
+     * Returns an inventory configuration (identified by the inventory ID) from the bucket.
+     *
+     * @param getBucketInventoryConfigurationRequest
+     *              The request object to retreive an inventory configuration.
+     * @return
+     *              An {@link GetBucketInventoryConfigurationResult} object containing the inventory configuration.
+     */
+    public GetBucketInventoryConfigurationResult getBucketInventoryConfiguration(
+            GetBucketInventoryConfigurationRequest getBucketInventoryConfigurationRequest)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * Sets an inventory configuration (identified by the inventory ID) to the bucket.
+     *
+     * @param bucketName
+     *              The name of the bucket to set the inventory configuration to.
+     * @param inventoryConfiguration
+     *              The inventory configuration to set.
+     */
+    public SetBucketInventoryConfigurationResult setBucketInventoryConfiguration(
+            String bucketName, InventoryConfiguration inventoryConfiguration)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * Sets an inventory configuration (identified by the inventory ID) to the bucket.
+     *
+     * @param setBucketInventoryConfigurationRequest
+     *              The request object for setting an inventory configuration.
+     */
+    public SetBucketInventoryConfigurationResult setBucketInventoryConfiguration(
+            SetBucketInventoryConfigurationRequest setBucketInventoryConfigurationRequest)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * Returns the list of inventory configurations for the bucket.
+     *
+     * @param listBucketInventoryConfigurationsRequest
+     *              The request object to list the inventory configurations in a bucket.
+     * @return
+     *              An {@link ListBucketInventoryConfigurationsResult} object containing the list of {@link InventoryConfiguration}s.
+     */
+    public ListBucketInventoryConfigurationsResult listBucketInventoryConfigurations(
+            ListBucketInventoryConfigurationsRequest listBucketInventoryConfigurationsRequest)
+            throws CosClientException, CosServiceException;
+    /**
+     * Gets the tagging configuration for the specified bucket, or null if
+     * the specified bucket does not exist, or if no configuration has been established.
+     *
+     * @param bucketName
+     *            The name of the bucket for which to retrieve tagging
+     *            configuration.
+     *
+     * @see COSClient#getBucketTaggingConfiguration(GetBucketTaggingConfigurationRequest)
+     * @see <a href="http://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketTagging">AWS API Documentation</a>
+     */
+    public BucketTaggingConfiguration getBucketTaggingConfiguration(String bucketName);
+
+    /**
+     * Gets the tagging configuration for the specified bucket, or null if
+     * the specified bucket does not exist, or if no configuration has been established.
+     *
+     * @param getBucketTaggingConfigurationRequest
+     *            The request object for retrieving the bucket tagging
+     *            configuration.
+     *
+     * @see COSClient#getBucketTaggingConfiguration(String)
+     * @see <a href="http://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketTagging">AWS API Documentation</a>
+     */
+    public BucketTaggingConfiguration getBucketTaggingConfiguration(
+            GetBucketTaggingConfigurationRequest getBucketTaggingConfigurationRequest);
+
+    /**
+     * Sets the tagging configuration for the specified bucket.
+     *
+     * @param bucketName
+     *            The name of the bucket for which to set the tagging
+     *            configuration.
+     * @param bucketTaggingConfiguration
+     *            The new tagging configuration for this bucket, which
+     *            completely replaces any existing configuration.
+     * @see <a href="http://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketTagging">AWS API Documentation</a>
+     */
+    public void setBucketTaggingConfiguration(String bucketName, BucketTaggingConfiguration bucketTaggingConfiguration);
+
+    /**
+     * Sets the tagging configuration for the specified bucket.
+     *
+     * @param setBucketTaggingConfigurationRequest
+     *            The request object containing all options for setting the
+     *            bucket tagging configuration.
+     * @see <a href="http://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketTagging">AWS API Documentation</a>
+     */
+    public void setBucketTaggingConfiguration(SetBucketTaggingConfigurationRequest setBucketTaggingConfigurationRequest);
+
+    /**
+     * Removes the tagging configuration for the bucket specified.
+     *
+     * @param bucketName
+     *            The name of the bucket for which to remove the tagging
+     *            configuration.
+     * @see <a href="http://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketTagging">AWS API Documentation</a>
+     */
+    public void deleteBucketTaggingConfiguration(String bucketName);
+
+    /**
+     * Removes the tagging configuration for the bucket specified.
+     *
+     * @param deleteBucketTaggingConfigurationRequest
+     *            The request object containing all options for removing the
+     *            bucket tagging configuration.
+     * @see <a href="http://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketTagging">AWS API Documentation</a>
+     */
+    public void deleteBucketTaggingConfiguration(
+            DeleteBucketTaggingConfigurationRequest deleteBucketTaggingConfigurationRequest);
+
+    /**
+     * append data to an COS object
+     *
+     * @param appendObjectRequest
+     * @return
+     * @throws CosServiceException
+     * @throws CosClientException
+     */
+    public AppendObjectResult appendObject(AppendObjectRequest appendObjectRequest)
+            throws CosServiceException, CosClientException;
 }
 
 
