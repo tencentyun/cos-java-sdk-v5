@@ -26,8 +26,7 @@ import java.util.Map;
  * Connect the specified endpoint
  */
 public class ConnectionUtils {
-    private static final int CONNECT_TIMEOUT = 5 * 1000;       // Considering the request is local, the timeout is
-    // 10 seconds
+    private static final int CONNECT_TIMEOUT = 5 * 1000;
     private static final int READ_TIMEOUT = 10 * 1000;
     private static final String DEFAULT_HTTP_METHOD = "GET";
 
