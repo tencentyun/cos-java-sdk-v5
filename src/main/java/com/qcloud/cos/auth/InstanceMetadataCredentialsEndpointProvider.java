@@ -52,7 +52,7 @@ public class InstanceMetadataCredentialsEndpointProvider extends CredentialsEndp
             throw new CosClientException("Unable to load the credentials path. No valid cam role was found.");
         }
 
-        LOG.info("Use the role [{}] to obtain the credentials.", this.roleName);
+        LOG.info("Use the role [{}] to obtain the credentials.", roleList[0]);
         return new URI(this.instance.METADATA_SERVICE_URL + this.instance.METADATA_CREDENTIALS_RESOURCE + "/" + roleList[0]);
     }
 }

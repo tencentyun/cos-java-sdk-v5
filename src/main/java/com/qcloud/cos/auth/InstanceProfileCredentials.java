@@ -8,6 +8,14 @@ public class InstanceProfileCredentials extends BasicSessionCredentials {
     private long expirationDurationSeconds = DEFAULT_EXPIRATION_DURATION_SECONDS;
     private double expiredFactor = DEFAULT_EXPIRED_FACTOR;
 
+    @Deprecated
+    public InstanceProfileCredentials(String appId, String accessKey, String secretKey, String sessionToken,
+                                      long expiredTime) {
+        super(appId, accessKey, secretKey, sessionToken);
+        this.expiredTime = expiredTime;
+        this.expirationDurationSeconds = this.expiredTime - (System.currentTimeMillis() / 1000);
+    }
+
     public InstanceProfileCredentials(String accessKey, String secretKey, String sessionToken, long expiredTime) {
         super(accessKey, secretKey, sessionToken);
         this.expiredTime = expiredTime;
