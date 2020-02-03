@@ -35,10 +35,8 @@ public class SimpleUploadFileDemo {
         File localFile = new File("src/test/resources/len10M.txt");
         PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, key, localFile);
         if(useTrafficLimit) {
-            ObjectMetadata objectMetadata = new ObjectMetadata();
-            // 限流使用的单位是bit, 这里测试1MB的上传带宽限制
-            objectMetadata.setHeader("x-cos-traffic-limit", 8*1024*1024);
-            putObjectRequest.setMetadata(objectMetadata);
+            // 限流使用的单位是bit/s, 这里测试1MB/s的上传带宽限制
+            putObjectRequest.setTrafficLimit(8*1024*1024);
         }
         // 设置存储类型, 默认是标准(Standard), 低频(standard_ia)
         putObjectRequest.setStorageClass(StorageClass.Standard_IA);

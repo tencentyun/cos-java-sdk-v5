@@ -48,6 +48,10 @@ public class UploadPartRequestFactory {
     private long remainingBytes;
     private SSECustomerKey sseCustomerKey;
     private final int totalNumberOfParts;
+    /**
+     * traffic limit speed in second, the unit is bit/s
+     */
+    private int trafficLimit = 0;
 
     /**
      * Wrapped to provide necessary mark-and-reset support for the underlying
@@ -70,6 +74,7 @@ public class UploadPartRequestFactory {
         if (origReq.getInputStream() != null) {
             wrappedStream = ReleasableInputStream.wrap(origReq.getInputStream());
         }
+        this.trafficLimit = origReq.getTrafficLimit();
     }
 
     public synchronized boolean hasMoreRequests() {
@@ -88,7 +93,8 @@ public class UploadPartRequestFactory {
                 .withUploadId(uploadId)
                 .withInputStream(new InputSubstream(wrappedStream, 0, partSize, isLastPart))
                 .withPartNumber(partNumber++)
-                .withPartSize(partSize);
+                .withPartSize(partSize)
+                .withTrafficLimit(trafficLimit);
         } else {
             req = new UploadPartRequest()
                 .withBucketName(bucketName)
@@ -97,7 +103,8 @@ public class UploadPartRequestFactory {
                 .withFile(file)
                 .withFileOffset(offset)
                 .withPartNumber(partNumber++)
-                .withPartSize(partSize);
+                .withPartSize(partSize)
+                .withTrafficLimit(trafficLimit);
         }
         TransferManager.appendMultipartUserAgent(req);
 
