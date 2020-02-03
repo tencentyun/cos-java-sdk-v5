@@ -64,6 +64,11 @@ public class UploadPartRequest extends CosServiceRequest implements SSECustomerK
     private String md5Digest;
 
     /**
+     * traffic limit speed in second, the unit is bit/s
+     */
+    private int trafficLimit = 0;
+
+    /**
      * The stream containing the data to upload for the new part. Exactly one
      * File or InputStream must be specified as the input to this operation.
      */
@@ -324,6 +329,21 @@ public class UploadPartRequest extends CosServiceRequest implements SSECustomerK
     }
 
     /**
+     * Sets the speed of this part upload, in bit/s, and returns this updated
+     * UploadPartRequest object so that additional method calls can be chained
+     * together.
+     *
+     * @param trafficLimit
+     *            the speed of upload, in bit/s.
+     *
+     * @return This updated UploadPartRequest object.
+     */
+    public UploadPartRequest withTrafficLimit(int trafficLimit) {
+        this.trafficLimit = trafficLimit;
+        return this;
+    }
+
+    /**
      * Returns the optional, but recommended, MD5 hash of the content of this
      * part. If specified, this value will be sent to Qcloud COS to verify the
      * data integrity when the data reaches Qcloud COS.
@@ -554,5 +574,13 @@ public class UploadPartRequest extends CosServiceRequest implements SSECustomerK
     public UploadPartRequest withObjectMetadata(ObjectMetadata objectMetadata) {
         setObjectMetadata(objectMetadata);
         return this;
+    }
+
+    public int getTrafficLimit() {
+        return trafficLimit;
+    }
+
+    public void setTrafficLimit(int trafficLimit) {
+        this.trafficLimit = trafficLimit;
     }
 }

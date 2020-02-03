@@ -98,6 +98,11 @@ public abstract class AbstractPutObjectRequest extends CosServiceRequest impleme
     private SSECOSKeyManagementParams sseCOSKeyManagementParams;
 
     /**
+     * traffic limit speed in second, the unit is bit/s
+    */
+    private int trafficLimit = 0;
+
+    /**
      * Constructs a new {@link AbstractPutObjectRequest} object to upload a file to the specified
      * bucket and key. After constructing the request, users may optionally specify object metadata
      * or a canned ACL as well.
@@ -725,5 +730,13 @@ public abstract class AbstractPutObjectRequest extends CosServiceRequest impleme
                 .withRedirectLocation(getRedirectLocation()).withStorageClass(getStorageClass())
                 .withSSECOSKeyManagementParams(getSSECOSKeyManagementParams())
                 .withSSECustomerKey(getSSECustomerKey());
+    }
+
+    public int getTrafficLimit() {
+        return trafficLimit;
+    }
+
+    public void setTrafficLimit(int trafficLimit) {
+        this.trafficLimit = trafficLimit;
     }
 }

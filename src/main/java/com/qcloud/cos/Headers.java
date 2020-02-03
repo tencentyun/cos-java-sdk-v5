@@ -68,6 +68,9 @@ public interface Headers {
     /** COS's Multi-Factor Authentication header */
     public static final String COS_AUTHORIZATION = "Authorization";
 
+    /** COS traffic limit header */
+    public static final String COS_TRAFFIC_LIMIT = "x-cos-traffic-limit";
+
     /** COS response header for a request's cos request ID */
     public static final String REQUEST_ID = "x-cos-request-id";
 

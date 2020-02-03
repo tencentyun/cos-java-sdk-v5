@@ -47,6 +47,11 @@ public class GetObjectRequest extends CosServiceRequest
     private long[] range;
 
     /**
+     * traffic limit speed in second, the unit is bit/s
+     */
+    private int trafficLimit = 0;
+
+    /**
      * Optional list of ETag values that constrain this request to only be executed if the object's
      * ETag matches one of the specified ETag values.
      */
@@ -625,5 +630,13 @@ public class GetObjectRequest extends CosServiceRequest
     
     public COSObjectId getCOSObjectId() {
         return new COSObjectId(bucketName, key, versionId);
+    }
+
+    public int getTrafficLimit() {
+        return trafficLimit;
+    }
+
+    public void setTrafficLimit(int trafficLimit) {
+        this.trafficLimit = trafficLimit;
     }
 }

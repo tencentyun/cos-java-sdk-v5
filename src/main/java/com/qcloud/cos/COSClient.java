@@ -736,6 +736,12 @@ public class COSClient implements COS {
         }
     }
 
+    private static void populateTrafficLimit(CosHttpRequest<?> request, int trafficLimit) {
+        if(trafficLimit > 0) {
+            request.addHeader(Headers.COS_TRAFFIC_LIMIT, String.valueOf(trafficLimit));
+        }
+    }
+
     private static void populateSourceSSE_C(CosHttpRequest<?> request, SSECustomerKey sseKey) {
         if (sseKey == null)
             return;
@@ -874,6 +880,8 @@ public class COSClient implements COS {
             // Populate the SSE KMS parameters to the request header
             populateSSE_KMS(request, uploadObjectRequest.getSSECOSKeyManagementParams());
 
+            // Populate the traffic limit parameter to the request header
+            populateTrafficLimit(request, uploadObjectRequest.getTrafficLimit());
             // Use internal interface to differentiate 0 from unset.
             final Long contentLength = (Long) metadata.getRawMetadataValue(Headers.CONTENT_LENGTH);
             if (contentLength == null) {
@@ -1045,6 +1053,8 @@ public class COSClient implements COS {
         // Populate the SSE-C parameters to the request header
         populateSSE_C(request, getObjectRequest.getSSECustomerKey());
 
+        // Populate the traffic limit parameter to the request header
+        populateTrafficLimit(request, getObjectRequest.getTrafficLimit());
         try {
             COSObject cosObject = invoke(request, new COSObjectResponseHandler());
             cosObject.setBucketName(getObjectRequest.getBucketName());
@@ -1506,6 +1516,8 @@ public class COSClient implements COS {
         // Populate the SSE-C parameters to the request header
         populateSSE_C(request, uploadPartRequest.getSSECustomerKey());
 
+        // Populate the traffic limit parameter to the request header
+        populateTrafficLimit(request, uploadPartRequest.getTrafficLimit());
         InputStream isCurr = isOrig;
         try {
             if (fileOrig == null) {
