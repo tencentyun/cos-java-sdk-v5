@@ -72,6 +72,12 @@ public class COSSigner {
                 new HashMap<String, String>(), cred, expiredTime);
     }
 
+    public String buildPostObjectSignature(String secretKey, String keyTime, String policy) {
+        String signKey = HmacUtils.hmacSha1Hex(secretKey, keyTime);
+        String stringToSign = DigestUtils.sha1Hex(policy);
+        return HmacUtils.hmacSha1Hex(signKey, stringToSign);
+    }
+
     public String buildAuthorizationStr(HttpMethodName methodName, String resouce_path,
             Map<String, String> headerMap, Map<String, String> paramMap, COSCredentials cred,
             Date expiredTime) {

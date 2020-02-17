@@ -216,7 +216,6 @@ public class AbstractCOSClientTest {
             Thread.sleep(5000L);
             String bucketName = bucket;
             CreateBucketRequest createBucketRequest = new CreateBucketRequest(bucketName);
-            createBucketRequest.setCannedAcl(CannedAccessControlList.PublicRead);
             Bucket createdBucket = cosclient.createBucket(createBucketRequest);
             assertEquals(bucketName, createdBucket.getName());
             Thread.sleep(5000L);
