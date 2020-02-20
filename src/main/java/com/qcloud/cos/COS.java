@@ -119,7 +119,8 @@ import com.qcloud.cos.model.SetBucketTaggingConfigurationRequest;
 import com.qcloud.cos.model.BucketTaggingConfiguration;
 import com.qcloud.cos.model.AppendObjectRequest;
 import com.qcloud.cos.model.AppendObjectResult;
-
+import com.qcloud.cos.model.SelectObjectContentResult;
+import com.qcloud.cos.model.SelectObjectContentRequest;
 
 public interface COS extends COSDirectSpi {
 
@@ -2836,6 +2837,21 @@ public interface COS extends COSDirectSpi {
      */
     public AppendObjectResult appendObject(AppendObjectRequest appendObjectRequest)
             throws CosServiceException, CosClientException;
+
+    /**
+     * This operation filters the contents of an COS object based on a simple Structured Query Language (SQL) statement.
+     * In the request, along with the SQL expression, you must also specify a data serialization format (JSON or CSV) of the
+     * object. COS uses this to parse object data into records, and returns only records that match the specified SQL
+     * expression. You must also specify the data serialization format for the response.
+     *
+     * @param selectRequest The request object for selecting object content.
+
+     * @return A {@link SelectObjectContentResult}.
+     * @throws CosClientException
+     * @throws CosServiceException
+     */
+    SelectObjectContentResult selectObjectContent(SelectObjectContentRequest selectRequest)
+            throws CosClientException, CosServiceException;
 }
 
 

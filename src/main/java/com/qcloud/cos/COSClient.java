@@ -41,6 +41,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.entity.ContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.qcloud.cos.auth.COSCredentials;
@@ -200,8 +201,10 @@ import com.qcloud.cos.model.DeleteBucketTaggingConfigurationRequest;
 import com.qcloud.cos.model.AppendObjectRequest;
 import com.qcloud.cos.model.AppendObjectResult;
 import com.qcloud.cos.model.UploadMode;
-
-
+import com.qcloud.cos.model.SelectObjectContentRequest;
+import com.qcloud.cos.model.SelectObjectContentResult;
+import com.qcloud.cos.internal.SdkFilterInputStream;
+import com.qcloud.cos.model.SelectObjectContentEventStream;
 
 public class COSClient implements COS {
 
@@ -3288,6 +3291,46 @@ public class COSClient implements COS {
         request.addParameter("tagging", null);
 
         invoke(request, voidCosResponseHandler);
+    }
+
+    private void setContent(CosHttpRequest<?> request, byte[] content, String contentType, boolean setMd5) {
+        request.setContent(new ByteArrayInputStream(content));
+        request.addHeader("Content-Length", Integer.toString(content.length));
+        request.addHeader("Content-Type", contentType);
+        if (setMd5) {
+            try {
+                byte[] md5 = Md5Utils.computeMD5Hash(content);
+                String md5Base64 = BinaryUtils.toBase64(md5);
+                request.addHeader("Content-MD5", md5Base64);
+            } catch ( Exception e ) {
+                throw new CosClientException("Couldn't compute md5 sum", e);
+            }
+        }
+    }
+
+    @Override
+    public SelectObjectContentResult selectObjectContent(SelectObjectContentRequest selectRequest) throws CosClientException, CosServiceException {
+        rejectNull(selectRequest, "The request parameter must be specified");
+
+        rejectNull(selectRequest.getBucketName(), "The bucket name parameter must be specified when selecting object content.");
+        rejectNull(selectRequest.getKey(), "The key parameter must be specified when selecting object content.");
+
+        CosHttpRequest<SelectObjectContentRequest> request = createRequest(selectRequest.getBucketName(), selectRequest.getKey(), selectRequest, HttpMethodName.POST);
+        request.addParameter("select", null);
+        request.addParameter("select-type", "2");
+
+        populateSSE_C(request, selectRequest.getSSECustomerKey());
+
+        setContent(request, RequestXmlFactory.convertToXmlByteArray(selectRequest), ContentType.APPLICATION_XML.toString(), true);
+
+        COSObject result = invoke(request, new COSObjectResponseHandler());
+
+        // Hold a reference to this client while the InputStream is still
+        // around - otherwise a finalizer in the HttpClient may reset the
+        // underlying TCP connection out from under us.
+        SdkFilterInputStream resultStream = new ServiceClientHolderInputStream(result.getObjectContent(), this);
+
+        return new SelectObjectContentResult().withPayload(new SelectObjectContentEventStream(resultStream));
     }
 }
 

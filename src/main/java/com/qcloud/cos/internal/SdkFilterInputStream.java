@@ -31,6 +31,7 @@ public class SdkFilterInputStream extends FilterInputStream implements Releasabl
     protected SdkFilterInputStream(InputStream in) {
         super(in);
     }
+    private volatile boolean aborted = false;
 
     /**
      * Aborts with subclass specific abortion logic executed if needed. Note the interrupted status
@@ -46,11 +47,21 @@ public class SdkFilterInputStream extends FilterInputStream implements Releasabl
     }
 
     /**
-     * Can be used to provide abortion logic prior to throwing the AbortedException. No-op by
-     * default.
+     * Can be used to provide abortion logic prior to throwing the
+     * AbortedException. If the wrapped {@code InputStream} is also an instance
+     * of this class, then it will also be aborted, otherwise this is a no-op.
      */
-    protected void abort() {
-        // no-op by default, but subclass such as cosObjectInputStream may override
+    public void abort() {
+        if(aborted)
+            return;
+        aborted = true;
+        if (in instanceof SdkFilterInputStream) {
+            ((SdkFilterInputStream) in).abort();
+        }
+    }
+
+    protected boolean isAborted() {
+        return aborted;
     }
 
     @Override
