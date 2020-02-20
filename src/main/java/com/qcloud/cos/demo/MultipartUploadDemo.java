@@ -108,6 +108,7 @@ public class MultipartUploadDemo {
         String key = "aaa/bbb.txt";
         // uploadid(通过initiateMultipartUpload或者ListMultipartUploads获取)
 
+        boolean userTrafficLimit = false;
         List<PartETag> partETags = new LinkedList<>();
 
         // 生成要上传的数据, 这里初始化一个10M的数据
@@ -122,6 +123,9 @@ public class MultipartUploadDemo {
             // 设置分块的长度
             uploadPartRequest.setPartSize(data.length); // 设置数据长度
             uploadPartRequest.setPartNumber(i+1);     // 假设要上传的part编号是10
+            if(userTrafficLimit) {
+                uploadPartRequest.setTrafficLimit(8*1024*1024);
+            }
 
             try {
                 UploadPartResult uploadPartResult = cosclient.uploadPart(uploadPartRequest);
