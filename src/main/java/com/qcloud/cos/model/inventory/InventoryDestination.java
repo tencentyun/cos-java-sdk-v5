@@ -30,7 +30,7 @@ public class InventoryDestination implements Serializable {
     private InventoryCosBucketDestination cosBucketDestination;
 
     /**
-     * Returns the {@link InventoryCosBucketDestination} which contains S3 bucket destination information
+     * Returns the {@link InventoryCosBucketDestination} which contains COS bucket destination information
      * of where inventory results are published.
      */
     public InventoryCosBucketDestination getCosBucketDestination() {
@@ -38,7 +38,7 @@ public class InventoryDestination implements Serializable {
     }
 
     /**
-     * Sets the {@link InventoryCosBucketDestination} which contains S3 bucket destination information
+     * Sets the {@link InventoryCosBucketDestination} which contains COS bucket destination information
      * of where inventory results are published.
      */
     public void setCosBucketDestination(InventoryCosBucketDestination cosBucketDestination) {
@@ -46,7 +46,7 @@ public class InventoryDestination implements Serializable {
     }
 
     /**
-     * Sets the {@link InventoryCosBucketDestination} which contains S3 bucket destination information
+     * Sets the {@link InventoryCosBucketDestination} which contains COS bucket destination information
      * of where inventory results are published.
      * This {@link InventoryDestination} object is returned for method chaining.
      */
