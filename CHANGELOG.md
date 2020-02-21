@@ -4,12 +4,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+<<<<<<< HEAD
 ## [5.6.19] - 2020-3-26
+=======
+## [5.6.15] - 2020-2-3
+>>>>>>> update
 
 ### Added
 - add trafficLimit support
 >>>>>>> update CHANGELOG.md
 
+<<<<<<< HEAD
 ### Added
 - add crc64 support for high level api 
 
@@ -34,6 +39,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - add trafficLimit support
 
+=======
+>>>>>>> update
 ## [5.6.13~5.6.14] - 2020-1-5
 
 ### Added
