@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [5.6.19] - 2020-3-26
 
 ### Added
+- add trafficLimit support
+>>>>>>> update CHANGELOG.md
+
+### Added
 - add crc64 support for high level api 
 
 ## [5.6.18] - 2020-3-17
