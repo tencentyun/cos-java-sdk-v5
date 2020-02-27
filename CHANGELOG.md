@@ -5,12 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [5.6.13~5.6.14] - 2019-1-5
+## [5.6.15] - 2020-2-3
+
+### Added
+- add trafficLimit support
+
+## [5.6.13~5.6.14] - 2020-1-5
 
 ### Added
 - 持CVM/CPM的角色绑定获取临时密钥
 
-## [5.6.12] - 2019-1-4
+## [5.6.12] - 2020-1-4
 
 ### Added
 - add upload part and complete crc get method
