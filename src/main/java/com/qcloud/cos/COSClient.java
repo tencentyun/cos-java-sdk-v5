@@ -2764,7 +2764,11 @@ public class COSClient implements COS {
 
         boolean hasAppendFirstParameter = false;
         if (authStr != null) {
-            strBuilder.append("?sign=").append(UrlEncoderUtils.encode(authStr));
+            if(req.isSignPrefixMode()) {
+                strBuilder.append("?sign=").append(UrlEncoderUtils.encode(authStr));
+            } else {
+                strBuilder.append("?").append(authStr);
+            }
             if (cred instanceof COSSessionCredentials) {
                 strBuilder.append("&").append(Headers.SECURITY_TOKEN).append("=").append(
                         UrlEncoderUtils.encode(((COSSessionCredentials) cred).getSessionToken()));

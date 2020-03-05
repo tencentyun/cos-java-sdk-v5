@@ -53,7 +53,10 @@ public class GeneratePresignedUrlRequest extends CosServiceRequest {
      * value will be supplied.
      */
     private Date expiration;
-    
+
+    /** the optional signPrefixMode decide the presigned url whether start with 'sign=' and encode value  */
+    private boolean signPrefixMode = true;
+
     /**
      * An optional map of additional parameters to include in the pre-signed
      * URL. Adding additional request parameters enables more advanced
@@ -448,5 +451,13 @@ public class GeneratePresignedUrlRequest extends CosServiceRequest {
             throw new IllegalArgumentException(
                     "The HTTP method request parameter must be specified when generating a pre-signed URL");
         }
+    }
+
+    public boolean isSignPrefixMode() {
+        return signPrefixMode;
+    }
+
+    public void setSignPrefixMode(boolean signPrefixMode) {
+        this.signPrefixMode = signPrefixMode;
     }
 }
