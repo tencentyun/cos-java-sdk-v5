@@ -40,14 +40,24 @@ public enum StorageClass {
     Standard("Standard"),
 
     /**
-     * STANDARD_IA
+     * Standard_IA
      */
     Standard_IA("Standard_IA"),
 
     /**
      * Archive
      */
-    Archive("Archive");
+    Archive("Archive"),
+   
+    /**
+     *Maz_Standard
+     */
+    Maz_Standard("Maz_Standard"),
+
+    /**
+     *Maz_Standard_IA
+     */
+     Maz_Standard_IA("Maz_Standard_IA");
 
     /**
      * Returns the Qcloud COS {@link StorageClass} enumeration value representing the
