@@ -753,6 +753,17 @@ public class ObjectMetadata implements ServerSideEncryptionResult, ObjectExpirat
 
     }
 
+   /**
+    * @return The storage class of the object. Returns null if the object is in STANDARD storage.
+    */
+    public String getStorageClass() {
+        final Object storageClass = metadata.get(Headers.STORAGE_CLASS);
+        if (storageClass == null) {
+            return null;
+        }
+        return storageClass.toString();
+    }
+
     /**
      * Returns the Key Management System key id used for Server Side Encryption of the COS
      * object.
