@@ -76,6 +76,7 @@ public class TransferManagerDemo {
             long endTime = System.currentTimeMillis();
             System.out.println("used time: " + (endTime - startTime) / 1000);
             System.out.println(uploadResult.getETag());
+            System.out.println(uploadResult.getCrc64Ecma());
         } catch (CosServiceException e) {
             e.printStackTrace();
         } catch (CosClientException e) {
