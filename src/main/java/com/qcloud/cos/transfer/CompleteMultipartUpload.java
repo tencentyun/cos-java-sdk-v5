@@ -102,6 +102,7 @@ public class CompleteMultipartUpload implements Callable<UploadResult> {
         uploadResult.setVersionId(res.getVersionId());
         uploadResult.setRequestId(res.getRequestId());
         uploadResult.setDateStr(res.getDateStr());
+        uploadResult.setCrc64Ecma(res.getCrc64Ecma());
 
         monitor.uploadComplete();
 

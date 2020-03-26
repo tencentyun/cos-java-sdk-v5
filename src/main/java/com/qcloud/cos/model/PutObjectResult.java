@@ -57,6 +57,8 @@ public class PutObjectResult extends SSEResultBase implements ObjectExpirationRe
     /** The metadata returned as a result of PutObject operation. */
     private ObjectMetadata metadata;
 
+    /** The crc64ecma value for this object */
+    private String crc64Ecma;
 
 
     /**
@@ -209,4 +211,11 @@ public class PutObjectResult extends SSEResultBase implements ObjectExpirationRe
         this.metadata = metadata;
     }
 
+    public String getCrc64Ecma() {
+        return crc64Ecma;
+    }
+
+    public void setCrc64Ecma(String crc64Ecma) {
+        this.crc64Ecma = crc64Ecma;
+    }
 }

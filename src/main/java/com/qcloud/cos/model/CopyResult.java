@@ -21,10 +21,10 @@ package com.qcloud.cos.model;
 /**
  * Contains information returned by COS for a completed copy operation.
  * <p>
- * See {@link TransferManager} for more information about creating transfers.
+ * See {@link com.qcloud.cos.transfer.TransferManager} for more information about creating transfers.
  *
- * @see TransferManager#copy(String, String, String, String)
- * @see TransferManager#copy(CopyObjectRequest)
+ * @see com.qcloud.cos.transfer.TransferManager#copy(String, String, String, String)
+ * @see com.qcloud.cos.transfer.TransferManager#copy(CopyObjectRequest)
  */
 public class CopyResult {
 
@@ -63,7 +63,10 @@ public class CopyResult {
      * enabled for the bucket.
      */
     private String versionId;
-    
+
+    /** The crc64ecma value for this object */
+    private String crc64Ecma;
+
     /**
      * get requestid for this upload
      * 
@@ -248,6 +251,14 @@ public class CopyResult {
      */
     public void setVersionId(String versionId) {
         this.versionId = versionId;
+    }
+
+    public String getCrc64Ecma() {
+        return crc64Ecma;
+    }
+
+    public void setCrc64Ecma(String crc64Ecma) {
+        this.crc64Ecma = crc64Ecma;
     }
 }
 

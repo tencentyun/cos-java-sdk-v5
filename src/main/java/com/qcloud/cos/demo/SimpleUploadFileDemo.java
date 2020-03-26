@@ -20,6 +20,9 @@ import com.qcloud.cos.region.Region;
  * SimpleUpload 给出了简单上传的示例
  */
 public class SimpleUploadFileDemo {
+    public static void main(String[] args) {
+        SimpleUploadFileFromLocal(false);
+    }
     // 将本地文件上传到COS
     public static void SimpleUploadFileFromLocal(boolean useTrafficLimit) {
         // 1 初始化用户身份信息(secretId, secretKey)
@@ -44,6 +47,7 @@ public class SimpleUploadFileDemo {
             PutObjectResult putObjectResult = cosclient.putObject(putObjectRequest);
             // putobjectResult会返回文件的etag
             String etag = putObjectResult.getETag();
+            String crc64 = putObjectResult.getCrc64Ecma();
         } catch (CosServiceException e) {
             e.printStackTrace();
         } catch (CosClientException e) {

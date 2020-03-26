@@ -177,6 +177,7 @@ public class MultipartUploadDemo {
         ClientConfig clientConfig = new ClientConfig(new Region("ap-guangzhou"));
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
+
         // bucket名需包含appid
         String bucketName = "mybucket-1251668577";
         String key = "aaa/bbb.txt";
@@ -204,6 +205,7 @@ public class MultipartUploadDemo {
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名需包含appid
         String bucketName = "mybucket-1251668577";
+
         String key = "aaa/bbb.txt";
 
         CopyPartRequest copyPartRequest = new CopyPartRequest();
@@ -220,7 +222,7 @@ public class MultipartUploadDemo {
         copyPartRequest.setDestinationBucketName(bucketName);
         // 目的路径名称
         copyPartRequest.setDestinationKey(key);
-
+        copyPartRequest.setPartNumber(1);
         // uploadId
         copyPartRequest.setUploadId(uploadId);
         try {

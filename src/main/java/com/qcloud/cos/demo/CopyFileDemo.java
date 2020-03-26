@@ -41,6 +41,7 @@ public class CopyFileDemo {
                 srcKey, destBucketName, destKey);
         try {
             CopyObjectResult copyObjectResult = cosclient.copyObject(copyObjectRequest);
+            String crc64 = copyObjectResult.getCrc64Ecma();
         } catch (CosServiceException e) {
             e.printStackTrace();
         } catch (CosClientException e) {

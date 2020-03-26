@@ -1,6 +1,9 @@
 package com.qcloud.cos.utils;
 
 import org.junit.Test;
+
+import java.math.BigInteger;
+
 import static org.junit.Assert.assertEquals;
 
 public class CRC64Test {
@@ -27,6 +30,10 @@ public class CRC64Test {
 
         CRC64 crc4 = CRC64.combine(crc1, crc2, str2.length());
         assertEquals(crc3.getValue(), crc4.getValue());
+
+        String serverCrc64Str = "9548687815775124833";
+        BigInteger bigInteger = new BigInteger(serverCrc64Str);
+        assertEquals(crc3.getValue(), bigInteger.longValue());
 
         CRC64 crc5 = new CRC64(0);
         crc5.update(str3.getBytes(), str3.length());
