@@ -933,6 +933,8 @@ public class XmlResponsesSaxParser {
         private String errorMessage = null;
         private String errorRequestId = null;
         private String errorHostId = null;
+        /** The crc64ecma value for this object */
+        private String crc64Ecma;
         private boolean receivedErrorResponse = false;
 
         @Override
@@ -970,6 +972,14 @@ public class XmlResponsesSaxParser {
 
         public void setVersionId(String versionId) {
             result.setVersionId(versionId);
+        }
+
+        public String getCrc64Ecma() {
+            return result.getCrc64Ecma();
+        }
+
+        public void setCrc64Ecma(String crc64Ecma) {
+            result.setCrc64Ecma(crc64Ecma);
         }
 
         @Override
@@ -1037,6 +1047,8 @@ public class XmlResponsesSaxParser {
                     result.setETag(StringUtils.removeQuotes(getText()));
                 } else if (name.equals("VersionId")) {
                     result.setVersionId(getText());
+                } else if(name.equals("CRC64")) {
+                    result.setCrc64Ecma(getText());
                 }
             }
 

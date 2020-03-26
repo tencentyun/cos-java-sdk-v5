@@ -150,6 +150,7 @@ public class CopyCallable implements Callable<CopyResult> {
         copyResult.setVersionId(copyObjectResult.getVersionId());
         copyResult.setRequestId(copyObjectResult.getRequestId());
         copyResult.setDateStr(copyObjectResult.getDateStr());
+        copyResult.setCrc64Ecma(copyObjectResult.getCrc64Ecma());
         return copyResult;
     }
 

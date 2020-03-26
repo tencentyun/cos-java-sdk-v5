@@ -140,6 +140,7 @@ public class UploadCallable implements Callable<UploadResult> {
         uploadResult.setVersionId(putObjectResult.getVersionId());
         uploadResult.setRequestId(putObjectResult.getRequestId());
         uploadResult.setDateStr(putObjectResult.getDateStr());
+        uploadResult.setCrc64Ecma(putObjectResult.getCrc64Ecma());
         return uploadResult;
     }
 
@@ -272,6 +273,7 @@ public class UploadCallable implements Callable<UploadResult> {
         uploadResult.setVersionId(res.getVersionId());
         uploadResult.setRequestId(res.getRequestId());
         uploadResult.setDateStr(res.getDateStr());
+        uploadResult.setCrc64Ecma(res.getCrc64Ecma());
         return uploadResult;
     }
 

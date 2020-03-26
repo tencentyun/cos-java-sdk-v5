@@ -585,6 +585,7 @@ public class COSClient implements COS {
         result.setSSEAlgorithm(metadata.getSSEAlgorithm());
         result.setSSECustomerAlgorithm(metadata.getSSECustomerAlgorithm());
         result.setSSECustomerKeyMd5(metadata.getSSECustomerKeyMd5());
+        result.setCrc64Ecma(metadata.getCrc64Ecma());
         result.setMetadata(metadata);
         return result;
     }
@@ -2003,6 +2004,7 @@ public class COSClient implements COS {
         copyObjectResult.setExpirationTime(copyObjectResultHandler.getExpirationTime());
         copyObjectResult.setExpirationTimeRuleId(copyObjectResultHandler.getExpirationTimeRuleId());
         copyObjectResult.setDateStr(copyObjectResultHandler.getDateStr());
+        copyObjectResult.setCrc64Ecma(copyObjectResultHandler.getCrc64Ecma());
         copyObjectResult.setRequestId(copyObjectResultHandler.getRequestId());
 
         return copyObjectResult;
@@ -2105,6 +2107,7 @@ public class COSClient implements COS {
         copyPartResult.setSSEAlgorithm(copyObjectResultHandler.getSSEAlgorithm());
         copyPartResult.setSSECustomerAlgorithm(copyObjectResultHandler.getSSECustomerAlgorithm());
         copyPartResult.setSSECustomerKeyMd5(copyObjectResultHandler.getSSECustomerKeyMd5());
+        copyPartResult.setCrc64Ecma(copyObjectResultHandler.getCrc64Ecma());
 
         return copyPartResult;
     }
