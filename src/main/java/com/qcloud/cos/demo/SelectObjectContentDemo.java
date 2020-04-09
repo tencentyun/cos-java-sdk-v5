@@ -89,7 +89,7 @@ public class SelectObjectContentDemo {
         String key = "test/my_test.json";
         String bucketName = "mybucket-1251668577";
         String csvContent = "{\"name\":\"xiaoming\",\"mathScore\":89,\"musicScore\":92}\n" +
-                "{\"name\":\"xiaowang\",\"mathScore\":93,\"musicScore\":85}\\n" +
+                "{\"name\":\"xiaowang\",\"mathScore\":93,\"musicScore\":85}\n" +
                 "{\"name\":\"xiaoli\",\"mathScore\":82,\"musicScore\":95}\n";
         cosclient.putObject(bucketName, key, csvContent);
         String query = "select * from COSObject s where mathScore > 85'";
