@@ -250,7 +250,7 @@ public class BucketConfigurationXmlFactory {
 
     /**
      * Converts the specified website configuration into an XML byte array to
-     * send to S3.
+     * send to COS.
      *
      * Sample XML:
      * <WebsiteConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/">

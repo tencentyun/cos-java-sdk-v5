@@ -19,10 +19,8 @@ package com.qcloud.cos.model.inventory;
 import java.io.Serializable;
 
 /**
- * Implementation of {@link InventoryEncryption} for server side encryption with S3 managed keys.
+ * Implementation of {@link InventoryEncryption} for server side encryption with COS managed keys.
  *
- * @see <a href="http://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/SSES3" target="_top">AWS API
- * Documentation</a>
  */
 public class ServerSideEncryptionCOS implements InventoryEncryption, Serializable, Cloneable {
 
