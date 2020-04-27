@@ -43,7 +43,7 @@ package com.qcloud.cos.exception;
 
 public class CosClientException extends RuntimeException {
     private static final long serialVersionUID = 1L;
-
+    private String errorCode = ClientExceptionConstants.UNKNOWN;
     /**
      * Creates a new CosClientException with the specified message, and root
      * cause.
@@ -57,9 +57,14 @@ public class CosClientException extends RuntimeException {
         super(message, t);
     }
 
+    public CosClientException(String message, String errorCode, Throwable t) {
+        super(message, t);
+        this.errorCode = errorCode;
+    }
+
     /**
      * Creates a new CosClientException with the specified message.
-     * 
+     *
      * @param message
      *            An error message describing why this exception was thrown.
      */
@@ -69,6 +74,14 @@ public class CosClientException extends RuntimeException {
 
     public CosClientException(Throwable t) {
         super(t);
+    }
+
+    public String getErrorCode() {
+        return errorCode;
+    }
+
+    public void setErrorCode(String errorCode) {
+        this.errorCode = errorCode;
     }
 
     /**
