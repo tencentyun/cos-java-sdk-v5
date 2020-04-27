@@ -421,7 +421,7 @@ public class COSClient implements COS {
 
         if(copyObjectRequest.getMetadataDirective() != null) {
             request.addHeader(Headers.METADATA_DIRECTIVE, copyObjectRequest.getMetadataDirective());
-        } else if (newObjectMetadata != null && !newObjectMetadata.getRawMetadata().containsKey(Headers.METADATA_DIRECTIVE)) {
+        } else if (newObjectMetadata != null) {
             request.addHeader(Headers.METADATA_DIRECTIVE, "REPLACE");
         }
 
