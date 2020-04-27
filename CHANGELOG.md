@@ -5,6 +5,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.6.20] - 2020-4-23
+
+### Added
+- update bcprov-jdk15on version 
+
+## [5.6.19] - 2020-3-26
+
+### Added
+- add crc64 support for high level api 
+
+## [5.6.18] - 2020-3-17
+
+### Added
+- add maz storage class
+
+## [5.6.17] - 2020-3-5
+
+### Added
+- support presigned url not begin with sign=
+
+## [5.6.16] - 2020-2-17
+
+### Added
+- add crc64 to utils
+- add post object demo and signature
+
 ## [5.6.15] - 2020-2-3
 
 ### Added
