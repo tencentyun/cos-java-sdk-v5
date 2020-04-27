@@ -123,6 +123,8 @@ public class CopyObjectRequest extends CosServiceRequest
 
     private SSECOSKeyManagementParams sseCOSKeyManagementParams;
 
+    private String metadataDirective;
+
     /**
      * <p>
      * Constructs a new {@link com.qcloud.cos.model#CopyObjectRequest} with only basic options.
@@ -978,5 +980,31 @@ public class CopyObjectRequest extends CosServiceRequest
     public void setSourceEndpointBuilder(EndpointBuilder sourceEndpointBuilder) {
         this.sourceEndpointBuilder = sourceEndpointBuilder;
     }
-    
+
+    /**
+     * Specifies whether the metadata is copied from the source object or replaced with metadata provided in the request.
+     */
+    public String getMetadataDirective() {
+        return metadataDirective;
+    }
+
+    /**
+     * Specifies whether the metadata is copied from the source object or replaced with metadata provided in the request.
+     *
+     * @param metadataDirective New value for the metadata directive.
+     */
+    public void setMetadataDirective(String metadataDirective) {
+        this.metadataDirective = metadataDirective;
+    }
+
+    /**
+     * Specifies whether the metadata is copied from the source object or replaced with metadata provided in the request.
+     *
+     * @param metadataDirective New value for the metadata directive.
+     * @return Returns a reference to this object so that method calls can be chained together.
+     */
+    public CopyObjectRequest withMetadataDirective(String metadataDirective) {
+        setMetadataDirective(metadataDirective);
+        return this;
+    }
 }
