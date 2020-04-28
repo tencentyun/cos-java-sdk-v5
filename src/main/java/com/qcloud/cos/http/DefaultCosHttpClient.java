@@ -476,13 +476,17 @@ public class DefaultCosHttpClient implements CosHttpClient {
                 checkResponse(request, httpRequest, httpResponse);
                 break;
             } catch (CosServiceException cse) {
-                log.error("failed to execute http request, due to service exception:", cse);
+                String errorMsg = String.format("failed to execute http request, due to service exception, httpRequest: %s",
+                        request.toString());
+                log.error(errorMsg, cse);
                 closeHttpResponseStream(httpResponse);
                 if (!shouldRetry(request, httpResponse, cse, retryIndex, retryPolicy)) {
                     throw cse;
                 }
             } catch (CosClientException cce) {
-                log.error("failed to execute http request, due to client exception", cce);
+                String errorMsg = String.format("failed to execute http request, due to client exception, httpRequest: %s",
+                        request.toString());
+                log.error(errorMsg, cce);
                 closeHttpResponseStream(httpResponse);
                 if (!shouldRetry(request, httpResponse, cce, retryIndex, retryPolicy)) {
                     throw cce;
