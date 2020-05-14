@@ -476,9 +476,11 @@ public class DefaultCosHttpClient implements CosHttpClient {
                 checkResponse(request, httpRequest, httpResponse);
                 break;
             } catch (CosServiceException cse) {
-                String errorMsg = String.format("failed to execute http request, due to service exception, httpRequest: %s",
-                        request.toString());
-                log.error(errorMsg, cse);
+                if(cse.getStatusCode() >= 500) {
+                    String errorMsg = String.format("failed to execute http request, due to service exception, httpRequest: %s",
+                            request.toString());
+                    log.error(errorMsg, cse);
+                }
                 closeHttpResponseStream(httpResponse);
                 if (!shouldRetry(request, httpResponse, cse, retryIndex, retryPolicy)) {
                     throw cse;
