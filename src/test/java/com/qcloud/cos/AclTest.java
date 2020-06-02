@@ -38,7 +38,7 @@ public class AclTest extends AbstractCOSClientTest {
     }
 
     @Test
-    public void GetAclForNewPubReadBucket() {
+    public void GetAclForNewPubReadBucket() throws InterruptedException {
         if (!judgeUserInfoValid()) {
             return;
         }
@@ -49,6 +49,7 @@ public class AclTest extends AbstractCOSClientTest {
             createBucketRequest.setCannedAcl(CannedAccessControlList.PublicRead);
             cosclient.createBucket(createBucketRequest);
             AccessControlList aclGet = cosclient.getBucketAcl(aclTestBucketName);
+            assertEquals(aclGet.getCannedAccessControl(), CannedAccessControlList.PublicRead);
             assertNotNull(aclGet.getOwner());
             assertNotNull(aclGet.getOwner().getId());
             assertNotNull(aclGet.getOwner().getDisplayName());
@@ -61,6 +62,19 @@ public class AclTest extends AbstractCOSClientTest {
             Grant secondGrant = aclGet.getGrantsAsList().get(1);
             assertEquals(Permission.FullControl.toString(), secondGrant.getPermission().toString());
             assertTrue(secondGrant.getGrantee() instanceof UinGrantee);
+
+            // set to PublicReadWrite acl and get canned acl compare
+            Thread.sleep(5000);
+            cosclient.setBucketAcl(aclTestBucketName, CannedAccessControlList.PublicReadWrite);
+            aclGet = cosclient.getBucketAcl(aclTestBucketName);
+            assertEquals(aclGet.getCannedAccessControl(), CannedAccessControlList.PublicReadWrite);
+
+            // set to private and get canned acl compare
+            Thread.sleep(5000);
+            cosclient.setBucketAcl(aclTestBucketName, CannedAccessControlList.Private);
+            aclGet = cosclient.getBucketAcl(aclTestBucketName);
+            assertEquals(aclGet.getCannedAccessControl(), CannedAccessControlList.Private);
+
         } finally {
             if (aclTestBucketName != null) {
                 cosclient.deleteBucket(aclTestBucketName);
@@ -133,7 +147,7 @@ public class AclTest extends AbstractCOSClientTest {
     }
 
     @Test
-    public void setObjectCannedAclTest() throws IOException {
+    public void setObjectCannedAclTest() throws IOException, InterruptedException {
         if (!judgeUserInfoValid()) {
             return;
         }
@@ -142,10 +156,14 @@ public class AclTest extends AbstractCOSClientTest {
         putObjectFromLocalFile(localFile, key);
         try {
             cosclient.setObjectAcl(bucket, key, CannedAccessControlList.PublicRead);
-            cosclient.getObjectAcl(bucket, key);
-
+            AccessControlList accessControlList = cosclient.getObjectAcl(bucket, key);
+            assertEquals(accessControlList.getCannedAccessControl(), CannedAccessControlList.PublicRead);
+            cosclient.setObjectAcl(bucket, key, CannedAccessControlList.Private);
+            accessControlList = cosclient.getObjectAcl(bucket, key);
+            assertEquals(accessControlList.getCannedAccessControl(), CannedAccessControlList.Private);
             cosclient.setObjectAcl(bucket, key, CannedAccessControlList.Default);
-            cosclient.getObjectAcl(bucket, key);
+            accessControlList = cosclient.getObjectAcl(bucket, key);
+            assertEquals(accessControlList.getCannedAccessControl(), CannedAccessControlList.Default);
 
         } finally {
             assertTrue(localFile.delete());

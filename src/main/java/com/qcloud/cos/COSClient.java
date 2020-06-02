@@ -76,6 +76,7 @@ import com.qcloud.cos.internal.LengthCheckInputStream;
 import com.qcloud.cos.internal.MD5DigestCalculatingInputStream;
 import com.qcloud.cos.internal.MultiObjectDeleteXmlFactory;
 import com.qcloud.cos.internal.ObjectExpirationHeaderHandler;
+import com.qcloud.cos.internal.COSDefaultAclHeaderHandler;
 import com.qcloud.cos.internal.ReleasableInputStream;
 import com.qcloud.cos.internal.RequestXmlFactory;
 import com.qcloud.cos.internal.ResettableInputStream;
@@ -2439,7 +2440,7 @@ public class COSClient implements COS {
         @SuppressWarnings("unchecked")
         ResponseHeaderHandlerChain<AccessControlList> responseHandler =
                 new ResponseHeaderHandlerChain<AccessControlList>(
-                        new Unmarshallers.AccessControlListUnmarshaller());
+                        new Unmarshallers.AccessControlListUnmarshaller(), new COSDefaultAclHeaderHandler());
 
         return invoke(request, responseHandler);
     }

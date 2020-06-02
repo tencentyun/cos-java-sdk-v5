@@ -67,6 +67,7 @@ public class AccessControlList implements Serializable {
     private Set<Grant> grantSet;
     private List<Grant> grantList;
     private Owner owner = null;
+    private boolean existDefaultAcl;
 
     /**
      * Gets the owner of the {@link AccessControlList}.
@@ -196,4 +197,75 @@ public class AccessControlList implements Serializable {
         return "AccessControlList [owner=" + owner + ", grants=" + getGrantsAsList() + "]";
     }
 
+    private boolean isAllUsersGrantee(Grantee grantee) {
+        String identifier = grantee.getIdentifier();
+        return grantee.equals(GroupGrantee.AllUsers) ||(identifier != null &&
+                identifier.equals("qcs::cam::anyone:anyone"));
+    }
+    /**
+     * according to the returned x-cos-acl header and grantList, to judge the bucket or object acl, the cases are below:
+     *
+     * 1. if the header returned x-cos-acl:default, return CannedAccessControlList.Default, only for object acl
+     * 2. if the body have AllUsers's Read or Write permission, combine it to decide bucket or object acl to
+     *     CannedAccessControlList.PublicReadWrite or CannedAccessControlList.PublicRead
+     * 3. for other cases, the object or bucket acl is CannedAccessControlList.Private
+     *
+     * @return CannedAccessControlList
+     */
+    public CannedAccessControlList getCannedAccessControl() {
+        if(grantList == null) {
+            return null;
+        }
+        // if the returned header have x-cos-acl:default, the object acl is Default access control
+        // attention: get bucket acl will not return this header
+        if(existDefaultAcl) {
+            return CannedAccessControlList.Default;
+        }
+
+        // check the object or bucket if have AllUsers Read and Write acl
+        boolean allUsersRead = false;
+        boolean allUsersWrite = false;
+        for(Grant grant:grantList) {
+            Grantee grantee = grant.getGrantee();
+            Permission permission = grant.getPermission();
+            if(grantee != null && permission != null && isAllUsersGrantee(grantee)) {
+                if(permission.equals(Permission.Read)) {
+                    allUsersRead = true;
+                }
+                if(permission.equals(Permission.Write)) {
+                    allUsersWrite = true;
+                }
+            }
+        }
+        // only bucket acl, will have public read and write acl
+        if(allUsersRead && allUsersWrite) {
+            return CannedAccessControlList.PublicReadWrite;
+        }
+
+        // bucket and object acl, may have public-read acl
+        if(allUsersRead) {
+            return CannedAccessControlList.PublicRead;
+        }
+
+        // in other cases, the object and bucket acl is private access
+        return CannedAccessControlList.Private;
+    }
+
+    /**
+     * @return true if the header have x-cos-acl:default
+     */
+    public boolean isExistDefaultAcl() {
+        return existDefaultAcl;
+    }
+
+
+    /**
+     * This method is only intended for internal use by the library.
+     * if the response header have x-cos-acl:default, set to true
+     *
+     * @param existDefaultAcl, if the response header have x-cos-acl:default
+     */
+    public void setExistDefaultAcl(boolean existDefaultAcl) {
+        this.existDefaultAcl = existDefaultAcl;
+    }
 }
