@@ -575,7 +575,7 @@ public class COSClient implements COS {
             HttpResponseHandler<CosServiceResponse<X>> responseHandler)
             throws CosClientException, CosServiceException {
 
-        COSSigner cosSigner = new COSSigner();
+        COSSigner cosSigner = clientConfig.getCosSigner();
         Date expiredTime =
                 new Date(System.currentTimeMillis() + clientConfig.getSignExpired() * 1000);
         cosSigner.sign(request, fetchCredential(), expiredTime);
