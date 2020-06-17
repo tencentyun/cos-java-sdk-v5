@@ -1480,6 +1480,9 @@ public class COSClient implements COS {
         // Populate the SSE KMS parameters to the request header
         populateSSE_KMS(request, initiateMultipartUploadRequest.getSSECOSKeyManagementParams());
 
+        // init upload body length is zero
+        request.addHeader(Headers.CONTENT_LENGTH, String.valueOf(0));
+
         @SuppressWarnings("unchecked")
         ResponseHeaderHandlerChain<InitiateMultipartUploadResult> responseHandler =
                 new ResponseHeaderHandlerChain<InitiateMultipartUploadResult>(
