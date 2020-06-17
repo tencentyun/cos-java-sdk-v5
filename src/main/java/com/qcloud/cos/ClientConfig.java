@@ -18,6 +18,7 @@
 
 package com.qcloud.cos;
 
+import com.qcloud.cos.auth.COSSigner;
 import com.qcloud.cos.endpoint.DefaultEndpointResolver;
 import com.qcloud.cos.endpoint.EndpointBuilder;
 import com.qcloud.cos.endpoint.EndpointResolver;
@@ -75,6 +76,7 @@ public class ClientConfig {
     private int maxConnectionsCount = DEFAULT_MAX_CONNECTIONS_COUNT;
     private String userAgent = DEFAULT_USER_AGENT;
     private int readLimit = DEFAULT_READ_LIMIT;
+    private COSSigner cosSigner = new COSSigner();
 
     // 不传入region 用于后续调用List Buckets(获取所有的bucket信息)
     public ClientConfig() {
@@ -247,5 +249,20 @@ public class ClientConfig {
 
     public void setBackoffStrategy(BackoffStrategy backoffStrategy) {
         this.backoffStrategy = backoffStrategy;
+    }
+
+    /**
+     * @return return the cos signature algorithm implementation
+     */
+    public COSSigner getCosSigner() {
+        return cosSigner;
+    }
+
+    /**
+     *
+     * @param cosSigner signature algorithm implementation
+     */
+    public void setCosSigner(COSSigner cosSigner) {
+        this.cosSigner = cosSigner;
     }
 }

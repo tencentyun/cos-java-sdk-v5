@@ -33,6 +33,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
+import java.util.Set;
+import java.util.HashSet;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.codec.digest.HmacUtils;
@@ -44,7 +46,17 @@ import com.qcloud.cos.internal.CosServiceRequest;
 import com.qcloud.cos.utils.UrlEncoderUtils;
 
 public class COSSigner {
-
+    private static Set<String> needSignedHeaderSet = new HashSet<>();
+    static {
+        needSignedHeaderSet.add("host");
+        needSignedHeaderSet.add("content-type");
+        needSignedHeaderSet.add("content-md5");
+        needSignedHeaderSet.add("content-disposition");
+        needSignedHeaderSet.add("content-encoding");
+        needSignedHeaderSet.add("content-length");
+        needSignedHeaderSet.add("transfer-encoding");
+        needSignedHeaderSet.add("range");
+    }
     private boolean isAnonymous(COSCredentials cred) {
         return cred instanceof AnonymousCOSCredentials;
     }
@@ -123,18 +135,19 @@ public class COSSigner {
         return authoriationStr;
     }
 
+    public boolean needSignedHeader(String header) {
+        return needSignedHeaderSet.contains(header) || header.startsWith("x-cos-");
+    }
+
     private Map<String, String> buildSignHeaders(Map<String, String> originHeaders) {
         Map<String, String> signHeaders = new HashMap<>();
         for (Entry<String, String> headerEntry : originHeaders.entrySet()) {
-            String key = headerEntry.getKey();
-            if (key.equalsIgnoreCase("content-type") || key.equalsIgnoreCase("content-md5")
-                    || key.startsWith("x") || key.startsWith("X")) {
-                String lowerKey = key.toLowerCase();
+            String key = headerEntry.getKey().toLowerCase();
+            if(needSignedHeader(key)) {
                 String value = headerEntry.getValue();
-                signHeaders.put(lowerKey, value);
+                signHeaders.put(key, value);
             }
         }
-
         return signHeaders;
     }
 
@@ -180,6 +193,14 @@ public class COSSigner {
         long endTime = expiredTime.getTime() / 1000;
         strBuilder.append(startTime).append(";").append(endTime);
         return strBuilder.toString();
+    }
+
+    public static Set<String> getNeedSignedHeaderSet() {
+        return needSignedHeaderSet;
+    }
+
+    public static void setNeedSignedHeaderSet(Set<String> needSignedHeaderSet) {
+        COSSigner.needSignedHeaderSet = needSignedHeaderSet;
     }
 
 }
