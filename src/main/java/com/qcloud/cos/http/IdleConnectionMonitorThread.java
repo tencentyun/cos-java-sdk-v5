@@ -50,6 +50,8 @@ public final class IdleConnectionMonitorThread extends Thread {
          }
      } catch (InterruptedException e) {
 
+     } finally {
+         connMgr.shutdown();
      }
  }
 
