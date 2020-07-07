@@ -22,6 +22,12 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import com.qcloud.cos.auth.COSCredentialsProvider;
+import com.qcloud.cos.auth.AnonymousCOSCredentials;
+import com.qcloud.cos.auth.COSCredentials;
+import com.qcloud.cos.auth.BasicCOSCredentials;
+import com.qcloud.cos.model.PutObjectRequest;
+import com.qcloud.cos.model.GetObjectRequest;
+import com.qcloud.cos.model.DeleteObjectRequest;
 import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.http.HttpProtocol;
 import com.qcloud.cos.model.COSObject;
@@ -479,4 +485,48 @@ public class PutGetDelTest extends AbstractCOSClientTest {
         }
     }
 
+    @Test
+    public void testRequestSpecifiedTmpKeyInfoPutGetDel() throws CosServiceException, IOException, InterruptedException {
+        COSClient cosclient = buildTemporyCredentialsCOSClient(1800L);
+        File localFile = buildTestFile(1024L);
+        COSCredentials cosCredentials = new BasicCOSCredentials(secretId, secretKey);
+        try {
+            String key = "ut/request-specified-key";
+            PutObjectRequest putObjectRequest = new PutObjectRequest(bucket, key, localFile);
+            putObjectRequest.setCosCredentials(cosCredentials);
+            cosclient.putObject(putObjectRequest);
+            GetObjectRequest getObjectRequest = new GetObjectRequest(bucket, key);
+            getObjectRequest.setCosCredentials(cosCredentials);
+            cosclient.getObject(getObjectRequest);
+            DeleteObjectRequest deleteObjectRequest = new DeleteObjectRequest(bucket, key);
+            deleteObjectRequest.setCosCredentials(cosCredentials);
+            cosclient.deleteObject(deleteObjectRequest);
+        } finally {
+            localFile.delete();
+            cosclient.shutdown();
+        }
+    }
+
+    @Test
+    public void testRequestSpecifiedKeyInfoPutGetDel() throws CosServiceException, IOException, InterruptedException { 
+        COSClient cosclient = new COSClient(new AnonymousCOSCredentials(), clientConfig);
+        File localFile = buildTestFile(1024L);
+        COSCredentials cosCredentials = new BasicCOSCredentials(secretId, secretKey);
+
+        try {
+            String key = "ut/request-specified-key";
+            PutObjectRequest putObjectRequest = new PutObjectRequest(bucket, key, localFile);
+            putObjectRequest.setCosCredentials(cosCredentials);
+            cosclient.putObject(putObjectRequest);
+            GetObjectRequest getObjectRequest = new GetObjectRequest(bucket, key);
+            getObjectRequest.setCosCredentials(cosCredentials);
+            cosclient.getObject(getObjectRequest);
+            DeleteObjectRequest deleteObjectRequest = new DeleteObjectRequest(bucket, key);
+            deleteObjectRequest.setCosCredentials(cosCredentials);
+            cosclient.deleteObject(deleteObjectRequest);
+        } finally {
+            localFile.delete();
+            cosclient.shutdown();
+        }
+    }
 }
