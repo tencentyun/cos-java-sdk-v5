@@ -576,9 +576,15 @@ public class COSClient implements COS {
             throws CosClientException, CosServiceException {
 
         COSSigner cosSigner = clientConfig.getCosSigner();
-        Date expiredTime =
-                new Date(System.currentTimeMillis() + clientConfig.getSignExpired() * 1000);
-        cosSigner.sign(request, fetchCredential(), expiredTime);
+        COSCredentials cosCredentials;
+        CosServiceRequest cosServiceRequest = request.getOriginalRequest();
+        if(cosServiceRequest != null && cosServiceRequest.getCosCredentials() != null) {
+            cosCredentials = cosServiceRequest.getCosCredentials();
+        } else {
+            cosCredentials = fetchCredential();
+        }
+        Date expiredTime = new Date(System.currentTimeMillis() + clientConfig.getSignExpired() * 1000);
+        cosSigner.sign(request, cosCredentials, expiredTime);
         return this.cosHttpClient.exeute(request, responseHandler);
     }
 

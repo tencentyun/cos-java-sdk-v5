@@ -24,10 +24,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.qcloud.cos.auth.COSCredentials;
 import com.qcloud.cos.event.ProgressListener;
 
 public class CosServiceRequest implements Cloneable, ReadLimitInfo  {
-    
+    /**
+     * Request related key information
+     */
+    private COSCredentials cosCredentials;
     /**
      * The optional progress listener for receiving updates about the progress of the request.
      */
@@ -260,4 +264,11 @@ public class CosServiceRequest implements Cloneable, ReadLimitInfo  {
         }
     }
 
+    public COSCredentials getCosCredentials() {
+        return cosCredentials;
+    }
+
+    public void setCosCredentials(COSCredentials cosCredentials) {
+        this.cosCredentials = cosCredentials;
+    }
 }
