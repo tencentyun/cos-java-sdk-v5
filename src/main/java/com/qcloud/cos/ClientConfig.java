@@ -18,6 +18,7 @@
 
 package com.qcloud.cos;
 
+import com.qcloud.cos.auth.COSSigner;
 import com.qcloud.cos.endpoint.DefaultEndpointResolver;
 import com.qcloud.cos.endpoint.EndpointBuilder;
 import com.qcloud.cos.endpoint.EndpointResolver;
@@ -25,6 +26,10 @@ import com.qcloud.cos.endpoint.RegionEndpointBuilder;
 import com.qcloud.cos.endpoint.SuffixEndpointBuilder;
 import com.qcloud.cos.http.HttpProtocol;
 import com.qcloud.cos.region.Region;
+import com.qcloud.cos.retry.BackoffStrategy;
+import com.qcloud.cos.retry.PredefinedBackoffStrategies;
+import com.qcloud.cos.retry.PredefinedRetryPolicies;
+import com.qcloud.cos.retry.RetryPolicy;
 import com.qcloud.cos.utils.VersionInfoUtils;
 
 public class ClientConfig {
@@ -42,12 +47,21 @@ public class ClientConfig {
     private static final String DEFAULT_USER_AGENT = VersionInfoUtils.getUserAgent();
     // Read Limit
     private static final int DEFAULT_READ_LIMIT = (2 << 17) + 1;
-
+    /** default retry times is 3 when retryable exception occured **/
+    private static final int DEFAULT_RETRY_TIMES = 3;
+    /** The max retry times if retryable exception occured **/
+    private int maxErrorRetry = DEFAULT_RETRY_TIMES;
+    /** The retry policy if exception occured **/
+    private static final RetryPolicy DEFAULT_RETRY_POLICY = PredefinedRetryPolicies.DEFAULT;
+    /** The sleep time interval between exception occured and retry **/
+    public static final BackoffStrategy DEFAULT_BACKOFF_STRATEGY = PredefinedBackoffStrategies.DEFAULT;
     private Region region;
     private HttpProtocol httpProtocol = HttpProtocol.http;
     private String endPointSuffix = null;
     private EndpointBuilder endpointBuilder = null;
     private EndpointResolver endpointResolver = new DefaultEndpointResolver();
+    private RetryPolicy retryPolicy = DEFAULT_RETRY_POLICY;
+    private BackoffStrategy backoffStrategy = DEFAULT_BACKOFF_STRATEGY;
 
     // http proxy代理，如果使用http proxy代理，需要设置IP与端口
     private String httpProxyIp = null;
@@ -62,6 +76,7 @@ public class ClientConfig {
     private int maxConnectionsCount = DEFAULT_MAX_CONNECTIONS_COUNT;
     private String userAgent = DEFAULT_USER_AGENT;
     private int readLimit = DEFAULT_READ_LIMIT;
+    private COSSigner cosSigner = new COSSigner();
 
     // 不传入region 用于后续调用List Buckets(获取所有的bucket信息)
     public ClientConfig() {
@@ -211,4 +226,43 @@ public class ClientConfig {
     public void setUseBasicAuth(boolean useBasicAuth) { this.useBasicAuth = useBasicAuth; }
 
     public boolean useBasicAuth() { return useBasicAuth; }
+
+    public int getMaxErrorRetry() {
+        return maxErrorRetry;
+    }
+
+    public void setMaxErrorRetry(int maxErrorRetry) {
+        this.maxErrorRetry = maxErrorRetry;
+    }
+
+    public RetryPolicy getRetryPolicy() {
+        return retryPolicy;
+    }
+
+    public void setRetryPolicy(RetryPolicy retryPolicy) {
+        this.retryPolicy = retryPolicy;
+    }
+
+    public BackoffStrategy getBackoffStrategy() {
+        return backoffStrategy;
+    }
+
+    public void setBackoffStrategy(BackoffStrategy backoffStrategy) {
+        this.backoffStrategy = backoffStrategy;
+    }
+
+    /**
+     * @return return the cos signature algorithm implementation
+     */
+    public COSSigner getCosSigner() {
+        return cosSigner;
+    }
+
+    /**
+     *
+     * @param cosSigner signature algorithm implementation
+     */
+    public void setCosSigner(COSSigner cosSigner) {
+        this.cosSigner = cosSigner;
+    }
 }

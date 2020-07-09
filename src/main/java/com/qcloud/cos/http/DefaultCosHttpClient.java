@@ -29,8 +29,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.ThreadLocalRandom;
 
+import com.qcloud.cos.retry.BackoffStrategy;
+import com.qcloud.cos.retry.RetryPolicy;
+import com.qcloud.cos.utils.ExceptionUtils;
+import com.qcloud.cos.utils.ValidationUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
@@ -79,6 +82,9 @@ public class DefaultCosHttpClient implements CosHttpClient {
     private HttpClient httpClient;
     private PoolingHttpClientConnectionManager connectionManager;
     private IdleConnectionMonitorThread idleConnectionMonitor;
+    private int maxErrorRetry;
+    private RetryPolicy retryPolicy;
+    private BackoffStrategy backoffStrategy;
 
     private CosErrorResponseHandler errorResponseHandler;
     private static final Logger log = LoggerFactory.getLogger(DefaultCosHttpClient.class);
@@ -88,6 +94,9 @@ public class DefaultCosHttpClient implements CosHttpClient {
         this.errorResponseHandler = new CosErrorResponseHandler();
         this.clientConfig = clientConfig;
         this.connectionManager = new PoolingHttpClientConnectionManager();
+        this.maxErrorRetry = clientConfig.getMaxErrorRetry();
+        this.retryPolicy = ValidationUtils.assertNotNull(clientConfig.getRetryPolicy(), "retry policy");
+        this.backoffStrategy = ValidationUtils.assertNotNull(clientConfig.getBackoffStrategy(),"backoff strategy");
         initHttpClient();
     }
 
@@ -247,6 +256,10 @@ public class DefaultCosHttpClient implements CosHttpClient {
             }
         }
         httpRequestBase.setConfig(this.requestConfig);
+        if(clientConfig.useBasicAuth()) {
+            // basic auth认证
+            setBasicProxyAuthorization(httpRequestBase);
+        }
         return httpRequestBase;
     }
 
@@ -357,6 +370,65 @@ public class DefaultCosHttpClient implements CosHttpClient {
         httpRequest.addHeader("Proxy-Authorization", authHeader);
     }
 
+    private <X extends CosServiceRequest> void checkResponse(CosHttpRequest<X> request,
+                                                              HttpRequestBase httpRequest,
+                                                              HttpResponse httpResponse) {
+        if (!isRequestSuccessful(httpResponse)) {
+            try {
+                throw handlerErrorMessage(request, httpRequest, httpResponse);
+            } catch (IOException ioe) {
+                String errorMsg = "Unable to execute HTTP request: " + ioe.getMessage();
+                log.error(errorMsg, ioe);
+                CosServiceException cse = new CosServiceException(errorMsg, ioe);
+                throw cse;
+            } finally {
+                httpRequest.abort();
+            }
+        }
+    }
+
+    private <X extends CosServiceRequest> boolean isRetryableRequest(CosHttpRequest<X> request) {
+        return request.getContent() == null || request.getContent().markSupported();
+    }
+
+    private <X extends CosServiceRequest> boolean shouldRetry(CosHttpRequest<X> request, HttpResponse response,
+                                                              Exception exception, int retryIndex,
+                                                              RetryPolicy retryPolicy) {
+        if (retryIndex >= maxErrorRetry) {
+            return false;
+        }
+
+        if (!isRetryableRequest(request)) {
+            return false;
+        }
+
+        if (retryPolicy.shouldRetry(request, response, exception, retryIndex)) {
+            return true;
+        }
+        return false;
+    }
+
+    private HttpResponse executeOneRequest(HttpContext context, HttpRequestBase httpRequest) {
+        HttpResponse httpResponse = null;
+        try {
+            httpResponse = httpClient.execute(httpRequest, context);
+        } catch (IOException e) {
+            httpRequest.abort();
+            throw ExceptionUtils.createClientException(e);
+        }
+        return httpResponse;
+    }
+
+    private void closeHttpResponseStream(HttpResponse httpResponse) {
+        try {
+            if(httpResponse != null && httpResponse.getEntity() != null &&
+                    httpResponse.getEntity().getContent() != null) {
+                httpResponse.getEntity().getContent().close();
+            }
+        } catch (IOException e) {
+        }
+    }
+
     @Override
     public <X, Y extends CosServiceRequest> X exeute(CosHttpRequest<Y> request,
             HttpResponseHandler<CosServiceResponse<X>> responseHandler)
@@ -364,8 +436,6 @@ public class DefaultCosHttpClient implements CosHttpClient {
 
         HttpResponse httpResponse = null;
         HttpRequestBase httpRequest = null;
-        int retryIndex = 0;
-        int kMaxRetryCnt = 5;
         bufferAndResetAbleContent(request);
 
         // Always mark the input stream before execution.
@@ -380,8 +450,8 @@ public class DefaultCosHttpClient implements CosHttpClient {
             originalContent.mark(readLimit);
         }
 
-
-        while (retryIndex < kMaxRetryCnt) {
+        int retryIndex = 0;
+        while (true) {
             try {
                 checkInterrupted();
                 if (originalContent instanceof BufferedInputStream
@@ -395,62 +465,52 @@ public class DefaultCosHttpClient implements CosHttpClient {
                 if (retryIndex != 0 && originalContent != null) {
                     originalContent.reset();
                 }
+                if(retryIndex != 0) {
+                    long delay = backoffStrategy.computeDelayBeforeNextRetry(retryIndex);
+                    Thread.sleep(delay);
+                }
                 HttpContext context = HttpClientContext.create();
                 httpRequest = buildHttpRequest(request);
-                if(clientConfig.useBasicAuth()) {
-                    // basic auth认证
-		    setBasicProxyAuthorization(httpRequest);
-                }
-                httpResponse = httpClient.execute(httpRequest, context);
+                httpResponse = null;
+                httpResponse = executeOneRequest(context, httpRequest);
+                checkResponse(request, httpRequest, httpResponse);
                 break;
-            } catch (IOException e) {
-                httpRequest.abort();
-                ++retryIndex;
-                if (retryIndex >= kMaxRetryCnt) {
-                    String errMsg = String.format(
-                            "httpClient execute occur a IOexcepiton. httpRequest: %s",
+            } catch (CosServiceException cse) {
+                if(cse.getStatusCode() >= 500) {
+                    String errorMsg = String.format("failed to execute http request, due to service exception, httpRequest: %s",
                             request.toString());
-                    log.error(errMsg, e);
-                    throw new CosClientException(errMsg, e);
-                } else {
-                    String warnMsg = String.format(
-                            "httpClient execute occur a IOexcepiton, ready to retry[%d/%d]. httpRequest: %s",
-                            retryIndex, kMaxRetryCnt, request.toString());
-                    log.warn(warnMsg, e);
-                    int threadSleepMs = ThreadLocalRandom.current().nextInt(10, 100);
-                    try {
-                        Thread.sleep(threadSleepMs);
-                    } catch (InterruptedException e1) {
-                        throw new CosClientException("operation has been interrupted!");
-                    }
+                    log.error(errorMsg, cse);
                 }
-            } catch (Exception e) {
-                String errMsg = String.format(
-                        "httpClient execute occur a unknown exception. httpRequest: %s",
+                closeHttpResponseStream(httpResponse);
+                if (!shouldRetry(request, httpResponse, cse, retryIndex, retryPolicy)) {
+                    throw cse;
+                }
+            } catch (CosClientException cce) {
+                String errorMsg = String.format("failed to execute http request, due to client exception, httpRequest: %s",
                         request.toString());
-                log.error(errMsg, e);
-                throw new CosClientException(errMsg, e);
-            }
-        }
-        if (!isRequestSuccessful(httpResponse)) {
-            try {
-                throw handlerErrorMessage(request, httpRequest, httpResponse);
-            } catch (IOException ioe) {
-                log.error("Unable to execute HTTP request: " + ioe.getMessage(), ioe);
-                CosServiceException cse = new CosServiceException(
-                        "Unable to execute HTTP request: " + ioe.getMessage(), ioe);
-                throw cse;
+                log.error(errorMsg, cce);
+                closeHttpResponseStream(httpResponse);
+                if (!shouldRetry(request, httpResponse, cce, retryIndex, retryPolicy)) {
+                    throw cce;
+                }
+            } catch (Exception exp) {
+                String errorMsg = String.format("httpClient execute occur a unknow exception, httpRequest: %s",
+                        request.toString());
+                closeHttpResponseStream(httpResponse);
+                log.error(errorMsg, exp);
+                throw new CosClientException(errorMsg, exp);
             } finally {
-                httpRequest.abort();
+                ++retryIndex;
             }
         }
+
         try {
             CosHttpResponse cosHttpResponse = createResponse(httpRequest, request, httpResponse);
             return responseHandler.handle(cosHttpResponse).getResult();
         } catch (Exception e) {
-            log.info("Unable to execute Response handle: " + e.getMessage(), e);
-            CosClientException cce = new CosClientException(
-                    "Unable to execute Response handle: " + e.getMessage(), e);
+            String errorMsg = "Unable to execute response handle: " + e.getMessage();
+            log.info(errorMsg, e);
+            CosClientException cce = new CosClientException(errorMsg, e);
             throw cce;
         } finally {
             if (!responseHandler.needsConnectionLeftOpen()) {

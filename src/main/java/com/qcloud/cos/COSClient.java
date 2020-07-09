@@ -77,6 +77,7 @@ import com.qcloud.cos.internal.LengthCheckInputStream;
 import com.qcloud.cos.internal.MD5DigestCalculatingInputStream;
 import com.qcloud.cos.internal.MultiObjectDeleteXmlFactory;
 import com.qcloud.cos.internal.ObjectExpirationHeaderHandler;
+import com.qcloud.cos.internal.COSDefaultAclHeaderHandler;
 import com.qcloud.cos.internal.ReleasableInputStream;
 import com.qcloud.cos.internal.RequestXmlFactory;
 import com.qcloud.cos.internal.ResettableInputStream;
@@ -421,8 +422,14 @@ public class COSClient implements COS {
         }
 
         ObjectMetadata newObjectMetadata = copyObjectRequest.getNewObjectMetadata();
-        if (newObjectMetadata != null) {
+
+        if(copyObjectRequest.getMetadataDirective() != null) {
+            request.addHeader(Headers.METADATA_DIRECTIVE, copyObjectRequest.getMetadataDirective());
+        } else if (newObjectMetadata != null) {
             request.addHeader(Headers.METADATA_DIRECTIVE, "REPLACE");
+        }
+
+        if(newObjectMetadata != null) {
             populateRequestMetadata(request, newObjectMetadata);
         }
 
@@ -571,10 +578,16 @@ public class COSClient implements COS {
             HttpResponseHandler<CosServiceResponse<X>> responseHandler)
             throws CosClientException, CosServiceException {
 
-        COSSigner cosSigner = new COSSigner();
-        Date expiredTime =
-                new Date(System.currentTimeMillis() + clientConfig.getSignExpired() * 1000);
-        cosSigner.sign(request, fetchCredential(), expiredTime);
+        COSSigner cosSigner = clientConfig.getCosSigner();
+        COSCredentials cosCredentials;
+        CosServiceRequest cosServiceRequest = request.getOriginalRequest();
+        if(cosServiceRequest != null && cosServiceRequest.getCosCredentials() != null) {
+            cosCredentials = cosServiceRequest.getCosCredentials();
+        } else {
+            cosCredentials = fetchCredential();
+        }
+        Date expiredTime = new Date(System.currentTimeMillis() + clientConfig.getSignExpired() * 1000);
+        cosSigner.sign(request, cosCredentials, expiredTime);
         return this.cosHttpClient.exeute(request, responseHandler);
     }
 
@@ -1475,6 +1488,9 @@ public class COSClient implements COS {
 
         // Populate the SSE KMS parameters to the request header
         populateSSE_KMS(request, initiateMultipartUploadRequest.getSSECOSKeyManagementParams());
+
+        // init upload body length is zero
+        request.addHeader(Headers.CONTENT_LENGTH, String.valueOf(0));
 
         @SuppressWarnings("unchecked")
         ResponseHeaderHandlerChain<InitiateMultipartUploadResult> responseHandler =
@@ -2436,7 +2452,7 @@ public class COSClient implements COS {
         @SuppressWarnings("unchecked")
         ResponseHeaderHandlerChain<AccessControlList> responseHandler =
                 new ResponseHeaderHandlerChain<AccessControlList>(
-                        new Unmarshallers.AccessControlListUnmarshaller());
+                        new Unmarshallers.AccessControlListUnmarshaller(), new COSDefaultAclHeaderHandler());
 
         return invoke(request, responseHandler);
     }
