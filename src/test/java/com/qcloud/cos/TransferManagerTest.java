@@ -49,7 +49,7 @@ public class TransferManagerTest extends AbstractCOSClientTest {
     @AfterClass
     public static void tearDownAfterClass() throws Exception {
         if (transferManager != null) {
-            transferManager.shutdownNow();
+            transferManager.shutdownNow(false);
         }
         AbstractCOSClientTest.destoryCosClient();
     }
