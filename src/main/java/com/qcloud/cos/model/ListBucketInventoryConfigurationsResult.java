@@ -40,15 +40,15 @@ public class ListBucketInventoryConfigurationsResult implements Serializable {
 
     /**
      * Indicates if this is a complete listing, or if the caller needs to make
-     * additional requests to Amazon S3 to see the full inventory configuration
-     * listing for an S3 bucket.
+     * additional requests to COS to see the full inventory configuration
+     * listing for an COS bucket.
      */
     private boolean isTruncated;
 
     /**
      * NextContinuationToken is sent when isTruncated is true meaning there are
      * more inventory configurations in the bucket that can be listed. The next list requests to Amazon
-     * S3 can be continued by providing this NextContinuationToken.
+     * COS can be continued by providing this NextContinuationToken.
      */
     private String nextContinuationToken;
 
@@ -81,7 +81,7 @@ public class ListBucketInventoryConfigurationsResult implements Serializable {
      * @return The value <code>true</code> if the inventory configuration listing is <b>not complete</b>.
      *         Returns the value <code>false</code> if otherwise.
      *         When returning <code>true</code>,
-     *         additional calls to Amazon S3 may be needed in order to
+     *         additional calls to COS may be needed in order to
      *         obtain more results.
      */
     public boolean isTruncated() {
@@ -91,7 +91,7 @@ public class ListBucketInventoryConfigurationsResult implements Serializable {
     /**
      * For internal use only. Sets the truncated property for
      * this inventory configuration listing, indicating if this is a complete listing or not and
-     * whether the caller needs to make additional calls to S3 to get more results.
+     * whether the caller needs to make additional calls to COS to get more results.
      *
      * @param isTruncated
      *            The value <code>true</code> if the inventory configuration listing is <b>not complete</b>.
@@ -104,7 +104,7 @@ public class ListBucketInventoryConfigurationsResult implements Serializable {
     /**
      * For internal use only. Sets the truncated property for
      * this inventory configuration listing, indicating if this is a complete listing or not and
-     * whether the caller needs to make additional calls to S3 to get more results.
+     * whether the caller needs to make additional calls to COS to get more results.
      *
      * @param isTruncated
      *            The value <code>true</code> if the inventory configuration listing is <b>not complete</b>.
@@ -161,7 +161,7 @@ public class ListBucketInventoryConfigurationsResult implements Serializable {
      * Gets the optional NextContinuationToken.
      * NextContinuationToken is sent when isTruncated is true meaning there are
      * more keys in the bucket that can be listed. The next list requests to Amazon
-     * S3 can be continued by providing this NextContinuationToken.
+     * COS can be continued by providing this NextContinuationToken.
      *
      * @return The optional NextContinuationToken parameter.
      */
@@ -173,7 +173,7 @@ public class ListBucketInventoryConfigurationsResult implements Serializable {
      * Sets the optional NextContinuationToken.
      * NextContinuationToken is sent when isTruncated is true meaning there are
      * more keys in the bucket that can be listed. The next list requests to Amazon
-     * S3 can be continued by providing this NextContinuationToken.
+     * COS can be continued by providing this NextContinuationToken.
      *
      * @param nextContinuationToken
      *              The optional NextContinuationToken parameter to associate with this request.
@@ -187,7 +187,7 @@ public class ListBucketInventoryConfigurationsResult implements Serializable {
      * Sets the optional NextContinuationToken.
      * NextContinuationToken is sent when isTruncated is true meaning there are
      * more keys in the bucket that can be listed. The next list requests to Amazon
-     * S3 can be continued by providing this NextContinuationToken.
+     * COS can be continued by providing this NextContinuationToken.
      *
      * @param nextContinuationToken
      *              The optional NextContinuationToken parameter to associate with this request.
