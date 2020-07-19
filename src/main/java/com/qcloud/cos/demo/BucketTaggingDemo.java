@@ -5,7 +5,6 @@ import com.qcloud.cos.ClientConfig;
 import com.qcloud.cos.auth.BasicCOSCredentials;
 import com.qcloud.cos.auth.COSCredentials;
 import com.qcloud.cos.model.*;
-import com.qcloud.cos.model.Tag.Tag;
 import com.qcloud.cos.region.Region;
 
 import java.util.LinkedList;

@@ -24,7 +24,7 @@ import com.qcloud.cos.model.lifecycle.LifecyclePredicateVisitor;
 /**
  * A {@link LifecycleFilterPredicate} class to represent the {@link Tag} object
  * that must exist in the object's tag set in order for the
- * {@link com.qcloud.cos.modle.BucketLifecycleConfiguration.Rule} to apply.
+ * {@link com.qcloud.cos.model.BucketLifecycleConfiguration.Rule} to apply.
  */
 public final class LifecycleTagPredicate extends LifecycleFilterPredicate {
 

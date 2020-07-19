@@ -121,6 +121,13 @@ import com.qcloud.cos.model.AppendObjectRequest;
 import com.qcloud.cos.model.AppendObjectResult;
 import com.qcloud.cos.model.SelectObjectContentResult;
 import com.qcloud.cos.model.SelectObjectContentRequest;
+import com.qcloud.cos.model.GetObjectTaggingRequest;
+import com.qcloud.cos.model.GetObjectTaggingResult;
+import com.qcloud.cos.model.SetObjectTaggingRequest;
+import com.qcloud.cos.model.SetObjectTaggingResult;
+import com.qcloud.cos.model.DeleteObjectTaggingRequest;
+import com.qcloud.cos.model.DeleteObjectTaggingResult;
+
 
 public interface COS extends COSDirectSpi {
 
@@ -2852,6 +2859,38 @@ public interface COS extends COSDirectSpi {
      */
     SelectObjectContentResult selectObjectContent(SelectObjectContentRequest selectRequest)
             throws CosClientException, CosServiceException;
+
+    /**
+     * Returns the tags for the specified object.
+     *
+     * @param getObjectTaggingRequest
+     *            The request object containing all the options on how to
+     *            retrieve the COS object tags.
+     * @return The tags for the specified object.
+     */
+    public GetObjectTaggingResult getObjectTagging(GetObjectTaggingRequest getObjectTaggingRequest);
+
+    /**
+     * Set the tags for the specified object.
+     *
+     * @param setObjectTaggingRequest
+     *            The request object containing all the options for setting the
+     *            tags for the specified object.
+     */
+    public SetObjectTaggingResult setObjectTagging(SetObjectTaggingRequest setObjectTaggingRequest);
+
+    /**
+     * Remove the tags for the specified object.
+     *
+     * @param deleteObjectTaggingRequest
+     *            The request object containing all the options for deleting
+     *            the tags for the specified object.
+     *
+     * @return a {@link DeleteObjectTaggingResult} object containing the
+     * information returned by COS for the the tag deletion.
+     */
+    public DeleteObjectTaggingResult deleteObjectTagging(DeleteObjectTaggingRequest deleteObjectTaggingRequest);
+
 }
 
 

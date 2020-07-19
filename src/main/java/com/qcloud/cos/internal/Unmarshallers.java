@@ -42,6 +42,9 @@ import com.qcloud.cos.model.GetBucketInventoryConfigurationResult;
 import com.qcloud.cos.model.SetBucketInventoryConfigurationResult;
 import com.qcloud.cos.model.ListBucketInventoryConfigurationsResult;
 import com.qcloud.cos.model.BucketTaggingConfiguration;
+import com.qcloud.cos.model.GetObjectTaggingResult;
+import com.qcloud.cos.model.SetObjectTaggingResult;
+import com.qcloud.cos.model.DeleteObjectTaggingResult;
 
 /*** Collection of unmarshallers for COS XML responses. */
 
@@ -353,6 +356,29 @@ public class Unmarshallers {
 
         public SetBucketInventoryConfigurationResult unmarshall(InputStream in) throws Exception {
             return new SetBucketInventoryConfigurationResult();
+        }
+    }
+    public static final class GetObjectTaggingResponseUnmarshaller implements Unmarshaller<GetObjectTaggingResult, InputStream> {
+
+        @Override
+        public GetObjectTaggingResult unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser().parseObjectTaggingResponse(in).getResult();
+        }
+    }
+
+    public static final class SetObjectTaggingResponseUnmarshaller implements Unmarshaller<SetObjectTaggingResult, InputStream> {
+
+        @Override
+        public SetObjectTaggingResult unmarshall(InputStream in) throws Exception {
+            return new SetObjectTaggingResult();
+        }
+    }
+
+    public static final class DeleteObjectTaggingResponseUnmarshaller implements Unmarshaller<DeleteObjectTaggingResult, InputStream> {
+
+        @Override
+        public DeleteObjectTaggingResult unmarshall(InputStream in) throws Exception {
+            return new DeleteObjectTaggingResult();
         }
     }
 }
