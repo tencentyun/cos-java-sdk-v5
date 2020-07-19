@@ -206,6 +206,16 @@ import com.qcloud.cos.model.SelectObjectContentRequest;
 import com.qcloud.cos.model.SelectObjectContentResult;
 import com.qcloud.cos.internal.SdkFilterInputStream;
 import com.qcloud.cos.model.SelectObjectContentEventStream;
+import com.qcloud.cos.model.GetObjectTaggingRequest;
+import com.qcloud.cos.model.GetObjectTaggingResult;
+import com.qcloud.cos.model.SetObjectTaggingRequest;
+import com.qcloud.cos.model.SetObjectTaggingResult;
+import com.qcloud.cos.model.DeleteObjectTaggingRequest;
+import com.qcloud.cos.model.DeleteObjectTaggingResult;
+import com.qcloud.cos.internal.GetObjectTaggingResponseHeaderHandler;
+import com.qcloud.cos.internal.SetObjectTaggingResponseHeaderHandler;
+import com.qcloud.cos.internal.DeleteObjectTaggingHeaderHandler;
+import com.qcloud.cos.model.transform.ObjectTaggingXmlFactory;
 
 public class COSClient implements COS {
 
@@ -3355,5 +3365,75 @@ public class COSClient implements COS {
 
         return new SelectObjectContentResult().withPayload(new SelectObjectContentEventStream(resultStream));
     }
+
+    @Override
+    public GetObjectTaggingResult getObjectTagging(GetObjectTaggingRequest getObjectTaggingRequest) {
+        rejectNull(getObjectTaggingRequest,
+                "The request parameter must be specified when getting the object tags");
+        rejectNull(getObjectTaggingRequest.getBucketName(),
+                "The request bucketName must be specified when getting the object tags");
+        rejectNull(getObjectTaggingRequest.getKey(),
+                "The request key must be specified when getting the object tags");
+
+        CosHttpRequest<GetObjectTaggingRequest> request = createRequest(getObjectTaggingRequest.getBucketName(),
+                getObjectTaggingRequest.getKey(), getObjectTaggingRequest, HttpMethodName.GET);
+        request.addParameter("tagging", null);
+        addParameterIfNotNull(request, "versionId", getObjectTaggingRequest.getVersionId());
+
+        ResponseHeaderHandlerChain<GetObjectTaggingResult> handlerChain = new ResponseHeaderHandlerChain<GetObjectTaggingResult>(
+                new Unmarshallers.GetObjectTaggingResponseUnmarshaller(),
+                new GetObjectTaggingResponseHeaderHandler()
+        );
+
+        return invoke(request, handlerChain);
+    }
+
+    @Override
+    public SetObjectTaggingResult setObjectTagging(SetObjectTaggingRequest setObjectTaggingRequest) {
+        rejectNull(setObjectTaggingRequest,
+                "The request parameter must be specified setting the object tags");
+        rejectNull(setObjectTaggingRequest.getBucketName(),
+                "The request bucketName must be specified setting the object tags");
+        rejectNull(setObjectTaggingRequest.getKey(),
+                "The request key must be specified setting the object tags");
+        rejectNull(setObjectTaggingRequest.getTagging(),
+                "The request tagging must be specified setting the object tags");
+
+        CosHttpRequest<SetObjectTaggingRequest> request = createRequest(setObjectTaggingRequest.getBucketName(),
+                setObjectTaggingRequest.getKey(), setObjectTaggingRequest, HttpMethodName.PUT);
+        request.addParameter("tagging", null);
+        addParameterIfNotNull(request, "versionId", setObjectTaggingRequest.getVersionId());
+        byte[] content = new ObjectTaggingXmlFactory().convertToXmlByteArray(setObjectTaggingRequest.getTagging());
+        setContent(request, content, "application/xml", true);
+
+        ResponseHeaderHandlerChain<SetObjectTaggingResult> handlerChain = new ResponseHeaderHandlerChain<SetObjectTaggingResult>(
+                new Unmarshallers.SetObjectTaggingResponseUnmarshaller(),
+                new SetObjectTaggingResponseHeaderHandler()
+        );
+
+        return invoke(request, handlerChain);
+    }
+
+    @Override
+    public DeleteObjectTaggingResult deleteObjectTagging(DeleteObjectTaggingRequest deleteObjectTaggingRequest) {
+        rejectNull(deleteObjectTaggingRequest, "The request parameter must be specified when delete the object tags");
+        rejectNull(deleteObjectTaggingRequest.getBucketName(),
+                "The request bucketName must be specified setting the object tags");
+        rejectNull(deleteObjectTaggingRequest.getKey(),
+                "The request key must be specified setting the object tags");
+
+        CosHttpRequest<DeleteObjectTaggingRequest> request = createRequest(deleteObjectTaggingRequest.getBucketName(),
+                deleteObjectTaggingRequest.getKey(), deleteObjectTaggingRequest, HttpMethodName.DELETE);
+        request.addParameter("tagging", null);
+        addParameterIfNotNull(request, "versionId", deleteObjectTaggingRequest.getVersionId());
+
+        ResponseHeaderHandlerChain<DeleteObjectTaggingResult> handlerChain = new ResponseHeaderHandlerChain<DeleteObjectTaggingResult>(
+                new Unmarshallers.DeleteObjectTaggingResponseUnmarshaller(),
+                new DeleteObjectTaggingHeaderHandler()
+        );
+
+        return invoke(request, handlerChain);
+    }
+
 }
 

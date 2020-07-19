@@ -100,6 +100,7 @@ import com.qcloud.cos.model.inventory.InventoryPrefixPredicate;
 import com.qcloud.cos.model.inventory.InventorySchedule;
 import com.qcloud.cos.model.TagSet;
 import com.qcloud.cos.model.BucketTaggingConfiguration;
+import com.qcloud.cos.model.GetObjectTaggingResult;
 
 /**
  * XML Sax parser to read XML documents returned by COS via the REST interface, converting these
@@ -511,6 +512,13 @@ public class XmlResponsesSaxParser {
         parseXmlInputStream(handler, inputStream);
         return handler;
     }
+
+    public GetObjectTaggingHandler parseObjectTaggingResponse(InputStream inputStream) throws IOException {
+        GetObjectTaggingHandler handler = new GetObjectTaggingHandler();
+        parseXmlInputStream(handler, inputStream);
+        return handler;
+    }
+
     /**
      * @param inputStream
      *
@@ -2715,9 +2723,71 @@ public class XmlResponsesSaxParser {
                 }
             }
         }
-
     }
 
+    /**
+     * Handler for unmarshalling the response from GET Object Tagging.
+     *
+     * <Tagging>
+     *     <TagSet>
+     *         <Tag>
+     *             <Key>Foo</Key>
+     *             <Value>1</Value>
+     *         </Tag>
+     *         <Tag>
+     *             <Key>Bar</Key>
+     *             <Value>2</Value>
+     *         </Tag>
+     *         <Tag>
+     *             <Key>Baz</Key>
+     *             <Value>3</Value>
+     *         </Tag>
+     *     </TagSet>
+     * </Tagging>
+     */
+    public static class GetObjectTaggingHandler extends AbstractHandler {
+        private GetObjectTaggingResult getObjectTaggingResult;
+        private List<Tag> tagSet;
+        private String currentTagValue;
+        private String currentTagKey;
+
+        public GetObjectTaggingResult getResult() {
+            return getObjectTaggingResult;
+        }
+
+
+        @Override
+        protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
+            if (in("Tagging")) {
+                if (name.equals("TagSet")) {
+                    tagSet = new ArrayList<Tag>();
+                }
+            }
+        }
+
+        @Override
+        protected void doEndElement(String uri, String name, String qName) {
+            if (in("Tagging")) {
+                if (name.equals("TagSet")) {
+                    getObjectTaggingResult = new GetObjectTaggingResult(tagSet);
+                    tagSet = null;
+                }
+            }
+            if (in("Tagging", "TagSet")) {
+                if (name.equals("Tag")) {
+                    tagSet.add(new Tag(currentTagKey, currentTagValue));
+                    currentTagKey = null;
+                    currentTagValue = null;
+                }
+            } else if (in("Tagging", "TagSet", "Tag")) {
+                if (name.equals("Key")) {
+                    currentTagKey = getText();
+                } else if (name.equals("Value")) {
+                    currentTagValue = getText();
+                }
+            }
+        }
+    }
 
 }
 
