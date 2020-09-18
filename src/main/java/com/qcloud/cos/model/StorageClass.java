@@ -48,7 +48,17 @@ public enum StorageClass {
      * Archive
      */
     Archive("Archive"),
-   
+
+    /**
+     * Deep_Archive
+     */
+    Deep_Archive("Deep_Archive"),
+
+    /**
+     * Intelligent_Tiering
+     */
+    Intelligent_Tiering("Intelligent_Tiering"),
+
     /**
      *Maz_Standard
      */
@@ -57,7 +67,22 @@ public enum StorageClass {
     /**
      *Maz_Standard_IA
      */
-     Maz_Standard_IA("Maz_Standard_IA");
+     Maz_Standard_IA("Maz_Standard_IA"),
+
+    /**
+     * Maz_Archive
+     */
+    Maz_Archive("Maz_Archive"),
+
+    /**
+     * Maz_Deep_Archive
+     */
+    Maz_Deep_Archive("Maz_Deep_Archive"),
+
+    /**
+     * Maz_Intelligent_Tiering
+     */
+    Maz_Intelligent_Tiering("Maz_Intelligent_Tiering");
 
     /**
      * Returns the Qcloud COS {@link StorageClass} enumeration value representing the
@@ -73,7 +98,7 @@ public enum StorageClass {
      */
     public static StorageClass fromValue(String cosStorageClassString) throws IllegalArgumentException {
         for (StorageClass storageClass : StorageClass.values()) {
-            if (storageClass.toString().equals(cosStorageClassString)) return storageClass;
+            if (storageClass.toString().compareToIgnoreCase(cosStorageClassString) == 0) return storageClass;
         }
 
         throw new IllegalArgumentException(
