@@ -765,6 +765,18 @@ public class ObjectMetadata implements ServerSideEncryptionResult, ObjectExpirat
     }
 
     /**
+     * @return The storage class of the object. Returns type is enum and return null if the object is in STANDARD storage.
+     */
+    public StorageClass getStorageClassEnum() {
+        String storageClassStr = getStorageClass();
+        StorageClass storageClass = null;
+        if(storageClassStr != null) {
+            storageClass = StorageClass.fromValue(storageClassStr);
+        }
+        return storageClass;
+    }
+
+    /**
      * Returns the Key Management System key id used for Server Side Encryption of the COS
      * object.
      */
