@@ -37,6 +37,7 @@ public class RetryUtils {
         RETRYABLE_CLIENT_ERROR_CODES.add(ClientExceptionConstants.HOST_CONNECT);
         RETRYABLE_CLIENT_ERROR_CODES.add(ClientExceptionConstants.UNKNOWN_HOST);
         RETRYABLE_CLIENT_ERROR_CODES.add(ClientExceptionConstants.SOCKET_TIMEOUT);
+        RETRYABLE_CLIENT_ERROR_CODES.add(ClientExceptionConstants.CLIENT_PROTOCAL_EXCEPTION);
     }
 
     /**

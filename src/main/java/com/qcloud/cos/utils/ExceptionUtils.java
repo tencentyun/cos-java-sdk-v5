@@ -19,6 +19,7 @@ package com.qcloud.cos.utils;
 
 import com.qcloud.cos.exception.ClientExceptionConstants;
 import com.qcloud.cos.exception.CosClientException;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.conn.HttpHostConnectException;
 import java.io.IOException;
@@ -39,6 +40,8 @@ public class ExceptionUtils {
             errorCode = ClientExceptionConstants.HOST_CONNECT;
         } else if (ex instanceof SocketTimeoutException) {
             errorCode = ClientExceptionConstants.SOCKET_TIMEOUT;
+        } else if(ex instanceof ClientProtocolException) {
+            errorCode = ClientExceptionConstants.CLIENT_PROTOCAL_EXCEPTION;
         }
 
         return new CosClientException(ex.getMessage(), errorCode, ex);
