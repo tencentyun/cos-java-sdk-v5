@@ -18,33 +18,27 @@
 
 package com.qcloud.cos.internal;
 
-import java.io.InputStream;
-import java.util.List;
-
 import com.qcloud.cos.internal.XmlResponsesSaxParser.CompleteMultipartUploadHandler;
 import com.qcloud.cos.internal.XmlResponsesSaxParser.CopyObjectResultHandler;
-import com.qcloud.cos.model.AccessControlList;
-import com.qcloud.cos.model.Bucket;
-import com.qcloud.cos.model.BucketCrossOriginConfiguration;
-import com.qcloud.cos.model.BucketLifecycleConfiguration;
-import com.qcloud.cos.model.BucketReplicationConfiguration;
-import com.qcloud.cos.model.BucketVersioningConfiguration;
-import com.qcloud.cos.model.InitiateMultipartUploadResult;
-import com.qcloud.cos.model.MultipartUploadListing;
-import com.qcloud.cos.model.ObjectListing;
-import com.qcloud.cos.model.PartListing;
-import com.qcloud.cos.model.VersionListing;
-import com.qcloud.cos.model.BucketWebsiteConfiguration;
-import com.qcloud.cos.model.BucketDomainConfiguration;
-import com.qcloud.cos.model.BucketLoggingConfiguration;
-import com.qcloud.cos.model.DeleteBucketInventoryConfigurationResult;
-import com.qcloud.cos.model.GetBucketInventoryConfigurationResult;
-import com.qcloud.cos.model.SetBucketInventoryConfigurationResult;
-import com.qcloud.cos.model.ListBucketInventoryConfigurationsResult;
-import com.qcloud.cos.model.BucketTaggingConfiguration;
-import com.qcloud.cos.model.GetObjectTaggingResult;
-import com.qcloud.cos.model.SetObjectTaggingResult;
-import com.qcloud.cos.model.DeleteObjectTaggingResult;
+import com.qcloud.cos.model.*;
+import com.qcloud.cos.model.ciModel.bucket.MediaBucketResponse;
+import com.qcloud.cos.model.ciModel.job.MediaJobResponse;
+import com.qcloud.cos.model.ciModel.job.MediaListJobResponse;
+import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoResponse;
+import com.qcloud.cos.model.ciModel.queue.MediaListQueueResponse;
+import com.qcloud.cos.model.ciModel.queue.MediaQueueResponse;
+import com.qcloud.cos.model.ciModel.snapshot.SnapshotResponse;
+import com.qcloud.cos.model.ciModel.template.MediaListTemplateResponse;
+import com.qcloud.cos.model.ciModel.template.MediaTemplateObject;
+import com.qcloud.cos.model.ciModel.template.MediaTemplateResponse;
+import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowExecutionResponse;
+import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowExecutionsResponse;
+import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowListResponse;
+import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowResponse;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
 
 /*** Collection of unmarshallers for COS XML responses. */
 
@@ -379,6 +373,135 @@ public class Unmarshallers {
         @Override
         public DeleteObjectTaggingResult unmarshall(InputStream in) throws Exception {
             return new DeleteObjectTaggingResult();
+        }
+    }
+
+    public static final class ListQueueUnmarshaller
+            implements Unmarshaller<MediaListQueueResponse, InputStream> {
+
+        public MediaListQueueResponse unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser()
+                    .parseListQueueResponse(in).getResponse();
+        }
+    }
+
+    public static final class QueueUnmarshaller
+            implements Unmarshaller<MediaQueueResponse, InputStream> {
+
+        public MediaQueueResponse unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser()
+                    .parseUpdateMediaQueueResponse(in).getResponse();
+        }
+    }
+
+    public static final class TemplateUnmarshaller
+            implements Unmarshaller<MediaTemplateResponse, InputStream> {
+
+        public MediaTemplateResponse unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser()
+                    .parseMediaTemplateResponse(in).getResponse();
+        }
+    }
+
+
+    public static final class SnapshotUnmarshaller
+            implements Unmarshaller<SnapshotResponse, InputStream> {
+
+        public SnapshotResponse unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser()
+                    .parseSnapshotResponse(in).getResponse();
+        }
+    }
+
+
+    public static final class MediaInfoUnmarshaller
+            implements Unmarshaller<MediaInfoResponse, InputStream> {
+
+        public MediaInfoResponse unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser()
+                    .parseGenerateMediainfoResponse(in).getResponse();
+        }
+    }
+
+    public static final class WorkflowExecutionsUnmarshaller
+            implements Unmarshaller<MediaWorkflowExecutionsResponse, InputStream> {
+
+        public MediaWorkflowExecutionsResponse unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser()
+                    .parseMediaWorkflowExecutionsResponse(in).getResponse();
+        }
+    }
+
+    public static final class WorkflowListUnmarshaller
+            implements Unmarshaller<MediaWorkflowListResponse, InputStream> {
+
+        public MediaWorkflowListResponse unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser().parseWorkflowListResponse(in).getResponse();
+        }
+    }
+
+
+    public static final class WorkflowExecutionUnmarshaller
+            implements Unmarshaller<MediaWorkflowExecutionResponse, InputStream> {
+
+        public MediaWorkflowExecutionResponse unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser().parseWorkflowExecutionResponse(in).getResponse();
+        }
+    }
+
+
+    public static final class ListTemplateUnmarshaller
+            implements Unmarshaller<MediaListTemplateResponse, InputStream> {
+
+        public MediaListTemplateResponse unmarshall(InputStream in) throws IOException {
+            return new XmlResponsesSaxParser().parseDescribeMediaTemplatesResponse(in).getResponse();
+        }
+    }
+
+    public static final class ListJobUnmarshaller
+            implements Unmarshaller<MediaListJobResponse, InputStream> {
+
+        public MediaListJobResponse unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser()
+                    .parseMediaJobsRespones(in).getResponse();
+        }
+    }
+
+
+    public static final class JobUnmarshaller
+            implements Unmarshaller<MediaJobResponse, InputStream> {
+
+        public MediaJobResponse unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser()
+                    .parseMediaJobRespones(in).getResponse();
+        }
+    }
+
+
+    public static final class JobCreatUnmarshaller
+            implements Unmarshaller<MediaJobResponse, InputStream> {
+
+        public MediaJobResponse unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser()
+                    .parseJobCreatResponse(in).getResponse();
+        }
+    }
+
+
+    public static final class ListBucketUnmarshaller
+            implements Unmarshaller<MediaBucketResponse, InputStream> {
+
+        public MediaBucketResponse unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser()
+                    .parseListBucketResponse(in).getResponse();
+        }
+    }
+
+    public static final class WorkflowUnmarshaller
+            implements Unmarshaller<MediaWorkflowResponse, InputStream> {
+
+        public MediaWorkflowResponse unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser().parseWorkflowResponse(in).getResponse();
         }
     }
 }

@@ -19,6 +19,34 @@
 package com.qcloud.cos.http;
 
 
+import com.qcloud.cos.ClientConfig;
+import com.qcloud.cos.Headers;
+import com.qcloud.cos.event.ProgressInputStream;
+import com.qcloud.cos.event.ProgressListener;
+import com.qcloud.cos.exception.CosClientException;
+import com.qcloud.cos.exception.CosServiceException;
+import com.qcloud.cos.exception.CosServiceException.ErrorType;
+import com.qcloud.cos.internal.*;
+import com.qcloud.cos.retry.BackoffStrategy;
+import com.qcloud.cos.retry.RetryPolicy;
+import com.qcloud.cos.utils.CodecUtils;
+import com.qcloud.cos.utils.ExceptionUtils;
+import com.qcloud.cos.utils.UrlEncoderUtils;
+import com.qcloud.cos.utils.ValidationUtils;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.http.*;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.*;
+import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.entity.InputStreamEntity;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.protocol.HttpContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -29,50 +57,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import com.qcloud.cos.retry.BackoffStrategy;
-import com.qcloud.cos.retry.RetryPolicy;
-import com.qcloud.cos.utils.ExceptionUtils;
-import com.qcloud.cos.utils.ValidationUtils;
-import org.apache.http.Header;
-import org.apache.http.HttpHost;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.StatusLine;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpHead;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.entity.InputStreamEntity;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.protocol.HttpContext;
-import org.apache.commons.codec.binary.Base64;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.qcloud.cos.ClientConfig;
-import com.qcloud.cos.Headers;
-import com.qcloud.cos.event.ProgressInputStream;
-import com.qcloud.cos.event.ProgressListener;
-import com.qcloud.cos.exception.CosClientException;
-import com.qcloud.cos.exception.CosServiceException;
-import com.qcloud.cos.exception.CosServiceException.ErrorType;
-import com.qcloud.cos.internal.CosErrorResponseHandler;
-import com.qcloud.cos.internal.CosServiceRequest;
-import com.qcloud.cos.internal.CosServiceResponse;
-import com.qcloud.cos.internal.ReleasableInputStream;
-import com.qcloud.cos.internal.ResettableInputStream;
-import com.qcloud.cos.internal.SdkBufferedInputStream;
-import com.qcloud.cos.utils.UrlEncoderUtils;
-import com.qcloud.cos.utils.CodecUtils;
 
 
 public class DefaultCosHttpClient implements CosHttpClient {
@@ -137,7 +121,6 @@ public class DefaultCosHttpClient implements CosHttpClient {
                 .append(request.getEndpoint());
         String encodedPath = UrlEncoderUtils.encodeUrlPath(request.getResourcePath());
         urlBuffer.append(encodedPath);
-
         StringBuffer paramBuffer = new StringBuffer();
         boolean seeOne = false;
         Map<String, String> requestParams = new HashMap<>();

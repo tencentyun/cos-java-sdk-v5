@@ -11,7 +11,7 @@
  * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
  * express or implied. See the License for the specific language governing
  * permissions and limitations under the License.
- 
+
  * According to cos feature, we modify some class，comment, field name, etc.
  */
 
@@ -171,7 +171,7 @@ public class StringUtils {
         }
         return value.isEmpty();
     }
-    
+
     /**
      * Removes any surrounding quotes from the specified string and returns a
      * new string.
@@ -191,7 +191,7 @@ public class StringUtils {
 
         return s;
     }
-    
+
     /**
      * Returns a new string created by joining each of the strings in the
      * specified list together, with a comma between them.
@@ -214,5 +214,17 @@ public class StringUtils {
         }
 
         return result.toString();
+    }
+
+    /**
+     * check url belong to CI workflow interface
+     * @param resourcePath
+     * @return true isCIWorkflowUrl
+     */
+    public static boolean isCIWorkflowUrl(String resourcePath) {
+        if (resourcePath == null || "".equals(resourcePath)) {
+            return false;
+        }
+        return resourcePath.contains("/workflow");
     }
 }

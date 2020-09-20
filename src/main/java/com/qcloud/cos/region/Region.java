@@ -75,4 +75,17 @@ public class Region implements Serializable {
             }
         }
     }
+
+    public static String formatCIRegion(Region region) throws CosClientException {
+        return formatCIRegion(region.getRegionName());
+    }
+
+    public static String formatCIRegion(String regionName) throws CosClientException {
+        UrlComponentUtils.validateRegionName(regionName);
+        if (regionName.startsWith("ap-")) {
+            return regionName;
+        } else {
+            return "ap-" + regionName;
+        }
+    }
 }

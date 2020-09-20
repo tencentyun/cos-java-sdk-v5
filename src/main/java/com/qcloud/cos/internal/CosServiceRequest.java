@@ -35,6 +35,7 @@ public class CosServiceRequest implements Cloneable, ReadLimitInfo  {
     /**
      * The optional progress listener for receiving updates about the progress of the request.
      */
+
     private ProgressListener progressListener = ProgressListener.NOOP;
     /**
      * The mannually set cos server ip and port, format is ip:port
@@ -50,7 +51,7 @@ public class CosServiceRequest implements Cloneable, ReadLimitInfo  {
      * Custom query parameters for the request.
      */
     private Map<String, List<String>> customQueryParameters;
-    
+
     private final RequestClientOptions requestClientOptions = new RequestClientOptions();
     
     /**

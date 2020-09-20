@@ -11,7 +11,7 @@
  * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
  * express or implied. See the License for the specific language governing
  * permissions and limitations under the License.
- 
+
  * According to cos feature, we modify some class，comment, field name, etc.
  */
 
@@ -21,10 +21,7 @@ package com.qcloud.cos;
 import static com.qcloud.cos.internal.LengthCheckInputStream.EXCLUDE_SKIPPED_BYTES;
 import static com.qcloud.cos.internal.LengthCheckInputStream.INCLUDE_SKIPPED_BYTES;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.MessageDigest;
@@ -39,6 +36,26 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
+import com.qcloud.cos.endpoint.CIRegionEndpointBuilder;
+import com.qcloud.cos.http.*;
+import com.qcloud.cos.internal.*;
+import com.qcloud.cos.model.ciModel.bucket.MediaBucketRequest;
+import com.qcloud.cos.model.ciModel.bucket.MediaBucketResponse;
+import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
+import com.qcloud.cos.model.ciModel.job.MediaJobResponse;
+import com.qcloud.cos.model.ciModel.job.MediaJobsRequest;
+import com.qcloud.cos.model.ciModel.job.MediaListJobResponse;
+import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoRequest;
+import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoResponse;
+import com.qcloud.cos.model.ciModel.queue.MediaListQueueResponse;
+import com.qcloud.cos.model.ciModel.queue.MediaQueueRequest;
+import com.qcloud.cos.model.ciModel.queue.MediaQueueResponse;
+import com.qcloud.cos.model.ciModel.snapshot.SnapshotRequest;
+import com.qcloud.cos.model.ciModel.snapshot.SnapshotResponse;
+import com.qcloud.cos.model.ciModel.template.MediaListTemplateResponse;
+import com.qcloud.cos.model.ciModel.template.MediaTemplateRequest;
+import com.qcloud.cos.model.ciModel.template.MediaTemplateResponse;
+import com.qcloud.cos.model.ciModel.workflow.*;
 import org.apache.commons.codec.DecoderException;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.ContentType;
@@ -56,39 +73,6 @@ import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.exception.CosServiceException.ErrorType;
 import com.qcloud.cos.exception.MultiObjectDeleteException;
 import com.qcloud.cos.exception.Throwables;
-import com.qcloud.cos.http.CosHttpClient;
-import com.qcloud.cos.http.CosHttpRequest;
-import com.qcloud.cos.http.DefaultCosHttpClient;
-import com.qcloud.cos.http.HttpMethodName;
-import com.qcloud.cos.http.HttpResponseHandler;
-import com.qcloud.cos.internal.BucketNameUtils;
-import com.qcloud.cos.internal.COSObjectResponseHandler;
-import com.qcloud.cos.internal.COSStringResponseHandler;
-import com.qcloud.cos.internal.COSVersionHeaderHandler;
-import com.qcloud.cos.internal.COSXmlResponseHandler;
-import com.qcloud.cos.internal.Constants;
-import com.qcloud.cos.internal.CosMetadataResponseHandler;
-import com.qcloud.cos.internal.CosServiceRequest;
-import com.qcloud.cos.internal.CosServiceResponse;
-import com.qcloud.cos.internal.DeleteObjectsResponse;
-import com.qcloud.cos.internal.DigestValidationInputStream;
-import com.qcloud.cos.internal.InputSubstream;
-import com.qcloud.cos.internal.LengthCheckInputStream;
-import com.qcloud.cos.internal.MD5DigestCalculatingInputStream;
-import com.qcloud.cos.internal.MultiObjectDeleteXmlFactory;
-import com.qcloud.cos.internal.ObjectExpirationHeaderHandler;
-import com.qcloud.cos.internal.COSDefaultAclHeaderHandler;
-import com.qcloud.cos.internal.ReleasableInputStream;
-import com.qcloud.cos.internal.RequestXmlFactory;
-import com.qcloud.cos.internal.ResettableInputStream;
-import com.qcloud.cos.internal.ResponseHeaderHandlerChain;
-import com.qcloud.cos.internal.ServerSideEncryptionHeaderHandler;
-import com.qcloud.cos.internal.ServiceClientHolderInputStream;
-import com.qcloud.cos.internal.SkipMd5CheckStrategy;
-import com.qcloud.cos.internal.Unmarshaller;
-import com.qcloud.cos.internal.Unmarshallers;
-import com.qcloud.cos.internal.VIDResultHandler;
-import com.qcloud.cos.internal.VoidCosResponseHandler;
 import com.qcloud.cos.internal.XmlResponsesSaxParser.CompleteMultipartUploadHandler;
 import com.qcloud.cos.internal.XmlResponsesSaxParser.CopyObjectResultHandler;
 import com.qcloud.cos.model.AbortMultipartUploadRequest;
@@ -204,7 +188,6 @@ import com.qcloud.cos.model.AppendObjectResult;
 import com.qcloud.cos.model.UploadMode;
 import com.qcloud.cos.model.SelectObjectContentRequest;
 import com.qcloud.cos.model.SelectObjectContentResult;
-import com.qcloud.cos.internal.SdkFilterInputStream;
 import com.qcloud.cos.model.SelectObjectContentEventStream;
 import com.qcloud.cos.model.GetObjectTaggingRequest;
 import com.qcloud.cos.model.GetObjectTaggingResult;
@@ -212,9 +195,6 @@ import com.qcloud.cos.model.SetObjectTaggingRequest;
 import com.qcloud.cos.model.SetObjectTaggingResult;
 import com.qcloud.cos.model.DeleteObjectTaggingRequest;
 import com.qcloud.cos.model.DeleteObjectTaggingResult;
-import com.qcloud.cos.internal.GetObjectTaggingResponseHeaderHandler;
-import com.qcloud.cos.internal.SetObjectTaggingResponseHeaderHandler;
-import com.qcloud.cos.internal.DeleteObjectTaggingHeaderHandler;
 import com.qcloud.cos.model.transform.ObjectTaggingXmlFactory;
 
 public class COSClient implements COS {
@@ -229,7 +209,7 @@ public class COSClient implements COS {
     protected ClientConfig clientConfig;
 
     private CosHttpClient cosHttpClient;
-    
+
     public COSClient(COSCredentials cred, ClientConfig clientConfig) {
         this(new COSStaticCredentialsProvider(cred), clientConfig);
     }
@@ -240,11 +220,11 @@ public class COSClient implements COS {
         this.clientConfig = clientConfig;
         this.cosHttpClient = new DefaultCosHttpClient(clientConfig);
     }
-    
+
     public void shutdown() {
         this.cosHttpClient.shutdown();
     }
-    
+
     public void setCOSCredentials(COSCredentials cred) {
         rejectNull(cred, "cred must not be null");
         this.credProvider = new COSStaticCredentialsProvider(cred);
@@ -254,7 +234,7 @@ public class COSClient implements COS {
         rejectNull(credProvider, "credProvider must not be null");
         this.credProvider = credProvider;
     }
-    
+
 
     @Override
     public ClientConfig getClientConfig() {
@@ -291,6 +271,11 @@ public class COSClient implements COS {
     }
 
     private void rejectEmpty(String parameterValue, String errorMessage) {
+        if (parameterValue.isEmpty())
+            throw new IllegalArgumentException(errorMessage);
+    }
+
+    private void rejectEmpty(Map parameterValue, String errorMessage) {
         if (parameterValue.isEmpty())
             throw new IllegalArgumentException(errorMessage);
     }
@@ -542,7 +527,8 @@ public class COSClient implements COS {
     }
 
     private <X extends CosServiceRequest> void buildUrlAndHost(CosHttpRequest<X> request,
-            String bucket, String key, boolean isServiceRequest) throws CosClientException {
+                                                               String bucket, String key, boolean isServiceRequest) throws CosClientException {
+        Boolean isCIRequest = request.getOriginalRequest() instanceof CIServiceRequest;
         key = formatKey(key);
         request.setResourcePath(key);
         String endpoint = "";
@@ -553,7 +539,11 @@ public class COSClient implements COS {
                     clientConfig.getEndpointResolver().resolveGetServiceApiEndpoint(endpoint);
         } else {
             bucket = formatBucket(bucket, fetchCredential().getCOSAppId());
-            endpoint = clientConfig.getEndpointBuilder().buildGeneralApiEndpoint(bucket);
+            if (isCIRequest) {
+                endpoint = new CIRegionEndpointBuilder(clientConfig.getRegion()).buildGeneralApiEndpoint(bucket);
+            } else {
+                endpoint = clientConfig.getEndpointBuilder().buildGeneralApiEndpoint(bucket);
+            }
             endpointAddr = clientConfig.getEndpointResolver().resolveGeneralApiEndpoint(endpoint);
         }
 
@@ -566,9 +556,14 @@ public class COSClient implements COS {
         }
 
         request.addHeader(Headers.HOST, endpoint);
-        request.setProtocol(clientConfig.getHttpProtocol());
+        if (isCIRequest) {
+            //万象请求只支持https
+            request.setProtocol(HttpProtocol.https);
+        } else {
+            request.setProtocol(clientConfig.getHttpProtocol());
+        }
         String fixedEndpointAddr = request.getOriginalRequest().getFixedEndpointAddr();
-        if(fixedEndpointAddr != null) {
+        if (fixedEndpointAddr != null) {
             request.setEndpoint(fixedEndpointAddr);
         } else {
             request.setEndpoint(endpointAddr);
@@ -581,7 +576,6 @@ public class COSClient implements COS {
             Unmarshaller<X, InputStream> unmarshaller)
             throws CosClientException, CosServiceException {
         return invoke(request, new COSXmlResponseHandler<X>(unmarshaller));
-
     }
 
     private <X, Y extends CosServiceRequest> X invoke(CosHttpRequest<Y> request,
@@ -3433,6 +3427,241 @@ public class COSClient implements COS {
         );
 
         return invoke(request, handlerChain);
+    }
+
+    @Override
+    public MediaJobResponse createMediaJobs(MediaJobsRequest req) throws UnsupportedEncodingException {
+        this.checkCIRequestCommon(req);
+        rejectNull(req.getTag(),
+                "The tag parameter must be specified setting the object tags");
+        rejectNull(req.getQueueId(),
+                "The queueId parameter must be specified setting the object tags");
+        rejectNull(req.getInput().getObject(),
+                "The input parameter must be specified setting the object tags");
+        this.checkRequestOutput(req.getOperation().getOutput());
+        CosHttpRequest<MediaJobsRequest> request = createRequest(req.getBucketName(), "/jobs", req, HttpMethodName.POST);
+        this.setContent(request, RequestXmlFactory.convertToXmlByteArray(req), "application/xml", false);
+        return invoke(request, new Unmarshallers.JobCreatUnmarshaller());
+    }
+
+    @Override
+    public Boolean cancelMediaJob(MediaJobsRequest req) {
+        this.checkCIRequestCommon(req);
+        rejectNull(req.getJobId(),
+                "The jobId parameter must be specified setting the object tags");
+        CosHttpRequest<MediaJobsRequest> request = createRequest(req.getBucketName(), "/jobs/" + req.getJobId(), req, HttpMethodName.PUT);
+        invoke(request, voidCosResponseHandler);
+        return true;
+    }
+
+    /**
+     * @param req
+     * @return
+     */
+    @Override
+    public MediaJobResponse describeMediaJob(MediaJobsRequest req) {
+        this.checkCIRequestCommon(req);
+        rejectNull(req.getJobId(),
+                "The jobId parameter must be specified setting the object tags");
+        CosHttpRequest<MediaJobsRequest> request = createRequest(req.getBucketName(), "/jobs/" + req.getJobId(), req, HttpMethodName.GET);
+        return invoke(request, new Unmarshallers.JobUnmarshaller());
+
+    }
+
+    @Override
+    public MediaListJobResponse describeMediaJobs(MediaJobsRequest req) {
+        this.checkCIRequestCommon(req);
+        rejectNull(req.getQueueId(),
+                "The queueId parameter must be specified setting the object tags");
+        rejectNull(req.getTag(),
+                "The tag parameter must be specified setting the object tags");
+        CosHttpRequest<MediaJobsRequest> request = createRequest(req.getBucketName(), "/jobs", req, HttpMethodName.GET);
+        addParameterIfNotNull(request, "queueId", req.getQueueId());
+        addParameterIfNotNull(request, "tag", req.getTag());
+        addParameterIfNotNull(request, "orderByTime", req.getOrderByTime());
+        addParameterIfNotNull(request, "nextToken", req.getNextToken());
+        addParameterIfNotNull(request, "size", req.getSize().toString());
+        addParameterIfNotNull(request, "states", req.getStates());
+        addParameterIfNotNull(request, "startCreationTime", req.getStartCreationTime());
+        addParameterIfNotNull(request, "endCreationTime", req.getEndCreationTime());
+        return invoke(request, new Unmarshallers.ListJobUnmarshaller());
+    }
+
+    @Override
+    public MediaListQueueResponse describeMediaQueues(MediaQueueRequest req) {
+        this.checkCIRequestCommon(req);
+        CosHttpRequest<MediaQueueRequest> request = createRequest(req.getBucketName(), "/queue", req, HttpMethodName.GET);
+        addParameterIfNotNull(request, "queueIds", req.getQueueId());
+        addParameterIfNotNull(request, "state", req.getState());
+        addParameterIfNotNull(request, "pageNumber", req.getPageNumber());
+        addParameterIfNotNull(request, "pageSize", req.getPageSize());
+        return invoke(request, new Unmarshallers.ListQueueUnmarshaller());
+    }
+
+    @Override
+    public MediaQueueResponse updateMediaQueue(MediaQueueRequest mediaQueueRequest) {
+        this.checkCIRequestCommon(mediaQueueRequest);
+        rejectNull(mediaQueueRequest.getQueueId(),
+                "The queueId parameter must be specified setting the object tags");
+        rejectNull(mediaQueueRequest.getName(),
+                "The name parameter must be specified setting the object tags");
+        rejectNull(mediaQueueRequest.getState(),
+                "The state parameter must be specified setting the object tags");
+        CosHttpRequest<MediaQueueRequest> request = createRequest(mediaQueueRequest.getBucketName(), "/queue/" + mediaQueueRequest.getQueueId(), mediaQueueRequest, HttpMethodName.PUT);
+        this.setContent(request, RequestXmlFactory.convertToXmlByteArray(mediaQueueRequest), "application/xml", false);
+        return invoke(request, new Unmarshallers.QueueUnmarshaller());
+    }
+
+    @Override
+    public MediaBucketResponse describeMediaBuckets(MediaBucketRequest mediaBucketRequest) {
+        this.checkCIRequestCommon(mediaBucketRequest);
+        CosHttpRequest<MediaBucketRequest> request = createRequest(mediaBucketRequest.getBucketName(), "/mediabucket", mediaBucketRequest, HttpMethodName.GET);
+        addParameterIfNotNull(request, "regions", mediaBucketRequest.getRegions());
+        addParameterIfNotNull(request, "bucketNames", mediaBucketRequest.getBucketNames());
+        addParameterIfNotNull(request, "bucketName", mediaBucketRequest.getBucketName());
+        addParameterIfNotNull(request, "pageNumber", mediaBucketRequest.getPageNumber());
+        addParameterIfNotNull(request, "pageSize", mediaBucketRequest.getPageSize());
+        return invoke(request, new Unmarshallers.ListBucketUnmarshaller());
+    }
+
+    @Override
+    public MediaTemplateResponse createMediaTemplate(MediaTemplateRequest templateRequest) {
+        rejectNull(templateRequest,
+                "The request parameter must be specified setting the object tags");
+        rejectNull(templateRequest.getTag(),
+                "The tag parameter must be specified setting the object tags");
+        rejectNull(templateRequest.getName(),
+                "The name parameter must be specified setting the object tags");
+        CosHttpRequest<MediaTemplateRequest> request = this.createRequest(templateRequest.getBucketName(), "/template", templateRequest, HttpMethodName.POST);
+        this.setContent(request, RequestXmlFactory.convertToXmlByteArray(templateRequest), "application/xml", false);
+        return this.invoke(request, new Unmarshallers.TemplateUnmarshaller());
+    }
+
+    @Override
+    public Boolean deleteMediaTemplate(MediaTemplateRequest request) {
+        this.checkCIRequestCommon(request);
+        rejectNull(request.getTemplateId(),
+                "The templateId parameter must be specified setting the object tags");
+        CosHttpRequest<MediaTemplateRequest> httpRequest = this.createRequest(request.getBucketName(), "/template/" + request.getTemplateId(), request, HttpMethodName.DELETE);
+        this.invoke(httpRequest, voidCosResponseHandler);
+        return true;
+    }
+
+    @Override
+    public MediaListTemplateResponse describeMediaTemplates(MediaTemplateRequest request) {
+        this.checkCIRequestCommon(request);
+        CosHttpRequest<MediaTemplateRequest> httpRequest = this.createRequest(request.getBucketName(), "/template", request, HttpMethodName.GET);
+        addParameterIfNotNull(httpRequest, "tag", request.getTag());
+        addParameterIfNotNull(httpRequest, "category", request.getCategory());
+        addParameterIfNotNull(httpRequest, "ids", request.getIds());
+        addParameterIfNotNull(httpRequest, "name", request.getName());
+        addParameterIfNotNull(httpRequest, "pageNumber", request.getPageNumber());
+        addParameterIfNotNull(httpRequest, "pageSize", request.getPageSize());
+        return this.invoke(httpRequest, new Unmarshallers.ListTemplateUnmarshaller());
+    }
+
+    @Override
+    public Boolean updateMediaTemplate(MediaTemplateRequest request) {
+        this.checkCIRequestCommon(request);
+        rejectNull(request.getTag(),
+                "The tag parameter must be specified setting the object tags");
+        rejectNull(request.getName(),
+                "The name parameter must be specified setting the object tags");
+        CosHttpRequest<MediaTemplateRequest> httpRequest = this.createRequest(request.getBucketName(), "/template/" + request.getTemplateId(), request, HttpMethodName.PUT);
+        this.setContent(httpRequest, RequestXmlFactory.convertToXmlByteArray(request), "application/xml", false);
+        this.invoke(httpRequest, voidCosResponseHandler);
+        return true;
+    }
+
+    @Override
+    public SnapshotResponse generateSnapshot(SnapshotRequest request) {
+        this.checkCIRequestCommon(request);
+        rejectNull(request.getTime(),
+                "The time parameter must be specified setting the object tags");
+        rejectNull(request.getInput().getObject(),
+                "The input.object parameter must be specified setting the object tags");
+        CosHttpRequest<SnapshotRequest> httpRequest = this.createRequest(request.getBucketName(), "/snapshot", request, HttpMethodName.POST);
+        this.setContent(httpRequest, RequestXmlFactory.convertToXmlByteArray(request), "application/xml", false);
+        return this.invoke(httpRequest, new Unmarshallers.SnapshotUnmarshaller());
+    }
+
+    @Override
+    public MediaInfoResponse generateMediainfo(MediaInfoRequest request) {
+        this.checkCIRequestCommon(request);
+        rejectNull(request.getInput().getObject(),
+                "The input.object parameter must be specified setting the object tags");
+        CosHttpRequest<MediaInfoRequest> httpRequest = this.createRequest(request.getBucketName(), "/mediainfo", request, HttpMethodName.POST);
+        this.setContent(httpRequest, RequestXmlFactory.convertToXmlByteArray(request), "application/xml", false);
+        return this.invoke(httpRequest, new Unmarshallers.MediaInfoUnmarshaller());
+    }
+
+    @Override
+    public Boolean deleteWorkflow(MediaWorkflowListRequest request) {
+        this.checkCIRequestCommon(request);
+        rejectNull(request.getWorkflowId(), "The request parameter must be specified when delete the object tags");
+        CosHttpRequest<MediaWorkflowListRequest> httpRequest = this.createRequest(request.getBucketName(), "/workflow/" + request.getWorkflowId(), request, HttpMethodName.DELETE);
+        this.invoke(httpRequest, voidCosResponseHandler);
+        return true;
+    }
+
+    @Override
+    public MediaWorkflowListResponse describeWorkflow(MediaWorkflowListRequest request) {
+        this.checkCIRequestCommon(request);
+        CosHttpRequest<MediaWorkflowListRequest> httpRequest = this.createRequest(request.getBucketName(), "/workflow", request, HttpMethodName.GET);
+        addParameterIfNotNull(httpRequest, "ids", request.getIds());
+        addParameterIfNotNull(httpRequest, "name", request.getName());
+        addParameterIfNotNull(httpRequest, "pageNumber", request.getPageNumber());
+        addParameterIfNotNull(httpRequest, "pageSize", request.getPageSize());
+        return this.invoke(httpRequest, new Unmarshallers.WorkflowListUnmarshaller());
+    }
+
+    @Override
+    public MediaWorkflowExecutionResponse describeWorkflowExecution(MediaWorkflowListRequest request) {
+        this.checkCIRequestCommon(request);
+        CosHttpRequest<MediaWorkflowListRequest> httpRequest = this.createRequest(request.getBucketName(), "/workflowexecution/" + request.getRunId(), request, HttpMethodName.GET);
+        return this.invoke(httpRequest, new Unmarshallers.WorkflowExecutionUnmarshaller());
+    }
+
+    @Override
+    public MediaWorkflowExecutionsResponse describeWorkflowExecutions(MediaWorkflowListRequest request) {
+        this.checkCIRequestCommon(request);
+        CosHttpRequest<MediaWorkflowListRequest> httpRequest = this.createRequest(request.getBucketName(), "/workflowexecution", request, HttpMethodName.GET);
+        addParameterIfNotNull(httpRequest, "workflowId", request.getWorkflowId());
+        addParameterIfNotNull(httpRequest, "name", request.getName());
+        addParameterIfNotNull(httpRequest, "orderByTime", request.getOrderByTime());
+        addParameterIfNotNull(httpRequest, "size", request.getSize());
+        addParameterIfNotNull(httpRequest, "states", request.getStates());
+        addParameterIfNotNull(httpRequest, "startCreationTime", request.getStartCreationTime());
+        addParameterIfNotNull(httpRequest, "endCreationTime", request.getEndCreationTime());
+        addParameterIfNotNull(httpRequest, "nextToken", request.getNextToken());
+        return this.invoke(httpRequest, new Unmarshallers.WorkflowExecutionsUnmarshaller());
+    }
+
+    private void checkWorkflowParameter(MediaWorkflowRequest request) {
+        rejectNull(request.getName(),
+                "The name parameter must be specified setting the object tags");
+        rejectNull(request.getTopology(),
+                "The topology parameter must be specified setting the object tags");
+        rejectEmpty(request.getTopology().getMediaWorkflowNodes(),
+                "The Nodes parameter must be specified setting the object tags");
+        rejectEmpty(request.getTopology().getMediaWorkflowDependency(),
+                "The Dependency parameter must be specified setting the object tags");
+    }
+
+    private void checkCIRequestCommon(CIServiceRequest request) {
+        rejectNull(request,
+                "The request parameter must be specified setting the object tags");
+        rejectNull(request.getBucketName(),
+                "The bucketName parameter must be specified setting the object tags");
+    }
+
+    private void checkRequestOutput(MediaOutputObject output) {
+        rejectNull(output.getBucket(),
+                "The output.bucket parameter must be specified setting the object tags");
+        rejectNull(output.getRegion(),
+                "The output.region parameter must be specified setting the object tags");
+        rejectNull(output.getObject(),
+                "The output.object parameter must be specified setting the object tags");
     }
 
 }
