@@ -39,15 +39,13 @@ import com.qcloud.cos.model.InputSerialization;
 import com.qcloud.cos.model.OutputSerialization;
 import com.qcloud.cos.model.ScanRange;
 import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
+import com.qcloud.cos.model.ciModel.job.MediaJobOperation;
 import com.qcloud.cos.model.ciModel.job.MediaJobsRequest;
 import com.qcloud.cos.model.ciModel.job.MediaVideoObject;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoRequest;
 import com.qcloud.cos.model.ciModel.queue.MediaQueueRequest;
 import com.qcloud.cos.model.ciModel.snapshot.SnapshotRequest;
-import com.qcloud.cos.model.ciModel.template.MediaSnapshotObject;
-import com.qcloud.cos.model.ciModel.template.MediaTemplateRequest;
-import com.qcloud.cos.model.ciModel.template.MediaWaterMarkImage;
-import com.qcloud.cos.model.ciModel.template.MediaWaterMarkText;
+import com.qcloud.cos.model.ciModel.template.*;
 import com.qcloud.cos.model.ciModel.workflow.MediaOperation;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowDependency;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowNode;
@@ -295,8 +293,6 @@ public class RequestXmlFactory {
         xml.end();
         xml.end();
         xml.end();
-        String s = new String(xml.getBytes(), "utf-8");
-        System.out.println(s);
         return xml.getBytes();
     }
 
@@ -317,13 +313,55 @@ public class RequestXmlFactory {
         xml.start("Object").value(request.getInput().getObject()).end();
         xml.end();
 
+        MediaJobOperation operation = request.getOperation();
         xml.start("Operation");
-        xml.start("TemplateId").value(request.getOperation().getTemplateId()).end();
+        xml.start("TemplateId").value(operation.getTemplateId()).end();
+
+        List<String> watermarkTemplateId = operation.getWatermarkTemplateId();
+        if (watermarkTemplateId.size() != 0) {
+            for (String templateId : watermarkTemplateId) {
+                xml.start("WatermarkTemplateId").value(templateId).end();
+            }
+        }
+
+        MediaWatermark watermark = operation.getWatermark();
+        if (CheckObjectUtils.objIsNotNull(watermark)) {
+            addIfNotNull(xml, "Type", watermark.getType());
+            addIfNotNull(xml, "Dx", watermark.getDx());
+            addIfNotNull(xml, "Dy", watermark.getDy());
+            addIfNotNull(xml, "EndTime", watermark.getEndTime());
+            addIfNotNull(xml, "LocMode", watermark.getLocMode());
+            addIfNotNull(xml, "Pos", watermark.getPos());
+            addIfNotNull(xml, "StartTime", watermark.getStartTime());
+
+            if ("Text".equalsIgnoreCase(watermark.getType())) {
+                MediaWaterMarkText text = watermark.getText();
+                xml.start("Text");
+                addIfNotNull(xml, "FontColor", text.getFontColor());
+                addIfNotNull(xml, "FontSize", text.getFontSize());
+                addIfNotNull(xml, "FontType", text.getFontType());
+                addIfNotNull(xml, "Text", text.getText());
+                addIfNotNull(xml, "Transparency", text.getTransparency());
+                xml.end();
+            } else if ("Image".equalsIgnoreCase(watermark.getType())) {
+                MediaWaterMarkImage image = watermark.getImage();
+                xml.start("Image");
+                addIfNotNull(xml, "Height", image.getHeight());
+                addIfNotNull(xml, "Mode", image.getMode());
+                addIfNotNull(xml, "Transparency", image.getTransparency());
+                addIfNotNull(xml, "Url", image.getUrl());
+                addIfNotNull(xml, "Width", image.getWidth());
+                xml.end();
+            }
+        }
+
+
         xml.start("Output");
-        xml.start("Region").value(request.getOperation().getOutput().getRegion()).end();
-        xml.start("Object").value(request.getOperation().getOutput().getObject()).end();
-        xml.start("Bucket").value(request.getOperation().getOutput().getBucket()).end();
+        xml.start("Region").value(operation.getOutput().getRegion()).end();
+        xml.start("Object").value(operation.getOutput().getObject()).end();
+        xml.start("Bucket").value(operation.getOutput().getBucket()).end();
         xml.end();
+
         xml.end();
         xml.start("QueueId").value(request.getQueueId()).end();
         xml.end();

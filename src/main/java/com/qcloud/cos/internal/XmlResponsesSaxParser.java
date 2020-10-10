@@ -42,7 +42,6 @@ import com.qcloud.cos.model.ciModel.queue.MediaQueueResponse;
 import com.qcloud.cos.model.ciModel.snapshot.SnapshotResponse;
 import com.qcloud.cos.model.ciModel.template.*;
 import com.qcloud.cos.model.ciModel.workflow.*;
-import com.qcloud.cos.utils.ParserMediaInfoUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
@@ -3433,59 +3432,22 @@ public class XmlResponsesSaxParser {
                 ParserMediaInfoUtils.ParsingMediaFormat(format, name, getText());
             } else if (in("Response", "JobsDetail", "Operation", "MediaInfo", "Stream", "Audio")) {
                 MediaInfoAudio audio = jobsDetail.getOperation().getMediaInfo().getStream().getAudio();
-                switch (name) {
-                    case "Bitrate":
-                        audio.setBitrate(getText());
-                        break;
-                    case "Channel":
-                        audio.setChannel(getText());
-                        break;
-                    case "ChannelLayout":
-                        audio.setChannelLayout(getText());
-                        break;
-                    case "CodecLongName":
-                        audio.setCodecLongName(getText());
-                        break;
-                    case "CodecName":
-                        audio.setCodecName(getText());
-                        break;
-                    case "CodecTag":
-                        audio.setCodecTag(getText());
-                        break;
-                    case "CodecTagString":
-                        audio.setCodecTagString(getText());
-                        break;
-                    case "CodecTimeBase":
-                        audio.setCodecTimeBase(getText());
-                        break;
-                    case "Duration":
-                        audio.setDuration(getText());
-                        break;
-                    case "Index":
-                        audio.setIndex(getText());
-                        break;
-                    case "Language":
-                        audio.setLanguage(getText());
-                        break;
-                    case "SampleFmt":
-                        audio.setSampleFmt(getText());
-                        break;
-                    case "SampleRate":
-                        audio.setSampleRate(getText());
-                        break;
-                    case "StartTime":
-                        audio.setStartTime(getText());
-                        break;
-                    case "Timebase":
-                        audio.setTimebase(getText());
-                        break;
-                }
+                ParserMediaInfoUtils.ParsingStreamAudio(audio, name, getText());
             } else if (in("Response", "JobsDetail", "Operation", "MediaInfo", "Stream", "Subtitle")) {
                 MediaInfoSubtitle subtitle = jobsDetail.getOperation().getMediaInfo().getStream().getSubtitle();
                 ParserMediaInfoUtils.ParsingSubtitle(subtitle, name, getText());
             } else if (in("Response", "JobsDetail", "Operation", "MediaInfo", "Stream", "Video")) {
                 MediaInfoVideo video = jobsDetail.getOperation().getMediaInfo().getStream().getVideo();
                 ParserMediaInfoUtils.ParsingMediaVideo(video, name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "Watermark")) {
+                MediaWatermark watermark = jobsDetail.getOperation().getWatermark();
+                ParserMediaInfoUtils.ParsingWatermark(watermark, name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "Watermark", "Text")) {
+                MediaWaterMarkText text = jobsDetail.getOperation().getWatermark().getText();
+                ParserMediaInfoUtils.ParsingWatermarkText(text, name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "Watermark", "Image")) {
+                MediaWaterMarkImage image = jobsDetail.getOperation().getWatermark().getImage();
+                ParserMediaInfoUtils.ParsingWatermarkImage(image, name, getText());
             } else if (in("Response", "JobsDetail", "Operation", "Output")) {
                 MediaOutputObject output = jobsDetail.getOperation().getOutput();
                 switch (name) {

@@ -4,6 +4,9 @@ import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoObjcet;
 import com.qcloud.cos.model.ciModel.template.MediaWatermark;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 媒体处理 operation实体 https://cloud.tencent.com/document/product/460/48234
  */
@@ -15,8 +18,7 @@ public class MediaJobOperation {
     private MediaInfoObjcet mediaInfo;
     private MediaRemoveWaterMark removeWatermark;
     private MediaWatermark watermark;
-    private String watermarkTemplateId;
-
+    private List<String> watermarkTemplateId;
 
     public MediaJobOperation() {
         this.output = new MediaOutputObject();
@@ -86,11 +88,14 @@ public class MediaJobOperation {
     }
 
 
-    public String getWatermarkTemplateId() {
+    public List<String> getWatermarkTemplateId() {
+        if (watermarkTemplateId==null){
+            watermarkTemplateId = new ArrayList<>();
+        }
         return watermarkTemplateId;
     }
 
-    public void setWatermarkTemplateId(String watermarkTemplateId) {
+    public void setWatermarkTemplateId(List<String> watermarkTemplateId) {
         this.watermarkTemplateId = watermarkTemplateId;
     }
 

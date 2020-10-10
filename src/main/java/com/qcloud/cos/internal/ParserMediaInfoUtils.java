@@ -1,4 +1,4 @@
-package com.qcloud.cos.utils;
+package com.qcloud.cos.internal;
 
 import com.qcloud.cos.model.ciModel.job.MediaAudioObject;
 import com.qcloud.cos.model.ciModel.job.MediaTimeIntervalObject;
