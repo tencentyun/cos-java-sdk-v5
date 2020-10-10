@@ -27,7 +27,6 @@ import static com.qcloud.cos.auth.COSSignerConstants.Q_SIGN_ALGORITHM_KEY;
 import static com.qcloud.cos.auth.COSSignerConstants.Q_SIGN_ALGORITHM_VALUE;
 import static com.qcloud.cos.auth.COSSignerConstants.Q_SIGN_TIME;
 import static com.qcloud.cos.auth.COSSignerConstants.Q_URL_PARAM_LIST;
-import static com.qcloud.cos.utils.StringUtils.isCIWorkflowUrl;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -48,6 +47,7 @@ import com.qcloud.cos.utils.UrlEncoderUtils;
 
 public class COSSigner {
     private static Set<String> needSignedHeaderSet = new HashSet<>();
+    private Boolean isCIWorkflowRequest = false;
     static {
         needSignedHeaderSet.add("host");
         needSignedHeaderSet.add("content-type");
@@ -99,7 +99,7 @@ public class COSSigner {
             return null;
         }
         //万象工作流接口会出现uri带问号的情况 例如 /workflow/xxxxxx?active 这种情况?后面的参数不参与鉴权
-        if (isCIWorkflowUrl(resouce_path)){
+        if (isCIWorkflowRequest){
             resouce_path = resouce_path.split("\\?")[0];
         }
 
@@ -208,4 +208,7 @@ public class COSSigner {
         COSSigner.needSignedHeaderSet = needSignedHeaderSet;
     }
 
+    public void setCIWorkflowRequest(Boolean CIRequest) {
+        isCIWorkflowRequest = CIRequest;
+    }
 }

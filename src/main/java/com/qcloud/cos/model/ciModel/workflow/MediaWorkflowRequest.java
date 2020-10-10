@@ -1,13 +1,13 @@
 package com.qcloud.cos.model.ciModel.workflow;
 
-import com.qcloud.cos.internal.CIServiceRequest;
+import com.qcloud.cos.internal.CIWorkflowServiceRequest;
 
 import java.io.Serializable;
 
 /**
  * 工作流请求实体类 请见：https://cloud.tencent.com/document/product/460/45947
  */
-public class MediaWorkflowRequest extends CIServiceRequest implements Serializable {
+public class MediaWorkflowRequest extends CIWorkflowServiceRequest implements Serializable {
 
     /**
      * 工作流名称 支持中文、英文、数字、—和_，长度限制128字符

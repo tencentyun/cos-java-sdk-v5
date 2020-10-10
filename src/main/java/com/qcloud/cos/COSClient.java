@@ -591,6 +591,8 @@ public class COSClient implements COS {
             cosCredentials = fetchCredential();
         }
         Date expiredTime = new Date(System.currentTimeMillis() + clientConfig.getSignExpired() * 1000);
+        boolean isCIWorkflowRequest = cosServiceRequest instanceof  CIWorkflowServiceRequest;
+        cosSigner.setCIWorkflowRequest(isCIWorkflowRequest);
         cosSigner.sign(request, cosCredentials, expiredTime);
         return this.cosHttpClient.exeute(request, responseHandler);
     }
