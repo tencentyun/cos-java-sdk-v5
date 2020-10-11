@@ -14,7 +14,7 @@ public class CheckObjectUtils {
      * @param obj
      * @return 包含 true 所有字段都为空 false
      */
-    public static Boolean objIsNotNull(Object obj) {
+    public static Boolean objIsNotBlank(Object obj) {
         //查询出对象所有的属性
         Field[] fields = obj.getClass().getDeclaredFields();
         //用于判断所有属性是否为空,如果参数为空则不查询
@@ -22,7 +22,7 @@ public class CheckObjectUtils {
             //不检查 直接取值
             field.setAccessible(true);
             try {
-                if (isNotNull(field.get(obj))) {
+                if (isNotBlank(field.get(obj))) {
                     //不为空
                     return true;
                 }
@@ -33,77 +33,77 @@ public class CheckObjectUtils {
         return false;
     }
 
-    public static Boolean objIsNull(Object obj){
-        return !objIsNotNull(obj);
+    public static Boolean objIsBlank(Object obj){
+        return !objIsNotBlank(obj);
     }
 
-    public static boolean isNull(Object[] objs) {
+    public static boolean isBlank(Object[] objs) {
         if (objs == null || objs.length == 0)
             return true;
         return false;
     }
 
-    public static boolean isNull(Object obj) {
-        if (obj == null || isNull(obj.toString())) {
+    public static boolean isBlank(Object obj) {
+        if (obj == null || isBlank(obj.toString())) {
             return true;
         }
         return false;
     }
 
-    public static boolean isNull(Integer integer) {
+    public static boolean isBlank(Integer integer) {
         if (integer == null || integer == 0)
             return true;
         return false;
     }
 
-    public static boolean isNull(Collection collection) {
+    public static boolean isBlank(Collection collection) {
         if (collection == null || collection.size() == 0)
             return true;
         return false;
     }
 
-    public static boolean isNull(Map map) {
+    public static boolean isBlank(Map map) {
         if (map == null || map.size() == 0)
             return true;
         return false;
     }
 
-    public static boolean isNull(String str) {
+    public static boolean isBlank(String str) {
         return str == null || "".equals(str.trim())
                 || "null".equals(str.toLowerCase());
     }
 
-    public static boolean isNull(Long longs) {
+    public static boolean isBlank(Long longs) {
         if (longs == null || longs == 0)
             return true;
         return false;
     }
 
-    public static boolean isNotNull(Long longs) {
-        return !isNull(longs);
+    public static boolean isNotBlank(Long longs) {
+        return !isBlank(longs);
     }
 
-    public static boolean isNotNull(String str) {
-        return !isNull(str);
+    public static boolean isNotBlank(String str) {
+        return !isBlank(str);
     }
 
-    public static boolean isNotNull(Collection collection) {
-        return !isNull(collection);
+    public static boolean isNotBlank(Collection collection) {
+        return !isBlank(collection);
     }
 
-    public static boolean isNotNull(Map map) {
-        return !isNull(map);
+    public static boolean isNotBlank(Map map) {
+        return !isBlank(map);
     }
 
-    public static boolean isNotNull(Integer integer) {
-        return !isNull(integer);
+    public static boolean isNotBlank(Integer integer) {
+        return !isBlank(integer);
     }
 
-    public static boolean isNotNull(Object[] objs) {
-        return !isNull(objs);
+    public static boolean isNotBlank(Object[] objs) {
+        return !isBlank(objs);
     }
 
-    public static boolean isNotNull(Object obj) {
-        return !isNull(obj);
+    public static boolean isNotBlank(Object obj) {
+        return !isBlank(obj);
     }
 }

@@ -9,8 +9,12 @@ import java.util.List;
 /**
  * 工作流请求实体类 请见：https://cloud.tencent.com/document/product/460/45947
  */
-public class MediaWorkflowListResponse extends CIServiceRequest implements Serializable {
+public class MediaWorkflowListResponse implements Serializable {
 
+    /**
+     * 请求id
+     */
+    private String requestId;
     /**
      * 工作流总数
      */
@@ -27,7 +31,6 @@ public class MediaWorkflowListResponse extends CIServiceRequest implements Seria
      * 工作流数组
      */
     private List<MediaWorkflowObject> mediaWorkflowList;
-
 
 
     public String getTotalCount() {
@@ -65,11 +68,19 @@ public class MediaWorkflowListResponse extends CIServiceRequest implements Seria
         this.mediaWorkflowList = mediaWorkflowList;
     }
 
+    public String getRequestId() {
+        return requestId;
+    }
+
+    public void setRequestId(String requestId) {
+        this.requestId = requestId;
+    }
 
     @Override
     public String toString() {
-        return "MediaWorkflowResponse{" +
-                "totalCount='" + totalCount + '\'' +
+        return "MediaWorkflowListResponse{" +
+                "requestId='" + requestId + '\'' +
+                ", totalCount='" + totalCount + '\'' +
                 ", pageNumber='" + pageNumber + '\'' +
                 ", pageSize='" + pageSize + '\'' +
                 ", mediaWorkflowList=" + mediaWorkflowList +

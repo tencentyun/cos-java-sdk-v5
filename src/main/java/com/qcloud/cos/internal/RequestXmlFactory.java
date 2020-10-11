@@ -325,7 +325,7 @@ public class RequestXmlFactory {
         }
 
         MediaWatermark watermark = operation.getWatermark();
-        if (CheckObjectUtils.objIsNotNull(watermark)) {
+        if (CheckObjectUtils.objIsNotBlank(watermark)) {
             addIfNotNull(xml, "Type", watermark.getType());
             addIfNotNull(xml, "Dx", watermark.getDx());
             addIfNotNull(xml, "Dy", watermark.getDy());
@@ -442,14 +442,14 @@ public class RequestXmlFactory {
             xml.start("Format").value(request.getContainer().getFormat()).end();
             xml.end();
             addVideo(xml, request);
-            if (CheckObjectUtils.objIsNotNull(request.getTimeInterval())) {
+            if (CheckObjectUtils.objIsNotBlank(request.getTimeInterval())) {
                 xml.start("TimeInterval");
                 xml.start("Duration").value(request.getTimeInterval().getDuration()).end();
                 xml.start("Start").value(request.getTimeInterval().getStart()).end();
                 xml.end();
             }
         } else if ("Snapshot".equalsIgnoreCase(tag)) {
-            if (CheckObjectUtils.objIsNotNull(request.getSnapshot())) {
+            if (CheckObjectUtils.objIsNotBlank(request.getSnapshot())) {
                 xml.start("Snapshot");
                 MediaSnapshotObject snapshot = request.getSnapshot();
                 addIfNotNull(xml, "Mode", snapshot.getMode());
@@ -557,7 +557,7 @@ public class RequestXmlFactory {
 
     private static void addVideo(XmlWriter xml, MediaTemplateRequest request) {
         MediaVideoObject video = request.getVideo();
-        if (CheckObjectUtils.objIsNull(video)) {
+        if (CheckObjectUtils.objIsBlank(video)) {
             return;
         }
         xml.start("Video");
