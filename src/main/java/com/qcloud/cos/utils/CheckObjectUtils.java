@@ -22,7 +22,7 @@ public class CheckObjectUtils {
             //不检查 直接取值
             field.setAccessible(true);
             try {
-                if (isNotBlank(field.get(obj))) {
+                if (!isBlank(field.get(obj))) {
                     //不为空
                     return true;
                 }
@@ -37,12 +37,6 @@ public class CheckObjectUtils {
         return !objIsNotBlank(obj);
     }
 
-    public static boolean isBlank(Object[] objs) {
-        if (objs == null || objs.length == 0)
-            return true;
-        return false;
-    }
-
     public static boolean isBlank(Object obj) {
         if (obj == null || isBlank(obj.toString())) {
             return true;
@@ -50,60 +44,8 @@ public class CheckObjectUtils {
         return false;
     }
 
-    public static boolean isBlank(Integer integer) {
-        if (integer == null || integer == 0)
-            return true;
-        return false;
-    }
-
-    public static boolean isBlank(Collection collection) {
-        if (collection == null || collection.size() == 0)
-            return true;
-        return false;
-    }
-
-    public static boolean isBlank(Map map) {
-        if (map == null || map.size() == 0)
-            return true;
-        return false;
-    }
-
     public static boolean isBlank(String str) {
         return str == null || "".equals(str.trim())
-                || "null".equals(str.toLowerCase());
-    }
-
-    public static boolean isBlank(Long longs) {
-        if (longs == null || longs == 0)
-            return true;
-        return false;
-    }
-
-    public static boolean isNotBlank(Long longs) {
-        return !isBlank(longs);
-    }
-
-    public static boolean isNotBlank(String str) {
-        return !isBlank(str);
-    }
-
-    public static boolean isNotBlank(Collection collection) {
-        return !isBlank(collection);
-    }
-
-    public static boolean isNotBlank(Map map) {
-        return !isBlank(map);
-    }
-
-    public static boolean isNotBlank(Integer integer) {
-        return !isBlank(integer);
-    }
-
-    public static boolean isNotBlank(Object[] objs) {
-        return !isBlank(objs);
-    }
-
-    public static boolean isNotBlank(Object obj) {
-        return !isBlank(obj);
+                || "null".equalsIgnoreCase(str);
     }
 }
