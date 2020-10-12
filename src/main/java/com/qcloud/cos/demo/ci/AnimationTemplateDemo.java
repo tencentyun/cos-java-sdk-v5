@@ -29,7 +29,7 @@ public class AnimationTemplateDemo {
         //1.创建模板请求对象
         MediaTemplateRequest request = new MediaTemplateRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("markjrzhang-1251704708");
+        request.setBucketName("DemoBucket-123456789");
         request.setTag("Animation");
         request.setName("TestTemplate40");
         request.getContainer().setFormat("gif");
@@ -53,8 +53,8 @@ public class AnimationTemplateDemo {
         //1.创建模板请求对象
         MediaTemplateRequest request = new MediaTemplateRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("markjrzhang-1251704708");
-        request.setTemplateId("t19c4a60ae1a694621a01f0c7130cfeaa2");
+        request.setBucketName("DemoBucket-123456789");
+        request.setTemplateId("t19c4a60ae1a694621a01f0c713******");
         //3.调用接口,获取模板响应对象
         Boolean response = client.deleteMediaTemplate(request);
         System.out.println(response);
@@ -69,7 +69,7 @@ public class AnimationTemplateDemo {
         //1.创建模板请求对象
         MediaTemplateRequest request = new MediaTemplateRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("markjrzhang-1251704708");
+        request.setBucketName("DemoBucket-123456789");
         //3.调用接口,获取模板响应对象
         MediaListTemplateResponse response = client.describeMediaTemplates(request);
         List<MediaTemplateObject> templateList = response.getTemplateList();
@@ -87,8 +87,8 @@ public class AnimationTemplateDemo {
         //1.创建模板请求对象
         MediaTemplateRequest request = new MediaTemplateRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("markjrzhang-1251704708");
-        request.setTemplateId("t1bc837f9ff52c4203b73ee3378f4d6cdc");
+        request.setBucketName("DemoBucket-123456789");
+        request.setTemplateId("t1bc837f9ff52c4203b73ee3378f4*****");
         request.setTag("Animation");
         request.setName("updateName1");
         request.getContainer().setFormat("gif");

@@ -22,9 +22,9 @@ public class SnapshotDemo {
         //1.创建截图请求对象
         SnapshotRequest request = new SnapshotRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("markjrzhang-1251704708");
+        request.setBucketName("DemoBucket-123456789");
         request.getInput().setObject("1.mp4");
-        request.getOutput().setBucket("markjrzhang-1251704708");
+        request.getOutput().setBucket("DemoBucket-123456789");
         request.getOutput().setRegion("ap-chongqing");
         request.getOutput().setObject("test/1.jpg");
         request.setTime("15");

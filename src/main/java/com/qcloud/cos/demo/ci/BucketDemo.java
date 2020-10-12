@@ -25,7 +25,7 @@ public class BucketDemo {
         //1.创建模板请求对象
         MediaBucketRequest request = new MediaBucketRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("markjrzhang-1251704708");
+        request.setBucketName("DemoBucket-123456789");
         //3.调用接口,获取桶响应对象
         MediaBucketResponse response = client.describeMediaBuckets(request);
         System.out.println(response);

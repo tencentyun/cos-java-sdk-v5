@@ -26,7 +26,7 @@ public class WatermarkTemplateDemo {
         //1.创建模板请求对象
         MediaTemplateRequest request = new MediaTemplateRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("markjrzhang-1251704708");
+        request.setBucketName("DemoBucket-123456789");
         request.setTag("Watermark");
         request.setName("mark-watermark-01");
         MediaWatermark waterMark = request.getWatermark();
@@ -56,7 +56,7 @@ public class WatermarkTemplateDemo {
         //1.创建模板请求对象
         MediaTemplateRequest request = new MediaTemplateRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("markjrzhang-1251704708");
+        request.setBucketName("DemoBucket-123456789");
         request.setTag("Watermark");
         request.setName("mark-test6");
         MediaWatermark waterMark = request.getWatermark();
@@ -68,7 +68,7 @@ public class WatermarkTemplateDemo {
         waterMark.setStartTime("0");
         waterMark.setEndTime("100.5");
         MediaWaterMarkImage image = waterMark.getImage();
-        image.setUrl("http://markjrzhang-1251704708.cos.ap-chongqing.myqcloud.com/1.png");
+        image.setUrl("http://DemoBucket-123456789.cos.ap-chongqing.myqcloud.com/1.png");
         image.setMode("Proportion");
         image.setWidth("10");
         image.setHeight("10");
@@ -87,7 +87,7 @@ public class WatermarkTemplateDemo {
         //1.创建模板请求对象
         MediaTemplateRequest request = new MediaTemplateRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("markjrzhang-1251704708");
+        request.setBucketName("DemoBucket-123456789");
         request.setTemplateId("t1c2da66ede73c423bae95d885f7a******");
         Boolean response = client.deleteMediaTemplate(request);
         System.out.println(response);
@@ -102,7 +102,7 @@ public class WatermarkTemplateDemo {
         //1.创建模板请求对象
         MediaTemplateRequest request = new MediaTemplateRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("markjrzhang-1251704708");
+        request.setBucketName("DemoBucket-123456789");
         MediaListTemplateResponse response = client.describeMediaTemplates(request);
         List<MediaTemplateObject> templateList = response.getTemplateList();
         for (MediaTemplateObject mediaTemplateObject : templateList) {
@@ -119,8 +119,8 @@ public class WatermarkTemplateDemo {
         //1.创建模板请求对象
         MediaTemplateRequest request = new MediaTemplateRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("markjrzhang-1251704708");
-        request.setTemplateId("t1be67e35b0d3b46168cf125f56efe1516");
+        request.setBucketName("DemoBucket-123456789");
+        request.setTemplateId("t1be67e35b0d3b46168cf125f56e*****");
         request.setTag("Watermark");
         request.setName("mark-test-watermark-01");
         MediaWatermark waterMark = request.getWatermark();

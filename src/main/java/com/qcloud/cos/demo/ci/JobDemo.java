@@ -29,11 +29,11 @@ public class JobDemo {
         //1.创建任务请求对象
         MediaJobsRequest request = new MediaJobsRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("markjrzhang-1251704708");
+        request.setBucketName("DemoBucket-123456789");
         request.setTag("Transcode");
         request.getInput().setObject("1.mp4");
-        request.getOperation().setTemplateId("t0e09a9456d4124542b1f0e44d501d7182");
-        request.getOperation().getOutput().setBucket("markjrzhang-1251704708");
+        request.getOperation().setTemplateId("t0e09a9456d4124542b1f0e44d501*****");
+        request.getOperation().getOutput().setBucket("DemoBucket-123456789");
         request.getOperation().getOutput().setRegion("ap-chongqing");
         request.getOperation().getOutput().setObject("2.mp4");
         request.setQueueId("p9900025e4ec44b5e8225e70a52170834");
@@ -50,8 +50,8 @@ public class JobDemo {
         //1.创建任务请求对象
         MediaJobsRequest request = new MediaJobsRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("markjrzhang-1251704708");
-        request.setJobId("j29a82fea08ba11ebb54bc9d1c0532b11");
+        request.setBucketName("DemoBucket-123456789");
+        request.setJobId("j29a82fea08ba11ebb54bc9d1c05*****");
         //3.调用接口,获取任务响应对象
         MediaJobResponse response = client.describeMediaJob(request);
         System.out.println(response);
@@ -65,8 +65,8 @@ public class JobDemo {
         //1.创建任务请求对象
         MediaJobsRequest request = new MediaJobsRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("markjrzhang-1251704708");
-        request.setQueueId("p9900025e4ec44b5e8225e70a52170834");
+        request.setBucketName("DemoBucket-123456789");
+        request.setQueueId("p9900025e4ec44b5e8225e70a521*****");
         request.setTag("Transcode");
         //3.调用接口,获取任务响应对象
         MediaListJobResponse response = client.describeMediaJobs(request);
@@ -84,8 +84,8 @@ public class JobDemo {
         //1.创建任务请求对象
         MediaJobsRequest request = new MediaJobsRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("markjrzhang-1251704708");
-        request.setJobId("jbfb0d02a092111ebb3167781dfef0484");
+        request.setBucketName("DemoBucket-123456789");
+        request.setJobId("jbfb0d02a092111ebb3167781d*****");
         //3.调用接口,获取任务响应对象
         Boolean response = client.cancelMediaJob(request);
         System.out.println(response);

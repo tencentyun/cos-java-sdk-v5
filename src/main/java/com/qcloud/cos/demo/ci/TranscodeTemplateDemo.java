@@ -33,7 +33,7 @@ public class TranscodeTemplateDemo {
         //1.创建模板请求对象
         MediaTemplateRequest request = new MediaTemplateRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("markjrzhang-1251704708");
+        request.setBucketName("DemoBucket-123456789");
         request.setTag("Transcode");
         request.setName("mark-test-2");
         request.getContainer().setFormat("mp4");
@@ -76,7 +76,7 @@ public class TranscodeTemplateDemo {
         //1.创建模板请求对象
         MediaTemplateRequest request = new MediaTemplateRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("markjrzhang-1251704708");
+        request.setBucketName("DemoBucket-123456789");
         request.setTemplateId("t1619b0381be1a46738796e97fff4*****");
         //3.调用接口,获取模板响应对象
         Boolean response = client.deleteMediaTemplate(request);
@@ -92,7 +92,7 @@ public class TranscodeTemplateDemo {
         //1.创建模板请求对象
         MediaTemplateRequest request = new MediaTemplateRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("markjrzhang-1251704708");
+        request.setBucketName("DemoBucket-123456789");
         request.setTag("Transcode");
         //3.调用接口,获取模板响应对象
         MediaListTemplateResponse response = client.describeMediaTemplates(request);
@@ -111,8 +111,8 @@ public class TranscodeTemplateDemo {
         //1.创建模板请求对象
         MediaTemplateRequest request = new MediaTemplateRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("markjrzhang-1251704708");
-        request.setTemplateId("t138b37dc82e59422d85f03bb7a8dea41c");
+        request.setBucketName("DemoBucket-123456789");
+        request.setTemplateId("t138b37dc82e59422d85f03bb7a8*****");
         request.setTag("Transcode");
         request.setName("mark-test-update-01");
         request.getContainer().setFormat("mp4");

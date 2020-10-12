@@ -29,7 +29,7 @@ public class SnapshotTemplateDemo {
         //1.创建模板请求对象
         MediaTemplateRequest request = new MediaTemplateRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("markjrzhang-1251704708");
+        request.setBucketName("DemoBucket-123456789");
         request.setTag("Snapshot");
         request.setName("mark-test-1");
         request.getSnapshot().setMode("Interval");
@@ -50,7 +50,7 @@ public class SnapshotTemplateDemo {
         //1.创建模板请求对象
         MediaTemplateRequest request = new MediaTemplateRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("markjrzhang-1251704708");
+        request.setBucketName("DemoBucket-123456789");
         request.setTemplateId("t19c4a60ae1a694621a01f0c7130c*****");
         //3.调用接口,获取模板响应对象
         Boolean response = client.deleteMediaTemplate(request);
@@ -66,7 +66,7 @@ public class SnapshotTemplateDemo {
         //1.创建模板请求对象
         MediaTemplateRequest request = new MediaTemplateRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("markjrzhang-1251704708");
+        request.setBucketName("DemoBucket-123456789");
         request.setTag("Snapshot");
         //3.调用接口,获取模板响应对象
         MediaListTemplateResponse response = client.describeMediaTemplates(request);
@@ -86,8 +86,8 @@ public class SnapshotTemplateDemo {
         //1.创建模板请求对象
         MediaTemplateRequest request = new MediaTemplateRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("markjrzhang-1251704708");
-        request.setTemplateId("t1e9679e24887e401eb3f46282fb9dafcb");
+        request.setBucketName("DemoBucket-123456789");
+        request.setTemplateId("t1e9679e24887e401eb3f46282fb9*****");
         request.setTag("Snapshot");
         request.setName("mark-test-update");
         request.getSnapshot().setMode("Interval");

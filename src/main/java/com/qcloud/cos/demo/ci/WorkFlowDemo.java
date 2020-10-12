@@ -25,7 +25,7 @@ public class WorkFlowDemo {
         //1.创建工作流请求对象
         MediaWorkflowListRequest request = new MediaWorkflowListRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("markjrzhang-1251704708");
+        request.setBucketName("DemoBucket-123456789");
         MediaWorkflowListResponse response = client.describeWorkflow(request);
         List<MediaWorkflowObject> mediaWorkflowList = response.getMediaWorkflowList();
         for (MediaWorkflowObject mediaWorkflowObject : mediaWorkflowList) {
@@ -43,7 +43,7 @@ public class WorkFlowDemo {
         //1.创建工作流请求对象
         MediaWorkflowListRequest request = new MediaWorkflowListRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("markjrzhang-1251704708");
+        request.setBucketName("DemoBucket-123456789");
         request.setWorkflowId("aaaa");
         Boolean response = client.deleteWorkflow(request);
         System.out.println(response);
@@ -58,7 +58,7 @@ public class WorkFlowDemo {
         //1.创建工作流请求对象
         MediaWorkflowListRequest request = new MediaWorkflowListRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("markjrzhang-1251704708");
+        request.setBucketName("DemoBucket-123456789");
         request.setRunId("i34bfd8d7eae711ea89fe525400c******");
         MediaWorkflowExecutionResponse response = client.describeWorkflowExecution(request);
         System.out.println(response);
@@ -73,8 +73,8 @@ public class WorkFlowDemo {
         //1.创建工作流请求对象
         MediaWorkflowListRequest request = new MediaWorkflowListRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("markjrzhang-1251704708");
-        request.setWorkflowId("w4e6963a18e2446ed8bc8f09410e38580");
+        request.setBucketName("DemoBucket-123456789");
+        request.setWorkflowId("w4e6963a18e2446ed8bc8f09410e******");
         MediaWorkflowExecutionsResponse response = client.describeWorkflowExecutions(request);
         List<MediaWorkflowExecutionObject> workflowExecutionList = response.getWorkflowExecutionList();
         for (MediaWorkflowExecutionObject mediaWorkflowExecutionObject : workflowExecutionList) {

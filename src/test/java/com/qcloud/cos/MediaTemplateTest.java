@@ -62,7 +62,7 @@ public class MediaTemplateTest extends AbstractCOSClientTest {
         List<MediaTemplateObject> templateList = templates.getTemplateList();
         Assert.assertTrue(templateList.size() >= 1);
         for (MediaTemplateObject mediaTemplateObject : templateList) {
-            if (response.getTemplateId().equals(mediaTemplateObject.getTemplateId())){
+            if (response.getTemplate().getTemplateId().equals(mediaTemplateObject.getTemplateId())){
                 Assert.assertEquals(bucket, mediaTemplateObject.getBucketId());
                 Assert.assertEquals(TAG, mediaTemplateObject.getTag());
                 Assert.assertEquals(FORMAT, mediaTemplateObject.getTransTpl().getContainer().getFormat());
