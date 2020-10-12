@@ -360,14 +360,15 @@ public class RequestXmlFactory {
             }
         }
         MediaRemoveWaterMark removeWatermark = operation.getRemoveWatermark();
-        if (CheckObjectUtils.objIsNotBlank(watermark)){
+        if (CheckObjectUtils.objIsNotBlank(removeWatermark)){
+            xml.start("RemoveWatermark");
             addIfNotNull(xml, "Height", removeWatermark.getHeight());
             addIfNotNull(xml, "Dx", removeWatermark.getDx());
             addIfNotNull(xml, "Dy", removeWatermark.getDy());
             addIfNotNull(xml, "Switch", removeWatermark.get_switch());
             addIfNotNull(xml, "Width", removeWatermark.getWidth());
+            xml.end();
         }
-
 
         xml.start("Output");
         xml.start("Region").value(operation.getOutput().getRegion()).end();
@@ -379,7 +380,6 @@ public class RequestXmlFactory {
         xml.start("QueueId").value(request.getQueueId()).end();
         xml.end();
 
-        System.out.println(xml.toString());
         return xml.getBytes();
     }
 
