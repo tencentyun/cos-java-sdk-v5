@@ -3426,6 +3426,8 @@ public class XmlResponsesSaxParser {
             } else if (in("Response", "JobsDetail", "Operation")) {
                 if ("TemplateId".equalsIgnoreCase(name)) {
                     jobsDetail.getOperation().setTemplateId(getText());
+                }else if ("WatermarkTemplateId".equalsIgnoreCase(name)){
+                    jobsDetail.getOperation().getWatermarkTemplateId().add(getText());
                 }
             } else if (in("Response", "JobsDetail", "Operation", "MediaInfo", "Format")) {
                 MediaFormat format = jobsDetail.getOperation().getMediaInfo().getFormat();
@@ -3442,6 +3444,9 @@ public class XmlResponsesSaxParser {
             } else if (in("Response", "JobsDetail", "Operation", "Watermark")) {
                 MediaWatermark watermark = jobsDetail.getOperation().getWatermark();
                 ParserMediaInfoUtils.ParsingWatermark(watermark, name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "RemoveWatermark")) {
+                MediaRemoveWaterMark removeWatermark = jobsDetail.getOperation().getRemoveWatermark();
+                ParserMediaInfoUtils.ParsingRemoveWatermark(removeWatermark, name, getText());
             } else if (in("Response", "JobsDetail", "Operation", "Watermark", "Text")) {
                 MediaWaterMarkText text = jobsDetail.getOperation().getWatermark().getText();
                 ParserMediaInfoUtils.ParsingWatermarkText(text, name, getText());
@@ -3518,6 +3523,8 @@ public class XmlResponsesSaxParser {
             } else if (in("Response", "JobsDetail", "Operation")) {
                 if ("TemplateId".equalsIgnoreCase(name)) {
                     jobsDetail.getOperation().setTemplateId(getText());
+                }else if ("WatermarkTemplateId".equalsIgnoreCase(name)){
+                    jobsDetail.getOperation().getWatermarkTemplateId().add(getText());
                 }
             } else if (in("Response", "JobsDetail", "Operation", "MediaInfo", "Format")) {
                 MediaFormat format = jobsDetail.getOperation().getMediaInfo().getFormat();
@@ -3531,8 +3538,10 @@ public class XmlResponsesSaxParser {
             } else if (in("Response", "JobsDetail", "Operation", "MediaInfo", "Stream", "Video")) {
                 MediaInfoVideo video = jobsDetail.getOperation().getMediaInfo().getStream().getVideo();
                 ParserMediaInfoUtils.ParsingMediaVideo(video, name, getText());
-            }
-            else if (in("Response", "JobsDetail", "Operation", "Output")) {
+            } else if (in("Response", "JobsDetail", "Operation", "RemoveWatermark")) {
+                MediaRemoveWaterMark removeWatermark = jobsDetail.getOperation().getRemoveWatermark();
+                ParserMediaInfoUtils.ParsingRemoveWatermark(removeWatermark, name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "Output")) {
                 MediaOutputObject output = jobsDetail.getOperation().getOutput();
                 switch (name) {
                     case "Bucket":
@@ -3606,19 +3615,24 @@ public class XmlResponsesSaxParser {
             } else if (in("Response", "JobsDetail", "Operation")) {
                 if ("TemplateId".equalsIgnoreCase(name)) {
                     jobsDetail.getOperation().setTemplateId(getText());
+                } else if ("WatermarkTemplateId".equalsIgnoreCase(name)) {
+                    jobsDetail.getOperation().getWatermarkTemplateId().add(getText());
                 }
             } else if (in("Response", "JobsDetail", "Operation", "MediaInfo", "Format")) {
                 MediaFormat format = jobsDetail.getOperation().getMediaInfo().getFormat();
                 ParserMediaInfoUtils.ParsingMediaFormat(format, name, getText());
             } else if (in("Response", "JobsDetail", "Operation", "MediaInfo", "Stream", "Audio")) {
                 MediaInfoAudio audio = jobsDetail.getOperation().getMediaInfo().getStream().getAudio();
-                ParserMediaInfoUtils.ParsingStreamAudio(audio,name,getText());
+                ParserMediaInfoUtils.ParsingStreamAudio(audio, name, getText());
             } else if (in("Response", "JobsDetail", "Operation", "MediaInfo", "Stream", "Subtitle")) {
                 MediaInfoSubtitle subtitle = jobsDetail.getOperation().getMediaInfo().getStream().getSubtitle();
                 ParserMediaInfoUtils.ParsingSubtitle(subtitle, name, getText());
             } else if (in("Response", "JobsDetail", "Operation", "MediaInfo", "Stream", "Video")) {
                 MediaInfoVideo video = jobsDetail.getOperation().getMediaInfo().getStream().getVideo();
                 ParserMediaInfoUtils.ParsingMediaVideo(video, name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "RemoveWatermark")) {
+                MediaRemoveWaterMark removeWatermark = jobsDetail.getOperation().getRemoveWatermark();
+                ParserMediaInfoUtils.ParsingRemoveWatermark(removeWatermark, name, getText());
             } else if (in("Response", "JobsDetail", "Operation", "Output")) {
                 MediaOutputObject output = jobsDetail.getOperation().getOutput();
                 switch (name) {

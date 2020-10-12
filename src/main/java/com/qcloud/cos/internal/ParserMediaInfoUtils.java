@@ -1,9 +1,10 @@
 package com.qcloud.cos.internal;
 
-import com.qcloud.cos.model.ciModel.job.MediaAudioObject;
+import com.qcloud.cos.model.ciModel.job.MediaVideoObject;
 import com.qcloud.cos.model.ciModel.job.MediaTimeIntervalObject;
 import com.qcloud.cos.model.ciModel.job.MediaTransConfigObject;
-import com.qcloud.cos.model.ciModel.job.MediaVideoObject;
+import com.qcloud.cos.model.ciModel.job.MediaAudioObject;
+import com.qcloud.cos.model.ciModel.job.MediaRemoveWaterMark;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaFormat;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoAudio;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoSubtitle;
@@ -395,6 +396,26 @@ public class ParserMediaInfoUtils {
                 break;
             case "Language":
                 subtitle.setLanguage(value);
+                break;
+        }
+    }
+
+    public static void ParsingRemoveWatermark(MediaRemoveWaterMark removeWatermark, String name, String value) {
+        switch (name) {
+            case "Switch":
+                removeWatermark.set_switch(value);
+                break;
+            case "Dx":
+                removeWatermark.setDx(value);
+                break;
+            case "Dy":
+                removeWatermark.setDy(value);
+                break;
+            case "Height":
+                removeWatermark.setHeight(value);
+                break;
+            case "Width":
+                removeWatermark.setWidth(value);
                 break;
         }
     }

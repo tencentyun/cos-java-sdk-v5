@@ -41,11 +41,16 @@ import com.qcloud.cos.model.ScanRange;
 import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
 import com.qcloud.cos.model.ciModel.job.MediaJobOperation;
 import com.qcloud.cos.model.ciModel.job.MediaJobsRequest;
+import com.qcloud.cos.model.ciModel.job.MediaRemoveWaterMark;
 import com.qcloud.cos.model.ciModel.job.MediaVideoObject;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoRequest;
 import com.qcloud.cos.model.ciModel.queue.MediaQueueRequest;
 import com.qcloud.cos.model.ciModel.snapshot.SnapshotRequest;
-import com.qcloud.cos.model.ciModel.template.*;
+import com.qcloud.cos.model.ciModel.template.MediaTemplateRequest;
+import com.qcloud.cos.model.ciModel.template.MediaSnapshotObject;
+import com.qcloud.cos.model.ciModel.template.MediaWatermark;
+import com.qcloud.cos.model.ciModel.template.MediaWaterMarkText;
+import com.qcloud.cos.model.ciModel.template.MediaWaterMarkImage;
 import com.qcloud.cos.model.ciModel.workflow.MediaOperation;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowDependency;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowNode;
@@ -354,6 +359,14 @@ public class RequestXmlFactory {
                 xml.end();
             }
         }
+        MediaRemoveWaterMark removeWatermark = operation.getRemoveWatermark();
+        if (CheckObjectUtils.objIsNotBlank(watermark)){
+            addIfNotNull(xml, "Height", removeWatermark.getHeight());
+            addIfNotNull(xml, "Dx", removeWatermark.getDx());
+            addIfNotNull(xml, "Dy", removeWatermark.getDy());
+            addIfNotNull(xml, "Switch", removeWatermark.get_switch());
+            addIfNotNull(xml, "Width", removeWatermark.getWidth());
+        }
 
 
         xml.start("Output");
@@ -365,6 +378,8 @@ public class RequestXmlFactory {
         xml.end();
         xml.start("QueueId").value(request.getQueueId()).end();
         xml.end();
+
+        System.out.println(xml.toString());
         return xml.getBytes();
     }
 
