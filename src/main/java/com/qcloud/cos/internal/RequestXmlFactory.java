@@ -19,6 +19,7 @@
 package com.qcloud.cos.internal;
 
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -55,7 +56,6 @@ import com.qcloud.cos.model.ciModel.workflow.MediaOperation;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowDependency;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowNode;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowRequest;
-import com.qcloud.cos.utils.CheckObjectUtils;
 
 
 public class RequestXmlFactory {
@@ -330,7 +330,7 @@ public class RequestXmlFactory {
         }
 
         MediaWatermark watermark = operation.getWatermark();
-        if (CheckObjectUtils.objIsNotBlank(watermark)) {
+        if (CheckObjectUtils.objIsNotValid(watermark)) {
             addIfNotNull(xml, "Type", watermark.getType());
             addIfNotNull(xml, "Dx", watermark.getDx());
             addIfNotNull(xml, "Dy", watermark.getDy());
@@ -360,7 +360,7 @@ public class RequestXmlFactory {
             }
         }
         MediaRemoveWaterMark removeWatermark = operation.getRemoveWatermark();
-        if (CheckObjectUtils.objIsNotBlank(removeWatermark)){
+        if (CheckObjectUtils.objIsNotValid(removeWatermark)) {
             xml.start("RemoveWatermark");
             addIfNotNull(xml, "Height", removeWatermark.getHeight());
             addIfNotNull(xml, "Dx", removeWatermark.getDx());
@@ -457,14 +457,14 @@ public class RequestXmlFactory {
             xml.start("Format").value(request.getContainer().getFormat()).end();
             xml.end();
             addVideo(xml, request);
-            if (CheckObjectUtils.objIsNotBlank(request.getTimeInterval())) {
+            if (CheckObjectUtils.objIsNotValid(request.getTimeInterval())) {
                 xml.start("TimeInterval");
                 xml.start("Duration").value(request.getTimeInterval().getDuration()).end();
                 xml.start("Start").value(request.getTimeInterval().getStart()).end();
                 xml.end();
             }
         } else if ("Snapshot".equalsIgnoreCase(tag)) {
-            if (CheckObjectUtils.objIsNotBlank(request.getSnapshot())) {
+            if (CheckObjectUtils.objIsNotValid(request.getSnapshot())) {
                 xml.start("Snapshot");
                 MediaSnapshotObject snapshot = request.getSnapshot();
                 addIfNotNull(xml, "Mode", snapshot.getMode());
@@ -572,7 +572,7 @@ public class RequestXmlFactory {
 
     private static void addVideo(XmlWriter xml, MediaTemplateRequest request) {
         MediaVideoObject video = request.getVideo();
-        if (CheckObjectUtils.objIsBlank(video)) {
+        if (CheckObjectUtils.objIsValid(video)) {
             return;
         }
         xml.start("Video");
@@ -602,5 +602,53 @@ public class RequestXmlFactory {
         xml.end();
     }
 
+    /**
+     * 对象校验内部静态工具类
+     */
+    private static class CheckObjectUtils {
 
+        /**
+         * 校验对象是否有效，判断对象中是否含有有效的字段。
+         *
+         * @param obj
+         * @return 包含有效值返回 true 所有字段都为空返回 false
+         */
+        public static Boolean objIsNotValid(Object obj) {
+            //查询出对象所有的属性
+            Field[] fields = obj.getClass().getDeclaredFields();
+            //用于判断所有属性是否为空,如果参数为空则不查询
+            for (Field field : fields) {
+                //不检查 直接取值
+                field.setAccessible(true);
+                try {
+                    if (!isValid(field.get(obj))) {
+                        //不为空
+                        return true;
+                    }
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+            return false;
+        }
+
+        public static Boolean objIsValid(Object obj) {
+            return !objIsNotValid(obj);
+        }
+
+        public static boolean isValid(Object obj) {
+            if (obj == null || isValid(obj.toString())) {
+                return true;
+            }
+            return false;
+        }
+
+        public static boolean isValid(String str) {
+            return str == null || "".equals(str.trim())
+                    || "null".equalsIgnoreCase(str);
+        }
+    }
 }
+
+
+
