@@ -215,16 +215,4 @@ public class StringUtils {
 
         return result.toString();
     }
-
-    /**
-     * check url belong to CI workflow interface
-     * @param resourcePath
-     * @return true isCIWorkflowUrl
-     */
-    public static boolean isCIWorkflowUrl(String resourcePath) {
-        if (resourcePath == null || "".equals(resourcePath)) {
-            return false;
-        }
-        return resourcePath.contains("/workflow");
-    }
 }
