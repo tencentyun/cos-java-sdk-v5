@@ -1752,7 +1752,10 @@ public class COSClient implements COS {
 
             request.addHeader("Content-Type", "text/plain");
             request.addHeader("Content-Length", String.valueOf(xml.length));
-
+            ObjectMetadata objectMetadata = completeMultipartUploadRequest.getObjectMetadata();
+            if(objectMetadata != null) {
+                populateRequestMetadata(request, objectMetadata);
+            }
             request.setContent(new ByteArrayInputStream(xml));
 
             @SuppressWarnings("unchecked")
