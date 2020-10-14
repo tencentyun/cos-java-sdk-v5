@@ -39,6 +39,7 @@ public class CompleteMultipartUploadRequest extends CosServiceRequest implements
     /** The list of part numbers and ETags to use when completing the multipart upload */
     private List<PartETag> partETags = new ArrayList<PartETag>();
 
+    private ObjectMetadata objectMetadata;
 
     public CompleteMultipartUploadRequest() {}
     /**
@@ -244,5 +245,13 @@ public class CompleteMultipartUploadRequest extends CosServiceRequest implements
             this.partETags.add(new PartETag(result.getPartNumber(), result.getETag()));
         }
         return this;
+    }
+
+    public ObjectMetadata getObjectMetadata() {
+        return objectMetadata;
+    }
+
+    public void setObjectMetadata(ObjectMetadata objectMetadata) {
+        this.objectMetadata = objectMetadata;
     }
 }
