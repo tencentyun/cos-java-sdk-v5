@@ -11,7 +11,7 @@
  * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
  * express or implied. See the License for the specific language governing
  * permissions and limitations under the License.
- 
+
  * According to cos feature, we modify some class，comment, field name, etc.
  */
 
@@ -48,6 +48,8 @@ import com.qcloud.cos.utils.UrlEncoderUtils;
 public class COSSigner {
     private static Set<String> needSignedHeaderSet = new HashSet<>();
     private Boolean isCIWorkflowRequest = false;
+    // Time offset between local and server
+    private int localTimeDelta = 0;
     static {
         needSignedHeaderSet.add("host");
         needSignedHeaderSet.add("content-type");
@@ -77,10 +79,8 @@ public class COSSigner {
                     ((COSSessionCredentials) cred).getSessionToken());
         }
     }
-
     public String buildAuthorizationStr(HttpMethodName methodName, String resouce_path,
             COSCredentials cred, Date expiredTime) {
-
         return buildAuthorizationStr(methodName, resouce_path, new HashMap<String, String>(),
                 new HashMap<String, String>(), cred, expiredTime);
     }
@@ -92,9 +92,16 @@ public class COSSigner {
     }
 
     public String buildAuthorizationStr(HttpMethodName methodName, String resouce_path,
-            Map<String, String> headerMap, Map<String, String> paramMap, COSCredentials cred,
-            Date expiredTime) {
+                                        Map<String, String> headerMap, Map<String, String> paramMap, COSCredentials cred,
+                                        Date expiredTime) {
+        Date startTime = new Date();
+        return buildAuthorizationStr(methodName, resouce_path, headerMap, paramMap,
+                cred, startTime, expiredTime);
+    }
 
+    public String buildAuthorizationStr(HttpMethodName methodName, String resouce_path,
+                                        Map<String, String> headerMap, Map<String, String> paramMap, COSCredentials cred,
+                                        Date startTime, Date expiredTime) {
         if (isAnonymous(cred)) {
             return null;
         }
@@ -114,7 +121,7 @@ public class COSSigner {
         String qHeaderListStr = buildSignMemberStr(sortedSignHeaders);
         String qUrlParamListStr = buildSignMemberStr(sortedParams);
         String qKeyTimeStr, qSignTimeStr;
-        qKeyTimeStr = qSignTimeStr = buildTimeStr(expiredTime);
+        qKeyTimeStr = qSignTimeStr = buildTimeStr(startTime, expiredTime);
         String signKey = HmacUtils.hmacSha1Hex(cred.getCOSSecretKey(), qKeyTimeStr);
         String formatMethod = methodName.toString().toLowerCase();
         String formatUri = resouce_path;
@@ -192,11 +199,11 @@ public class COSSigner {
         return strBuilder.toString();
     }
 
-    private String buildTimeStr(Date expiredTime) {
+    private String buildTimeStr(Date startTime, Date endTime) {
         StringBuilder strBuilder = new StringBuilder();
-        long startTime = System.currentTimeMillis() / 1000;
-        long endTime = expiredTime.getTime() / 1000;
-        strBuilder.append(startTime).append(";").append(endTime);
+        long startTimestamp = startTime.getTime() / 1000 + localTimeDelta;
+        long endTimestamp = endTime.getTime() / 1000 + localTimeDelta;
+        strBuilder.append(startTimestamp).append(";").append(endTimestamp);
         return strBuilder.toString();
     }
 
@@ -210,5 +217,13 @@ public class COSSigner {
 
     public void setCIWorkflowRequest(Boolean CIRequest) {
         isCIWorkflowRequest = CIRequest;
+    }
+
+    public int getLocalTimeDelta() {
+        return localTimeDelta;
+    }
+
+    public void setLocalTimeDelta(int localTimeDelta) {
+        this.localTimeDelta = localTimeDelta;
     }
 }

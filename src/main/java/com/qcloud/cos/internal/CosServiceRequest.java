@@ -58,7 +58,7 @@ public class CosServiceRequest implements Cloneable, ReadLimitInfo  {
      * The source object from which the current object was cloned; or null if there isn't one.
      */
     private CosServiceRequest cloneSource;
-    
+
     /**
      * Sets the optional progress listener for receiving updates about the progress of the request.
      *
