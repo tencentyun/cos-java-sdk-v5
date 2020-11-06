@@ -91,34 +91,34 @@ public abstract class AbstractCosResponseHandler<T>
     protected void populateObjectMetadata(CosHttpResponse response, ObjectMetadata metadata) {
         for (Entry<String, String> header : response.getHeaders().entrySet()) {
             String key = header.getKey();
-            if (key.startsWith(Headers.COS_USER_METADATA_PREFIX)) {
+            if (StringUtils.beginsWithIgnoreCase(key, Headers.COS_USER_METADATA_PREFIX)) {
                 key = key.substring(Headers.COS_USER_METADATA_PREFIX.length());
                 metadata.addUserMetadata(key, header.getValue());
             } else if (ignoredHeaders.contains(key)) {
                 // ignore...
-            } else if (key.equals(Headers.LAST_MODIFIED)) {
+            } else if (key.equalsIgnoreCase(Headers.LAST_MODIFIED)) {
                 try {
                     metadata.setHeader(key, DateUtils.parseRFC822Date(header.getValue()));
                 } catch (Exception pe) {
                     log.warn("Unable to parse last modified date: " + header.getValue(), pe);
                 }
-            } else if (key.equals(Headers.CONTENT_LENGTH)) {
+            } else if (key.equalsIgnoreCase(Headers.CONTENT_LENGTH)) {
                 try {
                     metadata.setHeader(key, Long.parseLong(header.getValue()));
                 } catch (NumberFormatException nfe) {
                     log.warn("Unable to parse content length: " + header.getValue(), nfe);
                 }
-            } else if (key.equals(Headers.DELETE_MARKER)) {
+            } else if (key.equalsIgnoreCase(Headers.DELETE_MARKER)) {
                 metadata.setDeleteMarker(Boolean.parseBoolean(header.getValue()));
-            } else if (key.equals(Headers.ETAG)) {
+            } else if (key.equalsIgnoreCase(Headers.ETAG)) {
                 metadata.setHeader(key, StringUtils.removeQuotes(header.getValue()));
-            } else if (key.equals(Headers.EXPIRES)) {
+            } else if (key.equalsIgnoreCase(Headers.EXPIRES)) {
                 try {
                     metadata.setHttpExpiresDate(DateUtils.parseRFC822Date(header.getValue()));
                 } catch (Exception pe) {
                     log.warn("Unable to parse http expiration date: " + header.getValue(), pe);
                 }
-            } else if (key.equals(Headers.EXPIRATION)) {
+            } else if (key.equalsIgnoreCase(Headers.EXPIRATION)) {
                 new ObjectExpirationHeaderHandler<ObjectMetadata>().handle(metadata, response);
             } else if (key.equalsIgnoreCase(Headers.RESTORE)) {
                 new ObjectRestoreHeaderHandler<ObjectRestoreResult>().handle(metadata, response);

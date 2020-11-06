@@ -48,8 +48,9 @@ public abstract class HttpCredentialsFetcher implements COSCredentialsFetcher {
             try {
                 return this.fetch();
             } catch (CosClientException e) {
-                LOG.error("The COSCredentialsFetcher [{}] fetch failed., retry: {}/{}, exception:",
-                        this.getClass().getName(), i, retryTimes, e);
+                String errorMsg = String.format("The COSCredentialsFetcher [%s] fetch failed, retry: %d/%d, exception:",
+                                                this.getClass().getName(), i, retryTimes);
+                LOG.error(errorMsg, e);
             }
         }
         throw new CosClientException("Failed to fetch the CosCredentials from a instance metadata service: max retry " +

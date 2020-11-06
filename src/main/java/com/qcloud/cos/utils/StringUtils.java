@@ -215,4 +215,12 @@ public class StringUtils {
 
         return result.toString();
     }
+
+    /**
+     * Performs a case insensitive comparison and returns true if the data
+     * begins with the given sequence.
+     */
+    public static boolean beginsWithIgnoreCase(final String data, final String seq) {
+        return data.regionMatches(true, 0, seq, 0, seq.length());
+    }
 }
