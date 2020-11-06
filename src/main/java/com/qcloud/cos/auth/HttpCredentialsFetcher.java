@@ -21,7 +21,9 @@ public abstract class HttpCredentialsFetcher implements COSCredentialsFetcher {
     @Override
     public COSCredentials fetch() throws CosClientException {
         if (null == this.cosCredentialsEndpointProvider) {
-            throw new CosClientException("The cos credentials endpoint provider is not specified.");
+            String errorMsg = "The cos credentials endpoint provider is not specified.";
+            LOG.error(errorMsg);
+            throw new CosClientException(errorMsg);
         }
 
         try {
@@ -46,8 +48,8 @@ public abstract class HttpCredentialsFetcher implements COSCredentialsFetcher {
             try {
                 return this.fetch();
             } catch (CosClientException e) {
-                LOG.warn("The COSCredentialsFetcher [{}] fetch failed. exception message: {}, retry: {}/{}.",
-                        this.getClass().getName(), e.getMessage(), i, retryTimes);
+                LOG.error("The COSCredentialsFetcher [{}] fetch failed., retry: {}/{}, exception:",
+                        this.getClass().getName(), i, retryTimes, e);
             }
         }
         throw new CosClientException("Failed to fetch the CosCredentials from a instance metadata service: max retry " +

@@ -264,6 +264,9 @@ public class UploadCallable implements Callable<UploadResult> {
                 new CompleteMultipartUploadRequest(origReq.getBucketName(), origReq.getKey(),
                         multipartUploadId, partETags)
                                 .withGeneralProgressListener(origReq.getGeneralProgressListener());
+        if(origReq.getFixedEndpointAddr() != null) {
+            req.setFixedEndpointAddr(origReq.getFixedEndpointAddr());
+        }
         CompleteMultipartUploadResult res = cos.completeMultipartUpload(req);
 
         UploadResult uploadResult = new UploadResult();
@@ -349,6 +352,9 @@ public class UploadCallable implements Callable<UploadResult> {
                 .withSSECOSKeyManagementParams(origReq.getSSECOSKeyManagementParams())
                 .withGeneralProgressListener(origReq.getGeneralProgressListener());
 
+        if(origReq.getFixedEndpointAddr() != null) {
+            req.setFixedEndpointAddr(origReq.getFixedEndpointAddr());
+        }
         String uploadId = cos.initiateMultipartUpload(req).getUploadId();
         log.debug("Initiated new multipart upload: " + uploadId);
 

@@ -44,7 +44,7 @@ public class InstanceMetadataCredentialsEndpointProvider extends CredentialsEndp
         }
 
         // Try to get a valid role.
-        LOG.warn("The role name is not specified. Trying to get a valid role name from the instance.");
+        LOG.debug("The role name is not specified. Trying to get a valid role name from the instance.");
         String roles =
                 InstanceCredentialsUtils.getInstance().readResource(
                         new URI(this.instance.METADATA_SERVICE_URL + this.instance.METADATA_CREDENTIALS_RESOURCE));

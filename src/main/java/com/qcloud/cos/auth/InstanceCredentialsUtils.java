@@ -48,36 +48,39 @@ public class InstanceCredentialsUtils {
         while (true) {
             try {
                 HttpURLConnection connection = this.connectionUtils.connectToEndpoint(endpoint, headers);
-
                 int statusCode = connection.getResponseCode();
 
                 if (statusCode == HttpURLConnection.HTTP_OK) {
                     inputStream = connection.getInputStream();
                     return IOUtils.toString(inputStream);
                 } else if (statusCode == HttpURLConnection.HTTP_NOT_FOUND) {
-                    throw new CosClientException("The requested metadata is not found at " + connection.getURL());
+                    String errorMsg = "The requested metadata is not found at " + connection.getURL();
+                    LOG.error(errorMsg);
+                    throw new CosClientException(errorMsg);
                 } else {
+                    LOG.error("The response status code is:" + statusCode);
+                    inputStream = connection.getErrorStream();
+                    String errorMessage = null;
+                    String errorCode = null;
+                    if (null != inputStream) {
+                        String errorResponse = IOUtils.toString(inputStream);
+                        LOG.error("errorResponse:" + errorResponse);
+                        try {
+                            JsonNode node = Jackson.jsonNodeOf(errorResponse);
+                            JsonNode code = node.get("code");
+                            JsonNode message = node.get("message");
+                            if (null != code) {
+                                errorCode = code.asText();
+                            }
+                            if (null != message) {
+                                errorMessage = message.asText();
+                            }
+                        } catch (Exception exception) {
+                            LOG.error("Unable to parse errorResponse:" + errorResponse, exception);
+                        }
+                    }
                     if (!retryPolicy.shouldRetry(retriesAttempted++,
                             CredentialsEndpointRetryParameters.builder().withStatusCode(statusCode).build())) {
-                        inputStream = connection.getErrorStream();
-                        String errorMessage = null;
-                        String errorCode = null;
-                        if (null != inputStream) {
-                            String errorResponse = IOUtils.toString(inputStream);
-                            try {
-                                JsonNode node = Jackson.jsonNodeOf(errorResponse);
-                                JsonNode code = node.get("code");
-                                JsonNode message = node.get("message");
-                                if (null != code) {
-                                    errorCode = code.asText();
-                                }
-                                if (null != message) {
-                                    errorMessage = message.asText();
-                                }
-                            } catch (Exception exception) {
-                                LOG.debug("Unable to parse error stream.");
-                            }
-                        }
                         CosServiceException cosServiceException =
                                 new CosServiceException(connection.getResponseMessage());
                         if (null != errorMessage) {
@@ -90,12 +93,11 @@ public class InstanceCredentialsUtils {
                     }
                 }
             } catch (IOException e) {
+                LOG.error("An IOException occurred, service endpoint:" + endpoint + ", exception:", e);
                 if (!retryPolicy.shouldRetry(retriesAttempted++,
                         CredentialsEndpointRetryParameters.builder().withException(e).build())) {
                     throw e;
                 }
-                LOG.warn("An IOException occurred when connecting to service endpoint: {}. Retrying to connect again" +
-                        ".", endpoint);
             } finally {
                 IOUtils.closeQuietly(inputStream, LOG);
             }

@@ -82,6 +82,9 @@ public class CopyPartRequestFactory {
                 .withUnmodifiedSinceConstraint(origReq.getUnmodifiedSinceConstraint())
                 // general meta data
                 .withGeneralProgressListener(origReq.getGeneralProgressListener());
+        if(origReq.getFixedEndpointAddr() != null) {
+            req.setFixedEndpointAddr(origReq.getFixedEndpointAddr());
+        }
         offset += partSize;
         remainingBytes -= partSize;
         return req;

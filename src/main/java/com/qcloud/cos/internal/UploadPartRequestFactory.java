@@ -109,7 +109,9 @@ public class UploadPartRequestFactory {
         TransferManager.appendMultipartUserAgent(req);
 
         if (sseCustomerKey != null) req.setSSECustomerKey(sseCustomerKey);
-
+        if(origReq.getFixedEndpointAddr() != null) {
+            req.setFixedEndpointAddr(origReq.getFixedEndpointAddr());
+        }
         offset += partSize;
         remainingBytes -= partSize;
 
