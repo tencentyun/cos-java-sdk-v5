@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.LinkedHashMap;
 
+import com.qcloud.cos.model.BucketIntelligentTierConfiguration;
 import com.qcloud.cos.model.ciModel.bucket.MediaBucketObject;
 import com.qcloud.cos.model.ciModel.bucket.MediaBucketResponse;
 import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
@@ -527,6 +528,13 @@ public class XmlResponsesSaxParser {
 
     public GetObjectTaggingHandler parseObjectTaggingResponse(InputStream inputStream) throws IOException {
         GetObjectTaggingHandler handler = new GetObjectTaggingHandler();
+        parseXmlInputStream(handler, inputStream);
+        return handler;
+    }
+
+    public GetBucketIntelligentTierConfigurationHandler parseBucketIntelligentTierConfigurationsResponse(InputStream inputStream)
+            throws IOException {
+        GetBucketIntelligentTierConfigurationHandler handler = new GetBucketIntelligentTierConfigurationHandler();
         parseXmlInputStream(handler, inputStream);
         return handler;
     }
@@ -2886,6 +2894,46 @@ public class XmlResponsesSaxParser {
                     currentTagValue = getText();
                 }
             }
+        }
+    }
+
+    public static class GetBucketIntelligentTierConfigurationHandler extends AbstractHandler {
+
+        private final BucketIntelligentTierConfiguration configuration =
+                new BucketIntelligentTierConfiguration();
+
+        private BucketIntelligentTierConfiguration.Transition transition;
+
+        public BucketIntelligentTierConfiguration getConfiguration() {
+            return configuration;
+        }
+
+        @Override
+        protected void doStartElement(
+                String uri,
+                String name,
+                String qName,
+                Attributes attrs) {
+
+            if (in("IntelligentTieringConfiguration")) {
+                if (name.equals("Transition")) {
+                    configuration.setTransition(new BucketIntelligentTierConfiguration.Transition());
+                }
+            }
+        }
+
+        @Override
+        protected void doEndElement(String uri, String name, String qName) {
+            if (in("IntelligentTieringConfiguration")) {
+                if(name.equals("Status")) {
+                    configuration.setStatus(getText());
+                }
+            } else if(in("IntelligentTieringConfiguration", "Transition")) {
+                if (name.equals("Days")) {
+                    configuration.getTransition().setDays(Integer.parseInt(getText()));
+                }
+            }
+
         }
     }
 

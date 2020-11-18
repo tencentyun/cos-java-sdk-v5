@@ -37,6 +37,9 @@ import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
 import com.qcloud.cos.endpoint.CIRegionEndpointBuilder;
+import com.qcloud.cos.model.BucketIntelligentTierConfiguration;
+import com.qcloud.cos.model.GetBucketIntelligentTierConfigurationRequest;
+import com.qcloud.cos.model.SetBucketIntelligentTierConfigurationRequest;
 import com.qcloud.cos.model.ciModel.bucket.MediaBucketRequest;
 import com.qcloud.cos.model.ciModel.bucket.MediaBucketResponse;
 import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
@@ -3473,6 +3476,39 @@ public class COSClient implements COS {
     }
 
     @Override
+    public BucketIntelligentTierConfiguration getBucketIntelligentTierConfiguration(GetBucketIntelligentTierConfigurationRequest getBucketIntelligentTierConfigurationRequest) {
+        rejectNull(getBucketIntelligentTierConfigurationRequest, "The request cannot be null");
+        rejectNull(getBucketIntelligentTierConfigurationRequest.getBucketName(), "The bucketName cannot be null");
+        final String bucketName = getBucketIntelligentTierConfigurationRequest.getBucketName();
+
+        CosHttpRequest<GetBucketIntelligentTierConfigurationRequest> request = createRequest(bucketName, null, getBucketIntelligentTierConfigurationRequest, HttpMethodName.GET);
+        request.addParameter("intelligenttiering", null);
+        return invoke(request, new Unmarshallers.GetBucketIntelligentTierConfigurationsUnmarshaller());
+    }
+
+    @Override
+    public BucketIntelligentTierConfiguration getBucketIntelligentTierConfiguration(String bucketName) {
+        return getBucketIntelligentTierConfiguration(new GetBucketIntelligentTierConfigurationRequest(bucketName));
+    }
+
+    @Override
+    public void setBucketIntelligentTieringConfiguration(SetBucketIntelligentTierConfigurationRequest setBucketIntelligentTierConfigurationRequest) {
+        rejectNull(setBucketIntelligentTierConfigurationRequest, "The request cannot be null");
+        rejectNull(setBucketIntelligentTierConfigurationRequest.getBucketName(), "The bucketName cannot be null");
+        BucketIntelligentTierConfiguration bucketIntelligentTierConfiguration = setBucketIntelligentTierConfigurationRequest.getBucketIntelligentTierConfiguration();
+        rejectNull(bucketIntelligentTierConfiguration, "Bucket intelligent tier configuration cannot be null");
+        final String bucketName = setBucketIntelligentTierConfigurationRequest.getBucketName();
+
+        CosHttpRequest<SetBucketIntelligentTierConfigurationRequest> request = createRequest(bucketName, null, setBucketIntelligentTierConfigurationRequest, HttpMethodName.PUT);
+        request.addParameter("intelligenttiering", null);
+
+        byte[] content = new BucketConfigurationXmlFactory().convertToXmlByteArray(bucketIntelligentTierConfiguration);
+        request.addHeader("Content-Length", String.valueOf(content.length));
+        request.addHeader("Content-Type", "application/xml");
+        request.setContent(new ByteArrayInputStream(content));
+        invoke(request, voidCosResponseHandler);
+    }
+    @Override
     public MediaJobResponse createMediaJobs(MediaJobsRequest req) throws UnsupportedEncodingException {
         this.checkCIRequestCommon(req);
         rejectNull(req.getTag(),
@@ -3706,6 +3742,5 @@ public class COSClient implements COS {
         rejectNull(output.getObject(),
                 "The output.object parameter must be specified setting the object tags");
     }
-
 }
 

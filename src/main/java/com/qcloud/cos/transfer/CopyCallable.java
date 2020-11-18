@@ -105,9 +105,12 @@ public class CopyCallable implements Callable<CopyResult> {
         Region destRegion = cos.getClientConfig().getRegion();
         String sourceStorageClass = (String)metadata.getRawMetadataValue(Headers.STORAGE_CLASS);
         String destStorageClass = copyObjectRequest.getStorageClass();
+        if(sourceStorageClass == null) {
+            sourceStorageClass = "Standard";
+        }
 
         // 如果源和目的对象的存储类型相同
-        if(sourceStorageClass != null && destStorageClass != null && sourceStorageClass.equals(destStorageClass)) {
+        if(sourceStorageClass.equalsIgnoreCase(destStorageClass)) {
             // 如果没有设置source region, 表示使用的和clientconfig里面同一region,
             // 或者设置了相同的region，使用put object copy即可
             if(sourceRegion == null || sourceRegion.equals(destRegion)) {

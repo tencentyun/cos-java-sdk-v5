@@ -22,6 +22,7 @@ import com.qcloud.cos.internal.XmlResponsesSaxParser.CompleteMultipartUploadHand
 import com.qcloud.cos.internal.XmlResponsesSaxParser.CopyObjectResultHandler;
 import com.qcloud.cos.model.AccessControlList;
 import com.qcloud.cos.model.Bucket;
+import com.qcloud.cos.model.BucketIntelligentTierConfiguration;
 import com.qcloud.cos.model.BucketVersioningConfiguration;
 import com.qcloud.cos.model.InitiateMultipartUploadResult;
 import com.qcloud.cos.model.MultipartUploadListing;
@@ -378,6 +379,17 @@ public class Unmarshallers {
         @Override
         public GetObjectTaggingResult unmarshall(InputStream in) throws Exception {
             return new XmlResponsesSaxParser().parseObjectTaggingResponse(in).getResult();
+        }
+    }
+
+    /**
+     * Unmarshaller for the ListBucketInventoryConfigurations XML response.
+     */
+    public static final class GetBucketIntelligentTierConfigurationsUnmarshaller implements
+            Unmarshaller<BucketIntelligentTierConfiguration, InputStream> {
+
+        public BucketIntelligentTierConfiguration unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser().parseBucketIntelligentTierConfigurationsResponse(in).getConfiguration();
         }
     }
 

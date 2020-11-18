@@ -34,10 +34,13 @@ import com.qcloud.cos.model.AbortMultipartUploadRequest;
 import com.qcloud.cos.model.AccessControlList;
 import com.qcloud.cos.model.Bucket;
 import com.qcloud.cos.model.BucketCrossOriginConfiguration;
+import com.qcloud.cos.model.BucketIntelligentTierConfiguration;
 import com.qcloud.cos.model.BucketLifecycleConfiguration;
 import com.qcloud.cos.model.BucketPolicy;
 import com.qcloud.cos.model.BucketReplicationConfiguration;
 import com.qcloud.cos.model.BucketVersioningConfiguration;
+import com.qcloud.cos.model.GetBucketIntelligentTierConfigurationRequest;
+import com.qcloud.cos.model.SetBucketIntelligentTierConfigurationRequest;
 import com.qcloud.cos.model.SetBucketLoggingConfigurationRequest;
 import com.qcloud.cos.model.GetBucketLoggingConfigurationRequest;
 import com.qcloud.cos.model.BucketLoggingConfiguration;
@@ -2855,6 +2858,30 @@ public interface COS extends COSDirectSpi {
             DeleteBucketTaggingConfigurationRequest deleteBucketTaggingConfigurationRequest);
 
     /**
+     * Get the intelligent configuration for the specified bucket.
+     * @param getBucketIntelligentTierConfigurationRequest
+     * @return
+     */
+    BucketIntelligentTierConfiguration getBucketIntelligentTierConfiguration(GetBucketIntelligentTierConfigurationRequest getBucketIntelligentTierConfigurationRequest);
+
+
+    /**
+     * Get the intelligent configuration for the specified bucket.
+     * @param bucketName
+     * @return
+     */
+    BucketIntelligentTierConfiguration getBucketIntelligentTierConfiguration(String bucketName);
+
+    /**
+     * Sets the intelligent configuration for the specified bucket.
+     *
+     * @param setBucketIntelligentTierConfigurationRequest
+     *            The request object containing all options for setting the
+     *            bucket intelligent configuration.
+     */
+    void setBucketIntelligentTieringConfiguration(SetBucketIntelligentTierConfigurationRequest setBucketIntelligentTierConfigurationRequest);
+
+    /**
      * append data to an COS object
      *
      * @param appendObjectRequest
@@ -3010,7 +3037,6 @@ public interface COS extends COSDirectSpi {
      * DescribeWorkflowExecutions 接口用于获取工作流实例列表。 https://cloud.tencent.com/document/product/460/45950
      */
     MediaWorkflowExecutionsResponse describeWorkflowExecutions(MediaWorkflowListRequest request);
-
 }
 
 

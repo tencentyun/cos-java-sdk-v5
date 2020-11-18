@@ -625,4 +625,25 @@ public class BucketConfigurationXmlFactory {
         xml.end();
     }
 
+
+    public byte[] convertToXmlByteArray(BucketIntelligentTierConfiguration configuration)
+            throws CosClientException {
+
+        XmlWriter xml = new XmlWriter();
+        xml.start("IntelligentTieringConfiguration");
+        String status = configuration.getStatus();
+        xml.start("Status").value(status).end();
+        BucketIntelligentTierConfiguration.Transition transition = configuration.getTransition();
+        if(status.equals(BucketIntelligentTierConfiguration.ENABLED) && transition != null) {
+            xml.start("Transition");
+            xml.start("Days").value(Integer.toString(transition.getDays())).end();
+            xml.start("RequestFrequent").value(Integer.toString(transition.getRequestFrequent())).end();
+            xml.end();
+        }
+
+        xml.end();
+
+        return xml.getBytes();
+    }
+
 }
