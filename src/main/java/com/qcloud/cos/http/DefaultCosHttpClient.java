@@ -11,7 +11,7 @@
  * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
  * express or implied. See the License for the specific language governing
  * permissions and limitations under the License.
- 
+
  * According to cos feature, we modify some class，comment, field name, etc.
  */
 
@@ -28,30 +28,16 @@ import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.exception.CosServiceException.ErrorType;
 import com.qcloud.cos.internal.CosErrorResponseHandler;
 import com.qcloud.cos.internal.CosServiceRequest;
-import com.qcloud.cos.internal.ReleasableInputStream;
 import com.qcloud.cos.internal.CosServiceResponse;
-import com.qcloud.cos.internal.SdkBufferedInputStream;
+import com.qcloud.cos.internal.ReleasableInputStream;
 import com.qcloud.cos.internal.ResettableInputStream;
+import com.qcloud.cos.internal.SdkBufferedInputStream;
 import com.qcloud.cos.retry.BackoffStrategy;
 import com.qcloud.cos.retry.RetryPolicy;
 import com.qcloud.cos.utils.CodecUtils;
 import com.qcloud.cos.utils.ExceptionUtils;
 import com.qcloud.cos.utils.UrlEncoderUtils;
 import com.qcloud.cos.utils.ValidationUtils;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.http.*;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.*;
-import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.entity.InputStreamEntity;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.protocol.HttpContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -62,6 +48,29 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.http.Header;
+import org.apache.http.HttpHost;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.StatusLine;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpHead;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.entity.InputStreamEntity;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.protocol.HttpContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class DefaultCosHttpClient implements CosHttpClient {
@@ -85,7 +94,7 @@ public class DefaultCosHttpClient implements CosHttpClient {
         this.connectionManager = new PoolingHttpClientConnectionManager();
         this.maxErrorRetry = clientConfig.getMaxErrorRetry();
         this.retryPolicy = ValidationUtils.assertNotNull(clientConfig.getRetryPolicy(), "retry policy");
-        this.backoffStrategy = ValidationUtils.assertNotNull(clientConfig.getBackoffStrategy(),"backoff strategy");
+        this.backoffStrategy = ValidationUtils.assertNotNull(clientConfig.getBackoffStrategy(), "backoff strategy");
         initHttpClient();
     }
 
@@ -107,8 +116,8 @@ public class DefaultCosHttpClient implements CosHttpClient {
                         .setContentCompressionEnabled(false)
                         .setConnectionRequestTimeout(
                                 this.clientConfig.getConnectionRequestTimeout())
-                .setConnectTimeout(this.clientConfig.getConnectionTimeout())
-                .setSocketTimeout(this.clientConfig.getSocketTimeout()).build();
+                        .setConnectTimeout(this.clientConfig.getConnectionTimeout())
+                        .setSocketTimeout(this.clientConfig.getSocketTimeout()).build();
         this.idleConnectionMonitor = new IdleConnectionMonitorThread(this.connectionManager);
         this.idleConnectionMonitor.setDaemon(true);
         this.idleConnectionMonitor.start();
@@ -167,7 +176,6 @@ public class DefaultCosHttpClient implements CosHttpClient {
             urlBuffer.append("?").append(paramStr);
         }
 
-
         try {
             URI uri = new URI(urlBuffer.toString());
             return uri;
@@ -195,16 +203,15 @@ public class DefaultCosHttpClient implements CosHttpClient {
             throw new CosClientException("unsupported http method " + httpMethodName);
         }
 
-
         httpRequestBase.setURI(buildUri(request));
 
-        long content_length = -1;
+        long contentLength = -1;
         Map<String, String> requestHeaders = request.getHeaders();
         for (Entry<String, String> headerEntry : requestHeaders.entrySet()) {
             String headerKey = headerEntry.getKey();
             String headerValue = headerEntry.getValue();
             if (headerKey.equals(Headers.CONTENT_LENGTH)) {
-                content_length = Long.parseLong(headerValue);
+                contentLength = Long.parseLong(headerValue);
                 continue;
             }
             headerValue = CodecUtils.convertFromUtf8ToIso88591(headerValue);
@@ -219,7 +226,7 @@ public class DefaultCosHttpClient implements CosHttpClient {
                 String headerKey = customHeaderEntry.getKey();
                 String headerValue = customHeaderEntry.getValue();
                 if (headerKey.equals(Headers.CONTENT_LENGTH)) {
-                    content_length = Long.parseLong(headerValue);
+                    contentLength = Long.parseLong(headerValue);
                     continue;
                 }
                 headerValue = CodecUtils.convertFromUtf8ToIso88591(headerValue);
@@ -235,7 +242,7 @@ public class DefaultCosHttpClient implements CosHttpClient {
 
         if (request.getContent() != null) {
             InputStreamEntity reqEntity =
-                    new InputStreamEntity(request.getContent(), content_length);
+                    new InputStreamEntity(request.getContent(), contentLength);
             if (httpMethodName.equals(HttpMethodName.PUT)
                     || httpMethodName.equals(HttpMethodName.POST)) {
                 HttpEntityEnclosingRequestBase entityRequestBase =
@@ -244,7 +251,7 @@ public class DefaultCosHttpClient implements CosHttpClient {
             }
         }
         httpRequestBase.setConfig(this.requestConfig);
-        if(clientConfig.useBasicAuth()) {
+        if (clientConfig.useBasicAuth()) {
             // basic auth认证
             setBasicProxyAuthorization(httpRequestBase);
         }
@@ -359,8 +366,8 @@ public class DefaultCosHttpClient implements CosHttpClient {
     }
 
     private <X extends CosServiceRequest> void checkResponse(CosHttpRequest<X> request,
-                                                              HttpRequestBase httpRequest,
-                                                              HttpResponse httpResponse) {
+            HttpRequestBase httpRequest,
+            HttpResponse httpResponse) {
         if (!isRequestSuccessful(httpResponse)) {
             try {
                 throw handlerErrorMessage(request, httpRequest, httpResponse);
@@ -380,8 +387,8 @@ public class DefaultCosHttpClient implements CosHttpClient {
     }
 
     private <X extends CosServiceRequest> boolean shouldRetry(CosHttpRequest<X> request, HttpResponse response,
-                                                              Exception exception, int retryIndex,
-                                                              RetryPolicy retryPolicy) {
+            Exception exception, int retryIndex,
+            RetryPolicy retryPolicy) {
         if (retryIndex >= maxErrorRetry) {
             return false;
         }
@@ -409,18 +416,19 @@ public class DefaultCosHttpClient implements CosHttpClient {
 
     private void closeHttpResponseStream(HttpResponse httpResponse) {
         try {
-            if(httpResponse != null && httpResponse.getEntity() != null &&
-                    httpResponse.getEntity().getContent() != null) {
+            if (httpResponse != null && httpResponse.getEntity() != null
+                    && httpResponse.getEntity().getContent() != null) {
                 httpResponse.getEntity().getContent().close();
             }
         } catch (IOException e) {
+            log.error("exception occur:", e);
         }
     }
 
     @Override
     public <X, Y extends CosServiceRequest> X exeute(CosHttpRequest<Y> request,
             HttpResponseHandler<CosServiceResponse<X>> responseHandler)
-                    throws CosClientException, CosServiceException {
+            throws CosClientException, CosServiceException {
 
         HttpResponse httpResponse = null;
         HttpRequestBase httpRequest = null;
@@ -453,7 +461,7 @@ public class DefaultCosHttpClient implements CosHttpClient {
                 if (retryIndex != 0 && originalContent != null) {
                     originalContent.reset();
                 }
-                if(retryIndex != 0) {
+                if (retryIndex != 0) {
                     long delay = backoffStrategy.computeDelayBeforeNextRetry(retryIndex);
                     Thread.sleep(delay);
                 }
@@ -464,9 +472,10 @@ public class DefaultCosHttpClient implements CosHttpClient {
                 checkResponse(request, httpRequest, httpResponse);
                 break;
             } catch (CosServiceException cse) {
-                if(cse.getStatusCode() >= 500) {
-                    String errorMsg = String.format("failed to execute http request, due to service exception, httpRequest: %s",
-                            request.toString());
+                if (cse.getStatusCode() >= 500) {
+                    String errorMsg = String
+                            .format("failed to execute http request, due to service exception, httpRequest: %s",
+                                    request.toString());
                     log.error(errorMsg, cse);
                 }
                 closeHttpResponseStream(httpResponse);
@@ -474,8 +483,9 @@ public class DefaultCosHttpClient implements CosHttpClient {
                     throw cse;
                 }
             } catch (CosClientException cce) {
-                String errorMsg = String.format("failed to execute http request, due to client exception, httpRequest: %s",
-                        request.toString());
+                String errorMsg = String
+                        .format("failed to execute http request, due to client exception, httpRequest: %s",
+                                request.toString());
                 log.error(errorMsg, cce);
                 closeHttpResponseStream(httpResponse);
                 if (!shouldRetry(request, httpResponse, cce, retryIndex, retryPolicy)) {

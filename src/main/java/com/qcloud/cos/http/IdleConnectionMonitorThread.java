@@ -11,7 +11,7 @@
  * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
  * express or implied. See the License for the specific language governing
  * permissions and limitations under the License.
- 
+
  * According to cos feature, we modify some class，comment, field name, etc.
  */
 
@@ -19,48 +19,51 @@
 package com.qcloud.cos.http;
 
 import java.util.concurrent.TimeUnit;
-
 import org.apache.http.conn.HttpClientConnectionManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 //用于监控空闲的连接池连接
 public final class IdleConnectionMonitorThread extends Thread {
- private final HttpClientConnectionManager connMgr;
- private volatile boolean shutdown;
 
- private static final int MONITOR_INTERVAL_MS = 2000;
- private static final int IDLE_ALIVE_MS = 5000;
+    private static final Logger log = LoggerFactory.getLogger(IdleConnectionMonitorThread.class);
+    private final HttpClientConnectionManager connMgr;
+    private volatile boolean shutdown;
 
- public IdleConnectionMonitorThread(HttpClientConnectionManager connMgr) {
-     super();
-     this.connMgr = connMgr;
-     this.shutdown = false;
- }
+    private static final int MONITOR_INTERVAL_MS = 2000;
+    private static final int IDLE_ALIVE_MS = 5000;
 
- @Override
- public void run() {
-     try {
-         while (!shutdown) {
-             synchronized (this) {
-                 wait(MONITOR_INTERVAL_MS);
-                 // 关闭无效的连接
-                 connMgr.closeExpiredConnections();
-                 // 关闭空闲时间超过IDLE_ALIVE_MS的连接
-                 connMgr.closeIdleConnections(IDLE_ALIVE_MS, TimeUnit.MILLISECONDS);
-             }
-         }
-     } catch (InterruptedException e) {
+    public IdleConnectionMonitorThread(HttpClientConnectionManager connMgr) {
+        super();
+        this.connMgr = connMgr;
+        this.shutdown = false;
+    }
 
-     } finally {
-         connMgr.shutdown();
-     }
- }
+    @Override
+    public void run() {
+        try {
+            while (!shutdown) {
+                synchronized (this) {
+                    wait(MONITOR_INTERVAL_MS);
+                    // 关闭无效的连接
+                    connMgr.closeExpiredConnections();
+                    // 关闭空闲时间超过IDLE_ALIVE_MS的连接
+                    connMgr.closeIdleConnections(IDLE_ALIVE_MS, TimeUnit.MILLISECONDS);
+                }
+            }
+        } catch (InterruptedException e) {
+            log.error("interrupt exception occured:", e);
+        } finally {
+            connMgr.shutdown();
+        }
+    }
 
- // 关闭后台连接
- public void shutdown() {
-     shutdown = true;
-     synchronized (this) {
-         notifyAll();
-     }
- }
+    // 关闭后台连接
+    public void shutdown() {
+        shutdown = true;
+        synchronized (this) {
+            notifyAll();
+        }
+    }
 
 }

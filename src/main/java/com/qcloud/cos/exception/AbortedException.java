@@ -11,7 +11,7 @@
  * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
  * express or implied. See the License for the specific language governing
  * permissions and limitations under the License.
- 
+
  * According to cos feature, we modify some class，comment, field name, etc.
  */
 
@@ -22,6 +22,7 @@ package com.qcloud.cos.exception;
  * SDK operation aborted exception.
  */
 public class AbortedException extends CosClientException {
+
     private static final long serialVersionUID = 1L;
 
     public AbortedException(String message, Throwable t) {

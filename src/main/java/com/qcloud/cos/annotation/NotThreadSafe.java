@@ -14,9 +14,14 @@
 
  * According to cos feature, we modify some class，comment, field name, etc.
  */
+
 package com.qcloud.cos.annotation;
 
-import java.lang.annotation.*;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * Documenting annotation to indicate a class is not thread-safe and should not be used in a multi-threaded context.
@@ -27,4 +32,5 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.CLASS)
 public @interface NotThreadSafe {
+
 }

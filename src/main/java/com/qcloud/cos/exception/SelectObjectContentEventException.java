@@ -14,6 +14,7 @@
 
  * According to cos feature, we modify some class，comment, field name, etc.
  */
+
 package com.qcloud.cos.exception;
 
 
@@ -21,12 +22,14 @@ import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.model.SelectObjectContentEvent;
 
 /**
- * An exception generated when COS has received and started request processing, but something goes wrong after it has started
+ * An exception generated when COS has received and started request processing, but something goes wrong after it has
+ * started
  * returning {@link SelectObjectContentEvent}s.
  *
  * The {@link #getErrorMessage()} and {@link #getErrorMessage()} will be specified if the service has returned them.
  */
 public final class SelectObjectContentEventException extends CosClientException {
+
     private String errorCode;
     private String errorMessage;
 
@@ -39,7 +42,8 @@ public final class SelectObjectContentEventException extends CosClientException 
     }
 
     /**
-     * Retrieve a summary of the reason for the exception, including the {@link #getErrorCode()} and {@link #getErrorMessage()},
+     * Retrieve a summary of the reason for the exception, including the {@link #getErrorCode()} and {@link
+     * #getErrorMessage()},
      * if the error was raised by the service.
      */
     @Override
@@ -48,7 +52,8 @@ public final class SelectObjectContentEventException extends CosClientException 
     }
 
     /**
-     * A unique error code for the failure scenario encountered by the service. May be null if a code was not returned by the
+     * A unique error code for the failure scenario encountered by the service. May be null if a code was not returned
+     * by the
      * service.
      */
     public String getErrorCode() {
@@ -60,7 +65,8 @@ public final class SelectObjectContentEventException extends CosClientException 
     }
 
     /**
-     * A human-readable error message for the failure scenario encountered by the service. May be null if a message was not
+     * A human-readable error message for the failure scenario encountered by the service. May be null if a message was
+     * not
      * returned by the service.
      */
     public String getErrorMessage() {

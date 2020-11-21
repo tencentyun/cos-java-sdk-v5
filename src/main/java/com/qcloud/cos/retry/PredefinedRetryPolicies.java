@@ -14,6 +14,7 @@
 
  * According to cos feature, we modify some class，comment, field name, etc.
  */
+
 package com.qcloud.cos.retry;
 
 import com.qcloud.cos.http.CosHttpRequest;
@@ -22,13 +23,16 @@ import org.apache.http.HttpResponse;
 
 
 public class PredefinedRetryPolicies {
-    /** No retry policy **/
+
+    /**
+     * No retry policy
+     **/
     public static final RetryPolicy NO_RETRY_POLICY = new RetryPolicy() {
         @Override
         public <X extends CosServiceRequest> boolean shouldRetry(CosHttpRequest<X> request,
-                                                                 HttpResponse response,
-                                                                 Exception exception,
-                                                                 int retryIndex) {
+                HttpResponse response,
+                Exception exception,
+                int retryIndex) {
             return false;
         }
     };
@@ -46,13 +50,13 @@ public class PredefinedRetryPolicies {
 
         @Override
         public <X extends CosServiceRequest> boolean shouldRetry(CosHttpRequest<X> request,
-                                                                 HttpResponse response,
-                                                                 Exception exception,
-                                                                 int retryIndex) {
-            if(RetryUtils.isRetryableServiceException(exception)) {
+                HttpResponse response,
+                Exception exception,
+                int retryIndex) {
+            if (RetryUtils.isRetryableServiceException(exception)) {
                 return true;
             }
-            if(RetryUtils.isRetryableClientException(exception)) {
+            if (RetryUtils.isRetryableClientException(exception)) {
                 return true;
             }
             return false;

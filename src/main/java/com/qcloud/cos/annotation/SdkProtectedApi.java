@@ -14,6 +14,7 @@
 
  * According to cos feature, we modify some class，comment, field name, etc.
  */
+
 package com.qcloud.cos.annotation;
 
 import java.lang.annotation.ElementType;
@@ -27,6 +28,7 @@ import java.lang.annotation.Target;
  * TODO: Write a linter that makes sure generated code only depends on public or
  * {@code @InternalApi} classes.
  */
-@Target({ ElementType.PACKAGE, ElementType.TYPE, ElementType.FIELD, ElementType.CONSTRUCTOR, ElementType.METHOD })
+@Target({ElementType.PACKAGE, ElementType.TYPE, ElementType.FIELD, ElementType.CONSTRUCTOR, ElementType.METHOD})
 public @interface SdkProtectedApi {
+
 }

@@ -14,6 +14,7 @@
 
  * According to cos feature, we modify some class，comment, field name, etc.
  */
+
 package com.qcloud.cos.retry;
 
 import com.qcloud.cos.exception.ClientExceptionConstants;
@@ -25,8 +26,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class RetryUtils {
+
     static final Set<Integer> RETRYABLE_STATUS_CODES = new HashSet<Integer>(4);
     static final Set<String> RETRYABLE_CLIENT_ERROR_CODES = new HashSet<>(1);
+
     static {
         RETRYABLE_STATUS_CODES.add(HttpStatus.SC_INTERNAL_SERVER_ERROR);
         RETRYABLE_STATUS_CODES.add(HttpStatus.SC_BAD_GATEWAY);
@@ -47,7 +50,7 @@ public class RetryUtils {
      * @return True if the exception resulted from a retryable service error, otherwise false.
      */
     public static boolean isRetryableServiceException(Exception exception) {
-        return exception instanceof CosServiceException && isRetryableServiceException((CosServiceException)exception);
+        return exception instanceof CosServiceException && isRetryableServiceException((CosServiceException) exception);
     }
 
     /**
@@ -67,7 +70,7 @@ public class RetryUtils {
      * @return True if the exception resulted from a retryable service error, otherwise false.
      */
     public static boolean isRetryableClientException(Exception exception) {
-        return exception instanceof CosClientException && isRetryableClientException((CosClientException)exception);
+        return exception instanceof CosClientException && isRetryableClientException((CosClientException) exception);
     }
 
     /**

@@ -28,12 +28,12 @@ public class Region implements Serializable {
     private String regionName;
     private String displayName;
 
-    public Region(String region_name) {
-        this(region_name, region_name);
+    public Region(String regionName) {
+        this(regionName, regionName);
     }
 
-    public Region(String region_name, String displayName) {
-        this.regionName = region_name;
+    public Region(String regionName, String displayName) {
+        this.regionName = regionName;
         this.displayName = displayName;
     }
 

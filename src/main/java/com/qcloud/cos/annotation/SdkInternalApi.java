@@ -14,6 +14,7 @@
 
  * According to cos feature, we modify some class，comment, field name, etc.
  */
+
 package com.qcloud.cos.annotation;
 
 import java.lang.annotation.ElementType;
@@ -25,6 +26,7 @@ import java.lang.annotation.Target;
  * and the generated clients themselves should not depend on any packages, types, fields,
  * constructors, or methods with this annotation.
  */
-@Target({ ElementType.PACKAGE, ElementType.TYPE, ElementType.FIELD, ElementType.CONSTRUCTOR, ElementType.METHOD })
+@Target({ElementType.PACKAGE, ElementType.TYPE, ElementType.FIELD, ElementType.CONSTRUCTOR, ElementType.METHOD})
 public @interface SdkInternalApi {
+
 }

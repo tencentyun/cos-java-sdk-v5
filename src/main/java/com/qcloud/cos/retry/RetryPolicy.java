@@ -14,15 +14,17 @@
 
  * According to cos feature, we modify some class，comment, field name, etc.
  */
+
 package com.qcloud.cos.retry;
 
 import com.qcloud.cos.http.CosHttpRequest;
 import com.qcloud.cos.internal.CosServiceRequest;
 import org.apache.http.HttpResponse;
 
-public abstract  class RetryPolicy {
-    public abstract <X extends CosServiceRequest>  boolean shouldRetry(CosHttpRequest<X> request,
-                                                                       HttpResponse response,
-                                                                       Exception exception,
-                                                                       int retryIndex);
+public abstract class RetryPolicy {
+
+    public abstract <X extends CosServiceRequest> boolean shouldRetry(CosHttpRequest<X> request,
+            HttpResponse response,
+            Exception exception,
+            int retryIndex);
 }

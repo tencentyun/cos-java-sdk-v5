@@ -14,12 +14,14 @@
 
  * According to cos feature, we modify some class，comment, field name, etc.
  */
+
 package com.qcloud.cos.retry;
 
 import com.qcloud.cos.utils.ValidationUtils;
 
 
 public class PredefinedBackoffStrategies {
+
     /**
      * Default base sleep time (milliseconds) for non-throttled exceptions.
      **/
@@ -57,7 +59,7 @@ public class PredefinedBackoffStrategies {
         private final int maxBackoffTime;
 
         public ExponentialBackoffStrategy(final int baseDelay,
-                                          final int maxBackoffTime) {
+                final int maxBackoffTime) {
             this.baseDelay = ValidationUtils.assertIsPositive(baseDelay, "Base delay");
             this.maxBackoffTime = ValidationUtils.assertIsPositive(maxBackoffTime, "Max backoff");
         }

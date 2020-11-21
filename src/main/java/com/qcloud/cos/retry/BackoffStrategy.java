@@ -14,12 +14,14 @@
 
  * According to cos feature, we modify some class，comment, field name, etc.
  */
+
 package com.qcloud.cos.retry;
 
 /**
  * Super interface for {@link RetryPolicy} that defines a strategy for backing off between retries.
  */
 public interface BackoffStrategy {
+
     /**
      * Compute the delay before the next retry request. This strategy is only consulted when there will be a next retry.
      *

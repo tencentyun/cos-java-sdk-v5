@@ -14,6 +14,7 @@
 
  * According to cos feature, we modify some class，comment, field name, etc.
  */
+
 package com.qcloud.cos.exception;
 
 import java.io.IOException;
@@ -29,10 +30,8 @@ public class CRC32MismatchException extends IOException {
      * Creates a new CRC32MismatchException with the specified message, and root
      * cause.
      *
-     * @param message
-     *            An error message describing why this exception was thrown.
-     * @param t
-     *            The underlying cause of this exception.
+     * @param message An error message describing why this exception was thrown.
+     * @param t The underlying cause of this exception.
      */
     public CRC32MismatchException(String message, Throwable t) {
         super(message, t);
@@ -41,8 +40,7 @@ public class CRC32MismatchException extends IOException {
     /**
      * Creates a new CRC32MismatchException with the specified message.
      *
-     * @param message
-     *            An error message describing why this exception was thrown.
+     * @param message An error message describing why this exception was thrown.
      */
     public CRC32MismatchException(String message) {
         super(message);
