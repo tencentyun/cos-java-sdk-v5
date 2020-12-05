@@ -211,9 +211,12 @@ public class UploadCallable implements Callable<UploadResult> {
      */
     void performAbortMultipartUpload() {
         try {
-            if (multipartUploadId != null)
-                cos.abortMultipartUpload(new AbortMultipartUploadRequest(origReq.getBucketName(),
-                        origReq.getKey(), multipartUploadId));
+            if (multipartUploadId != null) {
+                AbortMultipartUploadRequest abortMultipartUploadRequest =
+                        new AbortMultipartUploadRequest(origReq.getBucketName(), origReq.getKey(), multipartUploadId);
+                TransferManagerUtils.populateEndpointAddr(origReq, abortMultipartUploadRequest);
+                cos.abortMultipartUpload(abortMultipartUploadRequest);
+            }
         } catch (Exception e2) {
             log.info(
                     "Unable to abort multipart upload, you may need to manually remove uploaded parts: "
@@ -264,9 +267,7 @@ public class UploadCallable implements Callable<UploadResult> {
                 new CompleteMultipartUploadRequest(origReq.getBucketName(), origReq.getKey(),
                         multipartUploadId, partETags)
                                 .withGeneralProgressListener(origReq.getGeneralProgressListener());
-        if(origReq.getFixedEndpointAddr() != null) {
-            req.setFixedEndpointAddr(origReq.getFixedEndpointAddr());
-        }
+        TransferManagerUtils.populateEndpointAddr(origReq, req);
         CompleteMultipartUploadResult res = cos.completeMultipartUpload(req);
 
         UploadResult uploadResult = new UploadResult();
@@ -310,9 +311,10 @@ public class UploadCallable implements Callable<UploadResult> {
         int partNumber = 0;
 
         while (true) {
-            PartListing parts = cos.listParts(
-                    new ListPartsRequest(origReq.getBucketName(), origReq.getKey(), uploadId)
-                            .withPartNumberMarker(partNumber));
+            ListPartsRequest listPartsRequest =  new ListPartsRequest(origReq.getBucketName(), origReq.getKey(), uploadId)
+                    .withPartNumberMarker(partNumber);
+            TransferManagerUtils.populateEndpointAddr(origReq, listPartsRequest);
+            PartListing parts = cos.listParts(listPartsRequest);
             for (PartSummary partSummary : parts.getParts()) {
                 partNumbers.put(partSummary.getPartNumber(), partSummary);
             }
@@ -352,9 +354,7 @@ public class UploadCallable implements Callable<UploadResult> {
                 .withSSECOSKeyManagementParams(origReq.getSSECOSKeyManagementParams())
                 .withGeneralProgressListener(origReq.getGeneralProgressListener());
 
-        if(origReq.getFixedEndpointAddr() != null) {
-            req.setFixedEndpointAddr(origReq.getFixedEndpointAddr());
-        }
+        TransferManagerUtils.populateEndpointAddr(origReq, req);
         String uploadId = cos.initiateMultipartUpload(req).getUploadId();
         log.debug("Initiated new multipart upload: " + uploadId);
 

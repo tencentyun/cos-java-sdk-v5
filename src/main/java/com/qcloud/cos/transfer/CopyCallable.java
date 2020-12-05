@@ -226,6 +226,7 @@ public class CopyCallable implements Callable<CopyResult> {
         }
 
         req.setObjectMetadata(newObjectMetadata);
+        TransferManagerUtils.populateEndpointAddr(origReq, req);
 
         String uploadId = cos.initiateMultipartUpload(req).getUploadId();
         log.debug("Initiated new multipart upload: " + uploadId);
@@ -239,6 +240,7 @@ public class CopyCallable implements Callable<CopyResult> {
             AbortMultipartUploadRequest abortRequest =
                     new AbortMultipartUploadRequest(copyObjectRequest.getDestinationBucketName(),
                             copyObjectRequest.getDestinationKey(), multipartUploadId);
+            TransferManagerUtils.populateEndpointAddr(copyObjectRequest, abortRequest);
             cos.abortMultipartUpload(abortRequest);
         } catch (Exception e) {
             log.info(

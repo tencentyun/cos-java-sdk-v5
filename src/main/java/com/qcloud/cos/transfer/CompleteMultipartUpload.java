@@ -86,8 +86,8 @@ public class CompleteMultipartUpload implements Callable<UploadResult> {
             CompleteMultipartUploadRequest req = new CompleteMultipartUploadRequest(
                     origReq.getBucketName(), origReq.getKey(), uploadId,
                     collectPartETags())
-                .withGeneralProgressListener(origReq.getGeneralProgressListener())
-                ;
+                .withGeneralProgressListener(origReq.getGeneralProgressListener());
+            TransferManagerUtils.populateEndpointAddr(origReq, req);
             res = cos.completeMultipartUpload(req);
         } catch (Exception e) {
             monitor.uploadFailed();
