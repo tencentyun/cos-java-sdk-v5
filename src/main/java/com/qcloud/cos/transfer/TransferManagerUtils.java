@@ -20,6 +20,7 @@ package com.qcloud.cos.transfer;
 
 import static com.qcloud.cos.internal.Constants.MAXIMUM_UPLOAD_PARTS;
 
+import com.qcloud.cos.internal.CosServiceRequest;
 import java.io.File;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -184,5 +185,16 @@ public class TransferManagerUtils {
             return PauseStatus.NOT_STARTED;
         }
         return PauseStatus.NO_EFFECT;
+    }
+
+    /**
+     * set the fixedEndpointAddr in originReq,  set it to newReq
+     * @param originReq the origin request
+     * @param newReq
+     */
+    public static void populateEndpointAddr(CosServiceRequest originReq, CosServiceRequest newReq) {
+        if(originReq != null && originReq.getFixedEndpointAddr() != null) {
+            newReq.setFixedEndpointAddr(originReq.getFixedEndpointAddr());
+        }
     }
 }

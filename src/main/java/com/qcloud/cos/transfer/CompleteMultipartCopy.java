@@ -82,6 +82,7 @@ public class CompleteMultipartCopy implements Callable<CopyResult> {
                             origReq.getDestinationKey(), uploadId, collectPartETags())
                                     .withGeneralProgressListener(
                                             origReq.getGeneralProgressListener());
+            TransferManagerUtils.populateEndpointAddr(origReq, req);
             res = cos.completeMultipartUpload(req);
         } catch (Exception e) {
             publishProgress(listener, ProgressEventType.TRANSFER_FAILED_EVENT);
