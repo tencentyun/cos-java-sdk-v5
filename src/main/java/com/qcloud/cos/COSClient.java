@@ -40,17 +40,15 @@ import com.qcloud.cos.endpoint.CIRegionEndpointBuilder;
 import com.qcloud.cos.model.BucketIntelligentTierConfiguration;
 import com.qcloud.cos.model.GetBucketIntelligentTierConfigurationRequest;
 import com.qcloud.cos.model.SetBucketIntelligentTierConfigurationRequest;
+import com.qcloud.cos.model.ciModel.bucket.DocBucketRequest;
+import com.qcloud.cos.model.ciModel.bucket.DocBucketResponse;
 import com.qcloud.cos.model.ciModel.bucket.MediaBucketRequest;
 import com.qcloud.cos.model.ciModel.bucket.MediaBucketResponse;
 import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
-import com.qcloud.cos.model.ciModel.job.MediaJobResponse;
-import com.qcloud.cos.model.ciModel.job.MediaJobsRequest;
-import com.qcloud.cos.model.ciModel.job.MediaListJobResponse;
+import com.qcloud.cos.model.ciModel.job.*;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoRequest;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoResponse;
-import com.qcloud.cos.model.ciModel.queue.MediaListQueueResponse;
-import com.qcloud.cos.model.ciModel.queue.MediaQueueRequest;
-import com.qcloud.cos.model.ciModel.queue.MediaQueueResponse;
+import com.qcloud.cos.model.ciModel.queue.*;
 import com.qcloud.cos.model.ciModel.snapshot.SnapshotRequest;
 import com.qcloud.cos.model.ciModel.snapshot.SnapshotResponse;
 import com.qcloud.cos.model.ciModel.template.MediaListTemplateResponse;
@@ -3508,6 +3506,7 @@ public class COSClient implements COS {
         request.setContent(new ByteArrayInputStream(content));
         invoke(request, voidCosResponseHandler);
     }
+
     @Override
     public MediaJobResponse createMediaJobs(MediaJobsRequest req) throws UnsupportedEncodingException {
         this.checkCIRequestCommon(req);
@@ -3533,10 +3532,6 @@ public class COSClient implements COS {
         return true;
     }
 
-    /**
-     * @param req
-     * @return
-     */
     @Override
     public MediaJobResponse describeMediaJob(MediaJobsRequest req) {
         this.checkCIRequestCommon(req);
@@ -3714,6 +3709,63 @@ public class COSClient implements COS {
         addParameterIfNotNull(httpRequest, "endCreationTime", request.getEndCreationTime());
         addParameterIfNotNull(httpRequest, "nextToken", request.getNextToken());
         return this.invoke(httpRequest, new Unmarshallers.WorkflowExecutionsUnmarshaller());
+    }
+
+    @Override
+    public DocJobResponse createDocProcessJobs(DocJobRequest request) {
+        this.checkCIRequestCommon(request);
+        CosHttpRequest<DocJobRequest> httpRequest = this.createRequest(request.getBucketName(), "/doc_jobs", request, HttpMethodName.POST);
+        this.setContent(httpRequest, RequestXmlFactory.convertToXmlByteArray(request), "application/xml", false);
+        return this.invoke(httpRequest, new Unmarshallers.DocProcessJobUnmarshaller());
+    }
+
+    @Override
+    public DocJobResponse describeDocProcessJob(DocJobRequest request) {
+        this.checkCIRequestCommon(request);
+        CosHttpRequest<DocJobRequest> httpRequest = this.createRequest(request.getBucketName(), "/doc_jobs/"+request.getJobId(), request, HttpMethodName.GET);
+        return this.invoke(httpRequest, new Unmarshallers.DescribeDocJobUnmarshaller());
+    }
+
+    @Override
+    public DocJobListResponse describeDocProcessJobs(DocJobListRequest request) {
+        return null;
+    }
+
+    @Override
+    public DocListQueueResponse describeDocProcessQueues(DocQueueRequest docRequest) {
+        this.checkCIRequestCommon(docRequest);
+        CosHttpRequest<DocQueueRequest> request = createRequest(docRequest.getBucketName(), "/docqueue", docRequest, HttpMethodName.GET);
+        addParameterIfNotNull(request, "queueIds", docRequest.getQueueId());
+        addParameterIfNotNull(request, "state", docRequest.getState());
+        addParameterIfNotNull(request, "pageNumber", docRequest.getPageNumber());
+        addParameterIfNotNull(request, "pageSize", docRequest.getPageSize());
+        return (DocListQueueResponse)invoke(request, new Unmarshallers.ListQueueUnmarshaller());
+    }
+
+    @Override
+    public DocQueueResponse updateDocProcessQueue(DocQueueRequest docRequest) {
+        this.checkCIRequestCommon(docRequest);
+        rejectNull(docRequest.getQueueId(),
+                "The queueId parameter must be specified setting the object tags");
+        rejectNull(docRequest.getName(),
+                "The name parameter must be specified setting the object tags");
+        rejectNull(docRequest.getState(),
+                "The state parameter must be specified setting the object tags");
+        CosHttpRequest<DocQueueRequest> request = createRequest(docRequest.getBucketName(), "/docqueue/" + docRequest.getQueueId(), docRequest, HttpMethodName.PUT);
+        this.setContent(request, RequestXmlFactory.convertToXmlByteArray(docRequest), "application/xml", false);
+        return (DocQueueResponse)invoke(request, new Unmarshallers.QueueUnmarshaller());
+    }
+
+    @Override
+    public DocBucketResponse describeDocProcessBuckets(DocBucketRequest docRequest) {
+        this.checkCIRequestCommon(docRequest);
+        CosHttpRequest<DocBucketRequest> request = createRequest(docRequest.getBucketName(), "/docbucket", docRequest, HttpMethodName.GET);
+        addParameterIfNotNull(request, "regions", docRequest.getRegions());
+        addParameterIfNotNull(request, "bucketNames", docRequest.getBucketNames());
+        addParameterIfNotNull(request, "bucketName", docRequest.getBucketName());
+        addParameterIfNotNull(request, "pageNumber", docRequest.getPageNumber());
+        addParameterIfNotNull(request, "pageSize", docRequest.getPageSize());
+        return (DocBucketResponse)invoke(request, new Unmarshallers.ListBucketUnmarshaller());
     }
 
     private void checkWorkflowParameter(MediaWorkflowRequest request) {

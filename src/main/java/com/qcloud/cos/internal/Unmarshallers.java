@@ -44,6 +44,7 @@ import com.qcloud.cos.model.BucketReplicationConfiguration;
 import com.qcloud.cos.model.BucketLoggingConfiguration;
 import com.qcloud.cos.model.DeleteObjectTaggingResult;
 import com.qcloud.cos.model.ciModel.bucket.MediaBucketResponse;
+import com.qcloud.cos.model.ciModel.job.DocJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaListJobResponse;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoResponse;
@@ -535,6 +536,22 @@ public class Unmarshallers {
 
         public MediaWorkflowResponse unmarshall(InputStream in) throws Exception {
             return new XmlResponsesSaxParser().parseWorkflowResponse(in).getResponse();
+        }
+    }
+
+    public static final class DocProcessJobUnmarshaller
+            implements Unmarshaller<DocJobResponse, InputStream> {
+
+        public DocJobResponse unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser().parseDocJobResponse(in).getResponse();
+        }
+    }
+
+    public static final class DescribeDocJobUnmarshaller
+            implements Unmarshaller<DocJobResponse, InputStream> {
+
+        public DocJobResponse unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser().parseDescribeDocJobResponse(in).getResponse();
         }
     }
 }
