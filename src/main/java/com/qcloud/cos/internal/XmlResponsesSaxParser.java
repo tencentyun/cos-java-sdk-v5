@@ -627,6 +627,18 @@ public class XmlResponsesSaxParser {
         return handler;
     }
 
+    public DocJobHandler parseDocJobResponse(InputStream inputStream) throws IOException {
+        DocJobHandler handler = new DocJobHandler();
+        parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
+        return handler;
+    }
+
+    public DescribeDocProcessJobHandler parseDescribeDocJobResponse(InputStream inputStream) throws IOException {
+        DescribeDocProcessJobHandler handler = new DescribeDocProcessJobHandler();
+        parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
+        return handler;
+    }
+
     /**
      * @param inputStream
      *
@@ -4061,6 +4073,249 @@ public class XmlResponsesSaxParser {
         }
 
         public MediaWorkflowExecutionsResponse getResponse() {
+            return response;
+        }
+    }
+
+    public static class DocJobHandler extends AbstractHandler {
+        DocJobResponse response = new DocJobResponse();
+
+        @Override
+        protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
+
+        }
+
+        @Override
+        protected void doEndElement(String uri, String name, String qName) {
+            if (in("Response", "JobsDetail")) {
+                DocJobDetail jobsDetail = response.getJobsDetail();
+                switch (name) {
+                    case "Code":
+                        jobsDetail.setCode(getText());
+                        break;
+                    case "CreationTime":
+                        jobsDetail.setCreationTime(getText());
+                        break;
+                    case "EndTime":
+                        jobsDetail.setEndTime(getText());
+                        break;
+                    case "JobId":
+                        jobsDetail.setJobId(getText());
+                        break;
+                    case "Message":
+                        jobsDetail.setMessage(getText());
+                        break;
+                    case "QueueId":
+                        jobsDetail.setQueueId(getText());
+                        break;
+                    case "State":
+                        jobsDetail.setState(getText());
+                        break;
+                    case "Tag":
+                        jobsDetail.setTag(getText());
+                        break;
+                    default:
+                        break;
+                }
+            } else if (in("Response", "JobsDetail", "Input")) {
+                if ("Object".equalsIgnoreCase(name)) {
+                    response.getJobsDetail().getInput().setObject(getText());
+                }
+            } else if (in("Response", "JobsDetail", "Operation", "DocProcess")) {
+                DocProcessObject docProcess = response.getJobsDetail().getOperation().getDocProcessObject();
+                switch (name) {
+                    case "Comments":
+                        docProcess.setComments(getText());
+                        break;
+                    case "DocPassword":
+                        docProcess.setDocPassword(getText());
+                        break;
+                    case "EndPage":
+                        docProcess.setEndPage(getText());
+                        break;
+                    case "ImageParams":
+                        docProcess.setImageParams(getText());
+                        break;
+                    case "PaperDirection":
+                        docProcess.setPaperDirection(getText());
+                        break;
+                    case "Quality":
+                        docProcess.setQuality(getText());
+                        break;
+                    case "SrcType":
+                        docProcess.setSrcType(getText());
+                        break;
+                    case "StartPage":
+                        docProcess.setStartPage(getText());
+                        break;
+                    case "TgtType":
+                        docProcess.setTgtType(getText());
+                        break;
+                    case "Zoom":
+                        docProcess.setZoom(getText());
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        public DocJobResponse getResponse() {
+            return response;
+        }
+    }
+
+    public static class DescribeDocProcessJobHandler extends AbstractHandler {
+        DocJobResponse response = new DocJobResponse();
+        DocProcessPageInfo pageInfo = new DocProcessPageInfo();
+
+        @Override
+        protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
+            if ("PageInfo".equalsIgnoreCase(name)) {
+                pageInfo = new DocProcessPageInfo();
+            }
+        }
+
+        @Override
+        protected void doEndElement(String uri, String name, String qName) {
+            if (in("Response", "JobsDetail")) {
+                DocJobDetail jobsDetail = response.getJobsDetail();
+                switch (name) {
+                    case "Code":
+                        jobsDetail.setCode(getText());
+                        break;
+                    case "CreationTime":
+                        jobsDetail.setCreationTime(getText());
+                        break;
+                    case "EndTime":
+                        jobsDetail.setEndTime(getText());
+                        break;
+                    case "JobId":
+                        jobsDetail.setJobId(getText());
+                        break;
+                    case "Message":
+                        jobsDetail.setMessage(getText());
+                        break;
+                    case "QueueId":
+                        jobsDetail.setQueueId(getText());
+                        break;
+                    case "State":
+                        jobsDetail.setState(getText());
+                        break;
+                    case "Tag":
+                        jobsDetail.setTag(getText());
+                        break;
+                    default:
+                        break;
+                }
+            } else if (in("Response", "JobsDetail", "Input")) {
+                if ("Object".equalsIgnoreCase(name)) {
+                    response.getJobsDetail().getInput().setObject(getText());
+                }
+            } else if (in("Response", "JobsDetail", "Operation", "DocProcess")) {
+                DocProcessObject docProcess = response.getJobsDetail().getOperation().getDocProcessObject();
+                switch (name) {
+                    case "Comments":
+                        docProcess.setComments(getText());
+                        break;
+                    case "DocPassword":
+                        docProcess.setDocPassword(getText());
+                        break;
+                    case "EndPage":
+                        docProcess.setEndPage(getText());
+                        break;
+                    case "ImageParams":
+                        docProcess.setImageParams(getText());
+                        break;
+                    case "PaperDirection":
+                        docProcess.setPaperDirection(getText());
+                        break;
+                    case "Quality":
+                        docProcess.setQuality(getText());
+                        break;
+                    case "SrcType":
+                        docProcess.setSrcType(getText());
+                        break;
+                    case "StartPage":
+                        docProcess.setStartPage(getText());
+                        break;
+                    case "TgtType":
+                        docProcess.setTgtType(getText());
+                        break;
+                    case "Zoom":
+                        docProcess.setZoom(getText());
+                        break;
+                    default:
+                        break;
+                }
+
+            } else if (in("Response", "JobsDetail", "Operation", "DocProcessResult")) {
+                DocProcessResult docProcessResult = response.getJobsDetail().getOperation().getDocProcessResult();
+                switch (name) {
+                    case "FailPageCount":
+                        docProcessResult.setFailPageCount(getText());
+                        break;
+                    case "SuccPageCount":
+                        docProcessResult.setSuccPageCount(getText());
+                        break;
+                    case "TgtType":
+                        docProcessResult.setTgtType(getText());
+                        break;
+                    case "TotalPageCount":
+                        docProcessResult.setTotalPageCount(getText());
+                        break;
+                    case "TotalSheetCount":
+                        docProcessResult.setTotalSheetCount(getText());
+                        break;
+                    default:
+                        break;
+                }
+
+            } else if (in("Response", "JobsDetail", "Operation", "Output")) {
+                MediaOutputObject output = response.getJobsDetail().getOperation().getOutput();
+                switch (name) {
+                    case "Bucket":
+                        output.setBucket(getText());
+                        break;
+                    case "Object":
+                        output.setObject(getText());
+                        break;
+                    case "Region":
+                        output.setRegion(getText());
+                        break;
+                    default:
+                        break;
+                }
+            }else if (in("Response", "JobsDetail", "Operation", "DocProcessResult","PageInfo")) {
+                switch (name) {
+                    case "PageNo":
+                        pageInfo.setPageNo(getText());
+                        break;
+                    case "PicIndex":
+                        pageInfo.setPicIndex(getText());
+                        break;
+                    case "PicNum":
+                        pageInfo.setPicNum(getText());
+                        break;
+                    case "TgtUri":
+                        pageInfo.setTgtUri(getText());
+                        break;
+                    case "X-SheetPics":
+                        pageInfo.setxSheetPics(getText());
+                        break;
+                    default:
+                        break;
+                }
+
+            }
+
+            if ("PageInfo".equalsIgnoreCase(name)){
+                List<DocProcessPageInfo> pageInfoList = response.getJobsDetail().getOperation().getDocProcessResult().getDocProcessPageInfoList();
+                pageInfoList.add(pageInfo);
+            }
+        }
+
+        public DocJobResponse getResponse() {
             return response;
         }
     }
