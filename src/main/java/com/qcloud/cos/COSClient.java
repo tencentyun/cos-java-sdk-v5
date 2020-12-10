@@ -45,16 +45,30 @@ import com.qcloud.cos.model.ciModel.bucket.DocBucketResponse;
 import com.qcloud.cos.model.ciModel.bucket.MediaBucketRequest;
 import com.qcloud.cos.model.ciModel.bucket.MediaBucketResponse;
 import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
-import com.qcloud.cos.model.ciModel.job.*;
+import com.qcloud.cos.model.ciModel.job.DocJobListRequest;
+import com.qcloud.cos.model.ciModel.job.DocJobListResponse;
+import com.qcloud.cos.model.ciModel.job.DocJobRequest;
+import com.qcloud.cos.model.ciModel.job.DocJobResponse;
+import com.qcloud.cos.model.ciModel.job.MediaJobResponse;
+import com.qcloud.cos.model.ciModel.job.MediaJobsRequest;
+import com.qcloud.cos.model.ciModel.job.MediaListJobResponse;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoRequest;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoResponse;
-import com.qcloud.cos.model.ciModel.queue.*;
+import com.qcloud.cos.model.ciModel.queue.DocListQueueResponse;
+import com.qcloud.cos.model.ciModel.queue.DocQueueRequest;
+import com.qcloud.cos.model.ciModel.queue.MediaListQueueResponse;
+import com.qcloud.cos.model.ciModel.queue.MediaQueueRequest;
+import com.qcloud.cos.model.ciModel.queue.MediaQueueResponse;
 import com.qcloud.cos.model.ciModel.snapshot.SnapshotRequest;
 import com.qcloud.cos.model.ciModel.snapshot.SnapshotResponse;
 import com.qcloud.cos.model.ciModel.template.MediaListTemplateResponse;
 import com.qcloud.cos.model.ciModel.template.MediaTemplateRequest;
 import com.qcloud.cos.model.ciModel.template.MediaTemplateResponse;
-import com.qcloud.cos.model.ciModel.workflow.*;
+import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowExecutionResponse;
+import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowExecutionsResponse;
+import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowListRequest;
+import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowListResponse;
+import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowRequest;
 import org.apache.commons.codec.DecoderException;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.ContentType;
@@ -3373,7 +3387,7 @@ public class COSClient implements COS {
                 byte[] md5 = Md5Utils.computeMD5Hash(content);
                 String md5Base64 = BinaryUtils.toBase64(md5);
                 request.addHeader("Content-MD5", md5Base64);
-            } catch ( Exception e ) {
+            } catch (Exception e) {
                 throw new CosClientException("Couldn't compute md5 sum", e);
             }
         }
@@ -3722,13 +3736,23 @@ public class COSClient implements COS {
     @Override
     public DocJobResponse describeDocProcessJob(DocJobRequest request) {
         this.checkCIRequestCommon(request);
-        CosHttpRequest<DocJobRequest> httpRequest = this.createRequest(request.getBucketName(), "/doc_jobs/"+request.getJobId(), request, HttpMethodName.GET);
+        CosHttpRequest<DocJobRequest> httpRequest = this.createRequest(request.getBucketName(), "/doc_jobs/" + request.getJobId(), request, HttpMethodName.GET);
         return this.invoke(httpRequest, new Unmarshallers.DescribeDocJobUnmarshaller());
     }
 
     @Override
     public DocJobListResponse describeDocProcessJobs(DocJobListRequest request) {
-        return null;
+        this.checkCIRequestCommon(request);
+        CosHttpRequest<DocJobListRequest> httpRequest = this.createRequest(request.getBucketName(), "/doc_jobs", request, HttpMethodName.GET);
+        addParameterIfNotNull(httpRequest, "queueId", request.getQueueId());
+        addParameterIfNotNull(httpRequest, "tag", request.getTag());
+        addParameterIfNotNull(httpRequest, "orderByTime", request.getOrderByTime());
+        addParameterIfNotNull(httpRequest, "nextToken", request.getNextToken());
+        addParameterIfNotNull(httpRequest, "size", request.getSize().toString());
+        addParameterIfNotNull(httpRequest, "states", request.getStates());
+        addParameterIfNotNull(httpRequest, "startCreationTime", request.getStartCreationTime());
+        addParameterIfNotNull(httpRequest, "endCreationTime", request.getEndCreationTime());
+        return this.invoke(httpRequest, new Unmarshallers.DescribeDocJobsUnmarshaller());
     }
 
     @Override
@@ -3739,11 +3763,11 @@ public class COSClient implements COS {
         addParameterIfNotNull(request, "state", docRequest.getState());
         addParameterIfNotNull(request, "pageNumber", docRequest.getPageNumber());
         addParameterIfNotNull(request, "pageSize", docRequest.getPageSize());
-        return (DocListQueueResponse)invoke(request, new Unmarshallers.ListQueueUnmarshaller());
+        return invoke(request, new Unmarshallers.DocListQueueUnmarshaller());
     }
 
     @Override
-    public DocQueueResponse updateDocProcessQueue(DocQueueRequest docRequest) {
+    public boolean updateDocProcessQueue(DocQueueRequest docRequest) {
         this.checkCIRequestCommon(docRequest);
         rejectNull(docRequest.getQueueId(),
                 "The queueId parameter must be specified setting the object tags");
@@ -3753,7 +3777,8 @@ public class COSClient implements COS {
                 "The state parameter must be specified setting the object tags");
         CosHttpRequest<DocQueueRequest> request = createRequest(docRequest.getBucketName(), "/docqueue/" + docRequest.getQueueId(), docRequest, HttpMethodName.PUT);
         this.setContent(request, RequestXmlFactory.convertToXmlByteArray(docRequest), "application/xml", false);
-        return (DocQueueResponse)invoke(request, new Unmarshallers.QueueUnmarshaller());
+        invoke(request, voidCosResponseHandler);
+        return true;
     }
 
     @Override
@@ -3762,10 +3787,9 @@ public class COSClient implements COS {
         CosHttpRequest<DocBucketRequest> request = createRequest(docRequest.getBucketName(), "/docbucket", docRequest, HttpMethodName.GET);
         addParameterIfNotNull(request, "regions", docRequest.getRegions());
         addParameterIfNotNull(request, "bucketNames", docRequest.getBucketNames());
-        addParameterIfNotNull(request, "bucketName", docRequest.getBucketName());
         addParameterIfNotNull(request, "pageNumber", docRequest.getPageNumber());
         addParameterIfNotNull(request, "pageSize", docRequest.getPageSize());
-        return (DocBucketResponse)invoke(request, new Unmarshallers.ListBucketUnmarshaller());
+        return invoke(request, new Unmarshallers.DocListBucketUnmarshaller());
     }
 
     private void checkWorkflowParameter(MediaWorkflowRequest request) {

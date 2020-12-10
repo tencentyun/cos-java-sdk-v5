@@ -89,4 +89,16 @@ public class DocProcessResult {
     public void setTotalSheetCount(String totalSheetCount) {
         this.totalSheetCount = totalSheetCount;
     }
+
+    @Override
+    public String toString() {
+        return "DocProcessResult{" +
+                "docProcessPageInfoList=" + docProcessPageInfoList +
+                ", totalPageCount='" + totalPageCount + '\'' +
+                ", succPageCount='" + succPageCount + '\'' +
+                ", failPageCount='" + failPageCount + '\'' +
+                ", tgtType='" + tgtType + '\'' +
+                ", totalSheetCount='" + totalSheetCount + '\'' +
+                '}';
+    }
 }
