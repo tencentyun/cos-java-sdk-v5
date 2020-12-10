@@ -13,24 +13,37 @@ public class DocJobListRequest extends CIServiceRequest {
     private String bucketName;
 
     /**
-     * 文档预览任务对象
-     */
-    private DocJobObject docJobObject;
-
-    /**
-     * 任务ID
-     */
-    private String jobId;
-
-    /**
-     * 队列ID
+     * 任务的队列id
      */
     private String queueId;
-
     /**
-     * 查询类型
+     * 任务类型
      */
     private String tag;
+    /**
+     * 时间顺序
+     */
+    private String orderByTime;
+    /**
+     * 下一个token
+     */
+    private String nextToken;
+    /**
+     * 查询数量 默认为十个
+     */
+    private Integer size = 10;
+    /**
+     * 任务状态
+     */
+    private String states;
+    /**
+     * 开始时间
+     */
+    private String startCreationTime;
+    /**
+     * 结束时间
+     */
+    private String endCreationTime;
 
     @Override
     public String getBucketName() {
@@ -40,25 +53,6 @@ public class DocJobListRequest extends CIServiceRequest {
     @Override
     public void setBucketName(String bucketName) {
         this.bucketName = bucketName;
-    }
-
-    public DocJobObject getDocJobObject() {
-        if (docJobObject == null) {
-            docJobObject = new DocJobObject();
-        }
-        return docJobObject;
-    }
-
-    public void setDocJobObject(DocJobObject docJobObject) {
-        this.docJobObject = docJobObject;
-    }
-
-    public String getJobId() {
-        return jobId;
-    }
-
-    public void setJobId(String jobId) {
-        this.jobId = jobId;
     }
 
     public String getQueueId() {
@@ -75,5 +69,68 @@ public class DocJobListRequest extends CIServiceRequest {
 
     public void setTag(String tag) {
         this.tag = tag;
+    }
+
+    public String getOrderByTime() {
+        return orderByTime;
+    }
+
+    public void setOrderByTime(String orderByTime) {
+        this.orderByTime = orderByTime;
+    }
+
+    public String getNextToken() {
+        return nextToken;
+    }
+
+    public void setNextToken(String nextToken) {
+        this.nextToken = nextToken;
+    }
+
+    public Integer getSize() {
+        return size;
+    }
+
+    public void setSize(Integer size) {
+        this.size = size;
+    }
+
+    public String getStates() {
+        return states;
+    }
+
+    public void setStates(String states) {
+        this.states = states;
+    }
+
+    public String getStartCreationTime() {
+        return startCreationTime;
+    }
+
+    public void setStartCreationTime(String startCreationTime) {
+        this.startCreationTime = startCreationTime;
+    }
+
+    public String getEndCreationTime() {
+        return endCreationTime;
+    }
+
+    public void setEndCreationTime(String endCreationTime) {
+        this.endCreationTime = endCreationTime;
+    }
+
+    @Override
+    public String toString() {
+        return "DocJobListRequest{" +
+                "bucketName='" + bucketName + '\'' +
+                ", queueId='" + queueId + '\'' +
+                ", tag='" + tag + '\'' +
+                ", orderByTime='" + orderByTime + '\'' +
+                ", nextToken='" + nextToken + '\'' +
+                ", size=" + size +
+                ", states='" + states + '\'' +
+                ", startCreationTime='" + startCreationTime + '\'' +
+                ", endCreationTime='" + endCreationTime + '\'' +
+                '}';
     }
 }

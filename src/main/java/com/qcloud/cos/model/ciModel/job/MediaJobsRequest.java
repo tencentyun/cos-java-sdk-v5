@@ -50,11 +50,11 @@ public class MediaJobsRequest extends CIServiceRequest implements Serializable {
      */
     private String jobId;
     /**
-     * 任务id
+     * 输入对象
      */
     private MediaInputObject input;
     /**
-     * 任务id
+     * 媒体操作对象
      */
     private MediaJobOperation operation;
 

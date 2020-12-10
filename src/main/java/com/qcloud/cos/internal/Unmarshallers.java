@@ -11,7 +11,7 @@
  * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
  * express or implied. See the License for the specific language governing
  * permissions and limitations under the License.
- 
+
  * According to cos feature, we modify some class，comment, field name, etc.
  */
 
@@ -43,11 +43,14 @@ import com.qcloud.cos.model.BucketWebsiteConfiguration;
 import com.qcloud.cos.model.BucketReplicationConfiguration;
 import com.qcloud.cos.model.BucketLoggingConfiguration;
 import com.qcloud.cos.model.DeleteObjectTaggingResult;
+import com.qcloud.cos.model.ciModel.bucket.DocBucketResponse;
 import com.qcloud.cos.model.ciModel.bucket.MediaBucketResponse;
+import com.qcloud.cos.model.ciModel.job.DocJobListResponse;
 import com.qcloud.cos.model.ciModel.job.DocJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaListJobResponse;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoResponse;
+import com.qcloud.cos.model.ciModel.queue.DocListQueueResponse;
 import com.qcloud.cos.model.ciModel.queue.MediaListQueueResponse;
 import com.qcloud.cos.model.ciModel.queue.MediaQueueResponse;
 import com.qcloud.cos.model.ciModel.snapshot.SnapshotResponse;
@@ -110,13 +113,13 @@ public class Unmarshallers {
      */
     public static final class VersionListUnmarshaller
             implements Unmarshaller<VersionListing, InputStream> {
-        
+
         private final boolean shouldSDKDecodeResponse;
 
         public VersionListUnmarshaller(final boolean shouldSDKDecodeResponse) {
             this.shouldSDKDecodeResponse = shouldSDKDecodeResponse;
         }
-        
+
         public VersionListing unmarshall(InputStream in) throws Exception {
             return new XmlResponsesSaxParser().parseListVersionsResponse(in, shouldSDKDecodeResponse).getListing();
         }
@@ -419,6 +422,15 @@ public class Unmarshallers {
         }
     }
 
+    public static final class DocListQueueUnmarshaller
+            implements Unmarshaller<DocListQueueResponse, InputStream> {
+
+        public DocListQueueResponse unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser()
+                    .parseDocListQueueResponse(in).getResponse();
+        }
+    }
+
     public static final class QueueUnmarshaller
             implements Unmarshaller<MediaQueueResponse, InputStream> {
 
@@ -531,6 +543,15 @@ public class Unmarshallers {
         }
     }
 
+    public static final class DocListBucketUnmarshaller
+            implements Unmarshaller<DocBucketResponse, InputStream> {
+
+        public DocBucketResponse unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser()
+                    .parseDocListBucketResponse(in).getResponse();
+        }
+    }
+
     public static final class WorkflowUnmarshaller
             implements Unmarshaller<MediaWorkflowResponse, InputStream> {
 
@@ -552,6 +573,15 @@ public class Unmarshallers {
 
         public DocJobResponse unmarshall(InputStream in) throws Exception {
             return new XmlResponsesSaxParser().parseDescribeDocJobResponse(in).getResponse();
+        }
+    }
+
+    public static final class DescribeDocJobsUnmarshaller
+            implements Unmarshaller<DocJobListResponse, InputStream> {
+
+        public DocJobListResponse unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser()
+                    .parseDocJobListResponse(in).getResponse();
         }
     }
 }

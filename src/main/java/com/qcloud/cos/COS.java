@@ -2828,8 +2828,9 @@ public interface COS extends COSDirectSpi {
 
     /**
      * UpdateDocProcessQueue 接口用于更新文档预览队列。https://cloud.tencent.com/document/product/460/46947
+     * @return
      */
-    DocQueueResponse updateDocProcessQueue(DocQueueRequest request);
+    boolean updateDocProcessQueue(DocQueueRequest request);
 
     /**
      * DescribeDocProcessBuckets 接口用于查询存储桶是否已开通文档预览功能。https://cloud.tencent.com/document/product/460/46945

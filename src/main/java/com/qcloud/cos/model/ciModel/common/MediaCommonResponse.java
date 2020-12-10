@@ -80,14 +80,14 @@ public class MediaCommonResponse {
 
     @Override
     public String toString() {
-        return "MediaCommonResponse{" +
-                "requestId='" + requestId + '\'' +
-                ", totalCount='" + totalCount + '\'' +
-                ", pageNumber='" + pageNumber + '\'' +
-                ", pageSize='" + pageSize + '\'' +
-                ", createTime='" + createTime + '\'' +
-                ", updateTime='" + updateTime + '\'' +
-                '}';
+        final StringBuffer sb = new StringBuffer("MediaCommonResponse{");
+        sb.append("requestId='").append(requestId).append('\'');
+        sb.append(", totalCount='").append(totalCount).append('\'');
+        sb.append(", pageNumber='").append(pageNumber).append('\'');
+        sb.append(", pageSize='").append(pageSize).append('\'');
+        sb.append(", createTime='").append(createTime).append('\'');
+        sb.append(", updateTime='").append(updateTime).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
-
 }

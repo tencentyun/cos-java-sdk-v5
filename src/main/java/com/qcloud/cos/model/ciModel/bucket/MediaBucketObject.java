@@ -8,6 +8,7 @@ public class MediaBucketObject {
     private String Name;
     private String Region;
     private String CreateTime;
+    private String aliasBucketId;
 
     public String getBucketId() {
         return bucketId;
@@ -41,13 +42,23 @@ public class MediaBucketObject {
         CreateTime = createTime;
     }
 
+    public String getAliasBucketId() {
+        return aliasBucketId;
+    }
+
+    public void setAliasBucketId(String aliasBucketId) {
+        this.aliasBucketId = aliasBucketId;
+    }
+
     @Override
     public String toString() {
-        return "MediaBucketObject{" +
-                "bucketId='" + bucketId + '\'' +
-                ", Name='" + Name + '\'' +
-                ", Region='" + Region + '\'' +
-                ", CreateTime='" + CreateTime + '\'' +
-                '}';
+        final StringBuffer sb = new StringBuffer("MediaBucketObject{");
+        sb.append("bucketId='").append(bucketId).append('\'');
+        sb.append(", Name='").append(Name).append('\'');
+        sb.append(", Region='").append(Region).append('\'');
+        sb.append(", CreateTime='").append(CreateTime).append('\'');
+        sb.append(", aliasBucketId='").append(aliasBucketId).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 }

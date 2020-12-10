@@ -13,8 +13,8 @@ public class ClientUtils {
 
     public static COSClient getTestClient() {
         // 1 初始化用户身份信息（secretId, secretKey）。
-        String secretId = "";
-        String secretKey = "";
+        String secretId = "secretId";
+        String secretKey = "secretKey";
         return getCosClient(secretId,secretKey,"chongqing");
     }
 
