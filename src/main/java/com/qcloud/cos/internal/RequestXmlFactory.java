@@ -628,8 +628,10 @@ public class RequestXmlFactory {
         addIfNotNull(xml, "Type", request.getNotifyConfig().getType());
         addIfNotNull(xml, "Url", request.getNotifyConfig().getUrl());
         addIfNotNull(xml, "Event", request.getNotifyConfig().getEvent());
+        addIfNotNull(xml, "State", request.getNotifyConfig().getState());
         xml.end();
         xml.end();
+        System.out.println(xml.toString());
         return xml.getBytes();
     }
 

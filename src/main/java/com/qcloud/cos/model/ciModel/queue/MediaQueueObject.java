@@ -56,6 +56,9 @@ public class MediaQueueObject extends CIServiceRequest implements Serializable {
     }
 
     public MediaNotifyConfig getNotifyConfig() {
+        if (notifyConfig==null){
+            notifyConfig = new MediaNotifyConfig();
+        }
         return notifyConfig;
     }
 
