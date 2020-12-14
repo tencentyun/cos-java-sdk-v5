@@ -4286,7 +4286,23 @@ public class XmlResponsesSaxParser {
                 if ("Object".equalsIgnoreCase(name)) {
                     response.getJobsDetail().getInput().setObject(getText());
                 }
-            } else if (in("Response", "JobsDetail", "Operation", "DocProcess")) {
+            } else if (in("Response", "JobsDetail", "Operation", "Output")) {
+                MediaOutputObject output = response.getJobsDetail().getOperation().getOutput();
+                switch (name) {
+                    case "Bucket":
+                        output.setBucket(getText());
+                        break;
+                    case "Object":
+                        output.setObject(getText());
+                        break;
+                    case "Region":
+                        output.setRegion(getText());
+                        break;
+                    default:
+                        break;
+                }
+            }
+            else if (in("Response", "JobsDetail", "Operation", "DocProcess")) {
                 DocProcessObject docProcess = response.getJobsDetail().getOperation().getDocProcessObject();
                 switch (name) {
                     case "Comments":
