@@ -40,11 +40,15 @@ import com.qcloud.cos.model.InputSerialization;
 import com.qcloud.cos.model.OutputSerialization;
 import com.qcloud.cos.model.ScanRange;
 import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
+import com.qcloud.cos.model.ciModel.job.DocJobObject;
+import com.qcloud.cos.model.ciModel.job.DocJobRequest;
+import com.qcloud.cos.model.ciModel.job.DocProcessObject;
 import com.qcloud.cos.model.ciModel.job.MediaJobOperation;
 import com.qcloud.cos.model.ciModel.job.MediaJobsRequest;
 import com.qcloud.cos.model.ciModel.job.MediaRemoveWaterMark;
 import com.qcloud.cos.model.ciModel.job.MediaVideoObject;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoRequest;
+import com.qcloud.cos.model.ciModel.queue.DocQueueRequest;
 import com.qcloud.cos.model.ciModel.queue.MediaQueueRequest;
 import com.qcloud.cos.model.ciModel.snapshot.SnapshotRequest;
 import com.qcloud.cos.model.ciModel.template.MediaTemplateRequest;
@@ -555,6 +559,79 @@ public class RequestXmlFactory {
         xml.start("Object").value(request.getInput().getObject()).end();
         xml.end();
         xml.end();
+        return xml.getBytes();
+    }
+
+    /**
+     * Converts the DocJobRequest to an XML fragment that can be sent to the DocJobRequestParams of CI
+     *
+     * @param request The container which provides options for restoring an object
+     * @return A byte array containing the data
+     * @throws CosClientException
+     */
+    public static byte[] convertToXmlByteArray(DocJobRequest request) {
+        XmlWriter xml = new XmlWriter();
+        DocJobObject docJobObject = request.getDocJobObject();
+
+        xml.start("Request");
+        xml.start("Tag").value(docJobObject.getTag()).end();
+        xml.start("QueueId").value(docJobObject.getQueueId()).end();
+        xml.start("Input");
+        xml.start("Object").value(docJobObject.getInput().getObject()).end();
+        xml.end();
+
+        if (CheckObjectUtils.objIsNotValid(docJobObject)){
+            xml.start("Operation");
+            xml.start("Output");
+            MediaOutputObject output = docJobObject.getOperation().getOutput();
+            addIfNotNull(xml, "Region", output.getRegion());
+            addIfNotNull(xml, "Bucket", output.getBucket());
+            addIfNotNull(xml, "Object", output.getObject());
+            xml.end();
+
+            xml.start("DocProcess");
+            DocProcessObject docProcess = docJobObject.getOperation().getDocProcessObject();
+            addIfNotNull(xml, "SrcType", docProcess.getSrcType());
+            addIfNotNull(xml, "TgtType", docProcess.getTgtType());
+            addIfNotNull(xml, "SheetId", docProcess.getSheetId());
+            addIfNotNull(xml, "StartPage", docProcess.getStartPage());
+            addIfNotNull(xml, "EndPage", docProcess.getEndPage());
+            addIfNotNull(xml, "ImageParams", docProcess.getImageParams());
+            addIfNotNull(xml, "DocPassword", docProcess.getDocPassword());
+            addIfNotNull(xml, "Comments", docProcess.getComments());
+            addIfNotNull(xml, "PaperDirection", docProcess.getPaperDirection());
+            addIfNotNull(xml, "Quality", docProcess.getQuality());
+            addIfNotNull(xml, "Zoom", docProcess.getZoom());
+            xml.end();
+
+            xml.end();
+        }
+        xml.end();
+        return xml.getBytes();
+    }
+
+    /**
+     * Converts the MediaQueueRequest to an XML fragment that can be sent to the QueueObject of COS
+     *
+     * @param request The container which provides options for restoring an object
+     * @return A byte array containing the data
+     * @throws CosClientException
+     */
+    public static byte[] convertToXmlByteArray(DocQueueRequest request) {
+        XmlWriter xml = new XmlWriter();
+
+        xml.start("Request");
+        xml.start("Name").value(request.getName()).end();
+        xml.start("QueueId").value(request.getQueueId()).end();
+        xml.start("State").value(request.getState()).end();
+        xml.start("NotifyConfig");
+        addIfNotNull(xml, "Type", request.getNotifyConfig().getType());
+        addIfNotNull(xml, "Url", request.getNotifyConfig().getUrl());
+        addIfNotNull(xml, "Event", request.getNotifyConfig().getEvent());
+        addIfNotNull(xml, "State", request.getNotifyConfig().getState());
+        xml.end();
+        xml.end();
+        System.out.println(xml.toString());
         return xml.getBytes();
     }
 

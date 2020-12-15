@@ -1,18 +1,17 @@
 package com.qcloud.cos.model.ciModel.job;
 
 import com.qcloud.cos.internal.CIServiceRequest;
-import com.qcloud.cos.model.ciModel.common.MediaInputObject;
-
-import java.io.Serializable;
 
 /**
- * 媒体处理 任务请求实体 https://cloud.tencent.com/document/product/460/48234
+ * 文档预览任务发起请求类
  */
-public class MediaJobsRequest extends CIServiceRequest implements Serializable {
+public class DocJobListRequest extends CIServiceRequest {
+
     /**
-     * bucket名称
+     * cos桶名称
      */
     private String bucketName;
+
     /**
      * 任务的队列id
      */
@@ -45,24 +44,13 @@ public class MediaJobsRequest extends CIServiceRequest implements Serializable {
      * 结束时间
      */
     private String endCreationTime;
-    /**
-     * 任务id
-     */
-    private String jobId;
-    /**
-     * 输入对象
-     */
-    private MediaInputObject input;
-    /**
-     * 媒体操作对象
-     */
-    private MediaJobOperation operation;
 
-
+    @Override
     public String getBucketName() {
         return bucketName;
     }
 
+    @Override
     public void setBucketName(String bucketName) {
         this.bucketName = bucketName;
     }
@@ -131,39 +119,9 @@ public class MediaJobsRequest extends CIServiceRequest implements Serializable {
         this.endCreationTime = endCreationTime;
     }
 
-    public String getJobId() {
-        return jobId;
-    }
-
-    public void setJobId(String jobId) {
-        this.jobId = jobId;
-    }
-
-    public MediaInputObject getInput() {
-        if (input == null) {
-            input = new MediaInputObject();
-        }
-        return input;
-    }
-
-    public void setInput(MediaInputObject input) {
-        this.input = input;
-    }
-
-    public MediaJobOperation getOperation() {
-        if (operation == null) {
-            operation = new MediaJobOperation();
-        }
-        return operation;
-    }
-
-    public void setOperation(MediaJobOperation operation) {
-        this.operation = operation;
-    }
-
     @Override
     public String toString() {
-        return "MediaJobsRequest{" +
+        return "DocJobListRequest{" +
                 "bucketName='" + bucketName + '\'' +
                 ", queueId='" + queueId + '\'' +
                 ", tag='" + tag + '\'' +
@@ -173,8 +131,6 @@ public class MediaJobsRequest extends CIServiceRequest implements Serializable {
                 ", states='" + states + '\'' +
                 ", startCreationTime='" + startCreationTime + '\'' +
                 ", endCreationTime='" + endCreationTime + '\'' +
-                ", jobId='" + jobId + '\'' +
-                ", input=" + input +
                 '}';
     }
 }

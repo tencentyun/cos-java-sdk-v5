@@ -4,8 +4,9 @@ import com.qcloud.cos.model.ciModel.common.MediaCommonResponse;
 
 import java.util.ArrayList;
 import java.util.List;
+
 /**
- *  数据万象 媒体bucket查询接口响应实体 详情见 https://cloud.tencent.com/document/product/460/38914
+ * 数据万象 媒体bucket查询接口响应实体 详情见 https://cloud.tencent.com/document/product/460/38914
  */
 public class MediaBucketResponse extends MediaCommonResponse {
     private List<MediaBucketObject> MediaBucketList;
@@ -24,8 +25,9 @@ public class MediaBucketResponse extends MediaCommonResponse {
 
     @Override
     public String toString() {
-        return "MediaBucketResponse{" +
-                "MediaBucketList=" + MediaBucketList +
-                '}';
+        final StringBuffer sb = new StringBuffer("MediaBucketResponse{");
+        sb.append("MediaBucketList=").append(MediaBucketList);
+        sb.append('}');
+        return sb.toString();
     }
 }

@@ -5,9 +5,9 @@ import com.qcloud.cos.internal.CIServiceRequest;
 import java.io.Serializable;
 
 /**
- * 媒体处理 队列实体 https://cloud.tencent.com/document/product/460/42324
+ * 文档预览 队列实体 https://cloud.tencent.com/document/product/460/46947
  */
-public class MediaQueueObject extends CIServiceRequest implements Serializable {
+public class DocQueueObject extends CIServiceRequest implements Serializable {
     private String queueId;
     private String name;
     private String state;
@@ -27,7 +27,7 @@ public class MediaQueueObject extends CIServiceRequest implements Serializable {
         this.bucketId = bucketId;
     }
 
-    public MediaQueueObject() {
+    public DocQueueObject() {
         this.notifyConfig = new MediaNotifyConfig();
     }
 
@@ -56,9 +56,6 @@ public class MediaQueueObject extends CIServiceRequest implements Serializable {
     }
 
     public MediaNotifyConfig getNotifyConfig() {
-        if (notifyConfig==null){
-            notifyConfig = new MediaNotifyConfig();
-        }
         return notifyConfig;
     }
 

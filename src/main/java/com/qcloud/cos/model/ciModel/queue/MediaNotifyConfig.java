@@ -56,11 +56,12 @@ public class MediaNotifyConfig {
 
     @Override
     public String toString() {
-        return "NotifyConfig{" +
-                "url='" + url + '\'' +
-                ", type='" + type + '\'' +
-                ", event='" + event + '\'' +
-                ", state='" + state + '\'' +
-                '}';
+        final StringBuffer sb = new StringBuffer("MediaNotifyConfig{");
+        sb.append("url='").append(url).append('\'');
+        sb.append(", type='").append(type).append('\'');
+        sb.append(", event='").append(event).append('\'');
+        sb.append(", state='").append(state).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 }

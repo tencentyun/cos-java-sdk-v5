@@ -15,7 +15,7 @@ public class ClientUtils {
         // 1 初始化用户身份信息（secretId, secretKey）。
         String secretId = "secretId";
         String secretKey = "secretKey";
-        return getCosClient(secretId,secretKey,"region");
+        return getCosClient(secretId,secretKey,"chongqing");
     }
 
     public static COSClient getCosClient(String secretId, String secretKey, String _region) {

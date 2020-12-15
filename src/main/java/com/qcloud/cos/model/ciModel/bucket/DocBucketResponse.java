@@ -1,10 +1,14 @@
-package com.qcloud.cos.model.ciModel.common;
+package com.qcloud.cos.model.ciModel.bucket;
 
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * 媒体处理 公用返回实体
+ * 数据万象 文档预览 bucket查询接口响应实体 详情见 https://cloud.tencent.com/document/product/460/46945
  */
-public class MediaCommonResponse {
+public class DocBucketResponse {
+    private List<DocBucketObject> docBucketObjectList;
+
     /**
      * 请求id
      */
@@ -21,14 +25,7 @@ public class MediaCommonResponse {
      * 每页展示数量
      */
     private String pageSize;
-    /**
-     * 创建时间
-     */
-    private String createTime;
-    /**
-     * 修改时间
-     */
-    private String updateTime;
+
 
     public String getPageNumber() {
         return pageNumber;
@@ -62,31 +59,25 @@ public class MediaCommonResponse {
         this.requestId = requestId;
     }
 
-    public String getUpdateTime() {
-        return updateTime;
+    public List<DocBucketObject> getDocBucketObjectList() {
+        if (docBucketObjectList == null) {
+            docBucketObjectList = new ArrayList<>();
+        }
+        return docBucketObjectList;
     }
 
-    public void setUpdateTime(String updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    public String getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(String createTime) {
-        this.createTime = createTime;
+    public void setDocBucketObjectList(List<DocBucketObject> docBucketObjectList) {
+        this.docBucketObjectList = docBucketObjectList;
     }
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("MediaCommonResponse{");
-        sb.append("requestId='").append(requestId).append('\'');
+        final StringBuffer sb = new StringBuffer("DocBucketResponse{");
+        sb.append("docBucketObjectList=").append(docBucketObjectList);
+        sb.append(", requestId='").append(requestId).append('\'');
         sb.append(", totalCount='").append(totalCount).append('\'');
         sb.append(", pageNumber='").append(pageNumber).append('\'');
         sb.append(", pageSize='").append(pageSize).append('\'');
-        sb.append(", createTime='").append(createTime).append('\'');
-        sb.append(", updateTime='").append(updateTime).append('\'');
         sb.append('}');
         return sb.toString();
     }
