@@ -89,7 +89,12 @@
             <version>2.0.6</version>
             <scope>test</scope>
         </dependency>
-
+        <dependency>
+            <groupId>com.tencent.cloud</groupId>
+            <artifactId>cos-sts-java</artifactId>
+            <version>3.0.8</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <distributionManagement>
@@ -197,6 +202,12 @@
                         <format>xml</format>
                     </formats>
                     <check/>
+                    <instrumentation>
+                        <excludes>
+                            <exclude>com/qcloud/cos/demo/ci/*</exclude>
+                            <exclude>com/qcloud/cos/demo/*</exclude>
+                        </excludes>
+                    </instrumentation>
                 </configuration>
             </plugin>
 

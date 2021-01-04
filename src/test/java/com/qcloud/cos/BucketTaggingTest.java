@@ -1,6 +1,7 @@
 package com.qcloud.cos;
 
 import com.qcloud.cos.model.*;
+import java.util.ArrayList;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -23,7 +24,7 @@ public class BucketTaggingTest extends AbstractCOSClientTest{
 
     @Test
     public void setGetBucketLoggingTest() {
-        List<TagSet> tagSetList = new LinkedList<TagSet>();
+        List<TagSet> tagSetList = new ArrayList<>();
         TagSet tagSet = new TagSet();
         tagSet.setTag("age", "18");
         tagSet.setTag("name", "xiaoming");
@@ -34,7 +35,7 @@ public class BucketTaggingTest extends AbstractCOSClientTest{
                 new SetBucketTaggingConfigurationRequest(bucket, bucketTaggingConfiguration);
         cosclient.setBucketTaggingConfiguration(setBucketTaggingConfigurationRequest);
         BucketTaggingConfiguration bucketTaggingConfiguration1 = cosclient.getBucketTaggingConfiguration(bucket);
-        assertEquals(bucketTaggingConfiguration.getAllTagSets(), bucketTaggingConfiguration1.getAllTagSets());
+        assertEquals(tagSetList.size(), bucketTaggingConfiguration1.getAllTagSets().size());
         cosclient.deleteBucketTaggingConfiguration(bucket);
     }
 }

@@ -1,5 +1,7 @@
 package com.qcloud.cos;
 
+import com.qcloud.cos.utils.CRC64Test;
+import com.qcloud.cos.utils.UrlEncoderUtilsTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
@@ -10,6 +12,9 @@ import org.junit.runners.Suite.SuiteClasses;
         GeneratePresignedUrlTest.class, GetBucketLocationTest.class, GetServiceTest.class,
         ListObjectTest.class, ListVersionsTest.class, MultipartUploadTest.class,
         PutGetDelTest.class, PutGetLifeCycleConfigTest.class, PutObjectCopyTest.class, 
-        SSECustomerTest.class, TransferManagerTest.class, BucketWebsiteTest.class, AppendObjectTest.class})
+        SSECustomerTest.class, TransferManagerTest.class, BucketWebsiteTest.class, AppendObjectTest.class,
+        UrlEncoderUtilsTest.class, CRC64Test.class, BucketInventoryTest.class, BucketLoggingTest.class, BucketTaggingTest.class,
+        GetSetDelPolicyTest.class, ObjecTaggingTest.class, RestoreObjectTest.class,
+        })
 public class SuiteTest {
 }
