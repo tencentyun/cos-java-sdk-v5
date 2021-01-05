@@ -24,7 +24,7 @@ import java.lang.annotation.Target;
  * Marker for elements that should only be accessed by the generated clients and not users of the
  * SDK. Do not make breaking changes to these APIs - they won't directly break customers, but
  * they'll break old versions of generated clients.
- * <p>
+ * 
  * TODO: Write a linter that makes sure generated code only depends on public or
  * {@code @InternalApi} classes.
  */

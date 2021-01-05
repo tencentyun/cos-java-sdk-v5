@@ -1,8 +1,5 @@
 package com.qcloud.cos;
 
-import com.qcloud.Module.Sts;
-import com.qcloud.QcloudApiModuleCenter;
-import com.qcloud.Utilities.Json.JSONObject;
 import com.qcloud.cos.auth.*;
 import com.qcloud.cos.endpoint.UserSpecifiedEndpointBuilder;
 import com.qcloud.cos.exception.CosServiceException;
@@ -13,10 +10,12 @@ import com.qcloud.cos.region.Region;
 import com.qcloud.cos.utils.DateUtils;
 import com.qcloud.cos.utils.Md5Utils;
 
+import com.tencent.cloud.CosStsClient;
 import java.io.*;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.ThreadLocalRandom;
+import org.json.JSONObject;
 
 import static org.junit.Assert.*;
 
@@ -843,30 +842,33 @@ public class AbstractCOSClientTest {
         }
     }
 
-    protected static TemporyToken fetchTempToken(long duratonSeconds) {
-        final String policy =
-                "{\"statement\": [{\"action\": [\"name/cos:*\"],\"effect\": \"allow\",\"resource\":\"*\"}],\"version\": \"2.0\"}";
-
+    protected static TemporyToken fetchTempToken(long durationSeconds) {
         TreeMap<String, Object> config = new TreeMap<String, Object>();
-
-
-        config.put("SecretId", secretId);
-        config.put("SecretKey", secretKey);
-        config.put("RequestMethod", "GET");
-        QcloudApiModuleCenter module = new QcloudApiModuleCenter(new Sts(), config);
-        TreeMap<String, Object> params = new TreeMap<String, Object>();
-        params.put("name", "tac-storage-sts-java");
-        params.put("policy", policy);
-        params.put("durationSeconds", duratonSeconds);
         try {
-            /* call 方法正式向指定的接口名发送请求，并把请求参数 params 传入，返回即是接口的请求结果。 */
-            String resultStr = module.call("GetFederationToken", params);
-            JSONObject resultJson = new JSONObject(resultStr);
-            if (resultJson.getInt("code") != 0) {
-                fail("fetchTempToken failed: " + resultStr);
-            }
-            JSONObject credentialsJson =
-                    resultJson.getJSONObject("data").getJSONObject("credentials");
+            // 替换为您的 SecretId
+            config.put("SecretId", secretId);
+            // 替换为您的 SecretKey
+            config.put("SecretKey", secretKey);
+
+            // 临时密钥有效时长，单位是秒，默认1800秒，目前主账号最长2小时（即7200秒），子账号最长36小时（即129600秒）
+            config.put("durationSeconds", (int)durationSeconds);
+
+            // 换成您的 bucket
+            config.put("bucket", bucket);
+            // 换成 bucket 所在地区
+            config.put("region", region);
+
+            // 这里改成允许的路径前缀，可以根据自己网站的用户登录态判断允许上传的具体路径，例子：a.jpg 或者 a/* 或者 * 。
+            // 如果填写了“*”，将允许用户访问所有资源；除非业务需要，否则请按照最小权限原则授予用户相应的访问权限范围。
+            config.put("allowPrefix", "*");
+
+            // 密钥的权限列表。简单上传、表单上传和分片上传需要以下的权限，其他权限列表请看 https://cloud.tencent.com/document/product/436/31923
+            String[] allowActions = new String[] {
+                    "name/cos:*",
+            };
+            config.put("allowActions", allowActions);
+
+            JSONObject credentialsJson = CosStsClient.getCredential(config).getJSONObject("credentials");
             String tmpSecretId = credentialsJson.getString("tmpSecretId");
             String tmpSecretKey = credentialsJson.getString("tmpSecretKey");
             String sessionToken = credentialsJson.getString("sessionToken");

@@ -25,7 +25,7 @@ import java.util.Map;
  * Cos. Receiving an exception of this type indicates that the caller's request was correctly
  * transmitted to the service, but for some reason, the service was not able to process it, and
  * returned an error response instead.
- * <p>
+ *
  * CosServiceException provides callers several pieces of information that can be used to obtain
  * more information about the error and why it occurred. In particular, the errorType field can be
  * used to determine if the caller's request was invalid, or the service encountered an error on the
@@ -38,7 +38,6 @@ public class CosServiceException extends CosClientException {
     /**
      * Indicates who is responsible (if known) for a failed request.
      *
-     * <p>
      * For example, if a client is using an invalid COS access key, the returned exception will
      * indicate that there is an error in the request the caller is sending. Retrying that same
      * request will *not* result in a successful response. The Client ErrorType indicates that there
@@ -47,14 +46,12 @@ public class CosServiceException extends CosClientException {
      * request before it should be resent. Client errors are typically associated an HTTP error code
      * in the 4xx range.
      *
-     * <p>
      * The Service ErrorType indicates that although the request the caller sent was valid, the
      * service was unable to fulfill the request because of problems on the service's side. These
      * types of errors can be retried by the caller since the caller's request was valid and the
      * problem occurred while processing the request on the service side. Service errors will be
      * accompanied by an HTTP error code in the 5xx range.
      *
-     * <p>
      * Finally, if there isn't enough information to determine who's fault the error response is, an
      * Unknown ErrorType will be set.
      */

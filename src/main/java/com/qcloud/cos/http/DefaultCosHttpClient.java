@@ -473,9 +473,9 @@ public class DefaultCosHttpClient implements CosHttpClient {
                 break;
             } catch (CosServiceException cse) {
                 if (cse.getStatusCode() >= 500) {
-                    String errorMsg = String
-                            .format("failed to execute http request, due to service exception, httpRequest: %s",
-                                    request.toString());
+                    String errorMsg = String.format("failed to execute http request, due to service exception,"
+                                    + " httpRequest: %s, retryIdx:%d, maxErrorRetry:%d", request.toString(),
+                            retryIndex, maxErrorRetry);
                     log.error(errorMsg, cse);
                 }
                 closeHttpResponseStream(httpResponse);
@@ -483,9 +483,9 @@ public class DefaultCosHttpClient implements CosHttpClient {
                     throw cse;
                 }
             } catch (CosClientException cce) {
-                String errorMsg = String
-                        .format("failed to execute http request, due to client exception, httpRequest: %s",
-                                request.toString());
+                String errorMsg = String.format("failed to execute http request, due to client exception,"
+                                + " httpRequest: %s, retryIdx:%d, maxErrorRetry:%d",
+                        request.toString(), retryIndex, maxErrorRetry);
                 log.error(errorMsg, cce);
                 closeHttpResponseStream(httpResponse);
                 if (!shouldRetry(request, httpResponse, cce, retryIndex, retryPolicy)) {
