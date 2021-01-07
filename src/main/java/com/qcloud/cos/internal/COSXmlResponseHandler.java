@@ -18,6 +18,8 @@
 
 package com.qcloud.cos.internal;
 
+import com.qcloud.cos.Headers;
+import com.qcloud.cos.model.CosServiceResult;
 import java.io.InputStream;
 import java.util.Map;
 
@@ -53,7 +55,6 @@ public class COSXmlResponseHandler<T> extends AbstractCosResponseHandler<T> {
     public CosServiceResponse<T> handle(CosHttpResponse response) throws Exception {
         CosServiceResponse<T> cosResponse = parseResponseMetadata(response);
         responseHeaders = response.getHeaders();
-
         if (responseUnmarshaller != null) {
             log.trace("Beginning to parse service response XML");
             T result = responseUnmarshaller.unmarshall(response.getContent());
@@ -65,7 +66,9 @@ public class COSXmlResponseHandler<T> extends AbstractCosResponseHandler<T> {
             log.trace("Done parsing service response XML");
             cosResponse.setResult(result);
         }
-
+        if(cosResponse.getResult() != null && cosResponse.getResult() instanceof CosServiceResult) {
+            ((CosServiceResult) cosResponse.getResult()).setRequestId(responseHeaders.get(Headers.REQUEST_ID));
+        }
         return cosResponse;
     }
 
