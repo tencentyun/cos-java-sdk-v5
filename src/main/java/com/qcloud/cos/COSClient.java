@@ -1870,8 +1870,9 @@ public class COSClient implements COS {
         if (listObjectsRequest.getMaxKeys() != null
                 && listObjectsRequest.getMaxKeys().intValue() >= 0)
             request.addParameter("max-keys", listObjectsRequest.getMaxKeys().toString());
-
-        return invoke(request, new Unmarshallers.ListObjectsUnmarshaller(shouldSDKDecodeResponse));
+        COSXmlResponseHandler<ObjectListing> handler =
+                new COSXmlResponseHandler(new Unmarshallers.ListObjectsUnmarshaller(shouldSDKDecodeResponse));
+        return invoke(request, handler);
     }
 
     @Override

@@ -35,7 +35,7 @@ import com.qcloud.cos.internal.ServerSideEncryptionResult;
  * metadata, as well as the standard HTTP headers that Qcloud COS sends and receives
  * (Content-Length, ETag, Content-MD5, etc.).
  */
-public class ObjectMetadata implements ServerSideEncryptionResult, ObjectExpirationResult,
+public class ObjectMetadata extends CosServiceResult implements ServerSideEncryptionResult, ObjectExpirationResult,
         ObjectRestoreResult, Cloneable, Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -786,5 +786,10 @@ public class ObjectMetadata implements ServerSideEncryptionResult, ObjectExpirat
 
     public String getCrc64Ecma() {
         return (String)metadata.get(Headers.COS_HASH_CRC64_ECMA);
+    }
+
+    @Override
+    public String getRequestId() {
+        return (String)metadata.get(Headers.REQUEST_ID);
     }
 }

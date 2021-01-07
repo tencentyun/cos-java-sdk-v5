@@ -34,7 +34,7 @@ import java.util.List;
  * @see COS#listObjects(ListObjectsRequest)
  * @see COS#listNextBatchOfObjects(ObjectListing)
  */
-public class ObjectListing implements Serializable {
+public class ObjectListing extends CosServiceResult implements Serializable {
     
     /** A list of summary information describing the objects stored in the bucket */
     private List<COSObjectSummary> objectSummaries = new ArrayList<COSObjectSummary>();
