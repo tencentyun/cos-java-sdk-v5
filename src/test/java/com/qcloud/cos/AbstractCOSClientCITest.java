@@ -22,7 +22,7 @@ public class AbstractCOSClientCITest {
         appid = System.getenv("appid");
         secretId = System.getenv("secretId");
         secretKey = System.getenv("secretKey");
-        region = System.getenv("region");
+        region = System.getenv("ciRegion");
         bucket = System.getenv("ciBucket");
 
         File propFile = new File("ut_account.prop");
@@ -35,7 +35,7 @@ public class AbstractCOSClientCITest {
                 appid = prop.getProperty("appid");
                 secretId = prop.getProperty("secretId");
                 secretKey = prop.getProperty("secretKey");
-                region = prop.getProperty("region");
+                region = prop.getProperty("ciRegion");
                 bucket = prop.getProperty("ciBucket");
             } finally {
                 if (fis != null) {
