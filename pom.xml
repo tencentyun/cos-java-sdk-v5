@@ -203,10 +203,10 @@
                     </formats>
                     <check/>
                     <instrumentation>
-                        <excludes>
-                            <exclude>com/qcloud/cos/demo/ci/*</exclude>
-                            <exclude>com/qcloud/cos/demo/*</exclude>
-                        </excludes>
+                        <ignoreTrivial>true</ignoreTrivial>
+                        <includes>
+                            <include>**/cos/*.class</include>
+                        </includes>
                     </instrumentation>
                 </configuration>
             </plugin>
