@@ -9,7 +9,8 @@ import org.junit.runners.Suite.SuiteClasses;
         BucketVersioningTest.class, CORSTest.class, CreateDeleteHeadBucketTest.class,
         GeneratePresignedUrlTest.class, GetBucketLocationTest.class, GetServiceTest.class,
         ListObjectTest.class, ListVersionsTest.class, MultipartUploadTest.class,
-        PutGetDelTest.class, PutGetLifeCycleConfigTest.class, PutObjectCopyTest.class, 
-        SSECustomerTest.class, TransferManagerTest.class, BucketWebsiteTest.class, AppendObjectTest.class})
+        PutGetDelTest.class, PutGetLifeCycleConfigTest.class, PutObjectCopyTest.class,
+        SSECustomerTest.class, TransferManagerTest.class, BucketWebsiteTest.class, AppendObjectTest.class, MediaBucketTest.class,
+        MediaJobTest.class, MediaQueueTest.class, MediaTemplateTest.class,MediaWorkflowTest.class})
 public class SuiteTest {
 }

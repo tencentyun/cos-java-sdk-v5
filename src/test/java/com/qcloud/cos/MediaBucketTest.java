@@ -8,16 +8,16 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class MediaBucketTest extends AbstractCOSClientTest {
+public class MediaBucketTest extends AbstractCOSClientCITest {
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
-        AbstractCOSClientTest.initCosClient();
+        AbstractCOSClientCITest.initCosClient();
     }
 
     @AfterClass
     public static void tearDownAfterClass() throws Exception {
-        AbstractCOSClientTest.destoryCosClient();
+        AbstractCOSClientCITest.closeCosClient();
     }
 
     @Test
