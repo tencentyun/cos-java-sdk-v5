@@ -15,6 +15,7 @@ import org.junit.runners.Suite.SuiteClasses;
         SSECustomerTest.class, TransferManagerTest.class, BucketWebsiteTest.class, AppendObjectTest.class,
         UrlEncoderUtilsTest.class, CRC64Test.class, BucketInventoryTest.class, BucketLoggingTest.class, BucketTaggingTest.class,
         GetSetDelPolicyTest.class, ObjecTaggingTest.class, RestoreObjectTest.class,
+	MediaBucketTest.class, MediaJobTest.class, MediaQueueTest.class, MediaTemplateTest.class,MediaWorkflowTest.class
         })
 public class SuiteTest {
 }

@@ -1,7 +1,5 @@
 package com.qcloud.cos;
 
-import com.qcloud.cos.model.ciModel.bucket.MediaBucketRequest;
-import com.qcloud.cos.model.ciModel.bucket.MediaBucketResponse;
 import com.qcloud.cos.model.ciModel.queue.MediaListQueueResponse;
 import com.qcloud.cos.model.ciModel.queue.MediaQueueObject;
 import com.qcloud.cos.model.ciModel.queue.MediaQueueRequest;
@@ -12,21 +10,24 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 
-public class MediaQueueTest extends AbstractCOSClientTest {
+public class MediaQueueTest extends AbstractCOSClientCITest {
 
     public static final String QUEUE_NAME = "test-queue";
     public static final String QUEUE_URL = "cloud.tencent.com";
     public static final String QUEUE_STATE = "Active";
+
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
-        AbstractCOSClientTest.initCosClient();
+        AbstractCOSClientCITest.initCosClient();
     }
 
     @AfterClass
     public static void tearDownAfterClass() throws Exception {
-        AbstractCOSClientTest.destoryCosClient();
+        AbstractCOSClientCITest.closeCosClient();
     }
 
     @Test
@@ -69,7 +70,6 @@ public class MediaQueueTest extends AbstractCOSClientTest {
                 assertEquals(bucket, queue.getBucketId());
                 assertEquals(QUEUE_NAME, queue.getName());
                 assertEquals(QUEUE_STATE, queue.getState());
-                assertEquals(QUEUE_URL, queue.getNotifyConfig().getUrl());
             }
         }
     }

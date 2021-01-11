@@ -11,7 +11,7 @@ import org.junit.Test;
 
 import java.util.List;
 
-public class MediaTemplateTest extends AbstractCOSClientTest {
+public class MediaTemplateTest extends AbstractCOSClientCITest {
 
     public static final String TAG = "Animation";
     public static final String FORMAT = "gif";
@@ -24,12 +24,12 @@ public class MediaTemplateTest extends AbstractCOSClientTest {
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
-        AbstractCOSClientTest.initCosClient();
+        AbstractCOSClientCITest.initCosClient();
     }
 
     @AfterClass
     public static void tearDownAfterClass() throws Exception {
-        AbstractCOSClientTest.destoryCosClient();
+        AbstractCOSClientCITest.closeCosClient();
     }
 
     @Test

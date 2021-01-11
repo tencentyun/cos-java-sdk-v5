@@ -1,7 +1,5 @@
 package com.qcloud.cos;
 
-import com.qcloud.cos.model.ciModel.bucket.MediaBucketRequest;
-import com.qcloud.cos.model.ciModel.bucket.MediaBucketResponse;
 import com.qcloud.cos.model.ciModel.job.MediaJobObject;
 import com.qcloud.cos.model.ciModel.job.MediaJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaJobsRequest;
@@ -14,20 +12,20 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
-public class MediaJobTest extends AbstractCOSClientTest {
+public class MediaJobTest extends AbstractCOSClientCITest {
 
     public static final String TAG = "Transcode";
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
-        AbstractCOSClientTest.initCosClient();
+        AbstractCOSClientCITest.initCosClient();
     }
 
     @AfterClass
     public static void tearDownAfterClass() throws Exception {
-        AbstractCOSClientTest.destoryCosClient();
+        AbstractCOSClientCITest.closeCosClient();
     }
 
     @Test
