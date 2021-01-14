@@ -29,8 +29,7 @@ public class MediaBucketTest extends AbstractCOSClientCITest {
         request.setBucketName(bucket);
         MediaBucketResponse response = cosclient.describeMediaBuckets(request);
         if (response != null && response.getMediaBucketList().size() != 0) {
-            assertNotEquals("0", response.getTotalCount());
-            assertTrue(Integer.parseInt(response.getTotalCount()) > 0);
+            assertNotEquals("0", response.getMediaBucketList().size());
             assertTrue(Integer.parseInt(response.getPageSize()) > 0);
             assertTrue(Integer.parseInt(response.getPageNumber()) > 0);
             assertEquals(bucket, response.getMediaBucketList().get(0).getBucketId());
