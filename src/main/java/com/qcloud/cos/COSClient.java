@@ -562,8 +562,7 @@ public class COSClient implements COS {
     private String formatBucket(String bucketName, String appid) throws CosClientException {
         BucketNameUtils.validateBucketName(bucketName);
         if (appid == null) {
-            String parrtern = ".*-[0-9]{3,}$";
-            if (Pattern.matches(parrtern, bucketName)) {
+            if (!bucketName.trim().isEmpty()) {
                 return bucketName;
             } else {
                 throw new CosClientException(
@@ -1430,16 +1429,9 @@ public class COSClient implements COS {
     public boolean doesBucketExist(String bucketName)
             throws CosClientException, CosServiceException {
         try {
-            getBucketAcl(bucketName);
+            headBucket(new HeadBucketRequest(bucketName));
             return true;
         } catch (CosServiceException cse) {
-            // A redirect error or an AccessDenied exception means the bucket exists but it's not in
-            // this region
-            // or we don't have permissions to it.
-            if ((cse.getStatusCode() == Constants.BUCKET_REDIRECT_STATUS_CODE)
-                    || "AccessDenied".equals(cse.getErrorCode())) {
-                return true;
-            }
             if (cse.getStatusCode() == Constants.NO_SUCH_BUCKET_STATUS_CODE) {
                 return false;
             }
