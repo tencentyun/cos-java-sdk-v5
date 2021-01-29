@@ -129,6 +129,11 @@ public interface Headers {
     public static final String SERVER_SIDE_ENCRYPTION_CUSTOMER_KEY =
             "x-cos-server-side-encryption-customer-key";
 
+    public static final String SERVER_SIDE_ENCRYPTION_COS_KMS_KEY_ID =
+            "x-cos-server-side-encryption-cos-kms-key-id";
+
+    public static final String SERVER_SIDE_ENCRYPTION_CONTEXT =
+            "x-cos-server-side-encryption-context";
     /**
      * Header for the MD5 digest of the customer-provided key for server-side encryption
      */

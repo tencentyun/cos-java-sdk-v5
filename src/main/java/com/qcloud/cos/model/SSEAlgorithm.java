@@ -23,7 +23,7 @@ package com.qcloud.cos.model;
  */
 public enum SSEAlgorithm {
     AES256("AES256"),
-    KMS("COS:kms"),
+    KMS("cos/kms"),
     ;
 
     private final String algorithm;
