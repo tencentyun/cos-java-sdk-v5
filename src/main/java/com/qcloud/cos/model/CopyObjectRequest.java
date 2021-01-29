@@ -960,11 +960,7 @@ public class CopyObjectRequest extends CosServiceRequest
         this.destinationSSECustomerKey = destinationSSECustomerKey;
     }
 
-    public SSECOSKeyManagementParams getSseCOSKeyManagementParams() {
-        return sseCOSKeyManagementParams;
-    }
-
-    public void setSseCOSKeyManagementParams(SSECOSKeyManagementParams sseCOSKeyManagementParams) {
+    public void setSSECOSKeyManagementParams(SSECOSKeyManagementParams sseCOSKeyManagementParams) {
         this.sseCOSKeyManagementParams = sseCOSKeyManagementParams;
     }
 

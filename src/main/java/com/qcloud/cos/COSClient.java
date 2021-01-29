@@ -484,6 +484,7 @@ public class COSClient implements COS {
         // Populate the SSE-C parameters for the source and destination object
         populateSSE_C(request, copyObjectRequest.getDestinationSSECustomerKey());
         populateSourceSSE_C(request, copyObjectRequest.getSourceSSECustomerKey());
+        populateSSE_KMS(request, copyObjectRequest.getSSECOSKeyManagementParams());
     }
 
     private void populateRequestWithCopyPartParameters(
@@ -840,11 +841,12 @@ public class COSClient implements COS {
 
     private static void populateSSE_KMS(CosHttpRequest<?> request,
             SSECOSKeyManagementParams sseParams) {
-
         if (sseParams != null) {
             addHeaderIfNotNull(request, Headers.SERVER_SIDE_ENCRYPTION, sseParams.getEncryption());
-            addHeaderIfNotNull(request, Headers.SERVER_SIDE_ENCRYPTION_CUSTOMER_KEY,
+            addHeaderIfNotNull(request, Headers.SERVER_SIDE_ENCRYPTION_COS_KMS_KEY_ID,
                     sseParams.getCOSKmsKeyId());
+            addHeaderIfNotNull(request, Headers.SERVER_SIDE_ENCRYPTION_CONTEXT,
+                    sseParams.getEncryptionContext());
         }
     }
 
