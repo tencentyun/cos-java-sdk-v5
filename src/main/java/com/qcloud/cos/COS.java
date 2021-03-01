@@ -2740,6 +2740,17 @@ public interface COS extends COSDirectSpi {
             throws CosServiceException, CosClientException;
 
     /**
+     * rename object, which contains both file or dir in fs
+     *
+     * @param renameRequest
+     * @return
+     * @throws CosServiceException
+     * @throws CosClientException
+     */
+    public void rename(RenameRequest renameRequest)
+            throws CosServiceException, CosClientException;
+
+    /**
      * This operation filters the contents of an COS object based on a simple Structured Query Language (SQL) statement.
      * In the request, along with the SQL expression, you must also specify a data serialization format (JSON or CSV) of the
      * object. COS uses this to parse object data into records, and returns only records that match the specified SQL
