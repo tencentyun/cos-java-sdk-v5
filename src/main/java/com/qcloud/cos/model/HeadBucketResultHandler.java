@@ -11,7 +11,7 @@
  * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
  * express or implied. See the License for the specific language governing
  * permissions and limitations under the License.
- 
+
  * According to cos feature, we modify some class，comment, field name, etc.
  */
 
@@ -22,6 +22,9 @@ import com.qcloud.cos.Headers;
 import com.qcloud.cos.http.CosHttpResponse;
 import com.qcloud.cos.internal.AbstractCosResponseHandler;
 import com.qcloud.cos.internal.CosServiceResponse;
+import com.qcloud.cos.internal.ResponseMetadata;
+
+import static com.qcloud.cos.internal.Constants.BUCKET_OFS_ARCH_TYPE;
 
 public class HeadBucketResultHandler extends AbstractCosResponseHandler<HeadBucketResult> {
 
@@ -29,8 +32,15 @@ public class HeadBucketResultHandler extends AbstractCosResponseHandler<HeadBuck
     public CosServiceResponse<HeadBucketResult> handle(CosHttpResponse response)
             throws Exception {
         final CosServiceResponse<HeadBucketResult> cosResponse = new CosServiceResponse<HeadBucketResult>();
+        ResponseMetadata metadata = cosResponse.getResponseMetadata();
+        String bucketType = metadata.getBucketType();
+        boolean isMergeBucket = false;
+        if (bucketType.equals(BUCKET_OFS_ARCH_TYPE)) {
+            isMergeBucket = true;
+        }
         final HeadBucketResult result = new HeadBucketResult();
         result.setBucketRegion(response.getHeaders().get(Headers.COS_BUCKET_REGION));
+        result.setMergeBucket(isMergeBucket);
         cosResponse.setResult(result);
         return cosResponse;
     }

@@ -11,7 +11,7 @@
  * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
  * express or implied. See the License for the specific language governing
  * permissions and limitations under the License.
- 
+
  * According to cos feature, we modify some class，comment, field name, etc.
  */
 
@@ -36,22 +36,24 @@ public class Constants {
 
     /** The maximum allowed parts in a multipart upload. */
     public static final int MAXIMUM_UPLOAD_PARTS = 10000;
-    
+
     public static final int NO_SUCH_BUCKET_STATUS_CODE = 404;
 
     public static final int BUCKET_ACCESS_FORBIDDEN_STATUS_CODE = 403;
 
     public static final int BUCKET_REDIRECT_STATUS_CODE = 301;
-    
+
     /** Represents a null version ID */
     public static final String NULL_VERSION_ID = "null";
-    
+
     /** URL encoding for object keys when list object */
     public static final String URL_ENCODING = "url";
-    
+
     /** Default encoding used for url encode */
     public static final String DEFAULT_ENCODING = "UTF-8";
 
     public static final String ISO_8859_1_ENCODING = "ISO-8859-1";
     public static final String UTF8_ENCODING = "UTF-8";
+    public static final String BUCKET_COS_ARCH_TYPE = "COS";
+    public static final String BUCKET_OFS_ARCH_TYPE = "OFS";
 }

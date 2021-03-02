@@ -1227,6 +1227,9 @@ public class COSClient implements COS {
         CosHttpRequest<DeleteObjectRequest> request =
                 createRequest(deleteObjectRequest.getBucketName(), deleteObjectRequest.getKey(),
                         deleteObjectRequest, HttpMethodName.DELETE);
+        if (deleteObjectRequest.isRecursive()) {
+            request.addParameter("recursive", null);
+        }
         invoke(request, voidCosResponseHandler);
     }
 

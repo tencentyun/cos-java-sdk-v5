@@ -103,6 +103,11 @@ public interface Headers {
     public static final String TRACE_ID = "x-cos-trace-id";
 
     /**
+     * COS response header for merge bucket type
+     */
+    public static final String BUCKET_ARCH = "x-cos-bucket-arch";
+
+    /**
      * COS request header indicating how to handle metadata when copying an object
      */
     public static final String METADATA_DIRECTIVE = "x-cos-metadata-directive";
