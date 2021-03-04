@@ -37,7 +37,8 @@ import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
-import com.google.gson.Gson;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.qcloud.cos.Headers;
 import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.internal.CosServiceRequest;
@@ -236,13 +237,17 @@ final class ContentCryptoMaterial {
      */
     private static SecretKey cekByKMS(byte[] cekSecured, String keyWrapAlgo,
             EncryptionMaterials materials, ContentCryptoScheme contentCryptoScheme, QCLOUDKMS kms) {
-        DecryptRequest desryptReq = new DecryptRequest();
+        DecryptRequest decryptReq = new DecryptRequest();
         Map<String, String> materialDesc = materials.getMaterialsDescription();
-        Gson gson = new Gson();
-        desryptReq.setEncryptionContext(gson.toJson(materialDesc));
-        desryptReq.setCiphertextBlob(new String(cekSecured));
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            decryptReq.setEncryptionContext(mapper.writeValueAsString(materialDesc));
+        } catch (JsonProcessingException e) {
+            throw new CosClientException("decrypt request set encryption context got json processing exception", e);
+        }
+        decryptReq.setCiphertextBlob(new String(cekSecured));
 
-        DecryptResponse decryptRes = kms.decrypt(desryptReq);
+        DecryptResponse decryptRes = kms.decrypt(decryptReq);
         byte[] key = Base64.decode(decryptRes.getPlaintext());
 
         return new SecretKeySpec(key, contentCryptoScheme.getKeyGeneratorAlgorithm());
@@ -683,8 +688,12 @@ final class ContentCryptoMaterial {
         if (materials.isKMSEnabled()) {
             matdesc = mergeMaterialDescriptions(materials, req);
             EncryptRequest encryptRequest = new EncryptRequest();
-            Gson gson = new Gson();
-            encryptRequest.setEncryptionContext(gson.toJson(matdesc));
+            try {
+                ObjectMapper mapper = new ObjectMapper();
+                encryptRequest.setEncryptionContext(mapper.writeValueAsString(matdesc));
+            } catch (JsonProcessingException e) {
+                throw new CosClientException("encrypt request set encryption context got json processing exception", e);
+            }
             encryptRequest.setKeyId(materials.getCustomerMasterKeyId());
             encryptRequest.setPlaintext(cek.getEncoded().toString());
 

@@ -40,7 +40,8 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
-import com.google.gson.Gson;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.qcloud.cos.Headers;
 import com.qcloud.cos.auth.COSCredentialsProvider;
 import com.qcloud.cos.exception.CosClientException;
@@ -459,15 +460,19 @@ public abstract class COSCryptoModuleBase extends COSCryptoModule {
                     ContentCryptoMaterial.mergeMaterialDescriptions(materials, req);
 
             GenerateDataKeyRequest keyGenReq = new GenerateDataKeyRequest();
-            Gson gson = new Gson();
-            keyGenReq.setEncryptionContext(gson.toJson(encryptionContext));
+            try {
+                ObjectMapper mapper = new ObjectMapper();
+                keyGenReq.setEncryptionContext(mapper.writeValueAsString(encryptionContext));
+            } catch (JsonProcessingException e) {
+                throw new CosClientException("generate datakey request set encryption context got json processing exception", e);
+            }
             keyGenReq.setKeyId(materials.getCustomerMasterKeyId());
             keyGenReq.setKeySpec(contentCryptoScheme.getKeySpec());
 
             GenerateDataKeyResponse keyGenRes = kms.generateDataKey(keyGenReq);
 
             byte[] key = Base64.decode(keyGenRes.getPlaintext());
-            final SecretKey cek =new SecretKeySpec(key,
+            final SecretKey cek = new SecretKeySpec(key,
                                   contentCryptoScheme.getKeyGeneratorAlgorithm());
 
             byte[] keyBlob = keyGenRes.getCiphertextBlob().getBytes();
