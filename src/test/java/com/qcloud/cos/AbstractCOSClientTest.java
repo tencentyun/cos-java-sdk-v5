@@ -1,23 +1,91 @@
 package com.qcloud.cos;
 
-import com.qcloud.cos.auth.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Properties;
+import java.util.TreeMap;
+import java.util.concurrent.ThreadLocalRandom;
+
+import com.qcloud.cos.auth.BasicCOSCredentials;
+import com.qcloud.cos.auth.BasicSessionCredentials;
+import com.qcloud.cos.auth.COSCredentials;
+import com.qcloud.cos.auth.COSCredentialsProvider;
+import com.qcloud.cos.auth.COSStaticCredentialsProvider;
+import com.qcloud.cos.auth.InstanceCredentialsFetcher;
+import com.qcloud.cos.auth.InstanceCredentialsProvider;
+import com.qcloud.cos.auth.InstanceMetadataCredentialsEndpointProvider;
 import com.qcloud.cos.endpoint.UserSpecifiedEndpointBuilder;
 import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.internal.SkipMd5CheckStrategy;
-import com.qcloud.cos.internal.crypto.*;
-import com.qcloud.cos.model.*;
+import com.qcloud.cos.internal.crypto.CryptoConfiguration;
+import com.qcloud.cos.internal.crypto.CryptoMode;
+import com.qcloud.cos.internal.crypto.EncryptionMaterials;
+import com.qcloud.cos.internal.crypto.EncryptionMaterialsProvider;
+import com.qcloud.cos.internal.crypto.KMSEncryptionMaterials;
+import com.qcloud.cos.internal.crypto.KMSEncryptionMaterialsProvider;
+import com.qcloud.cos.internal.crypto.QCLOUDKMS;
+import com.qcloud.cos.internal.crypto.StaticEncryptionMaterialsProvider;
+import com.qcloud.cos.model.AbortMultipartUploadRequest;
+import com.qcloud.cos.model.AccessControlList;
+import com.qcloud.cos.model.AppendObjectRequest;
+import com.qcloud.cos.model.AppendObjectResult;
+import com.qcloud.cos.model.Bucket;
+import com.qcloud.cos.model.BucketVersioningConfiguration;
+import com.qcloud.cos.model.COSObjectSummary;
+import com.qcloud.cos.model.COSVersionSummary;
+import com.qcloud.cos.model.CompleteMultipartUploadRequest;
+import com.qcloud.cos.model.CompleteMultipartUploadResult;
+import com.qcloud.cos.model.CreateBucketRequest;
+import com.qcloud.cos.model.GetBucketVersioningConfigurationRequest;
+import com.qcloud.cos.model.GetObjectMetadataRequest;
+import com.qcloud.cos.model.GetObjectRequest;
+import com.qcloud.cos.model.InitiateMultipartUploadRequest;
+import com.qcloud.cos.model.InitiateMultipartUploadResult;
+import com.qcloud.cos.model.ListMultipartUploadsRequest;
+import com.qcloud.cos.model.ListObjectsRequest;
+import com.qcloud.cos.model.ListPartsRequest;
+import com.qcloud.cos.model.ListVersionsRequest;
+import com.qcloud.cos.model.MultipartUpload;
+import com.qcloud.cos.model.MultipartUploadListing;
+import com.qcloud.cos.model.ObjectListing;
+import com.qcloud.cos.model.ObjectMetadata;
+import com.qcloud.cos.model.PartETag;
+import com.qcloud.cos.model.PartListing;
+import com.qcloud.cos.model.PartSummary;
+import com.qcloud.cos.model.Permission;
+import com.qcloud.cos.model.PutObjectRequest;
+import com.qcloud.cos.model.PutObjectResult;
+import com.qcloud.cos.model.ResponseHeaderOverrides;
+import com.qcloud.cos.model.SSECOSKeyManagementParams;
+import com.qcloud.cos.model.SSECustomerKey;
+import com.qcloud.cos.model.StorageClass;
+import com.qcloud.cos.model.UinGrantee;
+import com.qcloud.cos.model.UploadPartRequest;
+import com.qcloud.cos.model.UploadPartResult;
+import com.qcloud.cos.model.VersionListing;
 import com.qcloud.cos.region.Region;
 import com.qcloud.cos.utils.DateUtils;
 import com.qcloud.cos.utils.Md5Utils;
-
 import com.tencent.cloud.CosStsClient;
-import java.io.*;
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.concurrent.ThreadLocalRandom;
-import org.json.JSONObject;
 
-import static org.junit.Assert.*;
+import org.json.JSONObject;
 
 public class AbstractCOSClientTest {
     protected static String appid = null;
@@ -31,6 +99,7 @@ public class AbstractCOSClientTest {
     protected static ClientConfig clientConfig = null;
     protected static COSClient cosclient = null;
     protected static File tmpDir = null;
+    protected static String cmk = null;
 
     protected static boolean useClientEncryption = false;
     protected static boolean useServerEncryption = false;
@@ -91,6 +160,7 @@ public class AbstractCOSClientTest {
         bucket = System.getenv("bucket");
         generalApiEndpoint = System.getenv("generalApiEndpoint");
         serviceApiEndpoint = System.getenv("serviceApiEndpoint");
+        cmk = System.getenv("cmk");
 
         File propFile = new File("ut_account.prop");
         if (propFile.exists() && propFile.canRead()) {
@@ -110,6 +180,7 @@ public class AbstractCOSClientTest {
                 useCPMInstanceCredentials = Boolean.parseBoolean(prop.getProperty("useCPMInstanceCredentials", "false"
                 ));
                 useCVMInstanceCredentials = Boolean.parseBoolean(prop.getProperty("useCVMInstanceCredentials", "false"));
+                cmk = prop.getProperty("cmk");
             } finally {
                 if (fis != null) {
                     try {
@@ -191,9 +262,17 @@ public class AbstractCOSClientTest {
             UserSpecifiedEndpointBuilder userSpecifiedEndpointBuilder = new UserSpecifiedEndpointBuilder(generalApiEndpoint, serviceApiEndpoint);
             clientConfig.setEndpointBuilder(userSpecifiedEndpointBuilder);
         }
+
+        EncryptionMaterialsProvider encryptionMaterialsProvider;
+        if (encryptionMaterials instanceof KMSEncryptionMaterials) {
+            KMSEncryptionMaterials kmsEncryptionMaterials = new KMSEncryptionMaterials(cmk);
+            encryptionMaterialsProvider = new KMSEncryptionMaterialsProvider(kmsEncryptionMaterials);
+        } else {
+            encryptionMaterialsProvider = new StaticEncryptionMaterialsProvider(encryptionMaterials);
+        }
+
         cosclient = new COSEncryptionClient(qcloudkms, new COSStaticCredentialsProvider(cred),
-                new StaticEncryptionMaterialsProvider(encryptionMaterials), clientConfig,
-                cryptoConfiguration);
+                encryptionMaterialsProvider, clientConfig, cryptoConfiguration);
     }
 
     public static void initCosClient() throws Exception {
