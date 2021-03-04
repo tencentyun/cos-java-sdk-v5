@@ -171,12 +171,13 @@ abstract class ContentCryptoScheme {
         Cipher cipher;
         try {
             if (specificProvider != null) { // use the specific provider if defined
-                    cipher = Cipher.getInstance(getCipherAlgorithm(), specificProvider);
+                cipher = Cipher.getInstance(getCipherAlgorithm(), specificProvider);
             } else if (securityProvider != null) { // use the one optionally specified in the input
                 cipher = Cipher.getInstance(getCipherAlgorithm(), securityProvider);
             } else { // use the default provider
                 cipher = Cipher.getInstance(getCipherAlgorithm());
             }
+
             cipher.init(cipherMode, cek, new IvParameterSpec(iv));
             return newCipherLite(cipher, cek, cipherMode);
         } catch (Exception e) {
