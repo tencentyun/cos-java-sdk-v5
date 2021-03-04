@@ -18,6 +18,8 @@
 
 package com.qcloud.cos.internal.crypto;
 
+import static com.qcloud.cos.internal.crypto.KMSSecuredCEK.isKMSKeyWrapped;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,6 +37,7 @@ import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
+import com.google.gson.Gson;
 import com.qcloud.cos.Headers;
 import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.internal.CosServiceRequest;
@@ -44,8 +47,10 @@ import com.qcloud.cos.model.ObjectMetadata;
 import com.qcloud.cos.utils.Base64;
 import com.qcloud.cos.utils.Jackson;
 import com.qcloud.cos.utils.StringUtils;
-
-import static com.qcloud.cos.internal.crypto.KMSSecuredCEK.isKMSKeyWrapped;
+import com.tencentcloudapi.kms.v20190118.models.DecryptRequest;
+import com.tencentcloudapi.kms.v20190118.models.DecryptResponse;
+import com.tencentcloudapi.kms.v20190118.models.EncryptRequest;
+import com.tencentcloudapi.kms.v20190118.models.EncryptResponse;
 
 /**
  * Cryptographic material used for client-side content encrypt/decryption in COS. This includes the
@@ -231,16 +236,16 @@ final class ContentCryptoMaterial {
      */
     private static SecretKey cekByKMS(byte[] cekSecured, String keyWrapAlgo,
             EncryptionMaterials materials, ContentCryptoScheme contentCryptoScheme, QCLOUDKMS kms) {
-        /*
-        DecryptRequest kmsreq = new DecryptRequest()
-            .withEncryptionContext(materials.getMaterialsDescription())
-            .withCiphertextBlob(ByteBuffer.wrap(cekSecured));
-        DecryptResult result = kms.decrypt(kmsreq);
-        return new SecretKeySpec(copyAllBytesFrom(result.getPlaintext()),
-                contentCryptoScheme.getKeyGeneratorAlgorithm());
-                */
-        // TODO(chengwu)
-        return null;
+        DecryptRequest desryptReq = new DecryptRequest();
+        Map<String, String> materialDesc = materials.getMaterialsDescription();
+        Gson gson = new Gson();
+        desryptReq.setEncryptionContext(gson.toJson(materialDesc));
+        desryptReq.setCiphertextBlob(new String(cekSecured));
+
+        DecryptResponse decryptRes = kms.decrypt(desryptReq);
+        byte[] key = Base64.decode(decryptRes.getPlaintext());
+
+        return new SecretKeySpec(key, contentCryptoScheme.getKeyGeneratorAlgorithm());
     }
 
     /**
@@ -677,20 +682,14 @@ final class ContentCryptoMaterial {
 
         if (materials.isKMSEnabled()) {
             matdesc = mergeMaterialDescriptions(materials, req);
-            /*
-            EncryptRequest encryptRequest = new EncryptRequest()
-                .withEncryptionContext(matdesc)
-                .withKeyId(materials.getCustomerMasterKeyId())
-                .withPlaintext(ByteBuffer.wrap(cek.getEncoded()))
-                ;
-            encryptRequest
-                .withGeneralProgressListener(req.getGeneralProgressListener())
-                .withRequestMetricCollector(req.getRequestMetricCollector())
-                ;
-            EncryptResult encryptResult = kms.encrypt(encryptRequest);
-            byte[] keyBlob = copyAllBytesFrom(encryptResult.getCiphertextBlob());
-            */
-            byte[] keyBlob = null;
+            EncryptRequest encryptRequest = new EncryptRequest();
+            Gson gson = new Gson();
+            encryptRequest.setEncryptionContext(gson.toJson(matdesc));
+            encryptRequest.setKeyId(materials.getCustomerMasterKeyId());
+            encryptRequest.setPlaintext(cek.getEncoded().toString());
+
+            EncryptResponse encryptResponse = kms.encrypt(encryptRequest);
+            byte[] keyBlob = encryptResponse.getCiphertextBlob().getBytes();
             return new KMSSecuredCEK(keyBlob, matdesc);
         } else {
             matdesc = materials.getMaterialsDescription();

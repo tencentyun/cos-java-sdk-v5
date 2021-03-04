@@ -18,6 +18,14 @@
 
 package com.qcloud.cos.internal.crypto;
 
+import static com.qcloud.cos.internal.LengthCheckInputStream.EXCLUDE_SKIPPED_BYTES;
+import static com.qcloud.cos.internal.crypto.CryptoStorageMode.InstructionFile;
+import static com.qcloud.cos.internal.crypto.CryptoStorageMode.ObjectMetadata;
+import static com.qcloud.cos.model.CosDataSource.Utils.cleanupDataSource;
+import static com.qcloud.cos.model.InstructionFileId.DEFAULT_INSTRUCTION_FILE_SUFFIX;
+import static com.qcloud.cos.model.InstructionFileId.DOT;
+import static com.qcloud.cos.utils.StringUtils.UTF8;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
@@ -30,10 +38,9 @@ import java.util.Map;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import com.google.gson.Gson;
 import com.qcloud.cos.Headers;
 import com.qcloud.cos.auth.COSCredentialsProvider;
 import com.qcloud.cos.exception.CosClientException;
@@ -64,16 +71,14 @@ import com.qcloud.cos.model.PutObjectRequest;
 import com.qcloud.cos.model.PutObjectResult;
 import com.qcloud.cos.model.UploadPartRequest;
 import com.qcloud.cos.model.UploadPartResult;
+import com.qcloud.cos.utils.Base64;
 import com.qcloud.cos.utils.IOUtils;
 import com.qcloud.cos.utils.Jackson;
+import com.tencentcloudapi.kms.v20190118.models.GenerateDataKeyRequest;
+import com.tencentcloudapi.kms.v20190118.models.GenerateDataKeyResponse;
 
-import static com.qcloud.cos.internal.crypto.CryptoStorageMode.ObjectMetadata;
-import static com.qcloud.cos.internal.crypto.CryptoStorageMode.InstructionFile;
-import static com.qcloud.cos.internal.LengthCheckInputStream.EXCLUDE_SKIPPED_BYTES;
-import static com.qcloud.cos.model.CosDataSource.Utils.cleanupDataSource;
-import static com.qcloud.cos.model.InstructionFileId.DEFAULT_INSTRUCTION_FILE_SUFFIX;
-import static com.qcloud.cos.model.InstructionFileId.DOT;
-import static com.qcloud.cos.utils.StringUtils.UTF8;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 
@@ -370,7 +375,7 @@ public abstract class COSCryptoModuleBase extends COSCryptoModule {
     /**
      * Creates and returns a non-null content crypto material for the given request.
      *
-     * @throws SdkClientException if no encryption material can be found.
+     * @throws CosClientException if no encryption material can be found.
      */
     protected final ContentCryptoMaterial createContentCryptoMaterial(CosServiceRequest req) {
         if (req instanceof EncryptionMaterialsFactory) {
@@ -450,23 +455,24 @@ public abstract class COSCryptoModuleBase extends COSCryptoModule {
         cryptoScheme.getSecureRandom().nextBytes(iv);
 
         if (materials.isKMSEnabled()) {
-            /*
             final Map<String, String> encryptionContext =
                     ContentCryptoMaterial.mergeMaterialDescriptions(materials, req);
-            GenerateDataKeyRequest keyGenReq =
-                    new GenerateDataKeyRequest().withEncryptionContext(encryptionContext)
-                            .withKeyId(materials.getCustomerMasterKeyId())
-                            .withKeySpec(contentCryptoScheme.getKeySpec());
-            keyGenReq.withGeneralProgressListener(req.getGeneralProgressListener())
-                    .withRequestMetricCollector(req.getRequestMetricCollector());
-            GenerateDataKeyResult keyGenRes = kms.generateDataKey(keyGenReq);
-            final SecretKey cek = new SecretKeySpec(copyAllBytesFrom(keyGenRes.getPlaintext()),
-                    contentCryptoScheme.getKeyGeneratorAlgorithm());
-            byte[] keyBlob = copyAllBytesFrom(keyGenRes.getCiphertextBlob());
+
+            GenerateDataKeyRequest keyGenReq = new GenerateDataKeyRequest();
+            Gson gson = new Gson();
+            keyGenReq.setEncryptionContext(gson.toJson(encryptionContext));
+            keyGenReq.setKeyId(materials.getCustomerMasterKeyId());
+            keyGenReq.setKeySpec(contentCryptoScheme.getKeySpec());
+
+            GenerateDataKeyResponse keyGenRes = kms.generateDataKey(keyGenReq);
+
+            byte[] key = Base64.decode(keyGenRes.getPlaintext());
+            final SecretKey cek =new SecretKeySpec(key,
+                                  contentCryptoScheme.getKeyGeneratorAlgorithm());
+
+            byte[] keyBlob = keyGenRes.getCiphertextBlob().getBytes();
             return ContentCryptoMaterial.wrap(cek, iv, contentCryptoScheme, provider,
                     new KMSSecuredCEK(keyBlob, encryptionContext));
-                    */
-            return null;
         } else {
             // Generate a one-time use symmetric key and initialize a cipher to encrypt object data
             return ContentCryptoMaterial.create(generateCEK(materials, provider), iv, materials,
