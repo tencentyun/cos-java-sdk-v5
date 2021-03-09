@@ -44,6 +44,13 @@ public class CryptoConfiguration implements Cloneable,Serializable {
     private boolean ignoreMissingInstructionFile = true;
 
     /**
+     * Used to specify the KMS region for the KMS client when such client
+     * is internally instantiated instead of externally passed in by users; or
+     * null if no explicit KMS region is specified.
+     */
+    private transient String kmsRegion;
+
+    /**
      * Creates a new CryptoConfiguration object with default storage mode and
      * crypto provider settings. The default storage mode is the Object Metadata
      * storage mode, and the default crypto provider is the JCE provider.
@@ -298,5 +305,40 @@ public class CryptoConfiguration implements Cloneable,Serializable {
         that.cryptoProvider = this.cryptoProvider;
         that.ignoreMissingInstructionFile = this.ignoreMissingInstructionFile;
         return that;
+    }
+
+    /**
+     * Returns the the KMS region explicitly specified for the KMS client
+     * when such client is internally instantiated; or null if no explicit KMS
+     * region is specified. This KMS region parameter is ignored when the AWS
+     * KMS client of the encryption client is explicitly passed in by the
+     * users, instead of being implicitly created.
+     */
+    public String getKmsRegion() {
+        return kmsRegion;
+    }
+
+    /**
+     * Sets the KMS region for the KMS client when such client is internally
+     * instantiated instead of externally passed in by users; or null if no
+     * explicit KMS region is explicitly configured.This KMS region parameter is
+     * ignored when the KMS client of the encryption client is explicitly
+     * passed in by the users, instead of being implicitly created.
+     */
+    public void setKmsRegion(String kmsRegion) {
+        this.kmsRegion = kmsRegion;
+    }
+
+    /**
+     * Fluent API for setting the KMS region for the KMS client when such
+     * client is internally instantiated instead of externally passed in by
+     * users; or null if no explicit KMS region is explicitly configured.This
+     * KMS region parameter is ignored when the KMS client of the encryption
+     * client is explicitly passed in by the users, instead of being
+     * implicitly created.
+     */
+    public CryptoConfiguration withKmsRegion(String kmsRegion) {
+        this.kmsRegion = kmsRegion;
+        return this;
     }
 }

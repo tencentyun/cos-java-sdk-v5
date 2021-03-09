@@ -1,29 +1,19 @@
 package com.qcloud.cos;
 
-import java.security.NoSuchAlgorithmException;
-
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
-
 import com.qcloud.cos.internal.crypto.CryptoConfiguration;
 import com.qcloud.cos.internal.crypto.CryptoMode;
 import com.qcloud.cos.internal.crypto.CryptoStorageMode;
-import com.qcloud.cos.internal.crypto.EncryptionMaterials;
+import com.qcloud.cos.internal.crypto.KMSEncryptionMaterials;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 
-@Ignore
-public class SymmetricCOSEncryptionClientWithObjectMetaCryptoModeTest
-        extends AbstractCOSEncryptionClientTest {
+public class COSKMSEncryptionClientWithObjectMetaCryptoModeTest
+        extends AbstractCOSEncryptionClientTest{
 
-    private static void initEncryptionInfo() throws NoSuchAlgorithmException {
-        KeyGenerator symKeyGenerator = KeyGenerator.getInstance("AES");
-        symKeyGenerator.init(128);
-        SecretKey symKey = symKeyGenerator.generateKey();
-
-        encryptionMaterials = new EncryptionMaterials(symKey);
+    private static void initEncryptionInfo() {
+        // set cmk in prop file
+        encryptionMaterials = new KMSEncryptionMaterials("null");
         cryptoConfiguration = new CryptoConfiguration(CryptoMode.AuthenticatedEncryption)
                 .withStorageMode(CryptoStorageMode.ObjectMetadata);
     }
