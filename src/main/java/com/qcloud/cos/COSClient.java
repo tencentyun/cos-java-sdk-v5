@@ -49,6 +49,7 @@ import com.qcloud.cos.model.ciModel.job.DocJobListRequest;
 import com.qcloud.cos.model.ciModel.job.DocJobListResponse;
 import com.qcloud.cos.model.ciModel.job.DocJobRequest;
 import com.qcloud.cos.model.ciModel.job.DocJobResponse;
+import com.qcloud.cos.model.ciModel.job.MediaJobObject;
 import com.qcloud.cos.model.ciModel.job.MediaJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaJobsRequest;
 import com.qcloud.cos.model.ciModel.job.MediaListJobResponse;
@@ -3567,7 +3568,9 @@ public class COSClient implements COS {
         addParameterIfNotNull(request, "states", req.getStates());
         addParameterIfNotNull(request, "startCreationTime", req.getStartCreationTime());
         addParameterIfNotNull(request, "endCreationTime", req.getEndCreationTime());
-        return invoke(request, new Unmarshallers.ListJobUnmarshaller());
+        MediaListJobResponse response = invoke(request, new Unmarshallers.ListJobUnmarshaller());
+        this.checkMediaListJobResponse(response);
+        return response;
     }
 
     @Override
@@ -3812,6 +3815,17 @@ public class COSClient implements COS {
                 "The output.region parameter must be specified setting the object tags");
         rejectNull(output.getObject(),
                 "The output.object parameter must be specified setting the object tags");
+    }
+
+
+    private void checkMediaListJobResponse(MediaListJobResponse response) {
+        List<MediaJobObject> jobsDetailList = response.getJobsDetailList();
+        if (jobsDetailList.size() == 1) {
+            MediaJobObject mediaJobObject = jobsDetailList.get(0);
+            if (mediaJobObject.getQueueId() == null && mediaJobObject.getJobId() == null && mediaJobObject.getCode() == null) {
+                jobsDetailList.clear();
+            }
+        }
     }
 }
 
