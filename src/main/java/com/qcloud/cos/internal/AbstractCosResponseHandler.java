@@ -72,10 +72,12 @@ public abstract class AbstractCosResponseHandler<T>
         CosServiceResponse<T> cosResponse = new CosServiceResponse<T>();
         String cosRequestId = response.getHeaders().get(Headers.REQUEST_ID);
         String cosTraceId = response.getHeaders().get(Headers.TRACE_ID);
+        String ciRequestId = response.getHeaders().get(Headers.CI_REQUEST_ID);
 
         Map<String, String> metadataMap = new HashMap<String, String>();
         metadataMap.put(Headers.REQUEST_ID, cosRequestId);
         metadataMap.put(Headers.TRACE_ID, cosTraceId);
+        metadataMap.put(Headers.CI_REQUEST_ID, ciRequestId);
         cosResponse.setResponseMetadata(new ResponseMetadata(metadataMap));
 
         return cosResponse;

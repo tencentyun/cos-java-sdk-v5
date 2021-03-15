@@ -19,15 +19,15 @@
 package com.qcloud.cos.internal;
 
 import com.qcloud.cos.Headers;
-import com.qcloud.cos.model.CosServiceResult;
-import java.io.InputStream;
-import java.util.Map;
-
+import com.qcloud.cos.http.CosHttpResponse;
 import com.qcloud.cos.model.BucketDomainConfiguration;
+import com.qcloud.cos.model.CiServiceResult;
+import com.qcloud.cos.model.CosServiceResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.qcloud.cos.http.CosHttpResponse;
+import java.io.InputStream;
+import java.util.Map;
 
 public class COSXmlResponseHandler<T> extends AbstractCosResponseHandler<T> {
 
@@ -68,6 +68,9 @@ public class COSXmlResponseHandler<T> extends AbstractCosResponseHandler<T> {
         }
         if(cosResponse.getResult() != null && cosResponse.getResult() instanceof CosServiceResult) {
             ((CosServiceResult) cosResponse.getResult()).setRequestId(responseHeaders.get(Headers.REQUEST_ID));
+        }
+        if (cosResponse.getResult() != null && cosResponse.getResult() instanceof CiServiceResult) {
+            ((CiServiceResult) cosResponse.getResult()).setRequestId(responseHeaders.get(Headers.CI_REQUEST_ID));
         }
         return cosResponse;
     }
