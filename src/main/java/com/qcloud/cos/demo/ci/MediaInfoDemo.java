@@ -26,10 +26,10 @@ public class MediaInfoDemo {
         //1.创建媒体信息请求对象
         MediaInfoRequest request = new MediaInfoRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("DemoBucket-123456789");
+        request.setBucketName("markjrzhang-1251704708");
         request.getInput().setObject("1.mp3");
         //3.调用接口,获取媒体信息响应对象
         MediaInfoResponse response = client.generateMediainfo(request);
-        System.out.println(response);
+        System.out.println(response.getRequestId());
     }
 }

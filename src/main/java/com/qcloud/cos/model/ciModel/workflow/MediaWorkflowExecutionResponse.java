@@ -1,9 +1,11 @@
 package com.qcloud.cos.model.ciModel.workflow;
 
+import com.qcloud.cos.model.CiServiceResult;
+
 /**
  * 工作流响应实体类 请见：https://cloud.tencent.com/document/product/460/45947
  */
-public class MediaWorkflowExecutionResponse {
+public class MediaWorkflowExecutionResponse extends CiServiceResult {
     private String requestId;
     /**
      * 工作流实例详细信息

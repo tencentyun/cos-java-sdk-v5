@@ -1,10 +1,12 @@
 package com.qcloud.cos.model.ciModel.common;
 
 
+import com.qcloud.cos.model.CiServiceResult;
+
 /**
  * 媒体处理 公用返回实体
  */
-public class MediaCommonResponse {
+public class MediaCommonResponse extends CiServiceResult {
     /**
      * 请求id
      */

@@ -1,6 +1,8 @@
 package com.qcloud.cos.model.ciModel.queue;
 
-public class MediaQueueResponse {
+import com.qcloud.cos.model.CiServiceResult;
+
+public class MediaQueueResponse extends CiServiceResult {
     private MediaQueueObject queue;
     private String requestId;
 

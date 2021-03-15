@@ -93,6 +93,11 @@ public interface Headers {
     public static final String REQUEST_ID = "x-cos-request-id";
 
     /**
+     * CI response header for a request's ci request ID
+     */
+    public static final String CI_REQUEST_ID = "x-ci-request-id";
+
+    /**
      * COS response header for TRACE ID
      */
     public static final String TRACE_ID = "x-cos-trace-id";

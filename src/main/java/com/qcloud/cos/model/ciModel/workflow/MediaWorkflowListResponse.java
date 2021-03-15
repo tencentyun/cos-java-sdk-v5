@@ -1,6 +1,7 @@
 package com.qcloud.cos.model.ciModel.workflow;
 
 import com.qcloud.cos.internal.CIServiceRequest;
+import com.qcloud.cos.model.CiServiceResult;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -9,7 +10,7 @@ import java.util.List;
 /**
  * 工作流请求实体类 请见：https://cloud.tencent.com/document/product/460/45947
  */
-public class MediaWorkflowListResponse implements Serializable {
+public class MediaWorkflowListResponse extends CiServiceResult implements Serializable {
 
     /**
      * 请求id
