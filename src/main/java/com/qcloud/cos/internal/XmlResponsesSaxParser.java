@@ -42,6 +42,8 @@ import com.qcloud.cos.model.ciModel.job.DocJobResponse;
 import com.qcloud.cos.model.ciModel.job.DocProcessObject;
 import com.qcloud.cos.model.ciModel.job.DocProcessPageInfo;
 import com.qcloud.cos.model.ciModel.job.DocProcessResult;
+import com.qcloud.cos.model.ciModel.job.MediaConcatFragmentObject;
+import com.qcloud.cos.model.ciModel.job.MediaConcatTemplateObject;
 import com.qcloud.cos.model.ciModel.job.MediaContainerObject;
 import com.qcloud.cos.model.ciModel.job.MediaListJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaRemoveWaterMark;
@@ -3605,10 +3607,13 @@ public class XmlResponsesSaxParser {
 
     public static class MediaJobCreatHandler extends AbstractHandler {
         MediaJobResponse response = new MediaJobResponse();
+        List<MediaConcatFragmentObject> concatFragmentList = response.getJobsDetail().getOperation().getMediaConcatTemplate().getConcatFragmentList();
 
         @Override
         protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
-
+            if ("ConcatFragment".equals(name)){
+                concatFragmentList.add(new MediaConcatFragmentObject());
+            }
         }
 
         @Override
@@ -3692,6 +3697,42 @@ public class XmlResponsesSaxParser {
                         break;
                 }
             }
+            MediaConcatTemplateObject mediaConcatTemplate = response.getJobsDetail().getOperation().getMediaConcatTemplate();
+            if (in("Response", "JobsDetail", "Operation", "ConcatTemplate", "ConcatFragment")) {
+                MediaConcatFragmentObject mediaConcatFragmentObject = concatFragmentList.get(concatFragmentList.size() - 1);
+                switch (name) {
+                    case "Mode":
+                        mediaConcatFragmentObject.setMode(getText());
+                        break;
+                    case "Url":
+                        mediaConcatFragmentObject.setUrl(getText());
+                        break;
+                    case "StartTime":
+                        mediaConcatFragmentObject.setStartTime(getText());
+                        break;
+                    case "EndTime":
+                        mediaConcatFragmentObject.setEndTime(getText());
+                        break;
+                    default:
+                        break;
+                }
+
+            } else if (in("Response", "JobsDetail", "Operation", "ConcatTemplate", "Audio")) {
+                MediaAudioObject audio = mediaConcatTemplate.getAudio();
+                ParserMediaInfoUtils.ParsingMediaAudio(audio, name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "ConcatTemplate", "Video")) {
+                MediaVideoObject video = mediaConcatTemplate.getVideo();
+                ParserMediaInfoUtils.ParsingMediaVideo(video, name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "ConcatTemplate", "Container")) {
+                MediaContainerObject container = mediaConcatTemplate.getContainer();
+                if ("Format".equals(name)) {
+                    container.setFormat(getText());
+                }
+            } else if (in("Response", "JobsDetail", "Operation", "ConcatTemplate")){
+                if ("Index".equals(name)) {
+                    mediaConcatTemplate.setIndex(getText());
+                }
+            }
         }
 
         public MediaJobResponse getResponse() {
@@ -3701,10 +3742,13 @@ public class XmlResponsesSaxParser {
 
     public static class DescribeMediaJobHandler extends AbstractHandler {
         MediaJobResponse response = new MediaJobResponse();
+        List<MediaConcatFragmentObject> concatFragmentList = response.getJobsDetail().getOperation().getMediaConcatTemplate().getConcatFragmentList();
 
         @Override
         protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
-
+            if ("ConcatFragment".equals(name)){
+                concatFragmentList.add(new MediaConcatFragmentObject());
+            }
         }
 
         @Override
@@ -3780,6 +3824,42 @@ public class XmlResponsesSaxParser {
                         break;
                 }
             }
+            MediaConcatTemplateObject mediaConcatTemplate = response.getJobsDetail().getOperation().getMediaConcatTemplate();
+            if (in("Response", "JobsDetail", "Operation", "ConcatTemplate", "ConcatFragment")) {
+                MediaConcatFragmentObject mediaConcatFragmentObject = concatFragmentList.get(concatFragmentList.size() - 1);
+                switch (name) {
+                    case "Mode":
+                        mediaConcatFragmentObject.setMode(getText());
+                        break;
+                    case "Url":
+                        mediaConcatFragmentObject.setUrl(getText());
+                        break;
+                    case "StartTime":
+                        mediaConcatFragmentObject.setStartTime(getText());
+                        break;
+                    case "EndTime":
+                        mediaConcatFragmentObject.setEndTime(getText());
+                        break;
+                    default:
+                        break;
+                }
+
+            } else if (in("Response", "JobsDetail", "Operation", "ConcatTemplate", "Audio")) {
+                MediaAudioObject audio = mediaConcatTemplate.getAudio();
+                ParserMediaInfoUtils.ParsingMediaAudio(audio, name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "ConcatTemplate", "Video")) {
+                MediaVideoObject video = mediaConcatTemplate.getVideo();
+                ParserMediaInfoUtils.ParsingMediaVideo(video, name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "ConcatTemplate", "Container")) {
+                MediaContainerObject container = mediaConcatTemplate.getContainer();
+                if ("Format".equals(name)) {
+                    container.setFormat(getText());
+                }
+            } else if (in("Response", "JobsDetail", "Operation", "ConcatTemplate")) {
+                if ("Index".equals(name)) {
+                    mediaConcatTemplate.setIndex(getText());
+                }
+            }
         }
 
         public MediaJobResponse getResponse() {
@@ -3792,10 +3872,17 @@ public class XmlResponsesSaxParser {
 
         @Override
         protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
+            List<MediaJobObject> jobsDetailList = response.getJobsDetailList();
             if ("JobsDetail".equalsIgnoreCase(name)) {
-                List<MediaJobObject> jobsDetail = response.getJobsDetailList();
+                List<MediaJobObject> jobsDetail = jobsDetailList;
                 jobsDetail.add(new MediaJobObject());
             }
+
+            if ("ConcatFragment".equals(name)){
+                List<MediaConcatFragmentObject> concatFragmentList = jobsDetailList.get(jobsDetailList.size()-1).getOperation().getMediaConcatTemplate().getConcatFragmentList();
+                concatFragmentList.add(new MediaConcatFragmentObject());
+            }
+
         }
 
         @Override
@@ -3870,6 +3957,43 @@ public class XmlResponsesSaxParser {
                     case "Region":
                         output.setRegion(getText());
                         break;
+                }
+            }
+            MediaConcatTemplateObject mediaConcatTemplate = jobsDetail.getOperation().getMediaConcatTemplate();
+            if (in("Response", "JobsDetail", "Operation", "ConcatTemplate", "ConcatFragment")) {
+                List<MediaConcatFragmentObject> concatFragmentList = mediaConcatTemplate.getConcatFragmentList();
+                MediaConcatFragmentObject mediaConcatFragmentObject = concatFragmentList.get(concatFragmentList.size() - 1);
+                switch (name) {
+                    case "Mode":
+                        mediaConcatFragmentObject.setMode(getText());
+                        break;
+                    case "Url":
+                        mediaConcatFragmentObject.setUrl(getText());
+                        break;
+                    case "StartTime":
+                        mediaConcatFragmentObject.setStartTime(getText());
+                        break;
+                    case "EndTime":
+                        mediaConcatFragmentObject.setEndTime(getText());
+                        break;
+                    default:
+                        break;
+                }
+
+            } else if (in("Response", "JobsDetail", "Operation", "ConcatTemplate", "Audio")) {
+                MediaAudioObject audio = mediaConcatTemplate.getAudio();
+                ParserMediaInfoUtils.ParsingMediaAudio(audio, name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "ConcatTemplate", "Video")) {
+                MediaVideoObject video = mediaConcatTemplate.getVideo();
+                ParserMediaInfoUtils.ParsingMediaVideo(video, name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "ConcatTemplate", "Container")) {
+                MediaContainerObject container = mediaConcatTemplate.getContainer();
+                if ("Format".equals(name)) {
+                    container.setFormat(getText());
+                }
+            } else if (in("Response", "JobsDetail", "Operation", "ConcatTemplate")) {
+                if ("Index".equals(name)) {
+                    mediaConcatTemplate.setIndex(getText());
                 }
             }
         }
