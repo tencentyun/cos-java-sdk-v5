@@ -19,6 +19,7 @@ public class MediaJobOperation {
     private MediaRemoveWaterMark removeWatermark;
     private MediaWatermark watermark;
     private List<String> watermarkTemplateId;
+    private MediaConcatTemplateObject mediaConcatTemplate;
 
     public MediaJobOperation() {
         this.output = new MediaOutputObject();
@@ -99,16 +100,29 @@ public class MediaJobOperation {
         this.watermarkTemplateId = watermarkTemplateId;
     }
 
+    public MediaConcatTemplateObject getMediaConcatTemplate() {
+        if (mediaConcatTemplate==null){
+            mediaConcatTemplate = new MediaConcatTemplateObject();
+        }
+        return mediaConcatTemplate;
+    }
+
+    public void setMediaConcatTemplate(MediaConcatTemplateObject mediaConcatTemplate) {
+        this.mediaConcatTemplate = mediaConcatTemplate;
+    }
+
     @Override
     public String toString() {
-        return "MediaJobOperation{" +
-                "templateId='" + templateId + '\'' +
-                ", output=" + output +
-                ", mediaAnimation=" + mediaAnimation +
-                ", mediaInfo=" + mediaInfo +
-                ", removeWatermark=" + removeWatermark +
-                ", waterMark=" + watermark +
-                ", watermarkTemplateId='" + watermarkTemplateId + '\'' +
-                '}';
+        final StringBuilder sb = new StringBuilder("MediaJobOperation{");
+        sb.append("templateId='").append(templateId).append('\'');
+        sb.append(", output=").append(output);
+        sb.append(", mediaAnimation=").append(mediaAnimation);
+        sb.append(", mediaInfo=").append(mediaInfo);
+        sb.append(", removeWatermark=").append(removeWatermark);
+        sb.append(", watermark=").append(watermark);
+        sb.append(", watermarkTemplateId=").append(watermarkTemplateId);
+        sb.append(", mediaConcatTemplate=").append(mediaConcatTemplate);
+        sb.append('}');
+        return sb.toString();
     }
 }

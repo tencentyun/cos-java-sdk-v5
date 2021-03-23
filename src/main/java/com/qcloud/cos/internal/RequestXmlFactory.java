@@ -43,6 +43,9 @@ import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
 import com.qcloud.cos.model.ciModel.job.DocJobObject;
 import com.qcloud.cos.model.ciModel.job.DocJobRequest;
 import com.qcloud.cos.model.ciModel.job.DocProcessObject;
+import com.qcloud.cos.model.ciModel.job.MediaAudioObject;
+import com.qcloud.cos.model.ciModel.job.MediaConcatFragmentObject;
+import com.qcloud.cos.model.ciModel.job.MediaConcatTemplateObject;
 import com.qcloud.cos.model.ciModel.job.MediaJobOperation;
 import com.qcloud.cos.model.ciModel.job.MediaJobsRequest;
 import com.qcloud.cos.model.ciModel.job.MediaRemoveWaterMark;
@@ -60,6 +63,7 @@ import com.qcloud.cos.model.ciModel.workflow.MediaOperation;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowDependency;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowNode;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowRequest;
+import com.qcloud.cos.utils.StringUtils;
 
 
 public class RequestXmlFactory {
@@ -324,7 +328,7 @@ public class RequestXmlFactory {
 
         MediaJobOperation operation = request.getOperation();
         xml.start("Operation");
-        xml.start("TemplateId").value(operation.getTemplateId()).end();
+        addIfNotNull(xml,"TemplateId",operation.getTemplateId());
 
         List<String> watermarkTemplateId = operation.getWatermarkTemplateId();
         if (watermarkTemplateId.size() != 0) {
@@ -374,6 +378,28 @@ public class RequestXmlFactory {
             xml.end();
         }
 
+        MediaConcatTemplateObject mediaConcatTemplate = operation.getMediaConcatTemplate();
+        if (CheckObjectUtils.objIsNotValid(mediaConcatTemplate)){
+            xml.start("ConcatTemplate");
+            List<MediaConcatFragmentObject> concatFragmentList = mediaConcatTemplate.getConcatFragmentList();
+            for (MediaConcatFragmentObject concatFragment : concatFragmentList) {
+                xml.start("ConcatFragment");
+                addIfNotNull(xml,"Mode",concatFragment.getMode());
+                addIfNotNull(xml,"Url",concatFragment.getUrl());
+                xml.end();
+            }
+            addVideo(xml,mediaConcatTemplate.getVideo());
+            addAudio(xml,mediaConcatTemplate.getAudio());
+            addIfNotNull(xml,"Index",mediaConcatTemplate.getIndex());
+            String format = mediaConcatTemplate.getContainer().getFormat();
+            if (!StringUtils.isNullOrEmpty(format)){
+                xml.start("Container");
+                xml.start("Format").value(format).end();
+                xml.end();
+            }
+            xml.end();
+        }
+
         xml.start("Output");
         xml.start("Region").value(operation.getOutput().getRegion()).end();
         xml.start("Object").value(operation.getOutput().getObject()).end();
@@ -383,7 +409,7 @@ public class RequestXmlFactory {
         xml.end();
         xml.start("QueueId").value(request.getQueueId()).end();
         xml.end();
-
+        System.out.println(xml.toString());
         return xml.getBytes();
     }
 
@@ -518,14 +544,7 @@ public class RequestXmlFactory {
             xml.start("Start").value(request.getTimeInterval().getStart()).end();
             xml.end();
 
-            xml.start("Audio");
-            addIfNotNull(xml, "Bitrate", request.getAudio().getBitrate());
-            addIfNotNull(xml, "Channels", request.getAudio().getChannels());
-            addIfNotNull(xml, "Codec", request.getAudio().getCodec());
-            addIfNotNull(xml, "Profile", request.getAudio().getProfile());
-            addIfNotNull(xml, "Remove", request.getAudio().getRemove());
-            addIfNotNull(xml, "Samplerate", request.getAudio().getSamplerate());
-            xml.end();
+            addAudio(xml, request.getAudio());
 
             xml.start("TransConfig");
             addIfNotNull(xml, "AdjDarMethod", request.getTransConfig().getAdjDarMethod());
@@ -539,9 +558,21 @@ public class RequestXmlFactory {
             xml.end();
 
             addVideo(xml, request);
+
         }
         xml.end();
         return xml.getBytes();
+    }
+
+    private static void addAudio(XmlWriter xml, MediaAudioObject audio) {
+        xml.start("Audio");
+        addIfNotNull(xml, "Bitrate", audio.getBitrate());
+        addIfNotNull(xml, "Channels", audio.getChannels());
+        addIfNotNull(xml, "Codec", audio.getCodec());
+        addIfNotNull(xml, "Profile", audio.getProfile());
+        addIfNotNull(xml, "Remove", audio.getRemove());
+        addIfNotNull(xml, "Samplerate", audio.getSamplerate());
+        xml.end();
     }
 
     /**
@@ -649,6 +680,9 @@ public class RequestXmlFactory {
 
     private static void addVideo(XmlWriter xml, MediaTemplateRequest request) {
         MediaVideoObject video = request.getVideo();
+        addVideo(xml,video);
+    }
+    private static void addVideo(XmlWriter xml, MediaVideoObject video){
         if (CheckObjectUtils.objIsValid(video)) {
             return;
         }
