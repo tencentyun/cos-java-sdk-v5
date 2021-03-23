@@ -1,6 +1,8 @@
 package com.qcloud.cos.demo;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -13,6 +15,7 @@ import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.model.CopyObjectRequest;
 import com.qcloud.cos.model.CopyResult;
 import com.qcloud.cos.model.GetObjectRequest;
+import com.qcloud.cos.model.ObjectMetadata;
 import com.qcloud.cos.model.PutObjectRequest;
 import com.qcloud.cos.model.UploadResult;
 import com.qcloud.cos.region.Region;
@@ -116,6 +119,52 @@ public class TransferManagerDemo {
             showTransferProgress(upload);
             UploadResult uploadResult = upload.waitForUploadResult();
             System.out.println(uploadResult.getETag());
+        } catch (CosServiceException e) {
+            e.printStackTrace();
+        } catch (CosClientException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        transferManager.shutdownNow();
+        cosclient.shutdown();
+    }
+
+    public static void multipartUploadWithMetaData() {
+        // 1 初始化用户身份信息(secretId, secretKey)
+        COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
+        // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
+        ClientConfig clientConfig = new ClientConfig(new Region("ap-shanghai"));
+        // 3 生成cos客户端
+        COSClient cosclient = new COSClient(cred, clientConfig);
+        // bucket名需包含appid
+        String bucketName = "mybucket-1251668577";
+
+        ExecutorService threadPool = Executors.newFixedThreadPool(2);
+        // 传入一个threadpool, 若不传入线程池, 默认TransferManager中会生成一个单线程的线程池。
+        TransferManager transferManager = new TransferManager(cosclient, threadPool);
+
+        String key = "aaa/bbb.txt";
+        File localFile = new File("src/test/resources/len20M.txt");
+
+        ObjectMetadata objectMetadata = new ObjectMetadata();
+        Map<String, String> userMeta = new HashMap<String, String>();
+        userMeta.put("usermeta", "hello-mult");
+        objectMetadata.setUserMetadata(userMeta);
+
+        PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, key, localFile);
+        putObjectRequest.withMetadata(objectMetadata);
+        try {
+            // 返回一个异步结果Upload, 可同步的调用waitForUploadResult等待upload结束, 成功返回UploadResult, 失败抛出异常.
+            long startTime = System.currentTimeMillis();
+            Upload upload = transferManager.upload(putObjectRequest);
+            //showTransferProgress(upload);
+            UploadResult uploadResult = upload.waitForUploadResult();
+            long endTime = System.currentTimeMillis();
+            System.out.println("used time: " + (endTime - startTime) / 1000);
+            System.out.println(uploadResult.getETag());
+            System.out.println(uploadResult.getCrc64Ecma());
         } catch (CosServiceException e) {
             e.printStackTrace();
         } catch (CosClientException e) {
@@ -341,7 +390,65 @@ public class TransferManagerDemo {
         cosclient.shutdown();
     }
 
+    public static void copyFileSetMetadata() {
+        // 1 初始化用户身份信息(secretId, secretKey)
+        COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
+        // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
+        ClientConfig clientConfig = new ClientConfig(new Region("ap-guangzhou"));
+        // 3 生成cos客户端
+        COSClient cosclient = new COSClient(cred, clientConfig);
+
+        ClientConfig srcClientConfig = new ClientConfig(new Region("ap-shanghai"));
+        COSClient srcCosclient = new COSClient(cred, srcClientConfig);
+
+        ExecutorService threadPool = Executors.newFixedThreadPool(2);
+        // 传入一个threadpool, 若不传入线程池, 默认TransferManager中会生成一个单线程的线程池。
+        TransferManager transferManager = new TransferManager(cosclient, threadPool);
+        TransferManagerConfiguration transferManagerConfiguration = new TransferManagerConfiguration();
+        transferManagerConfiguration.setMultipartCopyThreshold(5*1024*1024);
+        transferManager.setConfiguration(transferManagerConfiguration);
+
+        // 要拷贝的bucket region, 支持跨园区拷贝
+        Region srcBucketRegion = new Region("ap-shanghai");
+        // 源bucket, bucket名需包含appid
+        String srcBucketName = "mysrcbucket-123456789";
+        // 要拷贝的源文件
+        String srcKey = "aaa/bbb.txt";
+        // 目的bucket, bucket名需包含appid
+        String destBucketName = "mydestbucekt-123456789";
+        // 要拷贝的目的文件
+        String destKey = "bbb/ccc.txt";
+
+        ObjectMetadata objectMetadata = new ObjectMetadata();
+        Map<String, String> userMeta = new HashMap<String, String>();
+        userMeta.put("usermeta", "hello-mult-copy");
+        objectMetadata.setUserMetadata(userMeta);
+
+        CopyObjectRequest copyObjectRequest = new CopyObjectRequest(srcBucketRegion, srcBucketName,
+                srcKey, destBucketName, destKey);
+        System.out.println(copyObjectRequest.getDestinationBucketName());
+        copyObjectRequest.setNewObjectMetadata(objectMetadata);
+        try {
+            Copy copy = transferManager.copy(copyObjectRequest, srcCosclient, null);
+            // 返回一个异步结果copy, 可同步的调用waitForCopyResult等待copy结束, 成功返回CopyResult, 失败抛出异常.
+            //showTransferProgress(copy);
+            CopyResult copyResult = copy.waitForCopyResult();
+            System.out.println(copyResult.getCrc64Ecma());
+        } catch (CosServiceException e) {
+            e.printStackTrace();
+        } catch (CosClientException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        transferManager.shutdownNow();
+        cosclient.shutdown();
+    }
+
+
     public static void main(String[] args) {
-        copyFileForSameRegion();
+        //multipartUploadWithMetaData();
+        copyFileSetMetadata();
     }
 }
