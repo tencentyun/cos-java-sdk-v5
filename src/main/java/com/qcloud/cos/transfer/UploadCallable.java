@@ -30,9 +30,6 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.qcloud.cos.COS;
 import com.qcloud.cos.COSEncryptionClient;
 import com.qcloud.cos.event.COSProgressPublisher;
@@ -46,6 +43,7 @@ import com.qcloud.cos.model.EncryptedInitiateMultipartUploadRequest;
 import com.qcloud.cos.model.EncryptedPutObjectRequest;
 import com.qcloud.cos.model.InitiateMultipartUploadRequest;
 import com.qcloud.cos.model.ListPartsRequest;
+import com.qcloud.cos.model.ObjectMetadata;
 import com.qcloud.cos.model.PartETag;
 import com.qcloud.cos.model.PartListing;
 import com.qcloud.cos.model.PartSummary;
@@ -54,6 +52,9 @@ import com.qcloud.cos.model.PutObjectResult;
 import com.qcloud.cos.model.UploadPartRequest;
 import com.qcloud.cos.model.UploadResult;
 import com.qcloud.cos.transfer.Transfer.TransferState;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class UploadCallable implements Callable<UploadResult> {
@@ -267,6 +268,18 @@ public class UploadCallable implements Callable<UploadResult> {
                 new CompleteMultipartUploadRequest(origReq.getBucketName(), origReq.getKey(),
                         multipartUploadId, partETags)
                                 .withGeneralProgressListener(origReq.getGeneralProgressListener());
+
+        ObjectMetadata origMeta = origReq.getMetadata();
+        if (origMeta != null) {
+            ObjectMetadata objMeta = req.getObjectMetadata();
+            if (objMeta == null) {
+                objMeta = new ObjectMetadata();
+            }
+
+            objMeta.setUserMetadata(origMeta.getUserMetadata());
+            req.setObjectMetadata(objMeta);
+        }
+
         TransferManagerUtils.populateEndpointAddr(origReq, req);
         CompleteMultipartUploadResult res = cos.completeMultipartUpload(req);
 

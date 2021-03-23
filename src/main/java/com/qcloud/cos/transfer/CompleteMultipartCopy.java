@@ -33,6 +33,7 @@ import com.qcloud.cos.model.CompleteMultipartUploadRequest;
 import com.qcloud.cos.model.CompleteMultipartUploadResult;
 import com.qcloud.cos.model.CopyObjectRequest;
 import com.qcloud.cos.model.CopyResult;
+import com.qcloud.cos.model.ObjectMetadata;
 import com.qcloud.cos.model.PartETag;
 
 
@@ -82,6 +83,18 @@ public class CompleteMultipartCopy implements Callable<CopyResult> {
                             origReq.getDestinationKey(), uploadId, collectPartETags())
                                     .withGeneralProgressListener(
                                             origReq.getGeneralProgressListener());
+
+            ObjectMetadata origMeta = origReq.getNewObjectMetadata();
+            if (origMeta != null) {
+                ObjectMetadata objMeta = req.getObjectMetadata();
+                if (objMeta == null) {
+                    objMeta = new ObjectMetadata();
+                }
+
+                objMeta.setUserMetadata(origMeta.getUserMetadata());
+                req.setObjectMetadata(objMeta);
+            }
+
             TransferManagerUtils.populateEndpointAddr(origReq, req);
             res = cos.completeMultipartUpload(req);
         } catch (Exception e) {

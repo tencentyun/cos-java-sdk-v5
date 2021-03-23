@@ -28,6 +28,7 @@ import com.qcloud.cos.event.ProgressListenerChain;
 import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.model.CompleteMultipartUploadRequest;
 import com.qcloud.cos.model.CompleteMultipartUploadResult;
+import com.qcloud.cos.model.ObjectMetadata;
 import com.qcloud.cos.model.PartETag;
 import com.qcloud.cos.model.PutObjectRequest;
 import com.qcloud.cos.model.UploadResult;
@@ -87,6 +88,18 @@ public class CompleteMultipartUpload implements Callable<UploadResult> {
                     origReq.getBucketName(), origReq.getKey(), uploadId,
                     collectPartETags())
                 .withGeneralProgressListener(origReq.getGeneralProgressListener());
+
+            ObjectMetadata origMeta = origReq.getMetadata();
+            if (origMeta != null) {
+                ObjectMetadata objMeta = req.getObjectMetadata();
+                if (objMeta == null) {
+                    objMeta = new ObjectMetadata();
+                }
+
+                objMeta.setUserMetadata(origMeta.getUserMetadata());
+                req.setObjectMetadata(objMeta);
+            }
+
             TransferManagerUtils.populateEndpointAddr(origReq, req);
             res = cos.completeMultipartUpload(req);
         } catch (Exception e) {
