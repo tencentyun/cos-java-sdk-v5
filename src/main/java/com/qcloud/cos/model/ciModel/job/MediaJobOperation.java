@@ -34,7 +34,7 @@ public class MediaJobOperation {
     }
 
     public MediaOutputObject getOutput() {
-        if (output==null){
+        if (output == null) {
             output = new MediaOutputObject();
         }
         return output;
@@ -90,7 +90,7 @@ public class MediaJobOperation {
 
 
     public List<String> getWatermarkTemplateId() {
-        if (watermarkTemplateId==null){
+        if (watermarkTemplateId == null) {
             watermarkTemplateId = new ArrayList<>();
         }
         return watermarkTemplateId;
@@ -101,7 +101,7 @@ public class MediaJobOperation {
     }
 
     public MediaConcatTemplateObject getMediaConcatTemplate() {
-        if (mediaConcatTemplate==null){
+        if (mediaConcatTemplate == null) {
             mediaConcatTemplate = new MediaConcatTemplateObject();
         }
         return mediaConcatTemplate;

@@ -4425,8 +4425,7 @@ public class XmlResponsesSaxParser {
                     default:
                         break;
                 }
-            }
-            else if (in("Response", "JobsDetail", "Operation", "DocProcess")) {
+            } else if (in("Response", "JobsDetail", "Operation", "DocProcess")) {
                 DocProcessObject docProcess = response.getJobsDetail().getOperation().getDocProcessObject();
                 switch (name) {
                     case "Comments":
@@ -4458,6 +4457,9 @@ public class XmlResponsesSaxParser {
                         break;
                     case "Zoom":
                         docProcess.setZoom(getText());
+                        break;
+                    case "SheetId":
+                        docProcess.setSheetId(getText());
                         break;
                     default:
                         break;
