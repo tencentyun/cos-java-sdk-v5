@@ -26,19 +26,19 @@ public class ConcatDemo {
         //1.创建任务请求对象
         MediaJobsRequest request = new MediaJobsRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("markjrzhang-1251704708");
+        request.setBucketName("examplebucket-1250000000");
         request.setTag("Concat");
-        request.getInput().setObject("test1.mp4");
+        request.getInput().setObject("demo.mp4");
         MediaConcatTemplateObject mediaConcatTemplate = request.getOperation().getMediaConcatTemplate();
         List<MediaConcatFragmentObject> concatFragmentList = mediaConcatTemplate.getConcatFragmentList();
         MediaConcatFragmentObject mediaConcatFragmentObject = new MediaConcatFragmentObject();
         mediaConcatFragmentObject.setMode("Start");
-        mediaConcatFragmentObject.setUrl("http://markjrzhang-1251704708.cos.ap-chongqing.myqcloud.com/error1.mp4");
+        mediaConcatFragmentObject.setUrl("http://examplebucket-1250000000.cos.ap-chongqing.myqcloud.com/demo1.mp4");
         concatFragmentList.add(mediaConcatFragmentObject);
 
         mediaConcatFragmentObject = new MediaConcatFragmentObject();
         mediaConcatFragmentObject.setMode("End");
-        mediaConcatFragmentObject.setUrl("http://markjrzhang-1251704708.cos.ap-chongqing.myqcloud.com/error2.mp4");
+        mediaConcatFragmentObject.setUrl("http://examplebucket-1250000000.cos.ap-chongqing.myqcloud.com/demo2.mp4");
         concatFragmentList.add(mediaConcatFragmentObject);
 
         MediaAudioObject audio = mediaConcatTemplate.getAudio();
@@ -54,10 +54,10 @@ public class ConcatDemo {
 
         mediaConcatTemplate.setIndex("1");
 
-        request.getOperation().getOutput().setBucket("markjrzhang-1251704708");
+        request.getOperation().getOutput().setBucket("examplebucket-1250000000");
         request.getOperation().getOutput().setRegion("ap-chongqing");
         request.getOperation().getOutput().setObject("concat.mp4");
-        request.setQueueId("p9900025e4ec44b5e8225e70a52170834");
+        request.setQueueId("p9900025e4ec44b5e8225e70a521*****");
         //3.调用接口,获取任务响应对象
         MediaJobResponse response = client.createMediaJobs(request);
         System.out.println(response);
@@ -71,7 +71,7 @@ public class ConcatDemo {
         //1.创建任务请求对象
         MediaJobsRequest request = new MediaJobsRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("markjrzhang-1251704708");
+        request.setBucketName("examplebucket-1250000000");
         request.setJobId("j6fc9306c8bd411eb8b416b8ff9172c91");
         //3.调用接口,获取任务响应对象
         MediaJobResponse response = client.describeMediaJob(request);
@@ -86,8 +86,8 @@ public class ConcatDemo {
         //1.创建任务请求对象
         MediaJobsRequest request = new MediaJobsRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("markjrzhang-1251704708");
-        request.setQueueId("p9900025e4ec44b5e8225e70a52170834");
+        request.setBucketName("examplebucket-1250000000");
+        request.setQueueId("p9900025e4ec44b5e8225e70a521*****");
         request.setTag("Concat");
         request.setSize(100);
         //3.调用接口,获取任务响应对象
@@ -106,7 +106,7 @@ public class ConcatDemo {
         //1.创建任务请求对象
         MediaJobsRequest request = new MediaJobsRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("markjrzhang-1251704708");
+        request.setBucketName("examplebucket-1250000000");
         request.setJobId("jbfb0d02a092111ebb3167781d*****");
         //3.调用接口,获取任务响应对象
         Boolean response = client.cancelMediaJob(request);
