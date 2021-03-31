@@ -4,11 +4,15 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-
 ## [5.6.39] - 2021-3-24
 
 ### Added 
 - add CI media concat job
+
+## [5.6.38] - 2021-3-24
+
+### Added
+- transfer manager multipart complete with user object meta.
 
 ## [5.6.37] - 2021-3-10
 
