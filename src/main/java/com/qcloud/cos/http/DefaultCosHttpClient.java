@@ -89,7 +89,7 @@ public class DefaultCosHttpClient implements CosHttpClient {
 
     public DefaultCosHttpClient(ClientConfig clientConfig) {
         super();
-        this.errorResponseHandler = new CosErrorResponseHandler();
+        this.errorResponseHandler = clientConfig.getCosErrorResponseHandler();
         this.clientConfig = clientConfig;
         this.connectionManager = new PoolingHttpClientConnectionManager();
         this.maxErrorRetry = clientConfig.getMaxErrorRetry();
