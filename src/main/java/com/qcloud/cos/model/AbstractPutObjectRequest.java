@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.io.Serializable;
 
 import com.qcloud.cos.internal.CosServiceRequest;
+import com.qcloud.cos.model.ciModel.persistence.PicOperations;
 
 
 public abstract class AbstractPutObjectRequest extends CosServiceRequest implements Cloneable,
@@ -101,6 +102,11 @@ public abstract class AbstractPutObjectRequest extends CosServiceRequest impleme
      * traffic limit speed in second, the unit is bit/s
     */
     private int trafficLimit = 0;
+
+    /**
+     *  pic operations
+     */
+    private PicOperations picOperations;
 
     /**
      * Constructs a new {@link AbstractPutObjectRequest} object to upload a file to the specified
@@ -738,5 +744,13 @@ public abstract class AbstractPutObjectRequest extends CosServiceRequest impleme
 
     public void setTrafficLimit(int trafficLimit) {
         this.trafficLimit = trafficLimit;
+    }
+
+    public PicOperations getPicOperations() {
+        return picOperations;
+    }
+
+    public void setPicOperations(PicOperations picOperations) {
+        this.picOperations = picOperations;
     }
 }

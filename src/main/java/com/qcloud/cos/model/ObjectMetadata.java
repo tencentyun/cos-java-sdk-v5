@@ -28,6 +28,7 @@ import com.qcloud.cos.Headers;
 import com.qcloud.cos.internal.ObjectExpirationResult;
 import com.qcloud.cos.internal.ObjectRestoreResult;
 import com.qcloud.cos.internal.ServerSideEncryptionResult;
+import com.qcloud.cos.model.ciModel.persistence.CIUploadResult;
 
 
 /**
@@ -85,6 +86,11 @@ public class ObjectMetadata extends CosServiceResult implements ServerSideEncryp
 
     /** True if this object represents a delete marker */
     private boolean isDeleteMarker;
+
+    /**
+     * for ci put object result
+     */
+    private CIUploadResult ciUploadResult;
 
     /**
      * <p>
@@ -791,5 +797,13 @@ public class ObjectMetadata extends CosServiceResult implements ServerSideEncryp
     @Override
     public String getRequestId() {
         return (String)metadata.get(Headers.REQUEST_ID);
+    }
+
+    public CIUploadResult getCiUploadResult() {
+        return ciUploadResult;
+    }
+
+    public void setCiUploadResult(CIUploadResult ciUploadResult) {
+        this.ciUploadResult = ciUploadResult;
     }
 }

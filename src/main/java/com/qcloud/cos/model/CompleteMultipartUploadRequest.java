@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.List;
 
 import com.qcloud.cos.internal.CosServiceRequest;
+import com.qcloud.cos.model.ciModel.persistence.PicOperations;
 
 public class CompleteMultipartUploadRequest extends CosServiceRequest implements Serializable {
 
@@ -38,8 +39,8 @@ public class CompleteMultipartUploadRequest extends CosServiceRequest implements
 
     /** The list of part numbers and ETags to use when completing the multipart upload */
     private List<PartETag> partETags = new ArrayList<PartETag>();
-
     private ObjectMetadata objectMetadata;
+    private PicOperations picOperations;
 
     public CompleteMultipartUploadRequest() {}
     /**
@@ -253,5 +254,13 @@ public class CompleteMultipartUploadRequest extends CosServiceRequest implements
 
     public void setObjectMetadata(ObjectMetadata objectMetadata) {
         this.objectMetadata = objectMetadata;
+    }
+
+    public PicOperations getPicOperations() {
+        return picOperations;
+    }
+
+    public void setPicOperations(PicOperations picOperations) {
+        this.picOperations = picOperations;
     }
 }

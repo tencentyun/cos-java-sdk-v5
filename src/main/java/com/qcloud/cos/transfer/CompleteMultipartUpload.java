@@ -99,6 +99,9 @@ public class CompleteMultipartUpload implements Callable<UploadResult> {
                 objMeta.setUserMetadata(origMeta.getUserMetadata());
                 req.setObjectMetadata(objMeta);
             }
+            if(origReq.getPicOperations() != null) {
+                req.setPicOperations(origReq.getPicOperations());
+            }
 
             TransferManagerUtils.populateEndpointAddr(origReq, req);
             res = cos.completeMultipartUpload(req);
@@ -116,6 +119,7 @@ public class CompleteMultipartUpload implements Callable<UploadResult> {
         uploadResult.setRequestId(res.getRequestId());
         uploadResult.setDateStr(res.getDateStr());
         uploadResult.setCrc64Ecma(res.getCrc64Ecma());
+        uploadResult.setCiUploadResult(res.getCiUploadResult());
 
         monitor.uploadComplete();
 

@@ -18,6 +18,8 @@
 
 package com.qcloud.cos.model;
 
+import com.qcloud.cos.model.ciModel.persistence.CIUploadResult;
+
 /**
  * Contains information returned by Qcloud COS for a completed upload.
  * <p>
@@ -53,6 +55,9 @@ public class UploadResult {
 
     /** The crc64ecma value for this object */
     private String crc64Ecma;
+
+    /** The ci upload result */
+    private CIUploadResult ciUploadResult;
 
     /**
      * get requestid for this upload
@@ -171,5 +176,13 @@ public class UploadResult {
 
     public void setCrc64Ecma(String crc64Ecma) {
         this.crc64Ecma = crc64Ecma;
+    }
+
+    public CIUploadResult getCiUploadResult() {
+        return ciUploadResult;
+    }
+
+    public void setCiUploadResult(CIUploadResult ciUploadResult) {
+        this.ciUploadResult = ciUploadResult;
     }
 }

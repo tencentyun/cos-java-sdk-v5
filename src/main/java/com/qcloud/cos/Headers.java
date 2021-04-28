@@ -307,4 +307,5 @@ public interface Headers {
      */
     public static final String COS_BUCKET_REGION = "x-cos-bucket-region";
 
+    public static final String PIC_OPERATIONS = "Pic-Operations";
 }

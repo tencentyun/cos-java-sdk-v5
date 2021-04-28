@@ -70,6 +70,7 @@ import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowExecutionsResponse;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowListRequest;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowListResponse;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowRequest;
+import com.qcloud.cos.utils.Jackson;
 import org.apache.commons.codec.DecoderException;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.ContentType;
@@ -663,6 +664,7 @@ public class COSClient implements COS {
         result.setSSECustomerKeyMd5(metadata.getSSECustomerKeyMd5());
         result.setCrc64Ecma(metadata.getCrc64Ecma());
         result.setMetadata(metadata);
+        result.setCiUploadResult(metadata.getCiUploadResult());
         return result;
     }
 
@@ -1011,7 +1013,13 @@ public class COSClient implements COS {
             populateRequestMetadata(request, metadata);
             request.setContent(input);
             try {
-                returnedMetadata = invoke(request, new CosMetadataResponseHandler());
+                if(uploadObjectRequest.getPicOperations() != null) {
+                    request.addHeader(Headers.PIC_OPERATIONS, Jackson.toJsonString(uploadObjectRequest.getPicOperations()));
+                    returnedMetadata = invoke(request, new ResponseHeaderHandlerChain<ObjectMetadata>(
+                            new Unmarshallers.ImagePersistenceUnmarshaller(), new CosMetadataResponseHandler()));
+                } else {
+                    returnedMetadata = invoke(request, new CosMetadataResponseHandler());
+                }
             } catch (Throwable t) {
                 throw Throwables.failure(t);
             }
@@ -1767,7 +1775,10 @@ public class COSClient implements COS {
                 populateRequestMetadata(request, objectMetadata);
             }
             request.setContent(new ByteArrayInputStream(xml));
-
+            if(completeMultipartUploadRequest.getPicOperations() != null) {
+                request.addHeader(Headers.PIC_OPERATIONS, Jackson.toJsonString(
+                        completeMultipartUploadRequest.getPicOperations()));
+            }
             @SuppressWarnings("unchecked")
             ResponseHeaderHandlerChain<CompleteMultipartUploadHandler> responseHandler =
                     new ResponseHeaderHandlerChain<CompleteMultipartUploadHandler>(
@@ -1784,6 +1795,10 @@ public class COSClient implements COS {
                 String crc64Ecma = responseHeaders.get(Headers.COS_HASH_CRC64_ECMA);
                 handler.getCompleteMultipartUploadResult().setVersionId(versionId);
                 handler.getCompleteMultipartUploadResult().setCrc64Ecma(crc64Ecma);
+                // if ci request, set ciUploadResult to CompleteMultipartUploadResult
+                if(completeMultipartUploadRequest.getPicOperations() != null) {
+                    handler.getCompleteMultipartUploadResult().setCiUploadResult(handler.getCiUploadResult());
+                }
                 return handler.getCompleteMultipartUploadResult();
             }
         } while (shouldRetryCompleteMultipartUpload(completeMultipartUploadRequest,
