@@ -42,6 +42,7 @@ public interface Headers {
     public static final String SERVER = "Server";
     public static final String USER_AGENT = "User-Agent";
     public static final String SDK_LOG_DEBUG = "x-cos-sdk-log-debug";
+    public static final String FILE_MODE_DIR = "x-cos-file-mode-dir";
 
     /*
      * Cos HTTP Headers

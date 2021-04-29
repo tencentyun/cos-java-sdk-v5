@@ -124,6 +124,8 @@ public abstract class AbstractCosResponseHandler<T>
                 new ObjectExpirationHeaderHandler<ObjectMetadata>().handle(metadata, response);
             } else if (key.equalsIgnoreCase(Headers.RESTORE)) {
                 new ObjectRestoreHeaderHandler<ObjectRestoreResult>().handle(metadata, response);
+            } else if (key.equalsIgnoreCase(Headers.FILE_MODE_DIR)) { // used for merge bucket
+                metadata.setFileModeDir(true);
             } else {
                 metadata.setHeader(key, header.getValue());
             }

@@ -11,7 +11,7 @@
  * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
  * express or implied. See the License for the specific language governing
  * permissions and limitations under the License.
- 
+
  * According to cos feature, we modify some class，comment, field name, etc.
  */
 
@@ -86,6 +86,9 @@ public class ObjectMetadata extends CosServiceResult implements ServerSideEncryp
 
     /** True if this object represents a delete marker */
     private boolean isDeleteMarker;
+
+    /** Whether the object is dir or file, used for merge bucket */
+    private boolean isFileModeDir;
 
     /**
      * for ci put object result
@@ -699,6 +702,14 @@ public class ObjectMetadata extends CosServiceResult implements ServerSideEncryp
         this.isDeleteMarker = isDeleteMarker;
     }
 
+    public boolean isFileModeDir() {
+        return isFileModeDir;
+    }
+
+    public void setFileModeDir(boolean isFileModeDir) {
+        this.isFileModeDir = isFileModeDir;
+    }
+
     /**
      * Returns the value of the specified user meta datum.
      */
@@ -711,6 +722,7 @@ public class ObjectMetadata extends CosServiceResult implements ServerSideEncryp
     public ObjectMetadata() {
         userMetadata = new HashMap<String, String>();
         metadata = new HashMap<String, Object>();
+        isFileModeDir = false;
     }
 
     private ObjectMetadata(ObjectMetadata from) {

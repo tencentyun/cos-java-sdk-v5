@@ -24,6 +24,8 @@ import com.qcloud.cos.internal.AbstractCosResponseHandler;
 import com.qcloud.cos.internal.CosServiceResponse;
 import com.qcloud.cos.internal.ResponseMetadata;
 
+import java.util.Map;
+
 import static com.qcloud.cos.internal.Constants.BUCKET_OFS_ARCH_TYPE;
 
 public class HeadBucketResultHandler extends AbstractCosResponseHandler<HeadBucketResult> {
@@ -32,11 +34,13 @@ public class HeadBucketResultHandler extends AbstractCosResponseHandler<HeadBuck
     public CosServiceResponse<HeadBucketResult> handle(CosHttpResponse response)
             throws Exception {
         final CosServiceResponse<HeadBucketResult> cosResponse = new CosServiceResponse<HeadBucketResult>();
-        ResponseMetadata metadata = cosResponse.getResponseMetadata();
-        String bucketType = metadata.getBucketType();
         boolean isMergeBucket = false;
-        if (bucketType.equals(BUCKET_OFS_ARCH_TYPE)) {
-            isMergeBucket = true;
+        for (Map.Entry<String, String> header : response.getHeaders().entrySet()) {
+            String key = header.getKey();
+            if (key.equalsIgnoreCase(Headers.BUCKET_ARCH)) {
+                isMergeBucket = true;
+                break;
+            }
         }
         final HeadBucketResult result = new HeadBucketResult();
         result.setBucketRegion(response.getHeaders().get(Headers.COS_BUCKET_REGION));
