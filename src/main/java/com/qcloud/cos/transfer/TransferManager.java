@@ -22,9 +22,14 @@ import static com.qcloud.cos.utils.ServiceUtils.APPEND_MODE;
 import static com.qcloud.cos.utils.ServiceUtils.OVERWRITE_MODE;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.RandomAccessFile;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
@@ -35,9 +40,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.qcloud.cos.COS;
 import com.qcloud.cos.COSClient;
@@ -50,6 +52,7 @@ import com.qcloud.cos.event.ProgressListenerChain;
 import com.qcloud.cos.event.TransferCompletionFilter;
 import com.qcloud.cos.event.TransferProgressUpdatingListener;
 import com.qcloud.cos.event.TransferStateChangeListener;
+import com.qcloud.cos.exception.AbortedException;
 import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.exception.FileLockException;
@@ -70,6 +73,9 @@ import com.qcloud.cos.model.ObjectMetadata;
 import com.qcloud.cos.model.PutObjectRequest;
 import com.qcloud.cos.transfer.Transfer.TransferState;
 import com.qcloud.cos.utils.VersionInfoUtils;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * High level utility for managing transfers to Qcloud COS.
@@ -520,6 +526,134 @@ public class TransferManager {
     public Download download(final GetObjectRequest getObjectRequest, final File file,
             final COSProgressListener progressListener) {
         return doDownload(getObjectRequest, file, null, progressListener, OVERWRITE_MODE);
+    }
+
+    public Download download(final GetObjectRequest getObjectRequest, final File file,
+            boolean resumableDownload) {
+        return download(getObjectRequest, file, null, resumableDownload, null, 20*1024*1024, 8*1024*1024);
+    }
+
+    public Download download(final GetObjectRequest getObjectRequest, final File file,
+            final COSProgressListener progressListener, boolean resumableDownload) {
+        return download(getObjectRequest, file, progressListener, resumableDownload, null, 20*1024*1024, 8*1024*1024);
+    }
+
+    public Download download(final GetObjectRequest getObjectRequest, final File file,
+            boolean resumableDownload, String resumableTaskFile,
+            int multiThreadThreshold, int partSize) {
+        return download(getObjectRequest, file, null, resumableDownload, resumableTaskFile,
+                 multiThreadThreshold, partSize);
+    }
+
+    public Download download(final GetObjectRequest getObjectRequest, final File file,
+            final COSProgressListener progressListener, boolean resumableDownload, String resumableTaskFile,
+            int multiThreadThreshold, int partSize) {
+
+        if (!resumableDownload) {
+            return doDownload(getObjectRequest, file, null, progressListener, OVERWRITE_MODE);
+        }
+
+        return doResumableDownload(getObjectRequest, file, null, progressListener, resumableTaskFile,
+                multiThreadThreshold, partSize);
+    }
+
+    private PersistableResumeDownload getPersistableResumeRecord(GetObjectRequest getObjectRequest, File destFile,
+            String resumableTaskFilePath) {
+        GetObjectMetadataRequest getObjectMetadataRequest = new GetObjectMetadataRequest(
+                getObjectRequest.getBucketName(), getObjectRequest.getKey());
+        if (getObjectRequest.getSSECustomerKey() != null)
+            getObjectMetadataRequest.setSSECustomerKey(getObjectRequest.getSSECustomerKey());
+        if (getObjectRequest.getVersionId() != null)
+            getObjectMetadataRequest.setVersionId(getObjectRequest.getVersionId());
+
+        final ObjectMetadata objectMetadata = cos.getObjectMetadata(getObjectMetadataRequest);
+
+        long cosContentLength = objectMetadata.getContentLength();
+        long cosLastModified = objectMetadata.getLastModified().getTime();
+        String cosEtag = objectMetadata.getETag();
+        String cosCrc64 = objectMetadata.getCrc64Ecma();
+
+        File resumableTaskFile;
+        if (resumableTaskFilePath == null || resumableTaskFilePath == "") {
+            resumableTaskFile = new File(destFile.getAbsolutePath() + ".cosresumabletask");
+        } else {
+            resumableTaskFile = new File(resumableTaskFilePath);
+        }
+
+        PersistableResumeDownload downloadRecord = null;
+        try {
+            if (!resumableTaskFile.exists()) {
+                resumableTaskFile.createNewFile();
+            }
+
+            downloadRecord = PersistableResumeDownload.deserializeFrom(new FileInputStream(resumableTaskFile));
+            log.info("deserialize download record from " + resumableTaskFile.getAbsolutePath() + "record: " + downloadRecord.serialize());
+        } catch (IOException e) {
+            throw new CosClientException("can not create file" + resumableTaskFile.getAbsolutePath() + e);
+        } catch (IllegalArgumentException e) {
+            log.warn("resumedownload task file cannot deserialize"+e);
+        }
+
+        if (downloadRecord == null || downloadRecord.getLastModified() != cosLastModified ||
+            !downloadRecord.getContentLength().equals(Long.toString(cosContentLength)) ||
+            !downloadRecord.getEtag().equals(cosEtag) || !downloadRecord.getCrc64ecma().equals(cosCrc64)) {
+
+            HashMap<String, Integer> downloadedBlocks = new HashMap<String, Integer>();
+            downloadRecord = new PersistableResumeDownload(cosLastModified, Long.toString(cosContentLength), cosEtag,
+                    cosCrc64, downloadedBlocks);
+        }
+
+        downloadRecord.setDumpFile(resumableTaskFile);
+
+        return downloadRecord;
+    }
+
+    private Download doResumableDownload(final GetObjectRequest getObjectRequest, final File destFile,
+            final TransferStateChangeListener stateListener,
+            final COSProgressListener cosProgressListener, String resumableTaskFilePath,
+            int multiThreadThreshold, int partSize) {
+
+        appendSingleObjectUserAgent(getObjectRequest);
+        String description = "Resumable downloading from " + getObjectRequest.getBucketName() + "/"
+                + getObjectRequest.getKey();
+
+        TransferProgress transferProgress = new TransferProgress();
+        // COS progress listener to capture the persistable transfer when available
+        COSProgressListenerChain listenerChain = new COSProgressListenerChain(
+                // The listener for updating transfer progress
+                new TransferProgressUpdatingListener(transferProgress),
+                getObjectRequest.getGeneralProgressListener(), cosProgressListener);
+
+        getObjectRequest.setGeneralProgressListener(
+                new ProgressListenerChain(new TransferCompletionFilter(), listenerChain));
+
+        PersistableResumeDownload downloadRecord = getPersistableResumeRecord(getObjectRequest, destFile, resumableTaskFilePath);
+
+        long bytesToDownload = Long.parseLong(downloadRecord.getContentLength(), 10);
+
+        RandomAccessFile destRandomAccessFile;
+        FileChannel destFileChannel;
+        try{
+            destRandomAccessFile = new RandomAccessFile(destFile, "rw");
+            destRandomAccessFile.setLength(bytesToDownload);
+            destFileChannel = destRandomAccessFile.getChannel();
+        } catch (Exception e) {
+            throw new CosClientException("resumable download got exception:" + e.getCause().getMessage() + e.getMessage());
+        }
+
+        transferProgress.setTotalBytesToTransfer(bytesToDownload);
+
+        DownloadImpl download = new DownloadImpl(description, transferProgress, listenerChain,
+                null, stateListener, getObjectRequest, destFile);
+
+        ResumableDownloadSubmitter submitter = new ResumableDownloadSubmitter(cos, threadPool, getObjectRequest,
+                download, destFile, destRandomAccessFile, destFileChannel, downloadRecord, partSize, multiThreadThreshold, transferProgress, listenerChain);
+
+        ResumableDownloadMonitor monitor = ResumableDownloadMonitor.create(listenerChain, submitter, download, threadPool,
+                downloadRecord, destFile);
+
+        download.setMonitor(monitor);
+        return download;
     }
 
     /**

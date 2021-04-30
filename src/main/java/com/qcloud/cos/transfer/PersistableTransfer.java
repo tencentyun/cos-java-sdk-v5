@@ -83,6 +83,8 @@ public abstract class PersistableTransfer {
             clazz = PersistableDownload.class;
         } else if (PersistableUpload.TYPE.equals(type)) {
             clazz = PersistableUpload.class;
+        } else if (PersistableResumeDownload.TYPE.equals(type)) {
+            clazz = PersistableResumeDownload.class;
         } else {
             throw new UnsupportedOperationException("Unsupported paused transfer type: " + type);
         }
