@@ -23,6 +23,7 @@ import java.util.Date;
 
 import com.qcloud.cos.internal.ObjectExpirationResult;
 import com.qcloud.cos.internal.SSEResultBase;
+import com.qcloud.cos.model.ciModel.persistence.CIUploadResult;
 
 public class CompleteMultipartUploadResult extends SSEResultBase
         implements Serializable, ObjectExpirationResult {
@@ -61,6 +62,11 @@ public class CompleteMultipartUploadResult extends SSEResultBase
 
     /** The crc64ecma value for this object */
     private String crc64Ecma;
+
+    /*The ci upload result*/
+    private CIUploadResult ciUploadResult;
+
+
 
     /**
      * get requestid for this upload
@@ -230,5 +236,13 @@ public class CompleteMultipartUploadResult extends SSEResultBase
 
     public void setCrc64Ecma(String crc64Ecma) {
         this.crc64Ecma = crc64Ecma;
+    }
+
+    public CIUploadResult getCiUploadResult() {
+        return ciUploadResult;
+    }
+
+    public void setCiUploadResult(CIUploadResult ciUploadResult) {
+        this.ciUploadResult = ciUploadResult;
     }
 }

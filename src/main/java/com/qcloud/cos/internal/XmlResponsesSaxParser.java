@@ -59,11 +59,18 @@ import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoResponse;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoSubtitle;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoVideo;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaStream;
+import com.qcloud.cos.model.ciModel.persistence.CIObject;
+import com.qcloud.cos.model.ciModel.persistence.OriginalInfo;
+import com.qcloud.cos.model.ciModel.persistence.ProcessResults;
+import com.qcloud.cos.model.ciModel.persistence.CIUploadResult;
+import com.qcloud.cos.model.ciModel.persistence.ImageInfo;
 import com.qcloud.cos.model.ciModel.queue.DocListQueueResponse;
 import com.qcloud.cos.model.ciModel.queue.MediaListQueueResponse;
 import com.qcloud.cos.model.ciModel.queue.MediaNotifyConfig;
 import com.qcloud.cos.model.ciModel.queue.MediaQueueObject;
 import com.qcloud.cos.model.ciModel.queue.MediaQueueResponse;
+import com.qcloud.cos.model.ciModel.recognition.CodeLocation;
+import com.qcloud.cos.model.ciModel.recognition.QRcodeInfo;
 import com.qcloud.cos.model.ciModel.snapshot.SnapshotResponse;
 import com.qcloud.cos.model.ciModel.template.MediaListTemplateResponse;
 import com.qcloud.cos.model.ciModel.template.MediaSnapshotObject;
@@ -400,6 +407,21 @@ public class XmlResponsesSaxParser {
     public AccessControlListHandler parseAccessControlListResponse(InputStream inputStream)
             throws IOException {
         AccessControlListHandler handler = new AccessControlListHandler();
+        parseXmlInputStream(handler, inputStream);
+        return handler;
+    }
+
+    /**
+     * Parses an AccessControlListHandler response XML document from an input stream.
+     *
+     * @param inputStream XML data input stream.
+     * @return the XML handler object populated with data parsed from the XML stream.
+     *
+     * @throws CosClientException
+     */
+    public ImagePersistenceHandler parseImagePersistenceResponse(InputStream inputStream)
+            throws IOException {
+        ImagePersistenceHandler handler = new ImagePersistenceHandler();
         parseXmlInputStream(handler, inputStream);
         return handler;
     }
@@ -947,6 +969,117 @@ public class XmlResponsesSaxParser {
         }
     }
 
+    public static class ImagePersistenceHandler extends AbstractHandler {
+
+        private final CIUploadResult ciUploadResult = new CIUploadResult();
+        private CIObject ciObject;
+        private QRcodeInfo qRcodeInfo;
+        public CIUploadResult getCiUploadResult() {
+            return ciUploadResult;
+        }
+
+        @Override
+        protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
+            if (in("UploadResult")) {
+                if (name.equals("OriginalInfo")) {
+                    ciUploadResult.setOriginalInfo(new OriginalInfo());
+                } else if (name.equals("ProcessResults")) {
+                    ciUploadResult.setProcessResults(new ProcessResults());
+                }
+            } else if(in("UploadResult", "OriginalInfo")) {
+                if(name.equals("ImageInfo")) {
+                    ciUploadResult.getOriginalInfo().setImageInfo(new ImageInfo());
+                }
+            } else if(in("UploadResult", "ProcessResults")) {
+                if(name.equals("Object")) {
+                    ciObject = new CIObject();
+                }
+            } else if(in("UploadResult", "ProcessResults", "Object")) {
+                if(name.equals("QRcodeInfo")) {
+                    qRcodeInfo = new QRcodeInfo();
+                }
+            } else if(in("UploadResult", "ProcessResults", "Object", "QRcodeInfo")) {
+                if(name.equals("CodeLocation")) {
+                    qRcodeInfo.setCodeLocation(new CodeLocation());
+                }
+            }
+        }
+
+        @Override
+        protected void doEndElement(String uri, String name, String qName) {
+            if (in("UploadResult", "OriginalInfo")) {
+                OriginalInfo originalInfo = ciUploadResult.getOriginalInfo();
+                if (name.equals("Key")) {
+                    originalInfo.setKey(getText());
+                } else if (name.equals("Location")) {
+                    originalInfo.setLocation(getText());
+                } else if(name.equals("ETag")) {
+                    originalInfo.setEtag(StringUtils.removeQuotes(getText()));
+                }
+            } else if (in("UploadResult", "OriginalInfo", "ImageInfo")) {
+                ImageInfo imageInfo = ciUploadResult.getOriginalInfo().getImageInfo();
+                if (name.equals("Format")) {
+                    imageInfo.setFormat(getText());
+                } else if(name.equals("Width")) {
+                    imageInfo.setWidth(Integer.parseInt(getText()));
+                } else if(name.equals("Height")) {
+                    imageInfo.setHeight(Integer.parseInt(getText()));
+                } else if(name.equals("Quality")) {
+                    imageInfo.setQuality(Integer.parseInt(getText()));
+                } else if(name.equals("Ave")) {
+                    imageInfo.setAve(getText());
+                } else if(name.equals("Orientation")) {
+                    imageInfo.setOrientation(Integer.parseInt(getText()));
+                }
+            } else if(in("UploadResult", "ProcessResults")) {
+                if(name.equals("Object")) {
+                    if(ciUploadResult.getProcessResults().getObjectList() == null) {
+                        ciUploadResult.getProcessResults().setObjectList(new LinkedList<CIObject>());
+                    }
+                    ciUploadResult.getProcessResults().getObjectList().add(ciObject);
+                }
+            } else if (in("UploadResult", "ProcessResults", "Object")) {
+                if (name.equals("Key")) {
+                    ciObject.setKey(getText());
+                } else if(name.equals("Location")) {
+                    ciObject.setLocation(getText());
+                } else if(name.equals("Format")) {
+                    ciObject.setFormat(getText());
+                } else if(name.equals("Width")) {
+                    ciObject.setWidth(Integer.parseInt(getText()));
+                } else if(name.equals("Height")) {
+                    ciObject.setHeight(Integer.parseInt(getText()));
+                } else if(name.equals("Size")) {
+                    ciObject.setSize(Integer.parseInt(getText()));
+                } else if(name.equals("Quality")) {
+                    ciObject.setQuality(Integer.parseInt(getText()));
+                }  else if(name.equals("ETag")) {
+                    ciObject.setEtag(StringUtils.removeQuotes(getText()));
+                } else if(name.equals("CodeStatus")) {
+                    ciObject.setCodeStatus(Integer.parseInt(getText()));
+                } else if(name.equals("QRcodeInfo")) {
+                    if(ciObject.getQRcodeInfoList() == null) {
+                        ciObject.setQRcodeInfoList(new LinkedList<QRcodeInfo>());
+                    }
+                    ciObject.getQRcodeInfoList().add(qRcodeInfo);
+                } else if(name.equals("WatermarkStatus")) {
+                    ciObject.setWatermarkStatus(Integer.parseInt(getText()));
+                }
+            } else if(in("UploadResult", "ProcessResults", "Object", "QRcodeInfo")) {
+                if(name.equals("CodeUrl")) {
+                    qRcodeInfo.setCodeUrl(getText());
+                }
+            } else if(in("UploadResult", "ProcessResults", "Object", "QRcodeInfo", "CodeLocation")) {
+                CodeLocation codeLocation = qRcodeInfo.getCodeLocation();
+                if(codeLocation.getPoints() == null) {
+                    codeLocation.setPoints(new LinkedList<String>());
+                }
+                if(name.equals("Point")) {
+                    codeLocation.getPoints().add(getText());
+                }
+            }
+        }
+    }
 
     /**
      * Handler for AccessControlList response XML documents. The document is parsed into an
@@ -1575,6 +1708,11 @@ public class XmlResponsesSaxParser {
             implements ObjectExpirationResult, VIDResult {
         // Successful completion
         private CompleteMultipartUploadResult result;
+        private CIUploadResult ciUploadResult = new CIUploadResult();
+        private OriginalInfo originalInfo;
+        private CIObject ciObject;
+        private QRcodeInfo qRcodeInfo;
+
 
         // Error during completion
         private CosServiceException cse;
@@ -1650,12 +1788,35 @@ public class XmlResponsesSaxParser {
             return cse;
         }
 
+        public CIUploadResult getCiUploadResult() {
+            return ciUploadResult;
+        }
+
         @Override
         protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
-
             if (atTopLevel()) {
                 if (name.equals("CompleteMultipartUploadResult")) {
                     result = new CompleteMultipartUploadResult();
+                    originalInfo = new OriginalInfo();
+                    ciUploadResult.setOriginalInfo(originalInfo);
+                }
+            } else if(in("CompleteMultipartUploadResult")) {
+                if(name.equals("ImageInfo")) {
+                    ciUploadResult.getOriginalInfo().setImageInfo(new ImageInfo());
+                } else if (name.equals("ProcessResults")) {
+                    ciUploadResult.setProcessResults(new ProcessResults());
+                }
+            } else if(in("CompleteMultipartUploadResult", "ProcessResults")) {
+                if(name.equals("Object")) {
+                    ciObject = new CIObject();
+                }
+            } else if(in("CompleteMultipartUploadResult", "ProcessResults", "Object")) {
+                if(name.equals("QRcodeInfo")) {
+                    qRcodeInfo = new QRcodeInfo();
+                }
+            }  else if(in("CompleteMultipartUploadResult", "ProcessResults", "Object", "QRcodeInfo")) {
+                if(name.equals("CodeLocation")) {
+                    qRcodeInfo.setCodeLocation(new CodeLocation());
                 }
             }
         }
@@ -1670,21 +1831,7 @@ public class XmlResponsesSaxParser {
                         cse.setTraceId(traceId);
                     }
                 }
-            }
-
-            else if (in("CompleteMultipartUploadResult")) {
-                if (name.equals("Location")) {
-                    result.setLocation(getText());
-                } else if (name.equals("Bucket")) {
-                    result.setBucketName(getText());
-                } else if (name.equals("Key")) {
-                    result.setKey(getText());
-                } else if (name.equals("ETag")) {
-                    result.setETag(StringUtils.removeQuotes(getText()));
-                }
-            }
-
-            else if (in("Error")) {
+            } else if (in("Error")) {
                 if (name.equals("Code")) {
                     errorCode = getText();
                 } else if (name.equals("Message")) {
@@ -1693,6 +1840,81 @@ public class XmlResponsesSaxParser {
                     requestId = getText();
                 } else if (name.equals("HostId")) {
                     traceId = getText();
+                }
+            } else if (in("CompleteMultipartUploadResult")) {
+                if (name.equals("Location")) {
+                    result.setLocation(getText());
+                    originalInfo.setLocation(getText());
+                } else if (name.equals("Bucket")) {
+                    result.setBucketName(getText());
+                } else if (name.equals("Key")) {
+                    result.setKey(getText());
+                    originalInfo.setKey(getText());
+                } else if (name.equals("ETag")) {
+                    result.setETag(StringUtils.removeQuotes(getText()));
+                    originalInfo.setEtag(StringUtils.removeQuotes(getText()));
+                }
+            }  else if (in("CompleteMultipartUploadResult", "ImageInfo")) {
+                ImageInfo imageInfo = ciUploadResult.getOriginalInfo().getImageInfo();
+                if (name.equals("Format")) {
+                    imageInfo.setFormat(getText());
+                } else if(name.equals("Width")) {
+                    imageInfo.setWidth(Integer.parseInt(getText()));
+                } else if(name.equals("Height")) {
+                    imageInfo.setHeight(Integer.parseInt(getText()));
+                } else if(name.equals("Quality")) {
+                    imageInfo.setQuality(Integer.parseInt(getText()));
+                } else if(name.equals("Ave")) {
+                    imageInfo.setAve(getText());
+                } else if(name.equals("Orientation")) {
+                    imageInfo.setOrientation(Integer.parseInt(getText()));
+                }
+            } else if(in("CompleteMultipartUploadResult", "ProcessResults")) {
+                if(name.equals("Object")) {
+                    if(ciUploadResult.getProcessResults().getObjectList() == null) {
+                        ciUploadResult.getProcessResults().setObjectList(new LinkedList<CIObject>());
+                    }
+                    ciUploadResult.getProcessResults().getObjectList().add(ciObject);
+                }
+            } else if (in("CompleteMultipartUploadResult", "ProcessResults", "Object")) {
+                if (name.equals("Key")) {
+                    ciObject.setKey(getText());
+                } else if(name.equals("Location")) {
+                    ciObject.setLocation(getText());
+                } else if(name.equals("Format")) {
+                    ciObject.setFormat(getText());
+                } else if(name.equals("Width")) {
+                    ciObject.setWidth(Integer.parseInt(getText()));
+                } else if(name.equals("Height")) {
+                    ciObject.setHeight(Integer.parseInt(getText()));
+                } else if(name.equals("Size")) {
+                    ciObject.setSize(Integer.parseInt(getText()));
+                } else if(name.equals("Quality")) {
+                    ciObject.setQuality(Integer.parseInt(getText()));
+                }  else if(name.equals("ETag")) {
+                    ciObject.setEtag(StringUtils.removeQuotes(getText()));
+                } else if(name.equals("CodeStatus")) {
+                    ciObject.setCodeStatus(Integer.parseInt(getText()));
+                } else if(name.equals("QRcodeInfo")) {
+                    if(ciObject.getQRcodeInfoList() == null) {
+                        ciObject.setQRcodeInfoList(new LinkedList<QRcodeInfo>());
+                    }
+                    ciObject.getQRcodeInfoList().add(qRcodeInfo);
+                } else if(name.equals("WatermarkStatus")) {
+                    ciObject.setWatermarkStatus(Integer.parseInt(getText()));
+                }
+            } else if(in("CompleteMultipartUploadResult", "ProcessResults", "Object", "QRcodeInfo")) {
+                if(name.equals("CodeUrl")) {
+                    qRcodeInfo.setCodeUrl(getText());
+                }
+            } else if(in("CompleteMultipartUploadResult", "ProcessResults", "Object",
+                    "QRcodeInfo", "CodeLocation")) {
+                CodeLocation codeLocation = qRcodeInfo.getCodeLocation();
+                if(codeLocation.getPoints() == null) {
+                    codeLocation.setPoints(new LinkedList<String>());
+                }
+                if(name.equals("Point")) {
+                    codeLocation.getPoints().add(getText());
                 }
             }
         }
@@ -4485,7 +4707,11 @@ public class XmlResponsesSaxParser {
 
         @Override
         protected void doEndElement(String uri, String name, String qName) {
-            if (in("Response", "JobsDetail")) {
+            if(in( "Response")) {
+                if(name.equals("NonExistJobIds")) {
+                    response.setNonExistJobIds(getText());
+                }
+            } else if (in("Response", "JobsDetail")) {
                 DocJobDetail jobsDetail = response.getJobsDetail();
                 switch (name) {
                     case "Code":
@@ -4551,6 +4777,9 @@ public class XmlResponsesSaxParser {
                         break;
                     case "Zoom":
                         docProcess.setZoom(getText());
+                        break;
+                    case "SheetId":
+                        docProcess.setSheetId(getText());
                         break;
                     default:
                         break;
@@ -4643,7 +4872,9 @@ public class XmlResponsesSaxParser {
 
         @Override
         protected void doEndElement(String uri, String name, String qName) {
-            if (in("Response", "JobsDetail")) {
+            if(in("Response", "NextToken")) {
+                response.setNextToken(getText());
+            } else if (in("Response", "JobsDetail")) {
                 switch (name) {
                     case "Code":
                         jobsDetail.setCode(getText());
@@ -4709,6 +4940,8 @@ public class XmlResponsesSaxParser {
                     case "Zoom":
                         docProcess.setZoom(getText());
                         break;
+                    case "SheetId":
+                        docProcess.setSheetId(getText());
                     default:
                         break;
                 }

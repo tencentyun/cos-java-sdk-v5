@@ -7,7 +7,7 @@ import java.util.List;
 
 public class DocJobListResponse extends CiServiceResult {
     List<DocJobDetail> docJobDetailList;
-
+    private String nextToken;
     public List<DocJobDetail> getDocJobDetailList() {
         if (docJobDetailList==null){
             docJobDetailList = new ArrayList<>();
@@ -17,5 +17,13 @@ public class DocJobListResponse extends CiServiceResult {
 
     public void setDocJobDetailList(List<DocJobDetail> docJobDetailList) {
         this.docJobDetailList = docJobDetailList;
+    }
+
+    public String getNextToken() {
+        return nextToken;
+    }
+
+    public void setNextToken(String nextToken) {
+        this.nextToken = nextToken;
     }
 }

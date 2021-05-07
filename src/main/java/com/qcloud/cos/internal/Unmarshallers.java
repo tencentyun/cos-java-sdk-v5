@@ -43,6 +43,7 @@ import com.qcloud.cos.model.BucketWebsiteConfiguration;
 import com.qcloud.cos.model.BucketReplicationConfiguration;
 import com.qcloud.cos.model.BucketLoggingConfiguration;
 import com.qcloud.cos.model.DeleteObjectTaggingResult;
+import com.qcloud.cos.model.ObjectMetadata;
 import com.qcloud.cos.model.ciModel.bucket.DocBucketResponse;
 import com.qcloud.cos.model.ciModel.bucket.MediaBucketResponse;
 import com.qcloud.cos.model.ciModel.job.DocJobListResponse;
@@ -133,6 +134,19 @@ public class Unmarshallers {
         public AccessControlList unmarshall(InputStream in) throws Exception {
             return new XmlResponsesSaxParser().parseAccessControlListResponse(in)
                     .getAccessControlList();
+        }
+    }
+
+    /**
+     * Unmarshaller for the AccessControlList XML response.
+     */
+    public static final class ImagePersistenceUnmarshaller
+            implements Unmarshaller<ObjectMetadata, InputStream> {
+        public ObjectMetadata unmarshall(InputStream in) throws Exception {
+            ObjectMetadata objectMetadata = new ObjectMetadata();
+            objectMetadata.setCiUploadResult(new XmlResponsesSaxParser().parseImagePersistenceResponse(in)
+                    .getCiUploadResult());
+            return objectMetadata;
         }
     }
     //
