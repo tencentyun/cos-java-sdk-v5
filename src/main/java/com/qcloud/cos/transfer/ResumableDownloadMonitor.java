@@ -118,7 +118,7 @@ public class ResumableDownloadMonitor implements Callable<File>, TransferMonitor
             // download finished.
             downloadRecord.getDumpFile().delete();
 
-            if ((!downloadRecord.getCrc64ecma().isEmpty()) && downloadRecord.getCrc64ecma().length() > 0) {
+            if ((downloadRecord.getCrc64ecma() != null) && !downloadRecord.getCrc64ecma().isEmpty()) {
                 checkCRC(downloadParts);
             }
 
