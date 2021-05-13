@@ -613,6 +613,15 @@ public class TransferManager {
             final COSProgressListener cosProgressListener, String resumableTaskFilePath,
             int multiThreadThreshold, int partSize) {
 
+        PersistableResumeDownload downloadRecord = getPersistableResumeRecord(getObjectRequest, destFile, resumableTaskFilePath);
+
+        long bytesToDownload = Long.parseLong(downloadRecord.getContentLength());
+
+        if (bytesToDownload < multiThreadThreshold) {
+            downloadRecord.getDumpFile().delete();
+            return doDownload(getObjectRequest, destFile, stateListener, cosProgressListener, OVERWRITE_MODE);
+        }
+
         appendSingleObjectUserAgent(getObjectRequest);
         String description = "Resumable downloading from " + getObjectRequest.getBucketName() + "/"
                 + getObjectRequest.getKey();
@@ -626,10 +635,6 @@ public class TransferManager {
 
         getObjectRequest.setGeneralProgressListener(
                 new ProgressListenerChain(new TransferCompletionFilter(), listenerChain));
-
-        PersistableResumeDownload downloadRecord = getPersistableResumeRecord(getObjectRequest, destFile, resumableTaskFilePath);
-
-        long bytesToDownload = Long.parseLong(downloadRecord.getContentLength(), 10);
 
         RandomAccessFile destRandomAccessFile;
         FileChannel destFileChannel;

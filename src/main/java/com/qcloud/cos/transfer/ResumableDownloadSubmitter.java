@@ -32,6 +32,7 @@ import java.util.concurrent.Future;
 import com.qcloud.cos.COS;
 import com.qcloud.cos.event.ProgressEventType;
 import com.qcloud.cos.event.ProgressListenerChain;
+import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.model.GetObjectRequest;
 import com.qcloud.cos.transfer.Transfer.TransferState;
 import com.qcloud.cos.utils.CRC64;
@@ -84,9 +85,7 @@ final class ResumableDownloadSubmitter {
         download.setState(TransferState.InProgress);
 
         if (contentLength < this.multiThreadThreshold) {
-            req.setRange(0, contentLength);
-            futures.add(threadPool.submit(new RangeDownloadCallable(cos, req, destFile, destFileChannel, downloadRecord)));
-            return;
+            throw new CosClientException("contentLenth " + contentLength + " < " + this.multiThreadThreshold + " should not use resumabledownload.");
         }
 
         long start = 0;
