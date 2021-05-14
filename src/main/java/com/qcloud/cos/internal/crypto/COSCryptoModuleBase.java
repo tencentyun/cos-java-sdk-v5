@@ -228,6 +228,22 @@ public abstract class COSCryptoModuleBase extends COSCryptoModule {
             ObjectMetadata metadata = req.getObjectMetadata();
             if (metadata == null)
                 metadata = new ObjectMetadata();
+
+            long dataSize = req.getDataSize();
+            long partSize = req.getPartSize();
+
+            if (dataSize < 0 || partSize < 0) {
+                throw new CosClientException("initiate multipart upload with encryption client must set dataSize and partSize");
+            }
+
+            if (partSize % 16 != 0) {
+                throw new CosClientException("initiat multipart uplaod with encryption client must set part size a mutiple of 16"
+                    + "but got " + partSize);
+            }
+
+            metadata.addUserMetadata(Headers.ENCRYPTION_DATA_SIZE, Long.toString(dataSize));
+            metadata.addUserMetadata(Headers.ENCRYPTION_PART_SIZE, Long.toString(partSize));
+
             // Store encryption info in metadata
             req.setObjectMetadata(
                     updateMetadataWithContentCryptoMaterial(metadata, null, cekMaterial));
@@ -476,8 +492,10 @@ public abstract class COSCryptoModuleBase extends COSCryptoModule {
                                   contentCryptoScheme.getKeyGeneratorAlgorithm());
 
             byte[] keyBlob = keyGenRes.getCiphertextBlob().getBytes();
+            byte[] securedIV = ContentCryptoMaterial.encryptIV(iv, materials, cryptoScheme.getKeyWrapScheme(),
+                                    cryptoScheme.getSecureRandom(), provider, kms, req);
             return ContentCryptoMaterial.wrap(cek, iv, contentCryptoScheme, provider,
-                    new KMSSecuredCEK(keyBlob, encryptionContext));
+                    new KMSSecuredCEK(keyBlob, encryptionContext), securedIV);
         } else {
             // Generate a one-time use symmetric key and initialize a cipher to encrypt object data
             return ContentCryptoMaterial.create(generateCEK(materials, provider), iv, materials,
@@ -539,7 +557,7 @@ public abstract class COSCryptoModuleBase extends COSCryptoModule {
 
         // Record the original Content MD5, if present, for the unencrypted data
         if (metadata.getContentMD5() != null) {
-            metadata.addUserMetadata(Headers.UNENCRYPTED_CONTENT_MD5, metadata.getContentMD5());
+            metadata.addUserMetadata(Headers.ENCRYPTION_UNENCRYPTED_CONTENT_MD5, metadata.getContentMD5());
         }
 
         // Removes the original content MD5 if present from the meta data.
@@ -549,7 +567,7 @@ public abstract class COSCryptoModuleBase extends COSCryptoModule {
         // later
         final long plaintextLength = plaintextLength(request, metadata);
         if (plaintextLength >= 0) {
-            metadata.addUserMetadata(Headers.UNENCRYPTED_CONTENT_LENGTH,
+            metadata.addUserMetadata(Headers.ENCRYPTION_UNENCRYPTED_CONTENT_LENGTH,
                     Long.toString(plaintextLength));
             // Put the ciphertext length in the metadata
             metadata.setContentLength(ciphertextLength(plaintextLength));

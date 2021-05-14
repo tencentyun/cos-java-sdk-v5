@@ -22,16 +22,17 @@ import java.util.Map;
 
 final class KMSSecuredCEK extends SecuredCEK {
     static final String KEY_PROTECTION_MECHANISM = "kms";
+    static final String NEW_KEY_PROTECTION_MECHANISM = "KMS/TencentCloud";
 
     KMSSecuredCEK(byte[] encryptedKeyBlob, Map<String, String> matdesc) {
-        super(encryptedKeyBlob, KEY_PROTECTION_MECHANISM, matdesc);
+        super(encryptedKeyBlob, NEW_KEY_PROTECTION_MECHANISM, matdesc);
     }
 
     /**
      * Returns true if the specified key wrapping algorithm is
-     * {@value #KEY_PROTECTION_MECHANISM}; false otherwise.
+     * {@value #KEY_PROTECTION_MECHANISM} or {@value #NEW_KEY_PROTECTION_MECHANISM}; false otherwise.
      */
     public static boolean isKMSKeyWrapped(String keyWrapAlgo) {
-        return KEY_PROTECTION_MECHANISM.equals(keyWrapAlgo);
+        return KEY_PROTECTION_MECHANISM.equals(keyWrapAlgo) || NEW_KEY_PROTECTION_MECHANISM.equals(keyWrapAlgo);
     }
 }

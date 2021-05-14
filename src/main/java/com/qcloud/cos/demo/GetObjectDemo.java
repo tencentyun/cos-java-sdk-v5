@@ -1,16 +1,14 @@
 package com.qcloud.cos.demo;
 
+import java.io.File;
+
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.ClientConfig;
 import com.qcloud.cos.auth.BasicCOSCredentials;
 import com.qcloud.cos.auth.COSCredentials;
 import com.qcloud.cos.model.GetObjectRequest;
 import com.qcloud.cos.model.ObjectMetadata;
-import com.qcloud.cos.model.ResponseHeaderOverrides;
 import com.qcloud.cos.region.Region;
-import com.qcloud.cos.utils.DateUtils;
-import java.io.File;
-import java.util.Date;
 
 public class GetObjectDemo {
     public static void main(String[] args) {

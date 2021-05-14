@@ -35,6 +35,9 @@ public class KMSEncryptionMaterials extends EncryptionMaterials implements Seria
      * customer master key id.
      */
     public static final String CUSTOMER_MASTER_KEY_ID = "kms_cmk_id"; 
+
+    private String customerMasterKeyId = null;
+
     /**
      * @param defaultCustomerMasterKeyId
      *            KMS's customer master key id; must not be null
@@ -45,7 +48,7 @@ public class KMSEncryptionMaterials extends EncryptionMaterials implements Seria
                 || defaultCustomerMasterKeyId.length() == 0)
             throw new IllegalArgumentException(
                     "The default customer master key id must be specified");
-        addDescription(CUSTOMER_MASTER_KEY_ID, defaultCustomerMasterKeyId);
+        customerMasterKeyId = defaultCustomerMasterKeyId;
     }
 
     /**
@@ -82,11 +85,6 @@ public class KMSEncryptionMaterials extends EncryptionMaterials implements Seria
      */
     @Override
     public String getCustomerMasterKeyId() {
-        return getDescription(CUSTOMER_MASTER_KEY_ID);
-    }
-
-    @Override
-    public String toString() {
-        return String.valueOf(getMaterialsDescription());
+        return customerMasterKeyId;
     }
 }

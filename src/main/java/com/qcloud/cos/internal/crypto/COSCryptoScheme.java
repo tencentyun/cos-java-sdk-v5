@@ -55,6 +55,9 @@ final class COSCryptoScheme {
 
     static COSCryptoScheme from(CryptoMode mode) {
         switch (mode) {
+        case AesCtrEncryption:
+            return new COSCryptoScheme(ContentCryptoScheme.AES_CTR,
+                    new COSKeyWrapScheme());
         case AuthenticatedEncryption:
         case StrictAuthenticatedEncryption:
             return new COSCryptoScheme(ContentCryptoScheme.AES_GCM,

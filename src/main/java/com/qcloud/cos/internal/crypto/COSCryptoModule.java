@@ -26,6 +26,7 @@ import com.qcloud.cos.model.CompleteMultipartUploadRequest;
 import com.qcloud.cos.model.CompleteMultipartUploadResult;
 import com.qcloud.cos.model.CopyPartRequest;
 import com.qcloud.cos.model.CopyPartResult;
+import com.qcloud.cos.model.EncryptedGetObjectRequest;
 import com.qcloud.cos.model.GetObjectRequest;
 import com.qcloud.cos.model.InitiateMultipartUploadRequest;
 import com.qcloud.cos.model.InitiateMultipartUploadResult;

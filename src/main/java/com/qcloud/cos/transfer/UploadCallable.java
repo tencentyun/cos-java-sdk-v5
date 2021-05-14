@@ -179,7 +179,7 @@ public class UploadCallable implements Callable<UploadResult> {
         long optimalPartSize = getOptimalPartSize(isUsingEncryption);
         try {
             if (multipartUploadId == null) {
-                multipartUploadId = initiateMultipartUpload(origReq, isUsingEncryption);
+                multipartUploadId = initiateMultipartUpload(origReq, isUsingEncryption, optimalPartSize);
             }
 
             UploadPartRequestFactory requestFactory =
@@ -348,7 +348,7 @@ public class UploadCallable implements Callable<UploadResult> {
      * 
      * @param isUsingEncryption
      */
-    private String initiateMultipartUpload(PutObjectRequest origReq, boolean isUsingEncryption) {
+    private String initiateMultipartUpload(PutObjectRequest origReq, boolean isUsingEncryption, long optimalPartSize) {
 
         InitiateMultipartUploadRequest req = null;
         if (isUsingEncryption && origReq instanceof EncryptedPutObjectRequest) {
@@ -362,6 +362,9 @@ public class UploadCallable implements Callable<UploadResult> {
                     .withCannedACL(origReq.getCannedAcl())
                     .withObjectMetadata(origReq.getMetadata());
         }
+
+        long dataSize = TransferManagerUtils.getContentLength(origReq);
+        req.setDataSizePartSize(dataSize, optimalPartSize);
 
         TransferManager.appendMultipartUserAgent(req);
 

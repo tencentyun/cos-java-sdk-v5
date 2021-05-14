@@ -24,6 +24,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.security.Key;
 import java.security.Provider;
 import java.security.SecureRandom;
@@ -53,6 +54,9 @@ import com.tencentcloudapi.kms.v20190118.models.DecryptResponse;
 import com.tencentcloudapi.kms.v20190118.models.EncryptRequest;
 import com.tencentcloudapi.kms.v20190118.models.EncryptResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Cryptographic material used for client-side content encrypt/decryption in COS. This includes the
  * randomly generated one-time secured CEK (content-encryption-key) and the respective key wrapping
@@ -66,12 +70,17 @@ final class ContentCryptoMaterial {
     private final Map<String, String> kekMaterialsDescription;
     private final byte[] encryptedCEK;
 
+    private final byte[] securedIV;
+
+    private static final Logger log = LoggerFactory.getLogger(ContentCryptoMaterial.class);
+
     ContentCryptoMaterial(Map<String, String> kekMaterialsDescription, byte[] encryptedCEK,
-            String keyWrappingAlgorithm, CipherLite cipherLite) {
+            String keyWrappingAlgorithm, CipherLite cipherLite, byte[] securedIV) {
         this.cipherLite = cipherLite;
         this.keyWrappingAlgorithm = keyWrappingAlgorithm;
         this.encryptedCEK = encryptedCEK.clone();
         this.kekMaterialsDescription = kekMaterialsDescription;
+        this.securedIV = securedIV;
     }
 
     /**
@@ -114,23 +123,25 @@ final class ContentCryptoMaterial {
         // If we generated a symmetric key to encrypt the data, store it in the
         // object metadata.
         byte[] encryptedCEK = getEncryptedCEK();
-        metadata.addUserMetadata(Headers.CRYPTO_KEY_V2, Base64.encodeAsString(encryptedCEK));
+        metadata.addUserMetadata(Headers.ENCRYPTION_KEY, Base64.encodeAsString(encryptedCEK));
         // Put the cipher initialization vector (IV) into the object metadata
-        byte[] iv = cipherLite.getIV();
-        metadata.addUserMetadata(Headers.CRYPTO_IV, Base64.encodeAsString(iv));
+        metadata.addUserMetadata(Headers.ENCRYPTION_START, Base64.encodeAsString(securedIV));
         // Put the materials description into the object metadata as JSON
-        metadata.addUserMetadata(Headers.MATERIALS_DESCRIPTION, kekMaterialDescAsJson());
+        String matdesc = kekMaterialDescAsJson();
+        if (matdesc != null) {
+            metadata.addUserMetadata(Headers.ENCRYPTION_MATDESC, kekMaterialDescAsJson());
+        }
         // The CRYPTO_CEK_ALGORITHM, CRYPTO_TAG_LENGTH and
         // CRYPTO_KEYWRAP_ALGORITHM were not available in the Encryption Only
         // (EO) implementation
         ContentCryptoScheme scheme = getContentCryptoScheme();
-        metadata.addUserMetadata(Headers.CRYPTO_CEK_ALGORITHM, scheme.getCipherAlgorithm());
+        metadata.addUserMetadata(Headers.ENCRYPTION_CEK_ALG, scheme.getCipherAlgorithm());
         int tagLen = scheme.getTagLengthInBits();
         if (tagLen > 0)
             metadata.addUserMetadata(Headers.CRYPTO_TAG_LENGTH, String.valueOf(tagLen));
         String keyWrapAlgo = getKeyWrappingAlgorithm();
         if (keyWrapAlgo != null)
-            metadata.addUserMetadata(Headers.CRYPTO_KEYWRAP_ALGORITHM, keyWrapAlgo);
+            metadata.addUserMetadata(Headers.ENCRYPTION_WRAP_ALG, keyWrapAlgo);
         return metadata;
     }
 
@@ -160,8 +171,8 @@ final class ContentCryptoMaterial {
      */
     private String kekMaterialDescAsJson() {
         Map<String, String> kekMaterialDesc = getKEKMaterialsDescription();
-        if (kekMaterialDesc == null)
-            kekMaterialDesc = Collections.emptyMap();
+        if (kekMaterialDesc == null || kekMaterialDesc.isEmpty())
+            return null;
         return Jackson.toJsonString(kekMaterialDesc);
     }
 
@@ -284,6 +295,13 @@ final class ContentCryptoMaterial {
             long[] range, boolean keyWrapExpected, QCLOUDKMS kms) {
         // CEK and IV
         Map<String, String> userMeta = metadata.getUserMetadata();
+
+        // new version has different header
+        if (userMeta.get(Headers.ENCRYPTION_KEY) != null) {
+            return fromObjectMetadata1(userMeta, kekMaterialAccessor, securityProvider,
+                    range, keyWrapExpected, kms);
+        }
+
         String b64key = userMeta.get(Headers.CRYPTO_KEY_V2);
         if (b64key == null) {
             b64key = userMeta.get(Headers.CRYPTO_KEY);
@@ -291,6 +309,7 @@ final class ContentCryptoMaterial {
                 throw new CosClientException("Content encrypting key not found.");
         }
         byte[] cekWrapped = Base64.decode(b64key);
+        //byte[] iv = userMeta.get(Headers.CRYPTO_IV).getBytes();
         byte[] iv = Base64.decode(userMeta.get(Headers.CRYPTO_IV));
         if (cekWrapped == null || iv == null) {
             throw new CosClientException("Content encrypting key or IV not found.");
@@ -340,7 +359,75 @@ final class ContentCryptoMaterial {
         SecretKey cek =
                 cek(cekWrapped, keyWrapAlgo, materials, securityProvider, contentCryptoScheme, kms);
         return new ContentCryptoMaterial(core, cekWrapped, keyWrapAlgo, contentCryptoScheme
-                .createCipherLite(cek, iv, Cipher.DECRYPT_MODE, securityProvider));
+                .createCipherLite(cek, iv, Cipher.DECRYPT_MODE, securityProvider), null);
+    }
+
+    private static ContentCryptoMaterial fromObjectMetadata1(Map<String, String> userMeta,
+            EncryptionMaterialsAccessor kekMaterialAccessor, Provider securityProvider,
+            long[] range, boolean keyWrapExpected, QCLOUDKMS kms) {
+        String b64SecuredKey = userMeta.get(Headers.ENCRYPTION_KEY);
+        if (b64SecuredKey == null) {
+            throw new CosClientException("Content encrypting key not found.");
+        }
+
+        byte[] securedKey = Base64.decode(b64SecuredKey);
+
+        String b64SecuredIV = userMeta.get(Headers.ENCRYPTION_START);
+        if (b64SecuredIV == null) {
+            throw new CosClientException("Content encrypting key or IV not found.");
+        }
+
+        byte[] securedIV = Base64.decode(b64SecuredIV);
+
+        final String keyWrapAlgo = userMeta.get(Headers.ENCRYPTION_WRAP_ALG);
+        final String matdescStr = userMeta.get(Headers.ENCRYPTION_MATDESC);
+
+        final boolean isKMS = isKMSKeyWrapped(keyWrapAlgo);
+        final Map<String, String> metadesc = matdescFromJson(matdescStr);
+        final EncryptionMaterials materials;
+        if (isKMS) {
+            if (kekMaterialAccessor instanceof KMSEncryptionMaterialsProvider) {
+                KMSEncryptionMaterialsProvider kmsMaterialsProvider = (KMSEncryptionMaterialsProvider) kekMaterialAccessor;
+                materials = kmsMaterialsProvider.getEncryptionMaterials();
+            } else {
+                throw new CosClientException("Must use KMSEncryptionMaterials");
+            }
+            if (metadesc != null) {
+                materials.addDescriptions(metadesc);
+            }
+        } else {
+            materials = kekMaterialAccessor == null ? null
+                    : kekMaterialAccessor.getEncryptionMaterials(metadesc);
+            if (materials == null) {
+                throw new CosClientException("Unable to retrieve the client encryption materials");
+            }
+        }
+
+        // CEK algorithm
+        String cekAlgo = userMeta.get(Headers.ENCRYPTION_CEK_ALG);
+        boolean isRangeGet = range != null;
+
+        // The content crypto scheme may vary depending on whether
+        // it is a range get operation
+        ContentCryptoScheme contentCryptoScheme =
+                ContentCryptoScheme.fromCEKAlgo(cekAlgo, isRangeGet);
+
+        byte[] iv = decryptIV(securedIV, keyWrapAlgo, materials, securityProvider, contentCryptoScheme, kms);
+
+        if (isRangeGet) {
+            // Adjust the IV as needed
+            iv = contentCryptoScheme.adjustIV(iv, range[0]);
+        }
+
+        // Unwrap or decrypt the CEK
+        if (keyWrapExpected && keyWrapAlgo == null)
+            throw newKeyWrapException();
+
+        SecretKey cek =
+                cek(securedKey, keyWrapAlgo, materials, securityProvider, contentCryptoScheme, kms);
+
+        return new ContentCryptoMaterial(metadesc, securedKey, keyWrapAlgo, contentCryptoScheme
+                .createCipherLite(cek, iv, Cipher.DECRYPT_MODE, securityProvider), null);
     }
 
     private static CosClientException newKeyWrapException() {
@@ -436,7 +523,7 @@ final class ContentCryptoMaterial {
         SecretKey cek =
                 cek(cekWrapped, keyWrapAlgo, materials, securityProvider, contentCryptoScheme, kms);
         return new ContentCryptoMaterial(core, cekWrapped, keyWrapAlgo, contentCryptoScheme
-                .createCipherLite(cek, iv, Cipher.DECRYPT_MODE, securityProvider));
+                .createCipherLite(cek, iv, Cipher.DECRYPT_MODE, securityProvider), null);
     }
 
     /**
@@ -656,7 +743,10 @@ final class ContentCryptoMaterial {
         SecuredCEK cekSecured =
                 secureCEK(cek, kekMaterials, targetCOSCryptoScheme.getKeyWrapScheme(),
                         targetCOSCryptoScheme.getSecureRandom(), provider, kms, req);
-        return wrap(cek, iv, contentCryptoScheme, provider, cekSecured);
+        byte[] securedIV =
+                encryptIV(iv, kekMaterials, targetCOSCryptoScheme.getKeyWrapScheme(),
+                        targetCOSCryptoScheme.getSecureRandom(), provider, kms, req);
+        return wrap(cek, iv, contentCryptoScheme, provider, cekSecured, securedIV);
     }
 
     /**
@@ -664,10 +754,10 @@ final class ContentCryptoMaterial {
      * parameters, including the already secured CEK. No network calls are involved.
      */
     public static ContentCryptoMaterial wrap(SecretKey cek, byte[] iv,
-            ContentCryptoScheme contentCryptoScheme, Provider provider, SecuredCEK cekSecured) {
+            ContentCryptoScheme contentCryptoScheme, Provider provider, SecuredCEK cekSecured, byte[] securedIV) {
         return new ContentCryptoMaterial(cekSecured.getMaterialDescription(),
                 cekSecured.getEncrypted(), cekSecured.getKeyWrapAlgorithm(),
-                contentCryptoScheme.createCipherLite(cek, iv, Cipher.ENCRYPT_MODE, provider));
+                contentCryptoScheme.createCipherLite(cek, iv, Cipher.ENCRYPT_MODE, provider), securedIV);
     }
 
     /**
@@ -719,6 +809,106 @@ final class ContentCryptoMaterial {
             return new SecuredCEK(cipher.wrap(cek), keyWrapAlgo, matdesc);
         } catch (Exception e) {
             throw new CosClientException("Unable to encrypt symmetric key", e);
+        }
+    }
+
+    public static byte[] encryptIV(byte[] iv, EncryptionMaterials materials,
+            COSKeyWrapScheme kwScheme, SecureRandom srand, Provider p, QCLOUDKMS kms,
+            CosServiceRequest req) {
+
+        if (materials.isKMSEnabled()) {
+            Map<String, String> matdesc = mergeMaterialDescriptions(materials, req);
+            EncryptRequest encryptRequest = new EncryptRequest();
+            try {
+                ObjectMapper mapper = new ObjectMapper();
+                encryptRequest.setEncryptionContext(mapper.writeValueAsString(matdesc));
+            } catch (JsonProcessingException e) {
+                throw new CosClientException("encrypt request set encryption context got json processing exception", e);
+            }
+            encryptRequest.setKeyId(materials.getCustomerMasterKeyId());
+            encryptRequest.setPlaintext(Base64.encodeAsString(iv));
+
+            EncryptResponse encryptResponse = kms.encrypt(encryptRequest);
+
+            String cipherIV = encryptResponse.getCiphertextBlob();
+            return cipherIV.getBytes(Charset.forName("UTF-8"));
+        }
+
+        Key kek;
+        if (materials.getKeyPair() != null) {
+            // Do envelope encryption with public key from key pair
+            kek = materials.getKeyPair().getPublic();
+        } else {
+            // Do envelope encryption with symmetric key
+            kek = materials.getSymmetricKey();
+        }
+
+        String keyWrapAlgo = kwScheme.getKeyWrapAlgorithm(kek);
+        try {
+            Cipher cipher = p == null ? Cipher.getInstance(keyWrapAlgo)
+                    : Cipher.getInstance(keyWrapAlgo, p);
+            cipher.init(Cipher.ENCRYPT_MODE, kek, srand);
+            return cipher.doFinal(iv);
+        } catch (Exception e) {
+            throw new CosClientException("Unable to encrypt IV", e);
+        }
+    }
+
+    public static byte[] decryptIV(byte[] iv, String keyWrapAlgo,
+            EncryptionMaterials materials, Provider securityProvider,
+            ContentCryptoScheme contentCryptoScheme, QCLOUDKMS kms) {
+        if (materials.isKMSEnabled()) {
+
+            DecryptRequest decryptReq = new DecryptRequest();
+            Map<String, String> materialDesc = materials.getMaterialsDescription();
+            try {
+                ObjectMapper mapper = new ObjectMapper();
+                decryptReq.setEncryptionContext(mapper.writeValueAsString(materialDesc));
+            } catch (JsonProcessingException e) {
+                throw new CosClientException("decrypt request set encryption context got json processing exception", e);
+            }
+            decryptReq.setCiphertextBlob(new String(iv, Charset.forName("UTF-8")));
+
+            DecryptResponse decryptRes = kms.decrypt(decryptReq);
+
+            return Base64.decode(decryptRes.getPlaintext());
+        }
+
+        Key kek;
+        if (materials.getKeyPair() != null) {
+            // Do envelope decryption with private key from key pair
+            kek = materials.getKeyPair().getPrivate();
+            if (kek == null) {
+                throw new CosClientException("Key encrypting key not available");
+            }
+        } else {
+            // Do envelope decryption with symmetric key
+            kek = materials.getSymmetricKey();
+            if (kek == null) {
+                throw new CosClientException("Key encrypting key not available");
+            }
+        }
+
+        try {
+            if (keyWrapAlgo != null) {
+                // Key wrapping specified
+                Cipher cipher = securityProvider == null ? Cipher.getInstance(keyWrapAlgo)
+                        : Cipher.getInstance(keyWrapAlgo, securityProvider);
+                cipher.init(Cipher.DECRYPT_MODE, kek);
+                return cipher.doFinal(iv);
+            }
+
+            // fall back to the Encryption Only (EO) key decrypting method
+            Cipher cipher;
+            if (securityProvider != null) {
+                cipher = Cipher.getInstance(kek.getAlgorithm(), securityProvider);
+            } else {
+                cipher = Cipher.getInstance(kek.getAlgorithm());
+            }
+            cipher.init(Cipher.DECRYPT_MODE, kek);
+            return cipher.doFinal(iv);
+        } catch (Exception e) {
+            throw new CosClientException("Unable to decrypt symmetric key from object metadata", e);
         }
     }
 

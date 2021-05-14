@@ -147,6 +147,11 @@ abstract class ContentCryptoScheme {
         if (AES_GCM.getCipherAlgorithm().equals(cekAlgo)) {
             return isRangeGet ? AES_CTR : AES_GCM;
         }
+
+        if (AES_CTR.getCipherAlgorithm().equals(cekAlgo)) {
+            return AES_CTR;
+        }
+
         throw new UnsupportedOperationException("Unsupported content encryption scheme: " + cekAlgo);
     }
     

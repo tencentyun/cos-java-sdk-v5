@@ -96,9 +96,12 @@ public class COSObjectWrapper implements Closeable {
     final boolean hasEncryptionInfo() {
         ObjectMetadata metadata = cosobj.getObjectMetadata();
         Map<String, String> userMeta = metadata.getUserMetadata();
-        return userMeta != null && userMeta.containsKey(Headers.CRYPTO_IV)
+        return userMeta != null
+                && (userMeta.containsKey(Headers.CRYPTO_IV)
+                        || userMeta.containsKey(Headers.ENCRYPTION_START))
                 && (userMeta.containsKey(Headers.CRYPTO_KEY_V2)
-                        || userMeta.containsKey(Headers.CRYPTO_KEY));
+                        || userMeta.containsKey(Headers.CRYPTO_KEY))
+                        || userMeta.containsKey(Headers.ENCRYPTION_KEY);
     }
 
     /**

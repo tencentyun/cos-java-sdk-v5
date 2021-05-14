@@ -68,6 +68,10 @@ public class CryptoModuleDispatcher extends COSCryptoModule {
                 this.ae = new COSCryptoModuleAE(kms, cos, credentialsProvider,
                         encryptionMaterialsProvider, cryptoConfig);
                 break;
+            case AesCtrEncryption:
+                this.ae = new COSCryptoModuleAE(kms, cos, credentialsProvider,
+                        encryptionMaterialsProvider, cryptoConfig);
+                break;
             default:
                 throw new IllegalStateException();
         }

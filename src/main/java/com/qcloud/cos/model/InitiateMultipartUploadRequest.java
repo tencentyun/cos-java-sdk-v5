@@ -37,6 +37,16 @@ public class InitiateMultipartUploadRequest extends CosServiceRequest
     private String key;
 
     /**
+     * Size of the data upload to cos. Only used when it is an encryption client.
+     */
+    private long dataSize = -1;
+
+    /**
+     * Size of a part in the multipart uplaod. Only used when it is an encryption client.
+     */
+    private long partSize = -1;
+
+    /**
      * Additional information about the new object being created, such as content type, content
      * encoding, user metadata, etc.
      */
@@ -89,6 +99,24 @@ public class InitiateMultipartUploadRequest extends CosServiceRequest
     public InitiateMultipartUploadRequest(String bucketName, String key) {
         this.bucketName = bucketName;
         this.key = key;
+    }
+
+    /**
+     * Constructs a request to initiate a new multipart upload in the specified bucket, stored by
+     * the specified key, and with the additional specified data size and part size.
+     *
+     * @param bucketName The name of the bucket in which to create the new multipart upload, and
+     *        hence, the eventual object created from the multipart upload.
+     * @param key The key by which to store the new multipart upload, and hence, the eventual object
+     *        created from the multipart upload.
+     * @param dataSize Size of the data upload to cos. When use encryption client, it is necessary.
+     * @param partSize Size of a part in the multipart uplaod. When use encryption client, it is necessary.
+     */
+    public InitiateMultipartUploadRequest(String bucketName, String key, long dataSize, long partSize) {
+        this.bucketName = bucketName;
+        this.key = key;
+        this.dataSize = dataSize;
+        this.partSize = partSize;
     }
 
     /**
@@ -448,4 +476,36 @@ public class InitiateMultipartUploadRequest extends CosServiceRequest
         setSSECOSKeyManagementParams(sseCOSKeyManagementParams);
         return this;
     }
+
+    /**
+     * Sets the data size and part size of this multipart upload request;
+     *
+     * @param dataSize
+     * @param partSize
+     */
+    public void setDataSizePartSize(long dataSize, long partSize) {
+        this.dataSize = dataSize;
+        this.partSize = partSize;
+    }
+
+    /**
+     * Sets the data size and part size of this multipart upload request;
+     *
+     * @param dataSize
+     * @param partSize
+     * @return returns the update InitiateMultipartUploadRequest
+     */
+    public InitiateMultipartUploadRequest withDataSizePartSize(long dataSize, long partSize) {
+        setDataSizePartSize(dataSize, partSize);
+        return this;
+    }
+
+    public long getDataSize() {
+        return this.dataSize;
+    }
+
+    public long getPartSize() {
+        return this.partSize;
+    }
+
 }

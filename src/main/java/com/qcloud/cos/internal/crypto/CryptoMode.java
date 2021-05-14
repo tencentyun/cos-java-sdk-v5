@@ -25,6 +25,11 @@ package com.qcloud.cos.internal.crypto;
  */
 public enum CryptoMode {
     /**
+     * Authenticated encryption mode using AES/CTR. If you want to encrypt with Java SDK and decrypt
+     * with other COS SDKs, you must use this mode.
+     */
+    AesCtrEncryption,
+    /**
      * Authenticated encryption mode using AES/GCM, AESWrap, etc. Please note the limitation on the
      * maximum message size in bytes that can be encrypted under this mode is 2^36-32, or ~64G, due
      * to the security limitation of AES/GCM as recommended by NIST.
