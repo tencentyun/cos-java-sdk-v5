@@ -32,6 +32,7 @@ import com.qcloud.cos.http.HttpMethodName;
 import com.qcloud.cos.internal.COSDirectSpi;
 import com.qcloud.cos.model.AbortMultipartUploadRequest;
 import com.qcloud.cos.model.AccessControlList;
+import com.qcloud.cos.model.ciModel.common.ImageProcessRequest;
 import com.qcloud.cos.model.Bucket;
 import com.qcloud.cos.model.BucketCrossOriginConfiguration;
 import com.qcloud.cos.model.BucketIntelligentTierConfiguration;
@@ -125,6 +126,7 @@ import com.qcloud.cos.model.ciModel.job.MediaJobsRequest;
 import com.qcloud.cos.model.ciModel.job.MediaListJobResponse;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoRequest;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoResponse;
+import com.qcloud.cos.model.ciModel.persistence.CIUploadResult;
 import com.qcloud.cos.model.ciModel.queue.DocListQueueResponse;
 import com.qcloud.cos.model.ciModel.queue.DocQueueRequest;
 import com.qcloud.cos.model.ciModel.queue.MediaListQueueResponse;
@@ -2846,6 +2848,11 @@ public interface COS extends COSDirectSpi {
      * DescribeDocProcessBuckets 接口用于查询存储桶是否已开通文档预览功能。https://cloud.tencent.com/document/product/460/46945
      */
     DocBucketResponse describeDocProcessBuckets(DocBucketRequest request);
+
+    /**
+     * process Image 接口用于对图片进行处理
+     */
+    CIUploadResult processImage(ImageProcessRequest request);
 }
 
 

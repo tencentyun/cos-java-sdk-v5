@@ -34,9 +34,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.regex.Pattern;
 
 import com.qcloud.cos.endpoint.CIRegionEndpointBuilder;
+import com.qcloud.cos.model.ciModel.common.ImageProcessRequest;
 import com.qcloud.cos.model.BucketIntelligentTierConfiguration;
 import com.qcloud.cos.model.GetBucketIntelligentTierConfigurationRequest;
 import com.qcloud.cos.model.SetBucketIntelligentTierConfigurationRequest;
@@ -55,6 +55,7 @@ import com.qcloud.cos.model.ciModel.job.MediaJobsRequest;
 import com.qcloud.cos.model.ciModel.job.MediaListJobResponse;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoRequest;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoResponse;
+import com.qcloud.cos.model.ciModel.persistence.CIUploadResult;
 import com.qcloud.cos.model.ciModel.queue.DocListQueueResponse;
 import com.qcloud.cos.model.ciModel.queue.DocQueueRequest;
 import com.qcloud.cos.model.ciModel.queue.MediaListQueueResponse;
@@ -3803,6 +3804,29 @@ public class COSClient implements COS {
         addParameterIfNotNull(request, "pageNumber", docRequest.getPageNumber());
         addParameterIfNotNull(request, "pageSize", docRequest.getPageSize());
         return invoke(request, new Unmarshallers.DocListBucketUnmarshaller());
+    }
+
+    @Override
+    public CIUploadResult processImage(ImageProcessRequest imageProcessRequest) {
+        rejectNull(imageProcessRequest,
+                "The ImageProcessRequest parameter must be specified when requesting an object's metadata");
+        rejectNull(clientConfig.getRegion(),
+                "region is null, region in clientConfig must be specified when requesting an object's metadata");
+
+        String bucketName = imageProcessRequest.getBucketName();
+        String key = imageProcessRequest.getKey();
+
+        rejectNull(bucketName,
+                "The bucket name parameter must be specified when requesting an object's metadata");
+        rejectNull(key, "The key parameter must be specified when requesting an object's metadata");
+
+        CosHttpRequest<ImageProcessRequest> request =
+                createRequest(bucketName, key, imageProcessRequest, HttpMethodName.POST);
+        request.addParameter("image_process", null);
+        request.addHeader(Headers.PIC_OPERATIONS, Jackson.toJsonString(imageProcessRequest.getPicOperations()));
+        ObjectMetadata returnedMetadata = invoke(request, new ResponseHeaderHandlerChain<>(
+                new Unmarshallers.ImagePersistenceUnmarshaller(), new CosMetadataResponseHandler()));
+        return returnedMetadata.getCiUploadResult();
     }
 
     private void checkWorkflowParameter(MediaWorkflowRequest request) {
