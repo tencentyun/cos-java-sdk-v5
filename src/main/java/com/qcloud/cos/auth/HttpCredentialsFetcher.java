@@ -1,7 +1,6 @@
 package com.qcloud.cos.auth;
 
 import com.qcloud.cos.exception.CosClientException;
-import com.qcloud.cos.exception.CosServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,11 +32,7 @@ public abstract class HttpCredentialsFetcher implements COSCredentialsFetcher {
                             this.cosCredentialsEndpointProvider.getCredentialsEndpoint(),
                             this.cosCredentialsEndpointProvider.getRetryPolicy(),
                             this.cosCredentialsEndpointProvider.getHeaders());
-            COSCredentials credentials = parse(credentialsResponse);
-            if (credentials == null) {
-                throw new CosServiceException("credential parse failed");
-            }
-            return credentials;
+            return parse(credentialsResponse);
         } catch (URISyntaxException e) {
             throw new CosClientException("The cos credentials uri is invalid.", e);
         } catch (IOException e) {
