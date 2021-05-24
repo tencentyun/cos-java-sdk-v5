@@ -336,6 +336,13 @@ public class COSClient implements COS {
             throw new IllegalArgumentException(errorMessage);
     }
 
+    private void rejectStartWith(String value, String startStr, String errorMessage) {
+        if (value != null && !value.isEmpty() && startStr != null) {
+            if (!value.startsWith(startStr))
+                throw new IllegalArgumentException(errorMessage);
+        }
+    }
+
     protected <X extends CosServiceRequest> CosHttpRequest<X> createRequest(String bucketName,
             String key, X originalRequest, HttpMethodName httpMethod) {
         CosHttpRequest<X> httpRequest = new CosHttpRequest<X>(originalRequest);
@@ -3543,6 +3550,7 @@ public class COSClient implements COS {
         rejectNull(req.getInput().getObject(),
                 "The input parameter must be specified setting the object tags");
         this.checkRequestOutput(req.getOperation().getOutput());
+        this.rejectStartWith(req.getCallBack(),"http","The CallBack parameter mush start with http or https");
         CosHttpRequest<MediaJobsRequest> request = createRequest(req.getBucketName(), "/jobs", req, HttpMethodName.POST);
         this.setContent(request, RequestXmlFactory.convertToXmlByteArray(req), "application/xml", false);
         return invoke(request, new Unmarshallers.JobCreatUnmarshaller());

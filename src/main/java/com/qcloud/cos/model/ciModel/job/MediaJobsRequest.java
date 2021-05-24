@@ -57,6 +57,10 @@ public class MediaJobsRequest extends CIServiceRequest implements Serializable {
      * 媒体操作对象
      */
     private MediaJobOperation operation;
+    /**
+     * 回调参数
+     */
+    private String callBack;
 
 
     public String getBucketName() {
@@ -161,20 +165,31 @@ public class MediaJobsRequest extends CIServiceRequest implements Serializable {
         this.operation = operation;
     }
 
+    public String getCallBack() {
+        return callBack;
+    }
+
+    public void setCallBack(String callBack) {
+        this.callBack = callBack;
+    }
+
     @Override
     public String toString() {
-        return "MediaJobsRequest{" +
-                "bucketName='" + bucketName + '\'' +
-                ", queueId='" + queueId + '\'' +
-                ", tag='" + tag + '\'' +
-                ", orderByTime='" + orderByTime + '\'' +
-                ", nextToken='" + nextToken + '\'' +
-                ", size=" + size +
-                ", states='" + states + '\'' +
-                ", startCreationTime='" + startCreationTime + '\'' +
-                ", endCreationTime='" + endCreationTime + '\'' +
-                ", jobId='" + jobId + '\'' +
-                ", input=" + input +
-                '}';
+        final StringBuilder sb = new StringBuilder("MediaJobsRequest{");
+        sb.append("bucketName='").append(bucketName).append('\'');
+        sb.append(", queueId='").append(queueId).append('\'');
+        sb.append(", tag='").append(tag).append('\'');
+        sb.append(", orderByTime='").append(orderByTime).append('\'');
+        sb.append(", nextToken='").append(nextToken).append('\'');
+        sb.append(", size=").append(size);
+        sb.append(", states='").append(states).append('\'');
+        sb.append(", startCreationTime='").append(startCreationTime).append('\'');
+        sb.append(", endCreationTime='").append(endCreationTime).append('\'');
+        sb.append(", jobId='").append(jobId).append('\'');
+        sb.append(", input=").append(input);
+        sb.append(", operation=").append(operation);
+        sb.append(", callBack='").append(callBack).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 }
