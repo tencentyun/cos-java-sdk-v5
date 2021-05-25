@@ -39,6 +39,9 @@ import com.qcloud.cos.model.JSONOutput;
 import com.qcloud.cos.model.InputSerialization;
 import com.qcloud.cos.model.OutputSerialization;
 import com.qcloud.cos.model.ScanRange;
+import com.qcloud.cos.model.ciModel.auditing.AudioAuditingRequest;
+import com.qcloud.cos.model.ciModel.auditing.Conf;
+import com.qcloud.cos.model.ciModel.auditing.VideoAuditingRequest;
 import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
 import com.qcloud.cos.model.ciModel.job.DocJobObject;
 import com.qcloud.cos.model.ciModel.job.DocJobRequest;
@@ -662,7 +665,59 @@ public class RequestXmlFactory {
         addIfNotNull(xml, "State", request.getNotifyConfig().getState());
         xml.end();
         xml.end();
-        System.out.println(xml.toString());
+        return xml.getBytes();
+    }
+
+    /**
+     * Converts the VideoAuditingRequest to an XML fragment that can be sent to the CreateVideoAuditingJob of CI
+     *
+     * @param request The container which provides options for restoring an object
+     * @return A byte array containing the data
+     * @throws CosClientException
+     */
+    public static byte[] convertToXmlByteArray(VideoAuditingRequest request) {
+        XmlWriter xml = new XmlWriter();
+
+        xml.start("Request");
+        xml.start("Input");
+        addIfNotNull(xml,"Object",request.getInput().getObject());
+        xml.end();
+        Conf conf = request.getConf();
+        xml.start("Conf");
+        addIfNotNull(xml,"DetectType", conf.getDetectType());
+        xml.start("Snapshot");
+        addIfNotNull(xml,"Mode", conf.getSnapshot().getMode());
+        addIfNotNull(xml,"TimeInterval", conf.getSnapshot().getTimeInterval());
+        addIfNotNull(xml,"Count", conf.getSnapshot().getCount());
+        xml.end();
+        addIfNotNull(xml,"Callback", conf.getCallback());
+        xml.end();
+
+        xml.end();
+        return xml.getBytes();
+    }
+
+    /**
+     * Converts the AudioAuditingRequest to an XML fragment that can be sent to the CreateAudioAuditingJob of CI
+     *
+     * @param request The container which provides options for restoring an object
+     * @return A byte array containing the data
+     * @throws CosClientException
+     */
+    public static byte[] convertToXmlByteArray(AudioAuditingRequest request) {
+        XmlWriter xml = new XmlWriter();
+
+        xml.start("Request");
+        xml.start("Input");
+        addIfNotNull(xml,"Object",request.getInput().getObject());
+        xml.end();
+        Conf conf = request.getConf();
+        xml.start("Conf");
+        addIfNotNull(xml,"DetectType", conf.getDetectType());
+        addIfNotNull(xml,"Callback", conf.getCallback());
+        xml.end();
+
+        xml.end();
         return xml.getBytes();
     }
 
