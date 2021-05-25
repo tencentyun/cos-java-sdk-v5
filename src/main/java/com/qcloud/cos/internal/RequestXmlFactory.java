@@ -408,8 +408,8 @@ public class RequestXmlFactory {
 
         xml.end();
         xml.start("QueueId").value(request.getQueueId()).end();
+        addIfNotNull(xml,"CallBack",request.getCallBack());
         xml.end();
-        System.out.println(xml.toString());
         return xml.getBytes();
     }
 
