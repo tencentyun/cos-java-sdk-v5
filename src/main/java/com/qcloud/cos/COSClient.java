@@ -36,6 +36,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.qcloud.cos.endpoint.CIRegionEndpointBuilder;
+import com.qcloud.cos.model.ciModel.auditing.AudioAuditingRequest;
+import com.qcloud.cos.model.ciModel.auditing.AudioAuditingResponse;
+import com.qcloud.cos.model.ciModel.auditing.ImageAuditingRequest;
+import com.qcloud.cos.model.ciModel.auditing.ImageAuditingResponse;
+import com.qcloud.cos.model.ciModel.auditing.VideoAuditingRequest;
+import com.qcloud.cos.model.ciModel.auditing.VideoAuditingResponse;
 import com.qcloud.cos.model.ciModel.common.ImageProcessRequest;
 import com.qcloud.cos.model.BucketIntelligentTierConfiguration;
 import com.qcloud.cos.model.GetBucketIntelligentTierConfigurationRequest;
@@ -3835,6 +3841,60 @@ public class COSClient implements COS {
         ObjectMetadata returnedMetadata = invoke(request, new ResponseHeaderHandlerChain<>(
                 new Unmarshallers.ImagePersistenceUnmarshaller(), new CosMetadataResponseHandler()));
         return returnedMetadata.getCiUploadResult();
+    }
+
+    @Override
+    public ImageAuditingResponse imageAuditing(ImageAuditingRequest imageAuditingRequest) {
+        rejectNull(imageAuditingRequest,
+                "The imageAuditingRequest parameter must be specified setting the object tags");
+        rejectNull(imageAuditingRequest.getBucketName(),
+                "The bucketName parameter must be specified setting the object tags");
+        this.checkAuditingRequest(imageAuditingRequest);
+        CosHttpRequest<ImageAuditingRequest> request = createRequest(imageAuditingRequest.getBucketName(), imageAuditingRequest.getObjectKey(), imageAuditingRequest, HttpMethodName.GET);
+        request.addParameter("ci-process", "sensitive-content-recognition");
+        addParameterIfNotNull(request, "detect-type", imageAuditingRequest.getDetectType());
+        return invoke(request, new Unmarshallers.ImageAuditingUnmarshaller());
+    }
+
+    @Override
+    public VideoAuditingResponse createVideoAuditingJob(VideoAuditingRequest videoAuditingRequest) {
+        this.checkCIRequestCommon(videoAuditingRequest);
+        this.rejectStartWith(videoAuditingRequest.getConf().getCallback(), "http", "The Conf.CallBack parameter mush start with http or https");
+        CosHttpRequest<VideoAuditingRequest> request = createRequest(videoAuditingRequest.getBucketName(), "/video/auditing", videoAuditingRequest, HttpMethodName.POST);
+        this.setContent(request, RequestXmlFactory.convertToXmlByteArray(videoAuditingRequest), "application/xml", false);
+        return invoke(request, new Unmarshallers.VideoAuditingUnmarshaller());
+    }
+
+    @Override
+    public VideoAuditingResponse describeAuditingJob(VideoAuditingRequest videoAuditingRequest) {
+        this.checkCIRequestCommon(videoAuditingRequest);
+        rejectNull(videoAuditingRequest.getJobId(),
+                "The jobId parameter must be specified setting the object tags");
+        CosHttpRequest<VideoAuditingRequest> request = createRequest(videoAuditingRequest.getBucketName(), "/video/auditing/" + videoAuditingRequest.getJobId(), videoAuditingRequest, HttpMethodName.GET);
+        return invoke(request, new Unmarshallers.VideoAuditingJobUnmarshaller());
+    }
+
+    @Override
+    public AudioAuditingResponse createAudioAuditingJobs(AudioAuditingRequest audioAuditingRequest) {
+        this.checkCIRequestCommon(audioAuditingRequest);
+        this.rejectStartWith(audioAuditingRequest.getConf().getCallback(), "http", "The Conf.CallBack parameter mush start with http or https");
+        CosHttpRequest<AudioAuditingRequest> request = createRequest(audioAuditingRequest.getBucketName(), "/audio/auditing", audioAuditingRequest, HttpMethodName.POST);
+        this.setContent(request, RequestXmlFactory.convertToXmlByteArray(audioAuditingRequest), "application/xml", false);
+        return invoke(request, new Unmarshallers.AudioAuditingUnmarshaller());
+    }
+
+    @Override
+    public AudioAuditingResponse describeAudioAuditingJob(AudioAuditingRequest audioAuditingRequest) {
+        this.checkCIRequestCommon(audioAuditingRequest);
+        rejectNull(audioAuditingRequest.getJobId(),
+                "The jobId parameter must be specified setting the object tags");
+        CosHttpRequest<AudioAuditingRequest> request = createRequest(audioAuditingRequest.getBucketName(), "/audio/auditing/" + audioAuditingRequest.getJobId(), audioAuditingRequest, HttpMethodName.GET);
+        return invoke(request, new Unmarshallers.AudioAuditingJobUnmarshaller());
+    }
+
+    private void checkAuditingRequest(ImageAuditingRequest request) {
+        rejectNull(request.getDetectType(), "The detectType parameter must be specified setting the object tags");
+        rejectNull(request.getObjectKey(), "The detectType parameter must be specified setting the object tags");
     }
 
     private void checkWorkflowParameter(MediaWorkflowRequest request) {

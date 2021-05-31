@@ -23,6 +23,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
@@ -31,6 +32,12 @@ import java.util.Map;
 import java.util.LinkedHashMap;
 
 import com.qcloud.cos.model.BucketIntelligentTierConfiguration;
+import com.qcloud.cos.model.ciModel.auditing.AudioAuditingResponse;
+import com.qcloud.cos.model.ciModel.auditing.AuditingJobsDetail;
+import com.qcloud.cos.model.ciModel.auditing.AudtingCommonInfo;
+import com.qcloud.cos.model.ciModel.auditing.ImageAuditingResponse;
+import com.qcloud.cos.model.ciModel.auditing.SnapshotInfo;
+import com.qcloud.cos.model.ciModel.auditing.VideoAuditingResponse;
 import com.qcloud.cos.model.ciModel.bucket.DocBucketObject;
 import com.qcloud.cos.model.ciModel.bucket.DocBucketResponse;
 import com.qcloud.cos.model.ciModel.bucket.MediaBucketObject;
@@ -716,6 +723,36 @@ public class XmlResponsesSaxParser {
 
     public DescribeDocProcessJobsHandler parseDocJobListResponse(InputStream inputStream) throws IOException {
         DescribeDocProcessJobsHandler handler = new DescribeDocProcessJobsHandler();
+        parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
+        return handler;
+    }
+
+    public ImageAuditingHandler parseImageAuditingResponse(InputStream inputStream) throws IOException {
+        ImageAuditingHandler handler = new ImageAuditingHandler();
+        parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
+        return handler;
+    }
+
+    public CreateVideoAuditingJobHandler parseVideoAuditingJobResponse(InputStream inputStream) throws IOException {
+        CreateVideoAuditingJobHandler handler = new CreateVideoAuditingJobHandler();
+        parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
+        return handler;
+    }
+
+    public CreateAudioAuditingJobHandler parseAudioAuditingJobResponse(InputStream inputStream) throws IOException {
+        CreateAudioAuditingJobHandler handler = new CreateAudioAuditingJobHandler();
+        parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
+        return handler;
+    }
+
+    public DescribeVideoAuditingJobHandler parseDescribeVideoAuditingJobResponse(InputStream inputStream) throws IOException {
+        DescribeVideoAuditingJobHandler handler = new DescribeVideoAuditingJobHandler();
+        parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
+        return handler;
+    }
+
+    public DescribeAudioAuditingJobHandler parseDescribeAudioAuditingJobResponse(InputStream inputStream) throws IOException {
+        DescribeAudioAuditingJobHandler handler = new DescribeAudioAuditingJobHandler();
         parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
         return handler;
     }
@@ -5085,6 +5122,316 @@ public class XmlResponsesSaxParser {
 
         public DocBucketResponse getResponse() {
             return response;
+        }
+    }
+
+    public static class ImageAuditingHandler extends AbstractHandler {
+        private ImageAuditingResponse response = new ImageAuditingResponse();
+
+        @Override
+        protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
+
+        }
+
+        @Override
+        protected void doEndElement(String uri, String name, String qName) {
+            if (in("RecognitionResult", "PornInfo")) {
+                parseInfo(response.getPornInfo(), name, getText());
+            } else if (in("RecognitionResult", "PoliticsInfo")) {
+                parseInfo(response.getPoliticsInfo(), name, getText());
+            } else if (in("RecognitionResult", "TerroristInfo")) {
+                parseInfo(response.getTerroristInfo(), name, getText());
+            } else if (in("RecognitionResult", "AdsInfo")) {
+                parseInfo(response.getAdsInfo(), name, getText());
+            }
+        }
+
+        private void parseInfo(AudtingCommonInfo obj, String name, String value) {
+            switch (name) {
+                case "Code":
+                    obj.setCode(value);
+                    break;
+                case "Msg":
+                    obj.setMsg(getText());
+                    break;
+                case "HitFlag":
+                    obj.setHitFlag(getText());
+                    break;
+                case "Score":
+                    obj.setScore(getText());
+                    break;
+                case "Label":
+                    obj.setLabel(getText());
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        public ImageAuditingResponse getResponse() {
+            return response;
+        }
+    }
+
+    public static class DescribeVideoAuditingJobHandler extends AbstractHandler {
+
+        private VideoAuditingResponse response = new VideoAuditingResponse();
+
+        @Override
+        protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
+            List<SnapshotInfo> snapshotList = response.getJobsDetail().getSnapshotList();
+            if (in("Response", "JobsDetail") && "Snapshot".equals(name)) {
+                snapshotList.add(new SnapshotInfo());
+            }
+        }
+
+        @Override
+        protected void doEndElement(String uri, String name, String qName) {
+            List<SnapshotInfo> snapshotList = response.getJobsDetail().getSnapshotList();
+            if (in("Response", "JobsDetail")) {
+                AuditingJobsDetail jobsDetail = response.getJobsDetail();
+                switch (name) {
+                    case "Code":
+                        jobsDetail.setCode(getText());
+                        break;
+                    case "Message":
+                        jobsDetail.setMessage(getText());
+                        break;
+                    case "JobId":
+                        jobsDetail.setJobId(getText());
+                        break;
+                    case "State":
+                        jobsDetail.setState(getText());
+                        break;
+                    case "CreationTime":
+                        jobsDetail.setCreationTime(getText());
+                        break;
+                    case "Object":
+                        jobsDetail.setObject(getText());
+                        break;
+                    case "SnapshotCount":
+                        jobsDetail.setSnapshotCount(getText());
+                        break;
+                    case "Result":
+                        jobsDetail.setResult(getText());
+                        break;
+                    default:
+                        break;
+                }
+            } else if (in("Response", "JobsDetail", "PornInfo")) {
+                parseInfo(response.getJobsDetail().getPornInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "PoliticsInfo")) {
+                parseInfo(response.getJobsDetail().getPoliticsInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "TerrorismInfo")) {
+                parseInfo(response.getJobsDetail().getTerroristInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "AdsInfo")) {
+                parseInfo(response.getJobsDetail().getAdsInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "Snapshot")) {
+                SnapshotInfo snapshotInfo = snapshotList.get(snapshotList.size() - 1);
+                if ("Url".equals(name))
+                    snapshotInfo.setUrl(URLDecoder.decode(getText()));
+            } else if (in("Response", "JobsDetail", "Snapshot", "PornInfo")) {
+                SnapshotInfo snapshotInfo = snapshotList.get(snapshotList.size() - 1);
+                parseInfo(snapshotInfo.getPornInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "Snapshot", "PoliticsInfo")) {
+                SnapshotInfo snapshotInfo = snapshotList.get(snapshotList.size() - 1);
+                parseInfo(snapshotInfo.getPoliticsInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "Snapshot", "TerrorismInfo")) {
+                SnapshotInfo snapshotInfo = snapshotList.get(snapshotList.size() - 1);
+                parseInfo(snapshotInfo.getTerroristInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "Snapshot", "AdsInfo")) {
+                SnapshotInfo snapshotInfo = snapshotList.get(snapshotList.size() - 1);
+                parseInfo(snapshotInfo.getAdsInfo(), name, getText());
+            }
+        }
+
+        private void parseInfo(AudtingCommonInfo obj, String name, String value) {
+            switch (name) {
+                case "Code":
+                    obj.setCode(value);
+                    break;
+                case "Msg":
+                    obj.setMsg(getText());
+                    break;
+                case "HitFlag":
+                    obj.setHitFlag(getText());
+                    break;
+                case "Score":
+                    obj.setScore(getText());
+                    break;
+                case "Label":
+                    obj.setLabel(getText());
+                    break;
+                case "Count":
+                    obj.setCount(getText());
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        public VideoAuditingResponse getResponse() {
+            return response;
+        }
+
+        public void setResponse(VideoAuditingResponse response) {
+            this.response = response;
+        }
+    }
+
+    public static class CreateVideoAuditingJobHandler extends AbstractHandler {
+        private VideoAuditingResponse response = new VideoAuditingResponse();
+
+        @Override
+        protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
+
+        }
+
+        @Override
+        protected void doEndElement(String uri, String name, String qName) {
+            if (in("Response", "JobsDetail")) {
+                AuditingJobsDetail jobsDetail = response.getJobsDetail();
+                switch (name) {
+                    case "JobId":
+                        jobsDetail.setJobId(getText());
+                        break;
+                    case "State":
+                        jobsDetail.setState(getText());
+                        break;
+                    case "CreationTime":
+                        jobsDetail.setCreationTime(getText());
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        public VideoAuditingResponse getResponse() {
+            return response;
+        }
+
+        public void setResponse(VideoAuditingResponse response) {
+            this.response = response;
+        }
+    }
+
+    public static class DescribeAudioAuditingJobHandler extends AbstractHandler {
+        private AudioAuditingResponse response = new AudioAuditingResponse();
+
+        @Override
+        protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
+
+        }
+
+        @Override
+        protected void doEndElement(String uri, String name, String qName) {
+            if (in("Response", "JobsDetail")) {
+                AuditingJobsDetail jobsDetail = response.getJobsDetail();
+                switch (name) {
+                    case "Code":
+                        jobsDetail.setCode(getText());
+                        break;
+                    case "Message":
+                        jobsDetail.setMessage(getText());
+                        break;
+                    case "JobId":
+                        jobsDetail.setJobId(getText());
+                        break;
+                    case "State":
+                        jobsDetail.setState(getText());
+                        break;
+                    case "CreationTime":
+                        jobsDetail.setCreationTime(getText());
+                        break;
+                    case "Object":
+                        jobsDetail.setObject(getText());
+                        break;
+                    case "Result":
+                        jobsDetail.setResult(getText());
+                        break;
+                    default:
+                        break;
+                }
+            } else if (in("Response", "JobsDetail", "PornInfo")) {
+                parseInfo(response.getJobsDetail().getPornInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "PoliticsInfo")) {
+                parseInfo(response.getJobsDetail().getPoliticsInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "TerrorismInfo")) {
+                parseInfo(response.getJobsDetail().getTerroristInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "AdsInfo")) {
+                parseInfo(response.getJobsDetail().getAdsInfo(), name, getText());
+            }
+        }
+
+        private void parseInfo(AudtingCommonInfo obj, String name, String value) {
+            switch (name) {
+                case "Code":
+                    obj.setCode(value);
+                    break;
+                case "Msg":
+                    obj.setMsg(getText());
+                    break;
+                case "HitFlag":
+                    obj.setHitFlag(getText());
+                    break;
+                case "Score":
+                    obj.setScore(getText());
+                    break;
+                case "Label":
+                    obj.setLabel(getText());
+                    break;
+                case "Count":
+                    obj.setCount(getText());
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        public AudioAuditingResponse getResponse() {
+            return response;
+        }
+
+        public void setResponse(AudioAuditingResponse response) {
+            this.response = response;
+        }
+    }
+
+    public static class CreateAudioAuditingJobHandler extends AbstractHandler {
+        private AudioAuditingResponse response = new AudioAuditingResponse();
+
+        @Override
+        protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
+
+        }
+
+        @Override
+        protected void doEndElement(String uri, String name, String qName) {
+            if (in("Response", "JobsDetail")) {
+                AuditingJobsDetail jobsDetail = response.getJobsDetail();
+                switch (name) {
+                    case "JobId":
+                        jobsDetail.setJobId(getText());
+                        break;
+                    case "State":
+                        jobsDetail.setState(getText());
+                        break;
+                    case "CreationTime":
+                        jobsDetail.setCreationTime(getText());
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        public AudioAuditingResponse getResponse() {
+            return response;
+        }
+
+        public void setResponse(AudioAuditingResponse response) {
+            this.response = response;
         }
     }
 

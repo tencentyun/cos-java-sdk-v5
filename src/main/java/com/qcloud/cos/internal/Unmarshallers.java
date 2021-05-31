@@ -44,6 +44,9 @@ import com.qcloud.cos.model.BucketReplicationConfiguration;
 import com.qcloud.cos.model.BucketLoggingConfiguration;
 import com.qcloud.cos.model.DeleteObjectTaggingResult;
 import com.qcloud.cos.model.ObjectMetadata;
+import com.qcloud.cos.model.ciModel.auditing.AudioAuditingResponse;
+import com.qcloud.cos.model.ciModel.auditing.ImageAuditingResponse;
+import com.qcloud.cos.model.ciModel.auditing.VideoAuditingResponse;
 import com.qcloud.cos.model.ciModel.bucket.DocBucketResponse;
 import com.qcloud.cos.model.ciModel.bucket.MediaBucketResponse;
 import com.qcloud.cos.model.ciModel.job.DocJobListResponse;
@@ -56,7 +59,6 @@ import com.qcloud.cos.model.ciModel.queue.MediaListQueueResponse;
 import com.qcloud.cos.model.ciModel.queue.MediaQueueResponse;
 import com.qcloud.cos.model.ciModel.snapshot.SnapshotResponse;
 import com.qcloud.cos.model.ciModel.template.MediaListTemplateResponse;
-import com.qcloud.cos.model.ciModel.template.MediaTemplateObject;
 import com.qcloud.cos.model.ciModel.template.MediaTemplateResponse;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowExecutionResponse;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowExecutionsResponse;
@@ -596,6 +598,51 @@ public class Unmarshallers {
         public DocJobListResponse unmarshall(InputStream in) throws Exception {
             return new XmlResponsesSaxParser()
                     .parseDocJobListResponse(in).getResponse();
+        }
+    }
+
+    public static final class ImageAuditingUnmarshaller
+            implements Unmarshaller<ImageAuditingResponse, InputStream> {
+
+        public ImageAuditingResponse unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser()
+                    .parseImageAuditingResponse(in).getResponse();
+        }
+    }
+
+    public static final class VideoAuditingUnmarshaller
+            implements Unmarshaller<VideoAuditingResponse, InputStream> {
+
+        public VideoAuditingResponse unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser()
+                    .parseVideoAuditingJobResponse(in).getResponse();
+        }
+    }
+
+    public static final class VideoAuditingJobUnmarshaller
+            implements Unmarshaller<VideoAuditingResponse, InputStream> {
+
+        public VideoAuditingResponse unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser()
+                    .parseDescribeVideoAuditingJobResponse(in).getResponse();
+        }
+    }
+
+    public static final class AudioAuditingUnmarshaller
+            implements Unmarshaller<AudioAuditingResponse, InputStream> {
+
+        public AudioAuditingResponse unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser()
+                    .parseAudioAuditingJobResponse(in).getResponse();
+        }
+    }
+
+    public static final class AudioAuditingJobUnmarshaller
+            implements Unmarshaller<AudioAuditingResponse, InputStream> {
+
+        public AudioAuditingResponse unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser()
+                    .parseDescribeAudioAuditingJobResponse(in).getResponse();
         }
     }
 }
