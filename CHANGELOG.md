@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ###Added
 -  add content auditing api and demo
+-  copy object get version id
+-  demo of copy object with user metadata
 
 ## [5.6.43] - 2021-5-24
 

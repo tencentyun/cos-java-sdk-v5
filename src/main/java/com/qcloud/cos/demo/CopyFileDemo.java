@@ -1,5 +1,6 @@
 package com.qcloud.cos.demo;
 
+import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -12,9 +13,12 @@ import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.model.CopyObjectRequest;
 import com.qcloud.cos.model.CopyObjectResult;
 import com.qcloud.cos.model.CopyResult;
+import com.qcloud.cos.model.GetObjectRequest;
+import com.qcloud.cos.model.ObjectMetadata;
 import com.qcloud.cos.region.Region;
 import com.qcloud.cos.transfer.Copy;
 import com.qcloud.cos.transfer.TransferManager;
+import com.qcloud.cos.utils.Md5Utils;
 
 
 public class CopyFileDemo {
@@ -95,5 +99,65 @@ public class CopyFileDemo {
         transferManager.shutdownNow();
         srcCOSClient.shutdown();
         cosclient.shutdown();
+    }
+
+    public static void copyWithNewMetaDataDemo() {
+        // 1 初始化用户身份信息(secretId, secretKey)
+        COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
+        // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
+        ClientConfig clientConfig = new ClientConfig(new Region("ap-beijing-1"));
+        // 3 生成cos客户端
+        COSClient cosclient = new COSClient(cred, clientConfig);
+
+        ExecutorService threadPool = Executors.newFixedThreadPool(32);
+        // 传入一个threadpool, 若不传入线程池, 默认TransferManager中会生成一个单线程的线程池。
+        TransferManager transferManager = new TransferManager(cosclient, threadPool);
+
+        // 要拷贝的bucket region, 支持跨园区拷贝
+        Region srcBucketRegion = new Region("ap-shanghai");
+        // 源bucket, bucket名需包含appid
+        String srcBucketName = "srcBucket-1251668577";
+        // 要拷贝的源文件
+        String srcKey = "aaa/bbb.txt";
+        // 目的bucket, bucket名需包含appid
+        String destBucketName = "destBucket-1251668577";
+        // 要拷贝的目的文件
+        String destKey = "ccc/ddd.txt";
+
+        ClientConfig srcClientConfig = new ClientConfig(srcBucketRegion);
+        COSClient srcCosclient = new COSClient(cred, srcClientConfig);
+        GetObjectRequest getReq = new GetObjectRequest(srcBucketName, srcKey);
+
+        File srcFile = new File("srcFile");
+
+        srcCosclient.getObject(getReq, srcFile);
+
+        String srcMD5 = "";
+        try {
+            srcMD5 = Md5Utils.md5Hex(srcFile);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        ObjectMetadata destMeta = new ObjectMetadata();
+        destMeta.addUserMetadata("md5", srcMD5);
+
+        CopyObjectRequest copyObjectRequest = new CopyObjectRequest(srcBucketRegion, srcBucketName,
+                srcKey, destBucketName, destKey);
+        copyObjectRequest.setNewObjectMetadata(destMeta);
+
+        try {
+            CopyObjectResult copyObjectResult = cosclient.copyObject(copyObjectRequest);
+            System.out.print(copyObjectResult.getRequestId());
+        } catch (CosServiceException e) {
+            e.printStackTrace();
+        } catch (CosClientException e) {
+            e.printStackTrace();
+        }
+        cosclient.shutdown();
+    }
+
+    public static void main(String[] args) {
+        copyWithNewMetaDataDemo();
     }
 }
