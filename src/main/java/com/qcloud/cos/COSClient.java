@@ -2059,7 +2059,6 @@ public class COSClient implements COS {
                             new Unmarshallers.CopyObjectUnmarshaller(),
                             // header handlers
                             new ServerSideEncryptionHeaderHandler<CopyObjectResultHandler>(),
-                            new COSVersionHeaderHandler(),
                             new ObjectExpirationHeaderHandler<CopyObjectResultHandler>(),
                             new VIDResultHandler<CopyObjectResultHandler>());
             copyObjectResultHandler = invoke(request, handler);
