@@ -42,12 +42,11 @@ public class InstanceCredentialsUtils {
     public String readResource(URI endpoint, CredentialsEndpointRetryPolicy retryPolicy, Map<String, String> headers) throws IOException {
         int retriesAttempted = 0;
         InputStream inputStream = null;
-
-        headers = addDefaultHeader(headers);
+        Map<String, String> fullHeader = addDefaultHeader(headers);
 
         while (true) {
             try {
-                HttpURLConnection connection = this.connectionUtils.connectToEndpoint(endpoint, headers);
+                HttpURLConnection connection = this.connectionUtils.connectToEndpoint(endpoint, fullHeader);
                 int statusCode = connection.getResponseCode();
 
                 if (statusCode == HttpURLConnection.HTTP_OK) {
@@ -105,15 +104,13 @@ public class InstanceCredentialsUtils {
     }
 
     private Map<String, String> addDefaultHeader(Map<String, String> headers) {
-        HashMap<String, String> map = new HashMap<String, String>();
-        if (headers != null) {
-            map.putAll(headers);
-        }
+        Map<String, String> fullHeader = new HashMap<>(headers);
 
-        putIfAbsent(map,"User-Agent", USER_AGENT);
-        putIfAbsent(map,"Accept", "*/*");
-        putIfAbsent(map,"Connection", "keep-alive");
-        return map;
+        putIfAbsent(fullHeader,"User-Agent", USER_AGENT);
+        putIfAbsent(fullHeader,"Accept", "*/*");
+        putIfAbsent(fullHeader,"Connection", "keep-alive");
+
+        return fullHeader;
     }
 
     private <K, V> void putIfAbsent(Map<K, V> map, K key, V value) {

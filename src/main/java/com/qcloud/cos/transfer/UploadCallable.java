@@ -142,6 +142,7 @@ public class UploadCallable implements Callable<UploadResult> {
         uploadResult.setRequestId(putObjectResult.getRequestId());
         uploadResult.setDateStr(putObjectResult.getDateStr());
         uploadResult.setCrc64Ecma(putObjectResult.getCrc64Ecma());
+        uploadResult.setCiUploadResult(putObjectResult.getCiUploadResult());
         return uploadResult;
     }
 
@@ -279,6 +280,9 @@ public class UploadCallable implements Callable<UploadResult> {
             objMeta.setUserMetadata(origMeta.getUserMetadata());
             req.setObjectMetadata(objMeta);
         }
+        if(origReq.getPicOperations() != null) {
+            req.setPicOperations(origReq.getPicOperations());
+        }
 
         TransferManagerUtils.populateEndpointAddr(origReq, req);
         CompleteMultipartUploadResult res = cos.completeMultipartUpload(req);
@@ -291,6 +295,7 @@ public class UploadCallable implements Callable<UploadResult> {
         uploadResult.setRequestId(res.getRequestId());
         uploadResult.setDateStr(res.getDateStr());
         uploadResult.setCrc64Ecma(res.getCrc64Ecma());
+        uploadResult.setCiUploadResult(res.getCiUploadResult());
         return uploadResult;
     }
 

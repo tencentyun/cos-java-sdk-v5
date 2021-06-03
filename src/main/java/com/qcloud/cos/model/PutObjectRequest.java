@@ -228,5 +228,4 @@ public class PutObjectRequest extends AbstractPutObjectRequest implements Serial
         return super.withSSECOSKeyManagementParams(sseCOSKeyManagementParams);
     }
     
-    
 }

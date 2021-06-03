@@ -446,9 +446,39 @@ public class TransferManagerDemo {
         cosclient.shutdown();
     }
 
+    public static void resumableDownloadFile() {
+        // 1 初始化用户身份信息(secretId, secretKey)
+        COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
+        // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
+        ClientConfig clientConfig = new ClientConfig(new Region("ap-shanghai"));
+        // 3 生成cos客户端
+        COSClient cosclient = new COSClient(cred, clientConfig);
+
+        ExecutorService threadPool = Executors.newFixedThreadPool(5);
+        // 传入一个threadpool, 若不传入线程池, 默认TransferManager中会生成一个单线程的线程池。
+        TransferManager transferManager = new TransferManager(cosclient, threadPool);
+
+        GetObjectRequest getObj = new GetObjectRequest("mybucket-1000000000", "/path/to/key");
+
+        File dstFile = new File("dstFile");
+        Download download = transferManager.download(getObj, dstFile, true);
+        showTransferProgress(download);
+        try {
+            download.waitForCompletion();
+        } catch (CosServiceException e) {
+            e.printStackTrace();
+        } catch (CosClientException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        transferManager.shutdownNow();
+        cosclient.shutdown();
+    }
 
     public static void main(String[] args) {
         //multipartUploadWithMetaData();
-        copyFileSetMetadata();
+        resumableDownloadFile();
     }
 }

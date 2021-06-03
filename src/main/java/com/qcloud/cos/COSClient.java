@@ -34,9 +34,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.regex.Pattern;
 
 import com.qcloud.cos.endpoint.CIRegionEndpointBuilder;
+import com.qcloud.cos.model.ciModel.auditing.AudioAuditingRequest;
+import com.qcloud.cos.model.ciModel.auditing.AudioAuditingResponse;
+import com.qcloud.cos.model.ciModel.auditing.ImageAuditingRequest;
+import com.qcloud.cos.model.ciModel.auditing.ImageAuditingResponse;
+import com.qcloud.cos.model.ciModel.auditing.VideoAuditingRequest;
+import com.qcloud.cos.model.ciModel.auditing.VideoAuditingResponse;
+import com.qcloud.cos.model.ciModel.common.ImageProcessRequest;
 import com.qcloud.cos.model.BucketIntelligentTierConfiguration;
 import com.qcloud.cos.model.GetBucketIntelligentTierConfigurationRequest;
 import com.qcloud.cos.model.SetBucketIntelligentTierConfigurationRequest;
@@ -55,6 +61,7 @@ import com.qcloud.cos.model.ciModel.job.MediaJobsRequest;
 import com.qcloud.cos.model.ciModel.job.MediaListJobResponse;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoRequest;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoResponse;
+import com.qcloud.cos.model.ciModel.persistence.CIUploadResult;
 import com.qcloud.cos.model.ciModel.queue.DocListQueueResponse;
 import com.qcloud.cos.model.ciModel.queue.DocQueueRequest;
 import com.qcloud.cos.model.ciModel.queue.MediaListQueueResponse;
@@ -70,6 +77,7 @@ import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowExecutionsResponse;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowListRequest;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowListResponse;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowRequest;
+import com.qcloud.cos.utils.Jackson;
 import org.apache.commons.codec.DecoderException;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.ContentType;
@@ -332,6 +340,13 @@ public class COSClient implements COS {
     private void rejectEmpty(Map parameterValue, String errorMessage) {
         if (parameterValue.isEmpty())
             throw new IllegalArgumentException(errorMessage);
+    }
+
+    private void rejectStartWith(String value, String startStr, String errorMessage) {
+        if (value != null && !value.isEmpty() && startStr != null) {
+            if (!value.startsWith(startStr))
+                throw new IllegalArgumentException(errorMessage);
+        }
     }
 
     protected <X extends CosServiceRequest> CosHttpRequest<X> createRequest(String bucketName,
@@ -663,6 +678,7 @@ public class COSClient implements COS {
         result.setSSECustomerKeyMd5(metadata.getSSECustomerKeyMd5());
         result.setCrc64Ecma(metadata.getCrc64Ecma());
         result.setMetadata(metadata);
+        result.setCiUploadResult(metadata.getCiUploadResult());
         return result;
     }
 
@@ -1011,7 +1027,13 @@ public class COSClient implements COS {
             populateRequestMetadata(request, metadata);
             request.setContent(input);
             try {
-                returnedMetadata = invoke(request, new CosMetadataResponseHandler());
+                if(uploadObjectRequest.getPicOperations() != null) {
+                    request.addHeader(Headers.PIC_OPERATIONS, Jackson.toJsonString(uploadObjectRequest.getPicOperations()));
+                    returnedMetadata = invoke(request, new ResponseHeaderHandlerChain<ObjectMetadata>(
+                            new Unmarshallers.ImagePersistenceUnmarshaller(), new CosMetadataResponseHandler()));
+                } else {
+                    returnedMetadata = invoke(request, new CosMetadataResponseHandler());
+                }
             } catch (Throwable t) {
                 throw Throwables.failure(t);
             }
@@ -1767,7 +1789,10 @@ public class COSClient implements COS {
                 populateRequestMetadata(request, objectMetadata);
             }
             request.setContent(new ByteArrayInputStream(xml));
-
+            if(completeMultipartUploadRequest.getPicOperations() != null) {
+                request.addHeader(Headers.PIC_OPERATIONS, Jackson.toJsonString(
+                        completeMultipartUploadRequest.getPicOperations()));
+            }
             @SuppressWarnings("unchecked")
             ResponseHeaderHandlerChain<CompleteMultipartUploadHandler> responseHandler =
                     new ResponseHeaderHandlerChain<CompleteMultipartUploadHandler>(
@@ -1784,6 +1809,10 @@ public class COSClient implements COS {
                 String crc64Ecma = responseHeaders.get(Headers.COS_HASH_CRC64_ECMA);
                 handler.getCompleteMultipartUploadResult().setVersionId(versionId);
                 handler.getCompleteMultipartUploadResult().setCrc64Ecma(crc64Ecma);
+                // if ci request, set ciUploadResult to CompleteMultipartUploadResult
+                if(completeMultipartUploadRequest.getPicOperations() != null) {
+                    handler.getCompleteMultipartUploadResult().setCiUploadResult(handler.getCiUploadResult());
+                }
                 return handler.getCompleteMultipartUploadResult();
             }
         } while (shouldRetryCompleteMultipartUpload(completeMultipartUploadRequest,
@@ -2030,7 +2059,6 @@ public class COSClient implements COS {
                             new Unmarshallers.CopyObjectUnmarshaller(),
                             // header handlers
                             new ServerSideEncryptionHeaderHandler<CopyObjectResultHandler>(),
-                            new COSVersionHeaderHandler(),
                             new ObjectExpirationHeaderHandler<CopyObjectResultHandler>(),
                             new VIDResultHandler<CopyObjectResultHandler>());
             copyObjectResultHandler = invoke(request, handler);
@@ -3527,6 +3555,7 @@ public class COSClient implements COS {
         rejectNull(req.getInput().getObject(),
                 "The input parameter must be specified setting the object tags");
         this.checkRequestOutput(req.getOperation().getOutput());
+        this.rejectStartWith(req.getCallBack(),"http","The CallBack parameter mush start with http or https");
         CosHttpRequest<MediaJobsRequest> request = createRequest(req.getBucketName(), "/jobs", req, HttpMethodName.POST);
         this.setContent(request, RequestXmlFactory.convertToXmlByteArray(req), "application/xml", false);
         return invoke(request, new Unmarshallers.JobCreatUnmarshaller());
@@ -3788,6 +3817,83 @@ public class COSClient implements COS {
         addParameterIfNotNull(request, "pageNumber", docRequest.getPageNumber());
         addParameterIfNotNull(request, "pageSize", docRequest.getPageSize());
         return invoke(request, new Unmarshallers.DocListBucketUnmarshaller());
+    }
+
+    @Override
+    public CIUploadResult processImage(ImageProcessRequest imageProcessRequest) {
+        rejectNull(imageProcessRequest,
+                "The ImageProcessRequest parameter must be specified when requesting an object's metadata");
+        rejectNull(clientConfig.getRegion(),
+                "region is null, region in clientConfig must be specified when requesting an object's metadata");
+
+        String bucketName = imageProcessRequest.getBucketName();
+        String key = imageProcessRequest.getKey();
+
+        rejectNull(bucketName,
+                "The bucket name parameter must be specified when requesting an object's metadata");
+        rejectNull(key, "The key parameter must be specified when requesting an object's metadata");
+
+        CosHttpRequest<ImageProcessRequest> request =
+                createRequest(bucketName, key, imageProcessRequest, HttpMethodName.POST);
+        request.addParameter("image_process", null);
+        request.addHeader(Headers.PIC_OPERATIONS, Jackson.toJsonString(imageProcessRequest.getPicOperations()));
+        ObjectMetadata returnedMetadata = invoke(request, new ResponseHeaderHandlerChain<>(
+                new Unmarshallers.ImagePersistenceUnmarshaller(), new CosMetadataResponseHandler()));
+        return returnedMetadata.getCiUploadResult();
+    }
+
+    @Override
+    public ImageAuditingResponse imageAuditing(ImageAuditingRequest imageAuditingRequest) {
+        rejectNull(imageAuditingRequest,
+                "The imageAuditingRequest parameter must be specified setting the object tags");
+        rejectNull(imageAuditingRequest.getBucketName(),
+                "The bucketName parameter must be specified setting the object tags");
+        this.checkAuditingRequest(imageAuditingRequest);
+        CosHttpRequest<ImageAuditingRequest> request = createRequest(imageAuditingRequest.getBucketName(), imageAuditingRequest.getObjectKey(), imageAuditingRequest, HttpMethodName.GET);
+        request.addParameter("ci-process", "sensitive-content-recognition");
+        addParameterIfNotNull(request, "detect-type", imageAuditingRequest.getDetectType());
+        return invoke(request, new Unmarshallers.ImageAuditingUnmarshaller());
+    }
+
+    @Override
+    public VideoAuditingResponse createVideoAuditingJob(VideoAuditingRequest videoAuditingRequest) {
+        this.checkCIRequestCommon(videoAuditingRequest);
+        this.rejectStartWith(videoAuditingRequest.getConf().getCallback(), "http", "The Conf.CallBack parameter mush start with http or https");
+        CosHttpRequest<VideoAuditingRequest> request = createRequest(videoAuditingRequest.getBucketName(), "/video/auditing", videoAuditingRequest, HttpMethodName.POST);
+        this.setContent(request, RequestXmlFactory.convertToXmlByteArray(videoAuditingRequest), "application/xml", false);
+        return invoke(request, new Unmarshallers.VideoAuditingUnmarshaller());
+    }
+
+    @Override
+    public VideoAuditingResponse describeAuditingJob(VideoAuditingRequest videoAuditingRequest) {
+        this.checkCIRequestCommon(videoAuditingRequest);
+        rejectNull(videoAuditingRequest.getJobId(),
+                "The jobId parameter must be specified setting the object tags");
+        CosHttpRequest<VideoAuditingRequest> request = createRequest(videoAuditingRequest.getBucketName(), "/video/auditing/" + videoAuditingRequest.getJobId(), videoAuditingRequest, HttpMethodName.GET);
+        return invoke(request, new Unmarshallers.VideoAuditingJobUnmarshaller());
+    }
+
+    @Override
+    public AudioAuditingResponse createAudioAuditingJobs(AudioAuditingRequest audioAuditingRequest) {
+        this.checkCIRequestCommon(audioAuditingRequest);
+        this.rejectStartWith(audioAuditingRequest.getConf().getCallback(), "http", "The Conf.CallBack parameter mush start with http or https");
+        CosHttpRequest<AudioAuditingRequest> request = createRequest(audioAuditingRequest.getBucketName(), "/audio/auditing", audioAuditingRequest, HttpMethodName.POST);
+        this.setContent(request, RequestXmlFactory.convertToXmlByteArray(audioAuditingRequest), "application/xml", false);
+        return invoke(request, new Unmarshallers.AudioAuditingUnmarshaller());
+    }
+
+    @Override
+    public AudioAuditingResponse describeAudioAuditingJob(AudioAuditingRequest audioAuditingRequest) {
+        this.checkCIRequestCommon(audioAuditingRequest);
+        rejectNull(audioAuditingRequest.getJobId(),
+                "The jobId parameter must be specified setting the object tags");
+        CosHttpRequest<AudioAuditingRequest> request = createRequest(audioAuditingRequest.getBucketName(), "/audio/auditing/" + audioAuditingRequest.getJobId(), audioAuditingRequest, HttpMethodName.GET);
+        return invoke(request, new Unmarshallers.AudioAuditingJobUnmarshaller());
+    }
+
+    private void checkAuditingRequest(ImageAuditingRequest request) {
+        rejectNull(request.getDetectType(), "The detectType parameter must be specified setting the object tags");
+        rejectNull(request.getObjectKey(), "The detectType parameter must be specified setting the object tags");
     }
 
     private void checkWorkflowParameter(MediaWorkflowRequest request) {

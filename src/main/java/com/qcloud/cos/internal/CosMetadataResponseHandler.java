@@ -21,7 +21,8 @@ package com.qcloud.cos.internal;
 import com.qcloud.cos.http.CosHttpResponse;
 import com.qcloud.cos.model.ObjectMetadata;
 
-public class CosMetadataResponseHandler extends AbstractCosResponseHandler<ObjectMetadata>{
+public class CosMetadataResponseHandler extends AbstractCosResponseHandler<ObjectMetadata>
+        implements HeaderHandler<ObjectMetadata>{
 
     @Override
     public CosServiceResponse<ObjectMetadata> handle(CosHttpResponse response) throws Exception {
@@ -33,4 +34,8 @@ public class CosMetadataResponseHandler extends AbstractCosResponseHandler<Objec
         return cosResponse;
     }
 
+    @Override
+    public void handle(ObjectMetadata result, CosHttpResponse response) {
+        populateObjectMetadata(response, result);
+    }
 }

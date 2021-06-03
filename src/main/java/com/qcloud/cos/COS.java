@@ -32,6 +32,13 @@ import com.qcloud.cos.http.HttpMethodName;
 import com.qcloud.cos.internal.COSDirectSpi;
 import com.qcloud.cos.model.AbortMultipartUploadRequest;
 import com.qcloud.cos.model.AccessControlList;
+import com.qcloud.cos.model.ciModel.auditing.AudioAuditingRequest;
+import com.qcloud.cos.model.ciModel.auditing.AudioAuditingResponse;
+import com.qcloud.cos.model.ciModel.auditing.ImageAuditingRequest;
+import com.qcloud.cos.model.ciModel.auditing.ImageAuditingResponse;
+import com.qcloud.cos.model.ciModel.auditing.VideoAuditingRequest;
+import com.qcloud.cos.model.ciModel.auditing.VideoAuditingResponse;
+import com.qcloud.cos.model.ciModel.common.ImageProcessRequest;
 import com.qcloud.cos.model.Bucket;
 import com.qcloud.cos.model.BucketCrossOriginConfiguration;
 import com.qcloud.cos.model.BucketIntelligentTierConfiguration;
@@ -125,6 +132,7 @@ import com.qcloud.cos.model.ciModel.job.MediaJobsRequest;
 import com.qcloud.cos.model.ciModel.job.MediaListJobResponse;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoRequest;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoResponse;
+import com.qcloud.cos.model.ciModel.persistence.CIUploadResult;
 import com.qcloud.cos.model.ciModel.queue.DocListQueueResponse;
 import com.qcloud.cos.model.ciModel.queue.DocQueueRequest;
 import com.qcloud.cos.model.ciModel.queue.MediaListQueueResponse;
@@ -2846,6 +2854,36 @@ public interface COS extends COSDirectSpi {
      * DescribeDocProcessBuckets 接口用于查询存储桶是否已开通文档预览功能。https://cloud.tencent.com/document/product/460/46945
      */
     DocBucketResponse describeDocProcessBuckets(DocBucketRequest request);
+
+    /**
+     * process Image 接口用于对图片进行处理
+     */
+    CIUploadResult processImage(ImageProcessRequest request);
+
+    /**
+     * ImageAuditing图片审核  https://cloud.tencent.com/document/product/460/37318
+     */
+    ImageAuditingResponse imageAuditing(ImageAuditingRequest request);
+
+    /**
+     * CreateVideoAuditingJob 视频审核任务发起接口 https://cloud.tencent.com/document/product/460/46427
+     */
+    VideoAuditingResponse createVideoAuditingJob(VideoAuditingRequest request);
+
+    /**
+     * DescribeAuditingJob 视频审核任务查询接口 https://cloud.tencent.com/document/product/460/46926
+     */
+    VideoAuditingResponse describeAuditingJob(VideoAuditingRequest request);
+
+    /**
+     * CreateAudioAuditingJobs 音频审核任务创建接口 https://cloud.tencent.com/document/product/460/53395
+     */
+    AudioAuditingResponse createAudioAuditingJobs(AudioAuditingRequest request);
+
+    /**
+     * DescribeAudioAuditingJob 音频审核任务查询接口 https://cloud.tencent.com/document/product/460/53396
+     */
+    AudioAuditingResponse describeAudioAuditingJob(AudioAuditingRequest request);
 }
 
 
