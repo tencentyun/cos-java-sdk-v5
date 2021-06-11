@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ###Added
 - add tranferManager demo
+- add getObjectUrl method
 
 ## [5.6.44] - 2021-5-29
 
