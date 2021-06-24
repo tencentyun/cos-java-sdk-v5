@@ -43,6 +43,11 @@ import com.qcloud.cos.model.ciModel.bucket.DocBucketResponse;
 import com.qcloud.cos.model.ciModel.bucket.MediaBucketObject;
 import com.qcloud.cos.model.ciModel.bucket.MediaBucketResponse;
 import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
+import com.qcloud.cos.model.ciModel.image.ImageLabelResponse;
+import com.qcloud.cos.model.ciModel.image.ImageLabelV2Response;
+import com.qcloud.cos.model.ciModel.image.Lobel;
+import com.qcloud.cos.model.ciModel.image.LobelV2;
+import com.qcloud.cos.model.ciModel.image.LocationLabel;
 import com.qcloud.cos.model.ciModel.job.DocJobListResponse;
 import com.qcloud.cos.model.ciModel.job.DocJobDetail;
 import com.qcloud.cos.model.ciModel.job.DocJobResponse;
@@ -753,6 +758,18 @@ public class XmlResponsesSaxParser {
 
     public DescribeAudioAuditingJobHandler parseDescribeAudioAuditingJobResponse(InputStream inputStream) throws IOException {
         DescribeAudioAuditingJobHandler handler = new DescribeAudioAuditingJobHandler();
+        parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
+        return handler;
+    }
+
+    public ImageLabelHandler parseImageLabelResponse(InputStream inputStream) throws IOException {
+        ImageLabelHandler handler = new ImageLabelHandler();
+        parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
+        return handler;
+    }
+
+    public ImageLabelV2Handler parseImageLabelV2Response(InputStream inputStream) throws IOException {
+        ImageLabelV2Handler handler = new ImageLabelV2Handler();
         parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
         return handler;
     }
@@ -5432,6 +5449,151 @@ public class XmlResponsesSaxParser {
 
         public void setResponse(AudioAuditingResponse response) {
             this.response = response;
+        }
+    }
+
+    public static class ImageLabelHandler extends AbstractHandler {
+        private ImageLabelResponse response = new ImageLabelResponse();
+
+        @Override
+        protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
+            if ("Labels".equalsIgnoreCase(name)) {
+                response.getRecognitionResult().add(new Lobel());
+            }
+        }
+
+        @Override
+        protected void doEndElement(String uri, String name, String qName) {
+            List<Lobel> list = response.getRecognitionResult();
+            Lobel lobel = list.get(list.size() - 1);
+            if (in("RecognitionResult", "Labels")) {
+                switch (name) {
+                    case "Confidence":
+                        lobel.setConfidence(getText());
+                        break;
+                    case "Name":
+                        lobel.setName(getText());
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        public ImageLabelResponse getResponse() {
+            return response;
+        }
+
+        public void setResponse(ImageLabelResponse response) {
+            this.response = response;
+        }
+    }
+
+    public static class ImageLabelV2Handler extends AbstractHandler {
+        private ImageLabelV2Response response = new ImageLabelV2Response();
+
+        @Override
+        protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
+            if (in("RecognitionResult", "AlbumLabels") && "Label".equalsIgnoreCase(name)) {
+                response.getAlbumLabels().add(new LobelV2());
+            } else if (in("RecognitionResult", "CameraLabels") && "Label".equalsIgnoreCase(name)) {
+                response.getCameraLabels().add(new LobelV2());
+            } else if (in("RecognitionResult", "WebLabels") && "Label".equalsIgnoreCase(name)) {
+                response.getWebLabels().add(new LobelV2());
+            } else if (in("RecognitionResult", "NewsLabels") && "Label".equalsIgnoreCase(name)) {
+                response.getNewsLabels().add(new LobelV2());
+            } else if (in("RecognitionResult", "NoneCamLabels") && "Label".equalsIgnoreCase(name)) {
+                response.getNoneCamLabels().add(new LobelV2());
+            } else if (in("RecognitionResult", "LocationLabels") && "Label".equalsIgnoreCase(name)) {
+                response.getLocationLabels().add(new LocationLabel());
+            }
+        }
+
+        @Override
+        protected void doEndElement(String uri, String name, String qName) {
+            LobelV2 lobel = null;
+            if (in("RecognitionResult", "AlbumLabels","Label")) {
+                List<LobelV2> lobels = response.getAlbumLabels();
+                lobel = getListLast(lobels);
+            } else if (in("RecognitionResult", "CameraLabels","Label")) {
+                List<LobelV2> lobels = response.getCameraLabels();
+                lobel = getListLast(lobels);
+            } else if (in("RecognitionResult", "WebLabels","Label")) {
+                List<LobelV2> lobels = response.getWebLabels();
+                lobel = getListLast(lobels);
+            } else if (in("RecognitionResult", "LocationLabels","Label")) {
+                List<LocationLabel> locationLabels = response.getLocationLabels();
+                LocationLabel locationLabel = locationLabels.get(locationLabels.size() - 1);
+                addLocationLabel(locationLabel, name, getText());
+            } else if (in("RecognitionResult", "NewsLabels","Label")) {
+                List<LobelV2> lobels = response.getNewsLabels();
+                lobel = getListLast(lobels);
+            } else if (in("RecognitionResult", "NoneCamLabels","Label")) {
+                List<LobelV2> lobels = response.getNoneCamLabels();
+                lobel = getListLast(lobels);
+            }
+            if (lobel != null) {
+                addLabel(lobel, name, getText());
+            }
+        }
+
+        public ImageLabelV2Response getResponse() {
+            return response;
+        }
+
+        public void setResponse(ImageLabelV2Response response) {
+            this.response = response;
+        }
+
+        private void addLabel(LobelV2 lobel, String name, String value) {
+            switch (name) {
+                case "Confidence":
+                    lobel.setConfidence(value);
+                    break;
+                case "Name":
+                    lobel.setName(value);
+                    break;
+                case "FirstCategory":
+                    lobel.setFirstCategory(value);
+                    break;
+                case "SecondCategory":
+                    lobel.setSecondCategory(value);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private void addLocationLabel(LocationLabel lobel, String name, String value) {
+            switch (name) {
+                case "Confidence":
+                    lobel.setConfidence(value);
+                    break;
+                case "Name":
+                    lobel.setName(value);
+                    break;
+                case "Parents":
+                    lobel.setParents(value);
+                    break;
+                case "XMax":
+                    lobel.setxMax(value);
+                    break;
+                case "XMin":
+                    lobel.setxMin(value);
+                    break;
+                case "YMax":
+                    lobel.setyMax(value);
+                    break;
+                case "YMin":
+                    lobel.setyMin(value);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private LobelV2 getListLast(List<LobelV2> list) {
+            return list.get(list.size() - 1);
         }
     }
 

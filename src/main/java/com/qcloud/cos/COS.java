@@ -123,6 +123,10 @@ import com.qcloud.cos.model.ciModel.bucket.DocBucketRequest;
 import com.qcloud.cos.model.ciModel.bucket.DocBucketResponse;
 import com.qcloud.cos.model.ciModel.bucket.MediaBucketRequest;
 import com.qcloud.cos.model.ciModel.bucket.MediaBucketResponse;
+import com.qcloud.cos.model.ciModel.image.ImageLabelRequest;
+import com.qcloud.cos.model.ciModel.image.ImageLabelResponse;
+import com.qcloud.cos.model.ciModel.image.ImageLabelV2Request;
+import com.qcloud.cos.model.ciModel.image.ImageLabelV2Response;
 import com.qcloud.cos.model.ciModel.job.DocJobListRequest;
 import com.qcloud.cos.model.ciModel.job.DocJobListResponse;
 import com.qcloud.cos.model.ciModel.job.DocJobRequest;
@@ -2884,6 +2888,16 @@ public interface COS extends COSDirectSpi {
      * DescribeAudioAuditingJob 音频审核任务查询接口 https://cloud.tencent.com/document/product/460/53396
      */
     AudioAuditingResponse describeAudioAuditingJob(AudioAuditingRequest request);
+
+    /**
+     * GetImageLabel 图片标签 https://cloud.tencent.com/document/product/460/39082
+     */
+    ImageLabelResponse getImageLabel(ImageLabelRequest request);
+
+    /**
+     * GetImageLabel 图片标签V2 https://cloud.tencent.com/document/product/460/39082
+     */
+    ImageLabelV2Response getImageLabelV2(ImageLabelV2Request request);
 }
 
 

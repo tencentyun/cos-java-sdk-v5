@@ -107,6 +107,10 @@ import com.qcloud.cos.model.ciModel.bucket.MediaBucketRequest;
 import com.qcloud.cos.model.ciModel.bucket.MediaBucketResponse;
 import com.qcloud.cos.model.ciModel.common.ImageProcessRequest;
 import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
+import com.qcloud.cos.model.ciModel.image.ImageLabelRequest;
+import com.qcloud.cos.model.ciModel.image.ImageLabelResponse;
+import com.qcloud.cos.model.ciModel.image.ImageLabelV2Request;
+import com.qcloud.cos.model.ciModel.image.ImageLabelV2Response;
 import com.qcloud.cos.model.ciModel.job.DocJobListRequest;
 import com.qcloud.cos.model.ciModel.job.DocJobListResponse;
 import com.qcloud.cos.model.ciModel.job.DocJobRequest;
@@ -3781,6 +3785,30 @@ public class COSClient implements COS {
                 "The jobId parameter must be specified setting the object tags");
         CosHttpRequest<AudioAuditingRequest> request = createRequest(audioAuditingRequest.getBucketName(), "/audio/auditing/" + audioAuditingRequest.getJobId(), audioAuditingRequest, HttpMethodName.GET);
         return invoke(request, new Unmarshallers.AudioAuditingJobUnmarshaller());
+    }
+
+    @Override
+    public ImageLabelResponse getImageLabel(ImageLabelRequest imageLabelRequest) {
+        rejectNull(imageLabelRequest,
+                "The imageLabelRequest parameter must be specified setting the object tags");
+        rejectNull(imageLabelRequest.getBucketName(),
+                "The imageLabelRequest.bucketName parameter must be specified setting the object tags");
+        CosHttpRequest<ImageLabelRequest> request = createRequest(imageLabelRequest.getBucketName(), imageLabelRequest.getObjectKey(), imageLabelRequest, HttpMethodName.GET);
+        request.addParameter("ci-process", "detect-label");
+        return invoke(request, new Unmarshallers.ImageLabelUnmarshaller());
+    }
+
+    @Override
+    public ImageLabelV2Response getImageLabelV2(ImageLabelV2Request imageLabelV2Request) {
+        rejectNull(imageLabelV2Request,
+                "The imageAuditingRequest parameter must be specified setting the object tags");
+        rejectNull(imageLabelV2Request.getBucketName(),
+                "The bucketName parameter must be specified setting the object tags");
+        CosHttpRequest<ImageLabelV2Request> request = createRequest(imageLabelV2Request.getBucketName(), imageLabelV2Request.getObjectKey(), imageLabelV2Request, HttpMethodName.GET);
+        request.addParameter("ci-process", "content-analysis");
+        addParameterIfNotNull(request, "scenes", imageLabelV2Request.getScenes());
+        System.out.println(request.getEndpoint());
+        return invoke(request, new Unmarshallers.ImageLabelV2Unmarshaller());
     }
 
     private void checkAuditingRequest(ImageAuditingRequest request) {
