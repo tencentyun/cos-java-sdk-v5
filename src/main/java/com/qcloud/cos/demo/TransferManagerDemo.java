@@ -12,6 +12,7 @@ import com.qcloud.cos.auth.BasicCOSCredentials;
 import com.qcloud.cos.auth.COSCredentials;
 import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.exception.CosServiceException;
+import com.qcloud.cos.http.HttpProtocol;
 import com.qcloud.cos.model.CopyObjectRequest;
 import com.qcloud.cos.model.CopyResult;
 import com.qcloud.cos.model.GetObjectRequest;
@@ -21,6 +22,7 @@ import com.qcloud.cos.model.UploadResult;
 import com.qcloud.cos.region.Region;
 import com.qcloud.cos.transfer.Copy;
 import com.qcloud.cos.transfer.Download;
+import com.qcloud.cos.transfer.MultipleFileDownload;
 import com.qcloud.cos.transfer.MultipleFileUpload;
 import com.qcloud.cos.transfer.PersistableDownload;
 import com.qcloud.cos.transfer.PersistableUpload;
@@ -57,6 +59,7 @@ public class TransferManagerDemo {
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
         ClientConfig clientConfig = new ClientConfig(new Region("ap-beijing-1"));
+        clientConfig.setHttpProtocol(HttpProtocol.https);
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名需包含appid
@@ -210,6 +213,49 @@ public class TransferManagerDemo {
             upload.waitForCompletion();
 
             System.out.println("upload directory done.");
+        } catch (CosServiceException e) {
+            e.printStackTrace();
+        } catch (CosClientException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        transferManager.shutdownNow();
+        cosclient.shutdown();
+    }
+
+    // 批量下载
+    public static void downloadDirectory() {
+        // 1 初始化用户身份信息(secretId, secretKey)
+        COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
+        // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
+        ClientConfig clientConfig = new ClientConfig(new Region("ap-beijing-1"));
+        // 3 生成cos客户端
+        COSClient cosclient = new COSClient(cred, clientConfig);
+        // bucket名需包含appid
+        String bucketName = "mybucket-1251668577";
+
+        ExecutorService threadPool = Executors.newFixedThreadPool(4);
+        // 传入一个threadpool, 若不传入线程池, 默认TransferManager中会生成一个单线程的线程池。
+        TransferManager transferManager = new TransferManager(cosclient, threadPool);
+
+        // 设置要下载的对象的前缀（相当于cos上的一个目录），如果设置成 ""，则下载整个 bucket。
+        String cos_path = "/prefix";
+        // 要保存下载的文件的文件夹的绝对路径
+        String dir_path = "/to/mydir";
+
+        try {
+            // 返回一个异步结果download, 可同步的调用waitForUploadResult等待download结束.
+            MultipleFileDownload download = transferManager.downloadDirectory(bucketName, cos_path, new File(dir_path));
+
+            // 可以选择查看下载进度
+            showTransferProgress(download);
+
+            // 或者阻塞等待完成
+            download.waitForCompletion();
+
+            System.out.println("download directory done.");
         } catch (CosServiceException e) {
             e.printStackTrace();
         } catch (CosClientException e) {
