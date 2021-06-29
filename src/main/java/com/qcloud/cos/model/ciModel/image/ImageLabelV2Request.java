@@ -18,7 +18,7 @@ public class ImageLabelV2Request extends CosServiceRequest {
      * lbum，针对手机相册、网盘产品优化;
      * news，针对新闻、资讯、广电等行业优化；
      * nonecam，非实拍图；
-     * location，主体位置识别；如果不传此参数，则默认为web。
+     * product，主体位置识别；如果不传此参数，则默认为web。
      * 支持多场景（scenes）一起检测,例如，使用 scenes=web,camera 即对一张图片使用两个模型同时检测，输出两套识别结果。
      */
     private String scenes;

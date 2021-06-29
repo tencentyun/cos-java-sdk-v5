@@ -46,9 +46,9 @@ public class ImageLabelDemo {
         //1.创建任务请求对象
         ImageLabelV2Request request = new ImageLabelV2Request();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("shanghaitest-1251704708");
-        request.setObjectKey("mark1/1.jpg");
-        request.setScenes("web,location");
+        request.setBucketName("shanghai-1251704708");
+        request.setObjectKey("marksdk/data/img5.png");
+        request.setScenes("web,product");
         //3.调用接口,获取任务响应对象
         ImageLabelV2Response response = client.getImageLabelV2(request);
         String jsonStr = responseToJsonStr(response);

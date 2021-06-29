@@ -5504,8 +5504,8 @@ public class XmlResponsesSaxParser {
                 response.getNewsLabels().add(new LobelV2());
             } else if (in("RecognitionResult", "NoneCamLabels") && "Label".equalsIgnoreCase(name)) {
                 response.getNoneCamLabels().add(new LobelV2());
-            } else if (in("RecognitionResult", "LocationLabels") && "Label".equalsIgnoreCase(name)) {
-                response.getLocationLabels().add(new LocationLabel());
+            } else if (in("RecognitionResult", "ProductLabels") && "Label".equalsIgnoreCase(name)) {
+                response.getProductLabels().add(new LocationLabel());
             }
         }
 
@@ -5521,9 +5521,9 @@ public class XmlResponsesSaxParser {
             } else if (in("RecognitionResult", "WebLabels","Label")) {
                 List<LobelV2> lobels = response.getWebLabels();
                 lobel = getListLast(lobels);
-            } else if (in("RecognitionResult", "LocationLabels","Label")) {
-                List<LocationLabel> locationLabels = response.getLocationLabels();
-                LocationLabel locationLabel = locationLabels.get(locationLabels.size() - 1);
+            } else if (in("RecognitionResult", "ProductLabels","Label")) {
+                List<LocationLabel> ProductLabels = response.getProductLabels();
+                LocationLabel locationLabel = ProductLabels.get(ProductLabels.size() - 1);
                 addLocationLabel(locationLabel, name, getText());
             } else if (in("RecognitionResult", "NewsLabels","Label")) {
                 List<LobelV2> lobels = response.getNewsLabels();

@@ -36,7 +36,7 @@ public class ImageLabelV2Response {
     /**
      * 识别结果 注意：此字段可能不存在，表示取不到有效值
      */
-    private List<LocationLabel> locationLabels;
+    private List<LocationLabel> productLabels;
 
     public List<LobelV2> getWebLabels() {
         if (webLabels == null) {
@@ -93,15 +93,15 @@ public class ImageLabelV2Response {
         this.noneCamLabels = noneCamLabels;
     }
 
-    public List<LocationLabel> getLocationLabels() {
-        if (locationLabels == null) {
-            locationLabels = new ArrayList<>();
+    public List<LocationLabel> getProductLabels() {
+        if (productLabels == null) {
+            productLabels = new ArrayList<>();
         }
-        return locationLabels;
+        return productLabels;
     }
 
-    public void setLocationLabels(List<LocationLabel> locationLabels) {
-        this.locationLabels = locationLabels;
+    public void setProductLabels(List<LocationLabel> productLabels) {
+        this.productLabels = productLabels;
     }
 
     @Override
@@ -112,7 +112,7 @@ public class ImageLabelV2Response {
         sb.append(", albumLabels=").append(albumLabels);
         sb.append(", newsLabels=").append(newsLabels);
         sb.append(", noneCamLabels=").append(noneCamLabels);
-        sb.append(", locationLabels=").append(locationLabels);
+        sb.append(", locationLabels=").append(productLabels);
         sb.append('}');
         return sb.toString();
     }
