@@ -1,5 +1,11 @@
 package com.qcloud.cos.demo.ci;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.util.LinkedList;
+import java.util.List;
+
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.exception.CosServiceException;
@@ -13,16 +19,12 @@ import com.qcloud.cos.model.PutObjectResult;
 import com.qcloud.cos.model.UploadPartRequest;
 import com.qcloud.cos.model.UploadPartResult;
 import com.qcloud.cos.model.UploadResult;
+import com.qcloud.cos.model.ciModel.common.ImageProcessRequest;
 import com.qcloud.cos.model.ciModel.persistence.CIObject;
 import com.qcloud.cos.model.ciModel.persistence.CIUploadResult;
 import com.qcloud.cos.model.ciModel.persistence.PicOperations;
 import com.qcloud.cos.transfer.TransferManager;
 import com.qcloud.cos.transfer.Upload;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.util.LinkedList;
-import java.util.List;
 
 
 public class ImagePersistenceDemo {
@@ -152,6 +154,42 @@ public class ImagePersistenceDemo {
         for(CIObject ciObject:ciUploadResult.getProcessResults().getObjectList()) {
             System.out.println(ciObject.getLocation());
             System.out.println(ciObject.getEtag());
+        }
+    }
+
+    public static void persistenceImagePost(COSClient cosClient) {
+        String bucketName = "examplebucket-1250000000";
+        String key = "test.jpg";
+        ImageProcessRequest imageReq = new ImageProcessRequest(bucketName, key);
+
+        PicOperations picOperations = new PicOperations();
+        picOperations.setIsPicInfo(1);
+        List<PicOperations.Rule> ruleList = new LinkedList<>();
+        PicOperations.Rule rule1 = new PicOperations.Rule();
+        rule1.setBucket(bucketName);
+        rule1.setFileId("test-1.jpg");
+        rule1.setRule("imageMogr2/rotate/90");
+        ruleList.add(rule1);
+        PicOperations.Rule rule2 = new PicOperations.Rule();
+        rule2.setBucket(bucketName);
+        rule2.setFileId("test-2.jpg");
+        rule2.setRule("imageMogr2/rotate/180");
+        ruleList.add(rule2);
+        picOperations.setRules(ruleList);
+
+        imageReq.setPicOperations(picOperations);
+
+        try {
+            CIUploadResult ciUploadResult = cosClient.processImage(imageReq);
+            System.out.println(ciUploadResult.getOriginalInfo().getEtag());
+            for(CIObject ciObject:ciUploadResult.getProcessResults().getObjectList()) {
+                System.out.println(ciObject.getLocation());
+                System.out.println(ciObject.getEtag());
+            }
+        } catch (CosServiceException e) {
+            e.printStackTrace();
+        } catch (CosClientException e) {
+            e.printStackTrace();
         }
     }
 

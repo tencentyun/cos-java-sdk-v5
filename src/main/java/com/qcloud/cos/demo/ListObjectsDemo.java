@@ -9,8 +9,11 @@ import com.qcloud.cos.auth.COSCredentials;
 import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.model.COSObjectSummary;
+import com.qcloud.cos.model.COSVersionSummary;
 import com.qcloud.cos.model.ListObjectsRequest;
+import com.qcloud.cos.model.ListVersionsRequest;
 import com.qcloud.cos.model.ObjectListing;
+import com.qcloud.cos.model.VersionListing;
 import com.qcloud.cos.region.Region;
 
 /**
@@ -121,8 +124,51 @@ public class ListObjectsDemo {
         cosclient.shutdown();
     }
 
+    public static void listObjectsVersions() {
+        // 1 初始化用户身份信息(secretId, secretKey)
+        COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
+        // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
+        ClientConfig clientConfig = new ClientConfig(new Region("ap-beijing-1"));
+        // 3 生成cos客户端
+        COSClient cosclient = new COSClient(cred, clientConfig);
+        // bucket名需包含appid
+        String bucketName = "mybucket-1251668577";
+
+        ListVersionsRequest listVersionsRequest = new ListVersionsRequest();
+        listVersionsRequest.setBucketName(bucketName);
+        listVersionsRequest.setPrefix("");
+
+        VersionListing versionListing = null;
+
+        do {
+            try {
+                versionListing = cosclient.listVersions(listVersionsRequest);
+            } catch (CosServiceException e) {
+                e.printStackTrace();
+                return;
+            } catch (CosClientException e) {
+                e.printStackTrace();
+                return;
+            }
+
+            List<COSVersionSummary> cosVersionSummaries = versionListing.getVersionSummaries();
+            for (COSVersionSummary cosVersionSummary : cosVersionSummaries) {
+                System.out.println(cosVersionSummary.getKey() + ":" + cosVersionSummary.getVersionId());
+            }
+
+            String keyMarker = versionListing.getNextKeyMarker();
+            String versionIdMarker = versionListing.getNextVersionIdMarker();
+
+            listVersionsRequest.setKeyMarker(keyMarker);
+            listVersionsRequest.setVersionIdMarker(versionIdMarker);
+
+        } while (versionListing.isTruncated());
+
+        cosclient.shutdown();
+    }
+
     public static void main(String[] args) {
-        listAllObjects();
+        listObjectsVersions();
     }
 
 }

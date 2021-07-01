@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - add image label api v1&v2
 - update video auditing api
 - update httpclient to 4.5.13 for security reasons
+- add some demos
 
 ## [5.6.45] - 2021-6-10
 
