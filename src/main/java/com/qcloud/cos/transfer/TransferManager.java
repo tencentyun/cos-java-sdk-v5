@@ -582,6 +582,17 @@ public class TransferManager {
 
         PersistableResumeDownload downloadRecord = null;
         try {
+
+            // attempt to create the parent if it doesn't exist
+            File parentDirectory = resumableTaskFile.getParentFile();
+            if ( parentDirectory != null && !parentDirectory.exists() ) {
+                if (!(parentDirectory.mkdirs())) {
+                    throw new CosClientException(
+                            "Unable to create directory in the path"
+                                    + parentDirectory.getAbsolutePath());
+                }
+            }
+
             if (!resumableTaskFile.exists()) {
                 resumableTaskFile.createNewFile();
             }
