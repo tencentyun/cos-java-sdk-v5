@@ -41,6 +41,7 @@ import com.qcloud.cos.model.OutputSerialization;
 import com.qcloud.cos.model.ScanRange;
 import com.qcloud.cos.model.ciModel.auditing.AudioAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.Conf;
+import com.qcloud.cos.model.ciModel.auditing.TextAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.VideoAuditingRequest;
 import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
 import com.qcloud.cos.model.ciModel.job.DocJobObject;
@@ -685,6 +686,8 @@ public class RequestXmlFactory {
         Conf conf = request.getConf();
         xml.start("Conf");
         addIfNotNull(xml,"DetectType", conf.getDetectType());
+        addIfNotNull(xml,"BizType", conf.getBizType());
+        addIfNotNull(xml,"DetectContent", conf.getDetectContent());
         xml.start("Snapshot");
         addIfNotNull(xml,"Mode", conf.getSnapshot().getMode());
         addIfNotNull(xml,"TimeInterval", conf.getSnapshot().getTimeInterval());
@@ -715,6 +718,32 @@ public class RequestXmlFactory {
         xml.start("Conf");
         addIfNotNull(xml,"DetectType", conf.getDetectType());
         addIfNotNull(xml,"Callback", conf.getCallback());
+        xml.end();
+
+        xml.end();
+        System.out.println(xml.toString());
+        return xml.getBytes();
+    }
+
+    /**
+     * Converts the TextAuditingRequest to an XML fragment that can be sent to the CreateTextAuditingJob of CI
+     *
+     * @param request The container which provides options for restoring an object
+     * @return A byte array containing the data
+     * @throws CosClientException
+     */
+    public static byte[] convertToXmlByteArray(TextAuditingRequest request) {
+        XmlWriter xml = new XmlWriter();
+
+        xml.start("Request");
+        xml.start("Input");
+        addIfNotNull(xml,"Object",request.getInput().getObject());
+        xml.end();
+        Conf conf = request.getConf();
+        xml.start("Conf");
+        addIfNotNull(xml,"DetectType", conf.getDetectType());
+        addIfNotNull(xml,"Callback", conf.getCallback());
+        addIfNotNull(xml,"BizType", conf.getBizType());
         xml.end();
 
         xml.end();

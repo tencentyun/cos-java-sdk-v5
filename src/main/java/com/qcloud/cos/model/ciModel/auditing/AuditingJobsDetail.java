@@ -37,6 +37,11 @@ public class AuditingJobsDetail {
     private String snapshotCount;
 
     /**
+     * 文本分片数量
+     */
+    private String sectionCount;
+
+    /**
      * 供参考的识别结果，0表示确认正常，1表示确认敏感，2表示疑似敏感
      */
     private String result;
@@ -62,6 +67,11 @@ public class AuditingJobsDetail {
     private AdsInfo adsInfo;
 
     private List<SnapshotInfo> snapshotList;
+
+    /**
+     * 具体文本分片的审核结果信息，只返回带有违规结果的分片
+     */
+    private List<SectionInfo> sectionList;
 
     public String getJobId() {
         return jobId;
@@ -182,6 +192,25 @@ public class AuditingJobsDetail {
         this.snapshotList = snapshotList;
     }
 
+    public List<SectionInfo> getSectionList() {
+        if (sectionList == null) {
+            sectionList = new ArrayList<>();
+        }
+        return sectionList;
+    }
+
+    public void setSectionList(List<SectionInfo> sectionList) {
+        this.sectionList = sectionList;
+    }
+
+    public String getSectionCount() {
+        return sectionCount;
+    }
+
+    public void setSectionCount(String sectionCount) {
+        this.sectionCount = sectionCount;
+    }
+
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("AuditingJobsDetail{");
@@ -192,12 +221,14 @@ public class AuditingJobsDetail {
         sb.append(", message='").append(message).append('\'');
         sb.append(", object='").append(object).append('\'');
         sb.append(", snapshotCount='").append(snapshotCount).append('\'');
+        sb.append(", sectionCount='").append(sectionCount).append('\'');
         sb.append(", result='").append(result).append('\'');
         sb.append(", pornInfo=").append(pornInfo);
         sb.append(", terroristInfo=").append(terroristInfo);
         sb.append(", politicsInfo=").append(politicsInfo);
         sb.append(", adsInfo=").append(adsInfo);
         sb.append(", snapshotList=").append(snapshotList);
+        sb.append(", sectionList=").append(sectionList);
         sb.append('}');
         return sb.toString();
     }

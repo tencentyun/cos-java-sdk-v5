@@ -46,6 +46,7 @@ import com.qcloud.cos.model.DeleteObjectTaggingResult;
 import com.qcloud.cos.model.ObjectMetadata;
 import com.qcloud.cos.model.ciModel.auditing.AudioAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.ImageAuditingResponse;
+import com.qcloud.cos.model.ciModel.auditing.TextAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.VideoAuditingResponse;
 import com.qcloud.cos.model.ciModel.bucket.DocBucketResponse;
 import com.qcloud.cos.model.ciModel.bucket.MediaBucketResponse;
@@ -663,6 +664,24 @@ public class Unmarshallers {
         public ImageLabelV2Response unmarshall(InputStream in) throws Exception {
             return new XmlResponsesSaxParser()
                     .parseImageLabelV2Response(in).getResponse();
+        }
+    }
+
+    public static final class TextAuditingJobUnmarshaller
+            implements Unmarshaller<TextAuditingResponse, InputStream> {
+
+        public TextAuditingResponse unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser()
+                    .parseTextAuditingResponse(in).getResponse();
+        }
+    }
+
+    public static final class TextAuditingDescribeJobUnmarshaller
+            implements Unmarshaller<TextAuditingResponse, InputStream> {
+
+        public TextAuditingResponse unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser()
+                    .parseTextAuditingDescribeResponse(in).getResponse();
         }
     }
 }

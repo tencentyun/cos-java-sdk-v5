@@ -99,6 +99,8 @@ import com.qcloud.cos.model.ciModel.auditing.AudioAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.AudioAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.ImageAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.ImageAuditingResponse;
+import com.qcloud.cos.model.ciModel.auditing.TextAuditingRequest;
+import com.qcloud.cos.model.ciModel.auditing.TextAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.VideoAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.VideoAuditingResponse;
 import com.qcloud.cos.model.ciModel.bucket.DocBucketRequest;
@@ -3748,6 +3750,9 @@ public class COSClient implements COS {
         CosHttpRequest<ImageAuditingRequest> request = createRequest(imageAuditingRequest.getBucketName(), imageAuditingRequest.getObjectKey(), imageAuditingRequest, HttpMethodName.GET);
         request.addParameter("ci-process", "sensitive-content-recognition");
         addParameterIfNotNull(request, "detect-type", imageAuditingRequest.getDetectType());
+        addParameterIfNotNull(request, "interval", Integer.toString(imageAuditingRequest.getInterval()));
+        addParameterIfNotNull(request, "max-frames", Integer.toString(imageAuditingRequest.getMaxFrames()));
+        addParameterIfNotNull(request, "biz-type", imageAuditingRequest.getBizType());
         return invoke(request, new Unmarshallers.ImageAuditingUnmarshaller());
     }
 
@@ -3809,6 +3814,24 @@ public class COSClient implements COS {
         addParameterIfNotNull(request, "scenes", imageLabelV2Request.getScenes());
         System.out.println(request.getEndpoint());
         return invoke(request, new Unmarshallers.ImageLabelV2Unmarshaller());
+    }
+
+    @Override
+    public TextAuditingResponse createAuditingTextJobs(TextAuditingRequest textAuditingRequest) {
+        this.checkCIRequestCommon(textAuditingRequest);
+        this.rejectStartWith(textAuditingRequest.getConf().getCallback(), "http", "The Conf.CallBack parameter mush start with http or https");
+        CosHttpRequest<TextAuditingRequest> request = createRequest(textAuditingRequest.getBucketName(), "/text/auditing", textAuditingRequest, HttpMethodName.POST);
+        this.setContent(request, RequestXmlFactory.convertToXmlByteArray(textAuditingRequest), "application/xml", false);
+        return invoke(request, new Unmarshallers.TextAuditingJobUnmarshaller());
+    }
+
+    @Override
+    public TextAuditingResponse describeAuditingTextJob(TextAuditingRequest textAuditingRequest) {
+        this.checkCIRequestCommon(textAuditingRequest);
+        rejectNull(textAuditingRequest.getJobId(),
+                "The jobId parameter must be specified setting the object tags");
+        CosHttpRequest<TextAuditingRequest> request = createRequest(textAuditingRequest.getBucketName(), "/text/auditing/" + textAuditingRequest.getJobId(), textAuditingRequest, HttpMethodName.GET);
+        return invoke(request, new Unmarshallers.TextAuditingDescribeJobUnmarshaller());
     }
 
     private void checkAuditingRequest(ImageAuditingRequest request) {

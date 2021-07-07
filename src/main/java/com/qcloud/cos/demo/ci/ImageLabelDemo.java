@@ -17,7 +17,7 @@ public class ImageLabelDemo {
         // 1 初始化用户身份信息（secretId, secretKey）。
         COSClient client = ClientUtils.getTestClient();
         // 2 调用要使用的方法。
-        getImageLabelV2(client);
+        getImageLabel(client);
     }
 
     /**
@@ -29,31 +29,14 @@ public class ImageLabelDemo {
         //1.创建任务请求对象
         ImageLabelRequest request = new ImageLabelRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("markjrzhang-1251704708");
-        request.setObjectKey("mark1/1.png");
+        request.setBucketName("demo-123456789");
+        request.setObjectKey("1.png");
         //3.调用接口,获取任务响应对象
         ImageLabelResponse response = client.getImageLabel(request);
         String jsonStr = responseToJsonStr(response);
         System.out.println(jsonStr);
     }
 
-    /**
-     * getImageLabelV2 图片标签,返回图片中置信度较高的主题标签。
-     *
-     * @param client
-     */
-    public static void getImageLabelV2(COSClient client) throws JsonProcessingException {
-        //1.创建任务请求对象
-        ImageLabelV2Request request = new ImageLabelV2Request();
-        //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("shanghai-1251704708");
-        request.setObjectKey("marksdk/data/img5.png");
-        request.setScenes("web,product");
-        //3.调用接口,获取任务响应对象
-        ImageLabelV2Response response = client.getImageLabelV2(request);
-        String jsonStr = responseToJsonStr(response);
-        System.out.println(jsonStr);
-    }
 
     public static String responseToJsonStr(Object obj) throws JsonProcessingException {
         return new ObjectMapper().writeValueAsString(obj);

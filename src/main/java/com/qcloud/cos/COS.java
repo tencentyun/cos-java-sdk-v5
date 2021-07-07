@@ -36,6 +36,8 @@ import com.qcloud.cos.model.ciModel.auditing.AudioAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.AudioAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.ImageAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.ImageAuditingResponse;
+import com.qcloud.cos.model.ciModel.auditing.TextAuditingRequest;
+import com.qcloud.cos.model.ciModel.auditing.TextAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.VideoAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.VideoAuditingResponse;
 import com.qcloud.cos.model.ciModel.common.ImageProcessRequest;
@@ -2898,6 +2900,16 @@ public interface COS extends COSDirectSpi {
      * GetImageLabel 图片标签V2 https://cloud.tencent.com/document/product/460/39082
      */
     ImageLabelV2Response getImageLabelV2(ImageLabelV2Request request);
+
+    /**
+     * CreateAuditingTextJobs 音频审核任务查询接口 https://cloud.tencent.com/document/product/460/56289
+     */
+    TextAuditingResponse createAuditingTextJobs(TextAuditingRequest request);
+
+    /**
+     * DescribeAuditingTextJob 查询文本审核任务结果 https://cloud.tencent.com/document/product/436/56288
+     */
+    TextAuditingResponse describeAuditingTextJob(TextAuditingRequest request);
 }
 
 
