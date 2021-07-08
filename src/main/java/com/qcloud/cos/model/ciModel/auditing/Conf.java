@@ -22,6 +22,32 @@ public class Conf {
      */
     private String callback;
 
+    /**
+     * 审核策略，不带审核策略时使用默认策略
+     */
+    private String bizType;
+
+    /**
+     * 审核内容开关, 0: 只审截图, 1: 审核截图和音频, 默认为0
+     */
+    private String detectContent;
+
+    public String getBizType() {
+        return bizType;
+    }
+
+    public void setBizType(String bizType) {
+        this.bizType = bizType;
+    }
+
+    public String getDetectContent() {
+        return detectContent;
+    }
+
+    public void setDetectContent(String detectContent) {
+        this.detectContent = detectContent;
+    }
+
     public String getDetectType() {
         return detectType;
     }
@@ -55,6 +81,8 @@ public class Conf {
         sb.append("detectType='").append(detectType).append('\'');
         sb.append(", snapshot=").append(snapshot);
         sb.append(", callback='").append(callback).append('\'');
+        sb.append(", bizType='").append(bizType).append('\'');
+        sb.append(", detectContent='").append(detectContent).append('\'');
         sb.append('}');
         return sb.toString();
     }

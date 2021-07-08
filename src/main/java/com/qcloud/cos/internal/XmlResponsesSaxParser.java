@@ -36,13 +36,20 @@ import com.qcloud.cos.model.ciModel.auditing.AudioAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.AuditingJobsDetail;
 import com.qcloud.cos.model.ciModel.auditing.AudtingCommonInfo;
 import com.qcloud.cos.model.ciModel.auditing.ImageAuditingResponse;
+import com.qcloud.cos.model.ciModel.auditing.SectionInfo;
 import com.qcloud.cos.model.ciModel.auditing.SnapshotInfo;
+import com.qcloud.cos.model.ciModel.auditing.TextAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.VideoAuditingResponse;
 import com.qcloud.cos.model.ciModel.bucket.DocBucketObject;
 import com.qcloud.cos.model.ciModel.bucket.DocBucketResponse;
 import com.qcloud.cos.model.ciModel.bucket.MediaBucketObject;
 import com.qcloud.cos.model.ciModel.bucket.MediaBucketResponse;
 import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
+import com.qcloud.cos.model.ciModel.image.ImageLabelResponse;
+import com.qcloud.cos.model.ciModel.image.ImageLabelV2Response;
+import com.qcloud.cos.model.ciModel.image.Lobel;
+import com.qcloud.cos.model.ciModel.image.LobelV2;
+import com.qcloud.cos.model.ciModel.image.LocationLabel;
 import com.qcloud.cos.model.ciModel.job.DocJobListResponse;
 import com.qcloud.cos.model.ciModel.job.DocJobDetail;
 import com.qcloud.cos.model.ciModel.job.DocJobResponse;
@@ -753,6 +760,30 @@ public class XmlResponsesSaxParser {
 
     public DescribeAudioAuditingJobHandler parseDescribeAudioAuditingJobResponse(InputStream inputStream) throws IOException {
         DescribeAudioAuditingJobHandler handler = new DescribeAudioAuditingJobHandler();
+        parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
+        return handler;
+    }
+
+    public ImageLabelHandler parseImageLabelResponse(InputStream inputStream) throws IOException {
+        ImageLabelHandler handler = new ImageLabelHandler();
+        parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
+        return handler;
+    }
+
+    public ImageLabelV2Handler parseImageLabelV2Response(InputStream inputStream) throws IOException {
+        ImageLabelV2Handler handler = new ImageLabelV2Handler();
+        parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
+        return handler;
+    }
+
+    public TextAuditingJobHandler parseTextAuditingResponse(InputStream inputStream) throws IOException {
+        TextAuditingJobHandler handler = new TextAuditingJobHandler();
+        parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
+        return handler;
+    }
+
+    public TextAuditingDescribeJobHandler parseTextAuditingDescribeResponse(InputStream inputStream) throws IOException {
+        TextAuditingDescribeJobHandler handler = new TextAuditingDescribeJobHandler();
         parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
         return handler;
     }
@@ -5435,5 +5466,289 @@ public class XmlResponsesSaxParser {
         }
     }
 
+    public static class ImageLabelHandler extends AbstractHandler {
+        private ImageLabelResponse response = new ImageLabelResponse();
+
+        @Override
+        protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
+            if ("Labels".equalsIgnoreCase(name)) {
+                response.getRecognitionResult().add(new Lobel());
+            }
+        }
+
+        @Override
+        protected void doEndElement(String uri, String name, String qName) {
+            List<Lobel> list = response.getRecognitionResult();
+            Lobel lobel = list.get(list.size() - 1);
+            if (in("RecognitionResult", "Labels")) {
+                switch (name) {
+                    case "Confidence":
+                        lobel.setConfidence(getText());
+                        break;
+                    case "Name":
+                        lobel.setName(getText());
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        public ImageLabelResponse getResponse() {
+            return response;
+        }
+
+        public void setResponse(ImageLabelResponse response) {
+            this.response = response;
+        }
+    }
+
+    public static class ImageLabelV2Handler extends AbstractHandler {
+        private ImageLabelV2Response response = new ImageLabelV2Response();
+
+        @Override
+        protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
+            if (in("RecognitionResult", "AlbumLabels") && "Label".equalsIgnoreCase(name)) {
+                response.getAlbumLabels().add(new LobelV2());
+            } else if (in("RecognitionResult", "CameraLabels") && "Label".equalsIgnoreCase(name)) {
+                response.getCameraLabels().add(new LobelV2());
+            } else if (in("RecognitionResult", "WebLabels") && "Label".equalsIgnoreCase(name)) {
+                response.getWebLabels().add(new LobelV2());
+            } else if (in("RecognitionResult", "NewsLabels") && "Label".equalsIgnoreCase(name)) {
+                response.getNewsLabels().add(new LobelV2());
+            } else if (in("RecognitionResult", "NoneCamLabels") && "Label".equalsIgnoreCase(name)) {
+                response.getNoneCamLabels().add(new LobelV2());
+            } else if (in("RecognitionResult", "ProductLabels") && "Label".equalsIgnoreCase(name)) {
+                response.getProductLabels().add(new LocationLabel());
+            }
+        }
+
+        @Override
+        protected void doEndElement(String uri, String name, String qName) {
+            LobelV2 lobel = null;
+            if (in("RecognitionResult", "AlbumLabels","Label")) {
+                List<LobelV2> lobels = response.getAlbumLabels();
+                lobel = getListLast(lobels);
+            } else if (in("RecognitionResult", "CameraLabels","Label")) {
+                List<LobelV2> lobels = response.getCameraLabels();
+                lobel = getListLast(lobels);
+            } else if (in("RecognitionResult", "WebLabels","Label")) {
+                List<LobelV2> lobels = response.getWebLabels();
+                lobel = getListLast(lobels);
+            } else if (in("RecognitionResult", "ProductLabels","Label")) {
+                List<LocationLabel> ProductLabels = response.getProductLabels();
+                LocationLabel locationLabel = ProductLabels.get(ProductLabels.size() - 1);
+                addLocationLabel(locationLabel, name, getText());
+            } else if (in("RecognitionResult", "NewsLabels","Label")) {
+                List<LobelV2> lobels = response.getNewsLabels();
+                lobel = getListLast(lobels);
+            } else if (in("RecognitionResult", "NoneCamLabels","Label")) {
+                List<LobelV2> lobels = response.getNoneCamLabels();
+                lobel = getListLast(lobels);
+            }
+            if (lobel != null) {
+                addLabel(lobel, name, getText());
+            }
+        }
+
+        public ImageLabelV2Response getResponse() {
+            return response;
+        }
+
+        public void setResponse(ImageLabelV2Response response) {
+            this.response = response;
+        }
+
+        private void addLabel(LobelV2 lobel, String name, String value) {
+            switch (name) {
+                case "Confidence":
+                    lobel.setConfidence(value);
+                    break;
+                case "Name":
+                    lobel.setName(value);
+                    break;
+                case "FirstCategory":
+                    lobel.setFirstCategory(value);
+                    break;
+                case "SecondCategory":
+                    lobel.setSecondCategory(value);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private void addLocationLabel(LocationLabel lobel, String name, String value) {
+            switch (name) {
+                case "Confidence":
+                    lobel.setConfidence(value);
+                    break;
+                case "Name":
+                    lobel.setName(value);
+                    break;
+                case "Parents":
+                    lobel.setParents(value);
+                    break;
+                case "XMax":
+                    lobel.setxMax(value);
+                    break;
+                case "XMin":
+                    lobel.setxMin(value);
+                    break;
+                case "YMax":
+                    lobel.setyMax(value);
+                    break;
+                case "YMin":
+                    lobel.setyMin(value);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private LobelV2 getListLast(List<LobelV2> list) {
+            return list.get(list.size() - 1);
+        }
+    }
+
+    public static class TextAuditingJobHandler extends AbstractHandler {
+        private TextAuditingResponse response = new TextAuditingResponse();
+
+        @Override
+        protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
+
+        }
+
+        @Override
+        protected void doEndElement(String uri, String name, String qName) {
+            if (in("Response", "JobsDetail")) {
+                AuditingJobsDetail jobsDetail = response.getJobsDetail();
+                switch (name) {
+                    case "JobId":
+                        jobsDetail.setJobId(getText());
+                        break;
+                    case "State":
+                        jobsDetail.setState(getText());
+                        break;
+                    case "CreationTime":
+                        jobsDetail.setCreationTime(getText());
+                        break;
+                    default:
+                        break;
+
+                }
+            }
+        }
+
+        public TextAuditingResponse getResponse() {
+            return response;
+        }
+
+        public void setResponse(TextAuditingResponse response) {
+            this.response = response;
+        }
+    }
+
+    public static class TextAuditingDescribeJobHandler extends AbstractHandler {
+        private TextAuditingResponse response = new TextAuditingResponse();
+
+        @Override
+        protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
+            List<SectionInfo> sectionList = response.getJobsDetail().getSectionList();
+            if ((in("Response", "Detail") || in("Response", "JobsDetail")) && "Section".equals(name)) {
+                sectionList.add(new SectionInfo());
+            }
+        }
+
+        @Override
+        protected void doEndElement(String uri, String name, String qName) {
+            List<SectionInfo> sectionList = response.getJobsDetail().getSectionList();
+            if (in("Response", "Detail") || in("Response", "JobsDetail")) {
+                AuditingJobsDetail jobsDetail = response.getJobsDetail();
+                switch (name) {
+                    case "Code":
+                        jobsDetail.setCode(getText());
+                        break;
+                    case "Message":
+                        jobsDetail.setMessage(getText());
+                        break;
+                    case "JobId":
+                        jobsDetail.setJobId(getText());
+                        break;
+                    case "State":
+                        jobsDetail.setState(getText());
+                        break;
+                    case "CreationTime":
+                        jobsDetail.setCreationTime(getText());
+                        break;
+                    case "Object":
+                        jobsDetail.setObject(getText());
+                        break;
+                    case "SectionCount":
+                        jobsDetail.setSectionCount(getText());
+                        break;
+                    case "Result":
+                        jobsDetail.setResult(getText());
+                        break;
+                    default:
+                        break;
+                }
+            } else if (in("Response", "Detail", "PornInfo") || in("Response", "JobsDetail", "PornInfo")) {
+                parseInfo(response.getJobsDetail().getPornInfo(), name, getText());
+            } else if (in("Response", "Detail", "PoliticsInfo") || in("Response", "JobsDetail", "PoliticsInfo")) {
+                parseInfo(response.getJobsDetail().getPoliticsInfo(), name, getText());
+            } else if (in("Response", "Detail", "TerrorismInfo") || in("Response", "JobsDetail", "TerrorismInfo")) {
+                parseInfo(response.getJobsDetail().getTerroristInfo(), name, getText());
+            } else if (in("Response", "Detail", "AdsInfo") || in("Response", "JobsDetail", "AdsInfo")) {
+                parseInfo(response.getJobsDetail().getAdsInfo(), name, getText());
+            } else if (in("Response", "Detail", "Section") || in("Response", "JobsDetail", "Section")) {
+                SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
+                if ("StartByte".equals(name))
+                    sectionInfo.setStartByte(getText());
+            } else if (in("Response", "Detail", "Section", "PornInfo") || in("Response", "JobsDetail", "Section", "PornInfo")) {
+                SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
+                parseInfo(sectionInfo.getPornInfo(), name, getText());
+            } else if (in("Response", "Detail", "Section", "PoliticsInfo") || in("Response", "JobsDetail", "Section", "PoliticsInfo")) {
+                SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
+                parseInfo(sectionInfo.getPoliticsInfo(), name, getText());
+            } else if (in("Response", "Detail", "Section", "TerrorismInfo") || in("Response", "JobsDetail", "Section", "TerrorismInfo")) {
+                SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
+                parseInfo(sectionInfo.getTerroristInfo(), name, getText());
+            } else if (in("Response", "Detail", "Section", "AdsInfo") || in("Response", "JobsDetail", "Section", "AdsInfo")) {
+                SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
+                parseInfo(sectionInfo.getAdsInfo(), name, getText());
+            }
+        }
+
+        public TextAuditingResponse getResponse() {
+            return response;
+        }
+
+        public void setResponse(TextAuditingResponse response) {
+            this.response = response;
+        }
+
+        private void parseInfo(AudtingCommonInfo obj, String name, String value) {
+            switch (name) {
+                case "Code":
+                    obj.setCode(value);
+                    break;
+                case "HitFlag":
+                    obj.setHitFlag(getText());
+                    break;
+                case "Score":
+                    obj.setScore(getText());
+                    break;
+                case "Keywords":
+                    obj.setLabel(getText());
+                    break;
+                case "Count":
+                    obj.setCount(getText());
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
 }
 

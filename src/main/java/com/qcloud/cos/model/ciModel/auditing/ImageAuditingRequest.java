@@ -24,6 +24,21 @@ public class ImageAuditingRequest extends CosServiceRequest {
      */
     private String objectKey;
 
+    /**
+     * 截帧频率，GIF 图或长图检测专用，默认值为0，表示只会检测 GIF 图或长图的第一帧
+     */
+    private int interval;
+
+    /**
+     * 最大截帧数量，GIF 图或长图检测专用，默认值为1，表示只取 GIF 的第1帧图片进行审核，或长图不进行切分识别
+     */
+    private int maxFrames;
+
+    /**
+     * 审核策略的唯一标识，由后台自动生成，在控制台中对应为 Biztype 值
+     */
+    private String bizType;
+
     public String getDetectType() {
         return detectType;
     }
@@ -48,12 +63,40 @@ public class ImageAuditingRequest extends CosServiceRequest {
         this.objectKey = objectKey;
     }
 
+
+    public int getInterval() {
+        return interval;
+    }
+
+    public void setInterval(int interval) {
+        this.interval = interval;
+    }
+
+    public int getMaxFrames() {
+        return maxFrames;
+    }
+
+    public void setMaxFrames(int maxFrames) {
+        this.maxFrames = maxFrames;
+    }
+
+    public String getBizType() {
+        return bizType;
+    }
+
+    public void setBizType(String bizType) {
+        this.bizType = bizType;
+    }
+
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("ImageAuditingRequest{");
         sb.append("detectType='").append(detectType).append('\'');
         sb.append(", bucketName='").append(bucketName).append('\'');
         sb.append(", objectKey='").append(objectKey).append('\'');
+        sb.append(", interval=").append(interval);
+        sb.append(", maxFrames=").append(maxFrames);
+        sb.append(", bizType=").append(bizType);
         sb.append('}');
         return sb.toString();
     }

@@ -46,9 +46,12 @@ import com.qcloud.cos.model.DeleteObjectTaggingResult;
 import com.qcloud.cos.model.ObjectMetadata;
 import com.qcloud.cos.model.ciModel.auditing.AudioAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.ImageAuditingResponse;
+import com.qcloud.cos.model.ciModel.auditing.TextAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.VideoAuditingResponse;
 import com.qcloud.cos.model.ciModel.bucket.DocBucketResponse;
 import com.qcloud.cos.model.ciModel.bucket.MediaBucketResponse;
+import com.qcloud.cos.model.ciModel.image.ImageLabelResponse;
+import com.qcloud.cos.model.ciModel.image.ImageLabelV2Response;
 import com.qcloud.cos.model.ciModel.job.DocJobListResponse;
 import com.qcloud.cos.model.ciModel.job.DocJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaJobResponse;
@@ -643,6 +646,42 @@ public class Unmarshallers {
         public AudioAuditingResponse unmarshall(InputStream in) throws Exception {
             return new XmlResponsesSaxParser()
                     .parseDescribeAudioAuditingJobResponse(in).getResponse();
+        }
+    }
+
+    public static final class ImageLabelUnmarshaller
+            implements Unmarshaller<ImageLabelResponse, InputStream> {
+
+        public ImageLabelResponse unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser()
+                    .parseImageLabelResponse(in).getResponse();
+        }
+    }
+
+    public static final class ImageLabelV2Unmarshaller
+            implements Unmarshaller<ImageLabelV2Response, InputStream> {
+
+        public ImageLabelV2Response unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser()
+                    .parseImageLabelV2Response(in).getResponse();
+        }
+    }
+
+    public static final class TextAuditingJobUnmarshaller
+            implements Unmarshaller<TextAuditingResponse, InputStream> {
+
+        public TextAuditingResponse unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser()
+                    .parseTextAuditingResponse(in).getResponse();
+        }
+    }
+
+    public static final class TextAuditingDescribeJobUnmarshaller
+            implements Unmarshaller<TextAuditingResponse, InputStream> {
+
+        public TextAuditingResponse unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser()
+                    .parseTextAuditingDescribeResponse(in).getResponse();
         }
     }
 }
