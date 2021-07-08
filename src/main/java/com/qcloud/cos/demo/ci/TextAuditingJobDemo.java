@@ -50,10 +50,5 @@ public class TextAuditingJobDemo {
         request.setJobId("st84cee320df1c11eb8441525400*****");
         //3.调用接口,获取任务响应对象
         TextAuditingResponse response = client.describeAuditingTextJob(request);
-        try {
-            System.out.println(new ObjectMapper().writeValueAsString(response));
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
     }
 }

@@ -5655,7 +5655,7 @@ public class XmlResponsesSaxParser {
         @Override
         protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
             List<SectionInfo> sectionList = response.getJobsDetail().getSectionList();
-            if (in("Response", "Detail") && "Section".equals(name)) {
+            if ((in("Response", "Detail") || in("Response", "JobsDetail")) && "Section".equals(name)) {
                 sectionList.add(new SectionInfo());
             }
         }
@@ -5663,7 +5663,7 @@ public class XmlResponsesSaxParser {
         @Override
         protected void doEndElement(String uri, String name, String qName) {
             List<SectionInfo> sectionList = response.getJobsDetail().getSectionList();
-            if (in("Response", "Detail")) {
+            if (in("Response", "Detail") || in("Response", "JobsDetail")) {
                 AuditingJobsDetail jobsDetail = response.getJobsDetail();
                 switch (name) {
                     case "Code":
@@ -5693,28 +5693,28 @@ public class XmlResponsesSaxParser {
                     default:
                         break;
                 }
-            } else if (in("Response", "Detail", "PornInfo")) {
+            } else if (in("Response", "Detail", "PornInfo") || in("Response", "JobsDetail", "PornInfo")) {
                 parseInfo(response.getJobsDetail().getPornInfo(), name, getText());
-            } else if (in("Response", "Detail", "PoliticsInfo")) {
+            } else if (in("Response", "Detail", "PoliticsInfo") || in("Response", "JobsDetail", "PoliticsInfo")) {
                 parseInfo(response.getJobsDetail().getPoliticsInfo(), name, getText());
-            } else if (in("Response", "Detail", "TerrorismInfo")) {
+            } else if (in("Response", "Detail", "TerrorismInfo") || in("Response", "JobsDetail", "TerrorismInfo")) {
                 parseInfo(response.getJobsDetail().getTerroristInfo(), name, getText());
-            } else if (in("Response", "Detail", "AdsInfo")) {
+            } else if (in("Response", "Detail", "AdsInfo") || in("Response", "JobsDetail", "AdsInfo")) {
                 parseInfo(response.getJobsDetail().getAdsInfo(), name, getText());
-            } else if (in("Response", "Detail", "Section")) {
+            } else if (in("Response", "Detail", "Section") || in("Response", "JobsDetail", "Section")) {
                 SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
                 if ("StartByte".equals(name))
                     sectionInfo.setStartByte(getText());
-            } else if (in("Response", "Detail", "Section", "PornInfo")) {
+            } else if (in("Response", "Detail", "Section", "PornInfo") || in("Response", "JobsDetail", "Section", "PornInfo")) {
                 SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
                 parseInfo(sectionInfo.getPornInfo(), name, getText());
-            } else if (in("Response", "Detail", "Section", "PoliticsInfo")) {
+            } else if (in("Response", "Detail", "Section", "PoliticsInfo") || in("Response", "JobsDetail", "Section", "PoliticsInfo")) {
                 SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
                 parseInfo(sectionInfo.getPoliticsInfo(), name, getText());
-            } else if (in("Response", "Detail", "Section", "TerrorismInfo")) {
+            } else if (in("Response", "Detail", "Section", "TerrorismInfo") || in("Response", "JobsDetail", "Section", "TerrorismInfo")) {
                 SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
                 parseInfo(sectionInfo.getTerroristInfo(), name, getText());
-            } else if (in("Response", "Detail", "Section", "AdsInfo")) {
+            } else if (in("Response", "Detail", "Section", "AdsInfo") || in("Response", "JobsDetail", "Section", "AdsInfo")) {
                 SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
                 parseInfo(sectionInfo.getAdsInfo(), name, getText());
             }
