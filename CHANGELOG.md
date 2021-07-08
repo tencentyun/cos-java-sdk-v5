@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ###Added
 - update media transcode api
 - add media transcode demo
+- fix resumable download create directory error
+- add some demos
 
 ## [5.6.46] - 2021-7-8
 
