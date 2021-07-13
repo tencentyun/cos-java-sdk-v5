@@ -7,15 +7,19 @@ import java.io.Serializable;
 public class MediaTransConfigObject implements Serializable {
 
     /**
-     * 分辨率调整方式
+     * 分辨率调整方式 取值 scale、crop、pad、none
+     * 当输出视频的宽高比与原视频不等时，根据此参数做分辨率的相应调整
      */
     private String adjDarMethod;
     /**
-     * 是否检查分辨率
+     * 是否检查分辨率 true、false
+     * 当为 false时，按照配置参数转码
      */
     private String isCheckReso;
     /**
-     * 分辨率调整方式
+     * 分辨率调整方式 取值0、1；0 表示使用原视频分辨率；
+     * 1表示返回转码失败
+     * 当 IsCheckReso 为 true 时生效
      */
     private String resoAdjMethod;
     /**

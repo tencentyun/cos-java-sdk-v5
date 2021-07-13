@@ -18,6 +18,7 @@ public class MediaJobOperation {
     private MediaInfoObjcet mediaInfo;
     private MediaRemoveWaterMark removeWatermark;
     private MediaWatermark watermark;
+    private MediaTranscodeObject transcode;
     private List<String> watermarkTemplateId;
     private MediaConcatTemplateObject mediaConcatTemplate;
 
@@ -111,15 +112,27 @@ public class MediaJobOperation {
         this.mediaConcatTemplate = mediaConcatTemplate;
     }
 
+    public MediaTranscodeObject getTranscode() {
+        if (transcode == null) {
+            transcode = new MediaTranscodeObject();
+        }
+        return transcode;
+    }
+
+    public void setTranscode(MediaTranscodeObject transcode) {
+        this.transcode = transcode;
+    }
+
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("MediaJobOperation{");
+        final StringBuffer sb = new StringBuffer("MediaJobOperation{");
         sb.append("templateId='").append(templateId).append('\'');
         sb.append(", output=").append(output);
         sb.append(", mediaAnimation=").append(mediaAnimation);
         sb.append(", mediaInfo=").append(mediaInfo);
         sb.append(", removeWatermark=").append(removeWatermark);
         sb.append(", watermark=").append(watermark);
+        sb.append(", transcode=").append(transcode);
         sb.append(", watermarkTemplateId=").append(watermarkTemplateId);
         sb.append(", mediaConcatTemplate=").append(mediaConcatTemplate);
         sb.append('}');

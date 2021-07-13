@@ -1,5 +1,6 @@
 package com.qcloud.cos.internal;
 
+import com.qcloud.cos.model.ciModel.job.MediaTranscodeVideoObject;
 import com.qcloud.cos.model.ciModel.job.MediaVideoObject;
 import com.qcloud.cos.model.ciModel.job.MediaTimeIntervalObject;
 import com.qcloud.cos.model.ciModel.job.MediaTransConfigObject;
@@ -78,6 +79,8 @@ public class ParserMediaInfoUtils {
             case "Width":
                 video.setWidth(value);
                 break;
+            default:
+                break;
         }
     }
 
@@ -152,6 +155,54 @@ public class ParserMediaInfoUtils {
             case "ScanMode":
                 video.setScanMode(value);
                 break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParsingMediaVideo(MediaTranscodeVideoObject video, String name, String value) {
+        switch (name) {
+            case "Codec":
+                video.setCodec(value);
+                break;
+            case "Crf":
+                video.setCrf(value);
+                break;
+            case "Fps":
+                video.setFps(value);
+                break;
+            case "Height":
+                video.setHeight(value);
+                break;
+            case "Width":
+                video.setWidth(value);
+                break;
+            case "Maxrate":
+                video.setMaxrate(value);
+                break;
+            case "BufSize":
+                video.setBufSize(value);
+                break;
+            case "Preset":
+                video.setPreset(value);
+                break;
+            case "Bitrate":
+                video.setBitrate(value);
+                break;
+            case "Profile":
+                video.setProfile(value);
+                break;
+            case "Gop":
+                video.setGop(value);
+                break;
+            case "Remove":
+                video.setRemove(value);
+                break;
+            case "ScanMode":
+                video.setScanMode(value);
+                break;
+            default:
+                break;
         }
     }
 
@@ -162,6 +213,8 @@ public class ParserMediaInfoUtils {
                 break;
             case "Start":
                 timeInterval.setStart(value);
+                break;
+            default:
                 break;
         }
     }
@@ -189,6 +242,8 @@ public class ParserMediaInfoUtils {
             case "TimeInterval":
                 snapshot.setTimeInterval(value);
                 break;
+            default:
+                break;
         }
     }
 
@@ -211,6 +266,8 @@ public class ParserMediaInfoUtils {
                 break;
             case "Remove":
                 audio.setRemove(value);
+                break;
+            default:
                 break;
         }
     }
@@ -241,6 +298,8 @@ public class ParserMediaInfoUtils {
             case "VideoBitrateAdjMethod":
                 transConfig.setVideoBitrateAdjMethod(value);
                 break;
+            default:
+                break;
         }
     }
 
@@ -267,6 +326,8 @@ public class ParserMediaInfoUtils {
             case "Type":
                 watermark.setType(value);
                 break;
+            default:
+                break;
         }
     }
 
@@ -287,6 +348,8 @@ public class ParserMediaInfoUtils {
             case "FontColor":
                 text.setFontColor(value);
                 break;
+            default:
+                break;
         }
     }
 
@@ -306,6 +369,8 @@ public class ParserMediaInfoUtils {
                 break;
             case "Url":
                 image.setUrl(value);
+                break;
+            default:
                 break;
         }
     }
@@ -335,6 +400,8 @@ public class ParserMediaInfoUtils {
                 break;
             case "StartTime":
                 format.setStartTime(value);
+                break;
+            default:
                 break;
         }
     }
@@ -386,6 +453,30 @@ public class ParserMediaInfoUtils {
             case "CodecName":
                 audio.setCodecName(value);
                 break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParsingStreamAudio(MediaAudioObject audio, String name, String value) {
+        switch (name) {
+            case "Codec":
+                audio.setCodec(value);
+                break;
+            case "Samplerate":
+                audio.setSamplerate(value);
+                break;
+            case "Bitrate":
+                audio.setBitrate(value);
+                break;
+            case "Channels":
+                audio.setChannels(value);
+                break;
+            case "Remove":
+                audio.setRemove(value);
+                break;
+            default:
+                break;
         }
     }
 
@@ -396,6 +487,8 @@ public class ParserMediaInfoUtils {
                 break;
             case "Language":
                 subtitle.setLanguage(value);
+                break;
+            default:
                 break;
         }
     }
@@ -416,6 +509,8 @@ public class ParserMediaInfoUtils {
                 break;
             case "Width":
                 removeWatermark.setWidth(value);
+                break;
+            default:
                 break;
         }
     }

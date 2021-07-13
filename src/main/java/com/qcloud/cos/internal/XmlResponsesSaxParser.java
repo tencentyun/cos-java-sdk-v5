@@ -63,6 +63,7 @@ import com.qcloud.cos.model.ciModel.job.MediaListJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaRemoveWaterMark;
 import com.qcloud.cos.model.ciModel.job.MediaTransConfigObject;
 import com.qcloud.cos.model.ciModel.job.MediaAudioObject;
+import com.qcloud.cos.model.ciModel.job.MediaTranscodeVideoObject;
 import com.qcloud.cos.model.ciModel.job.MediaVideoObject;
 import com.qcloud.cos.model.ciModel.job.MediaJobObject;
 import com.qcloud.cos.model.ciModel.job.MediaJobResponse;
@@ -3973,6 +3974,21 @@ public class XmlResponsesSaxParser {
             } else if (in("Response", "JobsDetail", "Operation", "Watermark", "Image")) {
                 MediaWaterMarkImage image = jobsDetail.getOperation().getWatermark().getImage();
                 ParserMediaInfoUtils.ParsingWatermarkImage(image, name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "Transcode", "Container")) {
+                if ("Format".equalsIgnoreCase(name))
+                    response.getJobsDetail().getOperation().getTranscode().getContainer().setFormat(getText());
+            } else if (in("Response", "JobsDetail", "Operation", "Transcode", "Video")) {
+                MediaAudioObject audio = jobsDetail.getOperation().getTranscode().getAudio();
+                ParserMediaInfoUtils.ParsingStreamAudio(audio, name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "Transcode", "Audio")) {
+                MediaTranscodeVideoObject video = jobsDetail.getOperation().getTranscode().getVideo();
+                ParserMediaInfoUtils.ParsingMediaVideo(video, name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "Transcode", "TransConfig")) {
+                MediaTransConfigObject transConfig = jobsDetail.getOperation().getTranscode().getTransConfig();
+                ParserMediaInfoUtils.ParsingTransConfig(transConfig, name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "Transcode", "TimeInterval")) {
+                MediaTimeIntervalObject timeInterval = jobsDetail.getOperation().getTranscode().getTimeInterval();
+                ParserMediaInfoUtils.ParsingMediaTimeInterval(timeInterval, name, getText());
             } else if (in("Response", "JobsDetail", "Operation", "Output")) {
                 MediaOutputObject output = jobsDetail.getOperation().getOutput();
                 switch (name) {
@@ -4100,7 +4116,23 @@ public class XmlResponsesSaxParser {
             } else if (in("Response", "JobsDetail", "Operation", "RemoveWatermark")) {
                 MediaRemoveWaterMark removeWatermark = jobsDetail.getOperation().getRemoveWatermark();
                 ParserMediaInfoUtils.ParsingRemoveWatermark(removeWatermark, name, getText());
-            } else if (in("Response", "JobsDetail", "Operation", "Output")) {
+            }else if (in("Response", "JobsDetail", "Operation", "Transcode", "Container")) {
+                if ("Format".equalsIgnoreCase(name))
+                    jobsDetail.getOperation().getTranscode().getContainer().setFormat(getText());
+            } else if (in("Response", "JobsDetail", "Operation", "Transcode", "Video")) {
+                MediaAudioObject audio = jobsDetail.getOperation().getTranscode().getAudio();
+                ParserMediaInfoUtils.ParsingStreamAudio(audio, name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "Transcode", "Audio")) {
+                MediaTranscodeVideoObject video = jobsDetail.getOperation().getTranscode().getVideo();
+                ParserMediaInfoUtils.ParsingMediaVideo(video, name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "Transcode", "TransConfig")) {
+                MediaTransConfigObject transConfig = jobsDetail.getOperation().getTranscode().getTransConfig();
+                ParserMediaInfoUtils.ParsingTransConfig(transConfig, name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "Transcode", "TimeInterval")) {
+                MediaTimeIntervalObject timeInterval = jobsDetail.getOperation().getTranscode().getTimeInterval();
+                ParserMediaInfoUtils.ParsingMediaTimeInterval(timeInterval, name, getText());
+            }
+            else if (in("Response", "JobsDetail", "Operation", "Output")) {
                 MediaOutputObject output = jobsDetail.getOperation().getOutput();
                 switch (name) {
                     case "Bucket":
@@ -4235,6 +4267,21 @@ public class XmlResponsesSaxParser {
             } else if (in("Response", "JobsDetail", "Operation", "RemoveWatermark")) {
                 MediaRemoveWaterMark removeWatermark = jobsDetail.getOperation().getRemoveWatermark();
                 ParserMediaInfoUtils.ParsingRemoveWatermark(removeWatermark, name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "Transcode", "Container")) {
+                if ("Format".equalsIgnoreCase(name))
+                    jobsDetail.getOperation().getTranscode().getContainer().setFormat(getText());
+            } else if (in("Response", "JobsDetail", "Operation", "Transcode", "Video")) {
+                MediaAudioObject audio = jobsDetail.getOperation().getTranscode().getAudio();
+                ParserMediaInfoUtils.ParsingStreamAudio(audio, name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "Transcode", "Audio")) {
+                MediaTranscodeVideoObject video = jobsDetail.getOperation().getTranscode().getVideo();
+                ParserMediaInfoUtils.ParsingMediaVideo(video, name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "Transcode", "TransConfig")) {
+                MediaTransConfigObject transConfig = jobsDetail.getOperation().getTranscode().getTransConfig();
+                ParserMediaInfoUtils.ParsingTransConfig(transConfig, name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "Transcode", "TimeInterval")) {
+                MediaTimeIntervalObject timeInterval = jobsDetail.getOperation().getTranscode().getTimeInterval();
+                ParserMediaInfoUtils.ParsingMediaTimeInterval(timeInterval, name, getText());
             } else if (in("Response", "JobsDetail", "Operation", "Output")) {
                 MediaOutputObject output = jobsDetail.getOperation().getOutput();
                 switch (name) {
