@@ -53,6 +53,10 @@ import com.qcloud.cos.model.ciModel.job.MediaConcatTemplateObject;
 import com.qcloud.cos.model.ciModel.job.MediaJobOperation;
 import com.qcloud.cos.model.ciModel.job.MediaJobsRequest;
 import com.qcloud.cos.model.ciModel.job.MediaRemoveWaterMark;
+import com.qcloud.cos.model.ciModel.job.MediaTimeIntervalObject;
+import com.qcloud.cos.model.ciModel.job.MediaTransConfigObject;
+import com.qcloud.cos.model.ciModel.job.MediaTranscodeObject;
+import com.qcloud.cos.model.ciModel.job.MediaTranscodeVideoObject;
 import com.qcloud.cos.model.ciModel.job.MediaVideoObject;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoRequest;
 import com.qcloud.cos.model.ciModel.queue.DocQueueRequest;
@@ -404,6 +408,48 @@ public class RequestXmlFactory {
             xml.end();
         }
 
+        MediaTranscodeObject transcode = operation.getTranscode();
+        String format = transcode.getContainer().getFormat();
+        if (CheckObjectUtils.objIsNotValid(transcode) && !StringUtils.isNullOrEmpty(format)) {
+            xml.start("Transcode");
+            MediaTranscodeVideoObject video = transcode.getVideo();
+            MediaAudioObject audio = transcode.getAudio();
+            MediaTransConfigObject transConfig = transcode.getTransConfig();
+            MediaTimeIntervalObject timeInterval = transcode.getTimeInterval();
+            if (format != null) {
+                xml.start("Container");
+                xml.start("Format").value(format).end();
+                xml.end();
+            }
+            if (CheckObjectUtils.objIsNotValid(timeInterval)) {
+                xml.start("TimeInterval");
+                xml.start("Duration").value(timeInterval.getDuration()).end();
+                xml.start("Start").value(timeInterval.getStart()).end();
+                xml.end();
+            }
+            if (CheckObjectUtils.objIsNotValid(video)) {
+                addVideo(xml, video);
+
+            }
+            if (CheckObjectUtils.objIsNotValid(audio)) {
+                addAudio(xml, audio);
+            }
+
+            if (CheckObjectUtils.objIsNotValid(transConfig)) {
+                xml.start("TransConfig");
+                addIfNotNull(xml, "AdjDarMethod", transConfig.getAdjDarMethod());
+                addIfNotNull(xml, "AudioBitrateAdjMethod", transConfig.getAudioBitrateAdjMethod());
+                addIfNotNull(xml, "IsCheckAudioBitrate", transConfig.getIsCheckAudioBitrate());
+                addIfNotNull(xml, "IsCheckReso", transConfig.getIsCheckReso());
+                addIfNotNull(xml, "IsCheckVideoBitrate", transConfig.getIsCheckVideoBitrate());
+                addIfNotNull(xml, "ResoAdjMethod", transConfig.getResoAdjMethod());
+                addIfNotNull(xml, "TransMode", transConfig.getTransMode());
+                addIfNotNull(xml, "VideoBitrateAdjMethod", transConfig.getVideoBitrateAdjMethod());
+                xml.end();
+            }
+            xml.end();
+        }
+
         xml.start("Output");
         xml.start("Region").value(operation.getOutput().getRegion()).end();
         xml.start("Object").value(operation.getOutput().getObject()).end();
@@ -412,7 +458,7 @@ public class RequestXmlFactory {
 
         xml.end();
         xml.start("QueueId").value(request.getQueueId()).end();
-        addIfNotNull(xml,"CallBack",request.getCallBack());
+        addIfNotNull(xml, "CallBack", request.getCallBack());
         xml.end();
         return xml.getBytes();
     }
@@ -797,6 +843,27 @@ public class RequestXmlFactory {
         xml.end();
     }
 
+    private static void addVideo(XmlWriter xml, MediaTranscodeVideoObject video){
+        if (CheckObjectUtils.objIsValid(video)) {
+            return;
+        }
+        xml.start("Video");
+        addIfNotNull(xml, "Codec", video.getCodec());
+        addIfNotNull(xml, "Width", video.getWidth());
+        addIfNotNull(xml, "Height", video.getHeight());
+        addIfNotNull(xml, "Fps", video.getFps());
+        addIfNotNull(xml, "Bitrate", video.getBitrate());
+        addIfNotNull(xml, "BufSize", video.getBufSize());
+        addIfNotNull(xml, "Crf", video.getCrf());
+        addIfNotNull(xml, "Gop", video.getGop());
+        addIfNotNull(xml, "Maxrate", video.getMaxrate());
+        addIfNotNull(xml, "Preset", video.getPreset());
+        addIfNotNull(xml, "Profile", video.getProfile());
+        addIfNotNull(xml, "Remove", video.getRemove());
+        addIfNotNull(xml, "ScanMode", video.getScanMode());
+        xml.end();
+    }
+
     /**
      * 对象校验内部静态工具类
      */
@@ -816,7 +883,8 @@ public class RequestXmlFactory {
                 //不检查 直接取值
                 field.setAccessible(true);
                 try {
-                    if (!isValid(field.get(obj))) {
+                    Object o = field.get(obj);
+                    if (!isValid(o)) {
                         //不为空
                         return true;
                     }
