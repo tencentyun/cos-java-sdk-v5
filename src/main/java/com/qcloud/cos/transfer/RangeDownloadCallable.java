@@ -90,6 +90,7 @@ public class RangeDownloadCallable implements Callable<DownloadPart> {
         destFileChannel.write(tmpBuf, position);
 
         if (start != end + 1) {
+            destFileChannel.close();
             destFile.delete();
             String msg = String.format("get object want %d bytes, but got %d bytes, reqeust_id: %s",
                 end + 1, start, meta.getRequestId());

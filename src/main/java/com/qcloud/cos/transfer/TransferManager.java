@@ -677,7 +677,7 @@ public class TransferManager {
                 download, destFile, destRandomAccessFile, destFileChannel, downloadRecord, partSize, multiThreadThreshold, transferProgress, listenerChain);
 
         ResumableDownloadMonitor monitor = ResumableDownloadMonitor.create(listenerChain, submitter, download, threadPool,
-                downloadRecord, destFile);
+                downloadRecord, destFile, destFileChannel);
 
         download.setMonitor(monitor);
         return download;

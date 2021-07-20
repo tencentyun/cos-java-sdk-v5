@@ -23,6 +23,7 @@ import static com.qcloud.cos.event.SDKProgressPublisher.publishProgress;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -51,6 +52,7 @@ public class ResumableDownloadMonitor implements Callable<File>, TransferMonitor
     private final DownloadImpl transfer;
     private final PersistableResumeDownload downloadRecord;
     private final File destFile;
+    private final FileChannel destFileChannel;
     private final List<Future<DownloadPart>> futures =
             Collections.synchronizedList(new ArrayList<Future<DownloadPart>>());
 
@@ -68,22 +70,23 @@ public class ResumableDownloadMonitor implements Callable<File>, TransferMonitor
     ResumableDownloadMonitor(ProgressListenerChain listener,
             ResumableDownloadSubmitter downloadSubmitter, DownloadImpl transfer,
             PersistableResumeDownload downloadRecord,
-            File destFile) {
+            File destFile, FileChannel destFileChannel) {
 
         this.listener = listener;
         this.downloadSubmitter = downloadSubmitter;
         this.transfer = transfer;
         this.downloadRecord = downloadRecord;
         this.destFile = destFile;
+        this.destFileChannel = destFileChannel;
     }
 
     public static ResumableDownloadMonitor create(ProgressListenerChain listener,
             ResumableDownloadSubmitter downloadSubmitter, DownloadImpl transfer,
             ExecutorService threadPool, PersistableResumeDownload downloadRecord,
-            File destFile) {
+            File destFile, FileChannel destFileChannel) {
 
         ResumableDownloadMonitor monitor = new ResumableDownloadMonitor(listener, downloadSubmitter,
-            transfer, downloadRecord, destFile);
+            transfer, downloadRecord, destFile, destFileChannel);
         monitor.futureReference.compareAndSet(null, threadPool.submit(monitor));
         return monitor;
     }
@@ -117,6 +120,8 @@ public class ResumableDownloadMonitor implements Callable<File>, TransferMonitor
 
             // download finished.
             downloadRecord.getDumpFile().delete();
+
+            destFileChannel.close();
 
             if ((downloadRecord.getCrc64ecma() != null) && !downloadRecord.getCrc64ecma().isEmpty()) {
                 checkCRC(downloadParts);
