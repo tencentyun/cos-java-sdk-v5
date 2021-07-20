@@ -141,5 +141,6 @@ public class PersistableResumeDownload extends PersistableTransfer {
     public synchronized void dump() throws Exception {
         OutputStream out = new FileOutputStream(dumpFile);
         this.serialize(out);
+        out.close();
     }
 }

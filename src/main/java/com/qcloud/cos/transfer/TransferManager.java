@@ -581,6 +581,7 @@ public class TransferManager {
         }
 
         PersistableResumeDownload downloadRecord = null;
+        FileInputStream is = null;
         try {
 
             // attempt to create the parent if it doesn't exist
@@ -597,12 +598,22 @@ public class TransferManager {
                 resumableTaskFile.createNewFile();
             }
 
-            downloadRecord = PersistableResumeDownload.deserializeFrom(new FileInputStream(resumableTaskFile));
+            is = new FileInputStream(resumableTaskFile);
+
+            downloadRecord = PersistableResumeDownload.deserializeFrom(is);
             log.info("deserialize download record from " + resumableTaskFile.getAbsolutePath() + "record: " + downloadRecord.serialize());
         } catch (IOException e) {
             throw new CosClientException("can not create file" + resumableTaskFile.getAbsolutePath() + e);
         } catch (IllegalArgumentException e) {
             log.warn("resumedownload task file cannot deserialize"+e);
+        } finally {
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    throw new CosClientException("can not close input stream " + resumableTaskFile.getAbsolutePath() + e);
+                }
+            }
         }
 
         if (downloadRecord == null || downloadRecord.getLastModified() != cosLastModified ||
