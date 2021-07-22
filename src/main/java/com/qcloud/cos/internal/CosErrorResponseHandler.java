@@ -101,6 +101,7 @@ public class CosErrorResponseHandler implements HttpResponseHandler<CosServiceEx
              */
             int targetDepth = 0;
             final CosServiceExceptionBuilder exceptionBuilder = new CosServiceExceptionBuilder();
+            exceptionBuilder.setHeaders(httpResponse.getHeaders());
             exceptionBuilder.setErrorResponseXml(content);
             exceptionBuilder.setStatusCode(httpResponse.getStatusCode());
 
