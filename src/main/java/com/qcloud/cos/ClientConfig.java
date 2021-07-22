@@ -25,6 +25,7 @@ import com.qcloud.cos.endpoint.EndpointResolver;
 import com.qcloud.cos.endpoint.RegionEndpointBuilder;
 import com.qcloud.cos.endpoint.SuffixEndpointBuilder;
 import com.qcloud.cos.http.HttpProtocol;
+import com.qcloud.cos.internal.CosErrorResponseHandler;
 import com.qcloud.cos.region.Region;
 import com.qcloud.cos.retry.BackoffStrategy;
 import com.qcloud.cos.retry.PredefinedBackoffStrategies;
@@ -86,6 +87,7 @@ public class ClientConfig {
     private String userAgent = DEFAULT_USER_AGENT;
     private int readLimit = DEFAULT_READ_LIMIT;
     private COSSigner cosSigner = new COSSigner();
+    private CosErrorResponseHandler cosErrorResponseHandler = new CosErrorResponseHandler();
 
     // 不传入region 用于后续调用List Buckets(获取所有的bucket信息)
     public ClientConfig() {
@@ -270,5 +272,13 @@ public class ClientConfig {
 
     public void setCosSigner(COSSigner cosSigner) {
         this.cosSigner = cosSigner;
+    }
+
+    public CosErrorResponseHandler getCosErrorResponseHandler() {
+        return cosErrorResponseHandler;
+    }
+
+    public void setCosErrorResponseHandler(CosErrorResponseHandler cosErrorResponseHandler) {
+        this.cosErrorResponseHandler = cosErrorResponseHandler;
     }
 }
