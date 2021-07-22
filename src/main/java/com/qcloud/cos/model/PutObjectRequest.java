@@ -96,6 +96,10 @@ public class PutObjectRequest extends AbstractPutObjectRequest implements Serial
     public PutObjectRequest(String bucketName, String key, File file) {
         super(bucketName, key, file);
     }
+ 
+    public PutObjectRequest(String bucketName, String key, File file) {
+        this(bucketName, key, file, null);
+    }
 
     /**
      * Constructs a new
@@ -142,6 +146,10 @@ public class PutObjectRequest extends AbstractPutObjectRequest implements Serial
     public PutObjectRequest(String bucketName, String key, InputStream input,
             ObjectMetadata metadata) {
         super(bucketName, key, input, metadata);
+    }
+ 
+   public PutObjectRequest(String bucketName, String key, InputStream input) {
+        this(bucketName, key, input, null);
     }
 
     /**
