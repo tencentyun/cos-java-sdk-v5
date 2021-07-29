@@ -20,7 +20,6 @@ package com.qcloud.cos.model;
 import java.io.Serializable;
 
 import com.qcloud.cos.internal.CosServiceRequest;
-import com.qcloud.cos.model.BucketDomainConfiguration;
 
 /**
  * Request object for the parameters to set a bucket's domain configuration.

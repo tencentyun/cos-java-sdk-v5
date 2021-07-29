@@ -3061,6 +3061,25 @@ public class COSClient implements COS {
     }
 
     @Override
+    public void deleteBucketDomainConfiguration(String bucketName)
+            throws CosClientException, CosServiceException {
+        deleteBucketDomainConfiguration(new DeleteBucketDomainConfigurationRequest(bucketName));
+    }
+
+    @Override
+    public void deleteBucketDomainConfiguration(DeleteBucketDomainConfigurationRequest deleteBucketDomainConfigurationRequest) {
+        String bucketName = deleteBucketDomainConfigurationRequest.getBucketName();
+
+        rejectNull(bucketName,
+                "The bucket name parameter must be specified when deleting a bucket's domain configuration");
+
+        CosHttpRequest<DeleteBucketDomainConfigurationRequest> request = createRequest(bucketName, null, deleteBucketDomainConfigurationRequest, HttpMethodName.DELETE);
+        request.addParameter("domain", null);
+
+        invoke(request, voidCosResponseHandler);
+    }
+
+    @Override
     public void setBucketDomainConfiguration(String bucketName, BucketDomainConfiguration configuration)
             throws CosClientException, CosServiceException {
         setBucketDomainConfiguration(new SetBucketDomainConfigurationRequest(bucketName, configuration));

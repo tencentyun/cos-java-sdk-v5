@@ -18,32 +18,36 @@
 
 package com.qcloud.cos.internal;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+
 import com.qcloud.cos.internal.XmlResponsesSaxParser.CompleteMultipartUploadHandler;
 import com.qcloud.cos.internal.XmlResponsesSaxParser.CopyObjectResultHandler;
 import com.qcloud.cos.model.AccessControlList;
 import com.qcloud.cos.model.Bucket;
-import com.qcloud.cos.model.BucketIntelligentTierConfiguration;
-import com.qcloud.cos.model.BucketVersioningConfiguration;
-import com.qcloud.cos.model.InitiateMultipartUploadResult;
-import com.qcloud.cos.model.MultipartUploadListing;
-import com.qcloud.cos.model.SetBucketInventoryConfigurationResult;
-import com.qcloud.cos.model.BucketTaggingConfiguration;
-import com.qcloud.cos.model.ObjectListing;
-import com.qcloud.cos.model.VersionListing;
-import com.qcloud.cos.model.PartListing;
-import com.qcloud.cos.model.ListBucketInventoryConfigurationsResult;
-import com.qcloud.cos.model.SetObjectTaggingResult;
-import com.qcloud.cos.model.GetBucketInventoryConfigurationResult;
-import com.qcloud.cos.model.BucketDomainConfiguration;
-import com.qcloud.cos.model.BucketLifecycleConfiguration;
 import com.qcloud.cos.model.BucketCrossOriginConfiguration;
-import com.qcloud.cos.model.DeleteBucketInventoryConfigurationResult;
-import com.qcloud.cos.model.GetObjectTaggingResult;
-import com.qcloud.cos.model.BucketWebsiteConfiguration;
-import com.qcloud.cos.model.BucketReplicationConfiguration;
+import com.qcloud.cos.model.BucketDomainConfiguration;
+import com.qcloud.cos.model.BucketIntelligentTierConfiguration;
+import com.qcloud.cos.model.BucketLifecycleConfiguration;
 import com.qcloud.cos.model.BucketLoggingConfiguration;
+import com.qcloud.cos.model.BucketReplicationConfiguration;
+import com.qcloud.cos.model.BucketTaggingConfiguration;
+import com.qcloud.cos.model.BucketVersioningConfiguration;
+import com.qcloud.cos.model.BucketWebsiteConfiguration;
+import com.qcloud.cos.model.DeleteBucketInventoryConfigurationResult;
 import com.qcloud.cos.model.DeleteObjectTaggingResult;
+import com.qcloud.cos.model.GetBucketInventoryConfigurationResult;
+import com.qcloud.cos.model.GetObjectTaggingResult;
+import com.qcloud.cos.model.InitiateMultipartUploadResult;
+import com.qcloud.cos.model.ListBucketInventoryConfigurationsResult;
+import com.qcloud.cos.model.MultipartUploadListing;
+import com.qcloud.cos.model.ObjectListing;
 import com.qcloud.cos.model.ObjectMetadata;
+import com.qcloud.cos.model.PartListing;
+import com.qcloud.cos.model.SetBucketInventoryConfigurationResult;
+import com.qcloud.cos.model.SetObjectTaggingResult;
+import com.qcloud.cos.model.VersionListing;
 import com.qcloud.cos.model.ciModel.auditing.AudioAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.ImageAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.TextAuditingResponse;
@@ -67,10 +71,6 @@ import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowExecutionResponse;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowExecutionsResponse;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowListResponse;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowResponse;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
 
 /*** Collection of unmarshallers for COS XML responses. */
 
@@ -316,6 +316,9 @@ public class Unmarshallers {
     public static final class BucketDomainConfigurationUnmarshaller
             implements Unmarshaller<BucketDomainConfiguration, InputStream> {
         public BucketDomainConfiguration unmarshall(InputStream in) throws Exception {
+            if (in.available() == 0) {
+                return null;
+            }
             return new XmlResponsesSaxParser().parseBucketDomainConfigurationResponse(in)
                     .getConfiguration();
         }

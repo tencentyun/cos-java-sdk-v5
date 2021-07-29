@@ -30,8 +30,7 @@ import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.exception.MultiObjectDeleteException;
 import com.qcloud.cos.http.HttpMethodName;
 import com.qcloud.cos.internal.COSDirectSpi;
-import com.qcloud.cos.model.AbortMultipartUploadRequest;
-import com.qcloud.cos.model.AccessControlList;
+import com.qcloud.cos.model.*;
 import com.qcloud.cos.model.ciModel.auditing.AudioAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.AudioAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.ImageAuditingRequest;
@@ -40,91 +39,11 @@ import com.qcloud.cos.model.ciModel.auditing.TextAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.TextAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.VideoAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.VideoAuditingResponse;
-import com.qcloud.cos.model.ciModel.common.ImageProcessRequest;
-import com.qcloud.cos.model.Bucket;
-import com.qcloud.cos.model.BucketCrossOriginConfiguration;
-import com.qcloud.cos.model.BucketIntelligentTierConfiguration;
-import com.qcloud.cos.model.BucketLifecycleConfiguration;
-import com.qcloud.cos.model.BucketPolicy;
-import com.qcloud.cos.model.BucketReplicationConfiguration;
-import com.qcloud.cos.model.BucketVersioningConfiguration;
-import com.qcloud.cos.model.GetBucketIntelligentTierConfigurationRequest;
-import com.qcloud.cos.model.SetBucketIntelligentTierConfigurationRequest;
-import com.qcloud.cos.model.SetBucketLoggingConfigurationRequest;
-import com.qcloud.cos.model.GetBucketLoggingConfigurationRequest;
-import com.qcloud.cos.model.BucketLoggingConfiguration;
-import com.qcloud.cos.model.COSObject;
-import com.qcloud.cos.model.CannedAccessControlList;
-import com.qcloud.cos.model.CompleteMultipartUploadRequest;
-import com.qcloud.cos.model.CompleteMultipartUploadResult;
-import com.qcloud.cos.model.CopyObjectRequest;
-import com.qcloud.cos.model.CopyObjectResult;
-import com.qcloud.cos.model.CopyPartRequest;
-import com.qcloud.cos.model.CopyPartResult;
-import com.qcloud.cos.model.CreateBucketRequest;
-import com.qcloud.cos.model.DeleteBucketCrossOriginConfigurationRequest;
-import com.qcloud.cos.model.DeleteBucketLifecycleConfigurationRequest;
-import com.qcloud.cos.model.DeleteBucketPolicyRequest;
-import com.qcloud.cos.model.DeleteBucketReplicationConfigurationRequest;
-import com.qcloud.cos.model.DeleteBucketRequest;
-import com.qcloud.cos.model.DeleteObjectRequest;
-import com.qcloud.cos.model.DeleteObjectsRequest;
-import com.qcloud.cos.model.DeleteObjectsResult;
-import com.qcloud.cos.model.DeleteVersionRequest;
-import com.qcloud.cos.model.GeneratePresignedUrlRequest;
-import com.qcloud.cos.model.GetBucketAclRequest;
-import com.qcloud.cos.model.GetBucketCrossOriginConfigurationRequest;
-import com.qcloud.cos.model.GetBucketLifecycleConfigurationRequest;
-import com.qcloud.cos.model.GetBucketLocationRequest;
-import com.qcloud.cos.model.GetBucketPolicyRequest;
-import com.qcloud.cos.model.GetBucketReplicationConfigurationRequest;
-import com.qcloud.cos.model.GetBucketVersioningConfigurationRequest;
-import com.qcloud.cos.model.GetObjectAclRequest;
-import com.qcloud.cos.model.GetObjectMetadataRequest;
-import com.qcloud.cos.model.GetObjectRequest;
-import com.qcloud.cos.model.HeadBucketRequest;
-import com.qcloud.cos.model.HeadBucketResult;
-import com.qcloud.cos.model.InitiateMultipartUploadRequest;
-import com.qcloud.cos.model.InitiateMultipartUploadResult;
-import com.qcloud.cos.model.ListBucketsRequest;
-import com.qcloud.cos.model.ListMultipartUploadsRequest;
-import com.qcloud.cos.model.ListNextBatchOfObjectsRequest;
-import com.qcloud.cos.model.ListNextBatchOfVersionsRequest;
-import com.qcloud.cos.model.ListObjectsRequest;
-import com.qcloud.cos.model.ListPartsRequest;
-import com.qcloud.cos.model.ListVersionsRequest;
-import com.qcloud.cos.model.MultipartUploadListing;
-import com.qcloud.cos.model.ObjectListing;
-import com.qcloud.cos.model.ObjectMetadata;
-import com.qcloud.cos.model.PartListing;
-import com.qcloud.cos.model.PutObjectRequest;
-import com.qcloud.cos.model.PutObjectResult;
-import com.qcloud.cos.model.RestoreObjectRequest;
-import com.qcloud.cos.model.SetBucketAclRequest;
-import com.qcloud.cos.model.SetBucketCrossOriginConfigurationRequest;
-import com.qcloud.cos.model.SetBucketLifecycleConfigurationRequest;
-import com.qcloud.cos.model.SetBucketPolicyRequest;
-import com.qcloud.cos.model.SetBucketReplicationConfigurationRequest;
-import com.qcloud.cos.model.SetBucketVersioningConfigurationRequest;
-import com.qcloud.cos.model.SetObjectAclRequest;
-import com.qcloud.cos.model.UploadPartRequest;
-import com.qcloud.cos.model.UploadPartResult;
-import com.qcloud.cos.model.VersionListing;
-import com.qcloud.cos.model.GetBucketWebsiteConfigurationRequest;
-import com.qcloud.cos.model.SetBucketWebsiteConfigurationRequest;
-import com.qcloud.cos.model.DeleteBucketWebsiteConfigurationRequest;
-import com.qcloud.cos.model.BucketWebsiteConfiguration;
-import com.qcloud.cos.model.BucketDomainConfiguration;
-import com.qcloud.cos.model.SetBucketDomainConfigurationRequest;
-import com.qcloud.cos.model.GetBucketDomainConfigurationRequest;
-import com.qcloud.cos.model.DeleteBucketInventoryConfigurationResult;
-import com.qcloud.cos.model.DeleteBucketInventoryConfigurationRequest;
-import com.qcloud.cos.model.GetBucketInventoryConfigurationResult;
-import com.qcloud.cos.model.GetBucketInventoryConfigurationRequest;
 import com.qcloud.cos.model.ciModel.bucket.DocBucketRequest;
 import com.qcloud.cos.model.ciModel.bucket.DocBucketResponse;
 import com.qcloud.cos.model.ciModel.bucket.MediaBucketRequest;
 import com.qcloud.cos.model.ciModel.bucket.MediaBucketResponse;
+import com.qcloud.cos.model.ciModel.common.ImageProcessRequest;
 import com.qcloud.cos.model.ciModel.image.ImageLabelRequest;
 import com.qcloud.cos.model.ciModel.image.ImageLabelResponse;
 import com.qcloud.cos.model.ciModel.image.ImageLabelV2Request;
@@ -149,29 +68,12 @@ import com.qcloud.cos.model.ciModel.snapshot.SnapshotResponse;
 import com.qcloud.cos.model.ciModel.template.MediaListTemplateResponse;
 import com.qcloud.cos.model.ciModel.template.MediaTemplateRequest;
 import com.qcloud.cos.model.ciModel.template.MediaTemplateResponse;
-import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowListRequest;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowExecutionResponse;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowExecutionsResponse;
+import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowListRequest;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowListResponse;
 import com.qcloud.cos.model.inventory.InventoryConfiguration;
-import com.qcloud.cos.model.SetBucketInventoryConfigurationResult;
-import com.qcloud.cos.model.SetBucketInventoryConfigurationRequest;
-import com.qcloud.cos.model.ListBucketInventoryConfigurationsResult;
-import com.qcloud.cos.model.ListBucketInventoryConfigurationsRequest;
-import com.qcloud.cos.model.DeleteBucketTaggingConfigurationRequest;
-import com.qcloud.cos.model.GetBucketTaggingConfigurationRequest;
-import com.qcloud.cos.model.SetBucketTaggingConfigurationRequest;
-import com.qcloud.cos.model.BucketTaggingConfiguration;
-import com.qcloud.cos.model.AppendObjectRequest;
-import com.qcloud.cos.model.AppendObjectResult;
-import com.qcloud.cos.model.SelectObjectContentResult;
-import com.qcloud.cos.model.SelectObjectContentRequest;
-import com.qcloud.cos.model.GetObjectTaggingRequest;
-import com.qcloud.cos.model.GetObjectTaggingResult;
-import com.qcloud.cos.model.SetObjectTaggingRequest;
-import com.qcloud.cos.model.SetObjectTaggingResult;
-import com.qcloud.cos.model.DeleteObjectTaggingRequest;
-import com.qcloud.cos.model.DeleteObjectTaggingResult;
+import com.squareup.okhttp.internal.http.HttpMethod;
 
 
 public interface COS extends COSDirectSpi {
@@ -2410,6 +2312,38 @@ public interface COS extends COSDirectSpi {
      *                             request.
      */
     public void deleteBucketWebsiteConfiguration(DeleteBucketWebsiteConfigurationRequest deleteBucketWebsiteConfigurationRequest)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * This operation removes the domain configuration for a bucket. Calling
+     * this operation on a bucket with no domain configuration does <b>not</b>
+     * throw an exception. Calling this operation a bucket that does not exist
+     * <b>will</b> throw an exception.
+     *
+     * @param bucketName The name of the bucket whose domain configuration is being
+     *                   deleted.
+     * @throws CosClientException  If any errors are encountered on the client while making the
+     *                             request or handling the response.
+     * @throws CosServiceException If any errors occurred in COS while processing the
+     *                             request.
+     */
+    public void deleteBucketDomainConfiguration(String bucketName)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * This operation removes the domain configuration for a bucket. Calling
+     * this operation on a bucket with no domain configuration does <b>not</b>
+     * throw an exception. Calling this operation a bucket that does not exist
+     * <b>will</b> throw an exception.
+     *
+     * @param deleteBucketDomainConfigurationRequest The request object specifying the name of the bucket whose
+     *                                               domain configuration is to be deleted.
+     * @throws CosClientException  If any errors are encountered on the client while making the
+     *                             request or handling the response.
+     * @throws CosServiceException If any errors occurred in COS while processing the
+     *                             request.
+     */
+    public void deleteBucketDomainConfiguration(DeleteBucketDomainConfigurationRequest deleteBucketDomainConfigurationReqeuest)
             throws CosClientException, CosServiceException;
 
     /**
