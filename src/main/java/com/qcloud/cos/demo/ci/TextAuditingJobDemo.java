@@ -1,6 +1,5 @@
 package com.qcloud.cos.demo.ci;
 
-import com.alibaba.fastjson.JSONObject;
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.model.ciModel.auditing.TextAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.TextAuditingResponse;
@@ -35,7 +34,6 @@ public class TextAuditingJobDemo {
         request.getConf().setBizType("aa3e9d84a6a079556b0109a935c*****");
         //3.调用接口,获取任务响应对象
         TextAuditingResponse response = client.createAuditingTextJobs(request);
-        System.out.println(JSONObject.toJSONString(response));
     }
 
     /**
@@ -51,6 +49,5 @@ public class TextAuditingJobDemo {
         request.setJobId("st68d08596f35011eb9324525400*****");
         //3.调用接口,获取任务响应对象
         TextAuditingResponse response = client.describeAuditingTextJob(request);
-        System.out.println(JSONObject.toJSONString(response));
     }
 }
