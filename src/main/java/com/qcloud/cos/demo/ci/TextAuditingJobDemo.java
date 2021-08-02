@@ -1,7 +1,6 @@
 package com.qcloud.cos.demo.ci;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.alibaba.fastjson.JSONObject;
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.model.ciModel.auditing.TextAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.TextAuditingResponse;
@@ -15,7 +14,7 @@ public class TextAuditingJobDemo {
         // 1 初始化用户身份信息（secretId, secretKey）。
         COSClient client = ClientUtils.getTestClient();
         // 2 调用要使用的方法。
-        describeAuditingTextJob(client);
+        createAuditingTextJobs(client);
     }
 
     /**
@@ -26,15 +25,17 @@ public class TextAuditingJobDemo {
         TextAuditingRequest request = new TextAuditingRequest();
         //2.添加请求参数 参数详情请见api接口文档
         request.setBucketName("demo-123456789");
-        //2.1设置对象地址
-        request.getInput().setObject("1.txt");
+        //2.1.1设置对象地址
+//        request.getInput().setObject("1.txt");
+        //2.1.2或直接设置请求内容,文本内容的Base64编码
+        request.getInput().setContent("Base64Str");
         //2.2设置审核类型参数
         request.getConf().setDetectType("Porn,Terrorism,Politics,Ads");
         //2.3设置审核模板（可选）
         request.getConf().setBizType("aa3e9d84a6a079556b0109a935c*****");
         //3.调用接口,获取任务响应对象
         TextAuditingResponse response = client.createAuditingTextJobs(request);
-        System.out.println(response);
+        System.out.println(JSONObject.toJSONString(response));
     }
 
     /**
@@ -47,8 +48,9 @@ public class TextAuditingJobDemo {
         TextAuditingRequest request = new TextAuditingRequest();
         //2.添加请求参数 参数详情请见api接口文档
         request.setBucketName("demo-123456789");
-        request.setJobId("st84cee320df1c11eb8441525400*****");
+        request.setJobId("st68d08596f35011eb9324525400*****");
         //3.调用接口,获取任务响应对象
         TextAuditingResponse response = client.describeAuditingTextJob(request);
+        System.out.println(JSONObject.toJSONString(response));
     }
 }

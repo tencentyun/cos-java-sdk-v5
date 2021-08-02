@@ -783,6 +783,7 @@ public class RequestXmlFactory {
         xml.start("Request");
         xml.start("Input");
         addIfNotNull(xml,"Object",request.getInput().getObject());
+        addIfNotNull(xml,"Content",request.getInput().getContent());
         xml.end();
         Conf conf = request.getConf();
         xml.start("Conf");

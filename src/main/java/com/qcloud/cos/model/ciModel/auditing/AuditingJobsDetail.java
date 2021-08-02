@@ -32,6 +32,11 @@ public class AuditingJobsDetail {
     private String object;
 
     /**
+     * 任务内容
+     */
+    private String content;
+
+    /**
      * 截图数量
      */
     private String snapshotCount;
@@ -211,15 +216,24 @@ public class AuditingJobsDetail {
         this.sectionCount = sectionCount;
     }
 
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("AuditingJobsDetail{");
+        final StringBuilder sb = new StringBuilder("AuditingJobsDetail{");
         sb.append("jobId='").append(jobId).append('\'');
         sb.append(", state='").append(state).append('\'');
         sb.append(", creationTime='").append(creationTime).append('\'');
         sb.append(", code='").append(code).append('\'');
         sb.append(", message='").append(message).append('\'');
         sb.append(", object='").append(object).append('\'');
+        sb.append(", content='").append(content).append('\'');
         sb.append(", snapshotCount='").append(snapshotCount).append('\'');
         sb.append(", sectionCount='").append(sectionCount).append('\'');
         sb.append(", result='").append(result).append('\'');

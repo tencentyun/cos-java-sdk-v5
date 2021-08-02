@@ -5663,14 +5663,24 @@ public class XmlResponsesSaxParser {
 
         @Override
         protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
-
+            List<SectionInfo> sectionList = response.getJobsDetail().getSectionList();
+            if ((in("Response", "Detail") || in("Response", "JobsDetail")) && "Section".equals(name)) {
+                sectionList.add(new SectionInfo());
+            }
         }
 
         @Override
         protected void doEndElement(String uri, String name, String qName) {
-            if (in("Response", "JobsDetail")) {
+            List<SectionInfo> sectionList = response.getJobsDetail().getSectionList();
+            if (in("Response", "Detail") || in("Response", "JobsDetail")) {
                 AuditingJobsDetail jobsDetail = response.getJobsDetail();
                 switch (name) {
+                    case "Code":
+                        jobsDetail.setCode(getText());
+                        break;
+                    case "Message":
+                        jobsDetail.setMessage(getText());
+                        break;
                     case "JobId":
                         jobsDetail.setJobId(getText());
                         break;
@@ -5680,10 +5690,44 @@ public class XmlResponsesSaxParser {
                     case "CreationTime":
                         jobsDetail.setCreationTime(getText());
                         break;
+                    case "Object":
+                        jobsDetail.setObject(getText());
+                        break;
+                    case "SectionCount":
+                        jobsDetail.setSectionCount(getText());
+                        break;
+                    case "Result":
+                        jobsDetail.setResult(getText());
+                        break;
+                    case "Content":
+                        jobsDetail.setContent(getText());
                     default:
                         break;
-
                 }
+            } else if (in("Response", "JobsDetail", "PornInfo")) {
+                parseInfo(response.getJobsDetail().getPornInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "PoliticsInfo")) {
+                parseInfo(response.getJobsDetail().getPoliticsInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "TerrorismInfo")) {
+                parseInfo(response.getJobsDetail().getTerroristInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "AdsInfo")) {
+                parseInfo(response.getJobsDetail().getAdsInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "Section")) {
+                SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
+                if ("StartByte".equals(name))
+                    sectionInfo.setStartByte(getText());
+            } else if (in("Response", "JobsDetail", "Section", "PornInfo")) {
+                SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
+                parseInfo(sectionInfo.getPornInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "Section", "PoliticsInfo")) {
+                SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
+                parseInfo(sectionInfo.getPoliticsInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "Section", "TerrorismInfo")) {
+                SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
+                parseInfo(sectionInfo.getTerroristInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "Section", "AdsInfo")) {
+                SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
+                parseInfo(sectionInfo.getAdsInfo(), name, getText());
             }
         }
 
@@ -5693,6 +5737,28 @@ public class XmlResponsesSaxParser {
 
         public void setResponse(TextAuditingResponse response) {
             this.response = response;
+        }
+
+        private void parseInfo(AudtingCommonInfo obj, String name, String value) {
+            switch (name) {
+                case "Code":
+                    obj.setCode(value);
+                    break;
+                case "HitFlag":
+                    obj.setHitFlag(getText());
+                    break;
+                case "Score":
+                    obj.setScore(getText());
+                    break;
+                case "Keywords":
+                    obj.setLabel(getText());
+                    break;
+                case "Count":
+                    obj.setCount(getText());
+                    break;
+                default:
+                    break;
+            }
         }
     }
 

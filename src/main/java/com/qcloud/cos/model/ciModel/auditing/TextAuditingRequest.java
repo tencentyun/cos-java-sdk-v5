@@ -2,7 +2,6 @@ package com.qcloud.cos.model.ciModel.auditing;
 
 
 import com.qcloud.cos.internal.CIServiceRequest;
-import com.qcloud.cos.model.ciModel.common.MediaInputObject;
 
 /**
  * 文本审核请求实体 参数详情参考：https://cloud.tencent.com/document/product/436/56289
@@ -14,7 +13,7 @@ public class TextAuditingRequest extends CIServiceRequest {
      */
     private Conf conf;
 
-    private MediaInputObject input;
+    private AuditingInputObject input;
 
     private String jobId;
 
@@ -26,14 +25,14 @@ public class TextAuditingRequest extends CIServiceRequest {
         this.jobId = jobId;
     }
 
-    public MediaInputObject getInput() {
+    public AuditingInputObject getInput() {
         if (input == null) {
-            input = new MediaInputObject();
+            input = new AuditingInputObject();
         }
         return input;
     }
 
-    public void setInput(MediaInputObject input) {
+    public void setInput(AuditingInputObject input) {
         this.input = input;
     }
 
