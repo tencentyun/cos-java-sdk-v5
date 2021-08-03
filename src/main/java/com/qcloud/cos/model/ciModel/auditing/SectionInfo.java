@@ -9,6 +9,8 @@ public class SectionInfo {
     private TerroristInfo terroristInfo;
     private PoliticsInfo politicsInfo;
     private AdsInfo adsInfo;
+    private AbuseInfo abuseInfo;
+    private IllegalInfo illegalInfo;
 
     public PornInfo getPornInfo() {
         if (pornInfo == null) {
@@ -62,14 +64,38 @@ public class SectionInfo {
         this.startByte = startByte;
     }
 
+    public AbuseInfo getAbuseInfo() {
+        if (abuseInfo == null) {
+            abuseInfo = new AbuseInfo();
+        }
+        return abuseInfo;
+    }
+
+    public void setAbuseInfo(AbuseInfo abuseInfo) {
+        this.abuseInfo = abuseInfo;
+    }
+
+    public IllegalInfo getIllegalInfo() {
+        if (illegalInfo == null) {
+            illegalInfo = new IllegalInfo();
+        }
+        return illegalInfo;
+    }
+
+    public void setIllegalInfo(IllegalInfo illegalInfo) {
+        this.illegalInfo = illegalInfo;
+    }
+
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("SectionInfo{");
+        final StringBuilder sb = new StringBuilder("SectionInfo{");
         sb.append("startByte='").append(startByte).append('\'');
         sb.append(", pornInfo=").append(pornInfo);
         sb.append(", terroristInfo=").append(terroristInfo);
         sb.append(", politicsInfo=").append(politicsInfo);
         sb.append(", adsInfo=").append(adsInfo);
+        sb.append(", abuseInfo=").append(abuseInfo);
+        sb.append(", illegalInfo=").append(illegalInfo);
         sb.append('}');
         return sb.toString();
     }

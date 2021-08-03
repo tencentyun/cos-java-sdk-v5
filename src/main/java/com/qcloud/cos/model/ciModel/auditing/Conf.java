@@ -8,6 +8,7 @@ public class Conf {
 
     /**
      * 审核类型，拥有 porn（涉黄识别）、terrorist（涉暴恐识别）、politics（涉政识别）、ads（广告识别）四种。用户可选择多种识别类型，
+     * 文本审核类型额外支持 Illegal（违法）、Abuse（谩骂）
      * 例如 detectType=porn,ads 表示对图片进行涉黄及广告审核
      */
     private String detectType;

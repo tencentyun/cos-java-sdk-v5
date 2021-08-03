@@ -30,6 +30,18 @@ public class AudtingCommonInfo {
      */
     private String count;
 
+    public AudtingCommonInfo() {
+    }
+
+    public AudtingCommonInfo(String code, String msg, String hitFlag, String score, String label, String count) {
+        this.code = code;
+        this.msg = msg;
+        this.hitFlag = hitFlag;
+        this.score = score;
+        this.label = label;
+        this.count = count;
+    }
+
     public String getCode() {
         return code;
     }

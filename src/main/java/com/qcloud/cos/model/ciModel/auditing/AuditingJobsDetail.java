@@ -52,24 +52,34 @@ public class AuditingJobsDetail {
     private String result;
 
     /**
-     * 错误描述，只有 State 为 Failed 时有意义
+     * 审核结果 鉴黄信息
      */
     private PornInfo pornInfo;
 
     /**
-     * 错误描述，只有 State 为 Failed 时有意义
+     * 审核结果 暴恐信息
      */
     private TerroristInfo terroristInfo;
 
     /**
-     * 错误描述，只有 State 为 Failed 时有意义
+     * 审核结果 政治敏感信息
      */
     private PoliticsInfo politicsInfo;
 
     /**
-     * 错误描述，只有 State 为 Failed 时有意义
+     * 审核结果 广告信息
      */
     private AdsInfo adsInfo;
+
+    /**
+     * 审核结果 谩骂信息
+     */
+    private AbuseInfo abuseInfo;
+
+    /**
+     * 审核结果 违法信息
+     */
+    private IllegalInfo illegalInfo;
 
     private List<SnapshotInfo> snapshotList;
 
@@ -222,6 +232,28 @@ public class AuditingJobsDetail {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public AbuseInfo getAbuseInfo() {
+        if (abuseInfo == null) {
+            abuseInfo = new AbuseInfo();
+        }
+        return abuseInfo;
+    }
+
+    public void setAbuseInfo(AbuseInfo abuseInfo) {
+        this.abuseInfo = abuseInfo;
+    }
+
+    public IllegalInfo getIllegalInfo() {
+        if (illegalInfo == null) {
+            illegalInfo = new IllegalInfo();
+        }
+        return illegalInfo;
+    }
+
+    public void setIllegalInfo(IllegalInfo illegalInfo) {
+        this.illegalInfo = illegalInfo;
     }
 
     @Override

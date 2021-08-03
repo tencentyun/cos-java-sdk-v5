@@ -782,14 +782,18 @@ public class RequestXmlFactory {
 
         xml.start("Request");
         xml.start("Input");
-        addIfNotNull(xml,"Object",request.getInput().getObject());
-        addIfNotNull(xml,"Content",request.getInput().getContent());
+        addIfNotNull(xml, "Object", request.getInput().getObject());
+        addIfNotNull(xml, "Content", request.getInput().getContent());
         xml.end();
         Conf conf = request.getConf();
         xml.start("Conf");
-        addIfNotNull(xml,"DetectType", conf.getDetectType());
-        addIfNotNull(xml,"Callback", conf.getCallback());
-        addIfNotNull(xml,"BizType", conf.getBizType());
+        String detectType = conf.getDetectType();
+        if ("all".equalsIgnoreCase(detectType)) {
+            detectType = "Porn,Terrorism,Politics,Ads,Illegal,Abuse";
+        }
+        addIfNotNull(xml, "DetectType", detectType);
+        addIfNotNull(xml, "Callback", conf.getCallback());
+        addIfNotNull(xml, "BizType", conf.getBizType());
         xml.end();
 
         xml.end();
