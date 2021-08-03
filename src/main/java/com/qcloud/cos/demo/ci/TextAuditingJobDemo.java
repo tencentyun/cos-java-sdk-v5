@@ -1,12 +1,11 @@
 package com.qcloud.cos.demo.ci;
 
-import com.alibaba.fastjson.JSONObject;
+import java.util.List;
+
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.model.ciModel.auditing.AuditingInfo;
 import com.qcloud.cos.model.ciModel.auditing.TextAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.TextAuditingResponse;
-
-import java.util.List;
 
 /**
  * 内容审核 文本审核接口相关demo 详情见https://cloud.tencent.com/document/product/436/56289
