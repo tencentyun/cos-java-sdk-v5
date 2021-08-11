@@ -316,7 +316,8 @@ public interface Headers {
     public static final String ENCRYPTION_CEK_ALG = "client-side-encryption-cek-alg";
     public static final String ENCRYPTION_WRAP_ALG = "client-side-encryption-wrap-alg";
     public static final String ENCRYPTION_MATDESC = "client-side-encryption-matdesc";
-    public static final String ENCRYPTION_UNENCRYPTED_CONTENT_LENGTH = "client-side-encryption-unencrypted-content-length";
+    public static final String ENCRYPTION_UNENCRYPTED_CONTENT_LENGTH =
+            "client-side-encryption-unencrypted-content-length";
     public static final String ENCRYPTION_UNENCRYPTED_CONTENT_MD5 = "client-side-encryption-unencrypted-content-md5";
     public static final String ENCRYPTION_DATA_SIZE = "client-side-encryption-data-size";
     public static final String ENCRYPTION_PART_SIZE = "client-side-encryption-part-size";
