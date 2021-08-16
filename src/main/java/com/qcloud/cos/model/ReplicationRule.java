@@ -19,12 +19,18 @@
 package com.qcloud.cos.model;
 
 import java.io.Serializable;
+
 import com.qcloud.cos.utils.Jackson;
 
 /**
  * Rule that specifies the replication configuration.
  */
 public class ReplicationRule implements Serializable {
+
+    /**
+     * The id of this replication rule.
+     */
+    private String id;
 
     /**
      * The QCloud object prefix for the replication rule. This rule will be
@@ -42,6 +48,33 @@ public class ReplicationRule implements Serializable {
      * Destination configuration for the replication rule.
      */
     private ReplicationDestinationConfig destinationConfig;
+
+    /**
+     * Returns the id of the replication rule.
+     * @return
+     */
+    public String getID() {
+        return id;
+    }
+
+    /**
+     * Sets the id of the replication rule.
+     * @param id
+     */
+    public void setID(String id) {
+        this.id = id;
+    }
+
+    /**
+     * Sets th id of the replication rule, returns the
+     * updated object.
+     * @param id
+     * @return
+     */
+    public ReplicationRule withID(String id) {
+        setID(id);
+        return this;
+    }
 
     /**
      * Returns the prefix associated with the replication rule.

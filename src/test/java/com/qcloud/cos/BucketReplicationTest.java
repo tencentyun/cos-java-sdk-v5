@@ -1,10 +1,7 @@
 package com.qcloud.cos;
 
-import static org.junit.Assert.*;
-
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import com.qcloud.cos.model.BucketReplicationConfiguration;
 import com.qcloud.cos.model.BucketVersioningConfiguration;
@@ -13,6 +10,10 @@ import com.qcloud.cos.model.ReplicationRule;
 import com.qcloud.cos.model.ReplicationRuleStatus;
 import com.qcloud.cos.model.SetBucketVersioningConfigurationRequest;
 import com.qcloud.cos.model.StorageClass;
+
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 public class BucketReplicationTest extends AbstractCOSClientTest {
     @BeforeClass
@@ -56,7 +57,8 @@ public class BucketReplicationTest extends AbstractCOSClientTest {
         String ruleName = "qcs::cam::uin/123456789:uin/987654543";
         bucketReplicationConfiguration.setRoleName(ruleName);
         String ruleId = "cctest1";
-        bucketReplicationConfiguration.addRule(ruleId, replicationRule);
+        replicationRule.setID(ruleId);
+        bucketReplicationConfiguration.addRule(replicationRule);
         cosclient.setBucketReplicationConfiguration(bucket, bucketReplicationConfiguration);
 
         // replication设置后, 立刻获取会需要一段时间
@@ -70,7 +72,7 @@ public class BucketReplicationTest extends AbstractCOSClientTest {
                 cosclient.getBucketReplicationConfiguration(bucket);
         assertEquals(ruleName, replicaConfigGet.getRoleName());
         assertEquals(1, replicaConfigGet.getRules().size());
-        ReplicationRule replicationRule2 = replicaConfigGet.getRule(ruleId);
+        ReplicationRule replicationRule2 = replicaConfigGet.getRules().get(0);
         assertEquals(bucketQCS, replicationRule2.getDestinationConfig().getBucketQCS());
         assertEquals(StorageClass.Standard.toString(),
                 replicationRule2.getDestinationConfig().getStorageClass());

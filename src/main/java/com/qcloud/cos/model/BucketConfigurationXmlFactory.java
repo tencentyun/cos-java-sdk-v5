@@ -19,7 +19,6 @@
 package com.qcloud.cos.model;
 
 import java.util.List;
-import java.util.Map;
 
 import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.internal.XmlWriter;
@@ -30,22 +29,21 @@ import com.qcloud.cos.model.CORSRule.AllowedMethods;
 import com.qcloud.cos.model.Tag.LifecycleTagPredicate;
 import com.qcloud.cos.model.Tag.Tag;
 import com.qcloud.cos.model.inventory.InventoryConfiguration;
-import com.qcloud.cos.model.inventory.InventoryDestination;
 import com.qcloud.cos.model.inventory.InventoryCosBucketDestination;
+import com.qcloud.cos.model.inventory.InventoryDestination;
 import com.qcloud.cos.model.inventory.InventoryEncryption;
-import com.qcloud.cos.model.inventory.ServerSideEncryptionCOS;
-import com.qcloud.cos.model.inventory.InventoryPrefixPredicate;
 import com.qcloud.cos.model.inventory.InventoryFilter;
-import com.qcloud.cos.model.inventory.InventorySchedule;
 import com.qcloud.cos.model.inventory.InventoryFilterPredicate;
-
+import com.qcloud.cos.model.inventory.InventoryPrefixPredicate;
+import com.qcloud.cos.model.inventory.InventorySchedule;
+import com.qcloud.cos.model.inventory.ServerSideEncryptionCOS;
 import com.qcloud.cos.model.lifecycle.LifecycleAndOperator;
 import com.qcloud.cos.model.lifecycle.LifecycleFilter;
 import com.qcloud.cos.model.lifecycle.LifecycleFilterPredicate;
 import com.qcloud.cos.model.lifecycle.LifecyclePredicateVisitor;
 import com.qcloud.cos.model.lifecycle.LifecyclePrefixPredicate;
-import com.qcloud.cos.utils.DateUtils;
 import com.qcloud.cos.utils.CollectionUtils;
+import com.qcloud.cos.utils.DateUtils;
 
 
 /**
@@ -559,13 +557,12 @@ public class BucketConfigurationXmlFactory {
     public byte[] convertToXmlByteArray(BucketReplicationConfiguration replicationConfiguration) {
         XmlWriter xml = new XmlWriter();
         xml.start("ReplicationConfiguration");
-        Map<String, ReplicationRule> rules = replicationConfiguration.getRules();
+        List<ReplicationRule> rules = replicationConfiguration.getRules();
 
         final String role = replicationConfiguration.getRoleName();
         xml.start("Role").value(role).end();
-        for (Map.Entry<String, ReplicationRule> entry : rules.entrySet()) {
-            final String ruleId = entry.getKey();
-            final ReplicationRule rule = entry.getValue();
+        for (ReplicationRule rule : rules) {
+            final String ruleId = rule.getID();
 
             xml.start("Rule");
             xml.start("ID").value(ruleId).end();
