@@ -1,12 +1,18 @@
 package com.qcloud.cos.demo;
 
+import java.util.List;
+
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.ClientConfig;
 import com.qcloud.cos.auth.BasicCOSCredentials;
 import com.qcloud.cos.auth.COSCredentials;
-import com.qcloud.cos.model.*;
+import com.qcloud.cos.model.AccessControlList;
+import com.qcloud.cos.model.CannedAccessControlList;
+import com.qcloud.cos.model.Grant;
+import com.qcloud.cos.model.Owner;
+import com.qcloud.cos.model.Permission;
+import com.qcloud.cos.model.UinGrantee;
 import com.qcloud.cos.region.Region;
-import java.util.List;
 
 public class SetGetObjectAclDemo {
     public static void setGetObjectAclTest() {

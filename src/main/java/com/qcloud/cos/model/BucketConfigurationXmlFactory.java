@@ -593,6 +593,31 @@ public class BucketConfigurationXmlFactory {
         return xml.getBytes();
     }
 
+    public byte[] convertToXmlByteArray(BucketRefererConfiguration refererConfiguration) {
+        XmlWriter xml = new XmlWriter();
+
+        xml.start("RefererConfiguration");
+
+        xml.start("Status").value(refererConfiguration.getStatus()).end();
+        xml.start("RefererType").value(refererConfiguration.getRefererType()).end();
+
+        xml.start("DomainList");
+        for (String domain : refererConfiguration.getDomainList()) {
+            xml.start("Domain").value(domain).end();
+        }
+        xml.end();
+
+        String emptyReferConfiguration = refererConfiguration.getEmptyReferConfiguration();
+        if (emptyReferConfiguration != null &&
+                (emptyReferConfiguration == BucketRefererConfiguration.DENY || emptyReferConfiguration == BucketRefererConfiguration.ALLOW)) {
+
+            xml.start("EmptyReferConfiguration").value(emptyReferConfiguration).end();
+        }
+
+        xml.end();
+        return xml.getBytes();
+    }
+
     /**
      * @param rule
      * @return True if rule has a current expiration (<Expiration/>) policy set

@@ -3143,6 +3143,75 @@ public class COSClient implements COS {
     }
 
     @Override
+    public void setBucketRefererConfiguration(String bucketName, BucketRefererConfiguration configuration)
+            throws CosClientException, CosServiceException {
+        setBucketRefererConfiguration(new SetBucketRefererConfigurationRequest(bucketName, configuration));
+    }
+
+    @Override
+    public void setBucketRefererConfiguration(SetBucketRefererConfigurationRequest setBucketRefererConfigurationRequest)
+            throws CosClientException, CosServiceException {
+        rejectNull(setBucketRefererConfigurationRequest,
+                "The request object parameter setBucketRefererConfigurationRequest must be specified.");
+        String bucketName = setBucketRefererConfigurationRequest.getBucketName();
+        BucketRefererConfiguration configuration = setBucketRefererConfigurationRequest.getConfiguration();
+
+        rejectNull(bucketName,
+                "The bucket name parameter must be specified when setting a bucket's referer configuration");
+        rejectNull(configuration,
+                "The bucket domain configuration parameter must be specified when setting a bucket's referer configuration");
+
+        CosHttpRequest<SetBucketRefererConfigurationRequest> request = createRequest(bucketName,
+                null, setBucketRefererConfigurationRequest, HttpMethodName.PUT);
+        request.addParameter("referer", null);
+        request.addHeader("Content-Type", "application/xml");
+
+        byte[] bytes = new BucketConfigurationXmlFactory().convertToXmlByteArray(configuration);
+        request.setContent(new ByteArrayInputStream(bytes));
+
+        try {
+            byte[] md5 = Md5Utils.computeMD5Hash(bytes);
+            String md5Base64 = BinaryUtils.toBase64(md5);
+            request.addHeader("Content-MD5", md5Base64);
+        } catch ( Exception e ) {
+            throw new CosClientException("Couldn't compute md5 sum", e);
+        }
+
+        invoke(request, voidCosResponseHandler);
+    }
+
+    @Override
+    public BucketRefererConfiguration getBucketRefererConfiguration(String bucketName)
+            throws CosClientException, CosServiceException {
+        return getBucketRefererConfiguration(new GetBucketRefererConfigurationRequest(bucketName));
+    }
+
+    @Override
+    public BucketRefererConfiguration getBucketRefererConfiguration(GetBucketRefererConfigurationRequest getBucketRefererConfigurationRequest)
+            throws CosClientException, CosServiceException {
+        rejectNull(getBucketRefererConfigurationRequest,
+                "The request object parameter getBucketRefererConfigurationRequest must be specified.");
+        String bucketName = getBucketRefererConfigurationRequest.getBucketName();
+        rejectNull(bucketName,
+                "The bucket name must be specified when retrieving the bucket domain configuration.");
+
+        CosHttpRequest<GetBucketRefererConfigurationRequest> request = createRequest(bucketName,
+                null, getBucketRefererConfigurationRequest, HttpMethodName.GET);
+        request.addParameter("referer", null);
+
+        try {
+            return invoke(request, new Unmarshallers.BucketRefererConfigurationUnmarshaller());
+        } catch (CosServiceException cse) {
+            switch (cse.getStatusCode()) {
+                case 404:
+                    return null;
+                default:
+                    throw cse;
+            }
+        }
+    }
+
+    @Override
     public DeleteBucketInventoryConfigurationResult deleteBucketInventoryConfiguration(
             String bucketName, String id) throws CosClientException, CosServiceException {
         return deleteBucketInventoryConfiguration(

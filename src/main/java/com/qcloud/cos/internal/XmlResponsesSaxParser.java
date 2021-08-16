@@ -45,6 +45,7 @@ import com.qcloud.cos.model.BucketLifecycleConfiguration.NoncurrentVersionTransi
 import com.qcloud.cos.model.BucketLifecycleConfiguration.Rule;
 import com.qcloud.cos.model.BucketLifecycleConfiguration.Transition;
 import com.qcloud.cos.model.BucketLoggingConfiguration;
+import com.qcloud.cos.model.BucketRefererConfiguration;
 import com.qcloud.cos.model.BucketReplicationConfiguration;
 import com.qcloud.cos.model.BucketTaggingConfiguration;
 import com.qcloud.cos.model.BucketVersioningConfiguration;
@@ -475,6 +476,13 @@ public class XmlResponsesSaxParser {
     public BucketDomainConfigurationHandler parseBucketDomainConfigurationResponse(
             InputStream inputStream) throws IOException {
         BucketDomainConfigurationHandler handler = new BucketDomainConfigurationHandler();
+        parseXmlInputStream(handler, inputStream);
+        return handler;
+    }
+
+    public BucketRefererConfigurationHandler parseBucketRefererConfigurationResponse(
+            InputStream inputStream) throws IOException {
+        BucketRefererConfigurationHandler handler = new BucketRefererConfigurationHandler();
         parseXmlInputStream(handler, inputStream);
         return handler;
     }
@@ -2823,6 +2831,37 @@ public class XmlResponsesSaxParser {
             }
         }
 
+    }
+
+    public static class BucketRefererConfigurationHandler extends AbstractHandler {
+
+        private final BucketRefererConfiguration configuration =
+                new BucketRefererConfiguration();
+
+        public BucketRefererConfiguration getConfiguration() {
+            return configuration;
+        }
+
+        @Override
+        protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
+        }
+
+        @Override
+        protected void doEndElement(String uri, String name, String qName) {
+            if (in("RefererConfiguration")) {
+                if (name.equals("Status")) {
+                    configuration.setStatus(getText());
+                } else if (name.equals("RefererType")) {
+                    configuration.setRefererType(getText());
+                } else if (name.equals("EmptyReferConfiguration")) {
+                    configuration.setEmptyReferConfiguration(getText());
+                }
+            } else if (in("RefererConfiguration", "DomainList")) {
+                if (name.equals("Domain")) {
+                    configuration.addDomain(getText());
+                }
+            }
+        }
     }
 
     private static String findAttributeValue(String qnameToFind, Attributes attrs) {

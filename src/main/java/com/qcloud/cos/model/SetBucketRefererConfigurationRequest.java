@@ -22,96 +22,96 @@ import java.io.Serializable;
 import com.qcloud.cos.internal.CosServiceRequest;
 
 /**
- * Request object for the parameters to set a bucket's domain configuration.
+ * Request object for the parameters to set a bucket's referer configuration.
  */
-public class SetBucketDomainConfigurationRequest extends CosServiceRequest implements Serializable {
+public class SetBucketRefererConfigurationRequest extends CosServiceRequest implements Serializable {
 
-    /** The name of the bucket whose domain configuration is being set. */
+    /** The name of the bucket whose referer configuration is being set. */
     private String bucketName;
 
-    /** The domain configuration for the specified bucket. */
-    private BucketDomainConfiguration configuration;
+    /** The referer configuration for the specified bucket. */
+    private BucketRefererConfiguration configuration;
 
     /**
      * Creates a new request object, ready to be executed to set the specified
-     * bucket's domain configuration.
+     * bucket's referer configuration.
      *
      * @param bucketName
-     *            The name of the bucket whose domain configuration is being set.
+     *            The name of the bucket whose referer configuration is being set.
      * @param configuration
-     *            The new domain configuration for the specified bucket.
+     *            The new referer configuration for the specified bucket.
      */
-    public SetBucketDomainConfigurationRequest(String bucketName, BucketDomainConfiguration configuration) {
+    public SetBucketRefererConfigurationRequest(String bucketName, BucketRefererConfiguration configuration) {
         this.bucketName = bucketName;
         this.configuration = configuration;
     }
 
     /**
-     * Sets the name of the bucket whose domain configuration is to be updated.
+     * Sets the name of the bucket whose referer configuration is to be updated.
      *
      * @param bucketName
-     *            The name of the bucket whose domain configuration is being set.
+     *            The name of the bucket whose referer configuration is being set.
      */
     public void setBucketName(String bucketName) {
         this.bucketName = bucketName;
     }
 
     /**
-     * Returns the name of the bucket whose domain configuration is being set.
+     * Returns the name of the bucket whose referer configuration is being set.
      *
-     * @return The name of the bucket whose domain configuration is being set.
+     * @return The name of the bucket whose referer configuration is being set.
      */
     public String getBucketName() {
         return bucketName;
     }
 
     /**
-     * Sets the name of the bucket whose domain configuration is being set and
+     * Sets the name of the bucket whose referer configuration is being set and
      * returns this updated request object so that additional method calls can
      * be chained together.
      *
      * @param bucketName
-     *            The name of the bucket whose domain configuration is being
+     *            The name of the bucket whose referer configuration is being
      *            set.
      * @return This updated request object so that additional method calls can
      *         be chained together.
      */
-    public SetBucketDomainConfigurationRequest withBucketName(String bucketName) {
+    public SetBucketRefererConfigurationRequest withBucketName(String bucektName) {
         setBucketName(bucketName);
         return this;
     }
 
     /**
-     * Sets the domain configuration to send as part of this request.
+     * Sets the referer configuration to send as part of this request.
      *
      * @param configuration
-     *            The domain configuration to set for the specified bucket.
+     *            The referer configuration to set for the specified bucket.
      */
-    public void setConfiguration(BucketDomainConfiguration configuration) {
+    public void setConfiguration(BucketRefererConfiguration configuration) {
         this.configuration = configuration;
     }
 
     /**
-     * Returns the domain configuration to send as part of this request.
+     * Returns the referer configuration to send as part of this request.
      *
-     * @return The domain configuration to set for the specified bucket.
+     * @return The referer configuration to set for the specified bucket.
      */
-    public BucketDomainConfiguration getConfiguration() {
-        return configuration;
+    public BucketRefererConfiguration getConfiguration() {
+        return this.configuration;
     }
 
     /**
-     * Sets the domain configuration to send as part of this request, and
+     * Sets the referer configuration to send as part of this request, and
      * returns this updated request object so that additional method calls can
      * be chained together.
      *
      * @param configuration
-     *            The domain configuration to set for the specified bucket.
+     *            The referer configuration to set for the specified bucket.
      *
      * @return This updated request object so that additional method calls can
      *         be chained together.
      */
-    public SetBucketDomainConfigurationRequest withConfiguration(BucketDomainConfiguration configuration) {
+    public SetBucketRefererConfigurationRequest withConfiguration(BucketRefererConfiguration configuration) {
         setConfiguration(configuration);
         return this;
     }

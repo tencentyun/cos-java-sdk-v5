@@ -16,62 +16,63 @@
  */
 
 package com.qcloud.cos.model;
+
 import java.io.Serializable;
 
 import com.qcloud.cos.internal.CosServiceRequest;
+
 /**
- * Request object for the parameters to retrieve a bucket's domain
+ * Request object for the parameters to retrieve a bucket's referer
  * configuration.
  */
-public class GetBucketDomainConfigurationRequest extends CosServiceRequest implements Serializable {
+public class GetBucketRefererConfigurationRequest extends CosServiceRequest implements Serializable {
 
-    /** The name of the bucket whose domain configuration is being retrieved. */
+    /** The name of the bucket whose referer configuration is being retrieved. */
     private String bucketName;
-
 
     /**
      * Creates a new request object, ready to be executed to retrieve the bucket
-     * domain configuration for the specified bucket.
+     * referer configuration for the specified bucket.
      *
      * @param bucketName
-     *            The name of the bucket whose domain configuration is being retrieved.
+     *            The name of the bucket whose referer configuration is being retrieved.
      */
-    public GetBucketDomainConfigurationRequest(String bucketName) {
+    public GetBucketRefererConfigurationRequest(String bucketName) {
         this.bucketName = bucketName;
     }
 
     /**
-     * Sets the name of the bucket whose domain configuration is being retrieved.
+     * Sets the name of the bucket whose referer configuration is being retrieved.
      *
      * @param bucketName
-     *            The name of the bucket whose domain configuration is being retrieved.
+     *            The name of the bucket whose referer configuration is being retrieved.
      */
     public void setBucketName(String bucketName) {
         this.bucketName = bucketName;
     }
 
     /**
-     * Returns the name of the bucket whose domain configuration is being retrieved.
+     * Returns the name of the bucket whose referer configuration is being retrieved.
      *
-     * @return The name of the bucket whose domain configuration is being retrieved.
+     * @return The name of the bucket whose referer configuration is being retrieved.
      */
     public String getBucketName() {
         return bucketName;
     }
 
     /**
-     * Sets the name of the bucket whose domain configuration is being
+     * Sets the name of the bucket whose referer configuration is being
      * retrieved, and returns this updated request object so that additional
      * method calls can be chained together.
      *
      * @param bucketName
-     *            The name of the bucket whose domain configuration is being
+     *            The name of the bucket whose referer configuration is being
      *            retrieved.
      *
      * @return This updated request object, so that additional method calls can
      *         be chained together.
      */
-    public GetBucketDomainConfigurationRequest withBucketName(String bucketName) {
+    public GetBucketRefererConfigurationRequest withBucketName(String bucketName) {
         setBucketName(bucketName);
         return this;
     }

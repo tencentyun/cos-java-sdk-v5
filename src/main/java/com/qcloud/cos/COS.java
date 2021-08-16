@@ -2400,6 +2400,59 @@ public interface COS extends COSDirectSpi {
             throws CosClientException, CosServiceException;
 
     /**
+     * Sets the referer configuration for the specified bucket.
+     *
+     * @param bucketName    The name of the bucket whose referer configuration is being set.
+     * @param configuration The configuration describing the specified bucket referer
+     * @throws CosClientException  If any errors are encountered on the client while making the
+     *                             request or handling the response.
+     * @throws CosServiceException If any errors occurred in COS while processing the request.
+     */
+    public void setBucketRefererConfiguration(String bucketName, BucketRefererConfiguration configuration)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * Sets the referer configuration for the specified bucket.
+     *
+     * @param setBucketRefererConfigurationRequest The request object containing the name of the bucket whose
+     *                                            referer configuration is being updated, and the new referer
+     *                                            configuration values.
+     * @throws CosClientException  If any errors are encountered on the client while making the
+     *                             request or handling the response.
+     * @throws CosServiceException If any errors occurred in COS while processing the request.
+     */
+    public void setBucketRefererConfiguration(SetBucketRefererConfigurationRequest setBucketRefererConfigurationRequest)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * Returns the referer configuration for the specified bucket.
+     *
+     * @param bucketName The name of the bucket whose referer configuration is being retrieved.
+     * @return The bucket referer configuration for the specified bucket,
+     * otherwise null if there is no referer configuration set for the
+     * specified bucket.
+     * @throws CosClientException  If any errors are encountered on the client while making the
+     *                             request or handling the response.
+     * @throws CosServiceException If any errors occurred in COS while processing the request.
+     */
+    public BucketRefererConfiguration getBucketRefererConfiguration(String bucketName)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * Returns the referer configuration for the specified bucket.
+     *
+     * @param getBucketDomainConfigurationRequest The request object for retrieving the bucket referer configuration.
+     * @return The bucket referer configuration for the specified bucket,
+     * otherwise null if there is no referer configuration set for the
+     * specified bucket.
+     * @throws CosClientException  If any errors are encountered on the client while making the
+     *                             request or handling the response.
+     * @throws CosServiceException If any errors occurred in COS while processing the request.
+     */
+    public BucketRefererConfiguration getBucketRefererConfiguration(GetBucketRefererConfigurationRequest getBucketRefererConfigurationRequest)
+            throws CosClientException, CosServiceException;
+
+    /**
      * <p>
      * Gets the logging configuration for the specified bucket.
      * The bucket logging configuration object indicates if server access logging is
