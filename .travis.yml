@@ -18,5 +18,8 @@ install: mvn install -DskipTests=true -Dmaven.javadoc.skip=true -Dgpg.skip=true
 
 dist: trusty
 
-script: travis_wait 90 mvn test -Dtest=com.qcloud.cos.SuiteTest
+script: mvn test -Dtest=com.qcloud.cos.SuiteTest
 
+cache:
+  directories:
+  - $HOME/.m2
