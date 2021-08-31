@@ -19,8 +19,8 @@
 package com.qcloud.cos.model;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.LinkedList;
+import java.util.List;
 
 import com.qcloud.cos.utils.Jackson;
 
@@ -29,7 +29,7 @@ public class BucketReplicationConfiguration implements Serializable {
     private String roleName;
 
     /** Collection of replication rules associated with the QCloud bucket. */
-    private Map<String, ReplicationRule> rules = new HashMap<String, ReplicationRule>();
+    private List<ReplicationRule> rules = new LinkedList<>();
 
     /**
      * Returns the role name associated with this replication configuration.
@@ -63,18 +63,8 @@ public class BucketReplicationConfiguration implements Serializable {
      *
      * @return the replication rules associated with this QCloud bucket.
      */
-    public Map<String, ReplicationRule> getRules() {
+    public List<ReplicationRule> getRules() {
         return rules;
-    }
-
-    /**
-     * Returns the replication rule for the given rule id.
-     *
-     * @param id the unique identifier representing a rule in the replication configuration.
-     * @return the replication rule for the given rule id.
-     */
-    public ReplicationRule getRule(String id) {
-        return rules.get(id);
     }
 
     /**
@@ -83,11 +73,11 @@ public class BucketReplicationConfiguration implements Serializable {
      * @param rules the replication rules for the QCloud bucket.
      * @throws IllegalArgumentException if the rules are null.
      */
-    public void setRules(Map<String, ReplicationRule> rules) {
+    public void setRules(List<ReplicationRule> rules) {
         if (rules == null) {
             throw new IllegalArgumentException("Replication rules cannot be null");
         }
-        this.rules = new HashMap<String, ReplicationRule>(rules);
+        this.rules = new LinkedList<ReplicationRule>(rules);
     }
 
     /**
@@ -97,7 +87,7 @@ public class BucketReplicationConfiguration implements Serializable {
      * @throws IllegalArgumentException if the rules are null.
      * @return the updated {@link BucketReplicationConfiguration} object.
      */
-    public BucketReplicationConfiguration withRules(Map<String, ReplicationRule> rules) {
+    public BucketReplicationConfiguration withRules(List<ReplicationRule> rules) {
         setRules(rules);
         return this;
     }
@@ -111,14 +101,11 @@ public class BucketReplicationConfiguration implements Serializable {
      * @throws IllegalArgumentException if the given id or rule is null.
      * @return the updated {@link BucketReplicationConfiguration} object.
      */
-    public BucketReplicationConfiguration addRule(String id, ReplicationRule rule) {
-        if (id == null || id.trim().isEmpty()) {
-            throw new IllegalArgumentException("Rule id cannot be null or empty.");
-        }
+    public BucketReplicationConfiguration addRule(ReplicationRule rule) {
         if (rule == null) {
             throw new IllegalArgumentException("Replication rule cannot be null");
         }
-        rules.put(id, rule);
+        rules.add(rule);
         return this;
     }
 
@@ -129,8 +116,8 @@ public class BucketReplicationConfiguration implements Serializable {
      * @param id the id of the replication rule to be removed.
      * @return the updated {@link BucketReplicationConfiguration} object.
      */
-    public BucketReplicationConfiguration removeRule(String id) {
-        rules.remove(id);
+    public BucketReplicationConfiguration removeRule(ReplicationRule rule) {
+        rules.remove(rule);
         return this;
     }
 

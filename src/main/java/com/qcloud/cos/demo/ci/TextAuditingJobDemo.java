@@ -1,5 +1,7 @@
 package com.qcloud.cos.demo.ci;
 
+import java.util.List;
+
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.model.ciModel.auditing.AuditingInfo;
 import com.qcloud.cos.model.ciModel.auditing.TextAuditingRequest;

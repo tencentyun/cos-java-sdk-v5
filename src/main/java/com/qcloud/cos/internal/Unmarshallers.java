@@ -31,6 +31,7 @@ import com.qcloud.cos.model.BucketDomainConfiguration;
 import com.qcloud.cos.model.BucketIntelligentTierConfiguration;
 import com.qcloud.cos.model.BucketLifecycleConfiguration;
 import com.qcloud.cos.model.BucketLoggingConfiguration;
+import com.qcloud.cos.model.BucketRefererConfiguration;
 import com.qcloud.cos.model.BucketReplicationConfiguration;
 import com.qcloud.cos.model.BucketTaggingConfiguration;
 import com.qcloud.cos.model.BucketVersioningConfiguration;
@@ -322,6 +323,18 @@ public class Unmarshallers {
             return new XmlResponsesSaxParser().parseBucketDomainConfigurationResponse(in)
                     .getConfiguration();
         }
+    }
+
+    public static final class BucketRefererConfigurationUnmarshaller
+            implements Unmarshaller<BucketRefererConfiguration, InputStream> {
+        public BucketRefererConfiguration unmarshall(InputStream in) throws Exception {
+            if (in.available() == 0) {
+                return null;
+            }
+            return new XmlResponsesSaxParser().parseBucketRefererConfigurationResponse(in)
+                    .getConfiguration();
+        }
+
     }
 
     /**
