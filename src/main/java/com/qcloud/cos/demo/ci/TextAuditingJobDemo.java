@@ -7,8 +7,6 @@ import com.qcloud.cos.model.ciModel.auditing.AuditingInfo;
 import com.qcloud.cos.model.ciModel.auditing.TextAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.TextAuditingResponse;
 
-import java.util.List;
-
 /**
  * 内容审核 文本审核接口相关demo 详情见https://cloud.tencent.com/document/product/436/56289
  */
@@ -39,7 +37,7 @@ public class TextAuditingJobDemo {
         request.getConf().setBizType("aa3e9d84a6a079556b0109a935c*****");
         //3.调用接口,获取任务响应对象
         TextAuditingResponse response = client.createAuditingTextJobs(request);
-        //4.调用工具类，获取各审核类型详情集合 (也可自行根据业务)
+        //4.调用工具类，获取各审核类型详情集合 (也可自行根据业务解析)
         List<AuditingInfo> auditingInfoList = AuditingResultUtil.getAuditingInfoList(response.getJobsDetail());
     }
 

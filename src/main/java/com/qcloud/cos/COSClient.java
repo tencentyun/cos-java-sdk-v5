@@ -523,7 +523,7 @@ public class COSClient implements COS {
         }
 
         request.addHeader(Headers.HOST, endpoint);
-        if (isCIRequest) {
+        if (isCIRequest && !clientConfig.getCiSpecialRequest()) {
             //万象请求只支持https
             request.setProtocol(HttpProtocol.https);
         } else {

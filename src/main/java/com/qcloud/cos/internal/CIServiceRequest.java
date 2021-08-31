@@ -19,8 +19,6 @@
 
 package com.qcloud.cos.internal;
 
-import com.qcloud.cos.event.ProgressListener;
-
 public class CIServiceRequest extends CosServiceRequest {
     /**
      * BucketName e.g：bucketName-1234567

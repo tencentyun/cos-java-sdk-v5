@@ -87,6 +87,9 @@ public class ClientConfig {
     private int readLimit = DEFAULT_READ_LIMIT;
     private COSSigner cosSigner = new COSSigner();
 
+    // 数据万象特殊请求配置
+    private boolean ciSpecialRequest = false;
+
     // 不传入region 用于后续调用List Buckets(获取所有的bucket信息)
     public ClientConfig() {
         super();
@@ -270,5 +273,13 @@ public class ClientConfig {
 
     public void setCosSigner(COSSigner cosSigner) {
         this.cosSigner = cosSigner;
+    }
+
+    public boolean getCiSpecialRequest() {
+        return ciSpecialRequest;
+    }
+
+    public void setCiSpecialRequest(boolean ciSpecialRequest) {
+        this.ciSpecialRequest = ciSpecialRequest;
     }
 }
