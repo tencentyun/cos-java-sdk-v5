@@ -1,8 +1,11 @@
 package com.qcloud.cos.demo.ci;
 
 import com.qcloud.cos.COSClient;
+import com.qcloud.cos.model.ciModel.auditing.AuditingInfo;
 import com.qcloud.cos.model.ciModel.auditing.ImageAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.ImageAuditingResponse;
+
+import java.util.List;
 
 /**
  * 内容审核 图片审核接口相关demo 详情见https://cloud.tencent.com/document/product/460/37318
@@ -28,11 +31,12 @@ public class ImageAuditingDemo {
         //2.1设置请求bucket
         request.setBucketName("demo-123456789");
         //2.2设置审核类型
-        request.setDetectType("porn");
+        request.setDetectType("porn,terrorist,politics,ads");
         //2.3设置bucket中的图片位置
         request.setObjectKey("1.png");
         //3.调用接口,获取任务响应对象
         ImageAuditingResponse response = client.imageAuditing(request);
-        System.out.println(response);
+        //4调用工具类，获取各审核类型详情集合 (也可自行根据业务解析)
+        List<AuditingInfo> imageInfoList = AuditingResultUtil.getImageInfoList(response);
     }
 }

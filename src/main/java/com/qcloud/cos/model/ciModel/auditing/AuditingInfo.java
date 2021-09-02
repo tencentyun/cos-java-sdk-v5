@@ -1,5 +1,7 @@
 package com.qcloud.cos.model.ciModel.auditing;
 
+import java.util.Arrays;
+
 /**
  * 审核结果信息
  */
@@ -85,5 +87,18 @@ public class AuditingInfo {
 
     public void setCount(String count) {
         this.count = count;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("AuditingInfo{");
+        sb.append("type=").append(type);
+        sb.append(", typeName='").append(typeName).append('\'');
+        sb.append(", keyWords=").append(Arrays.toString(keyWords));
+        sb.append(", hitFlag='").append(hitFlag).append('\'');
+        sb.append(", score='").append(score).append('\'');
+        sb.append(", count='").append(count).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 }
