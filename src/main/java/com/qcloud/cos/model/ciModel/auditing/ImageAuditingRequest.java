@@ -25,19 +25,27 @@ public class ImageAuditingRequest extends CosServiceRequest {
     private String objectKey;
 
     /**
-     * 截帧频率，GIF 图或长图检测专用，默认值为0，表示只会检测 GIF 图或长图的第一帧
+     * 截帧频率，GIF 图或长图检测专用，默认值为5，表示只会检测 GIF 图或长图的第一帧
      */
-    private int interval;
+    private int interval = 5;
 
     /**
-     * 最大截帧数量，GIF 图或长图检测专用，默认值为1，表示只取 GIF 的第1帧图片进行审核，或长图不进行切分识别
+     * 最大截帧数量，GIF 图或长图检测专用，默认值为5，表示只取 GIF 的第1帧图片进行审核，或长图不进行切分识别
      */
-    private int maxFrames;
+    private int maxFrames = 5;
 
     /**
      * 审核策略的唯一标识，由后台自动生成，在控制台中对应为 Biztype 值
      */
     private String bizType;
+
+    /**
+     * 您可以通过填写detect-url审核任意公网可访问的图片链接
+     * 不填写detect-url时，后台会默认审核ObjectKey
+     * 填写了detect-url时，后台会审核detect-url链接，无需再填写ObjectKey
+     * detect-url示例：http://www.example.com/abc.jpg
+     */
+    private String detectUrl;
 
     public String getDetectType() {
         return detectType;
@@ -88,6 +96,14 @@ public class ImageAuditingRequest extends CosServiceRequest {
         this.bizType = bizType;
     }
 
+    public String getDetectUrl() {
+        return detectUrl;
+    }
+
+    public void setDetectUrl(String detectUrl) {
+        this.detectUrl = detectUrl;
+    }
+
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("ImageAuditingRequest{");
@@ -96,7 +112,8 @@ public class ImageAuditingRequest extends CosServiceRequest {
         sb.append(", objectKey='").append(objectKey).append('\'');
         sb.append(", interval=").append(interval);
         sb.append(", maxFrames=").append(maxFrames);
-        sb.append(", bizType=").append(bizType);
+        sb.append(", bizType='").append(bizType).append('\'');
+        sb.append(", detectUrl='").append(detectUrl).append('\'');
         sb.append('}');
         return sb.toString();
     }
