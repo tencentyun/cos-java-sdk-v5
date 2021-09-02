@@ -3746,13 +3746,14 @@ public class COSClient implements COS {
                 "The imageAuditingRequest parameter must be specified setting the object tags");
         rejectNull(imageAuditingRequest.getBucketName(),
                 "The bucketName parameter must be specified setting the object tags");
-        this.checkAuditingRequest(imageAuditingRequest);
+        rejectNull(imageAuditingRequest.getDetectType(), "The detectType parameter must be specified setting the object tags");
         CosHttpRequest<ImageAuditingRequest> request = createRequest(imageAuditingRequest.getBucketName(), imageAuditingRequest.getObjectKey(), imageAuditingRequest, HttpMethodName.GET);
         request.addParameter("ci-process", "sensitive-content-recognition");
         addParameterIfNotNull(request, "detect-type", imageAuditingRequest.getDetectType());
         addParameterIfNotNull(request, "interval", Integer.toString(imageAuditingRequest.getInterval()));
         addParameterIfNotNull(request, "max-frames", Integer.toString(imageAuditingRequest.getMaxFrames()));
         addParameterIfNotNull(request, "biz-type", imageAuditingRequest.getBizType());
+        addParameterIfNotNull(request, "detect-url", imageAuditingRequest.getDetectUrl());
         return invoke(request, new Unmarshallers.ImageAuditingUnmarshaller());
     }
 
@@ -3836,7 +3837,7 @@ public class COSClient implements COS {
 
     private void checkAuditingRequest(ImageAuditingRequest request) {
         rejectNull(request.getDetectType(), "The detectType parameter must be specified setting the object tags");
-        rejectNull(request.getObjectKey(), "The detectType parameter must be specified setting the object tags");
+        rejectNull(request.getObjectKey(), "The objectKey parameter must be specified setting the object tags");
     }
 
     private void checkWorkflowParameter(MediaWorkflowRequest request) {
