@@ -8,6 +8,7 @@ import com.qcloud.cos.model.ciModel.auditing.AuditingResult;
 import com.qcloud.cos.model.ciModel.auditing.AudtingCommonInfo;
 import com.qcloud.cos.model.ciModel.auditing.DetectType;
 import com.qcloud.cos.model.ciModel.auditing.IllegalInfo;
+import com.qcloud.cos.model.ciModel.auditing.ImageAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.PoliticsInfo;
 import com.qcloud.cos.model.ciModel.auditing.PornInfo;
 import com.qcloud.cos.model.ciModel.auditing.SectionInfo;
@@ -30,6 +31,18 @@ public class AuditingResultUtil {
         result = new AuditingResult();
         parsingAuditingResult(jobsDetail, result);
         return result;
+    }
+
+    public static List<AuditingInfo> getImageInfoList(ImageAuditingResponse response) {
+        AuditingJobsDetail jobsDetail = new AuditingJobsDetail();
+        List<SectionInfo> sectionList = jobsDetail.getSectionList();
+        SectionInfo sectionInfo = new SectionInfo();
+        sectionInfo.setPoliticsInfo(response.getPoliticsInfo());
+        sectionInfo.setPornInfo(response.getPornInfo());
+        sectionInfo.setAdsInfo(response.getAdsInfo());
+        sectionInfo.setTerroristInfo(response.getTerroristInfo());
+        sectionList.add(sectionInfo);
+        return getAuditingInfoList(jobsDetail);
     }
 
     public static List<AuditingInfo> getAuditingInfoList(AuditingJobsDetail jobsDetail) {
