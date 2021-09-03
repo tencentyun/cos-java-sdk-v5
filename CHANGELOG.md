@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [5.6.54]
+- default use https request
+- use strict sign
+- refine list buckets
+
 ## [5.6.53] - 2021-8-31
 - add clientConfig new params
 - update CI request httpProtocol rules

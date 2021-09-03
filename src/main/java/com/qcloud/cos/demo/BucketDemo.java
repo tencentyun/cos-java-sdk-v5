@@ -144,4 +144,27 @@ public class BucketDemo {
         // 关闭客户端
         cosclient.shutdown();
     }    
+
+    public static void ListBuckets() {
+        // 1 初始化用户身份信息(appid, secretId, secretKey)
+        COSCredentials cred = new BasicCOSCredentials("AKIDxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", "****************************");
+        // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
+        ClientConfig clientConfig = new ClientConfig(new Region("ap-shanghai"));
+        // 3 生成cos客户端
+        COSClient cosclient = new COSClient(cred, clientConfig);
+
+        List<Bucket> buckets = cosclient.listBuckets();
+
+        for (Bucket bucket : buckets) {
+            System.out.println(bucket.getName());
+            System.out.println(bucket.getLocation());
+            System.out.println(bucket.getOwner());
+            System.out.println(bucket.getType());
+            System.out.println(bucket.getBucketType());
+        }
+    }
+
+    public static void main(String[] args) {
+        ListBuckets();
+    }
 }

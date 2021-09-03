@@ -24,6 +24,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.exception.CosServiceException;
@@ -2062,9 +2063,10 @@ public interface COS extends COSDirectSpi {
      *                            request or handling the response.
      * @see COS#generatePresignedUrl(String, String, Date)
      * @see COS#generatePresignedUrl(String, String, Date, HttpMethodName)
+     *
+     * public URL generatePresignedUrl(String bucketName, String key, Date expiration)
+     *      throws CosClientException;
      */
-    public URL generatePresignedUrl(String bucketName, String key, Date expiration)
-            throws CosClientException;
 
     /**
      * <p>
@@ -2101,7 +2103,7 @@ public interface COS extends COSDirectSpi {
      * @see COS#generatePresignedUrl(String, String, Date, HttpMethodName)
      */
     public URL generatePresignedUrl(String bucketName, String key, Date expiration,
-                                    HttpMethodName method) throws CosClientException;
+                                    HttpMethodName method, Map<String, String> headers, Map<String, String> params) throws CosClientException;
 
     /**
      * <p>

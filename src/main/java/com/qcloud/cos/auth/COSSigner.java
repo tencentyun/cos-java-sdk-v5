@@ -30,20 +30,21 @@ import static com.qcloud.cos.auth.COSSignerConstants.Q_URL_PARAM_LIST;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.TreeMap;
 import java.util.Set;
-import java.util.HashSet;
-
-import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.codec.digest.HmacUtils;
+import java.util.TreeMap;
 
 import com.qcloud.cos.Headers;
+import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.http.CosHttpRequest;
 import com.qcloud.cos.http.HttpMethodName;
 import com.qcloud.cos.internal.CosServiceRequest;
 import com.qcloud.cos.utils.UrlEncoderUtils;
+
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.codec.digest.HmacUtils;
 
 public class COSSigner {
     private static Set<String> needSignedHeaderSet = new HashSet<>();
@@ -78,11 +79,6 @@ public class COSSigner {
             request.addHeader(Headers.SECURITY_TOKEN,
                     ((COSSessionCredentials) cred).getSessionToken());
         }
-    }
-    public String buildAuthorizationStr(HttpMethodName methodName, String resouce_path,
-            COSCredentials cred, Date expiredTime) {
-        return buildAuthorizationStr(methodName, resouce_path, new HashMap<String, String>(),
-                new HashMap<String, String>(), cred, expiredTime);
     }
 
     public String buildPostObjectSignature(String secretKey, String keyTime, String policy) {
@@ -152,14 +148,26 @@ public class COSSigner {
     }
 
     private Map<String, String> buildSignHeaders(Map<String, String> originHeaders) {
+        Boolean hasHost = false;
         Map<String, String> signHeaders = new HashMap<>();
         for (Entry<String, String> headerEntry : originHeaders.entrySet()) {
             String key = headerEntry.getKey().toLowerCase();
+
+            if (key.equals("host")) {
+                hasHost = true;
+            }
+
             if(needSignedHeader(key)) {
                 String value = headerEntry.getValue();
                 signHeaders.put(key, value);
             }
         }
+
+        if (!hasHost) {
+            String msg = String.format("buildAuthorization missing header: host. %s", originHeaders);
+            throw new CosClientException(msg);
+        }
+
         return signHeaders;
     }
 

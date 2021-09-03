@@ -65,7 +65,7 @@ public class ClientConfig {
      **/
     public static final BackoffStrategy DEFAULT_BACKOFF_STRATEGY = PredefinedBackoffStrategies.DEFAULT;
     private Region region;
-    private HttpProtocol httpProtocol = HttpProtocol.http;
+    private HttpProtocol httpProtocol = HttpProtocol.https;
     private String endPointSuffix = null;
     private EndpointBuilder endpointBuilder = null;
     private EndpointResolver endpointResolver = new DefaultEndpointResolver();

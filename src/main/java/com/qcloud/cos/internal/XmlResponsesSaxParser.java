@@ -1041,6 +1041,10 @@ public class XmlResponsesSaxParser {
                     currentBucket.setCreationDate(creationDate);
                 } else if (name.equals("Location")) {
                     currentBucket.setLocation(getText());
+                } else if (name.equals("BucketType")) {
+                    currentBucket.setBucketType(getText());
+                } else if (name.equals("Type")) {
+                    currentBucket.setType(getText());
                 }
             }
         }

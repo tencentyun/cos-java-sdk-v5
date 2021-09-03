@@ -6,6 +6,8 @@ import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.ClientConfig;
@@ -45,6 +47,12 @@ public class GeneratePresignedUrlDemo {
         Date expirationDate = new Date(System.currentTimeMillis() + 30 * 60 * 1000);
         req.setExpiration(expirationDate);
 
+        // 填写本次请求的参数
+        req.addRequestParameter("param1", "value1");
+
+        // 填写本次请求的头部。Host 头部会自动补全，不需要填写
+        req.putCustomRequestHeader("header1", "value1");
+
         URL url = cosclient.generatePresignedUrl(req);
         System.out.println(url.toString());
         
@@ -83,6 +91,13 @@ public class GeneratePresignedUrlDemo {
         // 这里设置签名在半个小时后过期
         Date expirationDate = new Date(System.currentTimeMillis() + 30 * 60 * 1000);
         req.setExpiration(expirationDate);
+
+        // 填写本次请求的参数
+        req.addRequestParameter("param1", "value1");
+
+        // 填写本次请求的头部。Host 头部会自动补全，不需要填写
+        req.putCustomRequestHeader("header1", "value1");
+
         URL url = cosclient.generatePresignedUrl(req);
 
         System.out.println(url.toString());
@@ -114,9 +129,9 @@ public class GeneratePresignedUrlDemo {
     // 生成预签名的上传连接
     public static void GeneratePresignedUploadUrl() {
         // 1 初始化用户身份信息(secretId, secretKey)
-        COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
+        COSCredentials cred = new BasicCOSCredentials("AKIDxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", "********************************");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
-        ClientConfig clientConfig = new ClientConfig(new Region("ap-beijing-1"));
+        ClientConfig clientConfig = new ClientConfig(new Region("ap-shanghai"));
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名需包含appid
@@ -124,7 +139,12 @@ public class GeneratePresignedUrlDemo {
         
         String key = "aaa.txt";
         Date expirationTime = new Date(System.currentTimeMillis() + 30 * 60 * 1000);
-        URL url = cosclient.generatePresignedUrl(bucketName, key, expirationTime, HttpMethodName.PUT);
+        // 填写本次请求的 header。Host 头部会自动补全，只需填入其他头部
+        Map<String, String> headers = new HashMap<String,String>();
+        // 填写本次请求的 params。
+        Map<String, String> params = new HashMap<String,String>();
+
+        URL url = cosclient.generatePresignedUrl(bucketName, key, expirationTime, HttpMethodName.PUT, headers, params);
         try {
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setDoOutput(true);
@@ -145,4 +165,7 @@ public class GeneratePresignedUrlDemo {
     }
     
 
+    public static void main(String[] args) {
+        GeneratePresignedUploadUrl();
+    }
 }

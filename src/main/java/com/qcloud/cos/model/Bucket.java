@@ -34,6 +34,12 @@ public class Bucket implements Serializable {
     /** The location of the bucket */
     private String location = null;
 
+    /** The type of the bucket */
+    private String bucketType = null;
+
+    /** The type set by internal */
+    private String type = null;
+
     /**
      * Constructs a bucket without any name specified.
      * 
@@ -132,5 +138,19 @@ public class Bucket implements Serializable {
         this.location = location;
     }
 
+    public void setBucketType(String bucketType) {
+        this.bucketType = bucketType;
+    }
 
+    public String getBucketType() {
+        return this.bucketType;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getType() {
+        return this.type;
+    }
 }

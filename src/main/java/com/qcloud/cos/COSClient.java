@@ -2702,17 +2702,21 @@ public class COSClient implements COS {
     }
 
     @Override
-    public URL generatePresignedUrl(String bucketName, String key, Date expiration)
-            throws CosClientException {
-        return generatePresignedUrl(bucketName, key, expiration, HttpMethodName.GET);
-    }
-
-    @Override
     public URL generatePresignedUrl(String bucketName, String key, Date expiration,
-            HttpMethodName method) throws CosClientException {
+            HttpMethodName method, Map<String, String> headers, Map<String, String> params) throws CosClientException {
         GeneratePresignedUrlRequest request =
                 new GeneratePresignedUrlRequest(bucketName, key, method);
         request.setExpiration(expiration);
+
+        for (Entry<String, String> entry : params.entrySet()) {
+            request.addRequestParameter(entry.getKey(), entry.getValue());
+        }
+
+        request.putCustomRequestHeader(Headers.HOST, this.clientConfig.getEndpointBuilder().buildGeneralApiEndpoint(bucketName));
+
+        for (Entry<String, String> entry : headers.entrySet()) {
+            request.putCustomRequestHeader(entry.getKey(), entry.getValue());
+        }
 
         return generatePresignedUrl(request);
     }

@@ -1,5 +1,9 @@
 package com.qcloud.cos;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -9,13 +13,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Date;
-
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import java.util.HashMap;
 
 import com.qcloud.cos.auth.AnonymousCOSCredentials;
 import com.qcloud.cos.auth.COSCredentials;
@@ -28,6 +26,10 @@ import com.qcloud.cos.model.ResponseHeaderOverrides;
 import com.qcloud.cos.region.Region;
 import com.qcloud.cos.utils.DateUtils;
 import com.qcloud.cos.utils.Md5Utils;
+
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 public class GeneratePresignedUrlTest extends AbstractCOSClientTest {
     @BeforeClass
@@ -136,9 +138,9 @@ public class GeneratePresignedUrlTest extends AbstractCOSClientTest {
         try {
             clientConfig.setHttpProtocol(HttpProtocol.https);
             Date expirationTime = new Date(System.currentTimeMillis() + 30 * 60 * 1000);
-            URL putUrl = cosclient.generatePresignedUrl(bucket, key, expirationTime, HttpMethodName.PUT);
-            URL getUrl = cosclient.generatePresignedUrl(bucket, key, expirationTime, HttpMethodName.GET);
-            URL delUrl = cosclient.generatePresignedUrl(bucket, key, expirationTime, HttpMethodName.DELETE);
+            URL putUrl = cosclient.generatePresignedUrl(bucket, key, expirationTime, HttpMethodName.PUT, new HashMap<String, String>(), new HashMap<String, String>());
+            URL getUrl = cosclient.generatePresignedUrl(bucket, key, expirationTime, HttpMethodName.GET, new HashMap<String, String>(), new HashMap<String, String>());
+            URL delUrl = cosclient.generatePresignedUrl(bucket, key, expirationTime, HttpMethodName.DELETE, new HashMap<String, String>(), new HashMap<String, String>());
             assertTrue(putUrl.toString().startsWith("https://"));
             assertTrue(getUrl.toString().startsWith("https://"));
             assertTrue(delUrl.toString().startsWith("https://"));
@@ -180,12 +182,12 @@ public class GeneratePresignedUrlTest extends AbstractCOSClientTest {
         File downLoadFile = new File(localFile.getAbsolutePath() + ".down");
         try {
             Date expirationTime = new Date(System.currentTimeMillis() + 30 * 60 * 1000);
-            URL putUrl = anoyCOSClient.generatePresignedUrl(bucket, key, expirationTime, HttpMethodName.PUT);
-            URL getUrl = anoyCOSClient.generatePresignedUrl(bucket, key, expirationTime, HttpMethodName.GET);
-            URL delUrl = anoyCOSClient.generatePresignedUrl(bucket, key, expirationTime, HttpMethodName.DELETE);
-            assertTrue(putUrl.toString().startsWith("http://"));
-            assertTrue(getUrl.toString().startsWith("http://"));
-            assertTrue(delUrl.toString().startsWith("http://"));
+            URL putUrl = anoyCOSClient.generatePresignedUrl(bucket, key, expirationTime, HttpMethodName.PUT, new HashMap<String, String>(), new HashMap<String, String>());
+            URL getUrl = anoyCOSClient.generatePresignedUrl(bucket, key, expirationTime, HttpMethodName.GET, new HashMap<String, String>(), new HashMap<String, String>());
+            URL delUrl = anoyCOSClient.generatePresignedUrl(bucket, key, expirationTime, HttpMethodName.DELETE, new HashMap<String, String>(), new HashMap<String, String>());
+            assertTrue(putUrl.toString().startsWith("https://"));
+            assertTrue(getUrl.toString().startsWith("https://"));
+            assertTrue(delUrl.toString().startsWith("https://"));
             assertFalse(putUrl.toString().contains("sign="));
             assertFalse(getUrl.toString().contains("sign="));
             assertFalse(delUrl.toString().contains("sign="));
@@ -217,12 +219,12 @@ public class GeneratePresignedUrlTest extends AbstractCOSClientTest {
         File downLoadFile = new File(localFile.getAbsolutePath() + ".down");
         try {
             Date expirationTime = new Date(System.currentTimeMillis() + 30 * 60 * 1000);
-            URL putUrl = temporyCOSClient.generatePresignedUrl(bucket, key, expirationTime, HttpMethodName.PUT);
-            URL getUrl = temporyCOSClient.generatePresignedUrl(bucket, key, expirationTime, HttpMethodName.GET);
-            URL delUrl = temporyCOSClient.generatePresignedUrl(bucket, key, expirationTime, HttpMethodName.DELETE);
-            assertTrue(putUrl.toString().startsWith("http://"));
-            assertTrue(getUrl.toString().startsWith("http://"));
-            assertTrue(delUrl.toString().startsWith("http://"));
+            URL putUrl = temporyCOSClient.generatePresignedUrl(bucket, key, expirationTime, HttpMethodName.PUT, new HashMap<String, String>(), new HashMap<String, String>());
+            URL getUrl = temporyCOSClient.generatePresignedUrl(bucket, key, expirationTime, HttpMethodName.GET, new HashMap<String, String>(), new HashMap<String, String>());
+            URL delUrl = temporyCOSClient.generatePresignedUrl(bucket, key, expirationTime, HttpMethodName.DELETE, new HashMap<String, String>(), new HashMap<String, String>());
+            assertTrue(putUrl.toString().startsWith("https://"));
+            assertTrue(getUrl.toString().startsWith("https://"));
+            assertTrue(delUrl.toString().startsWith("https://"));
             assertTrue(putUrl.toString().contains("sign="));
             assertTrue(getUrl.toString().contains("sign="));
             assertTrue(delUrl.toString().contains("sign="));
