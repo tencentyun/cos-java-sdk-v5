@@ -84,6 +84,7 @@ import com.qcloud.cos.model.Tag.Tag;
 import com.qcloud.cos.model.ciModel.auditing.AudioAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.AuditingJobsDetail;
 import com.qcloud.cos.model.ciModel.auditing.AudtingCommonInfo;
+import com.qcloud.cos.model.ciModel.auditing.DocumentAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.ImageAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.SectionInfo;
 import com.qcloud.cos.model.ciModel.auditing.SnapshotInfo;
@@ -792,6 +793,18 @@ public class XmlResponsesSaxParser {
     }
 
     public TextAuditingDescribeJobHandler parseTextAuditingDescribeResponse(InputStream inputStream) throws IOException {
+        TextAuditingDescribeJobHandler handler = new TextAuditingDescribeJobHandler();
+        parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
+        return handler;
+    }
+
+    public DocumentAuditingResponse parseDocumentAuditingResponse(InputStream inputStream) throws IOException {
+        TextAuditingJobHandler handler = new TextAuditingJobHandler();
+        parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
+        return handler;
+    }
+
+    public DocumentAuditingResponse parseDocumentAuditingDescribeResponse(InputStream inputStream) throws IOException {
         TextAuditingDescribeJobHandler handler = new TextAuditingDescribeJobHandler();
         parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
         return handler;
@@ -5889,6 +5902,222 @@ public class XmlResponsesSaxParser {
         }
 
         public void setResponse(TextAuditingResponse response) {
+            this.response = response;
+        }
+
+        private void parseInfo(AudtingCommonInfo obj, String name, String value) {
+            switch (name) {
+                case "Code":
+                    obj.setCode(value);
+                    break;
+                case "HitFlag":
+                    obj.setHitFlag(getText());
+                    break;
+                case "Score":
+                    obj.setScore(getText());
+                    break;
+                case "Keywords":
+                    obj.setLabel(getText());
+                    break;
+                case "Count":
+                    obj.setCount(getText());
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    public static class DocumentAuditingJobHandler extends AbstractHandler {
+        private DocumentAuditingResponse response = new DocumentAuditingResponse();
+
+        @Override
+        protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
+            List<SectionInfo> sectionList = response.getJobsDetail().getSectionList();
+            if ((in("Response", "Detail") || in("Response", "JobsDetail")) && "Section".equals(name)) {
+                sectionList.add(new SectionInfo());
+            }
+        }
+
+        @Override
+        protected void doEndElement(String uri, String name, String qName) {
+            List<SectionInfo> sectionList = response.getJobsDetail().getSectionList();
+            if (in("Response", "Detail") || in("Response", "JobsDetail")) {
+                AuditingJobsDetail jobsDetail = response.getJobsDetail();
+                switch (name) {
+                    case "Code":
+                        jobsDetail.setCode(getText());
+                        break;
+                    case "Message":
+                        jobsDetail.setMessage(getText());
+                        break;
+                    case "JobId":
+                        jobsDetail.setJobId(getText());
+                        break;
+                    case "State":
+                        jobsDetail.setState(getText());
+                        break;
+                    case "CreationTime":
+                        jobsDetail.setCreationTime(getText());
+                        break;
+                    case "Object":
+                        jobsDetail.setObject(getText());
+                        break;
+                    case "SectionCount":
+                        jobsDetail.setSectionCount(getText());
+                        break;
+                    case "Result":
+                        jobsDetail.setResult(getText());
+                        break;
+                    case "Content":
+                        jobsDetail.setContent(getText());
+                    default:
+                        break;
+                }
+            } else if (in("Response", "JobsDetail", "PornInfo")) {
+                parseInfo(response.getJobsDetail().getPornInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "PoliticsInfo")) {
+                parseInfo(response.getJobsDetail().getPoliticsInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "TerrorismInfo")) {
+                parseInfo(response.getJobsDetail().getTerroristInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "AdsInfo")) {
+                parseInfo(response.getJobsDetail().getAdsInfo(), name, getText());
+            }else if (in("Response", "JobsDetail", "AbuseInfo")) {
+                parseInfo(response.getJobsDetail().getAbuseInfo(), name, getText());
+            }else if (in("Response", "JobsDetail", "IllegalInfo")) {
+                parseInfo(response.getJobsDetail().getIllegalInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "Section")) {
+                SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
+                if ("StartByte".equals(name))
+                    sectionInfo.setStartByte(getText());
+            } else if (in("Response", "JobsDetail", "Section", "PornInfo")) {
+                SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
+                parseInfo(sectionInfo.getPornInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "Section", "PoliticsInfo")) {
+                SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
+                parseInfo(sectionInfo.getPoliticsInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "Section", "TerrorismInfo")) {
+                SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
+                parseInfo(sectionInfo.getTerroristInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "Section", "AdsInfo")) {
+                SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
+                parseInfo(sectionInfo.getAdsInfo(), name, getText());
+            }else if (in("Response", "JobsDetail", "Section", "AbuseInfo")) {
+                SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
+                parseInfo(sectionInfo.getAbuseInfo(), name, getText());
+            }else if (in("Response", "JobsDetail", "Section", "IllegalInfo")) {
+                SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
+                parseInfo(sectionInfo.getIllegalInfo(), name, getText());
+            }
+        }
+
+        public DocumentAuditingResponse getResponse() {
+            return response;
+        }
+
+        public void setResponse(DocumentAuditingResponse response) {
+            this.response = response;
+        }
+
+        private void parseInfo(AudtingCommonInfo obj, String name, String value) {
+            switch (name) {
+                case "Code":
+                    obj.setCode(value);
+                    break;
+                case "HitFlag":
+                    obj.setHitFlag(getText());
+                    break;
+                case "Score":
+                    obj.setScore(getText());
+                    break;
+                case "Keywords":
+                    obj.setLabel(getText());
+                    break;
+                case "Count":
+                    obj.setCount(getText());
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    public static class DocumentAuditingDescribeJobHandler extends AbstractHandler {
+        private DocumentAuditingResponse response = new DocumentAuditingResponse();
+
+        @Override
+        protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
+            List<SectionInfo> sectionList = response.getJobsDetail().getSectionList();
+            if ((in("Response", "Detail") || in("Response", "JobsDetail")) && "Section".equals(name)) {
+                sectionList.add(new SectionInfo());
+            }
+        }
+
+        @Override
+        protected void doEndElement(String uri, String name, String qName) {
+            List<SectionInfo> sectionList = response.getJobsDetail().getSectionList();
+            if (in("Response", "Detail") || in("Response", "JobsDetail")) {
+                AuditingJobsDetail jobsDetail = response.getJobsDetail();
+                switch (name) {
+                    case "Code":
+                        jobsDetail.setCode(getText());
+                        break;
+                    case "Message":
+                        jobsDetail.setMessage(getText());
+                        break;
+                    case "JobId":
+                        jobsDetail.setJobId(getText());
+                        break;
+                    case "State":
+                        jobsDetail.setState(getText());
+                        break;
+                    case "CreationTime":
+                        jobsDetail.setCreationTime(getText());
+                        break;
+                    case "Object":
+                        jobsDetail.setObject(getText());
+                        break;
+                    case "SectionCount":
+                        jobsDetail.setSectionCount(getText());
+                        break;
+                    case "Result":
+                        jobsDetail.setResult(getText());
+                        break;
+                    default:
+                        break;
+                }
+            } else if (in("Response", "Detail", "PornInfo") || in("Response", "JobsDetail", "PornInfo")) {
+                parseInfo(response.getJobsDetail().getPornInfo(), name, getText());
+            } else if (in("Response", "Detail", "PoliticsInfo") || in("Response", "JobsDetail", "PoliticsInfo")) {
+                parseInfo(response.getJobsDetail().getPoliticsInfo(), name, getText());
+            } else if (in("Response", "Detail", "TerrorismInfo") || in("Response", "JobsDetail", "TerrorismInfo")) {
+                parseInfo(response.getJobsDetail().getTerroristInfo(), name, getText());
+            } else if (in("Response", "Detail", "AdsInfo") || in("Response", "JobsDetail", "AdsInfo")) {
+                parseInfo(response.getJobsDetail().getAdsInfo(), name, getText());
+            } else if (in("Response", "Detail", "Section") || in("Response", "JobsDetail", "Section")) {
+                SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
+                if ("StartByte".equals(name))
+                    sectionInfo.setStartByte(getText());
+            } else if (in("Response", "Detail", "Section", "PornInfo") || in("Response", "JobsDetail", "Section", "PornInfo")) {
+                SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
+                parseInfo(sectionInfo.getPornInfo(), name, getText());
+            } else if (in("Response", "Detail", "Section", "PoliticsInfo") || in("Response", "JobsDetail", "Section", "PoliticsInfo")) {
+                SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
+                parseInfo(sectionInfo.getPoliticsInfo(), name, getText());
+            } else if (in("Response", "Detail", "Section", "TerrorismInfo") || in("Response", "JobsDetail", "Section", "TerrorismInfo")) {
+                SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
+                parseInfo(sectionInfo.getTerroristInfo(), name, getText());
+            } else if (in("Response", "Detail", "Section", "AdsInfo") || in("Response", "JobsDetail", "Section", "AdsInfo")) {
+                SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
+                parseInfo(sectionInfo.getAdsInfo(), name, getText());
+            }
+        }
+
+        public DocumentAuditingResponse getResponse() {
+            return response;
+        }
+
+        public void setResponse(DocumentAuditingResponse response) {
             this.response = response;
         }
 

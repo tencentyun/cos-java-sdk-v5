@@ -31,7 +31,7 @@ public class ImageAuditingDemo {
         //2.1设置请求bucket
         request.setBucketName("demo-123456789");
         //2.2设置审核类型
-        request.setDetectType("porn,terrorist,politics,ads");
+        request.setDetectType("porn");
         //2.3设置bucket中的图片位置
         request.setObjectKey("1.png");
         //3.调用接口,获取任务响应对象

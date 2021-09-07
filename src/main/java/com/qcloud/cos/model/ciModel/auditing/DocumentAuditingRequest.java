@@ -3,17 +3,18 @@ package com.qcloud.cos.model.ciModel.auditing;
 import com.qcloud.cos.internal.CIServiceRequest;
 
 public class DocumentAuditingRequest extends CIServiceRequest {
-    private AuditingInputObject input;
+    private DocumentInputObject input;
     private Conf conf;
+    private String jobId;
 
-    public AuditingInputObject getInput() {
+    public DocumentInputObject getInput() {
         if (input == null) {
-            input = new AuditingInputObject();
+            input = new DocumentInputObject();
         }
         return input;
     }
 
-    public void setInput(AuditingInputObject input) {
+    public void setInput(DocumentInputObject input) {
         this.input = input;
     }
 
@@ -28,11 +29,20 @@ public class DocumentAuditingRequest extends CIServiceRequest {
         this.conf = conf;
     }
 
+    public String getJobId() {
+        return jobId;
+    }
+
+    public void setJobId(String jobId) {
+        this.jobId = jobId;
+    }
+
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("DocumentAuditingRequest{");
+        final StringBuffer sb = new StringBuffer("DocumentAuditingRequest{");
         sb.append("input=").append(input);
         sb.append(", conf=").append(conf);
+        sb.append(", jobId='").append(jobId).append('\'');
         sb.append('}');
         return sb.toString();
     }
