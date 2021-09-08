@@ -33,6 +33,13 @@ public class Conf {
      */
     private String detectContent;
 
+    /**
+     * 	回调内容的结构，有效值：Simple（回调内容包含基本信息）、Detail（回调内容包含详细信息）。默认为 Simple。
+     */
+    private CallbackVersion callbackVersion;
+
+
+
     public String getBizType() {
         return bizType;
     }
@@ -76,14 +83,23 @@ public class Conf {
         this.callback = callback;
     }
 
+    public CallbackVersion getCallbackVersion() {
+        return callbackVersion;
+    }
+
+    public void setCallbackVersion(CallbackVersion callbackVersion) {
+        this.callbackVersion = callbackVersion;
+    }
+
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("Conf{");
+        final StringBuilder sb = new StringBuilder("Conf{");
         sb.append("detectType='").append(detectType).append('\'');
         sb.append(", snapshot=").append(snapshot);
         sb.append(", callback='").append(callback).append('\'');
         sb.append(", bizType='").append(bizType).append('\'');
         sb.append(", detectContent='").append(detectContent).append('\'');
+        sb.append(", callbackVersion=").append(callbackVersion);
         sb.append('}');
         return sb.toString();
     }

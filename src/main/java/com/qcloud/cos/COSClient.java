@@ -3935,7 +3935,7 @@ public class COSClient implements COS {
         this.rejectStartWith(documentAuditingRequest.getConf().getCallback(), "http", "The Conf.CallBack parameter mush start with http or https");
         CosHttpRequest<DocumentAuditingRequest> request = createRequest(documentAuditingRequest.getBucketName(), "/document/auditing", documentAuditingRequest, HttpMethodName.POST);
         this.setContent(request, RequestXmlFactory.convertToXmlByteArray(documentAuditingRequest), "application/xml", false);
-        return invoke(request, new Unmarshallers.TextAuditingDescribeJobUnmarshaller());
+        return invoke(request, new Unmarshallers.DocumentAuditingJobUnmarshaller());
     }
 
     @Override
@@ -3944,7 +3944,7 @@ public class COSClient implements COS {
         rejectNull(documentAuditingRequest.getJobId(),
                 "The jobId parameter must be specified setting the object tags");
         CosHttpRequest<DocumentAuditingRequest> request = createRequest(documentAuditingRequest.getBucketName(), "/document/auditing/" + documentAuditingRequest.getJobId(), documentAuditingRequest, HttpMethodName.GET);
-        return null;
+        return invoke(request, new Unmarshallers.DocumentAuditingDescribeJobUnmarshaller());
     }
 
     private void checkAuditingRequest(ImageAuditingRequest request) {

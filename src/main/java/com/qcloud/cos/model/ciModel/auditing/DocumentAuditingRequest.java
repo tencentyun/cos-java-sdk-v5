@@ -2,6 +2,9 @@ package com.qcloud.cos.model.ciModel.auditing;
 
 import com.qcloud.cos.internal.CIServiceRequest;
 
+/**
+ * 文档审核 请求实体类
+ */
 public class DocumentAuditingRequest extends CIServiceRequest {
     private DocumentInputObject input;
     private Conf conf;

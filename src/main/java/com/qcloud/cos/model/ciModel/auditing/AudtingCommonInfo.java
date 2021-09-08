@@ -93,6 +93,9 @@ public class AudtingCommonInfo {
     }
 
     public OcrResults getOcrResults() {
+        if (ocrResults == null) {
+            ocrResults = new OcrResults();
+        }
         return ocrResults;
     }
 

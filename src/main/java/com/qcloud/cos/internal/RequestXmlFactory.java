@@ -735,6 +735,7 @@ public class RequestXmlFactory {
         addIfNotNull(xml,"DetectType", conf.getDetectType());
         addIfNotNull(xml,"BizType", conf.getBizType());
         addIfNotNull(xml,"DetectContent", conf.getDetectContent());
+        addIfNotNull(xml,"CallbackVersion", conf.getCallbackVersion());
         xml.start("Snapshot");
         addIfNotNull(xml,"Mode", conf.getSnapshot().getMode());
         addIfNotNull(xml,"TimeInterval", conf.getSnapshot().getTimeInterval());
@@ -765,6 +766,8 @@ public class RequestXmlFactory {
         xml.start("Conf");
         addIfNotNull(xml,"DetectType", conf.getDetectType());
         addIfNotNull(xml,"Callback", conf.getCallback());
+        addIfNotNull(xml,"CallbackVersion", conf.getCallbackVersion());
+        addIfNotNull(xml,"BizType", conf.getBizType());
         xml.end();
 
         xml.end();

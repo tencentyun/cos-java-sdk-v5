@@ -20,9 +20,11 @@ package com.qcloud.cos.http;
 
 
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -471,6 +473,17 @@ public class DefaultCosHttpClient implements CosHttpClient {
                 httpRequest = buildHttpRequest(request);
                 httpResponse = null;
                 httpResponse = executeOneRequest(context, httpRequest);
+//                                BufferedReader in = new BufferedReader(new InputStreamReader(httpResponse.getEntity()
+//                        .getContent()));
+//                StringBuffer sb = new StringBuffer("");
+//                String line = "";
+//                String NL = System.getProperty("line.separator");
+//                while ((line = in.readLine()) != null) {
+//                    sb.append(line + NL);
+//                }
+////                in.close();
+//                String content = sb.toString();
+//                System.out.println(content);
                 checkResponse(request, httpRequest, httpResponse);
                 break;
             } catch (CosServiceException cse) {

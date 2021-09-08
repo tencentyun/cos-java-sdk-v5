@@ -16,7 +16,7 @@ public class VideoAuditingJobDemo {
         // 1 初始化用户身份信息（secretId, secretKey）。
         COSClient client = ClientUtils.getTestClient();
         // 2 调用要使用的方法。
-        describeAuditingJob(client);
+        createVideoAuditingJob(client);
     }
 
     /**
@@ -26,7 +26,7 @@ public class VideoAuditingJobDemo {
         //1.创建任务请求对象
         VideoAuditingRequest request = new VideoAuditingRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("demo-123456789");
+        request.setBucketName("markjrzhang-125170470");
         request.getInput().setObject("1.mp4");
         request.getConf().setDetectType("Porn,Terrorism,Politics,Ads");
         request.getConf().getSnapshot().setCount("10");

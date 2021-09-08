@@ -45,12 +45,12 @@ public class DocumentAuditingJobsDetail {
     /**
      * 文档转换为图片后，具体每张图片的审核结果信息，只返回带有违规结果的图片
      */
-    private List<DocumentAuditingJobsDetail> pageSegment;
+    private List<DocumentResultInfo> pageSegment;
 
     /**
      * 该字段用于返回命中的审核场景及对应的结果
      */
-    private List<SnapshotInfo> labels;
+    private DocumentResultInfo labels;
 
     public String getJobId() {
         return jobId;
@@ -116,25 +116,28 @@ public class DocumentAuditingJobsDetail {
         this.pageCount = pageCount;
     }
 
-    public List<DocumentAuditingJobsDetail> getPageSegment() {
+    public List<DocumentResultInfo> getPageSegment() {
+        if (pageSegment == null) {
+            pageSegment = new ArrayList<>();
+        }
         return pageSegment;
     }
 
-    public void setPageSegment(List<DocumentAuditingJobsDetail> pageSegment) {
+    public void setPageSegment(List<DocumentResultInfo> pageSegment) {
         if (pageSegment == null) {
             pageSegment = new ArrayList<>();
         }
         this.pageSegment = pageSegment;
     }
 
-    public List<SnapshotInfo> getLabels() {
+    public DocumentResultInfo getLabels() {
         if (labels == null) {
-            labels = new ArrayList<>();
+            labels = new DocumentResultInfo();
         }
         return labels;
     }
 
-    public void setLabels(List<SnapshotInfo> labels) {
+    public void setLabels(DocumentResultInfo labels) {
         this.labels = labels;
     }
 }

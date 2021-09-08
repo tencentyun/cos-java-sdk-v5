@@ -84,8 +84,11 @@ import com.qcloud.cos.model.Tag.Tag;
 import com.qcloud.cos.model.ciModel.auditing.AudioAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.AuditingJobsDetail;
 import com.qcloud.cos.model.ciModel.auditing.AudtingCommonInfo;
+import com.qcloud.cos.model.ciModel.auditing.DocumentAuditingJobsDetail;
 import com.qcloud.cos.model.ciModel.auditing.DocumentAuditingResponse;
+import com.qcloud.cos.model.ciModel.auditing.DocumentResultInfo;
 import com.qcloud.cos.model.ciModel.auditing.ImageAuditingResponse;
+import com.qcloud.cos.model.ciModel.auditing.OcrResults;
 import com.qcloud.cos.model.ciModel.auditing.SectionInfo;
 import com.qcloud.cos.model.ciModel.auditing.SnapshotInfo;
 import com.qcloud.cos.model.ciModel.auditing.TextAuditingResponse;
@@ -798,14 +801,14 @@ public class XmlResponsesSaxParser {
         return handler;
     }
 
-    public DocumentAuditingResponse parseDocumentAuditingResponse(InputStream inputStream) throws IOException {
-        TextAuditingJobHandler handler = new TextAuditingJobHandler();
+    public DocumentAuditingJobHandler parseDocumentAuditingResponse(InputStream inputStream) throws IOException {
+        DocumentAuditingJobHandler handler = new DocumentAuditingJobHandler();
         parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
         return handler;
     }
 
-    public DocumentAuditingResponse parseDocumentAuditingDescribeResponse(InputStream inputStream) throws IOException {
-        TextAuditingDescribeJobHandler handler = new TextAuditingDescribeJobHandler();
+    public DocumentAuditingDescribeJobHandler parseDocumentAuditingDescribeResponse(InputStream inputStream) throws IOException {
+        DocumentAuditingDescribeJobHandler handler = new DocumentAuditingDescribeJobHandler();
         parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
         return handler;
     }
@@ -5927,23 +5930,72 @@ public class XmlResponsesSaxParser {
             }
         }
     }
-
     public static class DocumentAuditingJobHandler extends AbstractHandler {
         private DocumentAuditingResponse response = new DocumentAuditingResponse();
 
         @Override
         protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
-            List<SectionInfo> sectionList = response.getJobsDetail().getSectionList();
-            if ((in("Response", "Detail") || in("Response", "JobsDetail")) && "Section".equals(name)) {
-                sectionList.add(new SectionInfo());
+
+        }
+
+        @Override
+        protected void doEndElement(String uri, String name, String qName) {
+            if (in("Response", "JobsDetail")) {
+                DocumentAuditingJobsDetail jobsDetail = response.getJobsDetail();
+                switch (name) {
+                    case "JobId":
+                        jobsDetail.setJobId(getText());
+                        break;
+                    case "State":
+                        jobsDetail.setState(getText());
+                        break;
+                    case "CreationTime":
+                        jobsDetail.setCreationTime(getText());
+                        break;
+                    default:
+                        break;
+                }
+            } else if (in("Response")) {
+                if ("RequestId".equalsIgnoreCase(name)) {
+                    response.setRequestId(getText());
+                }
+            }
+        }
+
+        public DocumentAuditingResponse getResponse() {
+            return response;
+        }
+
+        public void setResponse(DocumentAuditingResponse response) {
+            this.response = response;
+        }
+    }
+
+    public static class DocumentAuditingDescribeJobHandler extends AbstractHandler {
+        private DocumentAuditingResponse response = new DocumentAuditingResponse();
+
+        @Override
+        protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
+            List<DocumentResultInfo> pageSegment = response.getJobsDetail().getPageSegment();
+            if (in("Response", "JobsDetail", "PageSegment") && "Results".equals(name)) {
+                pageSegment.add(new DocumentResultInfo());
             }
         }
 
         @Override
         protected void doEndElement(String uri, String name, String qName) {
-            List<SectionInfo> sectionList = response.getJobsDetail().getSectionList();
-            if (in("Response", "Detail") || in("Response", "JobsDetail")) {
-                AuditingJobsDetail jobsDetail = response.getJobsDetail();
+            DocumentAuditingJobsDetail jobsDetail = response.getJobsDetail();
+            List<DocumentResultInfo> pageSegment = jobsDetail.getPageSegment();
+            DocumentResultInfo resultDetail = new DocumentResultInfo();
+            if (pageSegment.size() != 0) {
+                resultDetail = pageSegment.get(pageSegment.size() - 1);
+            }
+
+            if (in("Response")) {
+                if ("RequestId".equalsIgnoreCase(name)) {
+                    response.setRequestId(getText());
+                }
+            } else if (in("Response", "JobsDetail")) {
                 switch (name) {
                     case "Code":
                         jobsDetail.setCode(getText());
@@ -5960,54 +6012,48 @@ public class XmlResponsesSaxParser {
                     case "CreationTime":
                         jobsDetail.setCreationTime(getText());
                         break;
-                    case "Object":
-                        jobsDetail.setObject(getText());
+                    case "Suggestion":
+                        jobsDetail.setSuggestion(getText());
                         break;
-                    case "SectionCount":
-                        jobsDetail.setSectionCount(getText());
+                    case "PageCount":
+                        jobsDetail.setPageCount(getText());
                         break;
-                    case "Result":
-                        jobsDetail.setResult(getText());
+                    case "Url":
+                        jobsDetail.setUrl(getText());
                         break;
-                    case "Content":
-                        jobsDetail.setContent(getText());
                     default:
                         break;
                 }
-            } else if (in("Response", "JobsDetail", "PornInfo")) {
-                parseInfo(response.getJobsDetail().getPornInfo(), name, getText());
-            } else if (in("Response", "JobsDetail", "PoliticsInfo")) {
-                parseInfo(response.getJobsDetail().getPoliticsInfo(), name, getText());
-            } else if (in("Response", "JobsDetail", "TerrorismInfo")) {
-                parseInfo(response.getJobsDetail().getTerroristInfo(), name, getText());
-            } else if (in("Response", "JobsDetail", "AdsInfo")) {
-                parseInfo(response.getJobsDetail().getAdsInfo(), name, getText());
-            }else if (in("Response", "JobsDetail", "AbuseInfo")) {
-                parseInfo(response.getJobsDetail().getAbuseInfo(), name, getText());
-            }else if (in("Response", "JobsDetail", "IllegalInfo")) {
-                parseInfo(response.getJobsDetail().getIllegalInfo(), name, getText());
-            } else if (in("Response", "JobsDetail", "Section")) {
-                SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
-                if ("StartByte".equals(name))
-                    sectionInfo.setStartByte(getText());
-            } else if (in("Response", "JobsDetail", "Section", "PornInfo")) {
-                SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
-                parseInfo(sectionInfo.getPornInfo(), name, getText());
-            } else if (in("Response", "JobsDetail", "Section", "PoliticsInfo")) {
-                SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
-                parseInfo(sectionInfo.getPoliticsInfo(), name, getText());
-            } else if (in("Response", "JobsDetail", "Section", "TerrorismInfo")) {
-                SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
-                parseInfo(sectionInfo.getTerroristInfo(), name, getText());
-            } else if (in("Response", "JobsDetail", "Section", "AdsInfo")) {
-                SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
-                parseInfo(sectionInfo.getAdsInfo(), name, getText());
-            }else if (in("Response", "JobsDetail", "Section", "AbuseInfo")) {
-                SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
-                parseInfo(sectionInfo.getAbuseInfo(), name, getText());
-            }else if (in("Response", "JobsDetail", "Section", "IllegalInfo")) {
-                SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
-                parseInfo(sectionInfo.getIllegalInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "Labels", "AdsInfo")) {
+                parseInfo(response.getJobsDetail().getLabels().getAdsInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "Labels", "PoliticsInfo")) {
+                parseInfo(response.getJobsDetail().getLabels().getPoliticsInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "Labels", "PornInfo")) {
+                parseInfo(response.getJobsDetail().getLabels().getPornInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "Labels", "TerrorismInfo")) {
+                parseInfo(response.getJobsDetail().getLabels().getTerroristInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "PageSegment", "Results", "AdsInfo")) {
+                parseInfo(resultDetail.getAdsInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "PageSegment", "Results", "PoliticsInfo")) {
+                parseInfo(resultDetail.getPoliticsInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "PageSegment", "Results", "PornInfo")) {
+                parseInfo(resultDetail.getPornInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "PageSegment", "Results", "TerrorismInfo")) {
+                parseInfo(resultDetail.getTerroristInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "PageSegment", "Results")) {
+                if ("Text".equalsIgnoreCase(name)) {
+                    resultDetail.setText(getText());
+                } else if ("Url".equalsIgnoreCase(name)) {
+                    resultDetail.setUrl(getText());
+                }
+            }else if (in("Response", "JobsDetail", "PageSegment", "Results", "PornInfo","OcrResults")) {
+                parseResultInfo(resultDetail.getPornInfo().getOcrResults(), name, getText());
+            }else if (in("Response", "JobsDetail", "PageSegment", "Results", "PoliticsInfo","OcrResults")) {
+                parseResultInfo(resultDetail.getPoliticsInfo().getOcrResults(), name, getText());
+            }else if (in("Response", "JobsDetail", "PageSegment", "Results", "TerrorismInfo","OcrResults")) {
+                parseResultInfo(resultDetail.getTerroristInfo().getOcrResults(), name, getText());
+            }else if (in("Response", "JobsDetail", "PageSegment", "Results", "AdsInfo","OcrResults")) {
+                parseResultInfo(resultDetail.getAdsInfo().getOcrResults(), name, getText());
             }
         }
 
@@ -6040,103 +6086,14 @@ public class XmlResponsesSaxParser {
                     break;
             }
         }
-    }
 
-    public static class DocumentAuditingDescribeJobHandler extends AbstractHandler {
-        private DocumentAuditingResponse response = new DocumentAuditingResponse();
-
-        @Override
-        protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
-            List<SectionInfo> sectionList = response.getJobsDetail().getSectionList();
-            if ((in("Response", "Detail") || in("Response", "JobsDetail")) && "Section".equals(name)) {
-                sectionList.add(new SectionInfo());
-            }
-        }
-
-        @Override
-        protected void doEndElement(String uri, String name, String qName) {
-            List<SectionInfo> sectionList = response.getJobsDetail().getSectionList();
-            if (in("Response", "Detail") || in("Response", "JobsDetail")) {
-                AuditingJobsDetail jobsDetail = response.getJobsDetail();
-                switch (name) {
-                    case "Code":
-                        jobsDetail.setCode(getText());
-                        break;
-                    case "Message":
-                        jobsDetail.setMessage(getText());
-                        break;
-                    case "JobId":
-                        jobsDetail.setJobId(getText());
-                        break;
-                    case "State":
-                        jobsDetail.setState(getText());
-                        break;
-                    case "CreationTime":
-                        jobsDetail.setCreationTime(getText());
-                        break;
-                    case "Object":
-                        jobsDetail.setObject(getText());
-                        break;
-                    case "SectionCount":
-                        jobsDetail.setSectionCount(getText());
-                        break;
-                    case "Result":
-                        jobsDetail.setResult(getText());
-                        break;
-                    default:
-                        break;
-                }
-            } else if (in("Response", "Detail", "PornInfo") || in("Response", "JobsDetail", "PornInfo")) {
-                parseInfo(response.getJobsDetail().getPornInfo(), name, getText());
-            } else if (in("Response", "Detail", "PoliticsInfo") || in("Response", "JobsDetail", "PoliticsInfo")) {
-                parseInfo(response.getJobsDetail().getPoliticsInfo(), name, getText());
-            } else if (in("Response", "Detail", "TerrorismInfo") || in("Response", "JobsDetail", "TerrorismInfo")) {
-                parseInfo(response.getJobsDetail().getTerroristInfo(), name, getText());
-            } else if (in("Response", "Detail", "AdsInfo") || in("Response", "JobsDetail", "AdsInfo")) {
-                parseInfo(response.getJobsDetail().getAdsInfo(), name, getText());
-            } else if (in("Response", "Detail", "Section") || in("Response", "JobsDetail", "Section")) {
-                SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
-                if ("StartByte".equals(name))
-                    sectionInfo.setStartByte(getText());
-            } else if (in("Response", "Detail", "Section", "PornInfo") || in("Response", "JobsDetail", "Section", "PornInfo")) {
-                SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
-                parseInfo(sectionInfo.getPornInfo(), name, getText());
-            } else if (in("Response", "Detail", "Section", "PoliticsInfo") || in("Response", "JobsDetail", "Section", "PoliticsInfo")) {
-                SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
-                parseInfo(sectionInfo.getPoliticsInfo(), name, getText());
-            } else if (in("Response", "Detail", "Section", "TerrorismInfo") || in("Response", "JobsDetail", "Section", "TerrorismInfo")) {
-                SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
-                parseInfo(sectionInfo.getTerroristInfo(), name, getText());
-            } else if (in("Response", "Detail", "Section", "AdsInfo") || in("Response", "JobsDetail", "Section", "AdsInfo")) {
-                SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
-                parseInfo(sectionInfo.getAdsInfo(), name, getText());
-            }
-        }
-
-        public DocumentAuditingResponse getResponse() {
-            return response;
-        }
-
-        public void setResponse(DocumentAuditingResponse response) {
-            this.response = response;
-        }
-
-        private void parseInfo(AudtingCommonInfo obj, String name, String value) {
+        private void parseResultInfo(OcrResults obj, String name, String value) {
             switch (name) {
-                case "Code":
-                    obj.setCode(value);
-                    break;
-                case "HitFlag":
-                    obj.setHitFlag(getText());
-                    break;
-                case "Score":
-                    obj.setScore(getText());
+                case "Text":
+                    obj.setText(value);
                     break;
                 case "Keywords":
-                    obj.setLabel(getText());
-                    break;
-                case "Count":
-                    obj.setCount(getText());
+                    obj.setKeywords(getText());
                     break;
                 default:
                     break;
