@@ -13,6 +13,4 @@ public interface CIPostJob extends Transfer {
      */
     public void abort() throws IOException;
 
-    public PersistableDownload pause() throws PauseException;
-
 }

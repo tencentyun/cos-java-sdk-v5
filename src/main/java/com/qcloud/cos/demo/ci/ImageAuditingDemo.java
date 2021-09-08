@@ -4,8 +4,14 @@ import com.qcloud.cos.COSClient;
 import com.qcloud.cos.model.ciModel.auditing.AuditingInfo;
 import com.qcloud.cos.model.ciModel.auditing.ImageAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.ImageAuditingResponse;
+import com.qcloud.cos.model.ciModel.image.ImageLabelRequest;
+import com.qcloud.cos.transfer.CIPostJob;
+import com.qcloud.cos.transfer.TransferManager;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * 内容审核 图片审核接口相关demo 详情见https://cloud.tencent.com/document/product/460/37318
@@ -38,5 +44,28 @@ public class ImageAuditingDemo {
         ImageAuditingResponse response = client.imageAuditing(request);
         //4调用工具类，获取各审核类型详情集合 (也可自行根据业务解析)
         List<AuditingInfo> imageInfoList = AuditingResultUtil.getImageInfoList(response);
+    }
+
+    /**
+     * 批量获取图片标签
+     */
+    protected static void batchPostImageAuditing(COSClient client) {
+        List<ImageAuditingRequest> requestList = new ArrayList<>();
+        ImageAuditingRequest request = new ImageAuditingRequest();
+        request.setBucketName("demo-123456789");
+        request.setObjectKey("1.png");
+        requestList.add(request);
+
+        request = new ImageAuditingRequest();
+        request.setBucketName("demo-123456789");
+        request.setObjectKey("2.png");
+        requestList.add(request);
+
+        ExecutorService threadPool = Executors.newFixedThreadPool(16);
+        // 传入一个threadpool, 若不传入线程池, 默认TransferManager中会生成一个单线程的线程池。
+        TransferManager transferManager = new TransferManager(client, threadPool);
+        CIPostJob ciPostJob = transferManager.batchPostImageAuditing(requestList);
+        // 或者阻塞等待完成
+        ciPostJob.waitForCompletion();
     }
 }

@@ -105,14 +105,6 @@ public class CIPostJobImpl extends AbstractTransfer implements CIPostJob {
 
 
 
-    public COSObject getCosObject() {
-        return cosObject;
-    }
-
-    public void setCosObject(COSObject cosObject) {
-        this.cosObject = cosObject;
-    }
-
     /**
      * This method is also responsible for firing COMPLETED signal to the
      * listeners.
@@ -141,24 +133,6 @@ public class CIPostJobImpl extends AbstractTransfer implements CIPostJob {
                     file.getAbsolutePath());
         }
         return null;
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see com.qcloud.cos.transfer.Download#pause()
-     */
-    @Override
-    public PersistableDownload pause() throws PauseException {
-        boolean forceCancel = true;
-        TransferState currentState = getState();
-        this.monitor.getFuture().cancel(true);
-
-        if (persistableDownload == null) {
-            throw new PauseException(TransferManagerUtils.determinePauseStatus(
-                    currentState, forceCancel));
-        }
-        return persistableDownload;
     }
 
     public CIServiceRequest getRequest() {

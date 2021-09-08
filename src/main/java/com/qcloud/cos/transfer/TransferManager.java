@@ -71,6 +71,9 @@ import com.qcloud.cos.model.MultipartUploadListing;
 import com.qcloud.cos.model.ObjectListing;
 import com.qcloud.cos.model.ObjectMetadata;
 import com.qcloud.cos.model.PutObjectRequest;
+import com.qcloud.cos.model.ciModel.auditing.ImageAuditingRequest;
+import com.qcloud.cos.model.ciModel.auditing.ImageAuditingResponse;
+import com.qcloud.cos.model.ciModel.image.ImageLabelRequest;
 import com.qcloud.cos.transfer.Transfer.TransferState;
 import com.qcloud.cos.utils.VersionInfoUtils;
 
@@ -1106,6 +1109,24 @@ public class TransferManager {
                     .withKeyMarker(uploadListing.getNextKeyMarker());
             uploadListing = cos.listMultipartUploads(appendSingleObjectUserAgent(request));
         } while (uploadListing.isTruncated());
+    }
+
+    public CIPostJob batchPostImageAuditing(List<ImageAuditingRequest> requestList) {
+        List<ImageAuditingImpl> imageAuditingList = new ArrayList<>();
+        for (ImageAuditingRequest imageAuditingRequest : requestList) {
+            imageAuditingList.add(doImageAuditing());
+        }
+        return new ImageAuditingImpl();
+    }
+
+    private ImageAuditingImpl doImageAuditing(ImageAuditingRequest request) {
+        ImageAuditingImpl imageAuditing = new ImageAuditingImpl();
+        final CountDownLatch latch = new CountDownLatch(1);
+        Future<?> future = threadPool.submit(new ImageAuditingCallable(cos, latch, request,
+                imageAuditing));
+        imageAuditing.setMonitor(new ImageAuditingMonitor(imageAuditing, future));
+        latch.countDown();
+        return imageAuditing;
     }
 
     /**
