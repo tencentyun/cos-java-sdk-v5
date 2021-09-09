@@ -4,8 +4,8 @@ import com.qcloud.cos.COSClient;
 import com.qcloud.cos.model.ciModel.auditing.AuditingInfo;
 import com.qcloud.cos.model.ciModel.auditing.ImageAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.ImageAuditingResponse;
-import com.qcloud.cos.model.ciModel.image.ImageLabelRequest;
-import com.qcloud.cos.transfer.CIPostJob;
+import com.qcloud.cos.transfer.ImageAuditingImpl;
+import com.qcloud.cos.transfer.MultipleImageAuditingImpl;
 import com.qcloud.cos.transfer.TransferManager;
 
 import java.util.ArrayList;
@@ -18,11 +18,12 @@ import java.util.concurrent.Executors;
  */
 public class ImageAuditingDemo {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         // 1 初始化用户身份信息（secretId, secretKey）。
         COSClient client = ClientUtils.getTestClient();
         // 2 调用要使用的方法。
-        imageAuditing(client);
+//        imageAuditing(client);
+        batchPostImageAuditing(client);
     }
 
     /**
@@ -35,37 +36,61 @@ public class ImageAuditingDemo {
         ImageAuditingRequest request = new ImageAuditingRequest();
         //2.添加请求参数 参数详情请见api接口文档
         //2.1设置请求bucket
-        request.setBucketName("demo-123456789");
+        request.setBucketName("markjrzhang-1251704708");
         //2.2设置审核类型
         request.setDetectType("porn");
         //2.3设置bucket中的图片位置
-        request.setObjectKey("1.png");
+        request.setObjectKey("1.jpg");
         //3.调用接口,获取任务响应对象
         ImageAuditingResponse response = client.imageAuditing(request);
         //4调用工具类，获取各审核类型详情集合 (也可自行根据业务解析)
         List<AuditingInfo> imageInfoList = AuditingResultUtil.getImageInfoList(response);
+        System.out.println(response);
     }
 
     /**
      * 批量获取图片标签
      */
-    protected static void batchPostImageAuditing(COSClient client) {
+    public static void batchPostImageAuditing(COSClient client) throws InterruptedException {
         List<ImageAuditingRequest> requestList = new ArrayList<>();
         ImageAuditingRequest request = new ImageAuditingRequest();
-        request.setBucketName("demo-123456789");
+        request.setBucketName("markjrzhang-1251704708");
         request.setObjectKey("1.png");
+        request.setDetectType("all");
         requestList.add(request);
 
         request = new ImageAuditingRequest();
-        request.setBucketName("demo-123456789");
-        request.setObjectKey("2.png");
+        request.setBucketName("markjrzhang-1251704708");
+        request.setObjectKey("1.jpg");
+        request.setDetectType("all");
         requestList.add(request);
 
-        ExecutorService threadPool = Executors.newFixedThreadPool(16);
+        request = new ImageAuditingRequest();
+        request.setBucketName("markjrzhang-1251704708");
+        request.setObjectKey("1.jpg");
+        request.setDetectType("all");
+        requestList.add(request);
+
+        request = new ImageAuditingRequest();
+        request.setBucketName("markjrzhang-1251704708");
+        request.setObjectKey("1.jpg");
+        request.setDetectType("all");
+        requestList.add(request);
+
+        long start = System.currentTimeMillis();
+        ExecutorService threadPool = Executors.newFixedThreadPool(4);
         // 传入一个threadpool, 若不传入线程池, 默认TransferManager中会生成一个单线程的线程池。
         TransferManager transferManager = new TransferManager(client, threadPool);
-        CIPostJob ciPostJob = transferManager.batchPostImageAuditing(requestList);
-        // 或者阻塞等待完成
-        ciPostJob.waitForCompletion();
+        MultipleImageAuditingImpl multipleImageAuditing = transferManager.batchPostImageAuditing(requestList);
+        multipleImageAuditing.waitForCompletion();
+        List<ImageAuditingImpl> imageAuditingList = multipleImageAuditing.getImageAuditingList();
+        for (ImageAuditingImpl imageAuditing : imageAuditingList) {
+            System.out.println(imageAuditing.getState());
+            System.out.println(imageAuditing.getResponse());
+            System.out.println(imageAuditing.getErrMsg());
+        }
+        System.out.println(System.currentTimeMillis() - start);
+        transferManager.shutdownNow();
+        client.shutdown();
     }
 }

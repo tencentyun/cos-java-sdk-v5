@@ -3840,10 +3840,13 @@ public class COSClient implements COS {
                 "The imageAuditingRequest parameter must be specified setting the object tags");
         rejectNull(imageAuditingRequest.getBucketName(),
                 "The bucketName parameter must be specified setting the object tags");
-        rejectNull(imageAuditingRequest.getDetectType(), "The detectType parameter must be specified setting the object tags");
+        String detectType = imageAuditingRequest.getDetectType();
+        rejectNull(detectType, "The detectType parameter must be specified setting the object tags");
         CosHttpRequest<ImageAuditingRequest> request = createRequest(imageAuditingRequest.getBucketName(), imageAuditingRequest.getObjectKey(), imageAuditingRequest, HttpMethodName.GET);
         request.addParameter("ci-process", "sensitive-content-recognition");
-        addParameterIfNotNull(request, "detect-type", imageAuditingRequest.getDetectType());
+        if ("all".equalsIgnoreCase(detectType))
+            detectType = "porn,terrorist,politics,ads";
+        addParameterIfNotNull(request, "detect-type", detectType);
         addParameterIfNotNull(request, "interval", Integer.toString(imageAuditingRequest.getInterval()));
         addParameterIfNotNull(request, "max-frames", Integer.toString(imageAuditingRequest.getMaxFrames()));
         addParameterIfNotNull(request, "biz-type", imageAuditingRequest.getBizType());

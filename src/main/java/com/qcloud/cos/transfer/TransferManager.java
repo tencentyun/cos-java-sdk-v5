@@ -11,7 +11,7 @@
  * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
  * express or implied. See the License for the specific language governing
  * permissions and limitations under the License.
- 
+
  * According to cos feature, we modify some class，comment, field name, etc.
  */
 
@@ -128,7 +128,7 @@ import org.slf4j.LoggerFactory;
  * Transfers can be paused and resumed at a later time. It can also survive JVM crash, provided the
  * information that is required to resume the transfer is given as input to the resume operation.
  * For more information on pause and resume,
- * 
+ *
  * @see Upload#pause()
  * @see Download#pause()
  * @see TransferManager#resumeUpload(PersistableUpload)
@@ -1111,16 +1111,33 @@ public class TransferManager {
         } while (uploadListing.isTruncated());
     }
 
-    public CIPostJob batchPostImageAuditing(List<ImageAuditingRequest> requestList) {
+    public MultipleImageAuditingImpl batchPostImageAuditing(List<ImageAuditingRequest> requestList) {
+        String description = "Send image auditing jobs in bulk";
+        TransferProgress transferProgress = new TransferProgress();
         List<ImageAuditingImpl> imageAuditingList = new ArrayList<>();
+        final MultipleImageAuditingImpl multipleImageAuditing =
+                new MultipleImageAuditingImpl(description, transferProgress, imageAuditingList);
+        multipleImageAuditing
+                .setMonitor(new MultipleFileTransferMonitor(multipleImageAuditing, imageAuditingList));
+        final CountDownLatch latch = new CountDownLatch(1);
+        MultipleFileTransferStateChangeListener transferListener =
+                new MultipleFileTransferStateChangeListener(latch, multipleImageAuditing);
+
         for (ImageAuditingRequest imageAuditingRequest : requestList) {
-            imageAuditingList.add(doImageAuditing());
+            imageAuditingList.add(doImageAuditing(imageAuditingRequest,transferListener));
         }
-        return new ImageAuditingImpl();
+        latch.countDown();
+        return multipleImageAuditing;
     }
 
-    private ImageAuditingImpl doImageAuditing(ImageAuditingRequest request) {
-        ImageAuditingImpl imageAuditing = new ImageAuditingImpl();
+    private ImageAuditingImpl doImageAuditing(ImageAuditingRequest request, MultipleFileTransferStateChangeListener transferListener) {
+        appendImageAuditingUserAgent(request);
+        String description = "send image auditing job ";
+        TransferProgress transferProgress = new TransferProgress();
+        COSProgressListenerChain listenerChain = new COSProgressListenerChain(
+                new TransferProgressUpdatingListener(transferProgress),
+                request.getGeneralProgressListener());
+        ImageAuditingImpl imageAuditing = new ImageAuditingImpl(description,transferProgress,listenerChain,transferListener,request);
         final CountDownLatch latch = new CountDownLatch(1);
         Future<?> future = threadPool.submit(new ImageAuditingCallable(cos, latch, request,
                 imageAuditing));
@@ -1188,10 +1205,17 @@ public class TransferManager {
         return request;
     }
 
+    public static <X extends CosServiceRequest> X appendImageAuditingUserAgent(X request) {
+        request.getRequestClientOptions().appendUserAgent(USER_AGENT_MULTIPART);
+        return request;
+    }
+
     private static final String USER_AGENT =
             TransferManager.class.getName() + "/" + VersionInfoUtils.getVersion();
     private static final String USER_AGENT_MULTIPART =
             TransferManager.class.getName() + "_multipart/" + VersionInfoUtils.getVersion();
+    private static final String USER_AGENT_IMAGE_AUDITING_JOB =
+            TransferManager.class.getName() + "_ImageAuditing/" + VersionInfoUtils.getVersion();
 
 
     private static final String DEFAULT_DELIMITER = "/";
@@ -1429,7 +1453,7 @@ public class TransferManager {
      * source & destination buckets are in different regions, use the
      * {@link #copy(CopyObjectRequest, COS, TransferStateChangeListener)} method.
      * </p>
-     * 
+     *
      * @param sourceBucketName The name of the bucket from where the object is to be copied.
      * @param sourceKey The name of the COS object.
      * @param destinationBucketName The name of the bucket to where the COS object has to be copied.
@@ -1550,13 +1574,13 @@ public class TransferManager {
      * If resources are available, the copy request will begin immediately. Otherwise, the copy is
      * scheduled and started as soon as resources become available.
      * </p>
-     * 
+     *
      * <p>
      * <b>Note:</b> If the {@link TransferManager} is created with a regional COS client and the
      * source & destination buckets are in different regions, use the
      * {@link #copy(CopyObjectRequest, COS, TransferStateChangeListener)} method.
      * </p>
-     * 
+     *
      * @param copyObjectRequest The request containing all the parameters for the copy.
      * @param srcCOS An COS client constructed for the region in which the source object's bucket is
      *        located.

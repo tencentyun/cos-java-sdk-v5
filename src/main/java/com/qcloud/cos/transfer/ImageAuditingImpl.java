@@ -30,6 +30,7 @@ public class ImageAuditingImpl extends AbstractTransfer implements CIPostJob {
 
     private ImageAuditingRequest request;
     private ImageAuditingResponse response;
+    private String errMsg;
 
     public ImageAuditingImpl(String description, TransferProgress transferProgress,
                              ProgressListenerChain progressListenerChain,
@@ -47,7 +48,6 @@ public class ImageAuditingImpl extends AbstractTransfer implements CIPostJob {
      * @throws IOException
      */
     public synchronized void abort() throws IOException {
-
         this.monitor.getFuture().cancel(true);
         setState(TransferState.Canceled);
     }
@@ -79,5 +79,13 @@ public class ImageAuditingImpl extends AbstractTransfer implements CIPostJob {
 
     public void setResponse(ImageAuditingResponse response) {
         this.response = response;
+    }
+
+    public String getErrMsg() {
+        return errMsg;
+    }
+
+    public void setErrMsg(String errMsg) {
+        this.errMsg = errMsg;
     }
 }
