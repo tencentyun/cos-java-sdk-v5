@@ -19,17 +19,6 @@
 package com.qcloud.cos.http;
 
 
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import com.qcloud.cos.ClientConfig;
 import com.qcloud.cos.Headers;
 import com.qcloud.cos.event.ProgressInputStream;
@@ -49,7 +38,6 @@ import com.qcloud.cos.utils.CodecUtils;
 import com.qcloud.cos.utils.ExceptionUtils;
 import com.qcloud.cos.utils.UrlEncoderUtils;
 import com.qcloud.cos.utils.ValidationUtils;
-
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.Header;
 import org.apache.http.HttpHost;
@@ -73,6 +61,17 @@ import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.protocol.HttpContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 
 public class DefaultCosHttpClient implements CosHttpClient {

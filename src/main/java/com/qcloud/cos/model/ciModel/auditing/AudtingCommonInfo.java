@@ -30,6 +30,8 @@ public class AudtingCommonInfo {
      */
     private String count;
 
+    private OcrResults ocrResults;
+
     public AudtingCommonInfo() {
     }
 
@@ -88,6 +90,17 @@ public class AudtingCommonInfo {
 
     public void setCount(String count) {
         this.count = count;
+    }
+
+    public OcrResults getOcrResults() {
+        if (ocrResults == null) {
+            ocrResults = new OcrResults();
+        }
+        return ocrResults;
+    }
+
+    public void setOcrResults(OcrResults ocrResults) {
+        this.ocrResults = ocrResults;
     }
 
     @Override

@@ -41,6 +41,7 @@ import com.qcloud.cos.model.OutputSerialization;
 import com.qcloud.cos.model.ScanRange;
 import com.qcloud.cos.model.ciModel.auditing.AudioAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.Conf;
+import com.qcloud.cos.model.ciModel.auditing.DocumentAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.TextAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.VideoAuditingRequest;
 import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
@@ -734,6 +735,7 @@ public class RequestXmlFactory {
         addIfNotNull(xml,"DetectType", conf.getDetectType());
         addIfNotNull(xml,"BizType", conf.getBizType());
         addIfNotNull(xml,"DetectContent", conf.getDetectContent());
+        addIfNotNull(xml,"CallbackVersion", conf.getCallbackVersion());
         xml.start("Snapshot");
         addIfNotNull(xml,"Mode", conf.getSnapshot().getMode());
         addIfNotNull(xml,"TimeInterval", conf.getSnapshot().getTimeInterval());
@@ -764,6 +766,8 @@ public class RequestXmlFactory {
         xml.start("Conf");
         addIfNotNull(xml,"DetectType", conf.getDetectType());
         addIfNotNull(xml,"Callback", conf.getCallback());
+        addIfNotNull(xml,"CallbackVersion", conf.getCallbackVersion());
+        addIfNotNull(xml,"BizType", conf.getBizType());
         xml.end();
 
         xml.end();
@@ -799,6 +803,30 @@ public class RequestXmlFactory {
         xml.end();
         return xml.getBytes();
     }
+
+    public static byte[] convertToXmlByteArray(DocumentAuditingRequest request) {
+        XmlWriter xml = new XmlWriter();
+
+        xml.start("Request");
+        xml.start("Input");
+        addIfNotNull(xml, "Url", request.getInput().getUrl());
+        addIfNotNull(xml, "Type", request.getInput().getType());
+        xml.end();
+        Conf conf = request.getConf();
+        xml.start("Conf");
+        String detectType = conf.getDetectType();
+        if ("all".equalsIgnoreCase(detectType)) {
+            detectType = "Porn,Terrorism,Politics,Ads,Illegal,Abuse";
+        }
+        addIfNotNull(xml, "DetectType", detectType);
+        addIfNotNull(xml, "Callback", conf.getCallback());
+        addIfNotNull(xml, "BizType", conf.getBizType());
+        xml.end();
+
+        xml.end();
+        return xml.getBytes();
+    }
+
 
     private static void addIfNotNull(XmlWriter xml, String xmlTag, String value) {
         if (value != null) {
@@ -867,6 +895,7 @@ public class RequestXmlFactory {
         addIfNotNull(xml, "ScanMode", video.getScanMode());
         xml.end();
     }
+
 
     /**
      * 对象校验内部静态工具类

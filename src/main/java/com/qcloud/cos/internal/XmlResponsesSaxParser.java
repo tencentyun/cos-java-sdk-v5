@@ -84,7 +84,11 @@ import com.qcloud.cos.model.Tag.Tag;
 import com.qcloud.cos.model.ciModel.auditing.AudioAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.AuditingJobsDetail;
 import com.qcloud.cos.model.ciModel.auditing.AudtingCommonInfo;
+import com.qcloud.cos.model.ciModel.auditing.DocumentAuditingJobsDetail;
+import com.qcloud.cos.model.ciModel.auditing.DocumentAuditingResponse;
+import com.qcloud.cos.model.ciModel.auditing.DocumentResultInfo;
 import com.qcloud.cos.model.ciModel.auditing.ImageAuditingResponse;
+import com.qcloud.cos.model.ciModel.auditing.OcrResults;
 import com.qcloud.cos.model.ciModel.auditing.SectionInfo;
 import com.qcloud.cos.model.ciModel.auditing.SnapshotInfo;
 import com.qcloud.cos.model.ciModel.auditing.TextAuditingResponse;
@@ -793,6 +797,18 @@ public class XmlResponsesSaxParser {
 
     public TextAuditingDescribeJobHandler parseTextAuditingDescribeResponse(InputStream inputStream) throws IOException {
         TextAuditingDescribeJobHandler handler = new TextAuditingDescribeJobHandler();
+        parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
+        return handler;
+    }
+
+    public DocumentAuditingJobHandler parseDocumentAuditingResponse(InputStream inputStream) throws IOException {
+        DocumentAuditingJobHandler handler = new DocumentAuditingJobHandler();
+        parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
+        return handler;
+    }
+
+    public DocumentAuditingDescribeJobHandler parseDocumentAuditingDescribeResponse(InputStream inputStream) throws IOException {
+        DocumentAuditingDescribeJobHandler handler = new DocumentAuditingDescribeJobHandler();
         parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
         return handler;
     }
@@ -5908,6 +5924,176 @@ public class XmlResponsesSaxParser {
                     break;
                 case "Count":
                     obj.setCount(getText());
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+    public static class DocumentAuditingJobHandler extends AbstractHandler {
+        private DocumentAuditingResponse response = new DocumentAuditingResponse();
+
+        @Override
+        protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
+
+        }
+
+        @Override
+        protected void doEndElement(String uri, String name, String qName) {
+            if (in("Response", "JobsDetail")) {
+                DocumentAuditingJobsDetail jobsDetail = response.getJobsDetail();
+                switch (name) {
+                    case "JobId":
+                        jobsDetail.setJobId(getText());
+                        break;
+                    case "State":
+                        jobsDetail.setState(getText());
+                        break;
+                    case "CreationTime":
+                        jobsDetail.setCreationTime(getText());
+                        break;
+                    default:
+                        break;
+                }
+            } else if (in("Response")) {
+                if ("RequestId".equalsIgnoreCase(name)) {
+                    response.setRequestId(getText());
+                }
+            }
+        }
+
+        public DocumentAuditingResponse getResponse() {
+            return response;
+        }
+
+        public void setResponse(DocumentAuditingResponse response) {
+            this.response = response;
+        }
+    }
+
+    public static class DocumentAuditingDescribeJobHandler extends AbstractHandler {
+        private DocumentAuditingResponse response = new DocumentAuditingResponse();
+
+        @Override
+        protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
+            List<DocumentResultInfo> pageSegment = response.getJobsDetail().getPageSegment();
+            if (in("Response", "JobsDetail", "PageSegment") && "Results".equals(name)) {
+                pageSegment.add(new DocumentResultInfo());
+            }
+        }
+
+        @Override
+        protected void doEndElement(String uri, String name, String qName) {
+            DocumentAuditingJobsDetail jobsDetail = response.getJobsDetail();
+            List<DocumentResultInfo> pageSegment = jobsDetail.getPageSegment();
+            DocumentResultInfo resultDetail = new DocumentResultInfo();
+            if (pageSegment.size() != 0) {
+                resultDetail = pageSegment.get(pageSegment.size() - 1);
+            }
+
+            if (in("Response")) {
+                if ("RequestId".equalsIgnoreCase(name)) {
+                    response.setRequestId(getText());
+                }
+            } else if (in("Response", "JobsDetail")) {
+                switch (name) {
+                    case "Code":
+                        jobsDetail.setCode(getText());
+                        break;
+                    case "Message":
+                        jobsDetail.setMessage(getText());
+                        break;
+                    case "JobId":
+                        jobsDetail.setJobId(getText());
+                        break;
+                    case "State":
+                        jobsDetail.setState(getText());
+                        break;
+                    case "CreationTime":
+                        jobsDetail.setCreationTime(getText());
+                        break;
+                    case "Suggestion":
+                        jobsDetail.setSuggestion(getText());
+                        break;
+                    case "PageCount":
+                        jobsDetail.setPageCount(getText());
+                        break;
+                    case "Url":
+                        jobsDetail.setUrl(getText());
+                        break;
+                    default:
+                        break;
+                }
+            } else if (in("Response", "JobsDetail", "Labels", "AdsInfo")) {
+                parseInfo(response.getJobsDetail().getLabels().getAdsInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "Labels", "PoliticsInfo")) {
+                parseInfo(response.getJobsDetail().getLabels().getPoliticsInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "Labels", "PornInfo")) {
+                parseInfo(response.getJobsDetail().getLabels().getPornInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "Labels", "TerrorismInfo")) {
+                parseInfo(response.getJobsDetail().getLabels().getTerroristInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "PageSegment", "Results", "AdsInfo")) {
+                parseInfo(resultDetail.getAdsInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "PageSegment", "Results", "PoliticsInfo")) {
+                parseInfo(resultDetail.getPoliticsInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "PageSegment", "Results", "PornInfo")) {
+                parseInfo(resultDetail.getPornInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "PageSegment", "Results", "TerrorismInfo")) {
+                parseInfo(resultDetail.getTerroristInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "PageSegment", "Results")) {
+                if ("Text".equalsIgnoreCase(name)) {
+                    resultDetail.setText(getText());
+                } else if ("Url".equalsIgnoreCase(name)) {
+                    resultDetail.setUrl(getText());
+                }
+            }else if (in("Response", "JobsDetail", "PageSegment", "Results", "PornInfo","OcrResults")) {
+                parseResultInfo(resultDetail.getPornInfo().getOcrResults(), name, getText());
+            }else if (in("Response", "JobsDetail", "PageSegment", "Results", "PoliticsInfo","OcrResults")) {
+                parseResultInfo(resultDetail.getPoliticsInfo().getOcrResults(), name, getText());
+            }else if (in("Response", "JobsDetail", "PageSegment", "Results", "TerrorismInfo","OcrResults")) {
+                parseResultInfo(resultDetail.getTerroristInfo().getOcrResults(), name, getText());
+            }else if (in("Response", "JobsDetail", "PageSegment", "Results", "AdsInfo","OcrResults")) {
+                parseResultInfo(resultDetail.getAdsInfo().getOcrResults(), name, getText());
+            }
+        }
+
+        public DocumentAuditingResponse getResponse() {
+            return response;
+        }
+
+        public void setResponse(DocumentAuditingResponse response) {
+            this.response = response;
+        }
+
+        private void parseInfo(AudtingCommonInfo obj, String name, String value) {
+            switch (name) {
+                case "Code":
+                    obj.setCode(value);
+                    break;
+                case "HitFlag":
+                    obj.setHitFlag(getText());
+                    break;
+                case "Score":
+                    obj.setScore(getText());
+                    break;
+                case "Keywords":
+                    obj.setLabel(getText());
+                    break;
+                case "Count":
+                    obj.setCount(getText());
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private void parseResultInfo(OcrResults obj, String name, String value) {
+            switch (name) {
+                case "Text":
+                    obj.setText(value);
+                    break;
+                case "Keywords":
+                    obj.setKeywords(getText());
                     break;
                 default:
                     break;

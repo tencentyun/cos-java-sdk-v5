@@ -4,19 +4,26 @@ import com.qcloud.cos.COSClient;
 import com.qcloud.cos.model.ciModel.auditing.AuditingInfo;
 import com.qcloud.cos.model.ciModel.auditing.ImageAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.ImageAuditingResponse;
+import com.qcloud.cos.transfer.ImageAuditingImpl;
+import com.qcloud.cos.transfer.MultipleImageAuditingImpl;
+import com.qcloud.cos.transfer.TransferManager;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * 内容审核 图片审核接口相关demo 详情见https://cloud.tencent.com/document/product/460/37318
  */
 public class ImageAuditingDemo {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         // 1 初始化用户身份信息（secretId, secretKey）。
         COSClient client = ClientUtils.getTestClient();
         // 2 调用要使用的方法。
-        imageAuditing(client);
+//        imageAuditing(client);
+        batchPostImageAuditing(client);
     }
 
     /**
@@ -31,12 +38,45 @@ public class ImageAuditingDemo {
         //2.1设置请求bucket
         request.setBucketName("demo-123456789");
         //2.2设置审核类型
-        request.setDetectType("porn,terrorist,politics,ads");
+        request.setDetectType("porn");
         //2.3设置bucket中的图片位置
-        request.setObjectKey("1.png");
+        request.setObjectKey("1.jpg");
         //3.调用接口,获取任务响应对象
         ImageAuditingResponse response = client.imageAuditing(request);
         //4调用工具类，获取各审核类型详情集合 (也可自行根据业务解析)
         List<AuditingInfo> imageInfoList = AuditingResultUtil.getImageInfoList(response);
+        System.out.println(response);
+    }
+
+    /**
+     * 批量发送图片审核任务
+     */
+    public static void batchPostImageAuditing(COSClient client) throws InterruptedException {
+        List<ImageAuditingRequest> requestList = new ArrayList<>();
+        ImageAuditingRequest request = new ImageAuditingRequest();
+        request.setBucketName("demo-123456789");
+        request.setObjectKey("1.png");
+        request.setDetectType("all");
+        requestList.add(request);
+
+        request = new ImageAuditingRequest();
+        request.setBucketName("demo-123456789");
+        request.setObjectKey("1.jpg");
+        request.setDetectType("all");
+        requestList.add(request);
+
+        // 传入一个threadpool, 若不传入线程池, 默认TransferManager中会生成一个单线程的线程池。
+        ExecutorService threadPool = Executors.newFixedThreadPool(4);
+        TransferManager transferManager = new TransferManager(client, threadPool);
+        MultipleImageAuditingImpl multipleImageAuditing = transferManager.batchPostImageAuditing(requestList);
+        multipleImageAuditing.waitForCompletion();
+        List<ImageAuditingImpl> imageAuditingList = multipleImageAuditing.getImageAuditingList();
+        for (ImageAuditingImpl imageAuditing : imageAuditingList) {
+            System.out.println(imageAuditing.getState());
+            System.out.println(imageAuditing.getResponse());
+            System.out.println(imageAuditing.getErrMsg());
+        }
+        transferManager.shutdownNow();
+        client.shutdown();
     }
 }

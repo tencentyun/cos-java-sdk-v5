@@ -97,6 +97,8 @@ import com.qcloud.cos.internal.XmlResponsesSaxParser.CopyObjectResultHandler;
 import com.qcloud.cos.model.*;
 import com.qcloud.cos.model.ciModel.auditing.AudioAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.AudioAuditingResponse;
+import com.qcloud.cos.model.ciModel.auditing.DocumentAuditingRequest;
+import com.qcloud.cos.model.ciModel.auditing.DocumentAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.ImageAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.ImageAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.TextAuditingRequest;
@@ -3838,10 +3840,13 @@ public class COSClient implements COS {
                 "The imageAuditingRequest parameter must be specified setting the object tags");
         rejectNull(imageAuditingRequest.getBucketName(),
                 "The bucketName parameter must be specified setting the object tags");
-        rejectNull(imageAuditingRequest.getDetectType(), "The detectType parameter must be specified setting the object tags");
+        String detectType = imageAuditingRequest.getDetectType();
+        rejectNull(detectType, "The detectType parameter must be specified setting the object tags");
         CosHttpRequest<ImageAuditingRequest> request = createRequest(imageAuditingRequest.getBucketName(), imageAuditingRequest.getObjectKey(), imageAuditingRequest, HttpMethodName.GET);
         request.addParameter("ci-process", "sensitive-content-recognition");
-        addParameterIfNotNull(request, "detect-type", imageAuditingRequest.getDetectType());
+        if ("all".equalsIgnoreCase(detectType))
+            detectType = "porn,terrorist,politics,ads";
+        addParameterIfNotNull(request, "detect-type", detectType);
         addParameterIfNotNull(request, "interval", Integer.toString(imageAuditingRequest.getInterval()));
         addParameterIfNotNull(request, "max-frames", Integer.toString(imageAuditingRequest.getMaxFrames()));
         addParameterIfNotNull(request, "biz-type", imageAuditingRequest.getBizType());
@@ -3925,6 +3930,24 @@ public class COSClient implements COS {
                 "The jobId parameter must be specified setting the object tags");
         CosHttpRequest<TextAuditingRequest> request = createRequest(textAuditingRequest.getBucketName(), "/text/auditing/" + textAuditingRequest.getJobId(), textAuditingRequest, HttpMethodName.GET);
         return invoke(request, new Unmarshallers.TextAuditingDescribeJobUnmarshaller());
+    }
+
+    @Override
+    public DocumentAuditingResponse createAuditingDocumentJobs(DocumentAuditingRequest documentAuditingRequest) {
+        this.checkCIRequestCommon(documentAuditingRequest);
+        this.rejectStartWith(documentAuditingRequest.getConf().getCallback(), "http", "The Conf.CallBack parameter mush start with http or https");
+        CosHttpRequest<DocumentAuditingRequest> request = createRequest(documentAuditingRequest.getBucketName(), "/document/auditing", documentAuditingRequest, HttpMethodName.POST);
+        this.setContent(request, RequestXmlFactory.convertToXmlByteArray(documentAuditingRequest), "application/xml", false);
+        return invoke(request, new Unmarshallers.DocumentAuditingJobUnmarshaller());
+    }
+
+    @Override
+    public DocumentAuditingResponse describeAuditingDocumentJob(DocumentAuditingRequest documentAuditingRequest) {
+        this.checkCIRequestCommon(documentAuditingRequest);
+        rejectNull(documentAuditingRequest.getJobId(),
+                "The jobId parameter must be specified setting the object tags");
+        CosHttpRequest<DocumentAuditingRequest> request = createRequest(documentAuditingRequest.getBucketName(), "/document/auditing/" + documentAuditingRequest.getJobId(), documentAuditingRequest, HttpMethodName.GET);
+        return invoke(request, new Unmarshallers.DocumentAuditingDescribeJobUnmarshaller());
     }
 
     private void checkAuditingRequest(ImageAuditingRequest request) {
