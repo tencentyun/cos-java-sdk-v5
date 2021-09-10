@@ -36,7 +36,7 @@ public class ImageAuditingDemo {
         ImageAuditingRequest request = new ImageAuditingRequest();
         //2.添加请求参数 参数详情请见api接口文档
         //2.1设置请求bucket
-        request.setBucketName("markjrzhang-1251704708");
+        request.setBucketName("demo-123456789");
         //2.2设置审核类型
         request.setDetectType("porn");
         //2.3设置bucket中的图片位置
@@ -49,37 +49,24 @@ public class ImageAuditingDemo {
     }
 
     /**
-     * 批量获取图片标签
+     * 批量发送图片审核任务
      */
     public static void batchPostImageAuditing(COSClient client) throws InterruptedException {
         List<ImageAuditingRequest> requestList = new ArrayList<>();
         ImageAuditingRequest request = new ImageAuditingRequest();
-        request.setBucketName("markjrzhang-1251704708");
+        request.setBucketName("demo-123456789");
         request.setObjectKey("1.png");
         request.setDetectType("all");
         requestList.add(request);
 
         request = new ImageAuditingRequest();
-        request.setBucketName("markjrzhang-1251704708");
+        request.setBucketName("demo-123456789");
         request.setObjectKey("1.jpg");
         request.setDetectType("all");
         requestList.add(request);
 
-        request = new ImageAuditingRequest();
-        request.setBucketName("markjrzhang-1251704708");
-        request.setObjectKey("1.jpg");
-        request.setDetectType("all");
-        requestList.add(request);
-
-        request = new ImageAuditingRequest();
-        request.setBucketName("markjrzhang-1251704708");
-        request.setObjectKey("1.jpg");
-        request.setDetectType("all");
-        requestList.add(request);
-
-        long start = System.currentTimeMillis();
-        ExecutorService threadPool = Executors.newFixedThreadPool(4);
         // 传入一个threadpool, 若不传入线程池, 默认TransferManager中会生成一个单线程的线程池。
+        ExecutorService threadPool = Executors.newFixedThreadPool(4);
         TransferManager transferManager = new TransferManager(client, threadPool);
         MultipleImageAuditingImpl multipleImageAuditing = transferManager.batchPostImageAuditing(requestList);
         multipleImageAuditing.waitForCompletion();
@@ -89,7 +76,6 @@ public class ImageAuditingDemo {
             System.out.println(imageAuditing.getResponse());
             System.out.println(imageAuditing.getErrMsg());
         }
-        System.out.println(System.currentTimeMillis() - start);
         transferManager.shutdownNow();
         client.shutdown();
     }

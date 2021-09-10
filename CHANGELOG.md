@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [5.6.55]
+- add batch image auditing api
+- add DocumentAuditing api
+- update CI Auditing api
+
 ## [5.6.54]
 - default use https request
 - use strict sign

@@ -19,19 +19,6 @@
 package com.qcloud.cos.http;
 
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import com.qcloud.cos.ClientConfig;
 import com.qcloud.cos.Headers;
 import com.qcloud.cos.event.ProgressInputStream;
@@ -51,7 +38,6 @@ import com.qcloud.cos.utils.CodecUtils;
 import com.qcloud.cos.utils.ExceptionUtils;
 import com.qcloud.cos.utils.UrlEncoderUtils;
 import com.qcloud.cos.utils.ValidationUtils;
-
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.Header;
 import org.apache.http.HttpHost;
@@ -75,6 +61,17 @@ import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.protocol.HttpContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 
 public class DefaultCosHttpClient implements CosHttpClient {
@@ -473,17 +470,6 @@ public class DefaultCosHttpClient implements CosHttpClient {
                 httpRequest = buildHttpRequest(request);
                 httpResponse = null;
                 httpResponse = executeOneRequest(context, httpRequest);
-//                                BufferedReader in = new BufferedReader(new InputStreamReader(httpResponse.getEntity()
-//                        .getContent()));
-//                StringBuffer sb = new StringBuffer("");
-//                String line = "";
-//                String NL = System.getProperty("line.separator");
-//                while ((line = in.readLine()) != null) {
-//                    sb.append(line + NL);
-//                }
-////                in.close();
-//                String content = sb.toString();
-//                System.out.println(content);
                 checkResponse(request, httpRequest, httpResponse);
                 break;
             } catch (CosServiceException cse) {

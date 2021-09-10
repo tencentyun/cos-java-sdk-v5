@@ -26,7 +26,7 @@ public class TextAuditingJobDemo {
         //1.创建任务请求对象
         TextAuditingRequest request = new TextAuditingRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("markjrzhang-1251704708");
+        request.setBucketName("demo-1234567898");
         //2.1.1设置对象地址
 //        request.getInput().setObject("1.txt");
         //2.1.2或直接设置请求内容,文本内容的Base64编码

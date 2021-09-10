@@ -5,8 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.model.ciModel.image.ImageLabelRequest;
 import com.qcloud.cos.model.ciModel.image.ImageLabelResponse;
-import com.qcloud.cos.model.ciModel.image.ImageLabelV2Request;
-import com.qcloud.cos.model.ciModel.image.ImageLabelV2Response;
 
 /**
  * 图片标签接口使用demo https://cloud.tencent.com/document/product/460/39082
