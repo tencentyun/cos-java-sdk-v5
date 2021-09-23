@@ -117,6 +117,9 @@ public abstract class COSCryptoModuleBase extends COSCryptoModule {
         this.cryptoScheme = COSCryptoScheme.from(cryptoConfig.getCryptoMode());
         this.contentCryptoScheme = cryptoScheme.getContentCryptoScheme();
         this.kms = kms;
+
+        // if have user defined iv, set it to contentCryptoScheme.
+        this.contentCryptoScheme.setIV(cryptoConfig.getIV());
     }
 
     /**
@@ -467,9 +470,13 @@ public abstract class COSCryptoModuleBase extends COSCryptoModule {
      */
     private ContentCryptoMaterial buildContentCryptoMaterial(EncryptionMaterials materials,
             Provider provider, CosServiceRequest req) {
-        // Randomly generate the IV
-        final byte[] iv = new byte[contentCryptoScheme.getIVLengthInBytes()];
-        cryptoScheme.getSecureRandom().nextBytes(iv);
+        byte[] iv = contentCryptoScheme.getIV();
+
+        if (iv == null) {
+            // Randomly generate the IV
+            iv = new byte[contentCryptoScheme.getIVLengthInBytes()];
+            cryptoScheme.getSecureRandom().nextBytes(iv);
+        }
 
         if (materials.isKMSEnabled()) {
             final Map<String, String> encryptionContext =
@@ -569,7 +576,6 @@ public abstract class COSCryptoModuleBase extends COSCryptoModule {
         if (plaintextLength >= 0) {
             metadata.addUserMetadata(Headers.ENCRYPTION_UNENCRYPTED_CONTENT_LENGTH,
                     Long.toString(plaintextLength));
-            // Put the ciphertext length in the metadata
             metadata.setContentLength(ciphertextLength(plaintextLength));
         }
         request.setMetadata(metadata);

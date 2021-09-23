@@ -35,6 +35,9 @@ class AesGcm extends ContentCryptoScheme {
     @Override int getBlockSizeInBytes() { return 16; }
     @Override int getIVLengthInBytes() { return 12; }
     @Override long getMaxPlaintextSize() { return MAX_GCM_BYTES; }
+    @Override byte[] getIV() { return null; }
+    @Override void setIV(byte[] iv) {}
+
     /**
      * Used to explicitly record the tag length in COS for interoperability
      * with other services.
@@ -60,4 +63,5 @@ class AesGcm extends ContentCryptoScheme {
     protected CipherLite newCipherLite(Cipher cipher,  SecretKey cek, int cipherMode) {
         return new GCMCipherLite(cipher, cek, cipherMode);
     }
+
 }

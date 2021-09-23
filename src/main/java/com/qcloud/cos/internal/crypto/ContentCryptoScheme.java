@@ -70,6 +70,11 @@ abstract class ContentCryptoScheme {
      */
     static final ContentCryptoScheme AES_CTR = new AesCtr();
 
+    /**
+     * Crypto scheme "AES/CBC/PKCS5Padding"
+     */
+    static final ContentCryptoScheme AES_CBC = new AesCbc();
+
     abstract String getKeyGeneratorAlgorithm();
     abstract String getCipherAlgorithm();
 
@@ -82,6 +87,8 @@ abstract class ContentCryptoScheme {
     abstract int getKeyLengthInBits();
     abstract int getBlockSizeInBytes();
     abstract int getIVLengthInBytes();
+    abstract byte[] getIV();
+    abstract void setIV(byte[] iv);
 
     int getTagLengthInBits() { return 0; } // default to zero ie no tag
     
@@ -150,6 +157,10 @@ abstract class ContentCryptoScheme {
 
         if (AES_CTR.getCipherAlgorithm().equals(cekAlgo)) {
             return AES_CTR;
+        }
+
+        if (AES_CBC.getCipherAlgorithm().equals(cekAlgo)) {
+            return AES_CBC;
         }
 
         throw new UnsupportedOperationException("Unsupported content encryption scheme: " + cekAlgo);

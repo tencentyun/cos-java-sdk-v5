@@ -30,6 +30,10 @@ public enum CryptoMode {
      */
     AesCtrEncryption,
     /**
+     * Authenticated encryption mode using AES/CBC.
+     */
+    AesCbcEncryption,
+    /**
      * Authenticated encryption mode using AES/GCM, AESWrap, etc. Please note the limitation on the
      * maximum message size in bytes that can be encrypted under this mode is 2^36-32, or ~64G, due
      * to the security limitation of AES/GCM as recommended by NIST.

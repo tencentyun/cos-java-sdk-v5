@@ -51,6 +51,11 @@ public class CryptoConfiguration implements Cloneable,Serializable {
     private transient String kmsRegion;
 
     /**
+     * Used to specify user defined iv.
+     */
+    private byte[] iv = null;
+
+    /**
      * Creates a new CryptoConfiguration object with default storage mode and
      * crypto provider settings. The default storage mode is the Object Metadata
      * storage mode, and the default crypto provider is the JCE provider.
@@ -304,6 +309,7 @@ public class CryptoConfiguration implements Cloneable,Serializable {
         that.storageMode = this.storageMode;
         that.cryptoProvider = this.cryptoProvider;
         that.ignoreMissingInstructionFile = this.ignoreMissingInstructionFile;
+        that.iv = this.iv;
         return that;
     }
 
@@ -339,6 +345,19 @@ public class CryptoConfiguration implements Cloneable,Serializable {
      */
     public CryptoConfiguration withKmsRegion(String kmsRegion) {
         this.kmsRegion = kmsRegion;
+        return this;
+    }
+
+    public byte[] getIV() {
+        return this.iv;
+    }
+
+    public void setIV(byte[] iv) {
+        this.iv = iv;
+    }
+
+    public CryptoConfiguration withIV(byte[] iv) {
+        this.iv = iv;
         return this;
     }
 }

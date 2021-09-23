@@ -350,7 +350,7 @@ public class COSCryptoModuleAE extends COSCryptoModuleBase {
     }
 
     @Override
-    protected final long ciphertextLength(long originalContentLength) {
+    protected long ciphertextLength(long originalContentLength) {
         // Add 16 bytes for the 128-bit tag length using AES/GCM
         return originalContentLength + contentCryptoScheme.getTagLengthInBits() / 8;
     }
