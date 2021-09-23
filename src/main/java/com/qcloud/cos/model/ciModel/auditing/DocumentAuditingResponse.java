@@ -1,12 +1,12 @@
 package com.qcloud.cos.model.ciModel.auditing;
 
 
-import com.qcloud.cos.internal.CIServiceRequest;
+import com.qcloud.cos.model.CiServiceResult;
 
 /**
  * 文档审核响应实体
  */
-public class DocumentAuditingResponse extends CIServiceRequest {
+public class DocumentAuditingResponse extends CiServiceResult {
     private DocumentAuditingJobsDetail jobsDetail;
 
     public DocumentAuditingJobsDetail getJobsDetail() {

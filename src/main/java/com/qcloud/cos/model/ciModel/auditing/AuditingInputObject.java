@@ -8,6 +8,7 @@ package com.qcloud.cos.model.ciModel.auditing;
 public class AuditingInputObject {
     private String object;
     private String content;
+    private String url;
 
     public String getObject() {
         return object;
@@ -25,11 +26,20 @@ public class AuditingInputObject {
         this.content = content;
     }
 
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("AuditingInputObject{");
+        final StringBuffer sb = new StringBuffer("AuditingInputObject{");
         sb.append("object='").append(object).append('\'');
         sb.append(", content='").append(content).append('\'');
+        sb.append(", url='").append(url).append('\'');
         sb.append('}');
         return sb.toString();
     }

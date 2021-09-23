@@ -3,6 +3,9 @@ package com.qcloud.cos.demo.ci;
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.model.ciModel.auditing.AudioAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.AudioAuditingResponse;
+import com.qcloud.cos.model.ciModel.auditing.AuditingInfo;
+
+import java.util.List;
 
 
 /**
@@ -10,7 +13,7 @@ import com.qcloud.cos.model.ciModel.auditing.AudioAuditingResponse;
  */
 public class AudioAuditingJobDemo {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         // 1 初始化用户身份信息（secretId, secretKey）。
         COSClient client = ClientUtils.getTestClient();
         // 2 调用要使用的方法。
@@ -27,8 +30,9 @@ public class AudioAuditingJobDemo {
         AudioAuditingRequest request = new AudioAuditingRequest();
         //2.添加请求参数 参数详情请见api接口文档
         request.setBucketName("demo-123456789");
-        request.getInput().setObject("pron.mp3");
-        request.getConf().setDetectType("Porn,Terrorism,Politics,Ads");
+//        request.getInput().setObject("pron.mp3");
+        request.getInput().setUrl("https://demo-123456789.cos.ap-chongqing.myqcloud.com/pron.mp3");
+        request.getConf().setDetectType("all");
         request.getConf().setCallback("http://cloud.tencent.com/");
         //3.调用接口,获取任务响应对象
         AudioAuditingResponse response = client.createAudioAuditingJobs(request);
@@ -40,14 +44,26 @@ public class AudioAuditingJobDemo {
      *
      * @param client
      */
-    public static void describeAudioAuditingJob(COSClient client) {
+    public static void describeAudioAuditingJob(COSClient client) throws InterruptedException {
         //1.创建任务请求对象
         AudioAuditingRequest request = new AudioAuditingRequest();
         //2.添加请求参数 参数详情请见api接口文档
         request.setBucketName("demo-123456789");
-        request.setJobId("sacbf7269cbd2e11eba5325254009*****");
-        //3.调用接口,获取任务响应对象
-        AudioAuditingResponse response = client.describeAudioAuditingJob(request);
-        System.out.println(response);
+        request.setJobId("sa9175bc451c4b11ecb3fa5254009*****");
+        while (true) {
+            //3.调用接口,获取任务响应对象
+            AudioAuditingResponse response = client.describeAudioAuditingJob(request);
+            String state = response.getJobsDetail().getState();
+            if ("Success".equalsIgnoreCase(state) || "Failed".equalsIgnoreCase(state)) {
+                System.out.println(response.getRequestId());
+                System.out.println(response.getJobsDetail());
+                //4.根据业务逻辑进行处理结果，此处工具类处理操作仅供参考。
+                List<AuditingInfo> auditingInfoList = AuditingResultUtil.getAuditingInfoList(response.getJobsDetail());
+                System.out.println(auditingInfoList);
+                break;
+            }
+            Thread.sleep(100);
+        }
+
     }
 }

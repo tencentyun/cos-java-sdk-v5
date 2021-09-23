@@ -11,6 +11,10 @@ public class SectionInfo {
     private AdsInfo adsInfo;
     private AbuseInfo abuseInfo;
     private IllegalInfo illegalInfo;
+    private String text;
+    private String url;
+    private String duration;
+    private String offsetTime;
 
     public PornInfo getPornInfo() {
         if (pornInfo == null) {
@@ -82,13 +86,45 @@ public class SectionInfo {
         return illegalInfo;
     }
 
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public String getDuration() {
+        return duration;
+    }
+
+    public void setDuration(String duration) {
+        this.duration = duration;
+    }
+
+    public String getOffsetTime() {
+        return offsetTime;
+    }
+
+    public void setOffsetTime(String offsetTime) {
+        this.offsetTime = offsetTime;
+    }
+
     public void setIllegalInfo(IllegalInfo illegalInfo) {
         this.illegalInfo = illegalInfo;
     }
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("SectionInfo{");
+        final StringBuffer sb = new StringBuffer("SectionInfo{");
         sb.append("startByte='").append(startByte).append('\'');
         sb.append(", pornInfo=").append(pornInfo);
         sb.append(", terroristInfo=").append(terroristInfo);
@@ -96,6 +132,10 @@ public class SectionInfo {
         sb.append(", adsInfo=").append(adsInfo);
         sb.append(", abuseInfo=").append(abuseInfo);
         sb.append(", illegalInfo=").append(illegalInfo);
+        sb.append(", text='").append(text).append('\'');
+        sb.append(", url='").append(url).append('\'');
+        sb.append(", duration='").append(duration).append('\'');
+        sb.append(", offsetTime='").append(offsetTime).append('\'');
         sb.append('}');
         return sb.toString();
     }

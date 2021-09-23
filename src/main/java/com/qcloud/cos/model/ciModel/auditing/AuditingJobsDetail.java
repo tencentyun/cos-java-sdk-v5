@@ -52,6 +52,16 @@ public class AuditingJobsDetail {
     private String result;
 
     /**
+     * 审核文本
+     */
+    private String audioText;
+
+    /**
+     * 内容url地址
+     */
+    private String url;
+
+    /**
      * 审核结果 鉴黄信息
      */
     private PornInfo pornInfo;
@@ -256,6 +266,22 @@ public class AuditingJobsDetail {
         this.illegalInfo = illegalInfo;
     }
 
+    public String getAudioText() {
+        return audioText;
+    }
+
+    public void setAudioText(String audioText) {
+        this.audioText = audioText;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("AuditingJobsDetail{");
@@ -269,10 +295,14 @@ public class AuditingJobsDetail {
         sb.append(", snapshotCount='").append(snapshotCount).append('\'');
         sb.append(", sectionCount='").append(sectionCount).append('\'');
         sb.append(", result='").append(result).append('\'');
+        sb.append(", audioText='").append(audioText).append('\'');
+        sb.append(", url='").append(url).append('\'');
         sb.append(", pornInfo=").append(pornInfo);
         sb.append(", terroristInfo=").append(terroristInfo);
         sb.append(", politicsInfo=").append(politicsInfo);
         sb.append(", adsInfo=").append(adsInfo);
+        sb.append(", abuseInfo=").append(abuseInfo);
+        sb.append(", illegalInfo=").append(illegalInfo);
         sb.append(", snapshotList=").append(snapshotList);
         sb.append(", sectionList=").append(sectionList);
         sb.append('}');

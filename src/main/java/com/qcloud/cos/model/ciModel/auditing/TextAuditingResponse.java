@@ -1,9 +1,11 @@
 package com.qcloud.cos.model.ciModel.auditing;
 
+import com.qcloud.cos.model.CiServiceResult;
+
 /**
  * 视频审核响应实体 参数详情参考：https://cloud.tencent.com/document/product/460/37318
  */
-public class TextAuditingResponse {
+public class TextAuditingResponse extends CiServiceResult {
     /**
      * 任务的详细信息
      */

@@ -18,19 +18,6 @@
 
 package com.qcloud.cos.internal;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
 import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.exception.MultiObjectDeleteException.DeleteError;
@@ -76,11 +63,11 @@ import com.qcloud.cos.model.ReplicationDestinationConfig;
 import com.qcloud.cos.model.ReplicationRule;
 import com.qcloud.cos.model.RoutingRule;
 import com.qcloud.cos.model.RoutingRuleCondition;
+import com.qcloud.cos.model.Tag.LifecycleTagPredicate;
+import com.qcloud.cos.model.Tag.Tag;
 import com.qcloud.cos.model.TagSet;
 import com.qcloud.cos.model.UinGrantee;
 import com.qcloud.cos.model.VersionListing;
-import com.qcloud.cos.model.Tag.LifecycleTagPredicate;
-import com.qcloud.cos.model.Tag.Tag;
 import com.qcloud.cos.model.ciModel.auditing.AudioAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.AuditingJobsDetail;
 import com.qcloud.cos.model.ciModel.auditing.AudtingCommonInfo;
@@ -172,7 +159,6 @@ import com.qcloud.cos.model.lifecycle.LifecyclePrefixPredicate;
 import com.qcloud.cos.utils.DateUtils;
 import com.qcloud.cos.utils.StringUtils;
 import com.qcloud.cos.utils.UrlEncoderUtils;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
@@ -181,6 +167,19 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
+
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * XML Sax parser to read XML documents returned by COS via the REST interface, converting these
@@ -5350,6 +5349,9 @@ public class XmlResponsesSaxParser {
                     case "Result":
                         jobsDetail.setResult(getText());
                         break;
+                    case "Url":
+                        jobsDetail.setUrl(getText());
+                        break;
                     default:
                         break;
                 }
@@ -5377,6 +5379,13 @@ public class XmlResponsesSaxParser {
             } else if (in("Response", "JobsDetail", "Snapshot", "AdsInfo")) {
                 SnapshotInfo snapshotInfo = snapshotList.get(snapshotList.size() - 1);
                 parseInfo(snapshotInfo.getAdsInfo(), name, getText());
+            }else if (in("Response", "JobsDetail", "Snapshot")) {
+                SnapshotInfo snapshotInfo = snapshotList.get(snapshotList.size() - 1);
+                if ("Text".equalsIgnoreCase(name)){
+                    snapshotInfo.setText(getText());
+                }else if ("Url".equalsIgnoreCase(name)){
+                    snapshotInfo.setUrl(getText());
+                }
             }
         }
 
@@ -5456,7 +5465,10 @@ public class XmlResponsesSaxParser {
 
         @Override
         protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
-
+            List<SectionInfo> sectionList = response.getJobsDetail().getSectionList();
+            if (in("Response", "JobsDetail") && "Section".equals(name)) {
+                sectionList.add(new SectionInfo());
+            }
         }
 
         @Override
@@ -5485,6 +5497,9 @@ public class XmlResponsesSaxParser {
                     case "Result":
                         jobsDetail.setResult(getText());
                         break;
+                    case "AudioText":
+                        jobsDetail.setAudioText(getText());
+                        break;
                     default:
                         break;
                 }
@@ -5496,6 +5511,40 @@ public class XmlResponsesSaxParser {
                 parseInfo(response.getJobsDetail().getTerroristInfo(), name, getText());
             } else if (in("Response", "JobsDetail", "AdsInfo")) {
                 parseInfo(response.getJobsDetail().getAdsInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "Section", "PornInfo")) {
+                List<SectionInfo> sectionList = response.getJobsDetail().getSectionList();
+                SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
+                parseInfo(sectionInfo.getPornInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "Section", "PoliticsInfo")) {
+                List<SectionInfo> sectionList = response.getJobsDetail().getSectionList();
+                SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
+                parseInfo(sectionInfo.getPoliticsInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "Section", "TerrorismInfo")) {
+                List<SectionInfo> sectionList = response.getJobsDetail().getSectionList();
+                SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
+                parseInfo(sectionInfo.getTerroristInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "Section", "AdsInfo")) {
+                List<SectionInfo> sectionList = response.getJobsDetail().getSectionList();
+                SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
+                parseInfo(sectionInfo.getAdsInfo(), name, getText());
+            }else if (in("Response", "JobsDetail", "Section")){
+                List<SectionInfo> sectionList = response.getJobsDetail().getSectionList();
+                SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
+                switch (name){
+                    case "Text":
+                        sectionInfo.setText(getText());
+                        break;
+                    case "Url":
+                        sectionInfo.setUrl(getText());
+                        break;
+                    case "Duration":
+                        sectionInfo.setDuration(getText());
+                        break;
+                    case "OffsetTime":
+                        sectionInfo.setOffsetTime(getText());
+                    default:
+                        break;
+                }
             }
         }
 

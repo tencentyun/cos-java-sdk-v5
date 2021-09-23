@@ -63,11 +63,11 @@ import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoRequest;
 import com.qcloud.cos.model.ciModel.queue.DocQueueRequest;
 import com.qcloud.cos.model.ciModel.queue.MediaQueueRequest;
 import com.qcloud.cos.model.ciModel.snapshot.SnapshotRequest;
-import com.qcloud.cos.model.ciModel.template.MediaTemplateRequest;
 import com.qcloud.cos.model.ciModel.template.MediaSnapshotObject;
-import com.qcloud.cos.model.ciModel.template.MediaWatermark;
-import com.qcloud.cos.model.ciModel.template.MediaWaterMarkText;
+import com.qcloud.cos.model.ciModel.template.MediaTemplateRequest;
 import com.qcloud.cos.model.ciModel.template.MediaWaterMarkImage;
+import com.qcloud.cos.model.ciModel.template.MediaWaterMarkText;
+import com.qcloud.cos.model.ciModel.template.MediaWatermark;
 import com.qcloud.cos.model.ciModel.workflow.MediaOperation;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowDependency;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowNode;
@@ -729,10 +729,15 @@ public class RequestXmlFactory {
         xml.start("Request");
         xml.start("Input");
         addIfNotNull(xml,"Object",request.getInput().getObject());
+        addIfNotNull(xml, "Url", request.getInput().getUrl());
         xml.end();
         Conf conf = request.getConf();
         xml.start("Conf");
-        addIfNotNull(xml,"DetectType", conf.getDetectType());
+        String detectType = conf.getDetectType();
+        if ("all".equalsIgnoreCase(detectType)) {
+            detectType = "Porn,Terrorism,Politics,Ads,Illegal,Abuse";
+        }
+        addIfNotNull(xml,"DetectType", detectType);
         addIfNotNull(xml,"BizType", conf.getBizType());
         addIfNotNull(xml,"DetectContent", conf.getDetectContent());
         addIfNotNull(xml,"CallbackVersion", conf.getCallbackVersion());
@@ -760,14 +765,19 @@ public class RequestXmlFactory {
 
         xml.start("Request");
         xml.start("Input");
-        addIfNotNull(xml,"Object",request.getInput().getObject());
+        addIfNotNull(xml, "Object", request.getInput().getObject());
+        addIfNotNull(xml, "Url", request.getInput().getUrl());
         xml.end();
         Conf conf = request.getConf();
         xml.start("Conf");
-        addIfNotNull(xml,"DetectType", conf.getDetectType());
-        addIfNotNull(xml,"Callback", conf.getCallback());
-        addIfNotNull(xml,"CallbackVersion", conf.getCallbackVersion());
-        addIfNotNull(xml,"BizType", conf.getBizType());
+        String detectType = conf.getDetectType();
+        if ("all".equalsIgnoreCase(detectType)) {
+            detectType = "Porn,Terrorism,Politics,Ads,Illegal,Abuse";
+        }
+        addIfNotNull(xml, "DetectType", detectType);
+        addIfNotNull(xml, "Callback", conf.getCallback());
+        addIfNotNull(xml, "CallbackVersion", conf.getCallbackVersion());
+        addIfNotNull(xml, "BizType", conf.getBizType());
         xml.end();
 
         xml.end();

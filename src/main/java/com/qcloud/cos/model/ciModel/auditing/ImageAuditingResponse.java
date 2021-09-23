@@ -1,9 +1,11 @@
 package com.qcloud.cos.model.ciModel.auditing;
 
+import com.qcloud.cos.model.CosServiceResult;
+
 /**
  * 图片审核响应实体 参数详情参考：https://cloud.tencent.com/document/product/460/37318
  */
-public class ImageAuditingResponse {
+public class ImageAuditingResponse extends CosServiceResult {
     private PornInfo pornInfo;
     private TerroristInfo terroristInfo;
     private PoliticsInfo politicsInfo;

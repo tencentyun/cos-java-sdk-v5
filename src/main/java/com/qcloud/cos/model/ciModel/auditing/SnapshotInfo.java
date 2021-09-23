@@ -9,6 +9,7 @@ public class SnapshotInfo {
     private TerroristInfo terroristInfo;
     private PoliticsInfo politicsInfo;
     private AdsInfo adsInfo;
+    private String text;
 
     public String getUrl() {
         return url;
@@ -62,14 +63,23 @@ public class SnapshotInfo {
         this.adsInfo = adsInfo;
     }
 
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("SnapshotInfo{");
+        final StringBuilder sb = new StringBuilder("SnapshotInfo{");
         sb.append("url='").append(url).append('\'');
         sb.append(", pornInfo=").append(pornInfo);
         sb.append(", terroristInfo=").append(terroristInfo);
         sb.append(", politicsInfo=").append(politicsInfo);
         sb.append(", adsInfo=").append(adsInfo);
+        sb.append(", text='").append(text).append('\'');
         sb.append('}');
         return sb.toString();
     }

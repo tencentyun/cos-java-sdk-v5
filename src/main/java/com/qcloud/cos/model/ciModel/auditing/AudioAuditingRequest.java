@@ -2,7 +2,6 @@ package com.qcloud.cos.model.ciModel.auditing;
 
 
 import com.qcloud.cos.internal.CIServiceRequest;
-import com.qcloud.cos.model.ciModel.common.MediaInputObject;
 
 /**
  * 音频审核请求实体 参数详情参考：https://cloud.tencent.com/document/product/460/53395
@@ -14,7 +13,7 @@ public class AudioAuditingRequest extends CIServiceRequest {
      */
     private Conf conf;
 
-    private MediaInputObject input;
+    private AuditingInputObject input;
 
     private String jobId;
 
@@ -26,14 +25,14 @@ public class AudioAuditingRequest extends CIServiceRequest {
         this.jobId = jobId;
     }
 
-    public MediaInputObject getInput() {
+    public AuditingInputObject getInput() {
         if (input == null) {
-            input = new MediaInputObject();
+            input = new AuditingInputObject();
         }
         return input;
     }
 
-    public void setInput(MediaInputObject input) {
+    public void setInput(AuditingInputObject input) {
         this.input = input;
     }
 
@@ -50,7 +49,7 @@ public class AudioAuditingRequest extends CIServiceRequest {
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("VideoAuditingRequest{");
+        final StringBuffer sb = new StringBuffer("AudioAuditingRequest{");
         sb.append("conf=").append(conf);
         sb.append(", input=").append(input);
         sb.append(", jobId='").append(jobId).append('\'');
