@@ -20,14 +20,16 @@ package com.qcloud.cos.internal.crypto;
 
 class AesCtr extends ContentCryptoScheme {
 
+    private byte[] iv = null;
+
     @Override String getKeyGeneratorAlgorithm() { return AES_GCM.getKeyGeneratorAlgorithm(); }
     @Override String getCipherAlgorithm() { return "AES/CTR/NoPadding"; }
     @Override int getKeyLengthInBits() { return AES_GCM.getKeyLengthInBits(); }
     @Override int getBlockSizeInBytes() { return AES_GCM.getBlockSizeInBytes(); }
     @Override int getIVLengthInBytes() { return 16; }
     @Override long getMaxPlaintextSize() {  return MAX_CTR_BYTES;  }
-    @Override byte[] getIV() { return null; }
-    @Override void setIV(byte[] iv) {}
+    @Override byte[] getIV() { return this.iv; }
+    @Override void setIV(byte[] iv) { this.iv = iv; }
 
     @Override
     byte[] adjustIV(byte[] iv, long byteOffset) {
