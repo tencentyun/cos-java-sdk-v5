@@ -71,6 +71,8 @@ import com.qcloud.cos.model.VersionListing;
 import com.qcloud.cos.model.ciModel.auditing.AudioAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.AuditingJobsDetail;
 import com.qcloud.cos.model.ciModel.auditing.AudtingCommonInfo;
+import com.qcloud.cos.model.ciModel.auditing.BatchImageAuditingResponse;
+import com.qcloud.cos.model.ciModel.auditing.BatchImageJobDetail;
 import com.qcloud.cos.model.ciModel.auditing.DocumentAuditingJobsDetail;
 import com.qcloud.cos.model.ciModel.auditing.DocumentAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.DocumentResultInfo;
@@ -808,6 +810,12 @@ public class XmlResponsesSaxParser {
 
     public DocumentAuditingDescribeJobHandler parseDocumentAuditingDescribeResponse(InputStream inputStream) throws IOException {
         DocumentAuditingDescribeJobHandler handler = new DocumentAuditingDescribeJobHandler();
+        parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
+        return handler;
+    }
+
+    public BatchImageAuditingHandler parseBatchImageAuditingResponse(InputStream inputStream) throws IOException {
+        BatchImageAuditingHandler handler = new BatchImageAuditingHandler();
         parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
         return handler;
     }
@@ -5352,6 +5360,12 @@ public class XmlResponsesSaxParser {
                     case "Url":
                         jobsDetail.setUrl(getText());
                         break;
+                    case "DataId":
+                        jobsDetail.setDataId(getText());
+                        break;
+                    case "Label":
+                        jobsDetail.setLabel(getText());
+                        break;
                     default:
                         break;
                 }
@@ -5445,6 +5459,14 @@ public class XmlResponsesSaxParser {
                     case "CreationTime":
                         jobsDetail.setCreationTime(getText());
                         break;
+                    case "DataId":
+                        jobsDetail.setDataId(getText());
+                        break;
+                    case "Object":
+                        jobsDetail.setObject(getText());
+                    case "Url":
+                        jobsDetail.setUrl(getText());
+                        break;
                     default:
                         break;
                 }
@@ -5499,6 +5521,12 @@ public class XmlResponsesSaxParser {
                         break;
                     case "AudioText":
                         jobsDetail.setAudioText(getText());
+                        break;
+                    case "DataId":
+                        jobsDetail.setDataId(getText());
+                        break;
+                    case "Label":
+                        jobsDetail.setLabel(getText());
                         break;
                     default:
                         break;
@@ -5603,6 +5631,14 @@ public class XmlResponsesSaxParser {
                         break;
                     case "CreationTime":
                         jobsDetail.setCreationTime(getText());
+                        break;
+                    case "DataId":
+                        jobsDetail.setDataId(getText());
+                        break;
+                    case "Object":
+                        jobsDetail.setObject(getText());
+                    case "Url":
+                        jobsDetail.setUrl(getText());
                         break;
                     default:
                         break;
@@ -5807,6 +5843,12 @@ public class XmlResponsesSaxParser {
                         break;
                     case "Content":
                         jobsDetail.setContent(getText());
+                    case "DataId":
+                        jobsDetail.setDataId(getText());
+                        break;
+                    case "Url":
+                        jobsDetail.setUrl(getText());
+                        break;
                     default:
                         break;
                 }
@@ -5919,6 +5961,12 @@ public class XmlResponsesSaxParser {
                     case "Result":
                         jobsDetail.setResult(getText());
                         break;
+                    case "DataId":
+                        jobsDetail.setDataId(getText());
+                        break;
+                    case "Label":
+                        jobsDetail.setLabel(getText());
+                        break;
                     default:
                         break;
                 }
@@ -6001,6 +6049,12 @@ public class XmlResponsesSaxParser {
                     case "CreationTime":
                         jobsDetail.setCreationTime(getText());
                         break;
+                    case "DataId":
+                        jobsDetail.setDataId(getText());
+                        break;
+                    case "Url":
+                        jobsDetail.setUrl(getText());
+                        break;
                     default:
                         break;
                 }
@@ -6069,6 +6123,9 @@ public class XmlResponsesSaxParser {
                         break;
                     case "Url":
                         jobsDetail.setUrl(getText());
+                        break;
+                    case "DataId":
+                        jobsDetail.setDataId(getText());
                         break;
                     default:
                         break;
@@ -6148,6 +6205,94 @@ public class XmlResponsesSaxParser {
                     break;
             }
         }
+    }
+
+    public static class BatchImageAuditingHandler extends AbstractHandler {
+        private BatchImageAuditingResponse response = new BatchImageAuditingResponse();
+
+        @Override
+        protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
+            List<BatchImageJobDetail> jobList = response.getJobList();
+            if (in("Response") && "JobsDetail".equals(name)) {
+                jobList.add(new BatchImageJobDetail());
+            }
+        }
+
+        @Override
+        protected void doEndElement(String uri, String name, String qName) {
+            List<BatchImageJobDetail> jobList = response.getJobList();
+            BatchImageJobDetail jobsDetail = null;
+            if (jobList != null && jobList.size() > 0) {
+                jobsDetail = jobList.get(jobList.size() - 1);
+            } else {
+                jobsDetail = new BatchImageJobDetail();
+            }
+
+            if (in("Response", "JobsDetail")) {
+                switch (name) {
+                    case "Object":
+                        jobsDetail.setObject(getText());
+                        break;
+                    case "DataId":
+                        jobsDetail.setDataId(getText());
+                        break;
+                    case "Label":
+                        jobsDetail.setLabel(getText());
+                        break;
+                    case "Result":
+                        jobsDetail.setResult(getText());
+                        break;
+                    case "Score":
+                        jobsDetail.setScore(getText());
+                    case "Text":
+                        jobsDetail.setText(getText());
+                    case "SubLabel":
+                        jobsDetail.setSubLabel(getText());
+                        break;
+                    default:
+                        break;
+                }
+            }else if (in("Response","JobsDetail", "PornInfo")) {
+                parseInfo(jobsDetail.getPornInfo(), name, getText());
+            } else if (in("Response","JobsDetail", "PoliticsInfo")) {
+                parseInfo(jobsDetail.getPoliticsInfo(), name, getText());
+            } else if (in("Response", "JobsDetail","TerroristInfo")) {
+                parseInfo(jobsDetail.getTerroristInfo(), name, getText());
+            } else if (in("Response", "JobsDetail","AdsInfo")) {
+                parseInfo(jobsDetail.getAdsInfo(), name, getText());
+            }
+        }
+
+        public BatchImageAuditingResponse getResponse() {
+            return response;
+        }
+
+        public void setResponse(BatchImageAuditingResponse response) {
+            this.response = response;
+        }
+
+        private void parseInfo(AudtingCommonInfo obj, String name, String value) {
+            switch (name) {
+                case "Code":
+                    obj.setCode(value);
+                    break;
+                case "Msg":
+                    obj.setMsg(getText());
+                    break;
+                case "HitFlag":
+                    obj.setHitFlag(getText());
+                    break;
+                case "Score":
+                    obj.setScore(getText());
+                    break;
+                case "Label":
+                    obj.setLabel(getText());
+                    break;
+                default:
+                    break;
+            }
+        }
+
     }
 }
 

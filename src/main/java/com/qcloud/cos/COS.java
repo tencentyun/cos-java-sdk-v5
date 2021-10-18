@@ -34,6 +34,8 @@ import com.qcloud.cos.internal.COSDirectSpi;
 import com.qcloud.cos.model.*;
 import com.qcloud.cos.model.ciModel.auditing.AudioAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.AudioAuditingResponse;
+import com.qcloud.cos.model.ciModel.auditing.BatchImageAuditingRequest;
+import com.qcloud.cos.model.ciModel.auditing.BatchImageAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.DocumentAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.DocumentAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.ImageAuditingRequest;
@@ -2912,7 +2914,10 @@ public interface COS extends COSDirectSpi {
      */
     DocumentAuditingResponse describeAuditingDocumentJob(DocumentAuditingRequest request);
 
-
+    /**
+     * BatchImageAuditing 批量提交图片审核任务 https://cloud.tencent.com/document/product/460/59383
+     */
+    BatchImageAuditingResponse batchImageAuditing(BatchImageAuditingRequest request);
 }
 
 

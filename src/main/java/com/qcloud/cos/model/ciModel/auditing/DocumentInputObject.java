@@ -8,6 +8,15 @@ package com.qcloud.cos.model.ciModel.auditing;
 public class DocumentInputObject {
     private String url;
     private String type;
+    private String dataId;
+
+    public String getDataId() {
+        return dataId;
+    }
+
+    public void setDataId(String dataId) {
+        this.dataId = dataId;
+    }
 
     public String getUrl() {
         return url;

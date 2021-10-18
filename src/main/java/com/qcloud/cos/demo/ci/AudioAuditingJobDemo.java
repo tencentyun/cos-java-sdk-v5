@@ -31,7 +31,8 @@ public class AudioAuditingJobDemo {
         //2.添加请求参数 参数详情请见api接口文档
         request.setBucketName("demo-123456789");
 //        request.getInput().setObject("pron.mp3");
-        request.getInput().setUrl("https://demo-123456789.cos.ap-chongqing.myqcloud.com/pron.mp3");
+        request.getInput().setObject("pron.mp3");
+        request.getInput().setDataId("TestDataId");
         request.getConf().setDetectType("all");
         request.getConf().setCallback("http://cloud.tencent.com/");
         //3.调用接口,获取任务响应对象
