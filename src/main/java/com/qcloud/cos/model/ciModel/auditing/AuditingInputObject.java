@@ -9,6 +9,7 @@ public class AuditingInputObject {
     private String object;
     private String content;
     private String url;
+    private String dataId;
 
     public String getObject() {
         return object;
@@ -32,6 +33,14 @@ public class AuditingInputObject {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public String getDataId() {
+        return dataId;
+    }
+
+    public void setDataId(String dataId) {
+        this.dataId = dataId;
     }
 
     @Override

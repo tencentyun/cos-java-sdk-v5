@@ -2,6 +2,10 @@ package com.qcloud.cos.demo.ci;
 
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.model.ciModel.auditing.AuditingInfo;
+import com.qcloud.cos.model.ciModel.auditing.BatchImageAuditingInputObject;
+import com.qcloud.cos.model.ciModel.auditing.BatchImageAuditingRequest;
+import com.qcloud.cos.model.ciModel.auditing.BatchImageAuditingResponse;
+import com.qcloud.cos.model.ciModel.auditing.BatchImageJobDetail;
 import com.qcloud.cos.model.ciModel.auditing.ImageAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.ImageAuditingResponse;
 import com.qcloud.cos.transfer.ImageAuditingImpl;
@@ -22,12 +26,11 @@ public class ImageAuditingDemo {
         // 1 初始化用户身份信息（secretId, secretKey）。
         COSClient client = ClientUtils.getTestClient();
         // 2 调用要使用的方法。
-//        imageAuditing(client);
-        batchPostImageAuditing(client);
+        imageAuditing(client);
     }
 
     /**
-     * createImageAuditingJob 接口用于创建图片审核任务。
+     * createImageAuditingJob 接口用于创建图片审核任务。(发送单个任务 推荐)
      *
      * @param client
      */
@@ -49,7 +52,42 @@ public class ImageAuditingDemo {
     }
 
     /**
-     * 批量发送图片审核任务
+     * batchImageAuditing 接口批量创建图片审核任务。 (推荐)
+     *
+     * @param client
+     */
+    public static void batchImageAuditing(COSClient client) {
+        //1.创建任务请求对象
+        BatchImageAuditingRequest request = new BatchImageAuditingRequest();
+        //2.添加请求参数 参数详情请见api接口文档
+        //2.1设置请求bucket
+        request.setBucketName("demo-123456789");
+        //2.2添加请求内容
+        List<BatchImageAuditingInputObject> inputList = request.getInputList();
+        BatchImageAuditingInputObject input = new BatchImageAuditingInputObject();
+        input.setObject("1.jpg");
+        input.setDataId("DataId");
+        inputList.add(input);
+
+        input = new BatchImageAuditingInputObject();
+        input.setUrl("https://demo-123456789.cos.ap-chongqing.myqcloud.com/1.png");
+        input.setDataId("DataId");
+        inputList.add(input);
+
+        //2.2设置审核类型
+        request.getConf().setDetectType("all");
+        //3.调用接口,获取任务响应对象
+        BatchImageAuditingResponse response = client.batchImageAuditing(request);
+        List<BatchImageJobDetail> jobList = response.getJobList();
+        for (BatchImageJobDetail batchImageJobDetail : jobList) {
+            List<AuditingInfo> imageInfoList = AuditingResultUtil.getBatchImageInfoList(batchImageJobDetail);
+            System.out.println(imageInfoList);
+        }
+    }
+
+
+    /**
+     * 批量发送图片审核任务 使用sdk并发发送
      */
     public static void batchPostImageAuditing(COSClient client) throws InterruptedException {
         List<ImageAuditingRequest> requestList = new ArrayList<>();

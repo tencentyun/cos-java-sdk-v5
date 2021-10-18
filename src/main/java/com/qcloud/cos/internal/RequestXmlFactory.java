@@ -40,6 +40,9 @@ import com.qcloud.cos.model.InputSerialization;
 import com.qcloud.cos.model.OutputSerialization;
 import com.qcloud.cos.model.ScanRange;
 import com.qcloud.cos.model.ciModel.auditing.AudioAuditingRequest;
+import com.qcloud.cos.model.ciModel.auditing.AuditingInputObject;
+import com.qcloud.cos.model.ciModel.auditing.BatchImageAuditingInputObject;
+import com.qcloud.cos.model.ciModel.auditing.BatchImageAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.Conf;
 import com.qcloud.cos.model.ciModel.auditing.DocumentAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.TextAuditingRequest;
@@ -730,6 +733,7 @@ public class RequestXmlFactory {
         xml.start("Input");
         addIfNotNull(xml,"Object",request.getInput().getObject());
         addIfNotNull(xml, "Url", request.getInput().getUrl());
+        addIfNotNull(xml, "DataId", request.getInput().getDataId());
         xml.end();
         Conf conf = request.getConf();
         xml.start("Conf");
@@ -767,6 +771,7 @@ public class RequestXmlFactory {
         xml.start("Input");
         addIfNotNull(xml, "Object", request.getInput().getObject());
         addIfNotNull(xml, "Url", request.getInput().getUrl());
+        addIfNotNull(xml, "DataId", request.getInput().getDataId());
         xml.end();
         Conf conf = request.getConf();
         xml.start("Conf");
@@ -798,6 +803,7 @@ public class RequestXmlFactory {
         xml.start("Input");
         addIfNotNull(xml, "Object", request.getInput().getObject());
         addIfNotNull(xml, "Content", request.getInput().getContent());
+        addIfNotNull(xml, "DataId", request.getInput().getDataId());
         xml.end();
         Conf conf = request.getConf();
         xml.start("Conf");
@@ -821,12 +827,43 @@ public class RequestXmlFactory {
         xml.start("Input");
         addIfNotNull(xml, "Url", request.getInput().getUrl());
         addIfNotNull(xml, "Type", request.getInput().getType());
+        addIfNotNull(xml, "DataId", request.getInput().getDataId());
         xml.end();
         Conf conf = request.getConf();
         xml.start("Conf");
         String detectType = conf.getDetectType();
         if ("all".equalsIgnoreCase(detectType)) {
             detectType = "Porn,Terrorism,Politics,Ads,Illegal,Abuse";
+        }
+        addIfNotNull(xml, "DetectType", detectType);
+        addIfNotNull(xml, "Callback", conf.getCallback());
+        addIfNotNull(xml, "BizType", conf.getBizType());
+        xml.end();
+
+        xml.end();
+        return xml.getBytes();
+    }
+
+    public static byte[] convertToXmlByteArray(BatchImageAuditingRequest request) {
+        XmlWriter xml = new XmlWriter();
+
+        xml.start("Request");
+        List<BatchImageAuditingInputObject> inputList = request.getInputList();
+        for (BatchImageAuditingInputObject inputObject : inputList) {
+            xml.start("Input");
+            addIfNotNull(xml, "Url", inputObject.getUrl());
+            addIfNotNull(xml, "Object", inputObject.getObject());
+            addIfNotNull(xml, "DataId", inputObject.getDataId());
+            addIfNotNull(xml, "MaxFrames", inputObject.getMaxFrames());
+            addIfNotNull(xml, "Interval", inputObject.getInterval());
+            xml.end();
+        }
+
+        Conf conf = request.getConf();
+        xml.start("Conf");
+        String detectType = conf.getDetectType();
+        if ("all".equalsIgnoreCase(detectType)) {
+            detectType = "Porn,Terrorism,Politics,Ads";
         }
         addIfNotNull(xml, "DetectType", detectType);
         addIfNotNull(xml, "Callback", conf.getCallback());

@@ -43,6 +43,11 @@ public class DocumentAuditingJobsDetail {
     private String pageCount;
 
     /**
+     * 请求标识
+     */
+    private String dataId;
+
+    /**
      * 文档转换为图片后，具体每张图片的审核结果信息，只返回带有违规结果的图片
      */
     private List<DocumentResultInfo> pageSegment;
@@ -139,5 +144,31 @@ public class DocumentAuditingJobsDetail {
 
     public void setLabels(DocumentResultInfo labels) {
         this.labels = labels;
+    }
+
+    public String getDataId() {
+        return dataId;
+    }
+
+    public void setDataId(String dataId) {
+        this.dataId = dataId;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("DocumentAuditingJobsDetail{");
+        sb.append("jobId='").append(jobId).append('\'');
+        sb.append(", state='").append(state).append('\'');
+        sb.append(", creationTime='").append(creationTime).append('\'');
+        sb.append(", code='").append(code).append('\'');
+        sb.append(", message='").append(message).append('\'');
+        sb.append(", url='").append(url).append('\'');
+        sb.append(", suggestion='").append(suggestion).append('\'');
+        sb.append(", pageCount='").append(pageCount).append('\'');
+        sb.append(", dataId='").append(dataId).append('\'');
+        sb.append(", pageSegment=").append(pageSegment);
+        sb.append(", labels=").append(labels);
+        sb.append('}');
+        return sb.toString();
     }
 }

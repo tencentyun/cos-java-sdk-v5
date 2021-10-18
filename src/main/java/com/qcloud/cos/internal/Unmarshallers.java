@@ -50,6 +50,7 @@ import com.qcloud.cos.model.SetBucketInventoryConfigurationResult;
 import com.qcloud.cos.model.SetObjectTaggingResult;
 import com.qcloud.cos.model.VersionListing;
 import com.qcloud.cos.model.ciModel.auditing.AudioAuditingResponse;
+import com.qcloud.cos.model.ciModel.auditing.BatchImageAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.DocumentAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.ImageAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.TextAuditingResponse;
@@ -717,6 +718,15 @@ public class Unmarshallers {
         public DocumentAuditingResponse unmarshall(InputStream in) throws Exception {
             return new XmlResponsesSaxParser()
                     .parseDocumentAuditingDescribeResponse(in).getResponse();
+        }
+    }
+
+    public static final class BatchImageAuditingJobUnmarshaller
+            implements Unmarshaller<BatchImageAuditingResponse, InputStream> {
+
+        public BatchImageAuditingResponse unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser()
+                    .parseBatchImageAuditingResponse(in).getResponse();
         }
     }
 }

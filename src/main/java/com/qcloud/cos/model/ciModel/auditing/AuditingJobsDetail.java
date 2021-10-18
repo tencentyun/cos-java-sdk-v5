@@ -62,6 +62,15 @@ public class AuditingJobsDetail {
     private String url;
 
     /**
+     * 数据id
+     */
+    private String dataId;
+    /**
+     * 标签
+     */
+    private String label;
+
+    /**
      * 审核结果 鉴黄信息
      */
     private PornInfo pornInfo;
@@ -282,6 +291,22 @@ public class AuditingJobsDetail {
         this.url = url;
     }
 
+    public String getDataId() {
+        return dataId;
+    }
+
+    public void setDataId(String dataId) {
+        this.dataId = dataId;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("AuditingJobsDetail{");
@@ -297,6 +322,8 @@ public class AuditingJobsDetail {
         sb.append(", result='").append(result).append('\'');
         sb.append(", audioText='").append(audioText).append('\'');
         sb.append(", url='").append(url).append('\'');
+        sb.append(", dataId='").append(dataId).append('\'');
+        sb.append(", label='").append(label).append('\'');
         sb.append(", pornInfo=").append(pornInfo);
         sb.append(", terroristInfo=").append(terroristInfo);
         sb.append(", politicsInfo=").append(politicsInfo);

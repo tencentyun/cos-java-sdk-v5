@@ -97,6 +97,8 @@ import com.qcloud.cos.internal.XmlResponsesSaxParser.CopyObjectResultHandler;
 import com.qcloud.cos.model.*;
 import com.qcloud.cos.model.ciModel.auditing.AudioAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.AudioAuditingResponse;
+import com.qcloud.cos.model.ciModel.auditing.BatchImageAuditingRequest;
+import com.qcloud.cos.model.ciModel.auditing.BatchImageAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.DocumentAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.DocumentAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.ImageAuditingRequest;
@@ -3948,6 +3950,15 @@ public class COSClient implements COS {
                 "The jobId parameter must be specified setting the object tags");
         CosHttpRequest<DocumentAuditingRequest> request = createRequest(documentAuditingRequest.getBucketName(), "/document/auditing/" + documentAuditingRequest.getJobId(), documentAuditingRequest, HttpMethodName.GET);
         return invoke(request, new Unmarshallers.DocumentAuditingDescribeJobUnmarshaller());
+    }
+
+    @Override
+    public BatchImageAuditingResponse batchImageAuditing(BatchImageAuditingRequest batchImageAuditingRequest) {
+        this.checkCIRequestCommon(batchImageAuditingRequest);
+        this.rejectStartWith(batchImageAuditingRequest.getConf().getCallback(), "http", "The Conf.CallBack parameter mush start with http or https");
+        CosHttpRequest<BatchImageAuditingRequest> request = createRequest(batchImageAuditingRequest.getBucketName(), "/image/auditing", batchImageAuditingRequest, HttpMethodName.POST);
+        this.setContent(request, RequestXmlFactory.convertToXmlByteArray(batchImageAuditingRequest), "application/xml", false);
+        return invoke(request, new Unmarshallers.BatchImageAuditingJobUnmarshaller());
     }
 
     private void checkAuditingRequest(ImageAuditingRequest request) {
