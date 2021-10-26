@@ -1,20 +1,21 @@
 package com.qcloud.cos.auth;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.qcloud.cos.exception.CosClientException;
-import com.qcloud.cos.exception.CosServiceException;
-import com.qcloud.cos.utils.IOUtils;
-import com.qcloud.cos.utils.Jackson;
-import com.qcloud.cos.utils.VersionInfoUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.qcloud.cos.exception.CosClientException;
+import com.qcloud.cos.exception.CosServiceException;
+import com.qcloud.cos.utils.IOUtils;
+import com.qcloud.cos.utils.Jackson;
+import com.qcloud.cos.utils.VersionInfoUtils;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The utils for CPM and CVM credentials fetcher
@@ -104,7 +105,10 @@ public class InstanceCredentialsUtils {
     }
 
     private Map<String, String> addDefaultHeader(Map<String, String> headers) {
-        Map<String, String> fullHeader = new HashMap<>(headers);
+        Map<String, String> fullHeader = new HashMap<String, String>();
+        if (headers != null) {
+            fullHeader.putAll(headers);
+        }
 
         putIfAbsent(fullHeader,"User-Agent", USER_AGENT);
         putIfAbsent(fullHeader,"Accept", "*/*");
