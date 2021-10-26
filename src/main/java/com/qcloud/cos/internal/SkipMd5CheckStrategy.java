@@ -18,6 +18,8 @@
 
 package com.qcloud.cos.internal;
 
+import com.qcloud.cos.Headers;
+import com.qcloud.cos.model.COSObject;
 import com.qcloud.cos.model.GetObjectRequest;
 import com.qcloud.cos.model.ObjectMetadata;
 import com.qcloud.cos.model.PutObjectRequest;
@@ -239,7 +241,12 @@ public class SkipMd5CheckStrategy {
     }
 
     private boolean isPutObjectMd5ValidationDisabledByProperty() {
-        return System.getProperty(DISABLE_PUT_OBJECT_MD5_VALIDATION_PROPERTY) != null;
+        String propertyValue = System.getProperty(DISABLE_PUT_OBJECT_MD5_VALIDATION_PROPERTY);
+        if (propertyValue == null || propertyValue.equalsIgnoreCase("false")) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
     /**
