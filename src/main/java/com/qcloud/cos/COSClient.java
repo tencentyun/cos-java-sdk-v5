@@ -2706,8 +2706,21 @@ public class COSClient implements COS {
     }
 
     @Override
+    public URL generatePresignedUrl(String bucketName, String key, Date expiration, HttpMethodName method) throws CosClientException {
+        return generatePresignedUrl(bucketName, key, expiration, method, new HashMap<String, String>(), new HashMap<String, String>(), false, true);
+    }
+
+    @Override
     public URL generatePresignedUrl(String bucketName, String key, Date expiration,
             HttpMethodName method, Map<String, String> headers, Map<String, String> params) throws CosClientException {
+        return generatePresignedUrl(bucketName, key, expiration, method, headers, params, false, true);
+    }
+
+    @Override
+    public URL generatePresignedUrl(String bucketName, String key, Date expiration,
+            HttpMethodName method, Map<String, String> headers, Map<String, String> params, Boolean signPrefixMode,
+            Boolean signHost) throws CosClientException {
+
         GeneratePresignedUrlRequest request =
                 new GeneratePresignedUrlRequest(bucketName, key, method);
         request.setExpiration(expiration);
@@ -2716,17 +2729,26 @@ public class COSClient implements COS {
             request.addRequestParameter(entry.getKey(), entry.getValue());
         }
 
-        request.putCustomRequestHeader(Headers.HOST, this.clientConfig.getEndpointBuilder().buildGeneralApiEndpoint(bucketName));
+        if (signHost) {
+            request.putCustomRequestHeader(Headers.HOST, this.clientConfig.getEndpointBuilder().buildGeneralApiEndpoint(bucketName));
+        }
 
         for (Entry<String, String> entry : headers.entrySet()) {
             request.putCustomRequestHeader(entry.getKey(), entry.getValue());
         }
 
-        return generatePresignedUrl(request);
+        request.setSignPrefixMode(signPrefixMode);
+
+        return generatePresignedUrl(request, signHost);
     }
 
     @Override
     public URL generatePresignedUrl(GeneratePresignedUrlRequest req) throws CosClientException {
+        return generatePresignedUrl(req, true);
+    }
+
+    @Override
+    public URL generatePresignedUrl(GeneratePresignedUrlRequest req, Boolean signHost) throws CosClientException {
         rejectNull(clientConfig.getRegion(),
                 "region is null, region in clientConfig must be specified when generating a pre-signed URL");
         rejectNull(req, "The request parameter must be specified when generating a pre-signed URL");
@@ -2769,12 +2791,27 @@ public class COSClient implements COS {
         COSCredentials cred = fetchCredential();
         String authStr =
                 cosSigner.buildAuthorizationStr(request.getHttpMethod(), request.getResourcePath(),
-                        request.getHeaders(), request.getParameters(), cred, req.getExpiration());
+                        request.getHeaders(), request.getParameters(), cred, req.getExpiration(), signHost);
         StringBuilder strBuilder = new StringBuilder();
         strBuilder.append(clientConfig.getHttpProtocol().toString()).append("://");
         strBuilder.append(clientConfig.getEndpointBuilder()
                 .buildGeneralApiEndpoint(formatBucket(bucketName, cred.getCOSAppId())));
         strBuilder.append(UrlEncoderUtils.encodeUrlPath(formatKey(key)));
+
+        // urlencode auth string key & value
+        String[] authParts = authStr.split("&");
+        String[] encodeAuthParts = new String[authParts.length];
+
+        for (int i = 0; i < authParts.length; i++) {
+            String[] kv = authParts[i].split("=", 2);
+            if (kv.length == 2) {
+                encodeAuthParts[i] = StringUtils.join("=", UrlEncoderUtils.encode(kv[0]), UrlEncoderUtils.encode(kv[1]));
+            } else if (kv.length == 1) {
+                encodeAuthParts[i] = StringUtils.join("=", UrlEncoderUtils.encode(kv[0]));
+            }
+        }
+
+        authStr = StringUtils.join("&", encodeAuthParts);
 
         boolean hasAppendFirstParameter = false;
         if (authStr != null) {

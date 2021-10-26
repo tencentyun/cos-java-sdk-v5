@@ -2067,10 +2067,10 @@ public interface COS extends COSDirectSpi {
      *                            request or handling the response.
      * @see COS#generatePresignedUrl(String, String, Date)
      * @see COS#generatePresignedUrl(String, String, Date, HttpMethodName)
-     *
-     * public URL generatePresignedUrl(String bucketName, String key, Date expiration)
-     *      throws CosClientException;
      */
+     public URL generatePresignedUrl(String bucketName, String key, Date expiration, HttpMethodName method)
+          throws CosClientException;
+
 
     /**
      * <p>
@@ -2099,6 +2099,8 @@ public interface COS extends COSDirectSpi {
      * @param key        The key in the specified bucket under which the desired object is stored.
      * @param expiration The time at which the returned pre-signed URL will expire.
      * @param method     The HTTP method verb to use for this URL
+     * @param headers The HTTP headers to use for sign.
+     * @param params The HTTP params to use for sign.
      * @return A pre-signed URL that can be used to access an COS resource without requiring the
      * user of the URL to know the account's credentials.
      * @throws CosClientException If any errors are encountered in the client while making the
@@ -2108,6 +2110,27 @@ public interface COS extends COSDirectSpi {
      */
     public URL generatePresignedUrl(String bucketName, String key, Date expiration,
                                     HttpMethodName method, Map<String, String> headers, Map<String, String> params) throws CosClientException;
+
+
+     /**
+     * @param bucketName The name of the bucket containing the desired object.
+     * @param key        The key in the specified bucket under which the desired object is stored.
+     * @param expiration The time at which the returned pre-signed URL will expire.
+     * @param method     The HTTP method verb to use for this URL
+     * @param headers The HTTP headers to use for sign.
+     * @param params The HTTP params to use for sign.
+     * @param signPrefixMode The optional signPrefixMode decide the presigned url whether start with 'sign=' and encode value.
+     * @param signHost The optional signHost decide whether to sign with host header, by default it is true.
+     * @return A pre-signed URL that can be used to access an COS resource without requiring the
+     * user of the URL to know the account's credentials.
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *                            request or handling the response.
+     * @see COS#generatePresignedUrl(String, String, Date)
+     * @see COS#generatePresignedUrl(String, String, Date, HttpMethodName)
+     */
+    public URL generatePresignedUrl(String bucketName, String key, Date expiration,
+                                    HttpMethodName method, Map<String, String> headers, Map<String, String> params,
+                                    Boolean signPrefixMode, Boolean signHost) throws CosClientException;
 
     /**
      * <p>
@@ -2142,6 +2165,42 @@ public interface COS extends COSDirectSpi {
      * @see COS#generatePresignedUrl(String, String, Date, HttpMethod)
      */
     public URL generatePresignedUrl(GeneratePresignedUrlRequest generatePresignedUrlRequest)
+            throws CosClientException;
+
+    /**
+     * <p>
+     * Returns a pre-signed URL for accessing COS resource. you can specify the expiration time.
+     * Defaults, if you didn't set the expiration time, the expired time of ClientConfig will be
+     * used.
+     * </p>
+     * <p>
+     * Pre-signed URLs allow clients to form a URL for an COS resource, and then sign it with the
+     * current COS security credentials. The pre-signed URL can be shared to other users, allowing
+     * access to the resource without providing an account's security credentials.
+     * </p>
+     * <p>
+     * Pre-signed URLs are useful in many situations where COS security credentials aren't available
+     * from the client that needs to make the actual request to COS.
+     * </p>
+     * <p>
+     * For example, an application may need remote users to upload files to the application owner's
+     * COS bucket, but doesn't need to ship the COS security credentials with the application. A
+     * pre-signed URL to PUT an object into the owner's bucket can be generated from a remote
+     * location with the owner's COS security credentials, then the pre-signed URL can be passed to
+     * the end user's application to use.
+     * </p>
+     *
+     * @param generatePresignedUrlRequest The request object containing all the options for
+     *                                    generating a pre-signed URL (bucket name, key, expiration date, etc).
+     * @param signHost The optional signHost decide whether to sign with host header, by default it is true.
+     * @return A pre-signed URL that can be used to access an COS resource without requiring the
+     * user of the URL to know the account's credentials.
+     * @throws CosClientException If any errors are encountered in the client while making the
+     *                            request or handling the response.
+     * @see COS#generatePresignedUrl(String, String, Date)
+     * @see COS#generatePresignedUrl(String, String, Date, HttpMethod)
+     */
+    public URL generatePresignedUrl(GeneratePresignedUrlRequest generatePresignedUrlRequest, Boolean signHost)
             throws CosClientException;
 
     /**
