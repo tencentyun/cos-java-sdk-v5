@@ -2798,26 +2798,27 @@ public class COSClient implements COS {
                 .buildGeneralApiEndpoint(formatBucket(bucketName, cred.getCOSAppId())));
         strBuilder.append(UrlEncoderUtils.encodeUrlPath(formatKey(key)));
 
-        // urlencode auth string key & value
-        String[] authParts = authStr.split("&");
-        String[] encodeAuthParts = new String[authParts.length];
-
-        for (int i = 0; i < authParts.length; i++) {
-            String[] kv = authParts[i].split("=", 2);
-            if (kv.length == 2) {
-                encodeAuthParts[i] = StringUtils.join("=", UrlEncoderUtils.encode(kv[0]), UrlEncoderUtils.encode(kv[1]));
-            } else if (kv.length == 1) {
-                encodeAuthParts[i] = StringUtils.join("=", UrlEncoderUtils.encode(kv[0]));
-            }
-        }
-
-        authStr = StringUtils.join("&", encodeAuthParts);
-
         boolean hasAppendFirstParameter = false;
         if (authStr != null) {
             if(req.isSignPrefixMode()) {
                 strBuilder.append("?sign=").append(UrlEncoderUtils.encode(authStr));
             } else {
+
+                // urlencode auth string key & value
+                String[] authParts = authStr.split("&");
+                String[] encodeAuthParts = new String[authParts.length];
+
+                for (int i = 0; i < authParts.length; i++) {
+                    String[] kv = authParts[i].split("=", 2);
+                    if (kv.length == 2) {
+                        encodeAuthParts[i] = StringUtils.join("=", UrlEncoderUtils.encode(kv[0]), UrlEncoderUtils.encode(kv[1]));
+                    } else if (kv.length == 1) {
+                        encodeAuthParts[i] = StringUtils.join("=", UrlEncoderUtils.encode(kv[0]));
+                    }
+                }
+
+                authStr = StringUtils.join("&", encodeAuthParts);
+
                 strBuilder.append("?").append(authStr);
             }
             if (cred instanceof COSSessionCredentials) {

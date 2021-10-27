@@ -19,6 +19,17 @@
 package com.qcloud.cos.http;
 
 
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import com.qcloud.cos.ClientConfig;
 import com.qcloud.cos.Headers;
 import com.qcloud.cos.event.ProgressInputStream;
@@ -26,6 +37,7 @@ import com.qcloud.cos.event.ProgressListener;
 import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.exception.CosServiceException.ErrorType;
+import com.qcloud.cos.exception.ResponseNotCompleteException;
 import com.qcloud.cos.internal.CosErrorResponseHandler;
 import com.qcloud.cos.internal.CosServiceRequest;
 import com.qcloud.cos.internal.CosServiceResponse;
@@ -38,6 +50,7 @@ import com.qcloud.cos.utils.CodecUtils;
 import com.qcloud.cos.utils.ExceptionUtils;
 import com.qcloud.cos.utils.UrlEncoderUtils;
 import com.qcloud.cos.utils.ValidationUtils;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.Header;
 import org.apache.http.HttpHost;
@@ -61,17 +74,6 @@ import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.protocol.HttpContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 
 public class DefaultCosHttpClient implements CosHttpClient {
@@ -507,6 +509,10 @@ public class DefaultCosHttpClient implements CosHttpClient {
             CosHttpResponse cosHttpResponse = createResponse(httpRequest, request, httpResponse);
             return responseHandler.handle(cosHttpResponse).getResult();
         } catch (Exception e) {
+            if (e.getMessage().equals("Premature end of chunk coded message body: closing chunk expected")) {
+                throw new ResponseNotCompleteException("response chunk not complete", e);
+            }
+
             String errorMsg = "Unable to execute response handle: " + e.getMessage();
             log.info(errorMsg, e);
             CosClientException cce = new CosClientException(errorMsg, e);
