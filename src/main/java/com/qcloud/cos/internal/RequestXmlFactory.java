@@ -47,6 +47,7 @@ import com.qcloud.cos.model.ciModel.auditing.Conf;
 import com.qcloud.cos.model.ciModel.auditing.DocumentAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.TextAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.VideoAuditingRequest;
+import com.qcloud.cos.model.ciModel.bucket.DocBucketRequest;
 import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
 import com.qcloud.cos.model.ciModel.job.DocJobObject;
 import com.qcloud.cos.model.ciModel.job.DocJobRequest;
@@ -696,7 +697,7 @@ public class RequestXmlFactory {
     }
 
     /**
-     * Converts the MediaQueueRequest to an XML fragment that can be sent to the QueueObject of COS
+     * Converts the DocQueueRequest to an XML fragment that can be sent to the QueueObject of COS
      *
      * @param request The container which provides options for restoring an object
      * @return A byte array containing the data

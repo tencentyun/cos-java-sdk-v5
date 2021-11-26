@@ -26,7 +26,7 @@ public class ImageAuditingDemo {
         // 1 初始化用户身份信息（secretId, secretKey）。
         COSClient client = ClientUtils.getTestClient();
         // 2 调用要使用的方法。
-        imageAuditing(client);
+        batchImageAuditing(client);
     }
 
     /**
@@ -61,7 +61,7 @@ public class ImageAuditingDemo {
         BatchImageAuditingRequest request = new BatchImageAuditingRequest();
         //2.添加请求参数 参数详情请见api接口文档
         //2.1设置请求bucket
-        request.setBucketName("demo-123456789");
+        request.setBucketName("markjrzhang-1251704708");
         //2.2添加请求内容
         List<BatchImageAuditingInputObject> inputList = request.getInputList();
         BatchImageAuditingInputObject input = new BatchImageAuditingInputObject();
@@ -72,6 +72,7 @@ public class ImageAuditingDemo {
         input = new BatchImageAuditingInputObject();
         input.setUrl("https://demo-123456789.cos.ap-chongqing.myqcloud.com/1.png");
         input.setDataId("DataId");
+
         inputList.add(input);
 
         //2.2设置审核类型

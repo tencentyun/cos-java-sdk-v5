@@ -21,6 +21,8 @@ package com.qcloud.cos;
 import java.io.File;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Date;
 import java.util.List;
@@ -53,6 +55,7 @@ import com.qcloud.cos.model.ciModel.image.ImageLabelRequest;
 import com.qcloud.cos.model.ciModel.image.ImageLabelResponse;
 import com.qcloud.cos.model.ciModel.image.ImageLabelV2Request;
 import com.qcloud.cos.model.ciModel.image.ImageLabelV2Response;
+import com.qcloud.cos.model.ciModel.job.DocHtmlRequest;
 import com.qcloud.cos.model.ciModel.job.DocJobListRequest;
 import com.qcloud.cos.model.ciModel.job.DocJobListResponse;
 import com.qcloud.cos.model.ciModel.job.DocJobRequest;
@@ -2988,6 +2991,16 @@ public interface COS extends COSDirectSpi {
      * BatchImageAuditing 批量提交图片审核任务 https://cloud.tencent.com/document/product/460/59383
      */
     BatchImageAuditingResponse batchImageAuditing(BatchImageAuditingRequest request);
+
+    /**
+     * createDocProcessBucket 开通文档预览功能
+     */
+    Boolean createDocProcessBucket(DocBucketRequest request);
+
+    /**
+     * GenerateDocPreviewHtmlUrl  查询账号下已开通文档预览功能的bucket
+     */
+    String GenerateDocPreviewUrl(DocHtmlRequest docJobRequest) throws URISyntaxException;
 }
 
 

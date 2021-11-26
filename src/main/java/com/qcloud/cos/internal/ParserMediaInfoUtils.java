@@ -79,6 +79,15 @@ public class ParserMediaInfoUtils {
             case "Width":
                 video.setWidth(value);
                 break;
+            case "Dar":
+                video.setDar(value);
+                break;
+            case "Rotation":
+                video.setRotation(value);
+                break;
+            case "Sar":
+                video.setSar(value);
+                break;
             default:
                 break;
         }

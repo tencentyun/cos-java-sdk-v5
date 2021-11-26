@@ -6249,6 +6249,15 @@ public class XmlResponsesSaxParser {
                     case "SubLabel":
                         jobsDetail.setSubLabel(getText());
                         break;
+                    case "Code":
+                        jobsDetail.setCode(getText());
+                        break;
+                    case "Message":
+                        jobsDetail.setMessage(getText());
+                        break;
+                    case "Url":
+                        jobsDetail.setUrl(getText());
+                        break;
                     default:
                         break;
                 }

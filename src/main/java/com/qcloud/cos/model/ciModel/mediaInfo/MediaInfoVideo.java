@@ -102,6 +102,8 @@ public class MediaInfoVideo {
      */
     private String language;
 
+    private String rotation;
+
     public String getIndex() {
         return index;
     }
@@ -292,6 +294,14 @@ public class MediaInfoVideo {
 
     public void setLanguage(String language) {
         this.language = language;
+    }
+
+    public String getRotation() {
+        return rotation;
+    }
+
+    public void setRotation(String rotation) {
+        this.rotation = rotation;
     }
 
     @Override

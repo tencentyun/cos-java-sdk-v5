@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -117,6 +118,7 @@ import com.qcloud.cos.model.ciModel.image.ImageLabelRequest;
 import com.qcloud.cos.model.ciModel.image.ImageLabelResponse;
 import com.qcloud.cos.model.ciModel.image.ImageLabelV2Request;
 import com.qcloud.cos.model.ciModel.image.ImageLabelV2Response;
+import com.qcloud.cos.model.ciModel.job.DocHtmlRequest;
 import com.qcloud.cos.model.ciModel.job.DocJobListRequest;
 import com.qcloud.cos.model.ciModel.job.DocJobListResponse;
 import com.qcloud.cos.model.ciModel.job.DocJobRequest;
@@ -157,6 +159,7 @@ import com.qcloud.cos.utils.UrlEncoderUtils;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -4018,6 +4021,49 @@ public class COSClient implements COS {
         CosHttpRequest<BatchImageAuditingRequest> request = createRequest(batchImageAuditingRequest.getBucketName(), "/image/auditing", batchImageAuditingRequest, HttpMethodName.POST);
         this.setContent(request, RequestXmlFactory.convertToXmlByteArray(batchImageAuditingRequest), "application/xml", false);
         return invoke(request, new Unmarshallers.BatchImageAuditingJobUnmarshaller());
+    }
+
+    @Override
+    public Boolean createDocProcessBucket(DocBucketRequest docBucketRequest) {
+        this.checkCIRequestCommon(docBucketRequest);
+        CosHttpRequest<DocBucketRequest> request = createRequest(docBucketRequest.getBucketName(), "/docbucket", docBucketRequest, HttpMethodName.POST);
+        this.invoke(request, voidCosResponseHandler);
+        return true;
+    }
+
+    @Override
+    public String GenerateDocPreviewUrl(DocHtmlRequest docJobRequest) throws URISyntaxException {
+        rejectNull(docJobRequest,
+                "The request parameter must be specified setting the object tags");
+        rejectNull(docJobRequest.getBucketName(),
+                "The bucketName parameter must be specified setting the object tags");
+        rejectNull(docJobRequest.getObjectKey(),
+                "The objectKey parameter must be specified setting the object tags");
+        CosHttpRequest<DocHtmlRequest> request = createRequest(docJobRequest.getBucketName(), docJobRequest.getObjectKey(), docJobRequest, HttpMethodName.GET);
+        return buildDocPreview(request);
+    }
+
+
+    private String buildDocPreview(CosHttpRequest<DocHtmlRequest> request) throws URISyntaxException {
+        String urlStr = request.getProtocol().toString() + "://" + request.getEndpoint() + request.getResourcePath();
+        URIBuilder uriBuilder = new URIBuilder(urlStr);
+        COSSigner cosSigner = clientConfig.getCosSigner();
+        Date expiredTime = new Date(System.currentTimeMillis() + clientConfig.getSignExpired() * 1000);
+        String authoriationStr = cosSigner.buildAuthorizationStr(request.getHttpMethod(), request.getResourcePath(),
+                request.getHeaders(), request.getParameters(), fetchCredential(), expiredTime, true);
+        DocHtmlRequest originalRequest = request.getOriginalRequest();
+        uriBuilder.addParameter("ci-process", "doc-preview");
+        uriBuilder.addParameter("dsttype", originalRequest.getType().toString());
+        uriBuilder.addParameter("srcType", originalRequest.getSrcType());
+        uriBuilder.addParameter("page", originalRequest.getPage());
+        uriBuilder.addParameter("ImageParams", originalRequest.getImageParams());
+        uriBuilder.addParameter("sheet", originalRequest.getSheet());
+        uriBuilder.addParameter("password", originalRequest.getPassword());
+        uriBuilder.addParameter("comment", originalRequest.getComment());
+        uriBuilder.addParameter("excelPaperDirection", originalRequest.getExcelPaperDirection());
+        uriBuilder.addParameter("quality", originalRequest.getQuality());
+        uriBuilder.addParameter("scale", originalRequest.getScale());
+        return uriBuilder.build().toString() + "&" + authoriationStr;
     }
 
     private void checkAuditingRequest(ImageAuditingRequest request) {

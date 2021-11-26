@@ -9,7 +9,9 @@ public class BatchImageJobDetail {
     private String score;
     private String subLabel;
     private String text;
-
+    private String code;
+    private String message;
+    private String url;
     private PornInfo pornInfo;
     private TerroristInfo terroristInfo;
     private PoliticsInfo politicsInfo;
@@ -71,6 +73,30 @@ public class BatchImageJobDetail {
         this.text = text;
     }
 
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
     public PornInfo getPornInfo() {
         if (pornInfo == null) {
             pornInfo = new PornInfo();
@@ -117,7 +143,7 @@ public class BatchImageJobDetail {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("BatchImageJobDetail{");
+        final StringBuffer sb = new StringBuffer("BatchImageJobDetail{");
         sb.append("dataId='").append(dataId).append('\'');
         sb.append(", label='").append(label).append('\'');
         sb.append(", result='").append(result).append('\'');
@@ -125,6 +151,9 @@ public class BatchImageJobDetail {
         sb.append(", score='").append(score).append('\'');
         sb.append(", subLabel='").append(subLabel).append('\'');
         sb.append(", text='").append(text).append('\'');
+        sb.append(", code='").append(code).append('\'');
+        sb.append(", message='").append(message).append('\'');
+        sb.append(", url='").append(url).append('\'');
         sb.append(", pornInfo=").append(pornInfo);
         sb.append(", terroristInfo=").append(terroristInfo);
         sb.append(", politicsInfo=").append(politicsInfo);
