@@ -156,7 +156,7 @@ public class DocumentAuditingJobsDetail {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("DocumentAuditingJobsDetail{");
+        final StringBuffer sb = new StringBuffer("DocumentAuditingJobsDetail{");
         sb.append("jobId='").append(jobId).append('\'');
         sb.append(", state='").append(state).append('\'');
         sb.append(", creationTime='").append(creationTime).append('\'');

@@ -24,11 +24,11 @@ public class DocumentAuditingJobDemo {
         //1.创建任务请求对象
         DocumentAuditingRequest request = new DocumentAuditingRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("markjrzhang-1251704708");
+        request.setBucketName("demo-123456789");
         //2.1.1设置对象地址
 //        request.getInput().setObject("1.txt");
         //2.1.2或直接设置请求内容,文本内容的Base64编码
-        request.getInput().setUrl("https://markjrzhang-1251704708.cos.ap-chongqing.myqcloud.com/%E9%97%AE%E9%A2%98%E6%B1%87%E6%80%BB.pptx");
+        request.getInput().setUrl("https://demo-123456789.cos.ap-chongqing.myqcloud.com/test.docx");
         //2.2设置审核类型参数
         request.getConf().setDetectType("all");
         //2.3设置审核模板（可选）
@@ -46,8 +46,8 @@ public class DocumentAuditingJobDemo {
         //1.创建任务请求对象
         DocumentAuditingRequest request = new DocumentAuditingRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("markjrzhang-1251704708");
-        request.setJobId("sdd5d1cc630fdc11ecb3fa525400946f76");
+        request.setBucketName("demo-123456789");
+        request.setJobId("sd0312aa91510711eca163525400863904");
         //3.调用接口,获取任务响应对象
         DocumentAuditingResponse response = client.describeAuditingDocumentJob(request);
     }

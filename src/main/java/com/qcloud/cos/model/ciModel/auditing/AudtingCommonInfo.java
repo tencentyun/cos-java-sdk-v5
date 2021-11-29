@@ -1,5 +1,8 @@
 package com.qcloud.cos.model.ciModel.auditing;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 审核信息公共实体类 https://cloud.tencent.com/document/product/460/37318
  */
@@ -31,6 +34,8 @@ public class AudtingCommonInfo {
     private String count;
 
     private OcrResults ocrResults;
+
+    private List<ObjectResults> objectResults = new ArrayList<>();
 
     public AudtingCommonInfo() {
     }
@@ -101,6 +106,14 @@ public class AudtingCommonInfo {
 
     public void setOcrResults(OcrResults ocrResults) {
         this.ocrResults = ocrResults;
+    }
+
+    public List<ObjectResults> getObjectResults() {
+        return objectResults;
+    }
+
+    public void setObjectResults(List<ObjectResults> objectResults) {
+        this.objectResults = objectResults;
     }
 
     @Override

@@ -19,4 +19,12 @@ public class DocumentAuditingResponse extends CiServiceResult {
     public void setJobsDetail(DocumentAuditingJobsDetail jobsDetail) {
         this.jobsDetail = jobsDetail;
     }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("DocumentAuditingResponse{");
+        sb.append("jobsDetail=").append(jobsDetail);
+        sb.append('}');
+        return sb.toString();
+    }
 }

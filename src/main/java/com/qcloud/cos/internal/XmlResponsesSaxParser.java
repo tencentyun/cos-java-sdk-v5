@@ -77,6 +77,7 @@ import com.qcloud.cos.model.ciModel.auditing.DocumentAuditingJobsDetail;
 import com.qcloud.cos.model.ciModel.auditing.DocumentAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.DocumentResultInfo;
 import com.qcloud.cos.model.ciModel.auditing.ImageAuditingResponse;
+import com.qcloud.cos.model.ciModel.auditing.ObjectResults;
 import com.qcloud.cos.model.ciModel.auditing.OcrResults;
 import com.qcloud.cos.model.ciModel.auditing.SectionInfo;
 import com.qcloud.cos.model.ciModel.auditing.SnapshotInfo;
@@ -6082,6 +6083,14 @@ public class XmlResponsesSaxParser {
             List<DocumentResultInfo> pageSegment = response.getJobsDetail().getPageSegment();
             if (in("Response", "JobsDetail", "PageSegment") && "Results".equals(name)) {
                 pageSegment.add(new DocumentResultInfo());
+            } else if (in("Response", "JobsDetail", "PageSegment", "Results","PoliticsInfo") && "ObjectResults".equals(name)) {
+                pageSegment.get(pageSegment.size() - 1).getPoliticsInfo().getObjectResults().add(new ObjectResults());
+            }else if (in("Response", "JobsDetail", "PageSegment", "Results","PornInfo") && "ObjectResults".equals(name)) {
+                pageSegment.get(pageSegment.size() - 1).getPornInfo().getObjectResults().add(new ObjectResults());
+            }else if (in("Response", "JobsDetail", "PageSegment", "Results","AdsInfo") && "ObjectResults".equals(name)) {
+                pageSegment.get(pageSegment.size() - 1).getAdsInfo().getObjectResults().add(new ObjectResults());
+            }else if (in("Response", "JobsDetail", "PageSegment", "Results","TerroristInfo") && "ObjectResults".equals(name)) {
+                pageSegment.get(pageSegment.size() - 1).getTerroristInfo().getObjectResults().add(new ObjectResults());
             }
         }
 
@@ -6151,8 +6160,16 @@ public class XmlResponsesSaxParser {
                     resultDetail.setText(getText());
                 } else if ("Url".equalsIgnoreCase(name)) {
                     resultDetail.setUrl(getText());
+                } else if ("Label".equalsIgnoreCase(name)) {
+                    resultDetail.setLabel(getText());
+                } else if ("Suggestion".equalsIgnoreCase(name)) {
+                    resultDetail.setSuggestion(getText());
+                } else if ("PageNumber".equalsIgnoreCase(name)) {
+                    resultDetail.setPageNumber(getText());
+                } else if ("SheetNumber".equalsIgnoreCase(name)) {
+                    resultDetail.setSheetNumber(getText());
                 }
-            }else if (in("Response", "JobsDetail", "PageSegment", "Results", "PornInfo","OcrResults")) {
+            } else if (in("Response", "JobsDetail", "PageSegment", "Results", "PornInfo","OcrResults")) {
                 parseResultInfo(resultDetail.getPornInfo().getOcrResults(), name, getText());
             }else if (in("Response", "JobsDetail", "PageSegment", "Results", "PoliticsInfo","OcrResults")) {
                 parseResultInfo(resultDetail.getPoliticsInfo().getOcrResults(), name, getText());
@@ -6160,6 +6177,22 @@ public class XmlResponsesSaxParser {
                 parseResultInfo(resultDetail.getTerroristInfo().getOcrResults(), name, getText());
             }else if (in("Response", "JobsDetail", "PageSegment", "Results", "AdsInfo","OcrResults")) {
                 parseResultInfo(resultDetail.getAdsInfo().getOcrResults(), name, getText());
+            }else if (in("Response", "JobsDetail", "PageSegment", "Results", "PornInfo","ObjectResults")) {
+                parseResultInfo(resultDetail.getPornInfo().getObjectResults(), name, getText());
+            }else if (in("Response", "JobsDetail", "PageSegment", "Results", "PoliticsInfo","ObjectResults")) {
+                parseResultInfo(resultDetail.getPoliticsInfo().getObjectResults(), name, getText());
+            }else if (in("Response", "JobsDetail", "PageSegment", "Results", "TerrorismInfo","ObjectResults")) {
+                parseResultInfo(resultDetail.getTerroristInfo().getObjectResults(), name, getText());
+            }else if (in("Response", "JobsDetail", "PageSegment", "Results", "AdsInfo","ObjectResults")) {
+                parseResultInfo(resultDetail.getAdsInfo().getObjectResults(), name, getText());
+            }else if (in("Response", "JobsDetail", "PageSegment", "Results", "PornInfo","ObjectResults","Location")) {
+                parseResultInfo(resultDetail.getPornInfo().getObjectResults(), name, getText());
+            }else if (in("Response", "JobsDetail", "PageSegment", "Results", "PoliticsInfo","ObjectResults","Location")) {
+                parseResultInfo(resultDetail.getPoliticsInfo().getObjectResults(), name, getText());
+            }else if (in("Response", "JobsDetail", "PageSegment", "Results", "TerrorismInfo","ObjectResults","Location")) {
+                parseResultInfo(resultDetail.getTerroristInfo().getObjectResults(), name, getText());
+            }else if (in("Response", "JobsDetail", "PageSegment", "Results", "AdsInfo","ObjectResults","Location")) {
+                parseResultInfo(resultDetail.getAdsInfo().getObjectResults(), name, getText());
             }
         }
 
@@ -6190,6 +6223,36 @@ public class XmlResponsesSaxParser {
                     break;
                 default:
                     break;
+            }
+
+        }
+
+        private void parseResultInfo(List<ObjectResults> obj, String name, String value) {
+            if (!obj.isEmpty()) {
+                ObjectResults objectResult = obj.get(obj.size() - 1);
+                ObjectResults.Location location = objectResult.getLocation();
+                switch (name) {
+                    case "Name":
+                        objectResult.setName(value);
+                        break;
+                    case "Height":
+                        location.setHeight(value);
+                        break;
+                    case "Rotate":
+                        location.setRotate(value);
+                        break;
+                    case "Width":
+                        location.setWidth(value);
+                        break;
+                    case "X":
+                        location.setX(value);
+                        break;
+                    case "Y":
+                        location.setY(value);
+                        break;
+                    default:
+                        break;
+                }
             }
         }
 
