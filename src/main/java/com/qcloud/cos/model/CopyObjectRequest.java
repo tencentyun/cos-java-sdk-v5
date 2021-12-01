@@ -11,7 +11,7 @@
  * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
  * express or implied. See the License for the specific language governing
  * permissions and limitations under the License.
- 
+
  * According to cos feature, we modify some class，comment, field name, etc.
  */
 
@@ -47,7 +47,7 @@ public class CopyObjectRequest extends CosServiceRequest
      * the most recent version of the source object will be copied.
      */
     private String sourceVersionId;
-    
+
     /**
      * source endpoint builder to generate the source endpoint.
      */
@@ -129,13 +129,13 @@ public class CopyObjectRequest extends CosServiceRequest
      * <p>
      * Constructs a new {@link com.qcloud.cos.model#CopyObjectRequest} with only basic options.
      * </p>
-     * 
+     *
      * @param sourceBucketName The name of the COS bucket containing the object to copy.
      * @param sourceKey The source bucket key under which the object to copy is stored.
      * @param destinationBucketName The name of the COS bucket to which the new object will be
      *        copied.
      * @param destinationKey The destination bucket key under which the new object will be copied.
-     * 
+     *
      * @see CopyObjectRequest#CopyObjectRequest(String, String, String, String, String)
      */
     public CopyObjectRequest(String sourceBucketName, String sourceKey,
@@ -147,14 +147,14 @@ public class CopyObjectRequest extends CosServiceRequest
      * <p>
      * Constructs a new {@link com.qcloud.cos.model#CopyObjectRequest} with only basic options.
      * </p>
-     * 
+     *
      * @param sourceBucketRegion The source Bucket Region
      * @param sourceBucketName The name of the COS bucket containing the object to copy.
      * @param sourceKey The source bucket key under which the object to copy is stored.
      * @param destinationBucketName The name of the COS bucket to which the new object will be
      *        copied.
      * @param destinationKey The destination bucket key under which the new object will be copied.
-     * 
+     *
      * @see CopyObjectRequest#CopyObjectRequest(String, String, String, String, String)
      */
     public CopyObjectRequest(Region sourceBucketRegion, String sourceBucketName, String sourceKey,
@@ -167,7 +167,7 @@ public class CopyObjectRequest extends CosServiceRequest
      * <p>
      * Constructs a new {@link com.qcloud.cos.model#CopyObjectRequest} with only basic options.
      * </p>
-     * 
+     *
      * @param sourceAppid The source bucket appid
      * @param sourceBucketRegion The source Bucket Region
      * @param sourceBucketName The name of the COS bucket containing the object to copy.
@@ -175,7 +175,7 @@ public class CopyObjectRequest extends CosServiceRequest
      * @param destinationBucketName The name of the COS bucket to which the new object will be
      *        copied.
      * @param destinationKey The destination bucket key under which the new object will be copied.
-     * 
+     *
      * @see CopyObjectRequest#CopyObjectRequest(String, String, String, String, String)
      */
     public CopyObjectRequest(String sourceAppid, Region sourceBucketRegion, String sourceBucketName,
@@ -189,7 +189,7 @@ public class CopyObjectRequest extends CosServiceRequest
      * Constructs a new {@link CopyObjectRequest} with basic options, providing an COS version ID
      * identifying the specific version of the source object to copy.
      * </p>
-     * 
+     *
      * @param sourceBucketRegion The source Bucket Region
      * @param sourceBucketName The name of the COS bucket containing the object to copy.
      * @param sourceKey The key in the source bucket under which the object to copy is stored.
@@ -199,7 +199,7 @@ public class CopyObjectRequest extends CosServiceRequest
      *        copied.
      * @param destinationKey The key in the destination bucket under which the new object will be
      *        copied.
-     * 
+     *
      * @see CopyObjectRequest#CopyObjectRequest(String sourceBucketName, String sourceKey, String
      *      destinationBucketName, String destinationKey)
      */
@@ -234,9 +234,9 @@ public class CopyObjectRequest extends CosServiceRequest
 
     /**
      * Gets the name of the bucket containing the source object to be copied.
-     * 
+     *
      * @return The name of the bucket containing the source object to be copied.
-     * 
+     *
      * @see CopyObjectRequest#setSourceBucketName(String sourceBucketName)
      */
     public String getSourceBucketName() {
@@ -258,7 +258,7 @@ public class CopyObjectRequest extends CosServiceRequest
      * object, enabling additional method calls to be chained together.
      *
      * @param sourceBucketName The name of the bucket containing the source object to be copied.
-     * 
+     *
      * @return This <code>CopyObjectRequest</code> instance, enabling additional method calls to be
      *         chained together.
      */
@@ -269,9 +269,9 @@ public class CopyObjectRequest extends CosServiceRequest
 
     /**
      * Gets the source bucket key under which the source object to be copied is stored.
-     * 
+     *
      * @return The source bucket key under which the source object to be copied is stored.
-     * 
+     *
      * @see CopyObjectRequest#setSourceKey(String sourceKey)
      */
     public String getSourceKey() {
@@ -282,7 +282,7 @@ public class CopyObjectRequest extends CosServiceRequest
      * Sets the source bucket key under which the source object to be copied is stored.
      *
      * @param sourceKey The source bucket key under which the source object to be copied is stored.
-     * 
+     *
      * @see CopyObjectRequest#setSourceKey(String sourceKey)}
      */
     public void setSourceKey(String sourceKey) {
@@ -295,7 +295,7 @@ public class CopyObjectRequest extends CosServiceRequest
      *
      * @param sourceKey The key in the source bucket under which the source object to be copied is
      *        stored.
-     * 
+     *
      * @return This <code>CopyObjectRequest</code> instance, enabling additional method calls to be
      *         chained together.
      */
@@ -319,10 +319,10 @@ public class CopyObjectRequest extends CosServiceRequest
      * For more information about enabling versioning for a bucket, see
      * {@link COS#setBucketVersioningConfiguration(SetBucketVersioningConfigurationRequest)}.
      * </p>
-     * 
+     *
      * @return The version ID specifying which version of the source object to copy.
-     * 
-     * 
+     *
+     *
      * @see Constants#NULL_VERSION_ID
      * @see CopyObjectRequest#setSourceVersionId(String sourceVersionId)
      */
@@ -345,7 +345,7 @@ public class CopyObjectRequest extends CosServiceRequest
      * For more information about enabling versioning for a bucket, see
      * {@link COS#setBucketVersioningConfiguration(SetBucketVersioningConfigurationRequest)}.
      * </p>
-     * 
+     *
      * @param sourceVersionId The optional version ID specifying which version of the source object
      *        to copy.
      */
@@ -385,7 +385,7 @@ public class CopyObjectRequest extends CosServiceRequest
      * Gets the destination bucket name which will contain the new, copied object.
      *
      * @return The name of the destination bucket which will contain the new, copied object.
-     * 
+     *
      * @see CopyObjectRequest#setDestinationBucketName(String destinationBucketName)
      */
     public String getDestinationBucketName() {
@@ -397,7 +397,7 @@ public class CopyObjectRequest extends CosServiceRequest
      *
      * @param destinationBucketName The name of the destination bucket which will contain the new,
      *        copied object.
-     * 
+     *
      * @see CopyObjectRequest#getDestinationBucketName()
      */
     public void setDestinationBucketName(String destinationBucketName) {
@@ -421,9 +421,9 @@ public class CopyObjectRequest extends CosServiceRequest
 
     /**
      * Gets the destination bucket key under which the new, copied object will be stored.
-     * 
+     *
      * @return The destination bucket key under which the new, copied object will be stored.
-     * 
+     *
      * @see CopyObjectRequest#setDestinationKey(String destinationKey)
      */
     public String getDestinationKey() {
@@ -435,7 +435,7 @@ public class CopyObjectRequest extends CosServiceRequest
      *
      * @param destinationKey The destination bucket key under which the new, copied object will be
      *        stored.
-     * 
+     *
      * @see CopyObjectRequest#getDestinationKey()
      */
     public void setDestinationKey(String destinationKey) {
@@ -472,7 +472,7 @@ public class CopyObjectRequest extends CosServiceRequest
      * </p>
      *
      * @return The Qcloud COS storage class to use when storing the newly copied object.
-     * 
+     *
      * @see CopyObjectRequest#setStorageClass(String)
      * @see CopyObjectRequest#setStorageClass(StorageClass)
      */
@@ -491,7 +491,7 @@ public class CopyObjectRequest extends CosServiceRequest
      * </p>
      *
      * @return The Qcloud COS storage class to use when storing the newly copied object.
-     * 
+     *
      * @see CopyObjectRequest#getStorageClass()
      * @see CopyObjectRequest#setStorageClass(StorageClass)
      */
@@ -529,7 +529,7 @@ public class CopyObjectRequest extends CosServiceRequest
      * </p>
      *
      * @return The Qcloud COS storage class to use when storing the newly copied object.
-     * 
+     *
      * @see CopyObjectRequest#getStorageClass()
      * @see CopyObjectRequest#setStorageClass(String)
      */
@@ -604,7 +604,7 @@ public class CopyObjectRequest extends CosServiceRequest
     /**
      * Sets the optional access control list for the new object. If specified, cannedAcl will be
      * ignored.
-     * 
+     *
      * @param accessControlList The access control list for the new object.
      */
     public void setAccessControlList(AccessControlList accessControlList) {
@@ -615,7 +615,7 @@ public class CopyObjectRequest extends CosServiceRequest
      * Sets the optional access control list for the new object. If specified, cannedAcl will be
      * ignored. Returns this {@link CopyObjectRequest}, enabling additional method calls to be
      * chained together.
-     * 
+     *
      * @param accessControlList The access control list for the new object.
      */
     public CopyObjectRequest withAccessControlList(AccessControlList accessControlList) {
@@ -625,7 +625,7 @@ public class CopyObjectRequest extends CosServiceRequest
 
     /**
      * Gets the optional object metadata to set for the new, copied object.
-     * 
+     *
      * @return The object metadata to set for the newly copied object. Returns <code>null</code> if
      *         no object metadata has been specified.
      *
@@ -640,9 +640,9 @@ public class CopyObjectRequest extends CosServiceRequest
      * from the source object is copied to the destination object, but when setting object metadata
      * with this method, no metadata from the source object is copied. Instead, the new destination
      * object will have the metadata specified with this call.
-     * 
+     *
      * @param newObjectMetadata The object metadata to use for the newly copied object.
-     * 
+     *
      * @see CopyObjectRequest#getNewObjectMetadata()
      */
     public void setNewObjectMetadata(ObjectMetadata newObjectMetadata) {
@@ -918,7 +918,7 @@ public class CopyObjectRequest extends CosServiceRequest
 
     /**
      * Sets the optional redirect location for the newly copied object.
-     * 
+     *
      * @param redirectLocation The redirect location for the newly copied object.
      */
     public void setRedirectLocation(String redirectLocation) {
@@ -935,7 +935,7 @@ public class CopyObjectRequest extends CosServiceRequest
     /**
      * Sets the optional redirect location for the newly copied object.Returns this
      * {@link CopyObjectRequest}, enabling additional method calls to be chained together.
-     * 
+     *
      * @param redirectLocation The redirect location for the newly copied object.
      */
     public CopyObjectRequest withRedirectLocation(String redirectLocation) {

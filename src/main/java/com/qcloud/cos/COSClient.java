@@ -787,6 +787,24 @@ public class COSClient implements COS {
         return createAppendObjectResult(returnedMetadata);
     }
 
+    @Override
+    public void rename(RenameRequest renameRequest)
+            throws CosServiceException, CosClientException {
+        rejectNull(renameRequest, "The request must not be null");
+        rejectNull(renameRequest.getBucketName(), "The bucket name parameter must be specified when rename");
+        rejectNull(renameRequest.getSrcObject(), "The src object parameter must be specified when rename");
+        rejectNull(renameRequest.getDstObject(), "The dst object parameter must be specified when rename");
+        rejectNull(clientConfig.getRegion(),
+                "region is null, region in clientConfig must be specified when rename");
+        rejectEmpty(renameRequest.getSrcObject(), "The length of the src key must be greater than 0");
+        rejectEmpty(renameRequest.getDstObject(), "The length of the dst key must be greater than 0");
+        CosHttpRequest<RenameRequest> request = createRequest(renameRequest.getBucketName(),
+                renameRequest.getDstObject(), renameRequest, HttpMethodName.PUT);
+        request.addParameter("rename", null);
+        request.addHeader("x-cos-rename-source", renameRequest.getSrcObject());
+        invoke(request, voidCosResponseHandler);
+    }
+
     protected <UploadObjectRequest extends PutObjectRequest>
         ObjectMetadata uploadObjectInternal(UploadMode uploadMode, UploadObjectRequest uploadObjectRequest)
             throws CosClientException, CosServiceException {
@@ -1210,6 +1228,9 @@ public class COSClient implements COS {
         CosHttpRequest<DeleteObjectRequest> request =
                 createRequest(deleteObjectRequest.getBucketName(), deleteObjectRequest.getKey(),
                         deleteObjectRequest, HttpMethodName.DELETE);
+        if (deleteObjectRequest.isRecursive()) {
+            request.addParameter("recursive", null);
+        }
         invoke(request, voidCosResponseHandler);
     }
 
@@ -1684,7 +1705,7 @@ public class COSClient implements COS {
             byte[] xml = RequestXmlFactory
                     .convertToXmlByteArray(completeMultipartUploadRequest.getPartETags());
 
-            request.addHeader("Content-Type", "text/plain");
+            request.addHeader("Content-Type", "application/xml");
             request.addHeader("Content-Length", String.valueOf(xml.length));
             ObjectMetadata objectMetadata = completeMultipartUploadRequest.getObjectMetadata();
             if(objectMetadata != null) {

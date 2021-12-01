@@ -42,6 +42,7 @@ public interface Headers {
     public static final String SERVER = "Server";
     public static final String USER_AGENT = "User-Agent";
     public static final String SDK_LOG_DEBUG = "x-cos-sdk-log-debug";
+    public static final String FILE_MODE_DIR = "x-cos-file-mode-dir";
 
     /*
      * Cos HTTP Headers
@@ -101,6 +102,11 @@ public interface Headers {
      * COS response header for TRACE ID
      */
     public static final String TRACE_ID = "x-cos-trace-id";
+
+    /**
+     * COS response header for merge bucket type
+     */
+    public static final String BUCKET_ARCH = "x-cos-bucket-arch";
 
     /**
      * COS request header indicating how to handle metadata when copying an object
