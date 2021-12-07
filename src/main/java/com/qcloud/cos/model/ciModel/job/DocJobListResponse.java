@@ -8,8 +8,9 @@ import java.util.List;
 public class DocJobListResponse extends CiServiceResult {
     List<DocJobDetail> docJobDetailList;
     private String nextToken;
+
     public List<DocJobDetail> getDocJobDetailList() {
-        if (docJobDetailList==null){
+        if (docJobDetailList == null) {
             docJobDetailList = new ArrayList<>();
         }
         return docJobDetailList;
@@ -25,5 +26,14 @@ public class DocJobListResponse extends CiServiceResult {
 
     public void setNextToken(String nextToken) {
         this.nextToken = nextToken;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("DocJobListResponse{");
+        sb.append("docJobDetailList=").append(docJobDetailList);
+        sb.append(", nextToken='").append(nextToken).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 }

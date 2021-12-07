@@ -32,6 +32,11 @@ public class DocumentAuditingJobsDetail {
     private String url;
 
     /**
+     * 文档的cos相对地址
+     */
+    private String object;
+
+    /**
      * 表示本次判定的审核结果
      * 0（审核正常），1 （判定为违规敏感文件），2（疑似敏感，建议人工复核）
      */
@@ -154,6 +159,14 @@ public class DocumentAuditingJobsDetail {
         this.dataId = dataId;
     }
 
+    public String getObject() {
+        return object;
+    }
+
+    public void setObject(String object) {
+        this.object = object;
+    }
+
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("DocumentAuditingJobsDetail{");
@@ -163,6 +176,7 @@ public class DocumentAuditingJobsDetail {
         sb.append(", code='").append(code).append('\'');
         sb.append(", message='").append(message).append('\'');
         sb.append(", url='").append(url).append('\'');
+        sb.append(", object='").append(object).append('\'');
         sb.append(", suggestion='").append(suggestion).append('\'');
         sb.append(", pageCount='").append(pageCount).append('\'');
         sb.append(", dataId='").append(dataId).append('\'');

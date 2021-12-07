@@ -47,6 +47,7 @@ import com.qcloud.cos.model.ciModel.auditing.Conf;
 import com.qcloud.cos.model.ciModel.auditing.DocumentAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.TextAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.VideoAuditingRequest;
+import com.qcloud.cos.model.ciModel.auditing.WebpageAuditingRequest;
 import com.qcloud.cos.model.ciModel.bucket.DocBucketRequest;
 import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
 import com.qcloud.cos.model.ciModel.job.DocJobObject;
@@ -804,6 +805,7 @@ public class RequestXmlFactory {
         xml.start("Input");
         addIfNotNull(xml, "Object", request.getInput().getObject());
         addIfNotNull(xml, "Content", request.getInput().getContent());
+        addIfNotNull(xml, "Url", request.getInput().getUrl());
         addIfNotNull(xml, "DataId", request.getInput().getDataId());
         xml.end();
         Conf conf = request.getConf();
@@ -827,6 +829,7 @@ public class RequestXmlFactory {
         xml.start("Request");
         xml.start("Input");
         addIfNotNull(xml, "Url", request.getInput().getUrl());
+        addIfNotNull(xml, "Object", request.getInput().getObject());
         addIfNotNull(xml, "Type", request.getInput().getType());
         addIfNotNull(xml, "DataId", request.getInput().getDataId());
         xml.end();
@@ -839,6 +842,29 @@ public class RequestXmlFactory {
         addIfNotNull(xml, "DetectType", detectType);
         addIfNotNull(xml, "Callback", conf.getCallback());
         addIfNotNull(xml, "BizType", conf.getBizType());
+        xml.end();
+
+        xml.end();
+        return xml.getBytes();
+    }
+
+    public static byte[] convertToXmlByteArray(WebpageAuditingRequest request) {
+        XmlWriter xml = new XmlWriter();
+
+        xml.start("Request");
+        xml.start("Input");
+        addIfNotNull(xml, "Url", request.getInput().getUrl());
+        xml.end();
+        Conf conf = request.getConf();
+        xml.start("Conf");
+        String detectType = conf.getDetectType();
+        if ("all".equalsIgnoreCase(detectType)) {
+            detectType = "Porn,Terrorism,Politics,Ads,Illegal,Abuse";
+        }
+        addIfNotNull(xml, "DetectType", detectType);
+        addIfNotNull(xml, "Callback", conf.getCallback());
+        addIfNotNull(xml, "BizType", conf.getBizType());
+        addIfNotNull(xml, "ReturnHighlightHtml", conf.getReturnHighlightHtml());
         xml.end();
 
         xml.end();

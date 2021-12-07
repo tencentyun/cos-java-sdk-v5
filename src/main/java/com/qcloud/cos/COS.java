@@ -46,6 +46,8 @@ import com.qcloud.cos.model.ciModel.auditing.TextAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.TextAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.VideoAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.VideoAuditingResponse;
+import com.qcloud.cos.model.ciModel.auditing.WebpageAuditingRequest;
+import com.qcloud.cos.model.ciModel.auditing.WebpageAuditingResponse;
 import com.qcloud.cos.model.ciModel.bucket.DocBucketRequest;
 import com.qcloud.cos.model.ciModel.bucket.DocBucketResponse;
 import com.qcloud.cos.model.ciModel.bucket.MediaBucketRequest;
@@ -3001,6 +3003,16 @@ public interface COS extends COSDirectSpi {
      * GenerateDocPreviewHtmlUrl  查询账号下已开通文档预览功能的bucket
      */
     String GenerateDocPreviewUrl(DocHtmlRequest docJobRequest) throws URISyntaxException;
+
+    /**
+     * createWebpageAuditingJob  提交网页审核任务 https://cloud.tencent.com/document/product/460/63968
+     */
+    WebpageAuditingResponse createWebpageAuditingJob(WebpageAuditingRequest request);
+
+    /**
+     * describeWebpageAuditingJob 查询网页审核任务 https://cloud.tencent.com/document/product/460/63970
+     */
+    WebpageAuditingResponse describeWebpageAuditingJob(WebpageAuditingRequest request);
 }
 
 

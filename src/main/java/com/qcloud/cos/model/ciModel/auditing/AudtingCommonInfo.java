@@ -33,6 +33,12 @@ public class AudtingCommonInfo {
      */
     private String count;
 
+    /**
+     * 该字段表示审核命中的具体子标签，例如：Porn 下的 SexBehavior 子标签。
+     * 注意：该字段可能返回空，表示未命中具体的子标签。
+     */
+    private String subLabel;
+
     private OcrResults ocrResults;
 
     private List<ObjectResults> objectResults = new ArrayList<>();
@@ -116,6 +122,14 @@ public class AudtingCommonInfo {
         this.objectResults = objectResults;
     }
 
+    public String getSubLabel() {
+        return subLabel;
+    }
+
+    public void setSubLabel(String subLabel) {
+        this.subLabel = subLabel;
+    }
+
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("AudtingCommonInfo{");
@@ -125,6 +139,9 @@ public class AudtingCommonInfo {
         sb.append(", score='").append(score).append('\'');
         sb.append(", label='").append(label).append('\'');
         sb.append(", count='").append(count).append('\'');
+        sb.append(", subLabel='").append(subLabel).append('\'');
+        sb.append(", ocrResults=").append(ocrResults);
+        sb.append(", objectResults=").append(objectResults);
         sb.append('}');
         return sb.toString();
     }

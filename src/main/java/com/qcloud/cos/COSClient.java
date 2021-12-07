@@ -108,6 +108,8 @@ import com.qcloud.cos.model.ciModel.auditing.TextAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.TextAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.VideoAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.VideoAuditingResponse;
+import com.qcloud.cos.model.ciModel.auditing.WebpageAuditingRequest;
+import com.qcloud.cos.model.ciModel.auditing.WebpageAuditingResponse;
 import com.qcloud.cos.model.ciModel.bucket.DocBucketRequest;
 import com.qcloud.cos.model.ciModel.bucket.DocBucketResponse;
 import com.qcloud.cos.model.ciModel.bucket.MediaBucketRequest;
@@ -4041,6 +4043,24 @@ public class COSClient implements COS {
                 "The objectKey parameter must be specified setting the object tags");
         CosHttpRequest<DocHtmlRequest> request = createRequest(docJobRequest.getBucketName(), docJobRequest.getObjectKey(), docJobRequest, HttpMethodName.GET);
         return buildDocPreview(request);
+    }
+
+    @Override
+    public WebpageAuditingResponse createWebpageAuditingJob(WebpageAuditingRequest webpageAuditingRequest) {
+        this.checkCIRequestCommon(webpageAuditingRequest);
+        this.rejectStartWith(webpageAuditingRequest.getInput().getUrl(), "http", "The Conf.CallBack parameter mush start with http or https");
+        CosHttpRequest<WebpageAuditingRequest> request = createRequest(webpageAuditingRequest.getBucketName(), "/webpage/auditing", webpageAuditingRequest, HttpMethodName.POST);
+        this.setContent(request, RequestXmlFactory.convertToXmlByteArray(webpageAuditingRequest), "application/xml", false);
+        return invoke(request, new Unmarshallers.WebpageAuditingJobUnmarshaller());
+    }
+
+    @Override
+    public WebpageAuditingResponse describeWebpageAuditingJob(WebpageAuditingRequest webpageAuditingRequest) {
+        this.checkCIRequestCommon(webpageAuditingRequest);
+        rejectNull(webpageAuditingRequest.getJobId(),
+                "The jobId parameter must be specified setting the object tags");
+        CosHttpRequest<WebpageAuditingRequest> request = createRequest(webpageAuditingRequest.getBucketName(), "/webpage/auditing/" + webpageAuditingRequest.getJobId(), webpageAuditingRequest, HttpMethodName.GET);
+        return invoke(request, new Unmarshallers.WebpageAuditingDescribeJobUnmarshaller());
     }
 
 

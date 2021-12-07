@@ -7,6 +7,7 @@ package com.qcloud.cos.model.ciModel.auditing;
  */
 public class DocumentInputObject {
     private String url;
+    private String object;
     private String type;
     private String dataId;
 
@@ -32,5 +33,24 @@ public class DocumentInputObject {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getObject() {
+        return object;
+    }
+
+    public void setObject(String object) {
+        this.object = object;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("DocumentInputObject{");
+        sb.append("url='").append(url).append('\'');
+        sb.append(", object='").append(object).append('\'');
+        sb.append(", type='").append(type).append('\'');
+        sb.append(", dataId='").append(dataId).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 }

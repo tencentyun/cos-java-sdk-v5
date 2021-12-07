@@ -5,8 +5,6 @@ import com.qcloud.cos.model.ciModel.queue.MediaListQueueResponse;
 import com.qcloud.cos.model.ciModel.queue.MediaQueueRequest;
 import com.qcloud.cos.model.ciModel.queue.MediaQueueResponse;
 
-import java.io.UnsupportedEncodingException;
-
 /**
  * 媒体处理 queue接口相关demo 详情见https://cloud.tencent.com/document/product/460/38913
  */

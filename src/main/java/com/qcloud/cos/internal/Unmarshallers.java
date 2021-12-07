@@ -55,6 +55,7 @@ import com.qcloud.cos.model.ciModel.auditing.DocumentAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.ImageAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.TextAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.VideoAuditingResponse;
+import com.qcloud.cos.model.ciModel.auditing.WebpageAuditingResponse;
 import com.qcloud.cos.model.ciModel.bucket.DocBucketResponse;
 import com.qcloud.cos.model.ciModel.bucket.MediaBucketResponse;
 import com.qcloud.cos.model.ciModel.image.ImageLabelResponse;
@@ -727,6 +728,23 @@ public class Unmarshallers {
         public BatchImageAuditingResponse unmarshall(InputStream in) throws Exception {
             return new XmlResponsesSaxParser()
                     .parseBatchImageAuditingResponse(in).getResponse();
+        }
+    }
+
+    public static class WebpageAuditingJobUnmarshaller implements Unmarshaller<WebpageAuditingResponse, InputStream> {
+
+        public WebpageAuditingResponse unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser()
+                    .parseWebpageAuditingJobResponse(in).getResponse();
+        }
+    }
+
+    public static final class WebpageAuditingDescribeJobUnmarshaller
+            implements Unmarshaller<WebpageAuditingResponse, InputStream> {
+
+        public WebpageAuditingResponse unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser()
+                    .parseDWebpageAuditingDescribeResponse(in).getResponse();
         }
     }
 }

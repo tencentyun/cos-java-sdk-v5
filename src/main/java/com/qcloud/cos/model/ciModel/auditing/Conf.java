@@ -34,10 +34,14 @@ public class Conf {
     private String detectContent;
 
     /**
-     * 	回调内容的结构，有效值：Simple（回调内容包含基本信息）、Detail（回调内容包含详细信息）。默认为 Simple。
+     * 回调内容的结构，有效值：Simple（回调内容包含基本信息）、Detail（回调内容包含详细信息）。默认为 Simple。
      */
     private CallbackVersion callbackVersion;
 
+    /**
+     * 指定是否需要高亮展示网页内的违规文本，并返回高亮展示的 html 链接。取值为 true 和 false，默认为 false。
+     */
+    private CallbackVersion returnHighlightHtml;
 
 
     public String getBizType() {
@@ -91,15 +95,24 @@ public class Conf {
         this.callbackVersion = callbackVersion;
     }
 
+    public CallbackVersion getReturnHighlightHtml() {
+        return returnHighlightHtml;
+    }
+
+    public void setReturnHighlightHtml(CallbackVersion returnHighlightHtml) {
+        this.returnHighlightHtml = returnHighlightHtml;
+    }
+
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("Conf{");
+        final StringBuffer sb = new StringBuffer("Conf{");
         sb.append("detectType='").append(detectType).append('\'');
         sb.append(", snapshot=").append(snapshot);
         sb.append(", callback='").append(callback).append('\'');
         sb.append(", bizType='").append(bizType).append('\'');
         sb.append(", detectContent='").append(detectContent).append('\'');
         sb.append(", callbackVersion=").append(callbackVersion);
+        sb.append(", returnHighlightHtml=").append(returnHighlightHtml);
         sb.append('}');
         return sb.toString();
     }

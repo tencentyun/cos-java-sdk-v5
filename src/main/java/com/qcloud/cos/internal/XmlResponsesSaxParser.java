@@ -79,10 +79,14 @@ import com.qcloud.cos.model.ciModel.auditing.DocumentResultInfo;
 import com.qcloud.cos.model.ciModel.auditing.ImageAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.ObjectResults;
 import com.qcloud.cos.model.ciModel.auditing.OcrResults;
+import com.qcloud.cos.model.ciModel.auditing.ResultsImageAuditingDetail;
+import com.qcloud.cos.model.ciModel.auditing.ResultsTextAuditingDetail;
 import com.qcloud.cos.model.ciModel.auditing.SectionInfo;
 import com.qcloud.cos.model.ciModel.auditing.SnapshotInfo;
 import com.qcloud.cos.model.ciModel.auditing.TextAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.VideoAuditingResponse;
+import com.qcloud.cos.model.ciModel.auditing.WebpageAuditingJobsDetail;
+import com.qcloud.cos.model.ciModel.auditing.WebpageAuditingResponse;
 import com.qcloud.cos.model.ciModel.bucket.DocBucketObject;
 import com.qcloud.cos.model.ciModel.bucket.DocBucketResponse;
 import com.qcloud.cos.model.ciModel.bucket.MediaBucketObject;
@@ -817,6 +821,18 @@ public class XmlResponsesSaxParser {
 
     public BatchImageAuditingHandler parseBatchImageAuditingResponse(InputStream inputStream) throws IOException {
         BatchImageAuditingHandler handler = new BatchImageAuditingHandler();
+        parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
+        return handler;
+    }
+
+    public WebpageAuditingJobHandler parseWebpageAuditingJobResponse(InputStream inputStream) throws IOException {
+        WebpageAuditingJobHandler handler = new WebpageAuditingJobHandler();
+        parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
+        return handler;
+    }
+
+    public WebpageAuditingDescribeJobHandler parseDWebpageAuditingDescribeResponse(InputStream inputStream) throws IOException {
+        WebpageAuditingDescribeJobHandler handler = new WebpageAuditingDescribeJobHandler();
         parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
         return handler;
     }
@@ -6056,6 +6072,9 @@ public class XmlResponsesSaxParser {
                     case "Url":
                         jobsDetail.setUrl(getText());
                         break;
+                    case "Object":
+                        jobsDetail.setObject(getText());
+                        break;
                     default:
                         break;
                 }
@@ -6132,6 +6151,9 @@ public class XmlResponsesSaxParser {
                         break;
                     case "Url":
                         jobsDetail.setUrl(getText());
+                        break;
+                    case "Object":
+                        jobsDetail.setObject(getText());
                         break;
                     case "DataId":
                         jobsDetail.setDataId(getText());
@@ -6363,6 +6385,179 @@ public class XmlResponsesSaxParser {
                 default:
                     break;
             }
+        }
+    }
+
+    public static class WebpageAuditingJobHandler extends AbstractHandler {
+        private WebpageAuditingResponse response = new WebpageAuditingResponse();
+
+        @Override
+        protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
+
+        }
+
+        @Override
+        protected void doEndElement(String uri, String name, String qName) {
+            if (in("Response", "JobsDetail")) {
+                WebpageAuditingJobsDetail jobsDetail = response.getJobsDetail();
+                switch (name) {
+                    case "JobId":
+                        jobsDetail.setJobId(getText());
+                        break;
+                    case "State":
+                        jobsDetail.setState(getText());
+                        break;
+                    case "CreationTime":
+                        jobsDetail.setCreationTime(getText());
+                        break;
+                    case "Url":
+                        jobsDetail.setUrl(getText());
+                        break;
+                    default:
+                        break;
+                }
+            } else if (in("Response")) {
+                if ("RequestId".equalsIgnoreCase(name)) {
+                    response.setRequestId(getText());
+                }
+            }
+        }
+
+        public WebpageAuditingResponse getResponse() {
+            return response;
+        }
+
+        public void setResponse(WebpageAuditingResponse response) {
+            this.response = response;
+        }
+    }
+
+    public static class WebpageAuditingDescribeJobHandler extends AbstractHandler {
+        private WebpageAuditingResponse response = new WebpageAuditingResponse();
+
+        @Override
+        protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
+            List<ResultsImageAuditingDetail> imageResults = response.getJobsDetail().getImageResults();
+            List<ResultsTextAuditingDetail> textResults = response.getJobsDetail().getTextResults();
+            if (in("Response", "JobsDetail", "ImageResults") && "Results".equals(name)) {
+                imageResults.add(new ResultsImageAuditingDetail());
+            } else if (in("Response", "JobsDetail", "TextResults") && "Results".equals(name)) {
+                textResults.add(new ResultsTextAuditingDetail());
+            }
+        }
+
+        @Override
+        protected void doEndElement(String uri, String name, String qName) {
+            WebpageAuditingJobsDetail jobsDetail = response.getJobsDetail();
+            List<ResultsImageAuditingDetail> imageResults = jobsDetail.getImageResults();
+            List<ResultsTextAuditingDetail> textResults = jobsDetail.getTextResults();
+            ResultsImageAuditingDetail imageAuditingDetail = null;
+            ResultsTextAuditingDetail textAuditingDetail = null;
+            if (imageResults.isEmpty()) {
+                imageAuditingDetail = new ResultsImageAuditingDetail();
+            } else {
+                imageAuditingDetail = imageResults.get(imageResults.size() - 1);
+            }
+            if (textResults.isEmpty()) {
+                textAuditingDetail = new ResultsTextAuditingDetail();
+            } else {
+                textAuditingDetail = textResults.get(textResults.size() - 1);
+            }
+            if (in("Response")) {
+                if ("RequestId".equalsIgnoreCase(name)) {
+                    response.setRequestId(getText());
+                }
+            } else if (in("Response", "JobsDetail")) {
+                switch (name) {
+                    case "JobId":
+                        jobsDetail.setJobId(getText());
+                        break;
+                    case "State":
+                        jobsDetail.setState(getText());
+                        break;
+                    case "CreationTime":
+                        jobsDetail.setCreationTime(getText());
+                        break;
+                    case "Suggestion":
+                        jobsDetail.setSuggestion(getText());
+                        break;
+                    case "PageCount":
+                        jobsDetail.setPageCount(getText());
+                        break;
+                    case "Url":
+                        jobsDetail.setUrl(getText());
+                        break;
+                    case "Label":
+                        jobsDetail.setLabel(getText());
+                        break;
+                    default:
+                        break;
+                }
+            } else if (in("Response", "JobsDetail", "ImageResults", "Results")) {
+                switch (name) {
+                    case "Text":
+                        imageAuditingDetail.setText(getText());
+                        break;
+                    case "Url":
+                        imageAuditingDetail.setUrl(getText());
+                        break;
+                    default:
+                        break;
+                }
+            } else if (in("Response", "JobsDetail", "TextResults", "Results")) {
+                if ("Text".equals(name)) {
+                    textAuditingDetail.setText(getText());
+                }
+            } else if (in("Response", "JobsDetail", "ImageResults", "Results","PoliticsInfo")) {
+                parseInfo(imageAuditingDetail.getPoliticsInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "ImageResults", "Results", "PornInfo")) {
+                parseInfo(imageAuditingDetail.getPornInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "ImageResults", "Results", "TerrorismInfo")) {
+                parseInfo(imageAuditingDetail.getTerroristInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "ImageResults", "Results", "AdsInfo")) {
+                parseInfo(imageAuditingDetail.getAdsInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "TextResults", "Results","PoliticsInfo")) {
+                parseInfo(textAuditingDetail.getPoliticsInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "TextResults", "Results", "PornInfo")) {
+                parseInfo(textAuditingDetail.getPornInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "TextResults", "Results", "TerrorismInfo")) {
+                parseInfo(textAuditingDetail.getTerroristInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "TextResults", "Results", "AdsInfo")) {
+                parseInfo(textAuditingDetail.getAdsInfo(), name, getText());
+            }
+        }
+
+        private void parseInfo(AudtingCommonInfo obj, String name, String value) {
+            switch (name) {
+                case "Code":
+                    obj.setCode(value);
+                    break;
+                case "HitFlag":
+                    obj.setHitFlag(getText());
+                    break;
+                case "Score":
+                    obj.setScore(getText());
+                    break;
+                case "Keywords":
+                    obj.setLabel(getText());
+                    break;
+                case "Count":
+                    obj.setCount(getText());
+                    break;
+                case "SubLabel":
+                    obj.setSubLabel(getText());
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        public WebpageAuditingResponse getResponse() {
+            return response;
+        }
+
+        public void setResponse(WebpageAuditingResponse response) {
+            this.response = response;
         }
 
     }

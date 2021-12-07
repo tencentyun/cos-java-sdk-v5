@@ -25,7 +25,7 @@ public class DocBucketDemo {
         DocBucketRequest request = new DocBucketRequest();
         //2.添加请求参数 参数详情请见api接口文档
         request.setBucketName("examplebucket-1250000000");
-        //3.调用接口,获取任务响应对象
+        //3.调用接口
         Boolean result = client.createDocProcessBucket(request);
         System.out.println(result);
     }
