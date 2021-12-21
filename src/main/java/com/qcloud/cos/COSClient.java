@@ -40,6 +40,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.fasterxml.jackson.core.Version;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.qcloud.cos.auth.COSCredentials;
 import com.qcloud.cos.auth.COSCredentialsProvider;
 import com.qcloud.cos.auth.COSSessionCredentials;
@@ -147,6 +150,13 @@ import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowExecutionsResponse;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowListRequest;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowListResponse;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowRequest;
+import com.qcloud.cos.model.fetch.GetAsyncFetchTaskRequest;
+import com.qcloud.cos.model.fetch.GetAsyncFetchTaskResult;
+import com.qcloud.cos.model.fetch.GetAsyncFetchTaskResultHandler;
+import com.qcloud.cos.model.fetch.PutAsyncFetchTaskRequest;
+import com.qcloud.cos.model.fetch.PutAsyncFetchTaskResult;
+import com.qcloud.cos.model.fetch.PutAsyncFetchTaskResultHandler;
+import com.qcloud.cos.model.fetch.PutAsyncFetchTaskSerializer;
 import com.qcloud.cos.model.inventory.InventoryConfiguration;
 import com.qcloud.cos.model.transform.ObjectTaggingXmlFactory;
 import com.qcloud.cos.region.Region;
@@ -4179,6 +4189,35 @@ public class COSClient implements COS {
         } catch (MalformedURLException e) {
             throw new CosClientException(e.toString());
         }
+    }
+
+    public PutAsyncFetchTaskResult putAsyncFetchTask(PutAsyncFetchTaskRequest putAsyncFetchTaskRequest) {
+        CosHttpRequest<PutAsyncFetchTaskRequest> request = createRequest(putAsyncFetchTaskRequest.getBucketName(),
+                String.format("/%s/", putAsyncFetchTaskRequest.getBucketName()), putAsyncFetchTaskRequest, HttpMethodName.POST);
+        PutAsyncFetchTaskSerializer serializer = new PutAsyncFetchTaskSerializer(PutAsyncFetchTaskRequest.class);
+        SimpleModule module = 
+            new SimpleModule("PutAsyncFetchTaskSerializer", new Version(1, 0, 0, null, null, null));
+        module.addSerializer(PutAsyncFetchTaskRequest.class, serializer);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(module);
+
+        String body = null;
+        try {
+            body = objectMapper.writeValueAsString(putAsyncFetchTaskRequest);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        this.setContent(request, body.getBytes(), "application/json", false);
+        return invoke(request, new PutAsyncFetchTaskResultHandler());
+    }
+
+    public GetAsyncFetchTaskResult getAsyncFetchTask(GetAsyncFetchTaskRequest getAsyncFetchTaskRequest) {
+        CosHttpRequest<GetAsyncFetchTaskRequest> request = createRequest(getAsyncFetchTaskRequest.getBucketName(),
+                String.format("/%s/%s", getAsyncFetchTaskRequest.getBucketName(), getAsyncFetchTaskRequest.getTaskId()),
+                getAsyncFetchTaskRequest, HttpMethodName.GET);
+        return invoke(request, new GetAsyncFetchTaskResultHandler());
     }
 }
 

@@ -21,7 +21,6 @@ package com.qcloud.cos;
 import java.io.File;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Date;
@@ -82,6 +81,10 @@ import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowExecutionResponse;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowExecutionsResponse;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowListRequest;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowListResponse;
+import com.qcloud.cos.model.fetch.GetAsyncFetchTaskRequest;
+import com.qcloud.cos.model.fetch.GetAsyncFetchTaskResult;
+import com.qcloud.cos.model.fetch.PutAsyncFetchTaskRequest;
+import com.qcloud.cos.model.fetch.PutAsyncFetchTaskResult;
 import com.qcloud.cos.model.inventory.InventoryConfiguration;
 import com.squareup.okhttp.internal.http.HttpMethod;
 
@@ -3013,6 +3016,10 @@ public interface COS extends COSDirectSpi {
      * describeWebpageAuditingJob 查询网页审核任务 https://cloud.tencent.com/document/product/460/63970
      */
     WebpageAuditingResponse describeWebpageAuditingJob(WebpageAuditingRequest request);
+
+    PutAsyncFetchTaskResult putAsyncFetchTask(PutAsyncFetchTaskRequest request);
+
+    GetAsyncFetchTaskResult getAsyncFetchTask(GetAsyncFetchTaskRequest request);
 }
 
 
