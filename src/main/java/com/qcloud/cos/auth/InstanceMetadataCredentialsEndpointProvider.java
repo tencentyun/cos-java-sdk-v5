@@ -14,7 +14,8 @@ public class InstanceMetadataCredentialsEndpointProvider extends CredentialsEndp
     public enum Instance {
         CPM("http://bm.metadata.tencentyun.com", "/meta-data/cam/security-credentials"),
         CVM("http://metadata.tencentyun.com", "/meta-data/cam/security-credentials"),
-        EMR("http://localhost:2888", "/accesskey");
+        EMR("http://localhost:2888", "/accesskey"),
+        EMRV2("http://metaserver.tencentemr.com:9998", "/accesskey");
 
         final String METADATA_SERVICE_URL;
         final String METADATA_CREDENTIALS_RESOURCE;
