@@ -17,9 +17,11 @@
 
 package com.qcloud.cos.retry;
 
+import java.io.IOException;
+
 import com.qcloud.cos.http.CosHttpRequest;
 import com.qcloud.cos.internal.CosServiceRequest;
-import java.io.IOException;
+
 import org.apache.http.HttpResponse;
 
 
@@ -57,6 +59,7 @@ public class PredefinedRetryPolicies {
             if (RetryUtils.isRetryableServiceException(exception)) {
                 return true;
             }
+
             // Always retry on client exceptions caused by IOException
             if (exception.getCause() instanceof IOException) {
                 return true;
