@@ -122,6 +122,7 @@ public class DefaultCosHttpClient implements CosHttpClient {
                         .setConnectTimeout(this.clientConfig.getConnectionTimeout())
                         .setSocketTimeout(this.clientConfig.getSocketTimeout()).build();
         this.idleConnectionMonitor = new IdleConnectionMonitorThread(this.connectionManager);
+        this.idleConnectionMonitor.setIdleAliveMS(this.clientConfig.getIdleConnectionAlive());
         this.idleConnectionMonitor.setDaemon(true);
         this.idleConnectionMonitor.start();
     }
@@ -489,6 +490,7 @@ public class DefaultCosHttpClient implements CosHttpClient {
                 String errorMsg = String.format("failed to execute http request, due to client exception,"
                                 + " httpRequest: %s, retryIdx:%d, maxErrorRetry:%d",
                         request.toString(), retryIndex, maxErrorRetry);
+                log.info(errorMsg, cce);
                 closeHttpResponseStream(httpResponse);
                 if (!shouldRetry(request, httpResponse, cce, retryIndex, retryPolicy)) {
                     log.error(errorMsg, cce);
