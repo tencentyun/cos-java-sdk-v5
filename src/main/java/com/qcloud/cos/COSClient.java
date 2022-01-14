@@ -2742,6 +2742,11 @@ public class COSClient implements COS {
     }
 
     @Override
+    public URL generatePresignedUrl(String bucketName, String key, Date expiration) throws CosClientException {
+        return generatePresignedUrl(bucketName, key, expiration, HttpMethodName.GET);
+    }
+
+    @Override
     public URL generatePresignedUrl(String bucketName, String key, Date expiration, HttpMethodName method) throws CosClientException {
         return generatePresignedUrl(bucketName, key, expiration, method, new HashMap<String, String>(), new HashMap<String, String>(), false, true);
     }

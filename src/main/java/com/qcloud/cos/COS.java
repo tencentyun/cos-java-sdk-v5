@@ -2043,6 +2043,9 @@ public interface COS extends COSDirectSpi {
             DeleteBucketReplicationConfigurationRequest deleteBucketReplicationConfigurationRequest)
             throws CosClientException, CosServiceException;
 
+    public URL generatePresignedUrl(String bucketName, String key, Date expiration)
+          throws CosClientException;
+
     /**
      * <p>
      * Returns a pre-signed URL for accessing COS resource. you can specify the expiration time.
