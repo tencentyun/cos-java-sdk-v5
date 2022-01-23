@@ -1,14 +1,27 @@
 package com.qcloud.cos.demo;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.ClientConfig;
 import com.qcloud.cos.auth.BasicCOSCredentials;
 import com.qcloud.cos.auth.COSCredentials;
-import com.qcloud.cos.model.*;
-import com.qcloud.cos.region.Region;
-
-import java.io.*;
-import java.util.concurrent.atomic.AtomicBoolean;
+import com.qcloud.cos.model.CSVInput;
+import com.qcloud.cos.model.CSVOutput;
+import com.qcloud.cos.model.CompressionType;
+import com.qcloud.cos.model.ExpressionType;
+import com.qcloud.cos.model.InputSerialization;
+import com.qcloud.cos.model.JSONInput;
+import com.qcloud.cos.model.JSONOutput;
+import com.qcloud.cos.model.JSONType;
+import com.qcloud.cos.model.OutputSerialization;
+import com.qcloud.cos.model.SelectObjectContentEvent;
+import com.qcloud.cos.model.SelectObjectContentEventVisitor;
+import com.qcloud.cos.model.SelectObjectContentRequest;
+import com.qcloud.cos.model.SelectObjectContentResult;
 
 public class SelectObjectContentDemo {
     public static void main(String[] args) throws Exception {
@@ -17,10 +30,18 @@ public class SelectObjectContentDemo {
     }
 
     public static void selectCsvContentDemo() throws Exception {
-        // 初始化用户身份信息(secretId, secretKey)
+        // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
-        // 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
-        ClientConfig clientConfig = new ClientConfig(new Region("ap-guangzhou"));
+
+        ClientConfig clientConfig = new ClientConfig();
+
+        // 2 设置 bucket 的域名, bucket 对应的 COS 地域的简称请参照 https://www.qcloud.com/document/product/436/6224
+        String region = "ap-guangzhou";
+        // 如果是公网环境
+        clientConfig.setEndpoint(String.format("cos.%s.tencentcos.cn", region));
+        // 如果是腾讯云内网环境
+        clientConfig.setEndpoint(String.format("cos-internal.%s.tencentcos.cn", region));
+
         // 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         String key = "test/my_test.csv";
@@ -80,10 +101,18 @@ public class SelectObjectContentDemo {
     }
 
     public static void selectJsonContentDemo() throws Exception {
-        // 初始化用户身份信息(secretId, secretKey)
+        // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
-        // 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
-        ClientConfig clientConfig = new ClientConfig(new Region("ap-guangzhou"));
+
+        ClientConfig clientConfig = new ClientConfig();
+
+        // 2 设置 bucket 的域名, bucket 对应的 COS 地域的简称请参照 https://www.qcloud.com/document/product/436/6224
+        String region = "ap-guangzhou";
+        // 如果是公网环境
+        clientConfig.setEndpoint(String.format("cos.%s.tencentcos.cn", region));
+        // 如果是腾讯云内网环境
+        clientConfig.setEndpoint(String.format("cos-internal.%s.tencentcos.cn", region));
+
         // 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         String key = "test/my_test.json";

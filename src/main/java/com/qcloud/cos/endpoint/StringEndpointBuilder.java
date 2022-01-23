@@ -21,26 +21,25 @@ package com.qcloud.cos.endpoint;
 import com.qcloud.cos.internal.BucketNameUtils;
 import com.qcloud.cos.internal.UrlComponentUtils;
 
-public class SuffixEndpointBuilder implements EndpointBuilder {
+public class StringEndpointBuilder implements EndpointBuilder {
+    private String endpoint; 
 
-    private String endpointSuffix;
-
-    public SuffixEndpointBuilder(String endpointSuffix) {
+    public StringEndpointBuilder(String endpoint) {
         super();
-        if (endpointSuffix == null) {
-            throw new IllegalArgumentException("endpointSuffix must not be null");
+
+        if (endpoint == null) {
+            throw new IllegalArgumentException("endpoint must not be null");
         }
-        while (endpointSuffix.startsWith(".")) {
-            endpointSuffix = endpointSuffix.substring(1);
-        }
-        UrlComponentUtils.validateEndPointSuffix(endpointSuffix);
-        this.endpointSuffix = endpointSuffix.trim();
+
+        UrlComponentUtils.validateEndPointSuffix(endpoint);
+
+        this.endpoint = endpoint;
     }
 
     @Override
     public String buildGeneralApiEndpoint(String bucketName) {
         BucketNameUtils.validateBucketName(bucketName);
-        return String.format("%s.%s", bucketName, this.endpointSuffix);
+        return String.format("%s.%s", bucketName, this.endpoint);
     }
 
     @Override

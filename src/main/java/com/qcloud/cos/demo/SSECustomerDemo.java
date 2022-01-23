@@ -1,28 +1,40 @@
 package com.qcloud.cos.demo;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.ClientConfig;
 import com.qcloud.cos.auth.BasicCOSCredentials;
 import com.qcloud.cos.auth.COSCredentials;
 import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.exception.CosServiceException;
-import com.qcloud.cos.http.HttpProtocol;
-import com.qcloud.cos.model.*;
-import com.qcloud.cos.region.Region;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import com.qcloud.cos.model.COSObject;
+import com.qcloud.cos.model.COSObjectInputStream;
+import com.qcloud.cos.model.GetObjectMetadataRequest;
+import com.qcloud.cos.model.GetObjectRequest;
+import com.qcloud.cos.model.ObjectMetadata;
+import com.qcloud.cos.model.PutObjectRequest;
+import com.qcloud.cos.model.PutObjectResult;
+import com.qcloud.cos.model.SSECustomerKey;
+import com.qcloud.cos.model.StorageClass;
 
 public class SSECustomerDemo {
     public static void SSECustomerUpload() {
-        // 初始化用户身份信息(secretId, secretKey)
-        COSCredentials cred = new BasicCOSCredentials("COS_SECRETID", "COS_SECRETKEY");
-        // 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
-        ClientConfig clientConfig = new ClientConfig(new Region("ap-guangzhou"));
-        // 要求http协议
-        clientConfig.setHttpProtocol(HttpProtocol.https);
+        // 1 初始化用户身份信息(secretId, secretKey)
+        COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
+
+        ClientConfig clientConfig = new ClientConfig();
+
+        // 2 设置 bucket 的域名, bucket 对应的 COS 地域的简称请参照 https://www.qcloud.com/document/product/436/6224
+        String region = "ap-guangzhou";
+        // 如果是公网环境
+        clientConfig.setEndpoint(String.format("cos.%s.tencentcos.cn", region));
+        // 如果是腾讯云内网环境
+        clientConfig.setEndpoint(String.format("cos-internal.%s.tencentcos.cn", region));
+
         // 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名需包含appid
@@ -50,10 +62,17 @@ public class SSECustomerDemo {
     }
     public static void SSECustomerDownload() {
         // 1 初始化用户身份信息(secretId, secretKey)
-        COSCredentials cred = new BasicCOSCredentials("COS_SECRETID", "COS_SECRETKEY");
-        // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
-        ClientConfig clientConfig = new ClientConfig(new Region("ap-guangzhou"));
-        clientConfig.setHttpProtocol(HttpProtocol.https);
+        COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
+
+        ClientConfig clientConfig = new ClientConfig();
+
+        // 2 设置 bucket 的域名, bucket 对应的 COS 地域的简称请参照 https://www.qcloud.com/document/product/436/6224
+        String region = "ap-guangzhou";
+        // 如果是公网环境
+        clientConfig.setEndpoint(String.format("cos.%s.tencentcos.cn", region));
+        // 如果是腾讯云内网环境
+        clientConfig.setEndpoint(String.format("cos-internal.%s.tencentcos.cn", region));
+
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名需包含appid
@@ -81,10 +100,17 @@ public class SSECustomerDemo {
 
     static void SSECustomerHead() {
         // 1 初始化用户身份信息(secretId, secretKey)
-        COSCredentials cred = new BasicCOSCredentials("COS_SECRETID", "COS_SECRETKEY");
-        // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
-        ClientConfig clientConfig = new ClientConfig(new Region("ap-guangzhou"));
-        clientConfig.setHttpProtocol(HttpProtocol.https);
+        COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
+
+        ClientConfig clientConfig = new ClientConfig();
+
+        // 2 设置 bucket 的域名, bucket 对应的 COS 地域的简称请参照 https://www.qcloud.com/document/product/436/6224
+        String region = "ap-guangzhou";
+        // 如果是公网环境
+        clientConfig.setEndpoint(String.format("cos.%s.tencentcos.cn", region));
+        // 如果是腾讯云内网环境
+        clientConfig.setEndpoint(String.format("cos-internal.%s.tencentcos.cn", region));
+
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名需包含appid

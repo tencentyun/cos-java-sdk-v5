@@ -72,8 +72,6 @@ import com.qcloud.cos.model.ObjectListing;
 import com.qcloud.cos.model.ObjectMetadata;
 import com.qcloud.cos.model.PutObjectRequest;
 import com.qcloud.cos.model.ciModel.auditing.ImageAuditingRequest;
-import com.qcloud.cos.model.ciModel.auditing.ImageAuditingResponse;
-import com.qcloud.cos.model.ciModel.image.ImageLabelRequest;
 import com.qcloud.cos.transfer.Transfer.TransferState;
 import com.qcloud.cos.utils.VersionInfoUtils;
 
@@ -1612,8 +1610,6 @@ public class TransferManager {
                 + copyObjectRequest.getSourceKey() + " to "
                 + copyObjectRequest.getDestinationBucketName() + "/"
                 + copyObjectRequest.getDestinationKey();
-
-
 
         GetObjectMetadataRequest getObjectMetadataRequest =
                 new GetObjectMetadataRequest(copyObjectRequest.getSourceBucketName(),

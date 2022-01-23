@@ -23,10 +23,20 @@ import com.qcloud.cos.region.Region;
 
 public class RegionEndpointBuilder implements EndpointBuilder {
     private Region region;
+    private Boolean enableInternalDomain = true;
+    private Boolean enableOldDomain = false;
 
     public RegionEndpointBuilder(Region region) {
         super();
         this.region = region;
+    }
+
+    public void setEnableInternalDomain(Boolean enableInternalDomain) {
+        this.enableInternalDomain = enableInternalDomain;
+    }
+
+    public void setEnableOldDomain(Boolean enableOldDomain) {
+        this.enableOldDomain = enableOldDomain;
     }
 
     @Override
@@ -35,11 +45,23 @@ public class RegionEndpointBuilder implements EndpointBuilder {
             throw new IllegalArgumentException("region is null");
         }
         BucketNameUtils.validateBucketName(bucketName);
-        return String.format("%s.%s.myqcloud.com", bucketName, Region.formatRegion(this.region));
+
+        if (this.enableOldDomain) {
+            return String.format("%s.%s.myqcloud.com", bucketName, Region.formatRegion(this.region, false));
+        }
+
+        if (this.enableInternalDomain) {
+            return String.format("%s.%s.tencentcos.cn", bucketName, Region.formatRegion(this.region, true));
+        }
+
+        return String.format("%s.%s.tencentcos.cn", bucketName, Region.formatRegion(this.region, false));
     }
 
     @Override
     public String buildGetServiceApiEndpoint() {
-        return "service.cos.myqcloud.com";
+        if (this.enableOldDomain) {
+            return "service.cos.myqcloud.com";
+        }
+        return "service.cos.tencentcos.cn";
     }
 }

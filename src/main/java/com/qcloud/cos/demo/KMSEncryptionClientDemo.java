@@ -12,7 +12,6 @@ import com.qcloud.cos.auth.COSCredentials;
 import com.qcloud.cos.auth.COSStaticCredentialsProvider;
 import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.exception.CosServiceException;
-import com.qcloud.cos.http.HttpProtocol;
 import com.qcloud.cos.internal.crypto.CryptoConfiguration;
 import com.qcloud.cos.internal.crypto.CryptoMode;
 import com.qcloud.cos.internal.crypto.CryptoStorageMode;
@@ -23,7 +22,6 @@ import com.qcloud.cos.model.ObjectMetadata;
 import com.qcloud.cos.model.PutObjectRequest;
 import com.qcloud.cos.model.PutObjectResult;
 import com.qcloud.cos.model.UploadResult;
-import com.qcloud.cos.region.Region;
 import com.qcloud.cos.transfer.Download;
 import com.qcloud.cos.transfer.TransferManager;
 import com.qcloud.cos.transfer.TransferManagerConfiguration;
@@ -45,12 +43,15 @@ public class KMSEncryptionClientDemo {
 
 	static COSClient createCosClient(String region) {
         // 初始化用户身份信息(secretId, secretKey)
-        COSCredentials cred = new BasicCOSCredentials("AKIDxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-                "yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy");
-        // 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
-        ClientConfig clientConfig = new ClientConfig(new Region(region));
-        // 为防止请求头部被篡改导致的数据无法解密，强烈建议只使用 https 协议发起请求
-        clientConfig.setHttpProtocol(HttpProtocol.https);
+        COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
+
+        ClientConfig clientConfig = new ClientConfig();
+
+        // 如果是公网环境
+        clientConfig.setEndpoint(String.format("cos.%s.tencentcos.cn", region));
+        // 如果是腾讯云内网环境
+        clientConfig.setEndpoint(String.format("cos-internal.%s.tencentcos.cn", region));
+
 
         // 初始化 KMS 加密材料
         KMSEncryptionMaterials encryptionMaterials = new KMSEncryptionMaterials(cmk);

@@ -57,13 +57,18 @@ public class Region implements Serializable {
         return false;
     }
     
-    public static String formatRegion(Region region) throws CosClientException {
-        return formatRegion(region.getRegionName());
+    public static String formatRegion(Region region, Boolean useInternalDomain) throws CosClientException {
+        return formatRegion(region.getRegionName(), useInternalDomain);
     }
     
-    public static String formatRegion(String regionName) throws CosClientException {
+    public static String formatRegion(String regionName, Boolean useInternalDomain) throws CosClientException {
         UrlComponentUtils.validateRegionName(regionName);
-        if (regionName.startsWith("cos.")) {
+        String prefix = "cos.";
+        if (useInternalDomain) {
+            prefix = "cos-internal.";
+        }
+
+        if (regionName.startsWith(prefix)) {
             return regionName;
         } else {
             if (regionName.equals("cn-east") || regionName.equals("cn-south")
@@ -71,7 +76,7 @@ public class Region implements Serializable {
                     || regionName.equals("cn-southwest") || regionName.equals("sg")) {
                 return regionName;
             } else {
-                return "cos." + regionName;
+                return prefix + regionName;
             }
         }
     }

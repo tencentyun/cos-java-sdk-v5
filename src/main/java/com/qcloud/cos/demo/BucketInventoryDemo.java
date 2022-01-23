@@ -1,23 +1,43 @@
 package com.qcloud.cos.demo;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.ClientConfig;
 import com.qcloud.cos.auth.BasicCOSCredentials;
 import com.qcloud.cos.auth.COSCredentials;
-import com.qcloud.cos.model.*;
-import com.qcloud.cos.model.inventory.*;
+import com.qcloud.cos.model.DeleteBucketInventoryConfigurationRequest;
+import com.qcloud.cos.model.GetBucketInventoryConfigurationResult;
+import com.qcloud.cos.model.ListBucketInventoryConfigurationsRequest;
+import com.qcloud.cos.model.ListBucketInventoryConfigurationsResult;
+import com.qcloud.cos.model.SetBucketInventoryConfigurationRequest;
+import com.qcloud.cos.model.inventory.InventoryConfiguration;
+import com.qcloud.cos.model.inventory.InventoryCosBucketDestination;
+import com.qcloud.cos.model.inventory.InventoryDestination;
+import com.qcloud.cos.model.inventory.InventoryFilter;
+import com.qcloud.cos.model.inventory.InventoryFormat;
 import com.qcloud.cos.model.inventory.InventoryFrequency;
-import com.qcloud.cos.region.Region;
-
-import java.util.LinkedList;
-import java.util.List;
+import com.qcloud.cos.model.inventory.InventoryIncludedObjectVersions;
+import com.qcloud.cos.model.inventory.InventoryOptionalField;
+import com.qcloud.cos.model.inventory.InventoryPrefixPredicate;
+import com.qcloud.cos.model.inventory.InventorySchedule;
+import com.qcloud.cos.model.inventory.ServerSideEncryptionCOS;
 
 public class BucketInventoryDemo {
     public static void SetGetDeleteBucketInventoryDemo() {
         // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
-        // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
-        ClientConfig clientConfig = new ClientConfig(new Region("ap-guangzhou"));
+
+        ClientConfig clientConfig = new ClientConfig();
+
+        // 2 设置 bucket 的域名, bucket 对应的 COS 地域的简称请参照 https://www.qcloud.com/document/product/436/6224
+        String region = "ap-guangzhou";
+        // 如果是公网环境
+        clientConfig.setEndpoint(String.format("cos.%s.tencentcos.cn", region));
+        // 如果是腾讯云内网环境
+        clientConfig.setEndpoint(String.format("cos-internal.%s.tencentcos.cn", region));
+
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名需包含appid

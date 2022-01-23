@@ -23,7 +23,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.qcloud.cos.COS;
 import com.qcloud.cos.endpoint.EndpointBuilder;
+import com.qcloud.cos.internal.Constants;
 import com.qcloud.cos.internal.CosServiceRequest;
 import com.qcloud.cos.region.Region;
 
@@ -214,7 +216,6 @@ public class CopyObjectRequest extends CosServiceRequest
         this.destinationBucketName = destinationBucketName;
         this.destinationKey = destinationKey;
     }
-
 
     public String getSourceAppid() {
         return sourceAppid;

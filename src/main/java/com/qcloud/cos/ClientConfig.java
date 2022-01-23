@@ -23,6 +23,7 @@ import com.qcloud.cos.endpoint.DefaultEndpointResolver;
 import com.qcloud.cos.endpoint.EndpointBuilder;
 import com.qcloud.cos.endpoint.EndpointResolver;
 import com.qcloud.cos.endpoint.RegionEndpointBuilder;
+import com.qcloud.cos.endpoint.StringEndpointBuilder;
 import com.qcloud.cos.endpoint.SuffixEndpointBuilder;
 import com.qcloud.cos.http.HttpProtocol;
 import com.qcloud.cos.region.Region;
@@ -291,5 +292,25 @@ public class ClientConfig {
 
     public void setCiSpecialRequest(boolean ciSpecialRequest) {
         this.ciSpecialRequest = ciSpecialRequest;
+    }
+
+    public void enableOldDomain() {
+        if (this.endpointBuilder instanceof RegionEndpointBuilder) {
+            ((RegionEndpointBuilder)this.endpointBuilder).setEnableOldDomain(true);
+        } else {
+            throw new IllegalArgumentException("endpointBuilder is not a RegionEndpointBuilder, no need to enableOldDomain");
+        }
+    }
+
+    public void disableInternalDomain() {
+        if (this.endpointBuilder instanceof RegionEndpointBuilder) {
+            ((RegionEndpointBuilder)this.endpointBuilder).setEnableInternalDomain(false);
+        } else {
+            throw new IllegalArgumentException("endpointBuilder is not a RegionEndpointBuilder, no need to disableInternalDomain");
+        }
+    }
+
+    public void setEndpoint(String endpoint) {
+        this.endpointBuilder = new StringEndpointBuilder(endpoint);
     }
 }

@@ -20,7 +20,6 @@ import com.qcloud.cos.auth.BasicCOSCredentials;
 import com.qcloud.cos.auth.COSCredentials;
 import com.qcloud.cos.auth.COSStaticCredentialsProvider;
 import com.qcloud.cos.exception.CosClientException;
-import com.qcloud.cos.http.HttpProtocol;
 import com.qcloud.cos.internal.crypto.CryptoConfiguration;
 import com.qcloud.cos.internal.crypto.CryptoMode;
 import com.qcloud.cos.internal.crypto.CryptoStorageMode;
@@ -30,7 +29,6 @@ import com.qcloud.cos.model.GetObjectRequest;
 import com.qcloud.cos.model.ObjectMetadata;
 import com.qcloud.cos.model.PutObjectRequest;
 import com.qcloud.cos.model.PutObjectResult;
-import com.qcloud.cos.region.Region;
 
 //使用客户端加密前的注意事项请参考接口文档
 //这里给出使用对称秘钥AES256加密每次生成的随机对称秘钥
@@ -48,13 +46,17 @@ public class SymmetricKeyEncryptionClientDemo {
 	}
 
 	static COSClient createCosClient(String region) {
-        // 初始化用户身份信息(secretId, secretKey)
-        COSCredentials cred = new BasicCOSCredentials("AKIDxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-                "yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy");
-        // 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
-        ClientConfig clientConfig = new ClientConfig(new Region(region));
-        // 为防止请求头部被篡改导致的数据无法解密，强烈建议只使用 https 协议发起请求
-        clientConfig.setHttpProtocol(HttpProtocol.https);
+        // 1 初始化用户身份信息(secretId, secretKey)
+        COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
+
+        ClientConfig clientConfig = new ClientConfig();
+
+        // 2 设置 bucket 的域名, bucket 对应的 COS 地域的简称请参照 https://www.qcloud.com/document/product/436/6224
+        // 如果是公网环境
+        clientConfig.setEndpoint(String.format("cos.%s.tencentcos.cn", region));
+        // 如果是腾讯云内网环境
+        clientConfig.setEndpoint(String.format("cos-internal.%s.tencentcos.cn", region));
+
 
         SecretKey symKey = null;
 

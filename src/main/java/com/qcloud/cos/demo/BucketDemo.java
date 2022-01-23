@@ -17,7 +17,6 @@ import com.qcloud.cos.model.SetBucketLoggingConfigurationRequest;
 import com.qcloud.cos.model.SetBucketTaggingConfigurationRequest;
 import com.qcloud.cos.model.SetBucketVersioningConfigurationRequest;
 import com.qcloud.cos.model.TagSet;
-import com.qcloud.cos.region.Region;
 
 /**
  * 展示了创建bucket, 删除bucket, 查询bucket是否存在的demo
@@ -26,10 +25,18 @@ import com.qcloud.cos.region.Region;
 public class BucketDemo {
     // 创建bucket
     public static void CreateBucketDemo() {
-        // 1 初始化用户身份信息(appid, secretId, secretKey)
+        // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
-        // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
-        ClientConfig clientConfig = new ClientConfig(new Region("ap-beijing-1"));
+
+        ClientConfig clientConfig = new ClientConfig();
+
+        // 2 设置 bucket 的域名, bucket 对应的 COS 地域的简称请参照 https://www.qcloud.com/document/product/436/6224
+        String region = "ap-guangzhou";
+        // 如果是公网环境
+        clientConfig.setEndpoint(String.format("cos.%s.tencentcos.cn", region));
+        // 如果是腾讯云内网环境
+        clientConfig.setEndpoint(String.format("cos-internal.%s.tencentcos.cn", region));
+
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名称, 需包含appid
@@ -46,10 +53,18 @@ public class BucketDemo {
 
     // 开启 bucket 版本控制
     public static void SetBucketVersioning() {
-        // 1 初始化用户身份信息(appid, secretId, secretKey)
+        // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
-        // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
-        ClientConfig clientConfig = new ClientConfig(new Region("ap-beijing-1"));
+
+        ClientConfig clientConfig = new ClientConfig();
+
+        // 2 设置 bucket 的域名, bucket 对应的 COS 地域的简称请参照 https://www.qcloud.com/document/product/436/6224
+        String region = "ap-guangzhou";
+        // 如果是公网环境
+        clientConfig.setEndpoint(String.format("cos.%s.tencentcos.cn", region));
+        // 如果是腾讯云内网环境
+        clientConfig.setEndpoint(String.format("cos-internal.%s.tencentcos.cn", region));
+
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名称, 需包含appid
@@ -67,10 +82,18 @@ public class BucketDemo {
 
     // 开启日志存储
     public static void SetBucketLogging() {
-        // 1 初始化用户身份信息(appid, secretId, secretKey)
+        // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
-        // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
-        ClientConfig clientConfig = new ClientConfig(new Region("ap-beijing-1"));
+
+        ClientConfig clientConfig = new ClientConfig();
+
+        // 2 设置 bucket 的域名, bucket 对应的 COS 地域的简称请参照 https://www.qcloud.com/document/product/436/6224
+        String region = "ap-guangzhou";
+        // 如果是公网环境
+        clientConfig.setEndpoint(String.format("cos.%s.tencentcos.cn", region));
+        // 如果是腾讯云内网环境
+        clientConfig.setEndpoint(String.format("cos-internal.%s.tencentcos.cn", region));
+
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名称, 需包含appid
@@ -90,8 +113,16 @@ public class BucketDemo {
     public static void SetGetDeleteBucketTagging() {
         // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
-        // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
-        ClientConfig clientConfig = new ClientConfig(new Region("ap-guangzhou"));
+
+        ClientConfig clientConfig = new ClientConfig();
+
+        // 2 设置 bucket 的域名, bucket 对应的 COS 地域的简称请参照 https://www.qcloud.com/document/product/436/6224
+        String region = "ap-guangzhou";
+        // 如果是公网环境
+        clientConfig.setEndpoint(String.format("cos.%s.tencentcos.cn", region));
+        // 如果是腾讯云内网环境
+        clientConfig.setEndpoint(String.format("cos-internal.%s.tencentcos.cn", region));
+
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名需包含appid
@@ -113,10 +144,18 @@ public class BucketDemo {
     
     // 删除bucket, 只用于空bucket, 含有数据的bucket需要在删除前清空删除。
     public static void DeleteBucketDemo() {
-        // 1 初始化用户身份信息(appid, secretId, secretKey)
+        // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
-        // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
-        ClientConfig clientConfig = new ClientConfig(new Region("ap-beijing-1"));
+
+        ClientConfig clientConfig = new ClientConfig();
+
+        // 2 设置 bucket 的域名, bucket 对应的 COS 地域的简称请参照 https://www.qcloud.com/document/product/436/6224
+        String region = "ap-guangzhou";
+        // 如果是公网环境
+        clientConfig.setEndpoint(String.format("cos.%s.tencentcos.cn", region));
+        // 如果是腾讯云内网环境
+        clientConfig.setEndpoint(String.format("cos-internal.%s.tencentcos.cn", region));
+
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名称, 需包含appid        
@@ -130,10 +169,18 @@ public class BucketDemo {
     
     // 查询bucket是否存在
     public static void JudgeBucketExistDemo() {
-        // 1 初始化用户身份信息(appid, secretId, secretKey)
+        // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
-        // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
-        ClientConfig clientConfig = new ClientConfig(new Region("ap-beijing-1"));
+
+        ClientConfig clientConfig = new ClientConfig();
+
+        // 2 设置 bucket 的域名, bucket 对应的 COS 地域的简称请参照 https://www.qcloud.com/document/product/436/6224
+        String region = "ap-guangzhou";
+        // 如果是公网环境
+        clientConfig.setEndpoint(String.format("cos.%s.tencentcos.cn", region));
+        // 如果是腾讯云内网环境
+        clientConfig.setEndpoint(String.format("cos-internal.%s.tencentcos.cn", region));
+
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         
@@ -146,10 +193,18 @@ public class BucketDemo {
     }    
 
     public static void ListBuckets() {
-        // 1 初始化用户身份信息(appid, secretId, secretKey)
-        COSCredentials cred = new BasicCOSCredentials("AKIDxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", "****************************");
-        // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
-        ClientConfig clientConfig = new ClientConfig(new Region("ap-shanghai"));
+        // 1 初始化用户身份信息(secretId, secretKey)
+        COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
+
+        ClientConfig clientConfig = new ClientConfig();
+
+        // 2 设置 bucket 的域名, bucket 对应的 COS 地域的简称请参照 https://www.qcloud.com/document/product/436/6224
+        String region = "ap-guangzhou";
+        // 如果是公网环境
+        clientConfig.setEndpoint(String.format("cos.%s.tencentcos.cn", region));
+        // 如果是腾讯云内网环境
+        clientConfig.setEndpoint(String.format("cos-internal.%s.tencentcos.cn", region));
+
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
 

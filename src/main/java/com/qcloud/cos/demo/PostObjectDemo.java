@@ -1,16 +1,21 @@
 package com.qcloud.cos.demo;
 
-import com.qcloud.cos.auth.COSSigner;
-import com.qcloud.cos.utils.VersionInfoUtils;
-import org.apache.commons.codec.binary.Base64;
-
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.qcloud.cos.auth.COSSigner;
+import com.qcloud.cos.utils.VersionInfoUtils;
+
+import org.apache.commons.codec.binary.Base64;
 
 public class PostObjectDemo {
     public static void main(String[] args) throws Exception {
@@ -19,7 +24,7 @@ public class PostObjectDemo {
 
     private static void PostObjectUploadDemo() throws Exception {
         String bucketName = "mybucket-1251668577";
-        String endpoint = "cos.ap-guangzhou.myqcloud.com";
+        String endpoint = "cos.ap-guangzhou.tencentcos.cn";
         String key = "images/test.jpg";
         String filename = "test.jpg";
         String inputFilePath = "test.jpg";

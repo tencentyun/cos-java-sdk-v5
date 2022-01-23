@@ -12,7 +12,6 @@ import com.qcloud.cos.auth.BasicCOSCredentials;
 import com.qcloud.cos.auth.COSCredentials;
 import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.exception.CosServiceException;
-import com.qcloud.cos.http.HttpProtocol;
 import com.qcloud.cos.model.CopyObjectRequest;
 import com.qcloud.cos.model.CopyResult;
 import com.qcloud.cos.model.GetObjectRequest;
@@ -57,9 +56,16 @@ public class TransferManagerDemo {
     public static void uploadFile() {
         // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
-        // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
-        ClientConfig clientConfig = new ClientConfig(new Region("ap-beijing-1"));
-        clientConfig.setHttpProtocol(HttpProtocol.https);
+
+        ClientConfig clientConfig = new ClientConfig();
+
+        // 2 设置 bucket 的域名, bucket 对应的 COS 地域的简称请参照 https://www.qcloud.com/document/product/436/6224
+        String region = "ap-guangzhou";
+        // 如果是公网环境
+        clientConfig.setEndpoint(String.format("cos.%s.tencentcos.cn", region));
+        // 如果是腾讯云内网环境
+        clientConfig.setEndpoint(String.format("cos-internal.%s.tencentcos.cn", region));
+
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名需包含appid
@@ -99,8 +105,16 @@ public class TransferManagerDemo {
     public static void pauseUploadFileAndResume() {
         // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
-        // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
-        ClientConfig clientConfig = new ClientConfig(new Region("ap-beijing-1"));
+
+        ClientConfig clientConfig = new ClientConfig();
+
+        // 2 设置 bucket 的域名, bucket 对应的 COS 地域的简称请参照 https://www.qcloud.com/document/product/436/6224
+        String region = "ap-guangzhou";
+        // 如果是公网环境
+        clientConfig.setEndpoint(String.format("cos.%s.tencentcos.cn", region));
+        // 如果是腾讯云内网环境
+        clientConfig.setEndpoint(String.format("cos-internal.%s.tencentcos.cn", region));
+
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名需包含appid
@@ -137,8 +151,16 @@ public class TransferManagerDemo {
     public static void multipartUploadWithMetaData() {
         // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
-        // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
-        ClientConfig clientConfig = new ClientConfig(new Region("ap-shanghai"));
+
+        ClientConfig clientConfig = new ClientConfig();
+
+        // 2 设置 bucket 的域名, bucket 对应的 COS 地域的简称请参照 https://www.qcloud.com/document/product/436/6224
+        String region = "ap-guangzhou";
+        // 如果是公网环境
+        clientConfig.setEndpoint(String.format("cos.%s.tencentcos.cn", region));
+        // 如果是腾讯云内网环境
+        clientConfig.setEndpoint(String.format("cos-internal.%s.tencentcos.cn", region));
+
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名需包含appid
@@ -184,8 +206,16 @@ public class TransferManagerDemo {
     public static void uploadDirectory() {
         // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
-        // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
-        ClientConfig clientConfig = new ClientConfig(new Region("ap-beijing-1"));
+
+        ClientConfig clientConfig = new ClientConfig();
+
+        // 2 设置 bucket 的域名, bucket 对应的 COS 地域的简称请参照 https://www.qcloud.com/document/product/436/6224
+        String region = "ap-guangzhou";
+        // 如果是公网环境
+        clientConfig.setEndpoint(String.format("cos.%s.tencentcos.cn", region));
+        // 如果是腾讯云内网环境
+        clientConfig.setEndpoint(String.format("cos-internal.%s.tencentcos.cn", region));
+
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名需包含appid
@@ -229,8 +259,16 @@ public class TransferManagerDemo {
     public static void downloadDirectory() {
         // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
-        // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
-        ClientConfig clientConfig = new ClientConfig(new Region("ap-beijing-1"));
+
+        ClientConfig clientConfig = new ClientConfig();
+
+        // 2 设置 bucket 的域名, bucket 对应的 COS 地域的简称请参照 https://www.qcloud.com/document/product/436/6224
+        String region = "ap-guangzhou";
+        // 如果是公网环境
+        clientConfig.setEndpoint(String.format("cos.%s.tencentcos.cn", region));
+        // 如果是腾讯云内网环境
+        clientConfig.setEndpoint(String.format("cos-internal.%s.tencentcos.cn", region));
+
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名需包含appid
@@ -272,8 +310,16 @@ public class TransferManagerDemo {
     public static void downLoadFile() {
         // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
-        // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
-        ClientConfig clientConfig = new ClientConfig(new Region("ap-beijing-1"));
+
+        ClientConfig clientConfig = new ClientConfig();
+
+        // 2 设置 bucket 的域名, bucket 对应的 COS 地域的简称请参照 https://www.qcloud.com/document/product/436/6224
+        String region = "ap-guangzhou";
+        // 如果是公网环境
+        clientConfig.setEndpoint(String.format("cos.%s.tencentcos.cn", region));
+        // 如果是腾讯云内网环境
+        clientConfig.setEndpoint(String.format("cos-internal.%s.tencentcos.cn", region));
+
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名需包含appid
@@ -306,8 +352,16 @@ public class TransferManagerDemo {
     public static void pauseDownloadFileAndResume() {
         // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
-        // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
-        ClientConfig clientConfig = new ClientConfig(new Region("ap-beijing-1"));
+
+        ClientConfig clientConfig = new ClientConfig();
+
+        // 2 设置 bucket 的域名, bucket 对应的 COS 地域的简称请参照 https://www.qcloud.com/document/product/436/6224
+        String region = "ap-guangzhou";
+        // 如果是公网环境
+        clientConfig.setEndpoint(String.format("cos.%s.tencentcos.cn", region));
+        // 如果是腾讯云内网环境
+        clientConfig.setEndpoint(String.format("cos-internal.%s.tencentcos.cn", region));
+
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名需包含appid
@@ -342,37 +396,51 @@ public class TransferManagerDemo {
     }
 
 
-    // copy接口支持根据文件大小自动选择copy或者分块copy
+    // copy 接口支持根据文件大小自动选择copy或者分块copy
     // 以下代码展示跨园区拷贝, 即将一个园区的文件拷贝到另一个园区
     public static void copyFileForDiffRegion() {
         // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
-        // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
-        ClientConfig clientConfig = new ClientConfig(new Region("ap-beijing-1"));
-        // 3 生成cos客户端
-        COSClient cosclient = new COSClient(cred, clientConfig);
 
+        ClientConfig dstClientConfig = new ClientConfig();
+
+        // 2 设置目的 bucket 的域名, bucket 对应的 COS 地域的简称请参照 https://www.qcloud.com/document/product/436/6224
+        String dstRegion = "ap-guangzhou";
+        // 如果是公网环境
+        dstClientConfig.setEndpoint(String.format("cos.%s.tencentcos.cn", dstRegion));
+        // 如果是腾讯云内网环境
+        dstClientConfig.setEndpoint(String.format("cos-internal.%s.tencentcos.cn", dstRegion));
+
+        // 3 生成cos客户端
+        COSClient dstCosClient = new COSClient(cred, dstClientConfig);
 
         ExecutorService threadPool = Executors.newFixedThreadPool(32);
         // 传入一个threadpool, 若不传入线程池, 默认TransferManager中会生成一个单线程的线程池。
-        TransferManager transferManager = new TransferManager(cosclient, threadPool);
+        TransferManager transferManager = new TransferManager(dstCosClient, threadPool);
 
-        // 要拷贝的bucket region, 支持跨园区拷贝
-        Region srcBucketRegion = new Region("ap-shanghai");
+        ClientConfig srcClientConfig = new ClientConfig();
+        // 设置源 bucket 的域名, bucket 对应的 COS 地域的简称请参照 https://www.qcloud.com/document/product/436/6224
+        String srcBucketRegion = "ap-shanghai";
+        // 如果是公网环境
+        dstClientConfig.setEndpoint(String.format("cos.%s.tencentcos.cn", dstRegion));
+        // 如果是腾讯云内网环境
+        dstClientConfig.setEndpoint(String.format("cos-internal.%s.tencentcos.cn", dstRegion));
+
+        COSClient srcCosClient = new COSClient(cred, srcClientConfig);
+
         // 源bucket, bucket名需包含appid
         String srcBucketName = "srcBucket-1251668577";
         // 要拷贝的源文件
         String srcKey = "aaa/bbb.txt";
         // 目的bucket, bucket名需包含appid
-        String destBucketName = "destBucket-1251668577";
+        String dstBucketName = "dstBucket-1251668577";
         // 要拷贝的目的文件
-        String destKey = "ccc/ddd.txt";
+        String dstKey = "ccc/ddd.txt";
 
-        COSClient srcCOSClient = new COSClient(cred, new ClientConfig(srcBucketRegion));
-        CopyObjectRequest copyObjectRequest = new CopyObjectRequest(srcBucketRegion, srcBucketName,
-                srcKey, destBucketName, destKey);
+        CopyObjectRequest copyObjectRequest = new CopyObjectRequest(new Region(srcBucketRegion), srcBucketName,
+                srcKey, dstBucketName, dstKey);
         try {
-            Copy copy = transferManager.copy(copyObjectRequest, srcCOSClient, null);
+            Copy copy = transferManager.copy(copyObjectRequest, srcCosClient, null);
             // 返回一个异步结果copy, 可同步的调用waitForCopyResult等待copy结束, 成功返回CopyResult, 失败抛出异常.
             CopyResult copyResult = copy.waitForCopyResult();
         } catch (CosServiceException e) {
@@ -384,8 +452,8 @@ public class TransferManagerDemo {
         }
 
         transferManager.shutdownNow();
-        srcCOSClient.shutdown();
-        cosclient.shutdown();
+        srcCosClient.shutdown();
+        dstCosClient.shutdown();
     }
 
     // copy接口支持根据文件大小自动选择copy或者分块copy
@@ -393,11 +461,18 @@ public class TransferManagerDemo {
     public static void copyFileForSameRegion() {
         // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
-        // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
-        ClientConfig clientConfig = new ClientConfig(new Region("ap-beijing-1"));
+
+        ClientConfig clientConfig = new ClientConfig();
+
+        // 2 设置 bucket 的域名, bucket 对应的 COS 地域的简称请参照 https://www.qcloud.com/document/product/436/6224
+        String region = "ap-guangzhou";
+        // 如果是公网环境
+        clientConfig.setEndpoint(String.format("cos.%s.tencentcos.cn", region));
+        // 如果是腾讯云内网环境
+        clientConfig.setEndpoint(String.format("cos-internal.%s.tencentcos.cn", region));
+
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
-
 
         ExecutorService threadPool = Executors.newFixedThreadPool(32);
         // 传入一个threadpool, 若不传入线程池, 默认TransferManager中会生成一个单线程的线程池。
@@ -413,12 +488,12 @@ public class TransferManagerDemo {
         // 要拷贝的源文件
         String srcKey = "aaa/bbb.txt";
         // 目的bucket, bucket名需包含appid
-        String destBucketName = "destBucket-1251668577";
+        String dstBucketName = "dstBucket-1251668577";
         // 要拷贝的目的文件
-        String destKey = "ccc/ddd.txt";
+        String dstKey = "ccc/ddd.txt";
 
         CopyObjectRequest copyObjectRequest = new CopyObjectRequest(srcBucketRegion, srcBucketName,
-                srcKey, destBucketName, destKey);
+                srcKey, dstBucketName, dstKey);
         try {
             Copy copy = transferManager.copy(copyObjectRequest);
             // 返回一个异步结果copy, 可同步的调用waitForCopyResult等待copy结束, 成功返回CopyResult, 失败抛出异常.
@@ -439,8 +514,16 @@ public class TransferManagerDemo {
     public static void copyFileSetMetadata() {
         // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
-        // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
-        ClientConfig clientConfig = new ClientConfig(new Region("ap-guangzhou"));
+
+        ClientConfig clientConfig = new ClientConfig();
+
+        // 2 设置 bucket 的域名, bucket 对应的 COS 地域的简称请参照 https://www.qcloud.com/document/product/436/6224
+        String region = "ap-guangzhou";
+        // 如果是公网环境
+        clientConfig.setEndpoint(String.format("cos.%s.tencentcos.cn", region));
+        // 如果是腾讯云内网环境
+        clientConfig.setEndpoint(String.format("cos-internal.%s.tencentcos.cn", region));
+
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
 
@@ -495,8 +578,16 @@ public class TransferManagerDemo {
     public static void resumableDownloadFile() {
         // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
-        // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
-        ClientConfig clientConfig = new ClientConfig(new Region("ap-shanghai"));
+
+        ClientConfig clientConfig = new ClientConfig();
+
+        // 2 设置 bucket 的域名, bucket 对应的 COS 地域的简称请参照 https://www.qcloud.com/document/product/436/6224
+        String region = "ap-guangzhou";
+        // 如果是公网环境
+        clientConfig.setEndpoint(String.format("cos.%s.tencentcos.cn", region));
+        // 如果是腾讯云内网环境
+        clientConfig.setEndpoint(String.format("cos-internal.%s.tencentcos.cn", region));
+
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
 

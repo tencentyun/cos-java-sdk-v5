@@ -9,7 +9,6 @@ import com.qcloud.cos.model.GetObjectRequest;
 import com.qcloud.cos.model.ObjectMetadata;
 import com.qcloud.cos.model.PutObjectRequest;
 import com.qcloud.cos.model.PutObjectResult;
-import com.qcloud.cos.region.Region;
 
 public class TemporyTokenDemo {
 	// 该例子介绍使用临时秘钥来访问COS上的资源
@@ -27,8 +26,15 @@ public class TemporyTokenDemo {
 	public static void UseTemporyTokenUploadAndDownload() {
 		// 使用云api秘钥，可以获取一个临时secret id，secret key和session token,
 		BasicSessionCredentials cred = getSessionCredential();
-		// 设置区域, 这里设置为北京一区
-        ClientConfig clientConfig = new ClientConfig(new Region("ap-beijing-1"));
+        ClientConfig clientConfig = new ClientConfig();
+
+        // 设置 bucket 的域名, bucket 对应的 COS 地域的简称请参照 https://www.qcloud.com/document/product/436/6224
+        String region = "ap-guangzhou";
+        // 如果是公网环境
+        clientConfig.setEndpoint(String.format("cos.%s.tencentcos.cn", region));
+        // 如果是腾讯云内网环境
+        clientConfig.setEndpoint(String.format("cos-internal.%s.tencentcos.cn", region));
+
         // 生成cos客户端对象
         COSClient cosClient = new COSClient(cred, clientConfig);
         // 上传的bucket名字
