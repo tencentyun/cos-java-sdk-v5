@@ -18,6 +18,19 @@
 
 package com.qcloud.cos.internal;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
 import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.exception.MultiObjectDeleteException.DeleteError;
@@ -63,11 +76,11 @@ import com.qcloud.cos.model.ReplicationDestinationConfig;
 import com.qcloud.cos.model.ReplicationRule;
 import com.qcloud.cos.model.RoutingRule;
 import com.qcloud.cos.model.RoutingRuleCondition;
-import com.qcloud.cos.model.Tag.LifecycleTagPredicate;
-import com.qcloud.cos.model.Tag.Tag;
 import com.qcloud.cos.model.TagSet;
 import com.qcloud.cos.model.UinGrantee;
 import com.qcloud.cos.model.VersionListing;
+import com.qcloud.cos.model.Tag.LifecycleTagPredicate;
+import com.qcloud.cos.model.Tag.Tag;
 import com.qcloud.cos.model.ciModel.auditing.AudioAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.AuditingJobsDetail;
 import com.qcloud.cos.model.ciModel.auditing.AudtingCommonInfo;
@@ -166,6 +179,7 @@ import com.qcloud.cos.model.lifecycle.LifecyclePrefixPredicate;
 import com.qcloud.cos.utils.DateUtils;
 import com.qcloud.cos.utils.StringUtils;
 import com.qcloud.cos.utils.UrlEncoderUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
@@ -174,19 +188,6 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
-
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 
 /**
  * XML Sax parser to read XML documents returned by COS via the REST interface, converting these
@@ -1950,6 +1951,8 @@ public class XmlResponsesSaxParser {
                         cse.setErrorCode(errorCode);
                         cse.setRequestId(requestId);
                         cse.setTraceId(traceId);
+                        // complete multipart upload return 200 and chunked body
+                        cse.setStatusCode(200);
                     }
                 }
             } else if (in("Error")) {
