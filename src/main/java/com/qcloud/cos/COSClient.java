@@ -673,8 +673,30 @@ public class COSClient implements COS {
         req.addHeader(Headers.CONTENT_LENGTH, String.valueOf(0));
     }
 
-    private boolean shouldRetryCompleteMultipartUpload(CosServiceRequest originalRequest,
+    private boolean shouldRetryCompleteMultipartUpload(CompleteMultipartUploadRequest originalRequest,
             CosClientException exception, int retriesAttempted) {
+
+        /*
+        * Should not retry CI complete multipart upload.
+        *
+        * If CI retry request got a 404 NoSuchUpload, cannot load CIUploadResult to
+        * return valid complete multipart upload result.
+        */
+        if(originalRequest.getPicOperations() != null) {
+            return false;
+        }
+
+        /*
+        * Should retry compelte multipart upload internal error
+        *
+        * <?xml version="1.0" encoding="UTF-8"?> <Error> <Code>InternalError</Code> <Message>We
+        * encountered an internal error. Please try again.</Message>
+        * <RequestId>656c76696e6727732072657175657374</RequestId>
+        * <HostId>Uuag1LuByRx9e6j5Onimru9pO4ZVKnJ2Qz7/C1NPcfTWAtRPfTaOFg==</HostId> </Error>
+        */
+        if (exception.getErrorCode() == "InternalError") {
+            return true;
+        }
         return false;
     }
 
@@ -1687,8 +1709,6 @@ public class COSClient implements COS {
 
     }
 
-
-
     @Override
     public CompleteMultipartUploadResult completeMultipartUpload(
             CompleteMultipartUploadRequest completeMultipartUploadRequest)
@@ -1711,7 +1731,7 @@ public class COSClient implements COS {
 
 
         int retries = 0;
-        CompleteMultipartUploadHandler handler;
+        CompleteMultipartUploadHandler handler = new CompleteMultipartUploadHandler();
         do {
             CosHttpRequest<CompleteMultipartUploadRequest> request = createRequest(bucketName, key,
                     completeMultipartUploadRequest, HttpMethodName.POST);
@@ -1740,7 +1760,40 @@ public class COSClient implements COS {
                             new ServerSideEncryptionHeaderHandler<CompleteMultipartUploadHandler>(),
                             new ObjectExpirationHeaderHandler<CompleteMultipartUploadHandler>(),
                             new VIDResultHandler<CompleteMultipartUploadHandler>());
-            handler = invoke(request, responseHandler);
+
+            try {
+                handler = invoke(request, responseHandler);
+            } catch (CosServiceException completeException) {
+                if (retries > 0 && completeException.getStatusCode() == 404 && completeException.getErrorCode().equals("NoSuchUpload")) {
+                    try {
+                        ObjectMetadata metadata = getObjectMetadata(bucketName, key);
+
+                        CompleteMultipartUploadResult completeMultipartUploadResult = new CompleteMultipartUploadResult();
+                        completeMultipartUploadResult.setBucketName(bucketName);
+                        completeMultipartUploadResult.setKey(key);
+                        completeMultipartUploadResult.setETag(metadata.getETag());
+                        completeMultipartUploadResult.setVersionId(metadata.getVersionId());
+                        completeMultipartUploadResult.setCrc64Ecma(metadata.getCrc64Ecma());
+
+                        StringBuilder strBuilder = new StringBuilder();
+                        strBuilder.append("http://");
+                        strBuilder.append(bucketName).append(".cos.").append(clientConfig.getRegion());
+                        strBuilder.append(".myqcloud.com").append(UrlEncoderUtils.encodeUrlPath(formatKey(key)));
+                        completeMultipartUploadResult.setLocation(strBuilder.toString());
+
+                        return completeMultipartUploadResult;
+
+                    } catch (CosServiceException headException) {
+                        if (headException.getStatusCode() == 404) {
+                            throw completeException;
+                        }
+                        throw headException;
+                    }
+                } else {
+                    handler.setCOSException(completeException);
+                }
+            }
+
             if (handler.getCompleteMultipartUploadResult() != null) {
                 Map<String, String> responseHeaders = responseHandler.getResponseHeaders();
                 String versionId = responseHeaders.get(Headers.COS_VERSION_ID);
