@@ -44,6 +44,8 @@ public class ImageAuditingDemo {
         request.setDetectType("porn");
         //2.3设置bucket中的图片位置
         request.setObjectKey("1.jpg");
+        //2.4设置图片压缩参数 0（不压缩），1（压缩）默认为零
+        request.setLargeImageDetect("1");
         //3.调用接口,获取任务响应对象
         ImageAuditingResponse response = client.imageAuditing(request);
         //4调用工具类，获取各审核类型详情集合 (也可自行根据业务解析)

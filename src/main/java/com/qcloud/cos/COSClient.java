@@ -3932,7 +3932,7 @@ public class COSClient implements COS {
         addParameterIfNotNull(request, "max-frames", Integer.toString(imageAuditingRequest.getMaxFrames()));
         addParameterIfNotNull(request, "biz-type", imageAuditingRequest.getBizType());
         addParameterIfNotNull(request, "detect-url", imageAuditingRequest.getDetectUrl());
-        addParameterIfNotNull(request, "large-image-detect", imageAuditingRequest.getDetectUrl());
+        addParameterIfNotNull(request, "large-image-detect", imageAuditingRequest.getLargeImageDetect());
         return invoke(request, new Unmarshallers.ImageAuditingUnmarshaller());
     }
 
