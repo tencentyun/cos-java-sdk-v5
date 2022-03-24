@@ -47,6 +47,14 @@ public class ImageAuditingRequest extends CosServiceRequest {
      */
     private String detectUrl;
 
+    /**
+     * 对于超过大小限制的图片，可通过该参数选择是否需要压缩图片后再审核
+     * 压缩为后台默认操作，会产生额外的 基础图片处理用量
+     * 取值为：0（不压缩），1（压缩）。默认为0
+     * 注意：最大支持压缩32MB的图片。
+     */
+    private String largeImageDetect;
+
     public String getDetectType() {
         return detectType;
     }
@@ -104,9 +112,17 @@ public class ImageAuditingRequest extends CosServiceRequest {
         this.detectUrl = detectUrl;
     }
 
+    public String getLargeImageDetect() {
+        return largeImageDetect;
+    }
+
+    public void setLargeImageDetect(String largeImageDetect) {
+        this.largeImageDetect = largeImageDetect;
+    }
+
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("ImageAuditingRequest{");
+        final StringBuilder sb = new StringBuilder("ImageAuditingRequest{");
         sb.append("detectType='").append(detectType).append('\'');
         sb.append(", bucketName='").append(bucketName).append('\'');
         sb.append(", objectKey='").append(objectKey).append('\'');
@@ -114,6 +130,7 @@ public class ImageAuditingRequest extends CosServiceRequest {
         sb.append(", maxFrames=").append(maxFrames);
         sb.append(", bizType='").append(bizType).append('\'');
         sb.append(", detectUrl='").append(detectUrl).append('\'');
+        sb.append(", largeImageDetect='").append(largeImageDetect).append('\'');
         sb.append('}');
         return sb.toString();
     }
