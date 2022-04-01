@@ -10,6 +10,7 @@ public class AuditingInputObject {
     private String content;
     private String url;
     private String dataId;
+    private UserInfo userInfo = new UserInfo();
 
     public String getObject() {
         return object;
@@ -41,6 +42,14 @@ public class AuditingInputObject {
 
     public void setDataId(String dataId) {
         this.dataId = dataId;
+    }
+
+    public UserInfo getUserInfo() {
+        return userInfo;
+    }
+
+    public void setUserInfo(UserInfo userInfo) {
+        this.userInfo = userInfo;
     }
 
     @Override

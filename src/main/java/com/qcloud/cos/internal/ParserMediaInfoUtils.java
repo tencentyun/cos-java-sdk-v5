@@ -1,5 +1,6 @@
 package com.qcloud.cos.internal;
 
+import com.qcloud.cos.model.ciModel.auditing.UserInfo;
 import com.qcloud.cos.model.ciModel.job.MediaTranscodeVideoObject;
 import com.qcloud.cos.model.ciModel.job.MediaVideoObject;
 import com.qcloud.cos.model.ciModel.job.MediaTimeIntervalObject;
@@ -523,4 +524,34 @@ public class ParserMediaInfoUtils {
                 break;
         }
     }
+
+    public static void ParsingAuditingUserInfo(UserInfo userInfo, String name, String value) {
+        switch (name) {
+            case "Nickname":
+                userInfo.setNickname(value);
+                break;
+            case "AppId":
+                userInfo.setAppId(value);
+                break;
+            case "TokenId":
+                userInfo.setTokenId(value);
+                break;
+            case "DeviceId":
+                userInfo.setDeviceId(value);
+                break;
+            case "IP":
+                userInfo.setIp(value);
+                break;
+            case "Room":
+                userInfo.setRoom(value);
+                break;
+            case "Type":
+                userInfo.setType(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+
 }

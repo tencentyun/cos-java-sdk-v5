@@ -107,6 +107,11 @@ public class AuditingJobsDetail {
      */
     private List<SectionInfo> sectionList;
 
+    /**
+     * 用户自定义信息
+     */
+    private UserInfo userInfo = new UserInfo();
+
     public String getJobId() {
         return jobId;
     }
@@ -307,9 +312,17 @@ public class AuditingJobsDetail {
         this.label = label;
     }
 
+    public UserInfo getUserInfo() {
+        return userInfo;
+    }
+
+    public void setUserInfo(UserInfo userInfo) {
+        this.userInfo = userInfo;
+    }
+
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("AuditingJobsDetail{");
+        final StringBuffer sb = new StringBuffer("AuditingJobsDetail{");
         sb.append("jobId='").append(jobId).append('\'');
         sb.append(", state='").append(state).append('\'');
         sb.append(", creationTime='").append(creationTime).append('\'');
@@ -332,6 +345,7 @@ public class AuditingJobsDetail {
         sb.append(", illegalInfo=").append(illegalInfo);
         sb.append(", snapshotList=").append(snapshotList);
         sb.append(", sectionList=").append(sectionList);
+        sb.append(", userInfo=").append(userInfo);
         sb.append('}');
         return sb.toString();
     }

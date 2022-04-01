@@ -45,6 +45,7 @@ import com.qcloud.cos.model.ciModel.auditing.BatchImageAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.Conf;
 import com.qcloud.cos.model.ciModel.auditing.DocumentAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.TextAuditingRequest;
+import com.qcloud.cos.model.ciModel.auditing.UserInfo;
 import com.qcloud.cos.model.ciModel.auditing.VideoAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.WebpageAuditingRequest;
 import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
@@ -805,6 +806,19 @@ public class RequestXmlFactory {
         addIfNotNull(xml, "Content", request.getInput().getContent());
         addIfNotNull(xml, "Url", request.getInput().getUrl());
         addIfNotNull(xml, "DataId", request.getInput().getDataId());
+        UserInfo userInfo = request.getInput().getUserInfo();
+        if (CheckObjectUtils.objIsNotValid(userInfo)){
+            xml.start("UserInfo");
+            addIfNotNull(xml, "TokenId", userInfo.getTokenId());
+            addIfNotNull(xml, "Nickname", userInfo.getNickname());
+            addIfNotNull(xml, "DeviceId", userInfo.getDeviceId());
+            addIfNotNull(xml, "AppId", userInfo.getAppId());
+            addIfNotNull(xml, "Room", userInfo.getRoom());
+            addIfNotNull(xml, "IP", userInfo.getIp());
+            addIfNotNull(xml, "Type", userInfo.getType());
+            xml.end();
+        }
+
         xml.end();
         Conf conf = request.getConf();
         xml.start("Conf");
@@ -819,6 +833,7 @@ public class RequestXmlFactory {
         xml.end();
 
         xml.end();
+        System.out.println(xml.toString());
         return xml.getBytes();
     }
 
