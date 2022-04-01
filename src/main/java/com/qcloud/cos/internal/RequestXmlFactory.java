@@ -833,7 +833,6 @@ public class RequestXmlFactory {
         xml.end();
 
         xml.end();
-        System.out.println(xml.toString());
         return xml.getBytes();
     }
 
