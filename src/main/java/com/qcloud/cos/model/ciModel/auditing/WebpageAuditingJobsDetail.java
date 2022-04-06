@@ -14,6 +14,7 @@ public class WebpageAuditingJobsDetail {
     private String suggestion;
     private String url;
     private String creationTime;
+    private UserInfo userInfo = new UserInfo();
 
     public List<ResultsImageAuditingDetail> getImageResults() {
         return imageResults;
@@ -85,6 +86,14 @@ public class WebpageAuditingJobsDetail {
 
     public void setCreationTime(String creationTime) {
         this.creationTime = creationTime;
+    }
+
+    public UserInfo getUserInfo() {
+        return userInfo;
+    }
+
+    public void setUserInfo(UserInfo userInfo) {
+        this.userInfo = userInfo;
     }
 
     @Override

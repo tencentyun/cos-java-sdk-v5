@@ -1,6 +1,5 @@
 package com.qcloud.cos.demo.ci;
 
-import java.util.Base64;
 import java.util.List;
 
 import com.qcloud.cos.COSClient;

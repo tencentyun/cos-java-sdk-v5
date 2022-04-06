@@ -62,6 +62,8 @@ public class DocumentAuditingJobsDetail {
      */
     private DocumentResultInfo labels;
 
+    private UserInfo userInfo;
+
     public String getJobId() {
         return jobId;
     }
@@ -167,22 +169,30 @@ public class DocumentAuditingJobsDetail {
         this.object = object;
     }
 
+    public UserInfo getUserInfo() {
+        return userInfo;
+    }
+
+    public void setUserInfo(UserInfo userInfo) {
+        this.userInfo = userInfo;
+    }
+
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("DocumentAuditingJobsDetail{");
-        sb.append("jobId='").append(jobId).append('\'');
-        sb.append(", state='").append(state).append('\'');
-        sb.append(", creationTime='").append(creationTime).append('\'');
-        sb.append(", code='").append(code).append('\'');
-        sb.append(", message='").append(message).append('\'');
-        sb.append(", url='").append(url).append('\'');
-        sb.append(", object='").append(object).append('\'');
-        sb.append(", suggestion='").append(suggestion).append('\'');
-        sb.append(", pageCount='").append(pageCount).append('\'');
-        sb.append(", dataId='").append(dataId).append('\'');
-        sb.append(", pageSegment=").append(pageSegment);
-        sb.append(", labels=").append(labels);
-        sb.append('}');
-        return sb.toString();
+        return "DocumentAuditingJobsDetail{" +
+                "jobId='" + jobId + '\'' +
+                ", state='" + state + '\'' +
+                ", creationTime='" + creationTime + '\'' +
+                ", code='" + code + '\'' +
+                ", message='" + message + '\'' +
+                ", url='" + url + '\'' +
+                ", object='" + object + '\'' +
+                ", suggestion='" + suggestion + '\'' +
+                ", pageCount='" + pageCount + '\'' +
+                ", dataId='" + dataId + '\'' +
+                ", pageSegment=" + pageSegment +
+                ", labels=" + labels +
+                ", userInfo=" + userInfo +
+                '}';
     }
 }

@@ -16,6 +16,7 @@ public class BatchImageJobDetail {
     private TerroristInfo terroristInfo;
     private PoliticsInfo politicsInfo;
     private AdsInfo adsInfo;
+    private UserInfo userInfo = new UserInfo();
 
     public String getDataId() {
         return dataId;
@@ -141,24 +142,32 @@ public class BatchImageJobDetail {
         this.adsInfo = adsInfo;
     }
 
+    public UserInfo getUserInfo() {
+        return userInfo;
+    }
+
+    public void setUserInfo(UserInfo userInfo) {
+        this.userInfo = userInfo;
+    }
+
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("BatchImageJobDetail{");
-        sb.append("dataId='").append(dataId).append('\'');
-        sb.append(", label='").append(label).append('\'');
-        sb.append(", result='").append(result).append('\'');
-        sb.append(", object='").append(object).append('\'');
-        sb.append(", score='").append(score).append('\'');
-        sb.append(", subLabel='").append(subLabel).append('\'');
-        sb.append(", text='").append(text).append('\'');
-        sb.append(", code='").append(code).append('\'');
-        sb.append(", message='").append(message).append('\'');
-        sb.append(", url='").append(url).append('\'');
-        sb.append(", pornInfo=").append(pornInfo);
-        sb.append(", terroristInfo=").append(terroristInfo);
-        sb.append(", politicsInfo=").append(politicsInfo);
-        sb.append(", adsInfo=").append(adsInfo);
-        sb.append('}');
-        return sb.toString();
+        return "BatchImageJobDetail{" +
+                "dataId='" + dataId + '\'' +
+                ", label='" + label + '\'' +
+                ", result='" + result + '\'' +
+                ", object='" + object + '\'' +
+                ", score='" + score + '\'' +
+                ", subLabel='" + subLabel + '\'' +
+                ", text='" + text + '\'' +
+                ", code='" + code + '\'' +
+                ", message='" + message + '\'' +
+                ", url='" + url + '\'' +
+                ", pornInfo=" + pornInfo +
+                ", terroristInfo=" + terroristInfo +
+                ", politicsInfo=" + politicsInfo +
+                ", adsInfo=" + adsInfo +
+                ", userInfo=" + userInfo +
+                '}';
     }
 }

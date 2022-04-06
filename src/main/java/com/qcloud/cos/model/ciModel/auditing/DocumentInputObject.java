@@ -10,6 +10,7 @@ public class DocumentInputObject {
     private String object;
     private String type;
     private String dataId;
+    private UserInfo userInfo = new UserInfo();
 
     public String getDataId() {
         return dataId;
@@ -43,14 +44,22 @@ public class DocumentInputObject {
         this.object = object;
     }
 
+    public UserInfo getUserInfo() {
+        return userInfo;
+    }
+
+    public void setUserInfo(UserInfo userInfo) {
+        this.userInfo = userInfo;
+    }
+
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("DocumentInputObject{");
-        sb.append("url='").append(url).append('\'');
-        sb.append(", object='").append(object).append('\'');
-        sb.append(", type='").append(type).append('\'');
-        sb.append(", dataId='").append(dataId).append('\'');
-        sb.append('}');
-        return sb.toString();
+        return "DocumentInputObject{" +
+                "url='" + url + '\'' +
+                ", object='" + object + '\'' +
+                ", type='" + type + '\'' +
+                ", dataId='" + dataId + '\'' +
+                ", userInfo=" + userInfo +
+                '}';
     }
 }

@@ -29,6 +29,11 @@ public class AudtingCommonInfo {
     private String label;
 
     /**
+     * 在当前审核场景下命中的关键词，多关键词以,分隔。
+     */
+    private String keywords;
+
+    /**
      * 次数
      */
     private String count;
@@ -130,19 +135,27 @@ public class AudtingCommonInfo {
         this.subLabel = subLabel;
     }
 
+    public String getKeywords() {
+        return keywords;
+    }
+
+    public void setKeywords(String keywords) {
+        this.keywords = keywords;
+    }
+
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("AudtingCommonInfo{");
-        sb.append("code='").append(code).append('\'');
-        sb.append(", msg='").append(msg).append('\'');
-        sb.append(", hitFlag='").append(hitFlag).append('\'');
-        sb.append(", score='").append(score).append('\'');
-        sb.append(", label='").append(label).append('\'');
-        sb.append(", count='").append(count).append('\'');
-        sb.append(", subLabel='").append(subLabel).append('\'');
-        sb.append(", ocrResults=").append(ocrResults);
-        sb.append(", objectResults=").append(objectResults);
-        sb.append('}');
-        return sb.toString();
+        return "AudtingCommonInfo{" +
+                "code='" + code + '\'' +
+                ", msg='" + msg + '\'' +
+                ", hitFlag='" + hitFlag + '\'' +
+                ", score='" + score + '\'' +
+                ", label='" + label + '\'' +
+                ", keywords='" + keywords + '\'' +
+                ", count='" + count + '\'' +
+                ", subLabel='" + subLabel + '\'' +
+                ", ocrResults=" + ocrResults +
+                ", objectResults=" + objectResults +
+                '}';
     }
 }

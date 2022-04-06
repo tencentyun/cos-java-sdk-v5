@@ -3,6 +3,7 @@ package com.qcloud.cos.model.ciModel.auditing;
 public class BatchImageAuditingInputObject extends AuditingInputObject {
     private String interval;
     private String maxFrames;
+    private String largeImageDetect;
 
     public String getInterval() {
         return interval;
@@ -20,12 +21,20 @@ public class BatchImageAuditingInputObject extends AuditingInputObject {
         this.maxFrames = maxFrames;
     }
 
+    public String getLargeImageDetect() {
+        return largeImageDetect;
+    }
+
+    public void setLargeImageDetect(String largeImageDetect) {
+        this.largeImageDetect = largeImageDetect;
+    }
+
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("BatchImageAuditingInputObject{");
-        sb.append("interval='").append(interval).append('\'');
-        sb.append(", maxFrames='").append(maxFrames).append('\'');
-        sb.append('}');
-        return sb.toString();
+        return "BatchImageAuditingInputObject{" +
+                "interval='" + interval + '\'' +
+                ", maxFrames='" + maxFrames + '\'' +
+                ", largeImageDetect='" + largeImageDetect + '\'' +
+                '}';
     }
 }

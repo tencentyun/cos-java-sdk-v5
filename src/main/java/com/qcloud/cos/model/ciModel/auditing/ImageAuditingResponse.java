@@ -10,6 +10,7 @@ public class ImageAuditingResponse extends CosServiceResult {
     private TerroristInfo terroristInfo;
     private PoliticsInfo politicsInfo;
     private AdsInfo adsInfo;
+    private UserInfo userInfo = new UserInfo();
 
     public PornInfo getPornInfo() {
         if (pornInfo == null) {
@@ -55,14 +56,22 @@ public class ImageAuditingResponse extends CosServiceResult {
         this.adsInfo = adsInfo;
     }
 
+    public UserInfo getUserInfo() {
+        return userInfo;
+    }
+
+    public void setUserInfo(UserInfo userInfo) {
+        this.userInfo = userInfo;
+    }
+
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("ImageAuditingResponse{");
-        sb.append("pornInfo=").append(pornInfo);
-        sb.append(", terroristInfo=").append(terroristInfo);
-        sb.append(", politicsInfo=").append(politicsInfo);
-        sb.append(", adsInfo=").append(adsInfo);
-        sb.append('}');
-        return sb.toString();
+        return "ImageAuditingResponse{" +
+                "pornInfo=" + pornInfo +
+                ", terroristInfo=" + terroristInfo +
+                ", politicsInfo=" + politicsInfo +
+                ", adsInfo=" + adsInfo +
+                ", userInfo=" + userInfo +
+                '}';
     }
 }

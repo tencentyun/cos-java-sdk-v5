@@ -735,6 +735,7 @@ public class RequestXmlFactory {
         addIfNotNull(xml,"Object",request.getInput().getObject());
         addIfNotNull(xml, "Url", request.getInput().getUrl());
         addIfNotNull(xml, "DataId", request.getInput().getDataId());
+        addUserInfo(xml,request.getInput().getUserInfo());
         xml.end();
         Conf conf = request.getConf();
         xml.start("Conf");
@@ -773,6 +774,7 @@ public class RequestXmlFactory {
         addIfNotNull(xml, "Object", request.getInput().getObject());
         addIfNotNull(xml, "Url", request.getInput().getUrl());
         addIfNotNull(xml, "DataId", request.getInput().getDataId());
+        addUserInfo(xml,request.getInput().getUserInfo());
         xml.end();
         Conf conf = request.getConf();
         xml.start("Conf");
@@ -806,19 +808,7 @@ public class RequestXmlFactory {
         addIfNotNull(xml, "Content", request.getInput().getContent());
         addIfNotNull(xml, "Url", request.getInput().getUrl());
         addIfNotNull(xml, "DataId", request.getInput().getDataId());
-        UserInfo userInfo = request.getInput().getUserInfo();
-        if (CheckObjectUtils.objIsNotValid(userInfo)){
-            xml.start("UserInfo");
-            addIfNotNull(xml, "TokenId", userInfo.getTokenId());
-            addIfNotNull(xml, "Nickname", userInfo.getNickname());
-            addIfNotNull(xml, "DeviceId", userInfo.getDeviceId());
-            addIfNotNull(xml, "AppId", userInfo.getAppId());
-            addIfNotNull(xml, "Room", userInfo.getRoom());
-            addIfNotNull(xml, "IP", userInfo.getIp());
-            addIfNotNull(xml, "Type", userInfo.getType());
-            xml.end();
-        }
-
+        addUserInfo(xml,request.getInput().getUserInfo());
         xml.end();
         Conf conf = request.getConf();
         xml.start("Conf");
@@ -845,6 +835,7 @@ public class RequestXmlFactory {
         addIfNotNull(xml, "Object", request.getInput().getObject());
         addIfNotNull(xml, "Type", request.getInput().getType());
         addIfNotNull(xml, "DataId", request.getInput().getDataId());
+        addUserInfo(xml,request.getInput().getUserInfo());
         xml.end();
         Conf conf = request.getConf();
         xml.start("Conf");
@@ -896,6 +887,8 @@ public class RequestXmlFactory {
             addIfNotNull(xml, "DataId", inputObject.getDataId());
             addIfNotNull(xml, "MaxFrames", inputObject.getMaxFrames());
             addIfNotNull(xml, "Interval", inputObject.getInterval());
+            addIfNotNull(xml, "LargeImageDetect", inputObject.getLargeImageDetect());
+            addUserInfo(xml,inputObject.getUserInfo());
             xml.end();
         }
 
@@ -981,6 +974,20 @@ public class RequestXmlFactory {
         addIfNotNull(xml, "Remove", video.getRemove());
         addIfNotNull(xml, "ScanMode", video.getScanMode());
         xml.end();
+    }
+
+    private static void addUserInfo(XmlWriter xml, UserInfo userInfo) {
+        if (CheckObjectUtils.objIsNotValid(userInfo)) {
+            xml.start("UserInfo");
+            addIfNotNull(xml, "TokenId", userInfo.getTokenId());
+            addIfNotNull(xml, "Nickname", userInfo.getNickname());
+            addIfNotNull(xml, "DeviceId", userInfo.getDeviceId());
+            addIfNotNull(xml, "AppId", userInfo.getAppId());
+            addIfNotNull(xml, "Room", userInfo.getRoom());
+            addIfNotNull(xml, "IP", userInfo.getIp());
+            addIfNotNull(xml, "Type", userInfo.getType());
+            xml.end();
+        }
     }
 
 
