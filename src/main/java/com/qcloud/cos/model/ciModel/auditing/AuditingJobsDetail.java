@@ -100,6 +100,11 @@ public class AuditingJobsDetail {
      */
     private IllegalInfo illegalInfo;
 
+    /**
+     * 审核结果 青少年信息
+     */
+    private TeenagerInfo teenagerInfo;
+
     private List<SnapshotInfo> snapshotList;
 
     /**
@@ -320,6 +325,14 @@ public class AuditingJobsDetail {
         this.userInfo = userInfo;
     }
 
+    public TeenagerInfo getTeenagerInfo() {
+        return teenagerInfo;
+    }
+
+    public void setTeenagerInfo(TeenagerInfo teenagerInfo) {
+        this.teenagerInfo = teenagerInfo;
+    }
+
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("AuditingJobsDetail{");
@@ -343,6 +356,7 @@ public class AuditingJobsDetail {
         sb.append(", adsInfo=").append(adsInfo);
         sb.append(", abuseInfo=").append(abuseInfo);
         sb.append(", illegalInfo=").append(illegalInfo);
+        sb.append(", teenagerInfo=").append(teenagerInfo);
         sb.append(", snapshotList=").append(snapshotList);
         sb.append(", sectionList=").append(sectionList);
         sb.append(", userInfo=").append(userInfo);

@@ -741,7 +741,7 @@ public class RequestXmlFactory {
         xml.start("Conf");
         String detectType = conf.getDetectType();
         if ("all".equalsIgnoreCase(detectType)) {
-            detectType = "Porn,Terrorism,Politics,Ads,Illegal,Abuse";
+            detectType = "Porn,Terrorism,Politics,Ads,Illegal,Abuse,Teenager";
         }
         addIfNotNull(xml,"DetectType", detectType);
         addIfNotNull(xml,"BizType", conf.getBizType());

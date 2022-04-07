@@ -7,7 +7,8 @@ public enum DetectType {
     Politics("政治敏感", 3),
     Ads("广告", 4),
     Illegal("违法", 5),
-    Abuse("谩骂", 6);
+    Abuse("谩骂", 6),
+    Teenager("未成年人", 7);
 
     private int type;
     private String name;

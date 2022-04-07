@@ -3926,7 +3926,7 @@ public class COSClient implements COS {
         CosHttpRequest<ImageAuditingRequest> request = createRequest(imageAuditingRequest.getBucketName(), imageAuditingRequest.getObjectKey(), imageAuditingRequest, HttpMethodName.GET);
         request.addParameter("ci-process", "sensitive-content-recognition");
         if ("all".equalsIgnoreCase(detectType))
-            detectType = "porn,terrorist,politics,ads";
+            detectType = "porn,terrorist,politics,ads,teenager";
         addParameterIfNotNull(request, "detect-type", detectType);
         addParameterIfNotNull(request, "interval", Integer.toString(imageAuditingRequest.getInterval()));
         addParameterIfNotNull(request, "max-frames", Integer.toString(imageAuditingRequest.getMaxFrames()));

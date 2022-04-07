@@ -5305,7 +5305,9 @@ public class XmlResponsesSaxParser {
                 parseInfo(response.getTerroristInfo(), name, getText());
             } else if (in("RecognitionResult", "AdsInfo")) {
                 parseInfo(response.getAdsInfo(), name, getText());
-            }else if (in("RecognitionResult",  "UserInfo")) {
+            } else if (in("RecognitionResult", "TeenagerInfo")) {
+                parseInfo(response.getTeenagerInfo(), name, getText());
+            } else if (in("RecognitionResult", "UserInfo")) {
                 ParserMediaInfoUtils.ParsingAuditingUserInfo(response.getUserInfo(), name, getText());
             }
         }
@@ -5399,6 +5401,8 @@ public class XmlResponsesSaxParser {
                 parseInfo(response.getJobsDetail().getTerroristInfo(), name, getText());
             } else if (in("Response", "JobsDetail", "AdsInfo")) {
                 parseInfo(response.getJobsDetail().getAdsInfo(), name, getText());
+            }else if (in("Response", "JobsDetail", "TeenagerInfo")) {
+                parseInfo(response.getJobsDetail().getTeenagerInfo(), name, getText());
             } else if (in("Response", "JobsDetail", "Snapshot")) {
                 SnapshotInfo snapshotInfo = snapshotList.get(snapshotList.size() - 1);
                 if ("Url".equals(name))
@@ -6006,6 +6010,12 @@ public class XmlResponsesSaxParser {
                 parseInfo(response.getJobsDetail().getTerroristInfo(), name, getText());
             } else if (in("Response", "Detail", "AdsInfo") || in("Response", "JobsDetail", "AdsInfo")) {
                 parseInfo(response.getJobsDetail().getAdsInfo(), name, getText());
+            } else if (in("Response", "Detail", "AbuseInfo") || in("Response", "JobsDetail", "AbuseInfo")) {
+                parseInfo(response.getJobsDetail().getAbuseInfo(), name, getText());
+            } else if (in("Response", "Detail", "IllegalInfo") || in("Response", "JobsDetail", "IllegalInfo")) {
+                parseInfo(response.getJobsDetail().getIllegalInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "UserInfo")) {
+                ParserMediaInfoUtils.ParsingAuditingUserInfo(response.getJobsDetail().getUserInfo(), name, getText());
             } else if (in("Response", "Detail", "Section") || in("Response", "JobsDetail", "Section")) {
                 SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
                 if ("StartByte".equals(name))
@@ -6022,6 +6032,12 @@ public class XmlResponsesSaxParser {
             } else if (in("Response", "Detail", "Section", "AdsInfo") || in("Response", "JobsDetail", "Section", "AdsInfo")) {
                 SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
                 parseInfo(sectionInfo.getAdsInfo(), name, getText());
+            } else if (in("Response", "Detail", "Section", "AbuseInfo") || in("Response", "JobsDetail", "Section", "AbuseInfo")) {
+                SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
+                parseInfo(sectionInfo.getAbuseInfo(), name, getText());
+            } else if (in("Response", "Detail", "Section", "IllegalInfo") || in("Response", "JobsDetail", "Section", "IllegalInfo")) {
+                SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
+                parseInfo(sectionInfo.getIllegalInfo(), name, getText());
             }
         }
 
