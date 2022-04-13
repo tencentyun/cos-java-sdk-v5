@@ -18,8 +18,10 @@
 
 package com.qcloud.cos.internal;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.List;
 
 import com.qcloud.cos.internal.XmlResponsesSaxParser.CompleteMultipartUploadHandler;
@@ -68,6 +70,7 @@ import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoResponse;
 import com.qcloud.cos.model.ciModel.queue.DocListQueueResponse;
 import com.qcloud.cos.model.ciModel.queue.MediaListQueueResponse;
 import com.qcloud.cos.model.ciModel.queue.MediaQueueResponse;
+import com.qcloud.cos.model.ciModel.snapshot.PrivateM3U8Response;
 import com.qcloud.cos.model.ciModel.snapshot.SnapshotResponse;
 import com.qcloud.cos.model.ciModel.template.MediaListTemplateResponse;
 import com.qcloud.cos.model.ciModel.template.MediaTemplateResponse;
@@ -757,4 +760,22 @@ public class Unmarshallers {
         }
     }
 
+    public static final class PrivateM3U8Unmarshaller
+            implements Unmarshaller<PrivateM3U8Response, InputStream> {
+        public PrivateM3U8Response unmarshall(InputStream in) throws Exception {
+            PrivateM3U8Response privateM3U8Response = new PrivateM3U8Response();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+            StringBuffer sb = new StringBuffer("");
+            String line = "";
+            String NL = System.getProperty("line.separator");
+            while ((line = reader.readLine()) != null) {
+                sb.append(line + NL);
+            }
+            privateM3U8Response.setM3u8(sb.toString());
+            if (privateM3U8Response.getM3u8() == null)
+                privateM3U8Response.setM3u8("Unknown Error");
+
+            return privateM3U8Response;
+        }
+    }
 }

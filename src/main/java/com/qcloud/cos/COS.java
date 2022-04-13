@@ -59,6 +59,8 @@ import com.qcloud.cos.model.ciModel.queue.DocQueueRequest;
 import com.qcloud.cos.model.ciModel.queue.MediaListQueueResponse;
 import com.qcloud.cos.model.ciModel.queue.MediaQueueRequest;
 import com.qcloud.cos.model.ciModel.queue.MediaQueueResponse;
+import com.qcloud.cos.model.ciModel.snapshot.PrivateM3U8Request;
+import com.qcloud.cos.model.ciModel.snapshot.PrivateM3U8Response;
 import com.qcloud.cos.model.ciModel.snapshot.SnapshotRequest;
 import com.qcloud.cos.model.ciModel.snapshot.SnapshotResponse;
 import com.qcloud.cos.model.ciModel.template.MediaListTemplateResponse;
@@ -3012,6 +3014,8 @@ public interface COS extends COSDirectSpi {
     GetAsyncFetchTaskResult getAsyncFetchTask(GetAsyncFetchTaskRequest request);
 
     ImageAuditingResponse describeAuditingImageJob(DescribeImageAuditingRequest imageAuditingRequest);
+
+    PrivateM3U8Response getPrivateM3U8(PrivateM3U8Request request);
 }
 
 

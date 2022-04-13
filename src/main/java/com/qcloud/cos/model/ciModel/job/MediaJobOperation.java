@@ -21,6 +21,7 @@ public class MediaJobOperation {
     private MediaTranscodeObject transcode;
     private List<String> watermarkTemplateId;
     private MediaConcatTemplateObject mediaConcatTemplate;
+    private MediaDigitalWatermark digitalWatermark = new MediaDigitalWatermark();
 
     public MediaJobOperation() {
         this.output = new MediaOutputObject();
@@ -123,6 +124,14 @@ public class MediaJobOperation {
         this.transcode = transcode;
     }
 
+    public MediaDigitalWatermark getDigitalWatermark() {
+        return digitalWatermark;
+    }
+
+    public void setDigitalWatermark(MediaDigitalWatermark digitalWatermark) {
+        this.digitalWatermark = digitalWatermark;
+    }
+
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("MediaJobOperation{");
@@ -135,6 +144,7 @@ public class MediaJobOperation {
         sb.append(", transcode=").append(transcode);
         sb.append(", watermarkTemplateId=").append(watermarkTemplateId);
         sb.append(", mediaConcatTemplate=").append(mediaConcatTemplate);
+        sb.append(", digitalWatermark=").append(digitalWatermark);
         sb.append('}');
         return sb.toString();
     }

@@ -14,6 +14,7 @@ public class BatchImageJobDetail {
     private String code;
     private String message;
     private String url;
+    private String compressionResult;
     private PornInfo pornInfo;
     private TerroristInfo terroristInfo;
     private PoliticsInfo politicsInfo;
@@ -175,6 +176,14 @@ public class BatchImageJobDetail {
 
     public void setUserInfo(UserInfo userInfo) {
         this.userInfo = userInfo;
+    }
+
+    public String getCompressionResult() {
+        return compressionResult;
+    }
+
+    public void setCompressionResult(String compressionResult) {
+        this.compressionResult = compressionResult;
     }
 
     @Override

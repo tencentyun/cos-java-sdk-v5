@@ -56,6 +56,11 @@ public class ImageAuditingRequest extends CosServiceRequest {
     private String largeImageDetect;
 
     /**
+     * 图片标识，该字段在结果中返回原始内容，长度限制为512字节
+     */
+    private String dataId;
+
+    /**
      * 任务id 用于查询
      */
     private String jobId;
@@ -132,6 +137,14 @@ public class ImageAuditingRequest extends CosServiceRequest {
 
     public void setJobId(String jobId) {
         this.jobId = jobId;
+    }
+
+    public String getDataId() {
+        return dataId;
+    }
+
+    public void setDataId(String dataId) {
+        this.dataId = dataId;
     }
 
     @Override

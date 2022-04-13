@@ -7,7 +7,7 @@ package com.qcloud.cos.model.ciModel.auditing;
 public class Conf {
 
     /**
-     * 审核类型，拥有 porn（涉黄识别）、terrorist（涉暴恐识别）、politics（涉政识别）、ads（广告识别）四种。用户可选择多种识别类型，
+     * 审核的场景类型，有效值：Porn（涉黄）、Ads（广告）等，可以传入多种类型，不同类型以,分隔，例如：Porn,Ads。，
      * 文本审核类型额外支持 Illegal（违法）、Abuse（谩骂）
      * 例如 detectType=porn,ads 表示对图片进行涉黄及广告审核
      */

@@ -107,6 +107,8 @@ public class AuditingJobsDetail {
 
     private List<SnapshotInfo> snapshotList;
 
+    private List<AudioSectionInfo> audioSectionList = new ArrayList<>();
+
     /**
      * 具体文本分片的审核结果信息，只返回带有违规结果的分片
      */
@@ -336,6 +338,14 @@ public class AuditingJobsDetail {
 
     public void setTeenagerInfo(TeenagerInfo teenagerInfo) {
         this.teenagerInfo = teenagerInfo;
+    }
+
+    public List<AudioSectionInfo> getAudioSectionList() {
+        return audioSectionList;
+    }
+
+    public void setAudioSectionList(List<AudioSectionInfo> audioSectionList) {
+        this.audioSectionList = audioSectionList;
     }
 
     @Override

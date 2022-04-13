@@ -38,7 +38,7 @@ public class ImageAuditingDemo {
         //2.2设置审核类型
         request.setDetectType("porn");
         //2.3设置bucket中的图片位置
-        request.setObjectKey("1.jpg");
+        request.setObjectKey("ocr.png");
         //2.4设置图片压缩参数 0（不压缩），1（压缩）默认为零
         request.setLargeImageDetect("1");
         request.setBizType("a34415d405a001ef15f4855f46e9ceca");
@@ -129,10 +129,8 @@ public class ImageAuditingDemo {
         //2.添加请求参数 参数详情请见api接口文档
         //2.1设置请求bucket
         request.setBucketName("markjrzhang-1251704708");
-        request.setJobId("siac663942ba7111ec8c49525400863904");
+        request.setJobId("si45a4f827badf11ecb72c525400bc4ce1");
         ImageAuditingResponse response = client.describeAuditingImageJob(request);
         System.out.println(Jackson.toJsonString(response));
-        //4调用工具类，获取各审核类型详情集合 (也可自行根据业务解析)
-        System.out.println(response);
     }
 }

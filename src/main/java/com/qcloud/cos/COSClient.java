@@ -127,6 +127,8 @@ import com.qcloud.cos.model.ciModel.queue.DocQueueRequest;
 import com.qcloud.cos.model.ciModel.queue.MediaListQueueResponse;
 import com.qcloud.cos.model.ciModel.queue.MediaQueueRequest;
 import com.qcloud.cos.model.ciModel.queue.MediaQueueResponse;
+import com.qcloud.cos.model.ciModel.snapshot.PrivateM3U8Request;
+import com.qcloud.cos.model.ciModel.snapshot.PrivateM3U8Response;
 import com.qcloud.cos.model.ciModel.snapshot.SnapshotRequest;
 import com.qcloud.cos.model.ciModel.snapshot.SnapshotResponse;
 import com.qcloud.cos.model.ciModel.template.MediaListTemplateResponse;
@@ -3912,14 +3914,15 @@ public class COSClient implements COS {
         rejectNull(detectType, "The detectType parameter must be specified setting the object tags");
         CosHttpRequest<ImageAuditingRequest> request = createRequest(imageAuditingRequest.getBucketName(), imageAuditingRequest.getObjectKey(), imageAuditingRequest, HttpMethodName.GET);
         request.addParameter("ci-process", "sensitive-content-recognition");
-        if ("all".equalsIgnoreCase(detectType))
-            detectType = "porn,terrorist,politics,ads,teenager";
-        addParameterIfNotNull(request, "detect-type", detectType);
+        if (!"all".equalsIgnoreCase(detectType)) {
+            addParameterIfNotNull(request, "detect-type", detectType);
+        }
         addParameterIfNotNull(request, "interval", Integer.toString(imageAuditingRequest.getInterval()));
         addParameterIfNotNull(request, "max-frames", Integer.toString(imageAuditingRequest.getMaxFrames()));
         addParameterIfNotNull(request, "biz-type", imageAuditingRequest.getBizType());
         addParameterIfNotNull(request, "detect-url", imageAuditingRequest.getDetectUrl());
         addParameterIfNotNull(request, "large-image-detect", imageAuditingRequest.getLargeImageDetect());
+        addParameterIfNotNull(request, "dataid", imageAuditingRequest.getDataId());
         return invoke(request, new Unmarshallers.ImageAuditingUnmarshaller());
     }
 
@@ -4221,6 +4224,18 @@ public class COSClient implements COS {
                 "The jobId parameter must be specified setting the object tags");
         CosHttpRequest<DescribeImageAuditingRequest> request = createRequest(imageAuditingRequest.getBucketName(), "/image/auditing/" + imageAuditingRequest.getJobId(), imageAuditingRequest, HttpMethodName.GET);
         return invoke(request, new Unmarshallers.ImageAuditingDescribeJobUnmarshaller());
+    }
+
+    @Override
+    public PrivateM3U8Response getPrivateM3U8(PrivateM3U8Request privateM3U8Request) {
+        rejectNull(privateM3U8Request.getExpires(),
+                "The expires parameter must be specified setting the object tags , must satisfy the interval [3600, 43200]");
+        rejectNull(privateM3U8Request.getBucketName(),
+                "The privateM3U8Request.bucketName parameter must be specified setting the object tags");
+        CosHttpRequest<PrivateM3U8Request> request = createRequest(privateM3U8Request.getBucketName(), privateM3U8Request.getObject(), privateM3U8Request, HttpMethodName.GET);
+        request.addParameter("ci-process", "pm3u8");
+        request.addParameter("expires", privateM3U8Request.getExpires());
+        return invoke(request, new Unmarshallers.PrivateM3U8Unmarshaller());
     }
 }
 
