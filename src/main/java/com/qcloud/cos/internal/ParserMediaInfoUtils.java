@@ -1,5 +1,7 @@
 package com.qcloud.cos.internal;
 
+import com.qcloud.cos.model.ciModel.auditing.AudtingCommonInfo;
+import com.qcloud.cos.model.ciModel.auditing.OcrResults;
 import com.qcloud.cos.model.ciModel.auditing.UserInfo;
 import com.qcloud.cos.model.ciModel.job.MediaTranscodeVideoObject;
 import com.qcloud.cos.model.ciModel.job.MediaVideoObject;
@@ -547,6 +549,47 @@ public class ParserMediaInfoUtils {
                 break;
             case "Type":
                 userInfo.setType(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParsingAuditingCommonInfo(AudtingCommonInfo obj, String name, String value) {
+        switch (name) {
+            case "Code":
+                obj.setCode(value);
+                break;
+            case "Msg":
+                obj.setMsg(value);
+                break;
+            case "HitFlag":
+                obj.setHitFlag(value);
+                break;
+            case "Score":
+                obj.setScore(value);
+                break;
+            case "Label":
+                obj.setLabel(value);
+                break;
+            case "Category":
+                obj.setCategory(value);
+                break;
+            case "Keywords":
+                obj.setKeywords(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void parseOrcInfo(OcrResults obj, String name, String value) {
+        switch (name) {
+            case "Text":
+                obj.setText(value);
+                break;
+            case "Keywords":
+                obj.setKeywords(value);
                 break;
             default:
                 break;

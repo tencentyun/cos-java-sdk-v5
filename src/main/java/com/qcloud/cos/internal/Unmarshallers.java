@@ -747,4 +747,14 @@ public class Unmarshallers {
                     .parseDWebpageAuditingDescribeResponse(in).getResponse();
         }
     }
+
+    public static final class ImageAuditingDescribeJobUnmarshaller
+            implements Unmarshaller<ImageAuditingResponse, InputStream> {
+
+        public ImageAuditingResponse unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser()
+                    .parseImageAuditingDescribeResponse(in).getResponse();
+        }
+    }
+
 }

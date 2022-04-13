@@ -55,6 +55,12 @@ public class ImageAuditingRequest extends CosServiceRequest {
      */
     private String largeImageDetect;
 
+    /**
+     * 任务id 用于查询
+     */
+    private String jobId;
+
+
     public String getDetectType() {
         return detectType;
     }
@@ -118,6 +124,14 @@ public class ImageAuditingRequest extends CosServiceRequest {
 
     public void setLargeImageDetect(String largeImageDetect) {
         this.largeImageDetect = largeImageDetect;
+    }
+
+    public String getJobId() {
+        return jobId;
+    }
+
+    public void setJobId(String jobId) {
+        this.jobId = jobId;
     }
 
     @Override

@@ -15,7 +15,7 @@ public class AuditingSnapshotObject {
     /**
      * 截图数量，范围为(0,10000]
      */
-    private String count;
+    private String count = "1";
 
     /**
      * 截图频率，范围为(0,60]，单位为秒，支持 float 格式，执行精度精确到毫秒

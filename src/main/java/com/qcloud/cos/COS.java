@@ -33,20 +33,7 @@ import com.qcloud.cos.exception.MultiObjectDeleteException;
 import com.qcloud.cos.http.HttpMethodName;
 import com.qcloud.cos.internal.COSDirectSpi;
 import com.qcloud.cos.model.*;
-import com.qcloud.cos.model.ciModel.auditing.AudioAuditingRequest;
-import com.qcloud.cos.model.ciModel.auditing.AudioAuditingResponse;
-import com.qcloud.cos.model.ciModel.auditing.BatchImageAuditingRequest;
-import com.qcloud.cos.model.ciModel.auditing.BatchImageAuditingResponse;
-import com.qcloud.cos.model.ciModel.auditing.DocumentAuditingRequest;
-import com.qcloud.cos.model.ciModel.auditing.DocumentAuditingResponse;
-import com.qcloud.cos.model.ciModel.auditing.ImageAuditingRequest;
-import com.qcloud.cos.model.ciModel.auditing.ImageAuditingResponse;
-import com.qcloud.cos.model.ciModel.auditing.TextAuditingRequest;
-import com.qcloud.cos.model.ciModel.auditing.TextAuditingResponse;
-import com.qcloud.cos.model.ciModel.auditing.VideoAuditingRequest;
-import com.qcloud.cos.model.ciModel.auditing.VideoAuditingResponse;
-import com.qcloud.cos.model.ciModel.auditing.WebpageAuditingRequest;
-import com.qcloud.cos.model.ciModel.auditing.WebpageAuditingResponse;
+import com.qcloud.cos.model.ciModel.auditing.*;
 import com.qcloud.cos.model.ciModel.bucket.DocBucketRequest;
 import com.qcloud.cos.model.ciModel.bucket.DocBucketResponse;
 import com.qcloud.cos.model.ciModel.bucket.MediaBucketRequest;
@@ -3023,6 +3010,8 @@ public interface COS extends COSDirectSpi {
     PutAsyncFetchTaskResult putAsyncFetchTask(PutAsyncFetchTaskRequest request);
 
     GetAsyncFetchTaskResult getAsyncFetchTask(GetAsyncFetchTaskRequest request);
+
+    ImageAuditingResponse describeAuditingImageJob(DescribeImageAuditingRequest imageAuditingRequest);
 }
 
 

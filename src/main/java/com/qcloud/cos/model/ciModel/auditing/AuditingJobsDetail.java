@@ -113,6 +113,11 @@ public class AuditingJobsDetail {
     private List<SectionInfo> sectionList;
 
     /**
+     *
+     */
+    private SectionInfo audioSection;
+
+    /**
      * 用户自定义信息
      */
     private UserInfo userInfo = new UserInfo();
