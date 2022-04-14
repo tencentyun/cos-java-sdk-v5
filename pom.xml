@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.qcloud</groupId>
     <artifactId>cos_api</artifactId>
-    <version>5.6.72</version>
+    <version>5.6.73</version>
     <packaging>jar</packaging>
     <name>cos-java-sdk</name>
     <description>java sdk for qcloud cos</description>
@@ -25,6 +25,10 @@
         <developer>
             <name>aldoli</name>
             <email>aldoli@tencent.com</email>
+        </developer>
+        <developer>
+            <name>yangdonggao</name>
+            <email>yangdonggao@tencent.com</email>
         </developer>
     </developers>
 
