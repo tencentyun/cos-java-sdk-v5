@@ -21,7 +21,7 @@ public class ImageAuditingDemo {
         // 1 初始化用户身份信息（secretId, secretKey）。
         COSClient client = ClientUtils.getTestClient();
         // 2 调用要使用的方法。
-        describeAuditingImageJob(client);
+        imageAuditing(client);
     }
 
     /**
@@ -34,11 +34,11 @@ public class ImageAuditingDemo {
         ImageAuditingRequest request = new ImageAuditingRequest();
         //2.添加请求参数 参数详情请见api接口文档
         //2.1设置请求bucket
-        request.setBucketName("markjrzhang-1251704708");
-        //2.2设置审核类型
-        request.setDetectType("porn");
+        request.setBucketName("demobucket-1234567890");
+        //2.2设置审核类型 不设置值时表示审核所有类型
+//        request.setDetectType("porn");
         //2.3设置bucket中的图片位置
-        request.setObjectKey("ocr.png");
+        request.setObjectKey("1.png");
         //2.4设置图片压缩参数 0（不压缩），1（压缩）默认为零
         request.setLargeImageDetect("1");
         request.setBizType("a34415d405a001ef15f4855f46e9ceca");
@@ -92,15 +92,13 @@ public class ImageAuditingDemo {
     public static void batchPostImageAuditing(COSClient client) throws InterruptedException {
         List<ImageAuditingRequest> requestList = new ArrayList<>();
         ImageAuditingRequest request = new ImageAuditingRequest();
-        request.setBucketName("demo-123456789");
+        request.setBucketName("demo-1234567890");
         request.setObjectKey("1.png");
-        request.setDetectType("all");
         requestList.add(request);
 
         request = new ImageAuditingRequest();
-        request.setBucketName("demo-123456789");
+        request.setBucketName("demo-1234567890");
         request.setObjectKey("1.jpg");
-        request.setDetectType("all");
         requestList.add(request);
 
         // 传入一个threadpool, 若不传入线程池, 默认TransferManager中会生成一个单线程的线程池。
@@ -128,8 +126,8 @@ public class ImageAuditingDemo {
         DescribeImageAuditingRequest request = new DescribeImageAuditingRequest();
         //2.添加请求参数 参数详情请见api接口文档
         //2.1设置请求bucket
-        request.setBucketName("markjrzhang-1251704708");
-        request.setJobId("si45a4f827badf11ecb72c525400bc4ce1");
+        request.setBucketName("demobucket-1234567890");
+        request.setJobId("si45a4f827badf11ecb72c525400bc****");
         ImageAuditingResponse response = client.describeAuditingImageJob(request);
         System.out.println(Jackson.toJsonString(response));
     }

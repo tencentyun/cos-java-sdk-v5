@@ -52,6 +52,7 @@ import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
 import com.qcloud.cos.model.ciModel.job.DocJobObject;
 import com.qcloud.cos.model.ciModel.job.DocJobRequest;
 import com.qcloud.cos.model.ciModel.job.DocProcessObject;
+import com.qcloud.cos.model.ciModel.job.ExtractDigitalWatermark;
 import com.qcloud.cos.model.ciModel.job.MediaAudioObject;
 import com.qcloud.cos.model.ciModel.job.MediaConcatFragmentObject;
 import com.qcloud.cos.model.ciModel.job.MediaConcatTemplateObject;
@@ -459,22 +460,34 @@ public class RequestXmlFactory {
         MediaDigitalWatermark digitalWatermark = operation.getDigitalWatermark();
         if (CheckObjectUtils.objIsNotValid(digitalWatermark)) {
             xml.start("DigitalWatermark");
-            xml.start("Message").value(digitalWatermark.getMessage()).end();
-            xml.start("Type").value(digitalWatermark.getType()).end();
-            xml.start("Version").value(digitalWatermark.getVersion()).end();
+            addIfNotNull(xml, "Message",digitalWatermark.getMessage());
+            addIfNotNull(xml, "Type",digitalWatermark.getType());
+            addIfNotNull(xml, "Version",digitalWatermark.getVersion());
             xml.end();
         }
 
-        xml.start("Output");
-        xml.start("Region").value(operation.getOutput().getRegion()).end();
-        xml.start("Object").value(operation.getOutput().getObject()).end();
-        xml.start("Bucket").value(operation.getOutput().getBucket()).end();
-        xml.end();
+        ExtractDigitalWatermark extractDigitalWatermark = operation.getExtractDigitalWatermark();
+        if (extractDigitalWatermark.getType() != null || extractDigitalWatermark.getType() != null) {
+            xml.start("ExtractDigitalWatermark");
+            addIfNotNull(xml, "Message",extractDigitalWatermark.getMessage());
+            addIfNotNull(xml, "Type",extractDigitalWatermark.getType());
+            addIfNotNull(xml, "Version",extractDigitalWatermark.getVersion());
+            xml.end();
+        }
+        MediaOutputObject output = operation.getOutput();
+        if (CheckObjectUtils.objIsNotValid(output)){
+            xml.start("Output");
+            addIfNotNull(xml,"Region",output.getRegion());
+            addIfNotNull(xml,"Object",output.getObject());
+            addIfNotNull(xml,"Bucket",output.getBucket());
+            xml.end();
+        }
 
         xml.end();
         xml.start("QueueId").value(request.getQueueId()).end();
         addIfNotNull(xml, "CallBack", request.getCallBack());
         xml.end();
+        System.out.println(xml);
         return xml.getBytes();
     }
 

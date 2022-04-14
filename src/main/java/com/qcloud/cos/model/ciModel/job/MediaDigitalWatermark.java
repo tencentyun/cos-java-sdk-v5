@@ -13,11 +13,11 @@ public class MediaDigitalWatermark {
     /**
      * 水印类型	目前只支持Text
      */
-    private String type = "Text";
+    private String type;
     /**
      * 水印版本
      */
-    private String version = "V1";
+    private String version;
 
     public String getMessage() {
         return message;
@@ -41,5 +41,15 @@ public class MediaDigitalWatermark {
 
     public void setVersion(String version) {
         this.version = version;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("MediaDigitalWatermark{");
+        sb.append("message='").append(message).append('\'');
+        sb.append(", type='").append(type).append('\'');
+        sb.append(", version='").append(version).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 }

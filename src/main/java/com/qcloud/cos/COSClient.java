@@ -3616,7 +3616,6 @@ public class COSClient implements COS {
                 "The queueId parameter must be specified setting the object tags");
         rejectNull(req.getInput().getObject(),
                 "The input parameter must be specified setting the object tags");
-        this.checkRequestOutput(req.getOperation().getOutput());
         this.rejectStartWith(req.getCallBack(),"http","The CallBack parameter mush start with http or https");
         CosHttpRequest<MediaJobsRequest> request = createRequest(req.getBucketName(), "/jobs", req, HttpMethodName.POST);
         this.setContent(request, RequestXmlFactory.convertToXmlByteArray(req), "application/xml", false);
@@ -3910,10 +3909,9 @@ public class COSClient implements COS {
                 "The imageAuditingRequest parameter must be specified setting the object tags");
         rejectNull(imageAuditingRequest.getBucketName(),
                 "The bucketName parameter must be specified setting the object tags");
-        String detectType = imageAuditingRequest.getDetectType();
-        rejectNull(detectType, "The detectType parameter must be specified setting the object tags");
         CosHttpRequest<ImageAuditingRequest> request = createRequest(imageAuditingRequest.getBucketName(), imageAuditingRequest.getObjectKey(), imageAuditingRequest, HttpMethodName.GET);
         request.addParameter("ci-process", "sensitive-content-recognition");
+        String detectType = imageAuditingRequest.getDetectType();
         if (!"all".equalsIgnoreCase(detectType)) {
             addParameterIfNotNull(request, "detect-type", detectType);
         }

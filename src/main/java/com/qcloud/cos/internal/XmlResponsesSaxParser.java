@@ -117,6 +117,7 @@ import com.qcloud.cos.model.ciModel.job.DocJobResponse;
 import com.qcloud.cos.model.ciModel.job.DocProcessObject;
 import com.qcloud.cos.model.ciModel.job.DocProcessPageInfo;
 import com.qcloud.cos.model.ciModel.job.DocProcessResult;
+import com.qcloud.cos.model.ciModel.job.ExtractDigitalWatermark;
 import com.qcloud.cos.model.ciModel.job.MediaAudioObject;
 import com.qcloud.cos.model.ciModel.job.MediaConcatFragmentObject;
 import com.qcloud.cos.model.ciModel.job.MediaConcatTemplateObject;
@@ -4130,6 +4131,12 @@ public class XmlResponsesSaxParser {
                 if ("Index".equals(name)) {
                     mediaConcatTemplate.setIndex(getText());
                 }
+            } else if (in("Response", "JobsDetail", "Operation", "DigitalWatermark") ) {
+                MediaDigitalWatermark digitalWatermark = response.getJobsDetail().getOperation().getDigitalWatermark();
+                ParserMediaInfoUtils.ParsingDigitalWatermark(digitalWatermark, name, getText());
+            } else if ( in("Response", "JobsDetail", "Operation", "ExtractDigitalWatermark")) {
+                ExtractDigitalWatermark digitalWatermark = response.getJobsDetail().getOperation().getExtractDigitalWatermark();
+                ParserMediaInfoUtils.ParsingDigitalWatermark(digitalWatermark, name, getText());
             }
         }
 
@@ -4224,13 +4231,12 @@ public class XmlResponsesSaxParser {
                 MediaTimeIntervalObject timeInterval = jobsDetail.getOperation().getTranscode().getTimeInterval();
                 ParserMediaInfoUtils.ParsingMediaTimeInterval(timeInterval, name, getText());
             } else if (in("Response", "JobsDetail", "Operation", "DigitalWatermark")) {
-                MediaDigitalWatermark digitalWatermark = jobsDetail.getOperation().getDigitalWatermark();
+                MediaDigitalWatermark digitalWatermark = response.getJobsDetail().getOperation().getDigitalWatermark();
                 ParserMediaInfoUtils.ParsingDigitalWatermark(digitalWatermark, name, getText());
-            } else if (in("Response", "JobsDetail", "Operation", "DigitalWatermark","Image")) {
-//                MediaTimeIntervalObject timeInterval = jobsDetail.getOperation().getTranscode().getTimeInterval();
-//                ParserMediaInfoUtils.ParsingMediaTimeInterval(timeInterval, name, getText());
-            }
-            else if (in("Response", "JobsDetail", "Operation", "Output")) {
+            } else if (in("Response", "JobsDetail", "Operation", "ExtractDigitalWatermark")) {
+                ExtractDigitalWatermark digitalWatermark = response.getJobsDetail().getOperation().getExtractDigitalWatermark();
+                ParserMediaInfoUtils.ParsingDigitalWatermark(digitalWatermark, name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "Output")) {
                 MediaOutputObject output = jobsDetail.getOperation().getOutput();
                 switch (name) {
                     case "Bucket":
@@ -4430,6 +4436,12 @@ public class XmlResponsesSaxParser {
                 if ("Index".equals(name)) {
                     mediaConcatTemplate.setIndex(getText());
                 }
+            } else if (in("Response", "JobsDetail", "Operation", "DigitalWatermark")) {
+                MediaDigitalWatermark digitalWatermark = jobsDetail.getOperation().getDigitalWatermark();
+                ParserMediaInfoUtils.ParsingDigitalWatermark(digitalWatermark, name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "ExtractDigitalWatermark")) {
+                ExtractDigitalWatermark digitalWatermark = jobsDetail.getOperation().getExtractDigitalWatermark();
+                ParserMediaInfoUtils.ParsingDigitalWatermark(digitalWatermark, name, getText());
             }
         }
 

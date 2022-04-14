@@ -8,8 +8,9 @@ import com.qcloud.cos.internal.CosServiceRequest;
  */
 public class ImageAuditingRequest extends CosServiceRequest {
     /**
-     * 审核类型，拥有 porn（涉黄识别）、terrorist（涉暴恐识别）、politics（涉政识别）、ads（广告识别）四种。用户可选择多种识别类型，
+     * 审核类型，拥有 porn（涉黄识别）、terrorism（涉暴恐识别）、politics（涉政识别）、ads（广告识别）四种。用户可选择多种识别类型，
      * 例如 detectType=porn,ads 表示对图片进行涉黄及广告审核
+     * 为空时则表示审核全部类型
      */
     private String detectType;
 

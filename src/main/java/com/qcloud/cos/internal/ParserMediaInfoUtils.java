@@ -241,7 +241,7 @@ public class ParserMediaInfoUtils {
             case "Type":
                 watermark.setType(value);
                 break;
-            case "Level":
+            case "Version":
                 watermark.setVersion(value);
                 break;
             case "Message":
