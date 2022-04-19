@@ -46,6 +46,8 @@ public class AudtingCommonInfo {
 
     private OcrResults ocrResults;
 
+    private String category;
+
     private List<ObjectResults> objectResults = new ArrayList<>();
 
     public AudtingCommonInfo() {
@@ -143,6 +145,14 @@ public class AudtingCommonInfo {
         this.keywords = keywords;
     }
 
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
     @Override
     public String toString() {
         return "AudtingCommonInfo{" +
@@ -155,6 +165,7 @@ public class AudtingCommonInfo {
                 ", count='" + count + '\'' +
                 ", subLabel='" + subLabel + '\'' +
                 ", ocrResults=" + ocrResults +
+                ", category='" + category + '\'' +
                 ", objectResults=" + objectResults +
                 '}';
     }

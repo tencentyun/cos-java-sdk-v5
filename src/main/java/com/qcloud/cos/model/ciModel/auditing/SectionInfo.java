@@ -15,6 +15,8 @@ public class SectionInfo {
     private String url;
     private String duration;
     private String offsetTime;
+    private String label;
+    private String result;
 
     public PornInfo getPornInfo() {
         if (pornInfo == null) {
@@ -122,6 +124,22 @@ public class SectionInfo {
         this.illegalInfo = illegalInfo;
     }
 
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
+    public String getResult() {
+        return result;
+    }
+
+    public void setResult(String result) {
+        this.result = result;
+    }
+
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("SectionInfo{");
@@ -136,6 +154,8 @@ public class SectionInfo {
         sb.append(", url='").append(url).append('\'');
         sb.append(", duration='").append(duration).append('\'');
         sb.append(", offsetTime='").append(offsetTime).append('\'');
+        sb.append(", label='").append(label).append('\'');
+        sb.append(", result='").append(result).append('\'');
         sb.append('}');
         return sb.toString();
     }

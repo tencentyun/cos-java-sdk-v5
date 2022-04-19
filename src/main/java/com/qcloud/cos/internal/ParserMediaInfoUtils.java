@@ -1,12 +1,19 @@
 package com.qcloud.cos.internal;
 
+import com.qcloud.cos.model.ciModel.auditing.AudioSectionInfo;
+import com.qcloud.cos.model.ciModel.auditing.AudtingCommonInfo;
+import com.qcloud.cos.model.ciModel.auditing.OcrResults;
+import com.qcloud.cos.model.ciModel.auditing.PoliticsInfoObjectResults;
+import com.qcloud.cos.model.ciModel.auditing.SectionInfo;
+import com.qcloud.cos.model.ciModel.auditing.SnapshotInfo;
 import com.qcloud.cos.model.ciModel.auditing.UserInfo;
-import com.qcloud.cos.model.ciModel.job.MediaTranscodeVideoObject;
-import com.qcloud.cos.model.ciModel.job.MediaVideoObject;
+import com.qcloud.cos.model.ciModel.job.MediaAudioObject;
+import com.qcloud.cos.model.ciModel.job.MediaDigitalWatermark;
+import com.qcloud.cos.model.ciModel.job.MediaRemoveWaterMark;
 import com.qcloud.cos.model.ciModel.job.MediaTimeIntervalObject;
 import com.qcloud.cos.model.ciModel.job.MediaTransConfigObject;
-import com.qcloud.cos.model.ciModel.job.MediaAudioObject;
-import com.qcloud.cos.model.ciModel.job.MediaRemoveWaterMark;
+import com.qcloud.cos.model.ciModel.job.MediaTranscodeVideoObject;
+import com.qcloud.cos.model.ciModel.job.MediaVideoObject;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaFormat;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoAudio;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoSubtitle;
@@ -223,6 +230,22 @@ public class ParserMediaInfoUtils {
                 break;
             case "Start":
                 timeInterval.setStart(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParsingDigitalWatermark(MediaDigitalWatermark watermark, String name, String value) {
+        switch (name) {
+            case "Type":
+                watermark.setType(value);
+                break;
+            case "Version":
+                watermark.setVersion(value);
+                break;
+            case "Message":
+                watermark.setMessage(value);
                 break;
             default:
                 break;
@@ -553,5 +576,133 @@ public class ParserMediaInfoUtils {
         }
     }
 
+    public static void ParsingAuditingCommonInfo(AudtingCommonInfo obj, String name, String value) {
+        switch (name) {
+            case "Code":
+                obj.setCode(value);
+                break;
+            case "Msg":
+                obj.setMsg(value);
+                break;
+            case "HitFlag":
+                obj.setHitFlag(value);
+                break;
+            case "Score":
+                obj.setScore(value);
+                break;
+            case "Label":
+                obj.setLabel(value);
+                break;
+            case "Category":
+                obj.setCategory(value);
+                break;
+            case "Keywords":
+                obj.setKeywords(value);
+                break;
+            case "Count":
+                obj.setCount(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void parseOrcInfo(OcrResults obj, String name, String value) {
+        switch (name) {
+            case "Text":
+                obj.setText(value);
+                break;
+            case "Keywords":
+                obj.setKeywords(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void parseObjectResultsInfo(PoliticsInfoObjectResults obj, String name, String value) {
+        switch (name) {
+            case "Name":
+                obj.setName(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void parseSectionInfo(SectionInfo sectionInfo, String name, String value) {
+        switch (name) {
+            case "StartByte":
+                sectionInfo.setStartByte(value);
+                break;
+            case "Label":
+                sectionInfo.setLabel(value);
+                break;
+            case "Result":
+                sectionInfo.setResult(value);
+                break;
+            case "Url":
+                sectionInfo.setUrl(value);
+                break;
+            case "OffsetTime":
+                sectionInfo.setOffsetTime(value);
+                break;
+            case "Text":
+                sectionInfo.setText(value);
+                break;
+            case "Duration":
+                sectionInfo.setDuration(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void parseSnapshotInfo(SnapshotInfo snapshotInfo, String name, String value) {
+        switch (name) {
+            case "Url":
+                snapshotInfo.setUrl(value);
+                break;
+            case "SnapshotTime":
+                snapshotInfo.setSnapshotTime(value);
+                break;
+            case "Text":
+                snapshotInfo.setText(value);
+                break;
+            case "Label":
+                snapshotInfo.setLabel(value);
+                break;
+            case "Result":
+                snapshotInfo.setResult(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void parseAudioSection(AudioSectionInfo audioSectionInfo, String name, String value) {
+        switch (name) {
+            case "Url":
+                audioSectionInfo.setUrl(value);
+                break;
+            case "OffsetTime":
+                audioSectionInfo.setOffsetTime(value);
+                break;
+            case "Text":
+                audioSectionInfo.setText(value);
+                break;
+            case "Label":
+                audioSectionInfo.setLabel(value);
+                break;
+            case "Result":
+                audioSectionInfo.setResult(value);
+                break;
+            case "Duration":
+                audioSectionInfo.setDuration(value);
+                break;
+            default:
+                break;
+        }
+    }
 
 }

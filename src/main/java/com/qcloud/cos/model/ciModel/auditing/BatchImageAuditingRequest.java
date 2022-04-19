@@ -11,22 +11,13 @@ import java.util.List;
  */
 public class BatchImageAuditingRequest extends CIServiceRequest {
     /**
-     * 审核类型，拥有 porn（涉黄识别）、terrorist（涉暴恐识别）、politics（涉政识别）、ads（广告识别）四种。用户可选择多种识别类型，
-     * 例如 detectType=porn,ads 表示对图片进行涉黄及广告审核
+     * 审核规则配置
      */
     private Conf conf;
 
     private List<BatchImageAuditingInputObject> inputList;
 
-    private String jobId;
-
-    public String getJobId() {
-        return jobId;
-    }
-
-    public void setJobId(String jobId) {
-        this.jobId = jobId;
-    }
+//    private String jobId;
 
     public List<BatchImageAuditingInputObject> getInputList() {
         if (inputList == null) {
@@ -56,7 +47,6 @@ public class BatchImageAuditingRequest extends CIServiceRequest {
         final StringBuilder sb = new StringBuilder("BatchImageAuditingRequest{");
         sb.append("conf=").append(conf);
         sb.append(", inputList=").append(inputList);
-        sb.append(", jobId='").append(jobId).append('\'');
         sb.append('}');
         return sb.toString();
     }
