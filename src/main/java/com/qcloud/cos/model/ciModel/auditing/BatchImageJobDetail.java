@@ -3,6 +3,8 @@ package com.qcloud.cos.model.ciModel.auditing;
 
 public class BatchImageJobDetail {
     private String dataId;
+    private String jobId;
+    private String category;
     private String label;
     private String result;
     private String object;
@@ -12,11 +14,13 @@ public class BatchImageJobDetail {
     private String code;
     private String message;
     private String url;
+    private String compressionResult;
     private PornInfo pornInfo;
     private TerroristInfo terroristInfo;
     private PoliticsInfo politicsInfo;
     private AdsInfo adsInfo;
     private UserInfo userInfo = new UserInfo();
+    private OcrResults ocrResults = new OcrResults();
 
     public String getDataId() {
         return dataId;
@@ -98,6 +102,22 @@ public class BatchImageJobDetail {
         this.url = url;
     }
 
+    public String getJobId() {
+        return jobId;
+    }
+
+    public void setJobId(String jobId) {
+        this.jobId = jobId;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
     public PornInfo getPornInfo() {
         if (pornInfo == null) {
             pornInfo = new PornInfo();
@@ -138,6 +158,14 @@ public class BatchImageJobDetail {
         return adsInfo;
     }
 
+    public OcrResults getOcrResults() {
+        return ocrResults;
+    }
+
+    public void setOcrResults(OcrResults ocrResults) {
+        this.ocrResults = ocrResults;
+    }
+
     public void setAdsInfo(AdsInfo adsInfo) {
         this.adsInfo = adsInfo;
     }
@@ -150,10 +178,20 @@ public class BatchImageJobDetail {
         this.userInfo = userInfo;
     }
 
+    public String getCompressionResult() {
+        return compressionResult;
+    }
+
+    public void setCompressionResult(String compressionResult) {
+        this.compressionResult = compressionResult;
+    }
+
     @Override
     public String toString() {
         return "BatchImageJobDetail{" +
                 "dataId='" + dataId + '\'' +
+                ", jobId='" + jobId + '\'' +
+                ", category='" + category + '\'' +
                 ", label='" + label + '\'' +
                 ", result='" + result + '\'' +
                 ", object='" + object + '\'' +
@@ -168,6 +206,7 @@ public class BatchImageJobDetail {
                 ", politicsInfo=" + politicsInfo +
                 ", adsInfo=" + adsInfo +
                 ", userInfo=" + userInfo +
+                ", ocrResults=" + ocrResults +
                 '}';
     }
 }

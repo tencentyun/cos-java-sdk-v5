@@ -8,8 +8,9 @@ import com.qcloud.cos.internal.CosServiceRequest;
  */
 public class ImageAuditingRequest extends CosServiceRequest {
     /**
-     * 审核类型，拥有 porn（涉黄识别）、terrorist（涉暴恐识别）、politics（涉政识别）、ads（广告识别）四种。用户可选择多种识别类型，
+     * 审核类型，拥有 porn（涉黄识别）、terrorism（涉暴恐识别）、politics（涉政识别）、ads（广告识别）四种。用户可选择多种识别类型，
      * 例如 detectType=porn,ads 表示对图片进行涉黄及广告审核
+     * 为空时则表示审核全部类型
      */
     private String detectType;
 
@@ -54,6 +55,17 @@ public class ImageAuditingRequest extends CosServiceRequest {
      * 注意：最大支持压缩32MB的图片。
      */
     private String largeImageDetect;
+
+    /**
+     * 图片标识，该字段在结果中返回原始内容，长度限制为512字节
+     */
+    private String dataId;
+
+    /**
+     * 任务id 用于查询
+     */
+    private String jobId;
+
 
     public String getDetectType() {
         return detectType;
@@ -118,6 +130,22 @@ public class ImageAuditingRequest extends CosServiceRequest {
 
     public void setLargeImageDetect(String largeImageDetect) {
         this.largeImageDetect = largeImageDetect;
+    }
+
+    public String getJobId() {
+        return jobId;
+    }
+
+    public void setJobId(String jobId) {
+        this.jobId = jobId;
+    }
+
+    public String getDataId() {
+        return dataId;
+    }
+
+    public void setDataId(String dataId) {
+        this.dataId = dataId;
     }
 
     @Override

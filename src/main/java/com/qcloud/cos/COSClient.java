@@ -99,20 +99,7 @@ import com.qcloud.cos.internal.VoidCosResponseHandler;
 import com.qcloud.cos.internal.XmlResponsesSaxParser.CompleteMultipartUploadHandler;
 import com.qcloud.cos.internal.XmlResponsesSaxParser.CopyObjectResultHandler;
 import com.qcloud.cos.model.*;
-import com.qcloud.cos.model.ciModel.auditing.AudioAuditingRequest;
-import com.qcloud.cos.model.ciModel.auditing.AudioAuditingResponse;
-import com.qcloud.cos.model.ciModel.auditing.BatchImageAuditingRequest;
-import com.qcloud.cos.model.ciModel.auditing.BatchImageAuditingResponse;
-import com.qcloud.cos.model.ciModel.auditing.DocumentAuditingRequest;
-import com.qcloud.cos.model.ciModel.auditing.DocumentAuditingResponse;
-import com.qcloud.cos.model.ciModel.auditing.ImageAuditingRequest;
-import com.qcloud.cos.model.ciModel.auditing.ImageAuditingResponse;
-import com.qcloud.cos.model.ciModel.auditing.TextAuditingRequest;
-import com.qcloud.cos.model.ciModel.auditing.TextAuditingResponse;
-import com.qcloud.cos.model.ciModel.auditing.VideoAuditingRequest;
-import com.qcloud.cos.model.ciModel.auditing.VideoAuditingResponse;
-import com.qcloud.cos.model.ciModel.auditing.WebpageAuditingRequest;
-import com.qcloud.cos.model.ciModel.auditing.WebpageAuditingResponse;
+import com.qcloud.cos.model.ciModel.auditing.*;
 import com.qcloud.cos.model.ciModel.bucket.DocBucketRequest;
 import com.qcloud.cos.model.ciModel.bucket.DocBucketResponse;
 import com.qcloud.cos.model.ciModel.bucket.MediaBucketRequest;
@@ -140,11 +127,14 @@ import com.qcloud.cos.model.ciModel.queue.DocQueueRequest;
 import com.qcloud.cos.model.ciModel.queue.MediaListQueueResponse;
 import com.qcloud.cos.model.ciModel.queue.MediaQueueRequest;
 import com.qcloud.cos.model.ciModel.queue.MediaQueueResponse;
+import com.qcloud.cos.model.ciModel.snapshot.PrivateM3U8Request;
+import com.qcloud.cos.model.ciModel.snapshot.PrivateM3U8Response;
 import com.qcloud.cos.model.ciModel.snapshot.SnapshotRequest;
 import com.qcloud.cos.model.ciModel.snapshot.SnapshotResponse;
 import com.qcloud.cos.model.ciModel.template.MediaListTemplateResponse;
 import com.qcloud.cos.model.ciModel.template.MediaTemplateRequest;
 import com.qcloud.cos.model.ciModel.template.MediaTemplateResponse;
+import com.qcloud.cos.model.ciModel.utils.CICheckUtils;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowExecutionResponse;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowExecutionsResponse;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowListRequest;
@@ -983,7 +973,8 @@ public class COSClient implements COS {
 
         final String etag = returnedMetadata.getETag();
         if (contentMd5 != null && uploadMode.equals(UploadMode.PUT_OBJECT)
-                && !skipMd5CheckStrategy.skipClientSideValidationPerPutResponse(returnedMetadata) ) {
+                && !skipMd5CheckStrategy.skipClientSideValidationPerPutResponse(returnedMetadata)
+                && !CICheckUtils.isCoverImageRequest(uploadObjectRequest)) {
             byte[] clientSideHash = BinaryUtils.fromBase64(contentMd5);
             byte[] serverSideHash = null;
             try {
@@ -3627,7 +3618,6 @@ public class COSClient implements COS {
                 "The queueId parameter must be specified setting the object tags");
         rejectNull(req.getInput().getObject(),
                 "The input parameter must be specified setting the object tags");
-        this.checkRequestOutput(req.getOperation().getOutput());
         this.rejectStartWith(req.getCallBack(),"http","The CallBack parameter mush start with http or https");
         CosHttpRequest<MediaJobsRequest> request = createRequest(req.getBucketName(), "/jobs", req, HttpMethodName.POST);
         this.setContent(request, RequestXmlFactory.convertToXmlByteArray(req), "application/xml", false);
@@ -3921,18 +3911,18 @@ public class COSClient implements COS {
                 "The imageAuditingRequest parameter must be specified setting the object tags");
         rejectNull(imageAuditingRequest.getBucketName(),
                 "The bucketName parameter must be specified setting the object tags");
-        String detectType = imageAuditingRequest.getDetectType();
-        rejectNull(detectType, "The detectType parameter must be specified setting the object tags");
         CosHttpRequest<ImageAuditingRequest> request = createRequest(imageAuditingRequest.getBucketName(), imageAuditingRequest.getObjectKey(), imageAuditingRequest, HttpMethodName.GET);
         request.addParameter("ci-process", "sensitive-content-recognition");
-        if ("all".equalsIgnoreCase(detectType))
-            detectType = "porn,terrorist,politics,ads,teenager";
-        addParameterIfNotNull(request, "detect-type", detectType);
+        String detectType = imageAuditingRequest.getDetectType();
+        if (!"all".equalsIgnoreCase(detectType)) {
+            addParameterIfNotNull(request, "detect-type", detectType);
+        }
         addParameterIfNotNull(request, "interval", Integer.toString(imageAuditingRequest.getInterval()));
         addParameterIfNotNull(request, "max-frames", Integer.toString(imageAuditingRequest.getMaxFrames()));
         addParameterIfNotNull(request, "biz-type", imageAuditingRequest.getBizType());
         addParameterIfNotNull(request, "detect-url", imageAuditingRequest.getDetectUrl());
         addParameterIfNotNull(request, "large-image-detect", imageAuditingRequest.getLargeImageDetect());
+        addParameterIfNotNull(request, "dataid", imageAuditingRequest.getDataId());
         return invoke(request, new Unmarshallers.ImageAuditingUnmarshaller());
     }
 
@@ -4224,6 +4214,28 @@ public class COSClient implements COS {
                 String.format("/%s/%s", getAsyncFetchTaskRequest.getBucketName(), getAsyncFetchTaskRequest.getTaskId()),
                 getAsyncFetchTaskRequest, HttpMethodName.GET);
         return invoke(request, new GetAsyncFetchTaskResultHandler());
+    }
+
+    @Override
+    public ImageAuditingResponse describeAuditingImageJob(DescribeImageAuditingRequest imageAuditingRequest) {
+        rejectNull(imageAuditingRequest.getBucketName(),
+                "The bucketName parameter must be specified setting the object tags");
+        rejectNull(imageAuditingRequest.getJobId(),
+                "The jobId parameter must be specified setting the object tags");
+        CosHttpRequest<DescribeImageAuditingRequest> request = createRequest(imageAuditingRequest.getBucketName(), "/image/auditing/" + imageAuditingRequest.getJobId(), imageAuditingRequest, HttpMethodName.GET);
+        return invoke(request, new Unmarshallers.ImageAuditingDescribeJobUnmarshaller());
+    }
+
+    @Override
+    public PrivateM3U8Response getPrivateM3U8(PrivateM3U8Request privateM3U8Request) {
+        rejectNull(privateM3U8Request.getExpires(),
+                "The expires parameter must be specified setting the object tags , must satisfy the interval [3600, 43200]");
+        rejectNull(privateM3U8Request.getBucketName(),
+                "The privateM3U8Request.bucketName parameter must be specified setting the object tags");
+        CosHttpRequest<PrivateM3U8Request> request = createRequest(privateM3U8Request.getBucketName(), privateM3U8Request.getObject(), privateM3U8Request, HttpMethodName.GET);
+        request.addParameter("ci-process", "pm3u8");
+        request.addParameter("expires", privateM3U8Request.getExpires());
+        return invoke(request, new Unmarshallers.PrivateM3U8Unmarshaller());
     }
 }
 
