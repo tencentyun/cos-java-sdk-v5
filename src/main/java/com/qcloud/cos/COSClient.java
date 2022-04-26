@@ -134,6 +134,7 @@ import com.qcloud.cos.model.ciModel.snapshot.SnapshotResponse;
 import com.qcloud.cos.model.ciModel.template.MediaListTemplateResponse;
 import com.qcloud.cos.model.ciModel.template.MediaTemplateRequest;
 import com.qcloud.cos.model.ciModel.template.MediaTemplateResponse;
+import com.qcloud.cos.model.ciModel.utils.CICheckUtils;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowExecutionResponse;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowExecutionsResponse;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowListRequest;
@@ -972,7 +973,8 @@ public class COSClient implements COS {
 
         final String etag = returnedMetadata.getETag();
         if (contentMd5 != null && uploadMode.equals(UploadMode.PUT_OBJECT)
-                && !skipMd5CheckStrategy.skipClientSideValidationPerPutResponse(returnedMetadata) ) {
+                && !skipMd5CheckStrategy.skipClientSideValidationPerPutResponse(returnedMetadata)
+                && !CICheckUtils.isCoverImageRequest(uploadObjectRequest)) {
             byte[] clientSideHash = BinaryUtils.fromBase64(contentMd5);
             byte[] serverSideHash = null;
             try {

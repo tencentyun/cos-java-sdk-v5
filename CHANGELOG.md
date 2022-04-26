@@ -5,7 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [5.6.74]
+## [5.6.75]
+-  fix etag verification exception
+
+- ## [5.6.74]
 - add media DigitalWatermark api
 - update ImageAuditing  api
 
