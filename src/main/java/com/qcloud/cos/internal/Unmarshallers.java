@@ -67,6 +67,7 @@ import com.qcloud.cos.model.ciModel.job.DocJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaListJobResponse;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoResponse;
+import com.qcloud.cos.model.ciModel.persistence.DetectCarResponse;
 import com.qcloud.cos.model.ciModel.queue.DocListQueueResponse;
 import com.qcloud.cos.model.ciModel.queue.MediaListQueueResponse;
 import com.qcloud.cos.model.ciModel.queue.MediaQueueResponse;
@@ -776,6 +777,15 @@ public class Unmarshallers {
                 privateM3U8Response.setM3u8("Unknown Error");
 
             return privateM3U8Response;
+        }
+    }
+
+    public static final class DetectCarUnmarshaller
+            implements Unmarshaller<DetectCarResponse, InputStream> {
+
+        public DetectCarResponse unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser()
+                    .parseDetectCarResponse(in).getResponse();
         }
     }
 }
