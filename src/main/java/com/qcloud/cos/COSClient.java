@@ -122,6 +122,8 @@ import com.qcloud.cos.model.ciModel.job.MediaListJobResponse;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoRequest;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoResponse;
 import com.qcloud.cos.model.ciModel.persistence.CIUploadResult;
+import com.qcloud.cos.model.ciModel.persistence.DetectCarRequest;
+import com.qcloud.cos.model.ciModel.persistence.DetectCarResponse;
 import com.qcloud.cos.model.ciModel.queue.DocListQueueResponse;
 import com.qcloud.cos.model.ciModel.queue.DocQueueRequest;
 import com.qcloud.cos.model.ciModel.queue.MediaListQueueResponse;
@@ -4236,6 +4238,17 @@ public class COSClient implements COS {
         request.addParameter("ci-process", "pm3u8");
         request.addParameter("expires", privateM3U8Request.getExpires());
         return invoke(request, new Unmarshallers.PrivateM3U8Unmarshaller());
+    }
+
+    @Override
+    public DetectCarResponse detectCar(DetectCarRequest detectCarRequest) {
+        rejectNull(detectCarRequest.getBucketName(),
+                "The bucketName parameter must be specified setting the object tags");
+        rejectNull(detectCarRequest.getObjectKey(),
+                "The objectKey parameter must be specified setting the object tags");
+        CosHttpRequest<DetectCarRequest> request = createRequest(detectCarRequest.getBucketName(), detectCarRequest.getObjectKey(), detectCarRequest, HttpMethodName.GET);
+        request.addParameter("ci-process", "DetectCar");
+        return invoke(request, new Unmarshallers.DetectCarUnmarshaller());
     }
 }
 
