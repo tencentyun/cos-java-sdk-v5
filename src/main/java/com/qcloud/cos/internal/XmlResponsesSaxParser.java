@@ -34,6 +34,7 @@ import java.util.Map;
 import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.exception.MultiObjectDeleteException.DeleteError;
+import com.qcloud.cos.internal.cihandler.DetectCarHandler;
 import com.qcloud.cos.model.AbortIncompleteMultipartUpload;
 import com.qcloud.cos.model.AccessControlList;
 import com.qcloud.cos.model.Bucket;
@@ -139,6 +140,7 @@ import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoVideo;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaStream;
 import com.qcloud.cos.model.ciModel.persistence.CIObject;
 import com.qcloud.cos.model.ciModel.persistence.CIUploadResult;
+import com.qcloud.cos.model.ciModel.persistence.DetectCarResponse;
 import com.qcloud.cos.model.ciModel.persistence.ImageInfo;
 import com.qcloud.cos.model.ciModel.persistence.OriginalInfo;
 import com.qcloud.cos.model.ciModel.persistence.ProcessResults;
@@ -843,6 +845,12 @@ public class XmlResponsesSaxParser {
 
     public DescribeImageAuditingJobHandler parseImageAuditingDescribeResponse(InputStream inputStream) throws IOException {
         DescribeImageAuditingJobHandler handler = new DescribeImageAuditingJobHandler();
+        parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
+        return handler;
+    }
+
+    public DetectCarHandler parseDetectCarResponse(InputStream inputStream) throws IOException {
+        DetectCarHandler handler = new DetectCarHandler();
         parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
         return handler;
     }
