@@ -23,15 +23,18 @@ public class DetectCarDemo {
      * 图片大小：所下载图片经 Base64 编码后不超过4MB。
      * 图片像素：建议大于50*50像素，否则影响识别效果。
      * 长宽比：建议长边与短边的比例小于5：1。
+     * ObjectKey 对象位置或DetectUrl 图片url 需二选一
      */
     public static void detectCar(COSClient client) {
         //1.创建任务请求对象
         DetectCarRequest request = new DetectCarRequest();
         //2.添加请求参数 参数详情请见api接口文档
         //2.1设置请求bucket
-        request.setBucketName("demobucket-1234567890");
+        request.setBucketName("demo-1234567890");
         //2.2设置bucket中的图片位置
-        request.setObjectKey("car.jpg");
+//        request.setObjectKey("car.jpg");
+        //2.3或设置图片url
+        request.setDetectUrl("https://demo-1234567890.cos.ap-chongqing.myqcloud.com/car.jpg");
         DetectCarResponse response = client.detectCar(request);
         System.out.println(Jackson.toJsonString(response));
     }
