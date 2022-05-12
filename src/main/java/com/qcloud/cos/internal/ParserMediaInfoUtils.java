@@ -9,6 +9,7 @@ import com.qcloud.cos.model.ciModel.auditing.SnapshotInfo;
 import com.qcloud.cos.model.ciModel.auditing.UserInfo;
 import com.qcloud.cos.model.ciModel.job.MediaAudioObject;
 import com.qcloud.cos.model.ciModel.job.MediaDigitalWatermark;
+import com.qcloud.cos.model.ciModel.job.MediaJobObject;
 import com.qcloud.cos.model.ciModel.job.MediaRemoveWaterMark;
 import com.qcloud.cos.model.ciModel.job.MediaTimeIntervalObject;
 import com.qcloud.cos.model.ciModel.job.MediaTransConfigObject;
@@ -705,4 +706,37 @@ public class ParserMediaInfoUtils {
         }
     }
 
+    public static void parseMediaJobsDetail(MediaJobObject jobsDetail, String name, String value) {
+        switch (name) {
+            case "Code":
+                jobsDetail.setCode(value);
+                break;
+            case "CreationTime":
+                jobsDetail.setCreationTime(value);
+                break;
+            case "EndTime":
+                jobsDetail.setEndTime(value);
+                break;
+            case "JobId":
+                jobsDetail.setJobId(value);
+                break;
+            case "Message":
+                jobsDetail.setMessage(value);
+                break;
+            case "QueueId":
+                jobsDetail.setQueueId(value);
+                break;
+            case "State":
+                jobsDetail.setState(value);
+                break;
+            case "Tag":
+                jobsDetail.setTag(value);
+                break;
+            case "BucketName":
+                jobsDetail.setBucketName(value);
+                break;
+            default:
+                break;
+        }
+    }
 }

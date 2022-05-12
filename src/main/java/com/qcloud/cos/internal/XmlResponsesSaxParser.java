@@ -127,6 +127,7 @@ import com.qcloud.cos.model.ciModel.job.MediaDigitalWatermark;
 import com.qcloud.cos.model.ciModel.job.MediaJobObject;
 import com.qcloud.cos.model.ciModel.job.MediaJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaListJobResponse;
+import com.qcloud.cos.model.ciModel.job.MediaPicProcessTemplateObject;
 import com.qcloud.cos.model.ciModel.job.MediaRemoveWaterMark;
 import com.qcloud.cos.model.ciModel.job.MediaTimeIntervalObject;
 import com.qcloud.cos.model.ciModel.job.MediaTransConfigObject;
@@ -4145,6 +4146,13 @@ public class XmlResponsesSaxParser {
             } else if ( in("Response", "JobsDetail", "Operation", "ExtractDigitalWatermark")) {
                 ExtractDigitalWatermark digitalWatermark = response.getJobsDetail().getOperation().getExtractDigitalWatermark();
                 ParserMediaInfoUtils.ParsingDigitalWatermark(digitalWatermark, name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "PicProcess")) {
+                MediaPicProcessTemplateObject picProcess = response.getJobsDetail().getOperation().getPicProcess();
+                if ("IsPicInfo".equalsIgnoreCase(name)) {
+                    picProcess.setIsPicInfo(getText());
+                } else if ("ProcessRule".equalsIgnoreCase(name)) {
+                    picProcess.setProcessRule(getText());
+                }
             }
         }
 
