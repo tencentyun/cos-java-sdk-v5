@@ -467,7 +467,7 @@ public class RequestXmlFactory {
         }
 
         ExtractDigitalWatermark extractDigitalWatermark = operation.getExtractDigitalWatermark();
-        if (extractDigitalWatermark.getType() != null || extractDigitalWatermark.getType() != null) {
+        if (extractDigitalWatermark.getType() != null || extractDigitalWatermark.getMessage() != null) {
             xml.start("ExtractDigitalWatermark");
             addIfNotNull(xml, "Message",extractDigitalWatermark.getMessage());
             addIfNotNull(xml, "Type",extractDigitalWatermark.getType());
@@ -487,7 +487,6 @@ public class RequestXmlFactory {
         xml.start("QueueId").value(request.getQueueId()).end();
         addIfNotNull(xml, "CallBack", request.getCallBack());
         xml.end();
-        System.out.println(xml);
         return xml.getBytes();
     }
 
@@ -1004,7 +1003,7 @@ public class RequestXmlFactory {
     /**
      * 对象校验内部静态工具类
      */
-    private static class CheckObjectUtils {
+    public static class CheckObjectUtils {
 
         /**
          * 校验对象是否有效，判断对象中是否含有有效的字段。

@@ -17,6 +17,11 @@ public class DetectCarRequest extends CosServiceRequest {
      */
     private String objectKey;
 
+    /**
+     * 待识别图⽚url,需要进⾏urlencode
+     */
+    private String detectUrl;
+
     public String getBucketName() {
         return bucketName;
     }
@@ -33,11 +38,20 @@ public class DetectCarRequest extends CosServiceRequest {
         this.objectKey = objectKey;
     }
 
+    public String getDetectUrl() {
+        return detectUrl;
+    }
+
+    public void setDetectUrl(String detectUrl) {
+        this.detectUrl = detectUrl;
+    }
+
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("DetectCarRequest{");
         sb.append("bucketName='").append(bucketName).append('\'');
         sb.append(", objectKey='").append(objectKey).append('\'');
+        sb.append(", detectUrl='").append(detectUrl).append('\'');
         sb.append('}');
         return sb.toString();
     }

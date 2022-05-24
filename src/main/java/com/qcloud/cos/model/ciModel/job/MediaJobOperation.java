@@ -23,6 +23,7 @@ public class MediaJobOperation {
     private MediaConcatTemplateObject mediaConcatTemplate;
     private MediaDigitalWatermark digitalWatermark = new MediaDigitalWatermark();
     private ExtractDigitalWatermark extractDigitalWatermark = new ExtractDigitalWatermark();
+    private MediaPicProcessTemplateObject picProcess = new MediaPicProcessTemplateObject();
 
     public MediaJobOperation() {
         this.output = new MediaOutputObject();
@@ -139,6 +140,14 @@ public class MediaJobOperation {
 
     public void setExtractDigitalWatermark(ExtractDigitalWatermark extractDigitalWatermark) {
         this.extractDigitalWatermark = extractDigitalWatermark;
+    }
+
+    public MediaPicProcessTemplateObject getPicProcess() {
+        return picProcess;
+    }
+
+    public void setPicProcess(MediaPicProcessTemplateObject picProcess) {
+        this.picProcess = picProcess;
     }
 
     @Override

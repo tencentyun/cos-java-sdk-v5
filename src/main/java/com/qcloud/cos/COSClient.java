@@ -3972,6 +3972,7 @@ public class COSClient implements COS {
                 "The imageLabelRequest.bucketName parameter must be specified setting the object tags");
         CosHttpRequest<ImageLabelRequest> request = createRequest(imageLabelRequest.getBucketName(), imageLabelRequest.getObjectKey(), imageLabelRequest, HttpMethodName.GET);
         request.addParameter("ci-process", "detect-label");
+        addParameterIfNotNull(request,"detect-url", imageLabelRequest.getDetectUrl());
         return invoke(request, new Unmarshallers.ImageLabelUnmarshaller());
     }
 
@@ -4244,10 +4245,9 @@ public class COSClient implements COS {
     public DetectCarResponse detectCar(DetectCarRequest detectCarRequest) {
         rejectNull(detectCarRequest.getBucketName(),
                 "The bucketName parameter must be specified setting the object tags");
-        rejectNull(detectCarRequest.getObjectKey(),
-                "The objectKey parameter must be specified setting the object tags");
         CosHttpRequest<DetectCarRequest> request = createRequest(detectCarRequest.getBucketName(), detectCarRequest.getObjectKey(), detectCarRequest, HttpMethodName.GET);
         request.addParameter("ci-process", "DetectCar");
+        addParameterIfNotNull(request, "detect-url", detectCarRequest.getDetectUrl());
         return invoke(request, new Unmarshallers.DetectCarUnmarshaller());
     }
 }
