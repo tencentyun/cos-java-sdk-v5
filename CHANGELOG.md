@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 -  update DetectCar api
 -  update LabelImage api
 
+## [5.6.78]
+- add the isMetaAccBucket
+
 ## [5.6.77]
 -  add DetectCar api
 

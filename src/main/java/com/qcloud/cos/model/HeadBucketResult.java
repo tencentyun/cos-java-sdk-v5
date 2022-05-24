@@ -48,6 +48,10 @@ public class HeadBucketResult implements Serializable {
         return this.isMergeBucket;
     }
 
+    public boolean isMetaAccBucket() {
+        return this.isMergeBucket;
+    }
+
     public void setMergeBucket(boolean isMergeBucket) {
         this.isMergeBucket = isMergeBucket;
     }
