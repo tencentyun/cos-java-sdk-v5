@@ -43,6 +43,11 @@ public class Conf {
      */
     private CallbackVersion returnHighlightHtml;
 
+    /**
+     * 是否进行异步处理审核 0：同步返回结果  1：异步处理。 默认值为 0
+     */
+    private String async;
+
 
     public String getBizType() {
         return bizType;
@@ -103,6 +108,14 @@ public class Conf {
         this.returnHighlightHtml = returnHighlightHtml;
     }
 
+    public String getAsync() {
+        return async;
+    }
+
+    public void setAsync(String async) {
+        this.async = async;
+    }
+
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("Conf{");
@@ -113,6 +126,7 @@ public class Conf {
         sb.append(", detectContent='").append(detectContent).append('\'');
         sb.append(", callbackVersion=").append(callbackVersion);
         sb.append(", returnHighlightHtml=").append(returnHighlightHtml);
+        sb.append(", async='").append(async).append('\'');
         sb.append('}');
         return sb.toString();
     }

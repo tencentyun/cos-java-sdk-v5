@@ -642,6 +642,9 @@ public class RequestXmlFactory {
     }
 
     private static void addAudio(XmlWriter xml, MediaAudioObject audio) {
+        if (CheckObjectUtils.objIsValid(audio)) {
+            return;
+        }
         xml.start("Audio");
         addIfNotNull(xml, "Bitrate", audio.getBitrate());
         addIfNotNull(xml, "Channels", audio.getChannels());
@@ -904,6 +907,7 @@ public class RequestXmlFactory {
         String detectType = conf.getDetectType();
         addAuditingDetectType(xml,detectType);
         addIfNotNull(xml, "BizType", conf.getBizType());
+        addIfNotNull(xml, "Async", conf.getAsync());
         xml.end();
 
         xml.end();

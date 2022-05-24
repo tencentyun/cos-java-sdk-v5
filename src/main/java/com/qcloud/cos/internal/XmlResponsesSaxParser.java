@@ -5368,6 +5368,12 @@ public class XmlResponsesSaxParser {
                     case "DataId":
                         response.setDataId(getText());
                         break;
+                    case "Object":
+                        response.setObject(getText());
+                        break;
+                    case "State":
+                        response.setState(getText());
+                        break;
                     default:
                         break;
                 }
