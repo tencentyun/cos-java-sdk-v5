@@ -30,13 +30,13 @@ import java.util.List;
  */
 public class CIMediaXmlFactory {
 
-    private static void addIfNotNull(XmlWriter xml, String xmlTag, String value) {
+    static void addIfNotNull(XmlWriter xml, String xmlTag, String value) {
         if (value != null) {
             xml.start(xmlTag).value(value).end();
         }
     }
 
-    private static void addIfNotNull(XmlWriter xml, String xmlTag, Object value) {
+    static void addIfNotNull(XmlWriter xml, String xmlTag, Object value) {
         if (value != null && value.toString() != null) {
             xml.start(xmlTag).value(value.toString()).end();
         }

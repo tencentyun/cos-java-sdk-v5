@@ -66,6 +66,11 @@ public class ImageAuditingRequest extends CosServiceRequest {
      */
     private String jobId;
 
+    /**
+     * 是否开启异步审核 0 不开启 1开启  默认为0
+     */
+    private String async;
+
 
     public String getDetectType() {
         return detectType;
@@ -148,9 +153,17 @@ public class ImageAuditingRequest extends CosServiceRequest {
         this.dataId = dataId;
     }
 
+    public String getAsync() {
+        return async;
+    }
+
+    public void setAsync(String async) {
+        this.async = async;
+    }
+
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("ImageAuditingRequest{");
+        final StringBuffer sb = new StringBuffer("ImageAuditingRequest{");
         sb.append("detectType='").append(detectType).append('\'');
         sb.append(", bucketName='").append(bucketName).append('\'');
         sb.append(", objectKey='").append(objectKey).append('\'');
@@ -159,6 +172,9 @@ public class ImageAuditingRequest extends CosServiceRequest {
         sb.append(", bizType='").append(bizType).append('\'');
         sb.append(", detectUrl='").append(detectUrl).append('\'');
         sb.append(", largeImageDetect='").append(largeImageDetect).append('\'');
+        sb.append(", dataId='").append(dataId).append('\'');
+        sb.append(", jobId='").append(jobId).append('\'');
+        sb.append(", async='").append(async).append('\'');
         sb.append('}');
         return sb.toString();
     }

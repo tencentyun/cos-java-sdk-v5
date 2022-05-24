@@ -110,6 +110,8 @@ import com.qcloud.cos.model.ciModel.image.ImageLabelRequest;
 import com.qcloud.cos.model.ciModel.image.ImageLabelResponse;
 import com.qcloud.cos.model.ciModel.image.ImageLabelV2Request;
 import com.qcloud.cos.model.ciModel.image.ImageLabelV2Response;
+import com.qcloud.cos.model.ciModel.image.ImageSearchRequest;
+import com.qcloud.cos.model.ciModel.image.ImageSearchResponse;
 import com.qcloud.cos.model.ciModel.job.DocHtmlRequest;
 import com.qcloud.cos.model.ciModel.job.DocJobListRequest;
 import com.qcloud.cos.model.ciModel.job.DocJobListResponse;
@@ -142,6 +144,7 @@ import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowExecutionsResponse;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowListRequest;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowListResponse;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowRequest;
+import com.qcloud.cos.model.ciModel.xml.CImageXmlFactory;
 import com.qcloud.cos.model.fetch.GetAsyncFetchTaskRequest;
 import com.qcloud.cos.model.fetch.GetAsyncFetchTaskResult;
 import com.qcloud.cos.model.fetch.GetAsyncFetchTaskResultHandler;
@@ -3925,6 +3928,7 @@ public class COSClient implements COS {
         addParameterIfNotNull(request, "detect-url", imageAuditingRequest.getDetectUrl());
         addParameterIfNotNull(request, "large-image-detect", imageAuditingRequest.getLargeImageDetect());
         addParameterIfNotNull(request, "dataid", imageAuditingRequest.getDataId());
+        addParameterIfNotNull(request, "async", imageAuditingRequest.getAsync());
         return invoke(request, new Unmarshallers.ImageAuditingUnmarshaller());
     }
 
@@ -4249,6 +4253,23 @@ public class COSClient implements COS {
         request.addParameter("ci-process", "DetectCar");
         addParameterIfNotNull(request, "detect-url", detectCarRequest.getDetectUrl());
         return invoke(request, new Unmarshallers.DetectCarUnmarshaller());
+    }
+
+    @Override
+    public ImageSearchResponse getImageSearch(ImageSearchRequest request) {
+        return null;
+    }
+
+    @Override
+    public boolean postImageSearch(ImageSearchRequest imageSearchRequest) {
+        rejectNull(imageSearchRequest,
+                "The request parameter must be specified setting the object tags");
+        rejectNull(imageSearchRequest.getBucketName(),
+                "The bucketName parameter must be specified setting the object tags");
+        CosHttpRequest<ImageSearchRequest> request = createRequest(imageSearchRequest.getBucketName(), "/ImageSearchBucket", imageSearchRequest, HttpMethodName.POST);
+        this.setContent(request, CImageXmlFactory.convertToXmlByteArray(imageSearchRequest), "application/xml", false);
+        invoke(request, voidCosResponseHandler);
+        return true;
     }
 }
 

@@ -27,6 +27,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.qcloud.cos.model.ciModel.image.ImageSearchRequest;
+import com.qcloud.cos.model.ciModel.image.ImageSearchResponse;
 import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.exception.MultiObjectDeleteException;
@@ -3020,6 +3022,10 @@ public interface COS extends COSDirectSpi {
     PrivateM3U8Response getPrivateM3U8(PrivateM3U8Request request);
 
     DetectCarResponse detectCar(DetectCarRequest request);
+
+    ImageSearchResponse getImageSearch(ImageSearchRequest request);
+
+    boolean postImageSearch(ImageSearchRequest request);
 }
 
 
