@@ -6418,7 +6418,7 @@ public class XmlResponsesSaxParser {
                         jobsDetail.setUrl(getText());
                         break;
                     case "JobId":
-                        jobsDetail.setUrl(getText());
+                        jobsDetail.setJobId(getText());
                         break;
                     case "Category":
                         jobsDetail.setCategory(getText());
