@@ -71,6 +71,10 @@ public class ImageAuditingRequest extends CosServiceRequest {
      */
     private String async;
 
+    /**
+     * 审核结果（Detail版本）以回调形式发送至您的回调地址，异步审核时生效，支持以 http:// 或者 https:// 开头的地址，例如： http://www.callback.com
+     */
+    private String callback;
 
     public String getDetectType() {
         return detectType;
@@ -161,6 +165,14 @@ public class ImageAuditingRequest extends CosServiceRequest {
         this.async = async;
     }
 
+    public String getCallback() {
+        return callback;
+    }
+
+    public void setCallback(String callback) {
+        this.callback = callback;
+    }
+
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("ImageAuditingRequest{");
@@ -175,6 +187,7 @@ public class ImageAuditingRequest extends CosServiceRequest {
         sb.append(", dataId='").append(dataId).append('\'');
         sb.append(", jobId='").append(jobId).append('\'');
         sb.append(", async='").append(async).append('\'');
+        sb.append(", callback='").append(callback).append('\'');
         sb.append('}');
         return sb.toString();
     }
