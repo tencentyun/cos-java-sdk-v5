@@ -62,6 +62,7 @@ import com.qcloud.cos.model.ciModel.bucket.DocBucketResponse;
 import com.qcloud.cos.model.ciModel.bucket.MediaBucketResponse;
 import com.qcloud.cos.model.ciModel.image.ImageLabelResponse;
 import com.qcloud.cos.model.ciModel.image.ImageLabelV2Response;
+import com.qcloud.cos.model.ciModel.image.ImageSearchResponse;
 import com.qcloud.cos.model.ciModel.job.DocJobListResponse;
 import com.qcloud.cos.model.ciModel.job.DocJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaJobResponse;
@@ -786,6 +787,15 @@ public class Unmarshallers {
         public DetectCarResponse unmarshall(InputStream in) throws Exception {
             return new XmlResponsesSaxParser()
                     .parseDetectCarResponse(in).getResponse();
+        }
+    }
+
+    public static final class SearchImagesUnmarshaller
+            implements Unmarshaller<ImageSearchResponse, InputStream> {
+
+        public ImageSearchResponse unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser()
+                    .parseSearchImagesResponse(in).getResponse();
         }
     }
 }

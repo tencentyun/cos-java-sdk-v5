@@ -35,6 +35,7 @@ import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.exception.MultiObjectDeleteException.DeleteError;
 import com.qcloud.cos.internal.cihandler.DetectCarHandler;
+import com.qcloud.cos.internal.cihandler.SearchImageHandler;
 import com.qcloud.cos.model.AbortIncompleteMultipartUpload;
 import com.qcloud.cos.model.AccessControlList;
 import com.qcloud.cos.model.Bucket;
@@ -109,6 +110,7 @@ import com.qcloud.cos.model.ciModel.bucket.MediaBucketResponse;
 import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
 import com.qcloud.cos.model.ciModel.image.ImageLabelResponse;
 import com.qcloud.cos.model.ciModel.image.ImageLabelV2Response;
+import com.qcloud.cos.model.ciModel.image.ImageSearchResponse;
 import com.qcloud.cos.model.ciModel.image.Lobel;
 import com.qcloud.cos.model.ciModel.image.LobelV2;
 import com.qcloud.cos.model.ciModel.image.LocationLabel;
@@ -852,6 +854,12 @@ public class XmlResponsesSaxParser {
 
     public DetectCarHandler parseDetectCarResponse(InputStream inputStream) throws IOException {
         DetectCarHandler handler = new DetectCarHandler();
+        parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
+        return handler;
+    }
+
+    public SearchImageHandler parseSearchImagesResponse(InputStream inputStream) throws IOException {
+        SearchImageHandler handler = new SearchImageHandler();
         parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
         return handler;
     }

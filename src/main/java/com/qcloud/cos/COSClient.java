@@ -112,6 +112,7 @@ import com.qcloud.cos.model.ciModel.image.ImageLabelV2Request;
 import com.qcloud.cos.model.ciModel.image.ImageLabelV2Response;
 import com.qcloud.cos.model.ciModel.image.ImageSearchRequest;
 import com.qcloud.cos.model.ciModel.image.ImageSearchResponse;
+import com.qcloud.cos.model.ciModel.image.OpenImageSearchRequest;
 import com.qcloud.cos.model.ciModel.job.DocHtmlRequest;
 import com.qcloud.cos.model.ciModel.job.DocJobListRequest;
 import com.qcloud.cos.model.ciModel.job.DocJobListResponse;
@@ -4257,20 +4258,64 @@ public class COSClient implements COS {
     }
 
     @Override
+    public boolean openImageSearch(OpenImageSearchRequest imageSearchRequest) {
+        rejectNull(imageSearchRequest,
+                "The request parameter must be specified setting the object tags");
+        rejectNull(imageSearchRequest.getBucketName(),
+                "The bucketName parameter must be specified setting the object tags");
+        CosHttpRequest<OpenImageSearchRequest> request = createRequest(imageSearchRequest.getBucketName(), "/ImageSearchBucket", imageSearchRequest, HttpMethodName.POST);
+        this.setContent(request, CImageXmlFactory.convertToXmlByteArray(imageSearchRequest), "application/xml", false);
+        invoke(request, voidCosResponseHandler);
+        return true;
+    }
+
+    @Override
     public ImageSearchResponse getImageSearch(ImageSearchRequest request) {
         return null;
     }
 
     @Override
-    public boolean postImageSearch(ImageSearchRequest imageSearchRequest) {
+    public boolean addGalleryImages(ImageSearchRequest imageSearchRequest) {
         rejectNull(imageSearchRequest,
                 "The request parameter must be specified setting the object tags");
         rejectNull(imageSearchRequest.getBucketName(),
                 "The bucketName parameter must be specified setting the object tags");
-        CosHttpRequest<ImageSearchRequest> request = createRequest(imageSearchRequest.getBucketName(), "/ImageSearchBucket", imageSearchRequest, HttpMethodName.POST);
+        CosHttpRequest<ImageSearchRequest> request = createRequest(imageSearchRequest.getBucketName(),  imageSearchRequest.getObjectKey(), imageSearchRequest, HttpMethodName.POST);
+        request.addParameter("ci-process", "ImageSearch");
+        request.addParameter("action", "AddImage");
         this.setContent(request, CImageXmlFactory.convertToXmlByteArray(imageSearchRequest), "application/xml", false);
         invoke(request, voidCosResponseHandler);
         return true;
+    }
+
+    @Override
+    public boolean deleteGalleryImages(ImageSearchRequest imageSearchRequest) {
+        rejectNull(imageSearchRequest,
+                "The request parameter must be specified setting the object tags");
+        rejectNull(imageSearchRequest.getBucketName(),
+                "The bucketName parameter must be specified setting the object tags");
+        CosHttpRequest<ImageSearchRequest> request = createRequest(imageSearchRequest.getBucketName(),  imageSearchRequest.getObjectKey(), imageSearchRequest, HttpMethodName.POST);
+        request.addParameter("ci-process", "ImageSearch");
+        request.addParameter("action", "DeleteImage");
+        this.setContent(request, CImageXmlFactory.convertToXmlByteArray(imageSearchRequest), "application/xml", false);
+        invoke(request, voidCosResponseHandler);
+        return true;
+    }
+
+    @Override
+    public ImageSearchResponse searchGalleryImages(ImageSearchRequest imageSearchRequest) {
+        rejectNull(imageSearchRequest,
+                "The request parameter must be specified setting the object tags");
+        rejectNull(imageSearchRequest.getBucketName(),
+                "The bucketName parameter must be specified setting the object tags");
+        CosHttpRequest<ImageSearchRequest> request = createRequest(imageSearchRequest.getBucketName(), imageSearchRequest.getObjectKey(), imageSearchRequest, HttpMethodName.GET);
+        request.addParameter("ci-process", "ImageSearch");
+        request.addParameter("action", "SearchImage");
+        addParameterIfNotNull(request, "MatchThreshold", imageSearchRequest.getMatchThreshold());
+        addParameterIfNotNull(request, "Offset", imageSearchRequest.getOffset());
+        addParameterIfNotNull(request, "Limit", imageSearchRequest.getLimit());
+        addParameterIfNotNull(request, "Filter", imageSearchRequest.getFilter());
+        return invoke(request, new Unmarshallers.SearchImagesUnmarshaller());
     }
 }
 

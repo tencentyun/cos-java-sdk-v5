@@ -2,7 +2,7 @@ package com.qcloud.cos.model.ciModel.image;
 
 import com.qcloud.cos.internal.CosServiceRequest;
 
-public class PostImageSearchRequest extends CosServiceRequest {
+public class OpenImageSearchRequest extends CosServiceRequest {
     /**
      * 操作的bucket名称
      */
