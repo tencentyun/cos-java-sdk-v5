@@ -3929,6 +3929,7 @@ public class COSClient implements COS {
         addParameterIfNotNull(request, "large-image-detect", imageAuditingRequest.getLargeImageDetect());
         addParameterIfNotNull(request, "dataid", imageAuditingRequest.getDataId());
         addParameterIfNotNull(request, "async", imageAuditingRequest.getAsync());
+        addParameterIfNotNull(request, "callback", imageAuditingRequest.getCallback());
         return invoke(request, new Unmarshallers.ImageAuditingUnmarshaller());
     }
 
