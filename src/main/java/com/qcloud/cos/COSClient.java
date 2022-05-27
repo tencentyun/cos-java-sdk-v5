@@ -4270,11 +4270,6 @@ public class COSClient implements COS {
     }
 
     @Override
-    public ImageSearchResponse getImageSearch(ImageSearchRequest request) {
-        return null;
-    }
-
-    @Override
     public boolean addGalleryImages(ImageSearchRequest imageSearchRequest) {
         rejectNull(imageSearchRequest,
                 "The request parameter must be specified setting the object tags");
@@ -4316,6 +4311,19 @@ public class COSClient implements COS {
         addParameterIfNotNull(request, "Limit", imageSearchRequest.getLimit());
         addParameterIfNotNull(request, "Filter", imageSearchRequest.getFilter());
         return invoke(request, new Unmarshallers.SearchImagesUnmarshaller());
+    }
+
+    @Override
+    public MediaWorkflowListResponse triggerWorkflowList(MediaWorkflowListRequest mediaWorkflowListRequest) {
+        rejectNull(mediaWorkflowListRequest,
+                "The request parameter must be specified setting the object tags");
+        rejectNull(mediaWorkflowListRequest.getBucketName(),
+                "The bucketName parameter must be specified setting the object tags");
+        CosHttpRequest<MediaWorkflowListRequest> request = createRequest(mediaWorkflowListRequest.getBucketName(),  "triggerworkflow", mediaWorkflowListRequest, HttpMethodName.POST);
+        addParameterIfNotNull(request, "workflowId", mediaWorkflowListRequest.getWorkflowId());
+        addParameterIfNotNull(request, "object", mediaWorkflowListRequest.getObject());
+        addParameterIfNotNull(request, "name", mediaWorkflowListRequest.getName());
+        return invoke(request, new Unmarshallers.triggerWorkflowListUnmarshaller());
     }
 }
 

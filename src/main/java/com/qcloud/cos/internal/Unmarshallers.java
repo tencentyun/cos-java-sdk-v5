@@ -798,4 +798,13 @@ public class Unmarshallers {
                     .parseSearchImagesResponse(in).getResponse();
         }
     }
+
+    public static final class triggerWorkflowListUnmarshaller
+            implements Unmarshaller<MediaWorkflowListResponse, InputStream> {
+
+        public MediaWorkflowListResponse unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser()
+                    .parsetriggerWorkflowListResponse(in).getResponse();
+        }
+    }
 }

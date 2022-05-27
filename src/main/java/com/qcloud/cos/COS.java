@@ -3018,8 +3018,6 @@ public interface COS extends COSDirectSpi {
 
     DetectCarResponse detectCar(DetectCarRequest request);
 
-    ImageSearchResponse getImageSearch(ImageSearchRequest request);
-
     boolean openImageSearch(OpenImageSearchRequest imageSearchRequest);
 
     boolean addGalleryImages(ImageSearchRequest request);
@@ -3027,6 +3025,8 @@ public interface COS extends COSDirectSpi {
     boolean deleteGalleryImages(ImageSearchRequest request);
 
     ImageSearchResponse searchGalleryImages(ImageSearchRequest request);
+
+    MediaWorkflowListResponse triggerWorkflowList(MediaWorkflowListRequest request);
 }
 
 

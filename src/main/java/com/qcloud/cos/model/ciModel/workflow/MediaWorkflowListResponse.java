@@ -29,6 +29,10 @@ public class MediaWorkflowListResponse extends CiServiceResult implements Serial
      */
     private String pageSize;
     /**
+     * 实例 ID
+     */
+    private String instanceId;
+    /**
      * 工作流数组
      */
     private List<MediaWorkflowObject> mediaWorkflowList;
@@ -58,6 +62,14 @@ public class MediaWorkflowListResponse extends CiServiceResult implements Serial
         this.pageSize = pageSize;
     }
 
+    public String getInstanceId() {
+        return instanceId;
+    }
+
+    public void setInstanceId(String instanceId) {
+        this.instanceId = instanceId;
+    }
+
     public List<MediaWorkflowObject> getMediaWorkflowList() {
         if (mediaWorkflowList == null) {
             mediaWorkflowList = new ArrayList<>();
@@ -79,12 +91,14 @@ public class MediaWorkflowListResponse extends CiServiceResult implements Serial
 
     @Override
     public String toString() {
-        return "MediaWorkflowListResponse{" +
-                "requestId='" + requestId + '\'' +
-                ", totalCount='" + totalCount + '\'' +
-                ", pageNumber='" + pageNumber + '\'' +
-                ", pageSize='" + pageSize + '\'' +
-                ", mediaWorkflowList=" + mediaWorkflowList +
-                '}';
+        final StringBuffer sb = new StringBuffer("MediaWorkflowListResponse{");
+        sb.append("requestId='").append(requestId).append('\'');
+        sb.append(", totalCount='").append(totalCount).append('\'');
+        sb.append(", pageNumber='").append(pageNumber).append('\'');
+        sb.append(", pageSize='").append(pageSize).append('\'');
+        sb.append(", instanceId='").append(instanceId).append('\'');
+        sb.append(", mediaWorkflowList=").append(mediaWorkflowList);
+        sb.append('}');
+        return sb.toString();
     }
 }

@@ -36,6 +36,7 @@ import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.exception.MultiObjectDeleteException.DeleteError;
 import com.qcloud.cos.internal.cihandler.DetectCarHandler;
 import com.qcloud.cos.internal.cihandler.SearchImageHandler;
+import com.qcloud.cos.internal.cihandler.TriggerWorkflowListHandler;
 import com.qcloud.cos.model.AbortIncompleteMultipartUpload;
 import com.qcloud.cos.model.AccessControlList;
 import com.qcloud.cos.model.Bucket;
@@ -860,6 +861,12 @@ public class XmlResponsesSaxParser {
 
     public SearchImageHandler parseSearchImagesResponse(InputStream inputStream) throws IOException {
         SearchImageHandler handler = new SearchImageHandler();
+        parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
+        return handler;
+    }
+
+    public TriggerWorkflowListHandler parsetriggerWorkflowListResponse(InputStream inputStream) throws IOException {
+        TriggerWorkflowListHandler handler = new TriggerWorkflowListHandler();
         parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
         return handler;
     }
