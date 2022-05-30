@@ -27,8 +27,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import com.qcloud.cos.model.ciModel.image.ImageSearchRequest;
-import com.qcloud.cos.model.ciModel.image.ImageSearchResponse;
+import com.qcloud.cos.model.ciModel.image.*;
 import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.exception.MultiObjectDeleteException;
@@ -41,10 +40,6 @@ import com.qcloud.cos.model.ciModel.bucket.DocBucketResponse;
 import com.qcloud.cos.model.ciModel.bucket.MediaBucketRequest;
 import com.qcloud.cos.model.ciModel.bucket.MediaBucketResponse;
 import com.qcloud.cos.model.ciModel.common.ImageProcessRequest;
-import com.qcloud.cos.model.ciModel.image.ImageLabelRequest;
-import com.qcloud.cos.model.ciModel.image.ImageLabelResponse;
-import com.qcloud.cos.model.ciModel.image.ImageLabelV2Request;
-import com.qcloud.cos.model.ciModel.image.ImageLabelV2Response;
 import com.qcloud.cos.model.ciModel.job.DocHtmlRequest;
 import com.qcloud.cos.model.ciModel.job.DocJobListRequest;
 import com.qcloud.cos.model.ciModel.job.DocJobListResponse;
@@ -3023,9 +3018,15 @@ public interface COS extends COSDirectSpi {
 
     DetectCarResponse detectCar(DetectCarRequest request);
 
-    ImageSearchResponse getImageSearch(ImageSearchRequest request);
+    boolean openImageSearch(OpenImageSearchRequest imageSearchRequest);
 
-    boolean postImageSearch(ImageSearchRequest request);
+    boolean addGalleryImages(ImageSearchRequest request);
+
+    boolean deleteGalleryImages(ImageSearchRequest request);
+
+    ImageSearchResponse searchGalleryImages(ImageSearchRequest request);
+
+    MediaWorkflowListResponse triggerWorkflowList(MediaWorkflowListRequest request);
 }
 
 
