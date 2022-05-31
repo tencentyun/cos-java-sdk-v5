@@ -5464,8 +5464,15 @@ public class XmlResponsesSaxParser {
         protected void doEndElement(String uri, String name, String qName) {
             List<SnapshotInfo> snapshotList = response.getJobsDetail().getSnapshotList();
             List<AudioSectionInfo> audioSectionList = response.getJobsDetail().getAudioSectionList();
-            AudioSectionInfo audioSectionInfo = audioSectionList.get(audioSectionList.size() - 1);
-            SnapshotInfo snapshotInfo = snapshotList.get(snapshotList.size() - 1);
+            SnapshotInfo snapshotInfo = new SnapshotInfo();
+            AudioSectionInfo audioSectionInfo = new AudioSectionInfo();
+            if (snapshotList == null || !snapshotList.isEmpty()) {
+                snapshotInfo = snapshotList.get(snapshotList.size() - 1);
+            }
+            if (audioSectionList == null || !audioSectionList.isEmpty()) {
+                audioSectionInfo = audioSectionList.get(audioSectionList.size() - 1);
+            }
+
             if (in("Response", "JobsDetail")) {
                 AuditingJobsDetail jobsDetail = response.getJobsDetail();
                 switch (name) {
