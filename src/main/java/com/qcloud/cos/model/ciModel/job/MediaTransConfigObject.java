@@ -1,6 +1,7 @@
 package com.qcloud.cos.model.ciModel.job;
 
 import java.io.Serializable;
+
 /**
  * 媒体处理 任务转码配置实体 https://cloud.tencent.com/document/product/460/48234
  */
@@ -40,6 +41,21 @@ public class MediaTransConfigObject implements Serializable {
     private String audioBitrateAdjMethod;
 
     private String transMode;
+    /**
+     * 是否删除文件中的 MetaData 信息
+     * true、false
+     * 当为 false 时, 保留源文件信息
+     */
+    private String deleteMetadata;
+    /**
+     * 是否开启 HDR 转 SDR	 true/false
+     */
+    private String isHdr2Sdr;
+    /**
+     * hls 加密配置
+     */
+    private String hlsEncrypt;
+
 
     public String getAdjDarMethod() {
         return adjDarMethod;
@@ -103,6 +119,30 @@ public class MediaTransConfigObject implements Serializable {
 
     public void setTransMode(String transMode) {
         this.transMode = transMode;
+    }
+
+    public String getDeleteMetadata() {
+        return deleteMetadata;
+    }
+
+    public void setDeleteMetadata(String deleteMetadata) {
+        this.deleteMetadata = deleteMetadata;
+    }
+
+    public String getIsHdr2Sdr() {
+        return isHdr2Sdr;
+    }
+
+    public void setIsHdr2Sdr(String isHdr2Sdr) {
+        this.isHdr2Sdr = isHdr2Sdr;
+    }
+
+    public String getHlsEncrypt() {
+        return hlsEncrypt;
+    }
+
+    public void setHlsEncrypt(String hlsEncrypt) {
+        this.hlsEncrypt = hlsEncrypt;
     }
 
     @Override

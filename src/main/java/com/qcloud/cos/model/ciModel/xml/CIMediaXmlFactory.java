@@ -1,5 +1,6 @@
 package com.qcloud.cos.model.ciModel.xml;
 
+import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.internal.RequestXmlFactory;
 import com.qcloud.cos.internal.XmlWriter;
 import com.qcloud.cos.model.ciModel.common.MediaInputObject;
@@ -8,6 +9,7 @@ import com.qcloud.cos.model.ciModel.job.ExtractDigitalWatermark;
 import com.qcloud.cos.model.ciModel.job.MediaAudioObject;
 import com.qcloud.cos.model.ciModel.job.MediaConcatFragmentObject;
 import com.qcloud.cos.model.ciModel.job.MediaConcatTemplateObject;
+import com.qcloud.cos.model.ciModel.job.MediaContainerObject;
 import com.qcloud.cos.model.ciModel.job.MediaDigitalWatermark;
 import com.qcloud.cos.model.ciModel.job.MediaJobOperation;
 import com.qcloud.cos.model.ciModel.job.MediaJobsRequest;
@@ -18,9 +20,12 @@ import com.qcloud.cos.model.ciModel.job.MediaTransConfigObject;
 import com.qcloud.cos.model.ciModel.job.MediaTranscodeObject;
 import com.qcloud.cos.model.ciModel.job.MediaTranscodeVideoObject;
 import com.qcloud.cos.model.ciModel.job.MediaVideoObject;
+import com.qcloud.cos.model.ciModel.template.MediaSnapshotObject;
+import com.qcloud.cos.model.ciModel.template.MediaTemplateRequest;
 import com.qcloud.cos.model.ciModel.template.MediaWaterMarkImage;
 import com.qcloud.cos.model.ciModel.template.MediaWaterMarkText;
 import com.qcloud.cos.model.ciModel.template.MediaWatermark;
+import com.qcloud.cos.model.ciModel.template.SpriteSnapshotConfig;
 import com.qcloud.cos.utils.StringUtils;
 
 import java.util.List;
@@ -53,6 +58,70 @@ public class CIMediaXmlFactory {
         addOperation(xml, request);
         xml.end();
         System.out.println(xml);
+        return xml.getBytes();
+    }
+
+    /**
+     * 模板任务xml转换
+     */
+    public static byte[] convertToXmlByteArray(MediaTemplateRequest request) {
+        XmlWriter xml = new XmlWriter();
+        String tag = request.getTag();
+        xml.start("Request");
+        xml.start("Tag").value(tag).end();
+        xml.start("Name").value(request.getName()).end();
+
+        if ("Animation".equalsIgnoreCase(tag)) {
+            xml.start("Container");
+            xml.start("Format").value(request.getContainer().getFormat()).end();
+            xml.end();
+            addVideo(xml, request.getVideo());
+            if (RequestXmlFactory.CheckObjectUtils.objIsNotValid(request.getTimeInterval())) {
+                xml.start("TimeInterval");
+                xml.start("Duration").value(request.getTimeInterval().getDuration()).end();
+                xml.start("Start").value(request.getTimeInterval().getStart()).end();
+                xml.end();
+            }
+        } else if ("Snapshot".equalsIgnoreCase(tag)) {
+            MediaSnapshotObject snapshot = request.getSnapshot();
+            addSnapshot(xml, snapshot);
+        } else if ("Watermark".equalsIgnoreCase(tag)) {
+            xml.start("Watermark");
+            addIfNotNull(xml, "Type", request.getWatermark().getType());
+            addIfNotNull(xml, "Dx", request.getWatermark().getDx());
+            addIfNotNull(xml, "Dy", request.getWatermark().getDy());
+            addIfNotNull(xml, "EndTime", request.getWatermark().getEndTime());
+            addIfNotNull(xml, "LocMode", request.getWatermark().getLocMode());
+            addIfNotNull(xml, "Pos", request.getWatermark().getPos());
+            addIfNotNull(xml, "StartTime", request.getWatermark().getStartTime());
+            if ("Text".equalsIgnoreCase(request.getWatermark().getType())) {
+                xml.start("Text");
+                MediaWaterMarkText text = request.getWatermark().getText();
+                addIfNotNull(xml, "FontColor", text.getFontColor());
+                addIfNotNull(xml, "FontSize", text.getFontSize());
+                addIfNotNull(xml, "FontType", text.getFontType());
+                addIfNotNull(xml, "Text", text.getText());
+                addIfNotNull(xml, "Transparency", text.getTransparency());
+                xml.end();
+            } else if ("Image".equalsIgnoreCase(request.getWatermark().getType())) {
+                xml.start("Image");
+                MediaWaterMarkImage image = request.getWatermark().getImage();
+                addIfNotNull(xml, "Height", image.getHeight());
+                addIfNotNull(xml, "Mode", image.getMode());
+                addIfNotNull(xml, "Url", image.getUrl());
+                addIfNotNull(xml, "Transparency", image.getTransparency());
+                addIfNotNull(xml, "Width", image.getWidth());
+                xml.end();
+            }
+            xml.end();
+        } else if ("Transcode".equalsIgnoreCase(tag)) {
+            addFormat(xml, request.getContainer());
+            addTimeInterval(xml, request.getTimeInterval());
+            addAudio(xml, request.getAudio());
+            addVideo(xml, request.getVideo());
+            addTransConfig(xml, request.getTransConfig());
+        }
+        xml.end();
         return xml.getBytes();
     }
 
@@ -135,43 +204,7 @@ public class CIMediaXmlFactory {
         MediaTranscodeObject transcode = operation.getTranscode();
         String format = transcode.getContainer().getFormat();
         if (RequestXmlFactory.CheckObjectUtils.objIsNotValid(transcode) && !StringUtils.isNullOrEmpty(format)) {
-            xml.start("Transcode");
-            MediaTranscodeVideoObject video = transcode.getVideo();
-            MediaAudioObject audio = transcode.getAudio();
-            MediaTransConfigObject transConfig = transcode.getTransConfig();
-            MediaTimeIntervalObject timeInterval = transcode.getTimeInterval();
-            if (format != null) {
-                xml.start("Container");
-                xml.start("Format").value(format).end();
-                xml.end();
-            }
-            if (RequestXmlFactory.CheckObjectUtils.objIsNotValid(timeInterval)) {
-                xml.start("TimeInterval");
-                xml.start("Duration").value(timeInterval.getDuration()).end();
-                xml.start("Start").value(timeInterval.getStart()).end();
-                xml.end();
-            }
-            if (RequestXmlFactory.CheckObjectUtils.objIsNotValid(video)) {
-                addVideo(xml, video);
-
-            }
-            if (RequestXmlFactory.CheckObjectUtils.objIsNotValid(audio)) {
-                addAudio(xml, audio);
-            }
-
-            if (RequestXmlFactory.CheckObjectUtils.objIsNotValid(transConfig)) {
-                xml.start("TransConfig");
-                addIfNotNull(xml, "AdjDarMethod", transConfig.getAdjDarMethod());
-                addIfNotNull(xml, "AudioBitrateAdjMethod", transConfig.getAudioBitrateAdjMethod());
-                addIfNotNull(xml, "IsCheckAudioBitrate", transConfig.getIsCheckAudioBitrate());
-                addIfNotNull(xml, "IsCheckReso", transConfig.getIsCheckReso());
-                addIfNotNull(xml, "IsCheckVideoBitrate", transConfig.getIsCheckVideoBitrate());
-                addIfNotNull(xml, "ResoAdjMethod", transConfig.getResoAdjMethod());
-                addIfNotNull(xml, "TransMode", transConfig.getTransMode());
-                addIfNotNull(xml, "VideoBitrateAdjMethod", transConfig.getVideoBitrateAdjMethod());
-                xml.end();
-            }
-            xml.end();
+            addTranscode(xml, transcode);
         }
 
         MediaDigitalWatermark digitalWatermark = operation.getDigitalWatermark();
@@ -200,6 +233,7 @@ public class CIMediaXmlFactory {
             xml.end();
         }
         addPicProcess(xml, operation.getPicProcess());
+        addSnapshot(xml, operation.getSnapshot());
         xml.end();
     }
 
@@ -215,6 +249,69 @@ public class CIMediaXmlFactory {
             xml.start("PicProcess");
             addIfNotNull(xml, "IsPicInfo", picProcess.getIsPicInfo());
             addIfNotNull(xml, "ProcessRule", picProcess.getIsPicInfo());
+            xml.end();
+        }
+    }
+
+    private static void addTranscode(XmlWriter xml, MediaTranscodeObject transcode) {
+        if (RequestXmlFactory.CheckObjectUtils.objIsNotValid(transcode)) {
+            xml.start("Transcode");
+            MediaTranscodeVideoObject video = transcode.getVideo();
+            MediaAudioObject audio = transcode.getAudio();
+            MediaTransConfigObject transConfig = transcode.getTransConfig();
+            MediaTimeIntervalObject timeInterval = transcode.getTimeInterval();
+            addFormat(xml, transcode.getContainer());
+            addTimeInterval(xml, timeInterval);
+            addVideo(xml, video);
+            addAudio(xml, audio);
+            addTransConfig(xml, transConfig);
+
+            xml.end();
+        }
+    }
+
+    private static void addFormat(XmlWriter xml, MediaContainerObject container) {
+        String format = container.getFormat();
+        if (format != null) {
+            xml.start("Container");
+            xml.start("Format").value(format).end();
+            if (container.getClipConfig().getDuration() != null) {
+                xml.start("ClipConfig");
+                xml.start("Duration").value(container.getClipConfig().getDuration()).end();
+                xml.end();
+            }
+            xml.end();
+        }
+    }
+
+    private static void addSnapshot(XmlWriter xml, MediaSnapshotObject snapshot) {
+        if (RequestXmlFactory.CheckObjectUtils.objIsNotValid(snapshot)) {
+            xml.start("Snapshot");
+            addIfNotNull(xml, "Mode", snapshot.getMode());
+            addIfNotNull(xml, "Count", snapshot.getCount());
+            addIfNotNull(xml, "Fps", snapshot.getFps());
+            addIfNotNull(xml, "Height", snapshot.getHeight());
+            addIfNotNull(xml, "Start", snapshot.getStart());
+            addIfNotNull(xml, "TimeInterval", snapshot.getTimeInterval());
+            addIfNotNull(xml, "Width", snapshot.getWidth());
+            addIfNotNull(xml, "CIParam", snapshot.getCiParam());
+            addIfNotNull(xml, "IsCheckCount", snapshot.getIsCheckCount());
+            addIfNotNull(xml, "IsCheckBlack", snapshot.getIsCheckBlack());
+            addIfNotNull(xml, "BlackLevel", snapshot.getBlackLevel());
+            addIfNotNull(xml, "PixelBlackThreshold", snapshot.getPixelBlackThreshold());
+            addIfNotNull(xml, "SnapshotOutMode", snapshot.getSnapshotOutMode());
+            if (RequestXmlFactory.CheckObjectUtils.objIsNotValid(snapshot.getSnapshotConfig())) {
+                SpriteSnapshotConfig snapshotConfig = snapshot.getSnapshotConfig();
+                xml.start("SpriteSnapshotConfig");
+                addIfNotNull(xml, "CellWidth", snapshotConfig.getCellWidth());
+                addIfNotNull(xml, "CellHeight", snapshotConfig.getCellHeight());
+                addIfNotNull(xml, "Padding", snapshotConfig.getPadding());
+                addIfNotNull(xml, "Margin", snapshotConfig.getMargin());
+                addIfNotNull(xml, "Color", snapshotConfig.getColor());
+                addIfNotNull(xml, "Columns", snapshotConfig.getColumns());
+                addIfNotNull(xml, "Lines", snapshotConfig.getLines());
+                xml.end();
+            }
             xml.end();
         }
     }
@@ -272,14 +369,42 @@ public class CIMediaXmlFactory {
     }
 
     private static void addAudio(XmlWriter xml, MediaAudioObject audio) {
-        xml.start("Audio");
-        addIfNotNull(xml, "Bitrate", audio.getBitrate());
-        addIfNotNull(xml, "Channels", audio.getChannels());
-        addIfNotNull(xml, "Codec", audio.getCodec());
-        addIfNotNull(xml, "Profile", audio.getProfile());
-        addIfNotNull(xml, "Remove", audio.getRemove());
-        addIfNotNull(xml, "Samplerate", audio.getSamplerate());
-        xml.end();
+        if (RequestXmlFactory.CheckObjectUtils.objIsNotValid(audio)) {
+            xml.start("Audio");
+            addIfNotNull(xml, "Bitrate", audio.getBitrate());
+            addIfNotNull(xml, "Channels", audio.getChannels());
+            addIfNotNull(xml, "Codec", audio.getCodec());
+            addIfNotNull(xml, "Profile", audio.getProfile());
+            addIfNotNull(xml, "Remove", audio.getRemove());
+            addIfNotNull(xml, "Samplerate", audio.getSamplerate());
+            xml.end();
+        }
+    }
+
+    private static void addTimeInterval(XmlWriter xml, MediaTimeIntervalObject timeInterval) {
+        if (RequestXmlFactory.CheckObjectUtils.objIsNotValid(timeInterval)) {
+            xml.start("TimeInterval");
+            addIfNotNull(xml, "Duration", timeInterval.getDuration());
+            addIfNotNull(xml, "Start", timeInterval.getStart());
+            xml.end();
+        }
+    }
+
+    private static void addTransConfig(XmlWriter xml, MediaTransConfigObject transConfig) {
+        if (RequestXmlFactory.CheckObjectUtils.objIsNotValid(transConfig)) {
+            xml.start("TransConfig");
+            addIfNotNull(xml, "AdjDarMethod", transConfig.getAdjDarMethod());
+            addIfNotNull(xml, "AudioBitrateAdjMethod", transConfig.getAudioBitrateAdjMethod());
+            addIfNotNull(xml, "IsCheckAudioBitrate", transConfig.getIsCheckAudioBitrate());
+            addIfNotNull(xml, "IsCheckReso", transConfig.getIsCheckReso());
+            addIfNotNull(xml, "IsCheckVideoBitrate", transConfig.getIsCheckVideoBitrate());
+            addIfNotNull(xml, "ResoAdjMethod", transConfig.getResoAdjMethod());
+            addIfNotNull(xml, "TransMode", transConfig.getTransMode());
+            addIfNotNull(xml, "DeleteMetadata", transConfig.getDeleteMetadata());
+            addIfNotNull(xml, "IsHdr2Sdr", transConfig.getIsHdr2Sdr());
+            addIfNotNull(xml, "HlsEncrypt", transConfig.getHlsEncrypt());
+            xml.end();
+        }
     }
 
     private static void addInput(XmlWriter xml, MediaInputObject inputObject) {

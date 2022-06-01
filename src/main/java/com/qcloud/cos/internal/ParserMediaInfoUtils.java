@@ -273,8 +273,26 @@ public class ParserMediaInfoUtils {
             case "Height":
                 snapshot.setHeight(value);
                 break;
+            case "CIParam":
+                snapshot.setCiParam(value);
+                break;
+            case "IsCheckCount":
+                snapshot.setIsCheckCount(value);
+                break;
+            case "IsCheckBlack":
+                snapshot.setIsCheckBlack(value);
+                break;
+            case "BlackLevel":
+                snapshot.setBlackLevel(value);
+                break;
             case "TimeInterval":
                 snapshot.setTimeInterval(value);
+                break;
+            case "PixelBlackThreshold":
+                snapshot.setPixelBlackThreshold(value);
+                break;
+            case "SnapshotOutMode":
+                snapshot.setSnapshotOutMode(value);
                 break;
             default:
                 break;

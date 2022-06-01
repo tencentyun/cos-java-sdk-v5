@@ -14,6 +14,11 @@ public class MediaAudioObject implements Serializable {
     private String codec;
     /**
      * 采样率
+     * 单位：Hz
+     * 可选 8000、11025、12000、16000、22050、24000、32000、44100、48000、88200、96000
+     * 不同的封装，mp3 支持不同的采样率，如下表所示
+     * 当 Codec 设置为 amr 时，只支持8000
+     * 当 Codec 设置为 opus 时，仅支持8000，16000，24000，48000
      */
     private String samplerate;
     /**
@@ -29,10 +34,27 @@ public class MediaAudioObject implements Serializable {
      */
     private String remove;
 
-    /**
-     * 是否删除音频流
-     */
     private String profile;
+
+    /**
+     * 保持双音轨
+     * 取值 true、false。 当 Video.Codec 为H.265时，此参数无效。
+     */
+    private String keepTwoTracks;
+    /**
+     * 转换轨道
+     * 取值 true、false。 当 Video.Codec 为H.265时，此参数无效。
+     */
+    private String switchTrack;
+    /**
+     * 采样位宽
+     * 当 Codec 设置为 aac, 支持 fltp
+     * 当 Codec 设置为 mp3, 支持 fltp、s16p、s32p
+     * 当 Codec 设置为 flac, 支持s16、s32
+     * 当 Codec 设置为 amr, 支持s16
+     * 当 Video.Codec 为H.265时，此参数无效
+     */
+    private String sampleFormat;
 
     public String getProfile() {
         return profile;
@@ -82,15 +104,43 @@ public class MediaAudioObject implements Serializable {
         this.remove = remove;
     }
 
+    public String getKeepTwoTracks() {
+        return keepTwoTracks;
+    }
+
+    public void setKeepTwoTracks(String keepTwoTracks) {
+        this.keepTwoTracks = keepTwoTracks;
+    }
+
+    public String getSwitchTrack() {
+        return switchTrack;
+    }
+
+    public void setSwitchTrack(String switchTrack) {
+        this.switchTrack = switchTrack;
+    }
+
+    public String getSampleFormat() {
+        return sampleFormat;
+    }
+
+    public void setSampleFormat(String sampleFormat) {
+        this.sampleFormat = sampleFormat;
+    }
+
     @Override
     public String toString() {
-        return "MediaAudioObject{" +
-                "codec='" + codec + '\'' +
-                ", samplerate='" + samplerate + '\'' +
-                ", bitrate='" + bitrate + '\'' +
-                ", channels='" + channels + '\'' +
-                ", remove='" + remove + '\'' +
-                ", profile='" + profile + '\'' +
-                '}';
+        final StringBuffer sb = new StringBuffer("MediaAudioObject{");
+        sb.append("codec='").append(codec).append('\'');
+        sb.append(", samplerate='").append(samplerate).append('\'');
+        sb.append(", bitrate='").append(bitrate).append('\'');
+        sb.append(", channels='").append(channels).append('\'');
+        sb.append(", remove='").append(remove).append('\'');
+        sb.append(", profile='").append(profile).append('\'');
+        sb.append(", keepTwoTracks='").append(keepTwoTracks).append('\'');
+        sb.append(", switchTrack='").append(switchTrack).append('\'');
+        sb.append(", sampleFormat='").append(sampleFormat).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 }

@@ -2,6 +2,7 @@ package com.qcloud.cos.model.ciModel.job;
 
 import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoObjcet;
+import com.qcloud.cos.model.ciModel.template.MediaSnapshotObject;
 import com.qcloud.cos.model.ciModel.template.MediaWatermark;
 
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ public class MediaJobOperation {
     private MediaTranscodeObject transcode;
     private List<String> watermarkTemplateId;
     private MediaConcatTemplateObject mediaConcatTemplate;
+    private MediaSnapshotObject snapshot = new MediaSnapshotObject();
     private MediaDigitalWatermark digitalWatermark = new MediaDigitalWatermark();
     private ExtractDigitalWatermark extractDigitalWatermark = new ExtractDigitalWatermark();
     private MediaPicProcessTemplateObject picProcess = new MediaPicProcessTemplateObject();
@@ -148,6 +150,14 @@ public class MediaJobOperation {
 
     public void setPicProcess(MediaPicProcessTemplateObject picProcess) {
         this.picProcess = picProcess;
+    }
+
+    public MediaSnapshotObject getSnapshot() {
+        return snapshot;
+    }
+
+    public void setSnapshot(MediaSnapshotObject snapshot) {
+        this.snapshot = snapshot;
     }
 
     @Override
