@@ -157,6 +157,7 @@ import com.qcloud.cos.model.ciModel.recognition.CodeLocation;
 import com.qcloud.cos.model.ciModel.recognition.QRcodeInfo;
 import com.qcloud.cos.model.ciModel.snapshot.SnapshotResponse;
 import com.qcloud.cos.model.ciModel.template.MediaListTemplateResponse;
+import com.qcloud.cos.model.ciModel.template.MediaSegmentObject;
 import com.qcloud.cos.model.ciModel.template.MediaSnapshotObject;
 import com.qcloud.cos.model.ciModel.template.MediaTemplateObject;
 import com.qcloud.cos.model.ciModel.template.MediaTemplateResponse;
@@ -164,6 +165,7 @@ import com.qcloud.cos.model.ciModel.template.MediaTemplateTransTplObject;
 import com.qcloud.cos.model.ciModel.template.MediaWaterMarkImage;
 import com.qcloud.cos.model.ciModel.template.MediaWaterMarkText;
 import com.qcloud.cos.model.ciModel.template.MediaWatermark;
+import com.qcloud.cos.model.ciModel.template.SpriteSnapshotConfig;
 import com.qcloud.cos.model.ciModel.workflow.MediaTasks;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowDependency;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowExecutionObject;
@@ -4267,19 +4269,18 @@ public class XmlResponsesSaxParser {
             } else if (in("Response", "JobsDetail", "Operation", "ExtractDigitalWatermark")) {
                 ExtractDigitalWatermark digitalWatermark = response.getJobsDetail().getOperation().getExtractDigitalWatermark();
                 ParserMediaInfoUtils.ParsingDigitalWatermark(digitalWatermark, name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "Snapshot")){
+                MediaSnapshotObject snapshot = response.getJobsDetail().getOperation().getSnapshot();
+                ParserMediaInfoUtils.ParsingSnapshot(snapshot, name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "Segment")){
+                MediaSegmentObject segment = response.getJobsDetail().getOperation().getSegment();
+                ParserMediaInfoUtils.ParsingSegment(segment, name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "Snapshot","SpriteSnapshotConfig")){
+                SpriteSnapshotConfig snapshotConfig = response.getJobsDetail().getOperation().getSnapshot().getSnapshotConfig();
+                ParserMediaInfoUtils.ParsingSnapshotConfig(snapshotConfig, name, getText());
             } else if (in("Response", "JobsDetail", "Operation", "Output")) {
                 MediaOutputObject output = jobsDetail.getOperation().getOutput();
-                switch (name) {
-                    case "Bucket":
-                        output.setBucket(getText());
-                        break;
-                    case "Object":
-                        output.setObject(getText());
-                        break;
-                    case "Region":
-                        output.setRegion(getText());
-                        break;
-                }
+                ParserMediaInfoUtils.ParsingOutput(output, name, getText());
             }
             MediaConcatTemplateObject mediaConcatTemplate = response.getJobsDetail().getOperation().getMediaConcatTemplate();
             if (in("Response", "JobsDetail", "Operation", "ConcatTemplate", "ConcatFragment")) {
@@ -4345,7 +4346,12 @@ public class XmlResponsesSaxParser {
         @Override
         protected void doEndElement(String uri, String name, String qName) {
             List<MediaJobObject> jobsDetailList = response.getJobsDetailList();
-            MediaJobObject jobsDetail = jobsDetailList.get(jobsDetailList.size() - 1);
+            MediaJobObject jobsDetail;
+            if (jobsDetailList.isEmpty()) {
+                jobsDetail = new MediaJobObject();
+            } else {
+                jobsDetail = jobsDetailList.get(jobsDetailList.size() - 1);
+            }
             if (in("Response", "JobsDetail")) {
 
                 switch (name) {
@@ -4417,19 +4423,18 @@ public class XmlResponsesSaxParser {
             } else if (in("Response", "JobsDetail", "Operation", "Transcode", "TimeInterval")) {
                 MediaTimeIntervalObject timeInterval = jobsDetail.getOperation().getTranscode().getTimeInterval();
                 ParserMediaInfoUtils.ParsingMediaTimeInterval(timeInterval, name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "Snapshot")) {
+                MediaSnapshotObject snapshot = jobsDetail.getOperation().getSnapshot();
+                ParserMediaInfoUtils.ParsingSnapshot(snapshot, name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "Segment")) {
+                MediaSegmentObject segment = jobsDetail.getOperation().getSegment();
+                ParserMediaInfoUtils.ParsingSegment(segment, name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "Snapshot", "SpriteSnapshotConfig")) {
+                SpriteSnapshotConfig snapshotConfig = jobsDetail.getOperation().getSnapshot().getSnapshotConfig();
+                ParserMediaInfoUtils.ParsingSnapshotConfig(snapshotConfig, name, getText());
             } else if (in("Response", "JobsDetail", "Operation", "Output")) {
                 MediaOutputObject output = jobsDetail.getOperation().getOutput();
-                switch (name) {
-                    case "Bucket":
-                        output.setBucket(getText());
-                        break;
-                    case "Object":
-                        output.setObject(getText());
-                        break;
-                    case "Region":
-                        output.setRegion(getText());
-                        break;
-                }
+                ParserMediaInfoUtils.ParsingOutput(output, name, getText());
             }
             MediaConcatTemplateObject mediaConcatTemplate = jobsDetail.getOperation().getMediaConcatTemplate();
             if (in("Response", "JobsDetail", "Operation", "ConcatTemplate", "ConcatFragment")) {
@@ -5464,8 +5469,15 @@ public class XmlResponsesSaxParser {
         protected void doEndElement(String uri, String name, String qName) {
             List<SnapshotInfo> snapshotList = response.getJobsDetail().getSnapshotList();
             List<AudioSectionInfo> audioSectionList = response.getJobsDetail().getAudioSectionList();
-            AudioSectionInfo audioSectionInfo = audioSectionList.get(audioSectionList.size() - 1);
-            SnapshotInfo snapshotInfo = snapshotList.get(snapshotList.size() - 1);
+            SnapshotInfo snapshotInfo = new SnapshotInfo();
+            AudioSectionInfo audioSectionInfo = new AudioSectionInfo();
+            if (snapshotList == null || !snapshotList.isEmpty()) {
+                snapshotInfo = snapshotList.get(snapshotList.size() - 1);
+            }
+            if (audioSectionList == null || !audioSectionList.isEmpty()) {
+                audioSectionInfo = audioSectionList.get(audioSectionList.size() - 1);
+            }
+
             if (in("Response", "JobsDetail")) {
                 AuditingJobsDetail jobsDetail = response.getJobsDetail();
                 switch (name) {

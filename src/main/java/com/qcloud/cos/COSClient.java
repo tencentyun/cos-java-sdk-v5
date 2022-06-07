@@ -63,6 +63,7 @@ import com.qcloud.cos.http.HttpMethodName;
 import com.qcloud.cos.http.HttpProtocol;
 import com.qcloud.cos.http.HttpResponseHandler;
 import com.qcloud.cos.internal.BucketNameUtils;
+import com.qcloud.cos.internal.CIGetSnapshotResponseHandler;
 import com.qcloud.cos.internal.CIServiceRequest;
 import com.qcloud.cos.internal.CIWorkflowServiceRequest;
 import com.qcloud.cos.internal.COSDefaultAclHeaderHandler;
@@ -132,6 +133,7 @@ import com.qcloud.cos.model.ciModel.queue.DocQueueRequest;
 import com.qcloud.cos.model.ciModel.queue.MediaListQueueResponse;
 import com.qcloud.cos.model.ciModel.queue.MediaQueueRequest;
 import com.qcloud.cos.model.ciModel.queue.MediaQueueResponse;
+import com.qcloud.cos.model.ciModel.snapshot.CosSnapshotRequest;
 import com.qcloud.cos.model.ciModel.snapshot.PrivateM3U8Request;
 import com.qcloud.cos.model.ciModel.snapshot.PrivateM3U8Response;
 import com.qcloud.cos.model.ciModel.snapshot.SnapshotRequest;
@@ -145,6 +147,7 @@ import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowExecutionsResponse;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowListRequest;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowListResponse;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowRequest;
+import com.qcloud.cos.model.ciModel.xml.CIMediaXmlFactory;
 import com.qcloud.cos.model.ciModel.xml.CImageXmlFactory;
 import com.qcloud.cos.model.fetch.GetAsyncFetchTaskRequest;
 import com.qcloud.cos.model.fetch.GetAsyncFetchTaskResult;
@@ -3626,7 +3629,7 @@ public class COSClient implements COS {
                 "The input parameter must be specified setting the object tags");
         this.rejectStartWith(req.getCallBack(),"http","The CallBack parameter mush start with http or https");
         CosHttpRequest<MediaJobsRequest> request = createRequest(req.getBucketName(), "/jobs", req, HttpMethodName.POST);
-        this.setContent(request, RequestXmlFactory.convertToXmlByteArray(req), "application/xml", false);
+        this.setContent(request, CIMediaXmlFactory.convertToXmlByteArray(req), "application/xml", false);
         return invoke(request, new Unmarshallers.JobCreatUnmarshaller());
     }
 
@@ -3717,7 +3720,7 @@ public class COSClient implements COS {
         rejectNull(templateRequest.getName(),
                 "The name parameter must be specified setting the object tags");
         CosHttpRequest<MediaTemplateRequest> request = this.createRequest(templateRequest.getBucketName(), "/template", templateRequest, HttpMethodName.POST);
-        this.setContent(request, RequestXmlFactory.convertToXmlByteArray(templateRequest), "application/xml", false);
+        this.setContent(request, CIMediaXmlFactory.convertToXmlByteArray(templateRequest), "application/xml", false);
         return this.invoke(request, new Unmarshallers.TemplateUnmarshaller());
     }
 
@@ -4325,5 +4328,25 @@ public class COSClient implements COS {
         addParameterIfNotNull(request, "name", mediaWorkflowListRequest.getName());
         return invoke(request, new Unmarshallers.triggerWorkflowListUnmarshaller());
     }
+
+    @Override
+    public InputStream getSnapshot(CosSnapshotRequest snapshotRequest) {
+        rejectNull(snapshotRequest,
+                "The request parameter must be specified setting the object tags");
+        rejectNull(snapshotRequest.getBucketName(),
+                "The bucketName parameter must be specified setting the object tags");
+        rejectNull(snapshotRequest.getObjectKey(),
+                "The objectKey parameter must be specified setting the object tags");
+        CosHttpRequest<CosSnapshotRequest> request = this.createRequest(snapshotRequest.getBucketName(), snapshotRequest.getObjectKey(), snapshotRequest, HttpMethodName.GET);
+        addParameterIfNotNull(request, "ci-process", "snapshot");
+        addParameterIfNotNull(request, "time", snapshotRequest.getTime());
+        addParameterIfNotNull(request, "width", snapshotRequest.getWidth());
+        addParameterIfNotNull(request, "height", snapshotRequest.getHeight());
+        addParameterIfNotNull(request, "format", snapshotRequest.getFormat());
+        addParameterIfNotNull(request, "rotate", snapshotRequest.getRotate());
+        addParameterIfNotNull(request, "mode", snapshotRequest.getMode());
+        return this.invoke(request, new CIGetSnapshotResponseHandler());
+    }
+
 }
 

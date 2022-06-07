@@ -39,6 +39,18 @@ public class MediaTranscodeVideoObject extends MediaVideoCommon {
 
     private String scanMode;
 
+    /**
+     * 视频颜色格式
+     */
+    private String pixfmt;
+    /**
+     * 长短边自适应
+     */
+    private String longShortMode;
+    /**
+     * 旋转角度
+     */
+    private String rotate;
 
 
     public String getRemove() {
@@ -113,18 +125,47 @@ public class MediaTranscodeVideoObject extends MediaVideoCommon {
         this.scanMode = scanMode;
     }
 
+
+    public String getPixfmt() {
+        return pixfmt;
+    }
+
+    public void setPixfmt(String pixfmt) {
+        this.pixfmt = pixfmt;
+    }
+
+    public String getLongShortMode() {
+        return longShortMode;
+    }
+
+    public void setLongShortMode(String longShortMode) {
+        this.longShortMode = longShortMode;
+    }
+
+    public String getRotate() {
+        return rotate;
+    }
+
+    public void setRotate(String rotate) {
+        this.rotate = rotate;
+    }
+
     @Override
     public String toString() {
-        return "MediaTranscodeVideoObject{" +
-                "remove='" + remove + '\'' +
-                ", profile='" + profile + '\'' +
-                ", bitrate='" + bitrate + '\'' +
-                ", crf='" + crf + '\'' +
-                ", gop='" + gop + '\'' +
-                ", preset='" + preset + '\'' +
-                ", bufSize='" + bufSize + '\'' +
-                ", maxrate='" + maxrate + '\'' +
-                ", scanMode='" + scanMode + '\'' +
-                '}';
+        final StringBuffer sb = new StringBuffer("MediaTranscodeVideoObject{");
+        sb.append("remove='").append(remove).append('\'');
+        sb.append(", profile='").append(profile).append('\'');
+        sb.append(", bitrate='").append(bitrate).append('\'');
+        sb.append(", crf='").append(crf).append('\'');
+        sb.append(", gop='").append(gop).append('\'');
+        sb.append(", preset='").append(preset).append('\'');
+        sb.append(", bufSize='").append(bufSize).append('\'');
+        sb.append(", maxrate='").append(maxrate).append('\'');
+        sb.append(", scanMode='").append(scanMode).append('\'');
+        sb.append(", pixfmt='").append(pixfmt).append('\'');
+        sb.append(", longShortMode='").append(longShortMode).append('\'');
+        sb.append(", rotate='").append(rotate).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 }

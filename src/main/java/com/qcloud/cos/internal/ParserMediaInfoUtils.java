@@ -7,6 +7,7 @@ import com.qcloud.cos.model.ciModel.auditing.PoliticsInfoObjectResults;
 import com.qcloud.cos.model.ciModel.auditing.SectionInfo;
 import com.qcloud.cos.model.ciModel.auditing.SnapshotInfo;
 import com.qcloud.cos.model.ciModel.auditing.UserInfo;
+import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
 import com.qcloud.cos.model.ciModel.job.MediaAudioObject;
 import com.qcloud.cos.model.ciModel.job.MediaDigitalWatermark;
 import com.qcloud.cos.model.ciModel.job.MediaJobObject;
@@ -19,10 +20,12 @@ import com.qcloud.cos.model.ciModel.mediaInfo.MediaFormat;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoAudio;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoSubtitle;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoVideo;
+import com.qcloud.cos.model.ciModel.template.MediaSegmentObject;
 import com.qcloud.cos.model.ciModel.template.MediaSnapshotObject;
 import com.qcloud.cos.model.ciModel.template.MediaWaterMarkImage;
 import com.qcloud.cos.model.ciModel.template.MediaWaterMarkText;
 import com.qcloud.cos.model.ciModel.template.MediaWatermark;
+import com.qcloud.cos.model.ciModel.template.SpriteSnapshotConfig;
 
 /**
  * MediaInfo 解析工具类
@@ -273,8 +276,26 @@ public class ParserMediaInfoUtils {
             case "Height":
                 snapshot.setHeight(value);
                 break;
+            case "CIParam":
+                snapshot.setCiParam(value);
+                break;
+            case "IsCheckCount":
+                snapshot.setIsCheckCount(value);
+                break;
+            case "IsCheckBlack":
+                snapshot.setIsCheckBlack(value);
+                break;
+            case "BlackLevel":
+                snapshot.setBlackLevel(value);
+                break;
             case "TimeInterval":
                 snapshot.setTimeInterval(value);
+                break;
+            case "PixelBlackThreshold":
+                snapshot.setPixelBlackThreshold(value);
+                break;
+            case "SnapshotOutMode":
+                snapshot.setSnapshotOutMode(value);
                 break;
             default:
                 break;
@@ -734,6 +755,66 @@ public class ParserMediaInfoUtils {
                 break;
             case "BucketName":
                 jobsDetail.setBucketName(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParsingSnapshotConfig(SpriteSnapshotConfig snapshotConfig, String name, String value) {
+        switch (name) {
+            case "CellHeight":
+                snapshotConfig.setCellHeight(value);
+                break;
+            case "Padding":
+                snapshotConfig.setPadding(value);
+                break;
+            case "Margin":
+                snapshotConfig.setMargin(value);
+                break;
+            case "Color":
+                snapshotConfig.setColor(value);
+                break;
+            case "Columns":
+                snapshotConfig.setColumns(value);
+                break;
+            case "Lines":
+                snapshotConfig.setLines(value);
+                break;
+            case "CellWidth":
+                snapshotConfig.setCellWidth(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParsingOutput(MediaOutputObject output, String name, String value) {
+        switch (name) {
+            case "Bucket":
+                output.setBucket(value);
+                break;
+            case "Object":
+                output.setObject(value);
+                break;
+            case "Region":
+                output.setRegion(value);
+                break;
+            case "SpriteObject":
+                output.setSpriteObject(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParsingSegment(MediaSegmentObject segment, String name, String value) {
+        switch (name) {
+            case "Format":
+                segment.setFormat(value);
+                break;
+            case "Duration":
+                segment.setDuration(value);
                 break;
             default:
                 break;
