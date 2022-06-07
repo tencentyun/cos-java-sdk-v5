@@ -2,6 +2,7 @@ package com.qcloud.cos.model.ciModel.job;
 
 import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoObjcet;
+import com.qcloud.cos.model.ciModel.template.MediaSegmentObject;
 import com.qcloud.cos.model.ciModel.template.MediaSnapshotObject;
 import com.qcloud.cos.model.ciModel.template.MediaWatermark;
 
@@ -21,8 +22,10 @@ public class MediaJobOperation {
     private MediaWatermark watermark;
     private MediaTranscodeObject transcode;
     private List<String> watermarkTemplateId;
+    private List<MediaWatermark> watermarkList;
     private MediaConcatTemplateObject mediaConcatTemplate;
     private MediaSnapshotObject snapshot = new MediaSnapshotObject();
+    private MediaSegmentObject segment = new MediaSegmentObject();
     private MediaDigitalWatermark digitalWatermark = new MediaDigitalWatermark();
     private ExtractDigitalWatermark extractDigitalWatermark = new ExtractDigitalWatermark();
     private MediaPicProcessTemplateObject picProcess = new MediaPicProcessTemplateObject();
@@ -160,21 +163,43 @@ public class MediaJobOperation {
         this.snapshot = snapshot;
     }
 
+    public MediaSegmentObject getSegment() {
+        return segment;
+    }
+
+    public void setSegment(MediaSegmentObject segment) {
+        this.segment = segment;
+    }
+
+    public List<MediaWatermark> getWatermarkList() {
+        if (watermarkList == null) {
+            watermarkList = new ArrayList<>();
+        }
+        return watermarkList;
+    }
+
+    public void setWatermarkList(List<MediaWatermark> watermarkList) {
+        this.watermarkList = watermarkList;
+    }
+
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("MediaJobOperation{");
-        sb.append("templateId='").append(templateId).append('\'');
-        sb.append(", output=").append(output);
-        sb.append(", mediaAnimation=").append(mediaAnimation);
-        sb.append(", mediaInfo=").append(mediaInfo);
-        sb.append(", removeWatermark=").append(removeWatermark);
-        sb.append(", watermark=").append(watermark);
-        sb.append(", transcode=").append(transcode);
-        sb.append(", watermarkTemplateId=").append(watermarkTemplateId);
-        sb.append(", mediaConcatTemplate=").append(mediaConcatTemplate);
-        sb.append(", digitalWatermark=").append(digitalWatermark);
-        sb.append(", extractDigitalWatermark=").append(extractDigitalWatermark);
-        sb.append('}');
-        return sb.toString();
+        return "MediaJobOperation{" +
+                "templateId='" + templateId + '\'' +
+                ", output=" + output +
+                ", mediaAnimation=" + mediaAnimation +
+                ", mediaInfo=" + mediaInfo +
+                ", removeWatermark=" + removeWatermark +
+                ", watermark=" + watermark +
+                ", transcode=" + transcode +
+                ", watermarkTemplateId=" + watermarkTemplateId +
+                ", watermarkList=" + watermarkList +
+                ", mediaConcatTemplate=" + mediaConcatTemplate +
+                ", snapshot=" + snapshot +
+                ", segment=" + segment +
+                ", digitalWatermark=" + digitalWatermark +
+                ", extractDigitalWatermark=" + extractDigitalWatermark +
+                ", picProcess=" + picProcess +
+                '}';
     }
 }

@@ -20,6 +20,8 @@ import com.qcloud.cos.model.ciModel.job.MediaTransConfigObject;
 import com.qcloud.cos.model.ciModel.job.MediaTranscodeObject;
 import com.qcloud.cos.model.ciModel.job.MediaTranscodeVideoObject;
 import com.qcloud.cos.model.ciModel.job.MediaVideoObject;
+import com.qcloud.cos.model.ciModel.template.MediaHlsEncryptObject;
+import com.qcloud.cos.model.ciModel.template.MediaSegmentObject;
 import com.qcloud.cos.model.ciModel.template.MediaSnapshotObject;
 import com.qcloud.cos.model.ciModel.template.MediaTemplateRequest;
 import com.qcloud.cos.model.ciModel.template.MediaWaterMarkImage;
@@ -28,7 +30,10 @@ import com.qcloud.cos.model.ciModel.template.MediaWatermark;
 import com.qcloud.cos.model.ciModel.template.SpriteSnapshotConfig;
 import com.qcloud.cos.utils.StringUtils;
 
+import java.lang.reflect.Field;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 数据万象媒体处理xml格式化
@@ -76,7 +81,7 @@ public class CIMediaXmlFactory {
             xml.start("Format").value(request.getContainer().getFormat()).end();
             xml.end();
             addVideo(xml, request.getVideo());
-            if (RequestXmlFactory.CheckObjectUtils.objIsNotValid(request.getTimeInterval())) {
+            if (objIsNotValid(request.getTimeInterval())) {
                 xml.start("TimeInterval");
                 xml.start("Duration").value(request.getTimeInterval().getDuration()).end();
                 xml.start("Start").value(request.getTimeInterval().getStart()).end();
@@ -111,6 +116,7 @@ public class CIMediaXmlFactory {
                 addIfNotNull(xml, "Url", image.getUrl());
                 addIfNotNull(xml, "Transparency", image.getTransparency());
                 addIfNotNull(xml, "Width", image.getWidth());
+                addIfNotNull(xml, "Background", image.getBackground());
                 xml.end();
             }
             xml.end();
@@ -130,57 +136,40 @@ public class CIMediaXmlFactory {
         xml.start("Operation");
 
         addIfNotNull(xml, "TemplateId", operation.getTemplateId());
+        addWatermarkTemplateId(xml, operation.getWatermarkTemplateId());
+        addWatermar(xml, operation.getWatermark());
+        addWatermarList(xml, operation.getWatermarkList());
+        addRemoveWatermark(xml, operation.getRemoveWatermark());
+        addConcat(xml, operation.getMediaConcatTemplate());
+        addTranscode(xml, operation.getTranscode());
+        addExtractDigitalWatermark(xml, operation.getExtractDigitalWatermark());
+        addMediaDigitalWatermark(xml, operation.getDigitalWatermark());
+        addOutput(xml, operation.getOutput());
+        addPicProcess(xml, operation.getPicProcess());
+        addSnapshot(xml, operation.getSnapshot());
+        addSegment(xml, operation.getSegment());
 
-        List<String> watermarkTemplateId = operation.getWatermarkTemplateId();
-        if (watermarkTemplateId.size() != 0) {
+        xml.end();
+    }
+
+    private static void addWatermarList(XmlWriter xml, List<MediaWatermark> watermarkList) {
+        if (watermarkList != null && !watermarkList.isEmpty()) {
+            for (MediaWatermark mediaWatermark : watermarkList) {
+                addWatermar(xml, mediaWatermark);
+            }
+        }
+    }
+
+    private static void addWatermarkTemplateId(XmlWriter xml, List<String> watermarkTemplateId) {
+        if (watermarkTemplateId != null && !watermarkTemplateId.isEmpty()) {
             for (String templateId : watermarkTemplateId) {
                 xml.start("WatermarkTemplateId").value(templateId).end();
             }
         }
+    }
 
-        MediaWatermark watermark = operation.getWatermark();
-        if (RequestXmlFactory.CheckObjectUtils.objIsNotValid(watermark)) {
-            addIfNotNull(xml, "Type", watermark.getType());
-            addIfNotNull(xml, "Dx", watermark.getDx());
-            addIfNotNull(xml, "Dy", watermark.getDy());
-            addIfNotNull(xml, "EndTime", watermark.getEndTime());
-            addIfNotNull(xml, "LocMode", watermark.getLocMode());
-            addIfNotNull(xml, "Pos", watermark.getPos());
-            addIfNotNull(xml, "StartTime", watermark.getStartTime());
-
-            if ("Text".equalsIgnoreCase(watermark.getType())) {
-                MediaWaterMarkText text = watermark.getText();
-                xml.start("Text");
-                addIfNotNull(xml, "FontColor", text.getFontColor());
-                addIfNotNull(xml, "FontSize", text.getFontSize());
-                addIfNotNull(xml, "FontType", text.getFontType());
-                addIfNotNull(xml, "Text", text.getText());
-                addIfNotNull(xml, "Transparency", text.getTransparency());
-                xml.end();
-            } else if ("Image".equalsIgnoreCase(watermark.getType())) {
-                MediaWaterMarkImage image = watermark.getImage();
-                xml.start("Image");
-                addIfNotNull(xml, "Height", image.getHeight());
-                addIfNotNull(xml, "Mode", image.getMode());
-                addIfNotNull(xml, "Transparency", image.getTransparency());
-                addIfNotNull(xml, "Url", image.getUrl());
-                addIfNotNull(xml, "Width", image.getWidth());
-                xml.end();
-            }
-        }
-        MediaRemoveWaterMark removeWatermark = operation.getRemoveWatermark();
-        if (RequestXmlFactory.CheckObjectUtils.objIsNotValid(removeWatermark)) {
-            xml.start("RemoveWatermark");
-            addIfNotNull(xml, "Height", removeWatermark.getHeight());
-            addIfNotNull(xml, "Dx", removeWatermark.getDx());
-            addIfNotNull(xml, "Dy", removeWatermark.getDy());
-            addIfNotNull(xml, "Switch", removeWatermark.get_switch());
-            addIfNotNull(xml, "Width", removeWatermark.getWidth());
-            xml.end();
-        }
-
-        MediaConcatTemplateObject mediaConcatTemplate = operation.getMediaConcatTemplate();
-        if (RequestXmlFactory.CheckObjectUtils.objIsNotValid(mediaConcatTemplate)) {
+    private static void addConcat(XmlWriter xml, MediaConcatTemplateObject mediaConcatTemplate) {
+        if (objIsNotValid(mediaConcatTemplate)) {
             xml.start("ConcatTemplate");
             List<MediaConcatFragmentObject> concatFragmentList = mediaConcatTemplate.getConcatFragmentList();
             for (MediaConcatFragmentObject concatFragment : concatFragmentList) {
@@ -200,23 +189,19 @@ public class CIMediaXmlFactory {
             }
             xml.end();
         }
+    }
 
-        MediaTranscodeObject transcode = operation.getTranscode();
-        String format = transcode.getContainer().getFormat();
-        if (RequestXmlFactory.CheckObjectUtils.objIsNotValid(transcode) && !StringUtils.isNullOrEmpty(format)) {
-            addTranscode(xml, transcode);
-        }
-
-        MediaDigitalWatermark digitalWatermark = operation.getDigitalWatermark();
-        if (RequestXmlFactory.CheckObjectUtils.objIsNotValid(digitalWatermark)) {
+    private static void addMediaDigitalWatermark(XmlWriter xml, MediaDigitalWatermark digitalWatermark) {
+        if (objIsNotValid(digitalWatermark)) {
             xml.start("DigitalWatermark");
             addIfNotNull(xml, "Message", digitalWatermark.getMessage());
             addIfNotNull(xml, "Type", digitalWatermark.getType());
             addIfNotNull(xml, "Version", digitalWatermark.getVersion());
             xml.end();
         }
+    }
 
-        ExtractDigitalWatermark extractDigitalWatermark = operation.getExtractDigitalWatermark();
+    private static void addExtractDigitalWatermark(XmlWriter xml, ExtractDigitalWatermark extractDigitalWatermark) {
         if (extractDigitalWatermark.getType() != null || extractDigitalWatermark.getMessage() != null) {
             xml.start("ExtractDigitalWatermark");
             addIfNotNull(xml, "Message", extractDigitalWatermark.getMessage());
@@ -224,28 +209,46 @@ public class CIMediaXmlFactory {
             addIfNotNull(xml, "Version", extractDigitalWatermark.getVersion());
             xml.end();
         }
-        MediaOutputObject output = operation.getOutput();
-        if (RequestXmlFactory.CheckObjectUtils.objIsNotValid(output)) {
+    }
+
+    private static void addOutput(XmlWriter xml, MediaOutputObject output) {
+        if (objIsNotValid(output)) {
             xml.start("Output");
             addIfNotNull(xml, "Region", output.getRegion());
             addIfNotNull(xml, "Object", output.getObject());
             addIfNotNull(xml, "Bucket", output.getBucket());
+            addIfNotNull(xml, "SpriteObject", output.getSpriteObject());
             xml.end();
         }
-        addPicProcess(xml, operation.getPicProcess());
-        addSnapshot(xml, operation.getSnapshot());
-        xml.end();
+    }
+
+    private static void addSegment(XmlWriter xml, MediaSegmentObject segment) {
+        if (objIsNotValid(segment)) {
+            xml.start("Segment");
+            addIfNotNull(xml, "Duration", segment.getDuration());
+            addIfNotNull(xml, "Format", segment.getFormat());
+            MediaHlsEncryptObject hlsEncrypt = segment.getHlsEncrypt();
+            if (objIsNotValid(hlsEncrypt)) {
+                xml.start("HlsEncrypt");
+                addIfNotNull(xml, "IsHlsEncrypt", hlsEncrypt.getIsHlsEncrypt());
+                addIfNotNull(xml, "UriKey", hlsEncrypt.getUriKey());
+                xml.end();
+            }
+            xml.end();
+        }
     }
 
     private static void addCommonParams(XmlWriter xml, MediaJobsRequest request) {
-        xml.start("Tag").value(request.getTag()).end();
-        xml.start("BucketName").value(request.getBucketName()).end();
-        xml.start("QueueId").value(request.getQueueId()).end();
-        addIfNotNull(xml, "CallBack", request.getCallBack());
+        if (objIsNotValid(request)) {
+            xml.start("Tag").value(request.getTag()).end();
+            xml.start("BucketName").value(request.getBucketName()).end();
+            xml.start("QueueId").value(request.getQueueId()).end();
+            addIfNotNull(xml, "CallBack", request.getCallBack());
+        }
     }
 
     private static void addPicProcess(XmlWriter xml, MediaPicProcessTemplateObject picProcess) {
-        if (RequestXmlFactory.CheckObjectUtils.objIsNotValid(picProcess)) {
+        if (objIsNotValid(picProcess)) {
             xml.start("PicProcess");
             addIfNotNull(xml, "IsPicInfo", picProcess.getIsPicInfo());
             addIfNotNull(xml, "ProcessRule", picProcess.getIsPicInfo());
@@ -254,7 +257,7 @@ public class CIMediaXmlFactory {
     }
 
     private static void addTranscode(XmlWriter xml, MediaTranscodeObject transcode) {
-        if (RequestXmlFactory.CheckObjectUtils.objIsNotValid(transcode)) {
+        if (objIsNotValid(transcode)) {
             xml.start("Transcode");
             MediaTranscodeVideoObject video = transcode.getVideo();
             MediaAudioObject audio = transcode.getAudio();
@@ -285,7 +288,7 @@ public class CIMediaXmlFactory {
     }
 
     private static void addSnapshot(XmlWriter xml, MediaSnapshotObject snapshot) {
-        if (RequestXmlFactory.CheckObjectUtils.objIsNotValid(snapshot)) {
+        if (objIsNotValid(snapshot)) {
             xml.start("Snapshot");
             addIfNotNull(xml, "Mode", snapshot.getMode());
             addIfNotNull(xml, "Count", snapshot.getCount());
@@ -300,7 +303,7 @@ public class CIMediaXmlFactory {
             addIfNotNull(xml, "BlackLevel", snapshot.getBlackLevel());
             addIfNotNull(xml, "PixelBlackThreshold", snapshot.getPixelBlackThreshold());
             addIfNotNull(xml, "SnapshotOutMode", snapshot.getSnapshotOutMode());
-            if (RequestXmlFactory.CheckObjectUtils.objIsNotValid(snapshot.getSnapshotConfig())) {
+            if (objIsNotValid(snapshot.getSnapshotConfig())) {
                 SpriteSnapshotConfig snapshotConfig = snapshot.getSnapshotConfig();
                 xml.start("SpriteSnapshotConfig");
                 addIfNotNull(xml, "CellWidth", snapshotConfig.getCellWidth());
@@ -369,7 +372,7 @@ public class CIMediaXmlFactory {
     }
 
     private static void addAudio(XmlWriter xml, MediaAudioObject audio) {
-        if (RequestXmlFactory.CheckObjectUtils.objIsNotValid(audio)) {
+        if (objIsNotValid(audio)) {
             xml.start("Audio");
             addIfNotNull(xml, "Bitrate", audio.getBitrate());
             addIfNotNull(xml, "Channels", audio.getChannels());
@@ -382,7 +385,7 @@ public class CIMediaXmlFactory {
     }
 
     private static void addTimeInterval(XmlWriter xml, MediaTimeIntervalObject timeInterval) {
-        if (RequestXmlFactory.CheckObjectUtils.objIsNotValid(timeInterval)) {
+        if (objIsNotValid(timeInterval)) {
             xml.start("TimeInterval");
             addIfNotNull(xml, "Duration", timeInterval.getDuration());
             addIfNotNull(xml, "Start", timeInterval.getStart());
@@ -391,7 +394,7 @@ public class CIMediaXmlFactory {
     }
 
     private static void addTransConfig(XmlWriter xml, MediaTransConfigObject transConfig) {
-        if (RequestXmlFactory.CheckObjectUtils.objIsNotValid(transConfig)) {
+        if (objIsNotValid(transConfig)) {
             xml.start("TransConfig");
             addIfNotNull(xml, "AdjDarMethod", transConfig.getAdjDarMethod());
             addIfNotNull(xml, "AudioBitrateAdjMethod", transConfig.getAudioBitrateAdjMethod());
@@ -412,4 +415,93 @@ public class CIMediaXmlFactory {
         xml.start("Object").value(inputObject.getObject()).end();
         xml.end();
     }
+
+    private static void addWatermar(XmlWriter xml, MediaWatermark watermark) {
+        if (objIsNotValid(watermark)) {
+            xml.start("Watermark");
+            addIfNotNull(xml, "Type", watermark.getType());
+            addIfNotNull(xml, "Dx", watermark.getDx());
+            addIfNotNull(xml, "Dy", watermark.getDy());
+            addIfNotNull(xml, "EndTime", watermark.getEndTime());
+            addIfNotNull(xml, "LocMode", watermark.getLocMode());
+            addIfNotNull(xml, "Pos", watermark.getPos());
+            addIfNotNull(xml, "StartTime", watermark.getStartTime());
+
+            if ("Text".equalsIgnoreCase(watermark.getType())) {
+                MediaWaterMarkText text = watermark.getText();
+                xml.start("Text");
+                addIfNotNull(xml, "FontColor", text.getFontColor());
+                addIfNotNull(xml, "FontSize", text.getFontSize());
+                addIfNotNull(xml, "FontType", text.getFontType());
+                addIfNotNull(xml, "Text", text.getText());
+                addIfNotNull(xml, "Transparency", text.getTransparency());
+                xml.end();
+            } else if ("Image".equalsIgnoreCase(watermark.getType())) {
+                MediaWaterMarkImage image = watermark.getImage();
+                xml.start("Image");
+                addIfNotNull(xml, "Height", image.getHeight());
+                addIfNotNull(xml, "Mode", image.getMode());
+                addIfNotNull(xml, "Transparency", image.getTransparency());
+                addIfNotNull(xml, "Url", image.getUrl());
+                addIfNotNull(xml, "Width", image.getWidth());
+                xml.end();
+            }
+            xml.end();
+        }
+    }
+
+
+    private static void addRemoveWatermark(XmlWriter xml, MediaRemoveWaterMark removeWatermark) {
+        if (objIsNotValid(removeWatermark)) {
+            xml.start("RemoveWatermark");
+            addIfNotNull(xml, "Height", removeWatermark.getHeight());
+            addIfNotNull(xml, "Dx", removeWatermark.getDx());
+            addIfNotNull(xml, "Dy", removeWatermark.getDy());
+            addIfNotNull(xml, "Switch", removeWatermark.get_switch());
+            addIfNotNull(xml, "Width", removeWatermark.getWidth());
+            xml.end();
+        }
+    }
+
+    private static boolean isEmpty(Object object) {
+        if (object == null) {
+            return true;
+        }
+        if (object instanceof String && (object.toString().equals(""))) {
+            return true;
+        }
+        if (object instanceof Collection && ((Collection) object).isEmpty()) {
+            return true;
+        }
+        if (object instanceof Map && ((Map) object).isEmpty()) {
+            return true;
+        }
+        if (object instanceof Object[] && ((Object[]) object).length == 0) {
+            return true;
+        }
+        return false;
+    }
+
+
+    public static Boolean objIsNotValid(Object obj) {
+        //查询出对象所有的属性
+        Field[] fields = obj.getClass().getDeclaredFields();
+        //用于判断所有属性是否为空,如果参数为空则不查询
+        for (Field field : fields) {
+            //不检查 直接取值
+            field.setAccessible(true);
+            try {
+                Object o = field.get(obj);
+                if (!isEmpty(o)) {
+                    //不为空
+                    return true;
+                }
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+        return false;
+    }
+
+
 }

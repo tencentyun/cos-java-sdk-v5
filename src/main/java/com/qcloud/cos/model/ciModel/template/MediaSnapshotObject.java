@@ -12,7 +12,7 @@ public class MediaSnapshotObject {
      */
     private String start;
     /**
-     * 截图频率
+     * 截图频率 单位：秒
      */
     private String timeInterval;
     /**
@@ -72,7 +72,7 @@ public class MediaSnapshotObject {
     /**
      * 雪碧图输出配置
      */
-    private SpriteSnapshotConfig snapshotConfig = new SpriteSnapshotConfig();
+    private SpriteSnapshotConfig snapshotConfig;
 
     public String getMode() {
         return mode;
@@ -179,6 +179,9 @@ public class MediaSnapshotObject {
     }
 
     public SpriteSnapshotConfig getSnapshotConfig() {
+        if (snapshotConfig == null) {
+            snapshotConfig = new SpriteSnapshotConfig();
+        }
         return snapshotConfig;
     }
 
