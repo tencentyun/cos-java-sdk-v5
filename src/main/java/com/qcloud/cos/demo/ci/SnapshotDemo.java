@@ -34,8 +34,13 @@ public class SnapshotDemo {
         request.setTime("15");
         request.setFormat("jpg");
         //3.调用接口,获取截图响应对象
-        InputStream is = client.getSnapshot(request);
-        inputStream2File(is, new File("1.jpg"));
+        InputStream is = null;
+        try {
+            is = client.getSnapshot(request);
+            inputStream2File(is, new File("1.jpg"));
+        } finally {
+            close(is);
+        }
     }
 
     /**
@@ -57,12 +62,22 @@ public class SnapshotDemo {
     }
 
     private static void inputStream2File(InputStream is, File file) throws IOException {
-        try (FileOutputStream outputStream = new FileOutputStream(file);is) {
+        try (FileOutputStream outputStream = new FileOutputStream(file)) {
             byte[] read = new byte[4096];
             int count;
             while ((count = is.read(read)) != -1) {
                 outputStream.write(read, 0, count);
             }
+        }
+    }
+
+    private static void close(InputStream is) {
+        try {
+            if (is != null) {
+                is.close();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }
