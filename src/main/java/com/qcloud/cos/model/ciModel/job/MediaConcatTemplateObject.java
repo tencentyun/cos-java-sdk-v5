@@ -12,6 +12,11 @@ public class MediaConcatTemplateObject {
     private MediaVideoObject video;
     private MediaContainerObject container;
     private String index;
+    /**
+     * 简单拼接方式（不转码直接拼接），其他的视频和音频参数失效 true、false
+     * 默认为false
+     */
+    private String directConcat;
 
     public List<MediaConcatFragmentObject> getConcatFragmentList() {
         if (concatFragmentList == null) {
@@ -65,14 +70,23 @@ public class MediaConcatTemplateObject {
         this.index = index;
     }
 
+    public String getDirectConcat() {
+        return directConcat;
+    }
+
+    public void setDirectConcat(String directConcat) {
+        this.directConcat = directConcat;
+    }
+
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("MediaConcatTemplateObject{");
+        final StringBuffer sb = new StringBuffer("MediaConcatTemplateObject{");
         sb.append("concatFragmentList=").append(concatFragmentList);
         sb.append(", audio=").append(audio);
         sb.append(", video=").append(video);
         sb.append(", container=").append(container);
         sb.append(", index='").append(index).append('\'');
+        sb.append(", directConcat='").append(directConcat).append('\'');
         sb.append('}');
         return sb.toString();
     }

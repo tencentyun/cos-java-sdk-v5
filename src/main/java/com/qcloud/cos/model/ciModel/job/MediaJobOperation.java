@@ -3,7 +3,9 @@ package com.qcloud.cos.model.ciModel.job;
 import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoObjcet;
 import com.qcloud.cos.model.ciModel.template.MediaSegmentObject;
+import com.qcloud.cos.model.ciModel.template.MediaSmartCoverObject;
 import com.qcloud.cos.model.ciModel.template.MediaSnapshotObject;
+import com.qcloud.cos.model.ciModel.template.MediaVideoMontageObject;
 import com.qcloud.cos.model.ciModel.template.MediaWatermark;
 
 import java.util.ArrayList;
@@ -26,6 +28,8 @@ public class MediaJobOperation {
     private MediaConcatTemplateObject mediaConcatTemplate;
     private MediaSnapshotObject snapshot = new MediaSnapshotObject();
     private MediaSegmentObject segment = new MediaSegmentObject();
+    private MediaSmartCoverObject smartCover = new MediaSmartCoverObject();
+    private MediaVideoMontageObject videoMontage = new MediaVideoMontageObject();
     private MediaDigitalWatermark digitalWatermark = new MediaDigitalWatermark();
     private ExtractDigitalWatermark extractDigitalWatermark = new ExtractDigitalWatermark();
     private MediaPicProcessTemplateObject picProcess = new MediaPicProcessTemplateObject();
@@ -182,24 +186,43 @@ public class MediaJobOperation {
         this.watermarkList = watermarkList;
     }
 
+    public MediaSmartCoverObject getSmartCover() {
+        return smartCover;
+    }
+
+    public void setSmartCover(MediaSmartCoverObject smartCover) {
+        this.smartCover = smartCover;
+    }
+
+    public MediaVideoMontageObject getVideoMontage() {
+        return videoMontage;
+    }
+
+    public void setVideoMontage(MediaVideoMontageObject videoMontage) {
+        this.videoMontage = videoMontage;
+    }
+
     @Override
     public String toString() {
-        return "MediaJobOperation{" +
-                "templateId='" + templateId + '\'' +
-                ", output=" + output +
-                ", mediaAnimation=" + mediaAnimation +
-                ", mediaInfo=" + mediaInfo +
-                ", removeWatermark=" + removeWatermark +
-                ", watermark=" + watermark +
-                ", transcode=" + transcode +
-                ", watermarkTemplateId=" + watermarkTemplateId +
-                ", watermarkList=" + watermarkList +
-                ", mediaConcatTemplate=" + mediaConcatTemplate +
-                ", snapshot=" + snapshot +
-                ", segment=" + segment +
-                ", digitalWatermark=" + digitalWatermark +
-                ", extractDigitalWatermark=" + extractDigitalWatermark +
-                ", picProcess=" + picProcess +
-                '}';
+        final StringBuffer sb = new StringBuffer("MediaJobOperation{");
+        sb.append("templateId='").append(templateId).append('\'');
+        sb.append(", output=").append(output);
+        sb.append(", mediaAnimation=").append(mediaAnimation);
+        sb.append(", mediaInfo=").append(mediaInfo);
+        sb.append(", removeWatermark=").append(removeWatermark);
+        sb.append(", watermark=").append(watermark);
+        sb.append(", transcode=").append(transcode);
+        sb.append(", watermarkTemplateId=").append(watermarkTemplateId);
+        sb.append(", watermarkList=").append(watermarkList);
+        sb.append(", mediaConcatTemplate=").append(mediaConcatTemplate);
+        sb.append(", snapshot=").append(snapshot);
+        sb.append(", segment=").append(segment);
+        sb.append(", smartCover=").append(smartCover);
+        sb.append(", videoMontage=").append(videoMontage);
+        sb.append(", digitalWatermark=").append(digitalWatermark);
+        sb.append(", extractDigitalWatermark=").append(extractDigitalWatermark);
+        sb.append(", picProcess=").append(picProcess);
+        sb.append('}');
+        return sb.toString();
     }
 }
