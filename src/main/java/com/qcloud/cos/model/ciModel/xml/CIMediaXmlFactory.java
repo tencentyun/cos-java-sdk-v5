@@ -6,6 +6,7 @@ import com.qcloud.cos.internal.XmlWriter;
 import com.qcloud.cos.model.ciModel.common.MediaInputObject;
 import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
 import com.qcloud.cos.model.ciModel.job.ExtractDigitalWatermark;
+import com.qcloud.cos.model.ciModel.job.MediaAudioMixObject;
 import com.qcloud.cos.model.ciModel.job.MediaAudioObject;
 import com.qcloud.cos.model.ciModel.job.MediaConcatFragmentObject;
 import com.qcloud.cos.model.ciModel.job.MediaConcatTemplateObject;
@@ -22,8 +23,10 @@ import com.qcloud.cos.model.ciModel.job.MediaTranscodeVideoObject;
 import com.qcloud.cos.model.ciModel.job.MediaVideoObject;
 import com.qcloud.cos.model.ciModel.template.MediaHlsEncryptObject;
 import com.qcloud.cos.model.ciModel.template.MediaSegmentObject;
+import com.qcloud.cos.model.ciModel.template.MediaSmartCoverObject;
 import com.qcloud.cos.model.ciModel.template.MediaSnapshotObject;
 import com.qcloud.cos.model.ciModel.template.MediaTemplateRequest;
+import com.qcloud.cos.model.ciModel.template.MediaVideoMontageObject;
 import com.qcloud.cos.model.ciModel.template.MediaWaterMarkImage;
 import com.qcloud.cos.model.ciModel.template.MediaWaterMarkText;
 import com.qcloud.cos.model.ciModel.template.MediaWatermark;
@@ -147,7 +150,8 @@ public class CIMediaXmlFactory {
         addPicProcess(xml, operation.getPicProcess());
         addSnapshot(xml, operation.getSnapshot());
         addSegment(xml, operation.getSegment());
-
+        addSmartCover(xml, operation.getSmartCover());
+        addVideoMontage(xml, operation.getVideoMontage());
         xml.end();
     }
 
@@ -167,6 +171,28 @@ public class CIMediaXmlFactory {
         }
     }
 
+    private static void addVideoMontage(XmlWriter xml, MediaVideoMontageObject videoMontage) {
+        if (objIsNotValid(videoMontage)) {
+            xml.start("VideoMontage");
+            addIfNotNull(xml, "Duration", videoMontage.getDuration());
+            addVideo(xml, videoMontage.getVideo());
+            addAudio(xml, videoMontage.getAudio());
+            addAudioMix(xml, videoMontage.getAudioMix());
+            addContainer(xml, videoMontage.getContainer());
+            xml.end();
+        }
+    }
+
+    private static void addAudioMix(XmlWriter xml, MediaAudioMixObject audioMix) {
+        if (objIsNotValid(audioMix)) {
+            xml.start("AudioMix");
+            addIfNotNull(xml, "MixMode", audioMix.getMixMode());
+            addIfNotNull(xml, "AudioSource", audioMix.getAudioSource());
+            addIfNotNull(xml, "Replace", audioMix.getReplace());
+            xml.end();
+        }
+    }
+
     private static void addConcat(XmlWriter xml, MediaConcatTemplateObject mediaConcatTemplate) {
         if (objIsNotValid(mediaConcatTemplate)) {
             xml.start("ConcatTemplate");
@@ -175,17 +201,24 @@ public class CIMediaXmlFactory {
                 xml.start("ConcatFragment");
                 addIfNotNull(xml, "Mode", concatFragment.getMode());
                 addIfNotNull(xml, "Url", concatFragment.getUrl());
+                addIfNotNull(xml, "FragmentIndex", concatFragment.getFragmentIndex());
+                addIfNotNull(xml, "StartTime", concatFragment.getStartTime());
+                addIfNotNull(xml, "EndTime", concatFragment.getEndTime());
                 xml.end();
             }
             addVideo(xml, mediaConcatTemplate.getVideo());
             addAudio(xml, mediaConcatTemplate.getAudio());
             addIfNotNull(xml, "Index", mediaConcatTemplate.getIndex());
-            String format = mediaConcatTemplate.getContainer().getFormat();
-            if (!StringUtils.isNullOrEmpty(format)) {
-                xml.start("Container");
-                xml.start("Format").value(format).end();
-                xml.end();
-            }
+            addIfNotNull(xml, "DirectConcat", mediaConcatTemplate.getDirectConcat());
+            addContainer(xml, mediaConcatTemplate.getContainer());
+            xml.end();
+        }
+    }
+
+    private static void addContainer(XmlWriter xml, MediaContainerObject container) {
+        if (!StringUtils.isNullOrEmpty(container.getFormat())) {
+            xml.start("Container");
+            xml.start("Format").value(container.getFormat()).end();
             xml.end();
         }
     }
@@ -233,6 +266,18 @@ public class CIMediaXmlFactory {
                 addIfNotNull(xml, "UriKey", hlsEncrypt.getUriKey());
                 xml.end();
             }
+            xml.end();
+        }
+    }
+
+    private static void addSmartCover(XmlWriter xml, MediaSmartCoverObject smartCover) {
+        if (objIsNotValid(smartCover)) {
+            xml.start("SmartCover");
+            addIfNotNull(xml, "Format", smartCover.getFormat());
+            addIfNotNull(xml, "Width", smartCover.getWidth());
+            addIfNotNull(xml, "Height", smartCover.getHeight());
+            addIfNotNull(xml, "Count", smartCover.getCount());
+            addIfNotNull(xml, "DeleteDuplicates", smartCover.getDeleteDuplicates());
             xml.end();
         }
     }
