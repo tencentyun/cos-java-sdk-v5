@@ -34,6 +34,14 @@ public class UserInfo {
      */
     private String type;
 
+    private String receiveTokenId;
+
+    private String gender;
+
+    private String level;
+
+    private String role;
+
     public String getTokenId() {
         return tokenId;
     }
@@ -88,6 +96,38 @@ public class UserInfo {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getReceiveTokenId() {
+        return receiveTokenId;
+    }
+
+    public void setReceiveTokenId(String receiveTokenId) {
+        this.receiveTokenId = receiveTokenId;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public String getLevel() {
+        return level;
+    }
+
+    public void setLevel(String level) {
+        this.level = level;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 
     @Override

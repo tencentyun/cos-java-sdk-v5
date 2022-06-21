@@ -908,6 +908,7 @@ public class RequestXmlFactory {
         addAuditingDetectType(xml,detectType);
         addIfNotNull(xml, "BizType", conf.getBizType());
         addIfNotNull(xml, "Async", conf.getAsync());
+        addIfNotNull(xml, "Callback", conf.getCallback());
         xml.end();
 
         xml.end();
@@ -993,6 +994,10 @@ public class RequestXmlFactory {
             addIfNotNull(xml, "Room", userInfo.getRoom());
             addIfNotNull(xml, "IP", userInfo.getIp());
             addIfNotNull(xml, "Type", userInfo.getType());
+            addIfNotNull(xml, "ReceiveTokenId", userInfo.getReceiveTokenId());
+            addIfNotNull(xml, "Gender", userInfo.getGender());
+            addIfNotNull(xml, "Level", userInfo.getLevel());
+            addIfNotNull(xml, "Role", userInfo.getRole());
             xml.end();
         }
     }
