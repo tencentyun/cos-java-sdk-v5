@@ -288,6 +288,7 @@ public class CIMediaXmlFactory {
             xml.start("BucketName").value(request.getBucketName()).end();
             xml.start("QueueId").value(request.getQueueId()).end();
             addIfNotNull(xml, "CallBack", request.getCallBack());
+            addIfNotNull(xml, "CallBackFormat", request.getCallBackFormat());
         }
     }
 
