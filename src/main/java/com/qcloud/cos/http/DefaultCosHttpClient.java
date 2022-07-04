@@ -498,7 +498,7 @@ public class DefaultCosHttpClient implements CosHttpClient {
                 }
             } catch (Exception exp) {
                 String expName = exp.getClass().getName();
-                String errorMsg = String.format("httpClient execute occur a unknown exception:%s, httpRequest: %s"
+                String errorMsg = String.format("httpClient execute occur an unknown exception:%s, httpRequest: %s"
                         , expName, request);
                 closeHttpResponseStream(httpResponse);
                 log.error(errorMsg, exp);
