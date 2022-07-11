@@ -123,6 +123,10 @@ public class AuditingJobsDetail {
      * 用户自定义信息
      */
     private UserInfo userInfo = new UserInfo();
+    /**
+     * 黑白名单信息
+     */
+    private ListInfo listInfo = new ListInfo();
 
     public String getJobId() {
         return jobId;
@@ -348,6 +352,22 @@ public class AuditingJobsDetail {
         this.audioSectionList = audioSectionList;
     }
 
+    public SectionInfo getAudioSection() {
+        return audioSection;
+    }
+
+    public void setAudioSection(SectionInfo audioSection) {
+        this.audioSection = audioSection;
+    }
+
+    public ListInfo getListInfo() {
+        return listInfo;
+    }
+
+    public void setListInfo(ListInfo listInfo) {
+        this.listInfo = listInfo;
+    }
+
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("AuditingJobsDetail{");
@@ -373,8 +393,11 @@ public class AuditingJobsDetail {
         sb.append(", illegalInfo=").append(illegalInfo);
         sb.append(", teenagerInfo=").append(teenagerInfo);
         sb.append(", snapshotList=").append(snapshotList);
+        sb.append(", audioSectionList=").append(audioSectionList);
         sb.append(", sectionList=").append(sectionList);
+        sb.append(", audioSection=").append(audioSection);
         sb.append(", userInfo=").append(userInfo);
+        sb.append(", listInfo=").append(listInfo);
         sb.append('}');
         return sb.toString();
     }

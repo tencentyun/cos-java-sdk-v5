@@ -20,6 +20,7 @@ public class BatchImageJobDetail {
     private PoliticsInfo politicsInfo;
     private AdsInfo adsInfo;
     private UserInfo userInfo = new UserInfo();
+    private ListInfo listInfo = new ListInfo();
     private OcrResults ocrResults = new OcrResults();
 
     public String getDataId() {
@@ -184,6 +185,14 @@ public class BatchImageJobDetail {
 
     public void setCompressionResult(String compressionResult) {
         this.compressionResult = compressionResult;
+    }
+
+    public ListInfo getListInfo() {
+        return listInfo;
+    }
+
+    public void setListInfo(ListInfo listInfo) {
+        this.listInfo = listInfo;
     }
 
     @Override

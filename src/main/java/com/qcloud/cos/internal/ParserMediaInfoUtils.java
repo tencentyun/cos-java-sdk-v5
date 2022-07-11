@@ -2,6 +2,8 @@ package com.qcloud.cos.internal;
 
 import com.qcloud.cos.model.ciModel.auditing.AudioSectionInfo;
 import com.qcloud.cos.model.ciModel.auditing.AudtingCommonInfo;
+import com.qcloud.cos.model.ciModel.auditing.ListInfo;
+import com.qcloud.cos.model.ciModel.auditing.ListResult;
 import com.qcloud.cos.model.ciModel.auditing.OcrResults;
 import com.qcloud.cos.model.ciModel.auditing.PoliticsInfoObjectResults;
 import com.qcloud.cos.model.ciModel.auditing.SectionInfo;
@@ -592,6 +594,22 @@ public class ParserMediaInfoUtils {
                 break;
             case "Type":
                 userInfo.setType(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParsingAuditingListResultInfo(ListResult result, String name, String value) {
+        switch (name) {
+            case "ListName":
+                result.setListName(value);
+                break;
+            case "Entity":
+                result.setEntity(value);
+                break;
+            case "ListType":
+                result.setListType(value);
                 break;
             default:
                 break;

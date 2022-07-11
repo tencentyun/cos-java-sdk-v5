@@ -11,6 +11,7 @@ public class AuditingInputObject {
     private String url;
     private String dataId;
     private UserInfo userInfo = new UserInfo();
+    private ListInfo listInfo = new ListInfo();
 
     public String getObject() {
         return object;
@@ -50,6 +51,14 @@ public class AuditingInputObject {
 
     public void setUserInfo(UserInfo userInfo) {
         this.userInfo = userInfo;
+    }
+
+    public ListInfo getListInfo() {
+        return listInfo;
+    }
+
+    public void setListInfo(ListInfo listInfo) {
+        this.listInfo = listInfo;
     }
 
     @Override

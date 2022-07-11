@@ -94,6 +94,8 @@ import com.qcloud.cos.model.ciModel.auditing.DocumentAuditingJobsDetail;
 import com.qcloud.cos.model.ciModel.auditing.DocumentAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.DocumentResultInfo;
 import com.qcloud.cos.model.ciModel.auditing.ImageAuditingResponse;
+import com.qcloud.cos.model.ciModel.auditing.ListInfo;
+import com.qcloud.cos.model.ciModel.auditing.ListResult;
 import com.qcloud.cos.model.ciModel.auditing.ObjectResults;
 import com.qcloud.cos.model.ciModel.auditing.OcrResults;
 import com.qcloud.cos.model.ciModel.auditing.ResultsImageAuditingDetail;
@@ -5462,6 +5464,8 @@ public class XmlResponsesSaxParser {
             }
             if (in("Response", "JobsDetail") && "AudioSection".equals(name)) {
                 audioSectionList.add(new AudioSectionInfo());
+            } else if (in("Response", "JobsDetail", "ListInfo") && "ListResults".equals(name)) {
+                response.getJobsDetail().getListInfo().getListResults().add(new ListResult());
             }
         }
 
@@ -5554,6 +5558,11 @@ public class XmlResponsesSaxParser {
                 ParserMediaInfoUtils.parseAudioSection(audioSectionInfo, name, getText());
             } else if (in("Response", "JobsDetail", "UserInfo")) {
                 ParserMediaInfoUtils.ParsingAuditingUserInfo(response.getJobsDetail().getUserInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "ListInfo", "ListResults")) {
+                List<ListResult> listResults = response.getJobsDetail().getListInfo().getListResults();
+                if (!listResults.isEmpty()) {
+                    ParserMediaInfoUtils.ParsingAuditingListResultInfo(listResults.get(listResults.size() - 1), name, getText());
+                }
             }
         }
 
@@ -5619,6 +5628,8 @@ public class XmlResponsesSaxParser {
             List<SectionInfo> sectionList = response.getJobsDetail().getSectionList();
             if (in("Response", "JobsDetail") && "Section".equals(name)) {
                 sectionList.add(new SectionInfo());
+            }else if (in("Response", "JobsDetail", "ListInfo") && "ListResults".equals(name)) {
+                response.getJobsDetail().getListInfo().getListResults().add(new ListResult());
             }
         }
 
@@ -5690,9 +5701,14 @@ public class XmlResponsesSaxParser {
             }else if (in("Response", "JobsDetail", "Section")){
                 List<SectionInfo> sectionList = response.getJobsDetail().getSectionList();
                 SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
-                ParserMediaInfoUtils.parseSectionInfo(sectionInfo,name,getText());
-            }else if (in("Response", "JobsDetail", "UserInfo")) {
+                ParserMediaInfoUtils.parseSectionInfo(sectionInfo, name, getText());
+            } else if (in("Response", "JobsDetail", "UserInfo")) {
                 ParserMediaInfoUtils.ParsingAuditingUserInfo(response.getJobsDetail().getUserInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "ListInfo", "ListResults")) {
+                List<ListResult> listResults = response.getJobsDetail().getListInfo().getListResults();
+                if (!listResults.isEmpty()) {
+                    ParserMediaInfoUtils.ParsingAuditingListResultInfo(listResults.get(listResults.size() - 1), name, getText());
+                }
             }
         }
 
@@ -6027,6 +6043,8 @@ public class XmlResponsesSaxParser {
             List<SectionInfo> sectionList = response.getJobsDetail().getSectionList();
             if ((in("Response", "Detail") || in("Response", "JobsDetail")) && "Section".equals(name)) {
                 sectionList.add(new SectionInfo());
+            } else if (in("Response", "JobsDetail", "ListInfo") && "ListResults".equals(name)) {
+                response.getJobsDetail().getListInfo().getListResults().add(new ListResult());
             }
         }
 
@@ -6086,9 +6104,14 @@ public class XmlResponsesSaxParser {
                 parseInfo(response.getJobsDetail().getIllegalInfo(), name, getText());
             } else if (in("Response", "JobsDetail", "UserInfo")) {
                 ParserMediaInfoUtils.ParsingAuditingUserInfo(response.getJobsDetail().getUserInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "ListInfo", "ListResults")) {
+                List<ListResult> listResults = response.getJobsDetail().getListInfo().getListResults();
+                if (!listResults.isEmpty()) {
+                    ParserMediaInfoUtils.ParsingAuditingListResultInfo(listResults.get(listResults.size() - 1), name, getText());
+                }
             } else if (in("Response", "Detail", "Section") || in("Response", "JobsDetail", "Section")) {
                 SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
-                ParserMediaInfoUtils.parseSectionInfo(sectionInfo,name,getText());
+                ParserMediaInfoUtils.parseSectionInfo(sectionInfo, name, getText());
             } else if (in("Response", "Detail", "Section", "PornInfo") || in("Response", "JobsDetail", "Section", "PornInfo")) {
                 SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
                 parseInfo(sectionInfo.getPornInfo(), name, getText());
@@ -6207,10 +6230,10 @@ public class XmlResponsesSaxParser {
                 pageSegment.get(pageSegment.size() - 1).getPornInfo().getObjectResults().add(new ObjectResults());
             }else if (in("Response", "JobsDetail", "PageSegment", "Results","AdsInfo") && "ObjectResults".equals(name)) {
                 pageSegment.get(pageSegment.size() - 1).getAdsInfo().getObjectResults().add(new ObjectResults());
-            }else if (in("Response", "JobsDetail", "PageSegment", "Results","TerroristInfo") && "ObjectResults".equals(name)) {
+            } else if (in("Response", "JobsDetail", "PageSegment", "Results", "TerroristInfo") && "ObjectResults".equals(name)) {
                 pageSegment.get(pageSegment.size() - 1).getTerroristInfo().getObjectResults().add(new ObjectResults());
-            }else if (in("Response", "JobsDetail", "UserInfo")) {
-                ParserMediaInfoUtils.ParsingAuditingUserInfo(response.getJobsDetail().getUserInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "ListInfo") && "ListResults".equals(name)) {
+                response.getJobsDetail().getListInfo().getListResults().add(new ListResult());
             }
         }
 
@@ -6316,6 +6339,13 @@ public class XmlResponsesSaxParser {
                 parseResultInfo(resultDetail.getTerroristInfo().getObjectResults(), name, getText());
             }else if (in("Response", "JobsDetail", "PageSegment", "Results", "AdsInfo","ObjectResults","Location")) {
                 parseResultInfo(resultDetail.getAdsInfo().getObjectResults(), name, getText());
+            } else if (in("Response", "JobsDetail", "UserInfo")) {
+                ParserMediaInfoUtils.ParsingAuditingUserInfo(response.getJobsDetail().getUserInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "ListInfo", "ListResults")) {
+                List<ListResult> listResults = response.getJobsDetail().getListInfo().getListResults();
+                if (!listResults.isEmpty()) {
+                    ParserMediaInfoUtils.ParsingAuditingListResultInfo(listResults.get(listResults.size() - 1), name, getText());
+                }
             }
         }
 
@@ -6401,6 +6431,11 @@ public class XmlResponsesSaxParser {
             List<BatchImageJobDetail> jobList = response.getJobList();
             if (in("Response") && "JobsDetail".equals(name)) {
                 jobList.add(new BatchImageJobDetail());
+            } else if (in("Response", "JobsDetail", "ListInfo") && "ListResults".equals(name)) {
+                if (!jobList.isEmpty()) {
+                    List<ListResult> listResults = jobList.get(jobList.size() - 1).getListInfo().getListResults();
+                    listResults.add(new ListResult());
+                }
             }
         }
 
@@ -6466,6 +6501,12 @@ public class XmlResponsesSaxParser {
                 parseInfo(jobsDetail.getAdsInfo(), name, getText());
             } else if (in("Response", "JobsDetail", "UserInfo")) {
                 ParserMediaInfoUtils.ParsingAuditingUserInfo(jobsDetail.getUserInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "ListInfo","ListResults")) {
+                List<ListResult> listResults = jobsDetail.getListInfo().getListResults();
+                if (listResults.isEmpty()){
+                    return;
+                }
+                ParserMediaInfoUtils.ParsingAuditingListResultInfo(listResults.get(listResults.size()-1), name, getText());
             } else if (in("Response", "JobsDetail", "PornInfo", "OcrResults")) {
                 ParserMediaInfoUtils.parseOrcInfo(jobsDetail.getPornInfo().getOcrResults(), name, getText());
             } else if (in("Response", "JobsDetail", "PoliticsInfo", "OcrResults")) {
@@ -6565,6 +6606,8 @@ public class XmlResponsesSaxParser {
                 imageResults.add(new ResultsImageAuditingDetail());
             } else if (in("Response", "JobsDetail", "TextResults") && "Results".equals(name)) {
                 textResults.add(new ResultsTextAuditingDetail());
+            } else if (in("Response", "JobsDetail", "ListInfo") && "ListResults".equals(name)) {
+                response.getJobsDetail().getListInfo().getListResults().add(new ListResult());
             }
         }
 
@@ -6646,8 +6689,13 @@ public class XmlResponsesSaxParser {
                 parseInfo(textAuditingDetail.getTerroristInfo(), name, getText());
             } else if (in("Response", "JobsDetail", "TextResults", "Results", "AdsInfo")) {
                 parseInfo(textAuditingDetail.getAdsInfo(), name, getText());
-            }else if (in("Response", "JobsDetail", "UserInfo")) {
+            } else if (in("Response", "JobsDetail", "UserInfo")) {
                 ParserMediaInfoUtils.ParsingAuditingUserInfo(response.getJobsDetail().getUserInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "ListInfo", "ListResults")) {
+                List<ListResult> listResults = response.getJobsDetail().getListInfo().getListResults();
+                if (!listResults.isEmpty()) {
+                    ParserMediaInfoUtils.ParsingAuditingListResultInfo(listResults.get(listResults.size() - 1), name, getText());
+                }
             }
         }
 
@@ -6692,7 +6740,9 @@ public class XmlResponsesSaxParser {
 
         @Override
         protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
-
+            if (in("Response", "JobsDetail", "ListInfo") && "ListResults".equals(name)) {
+                response.getListInfo().getListResults().add(new ListResult());
+            }
         }
 
         @Override
@@ -6762,6 +6812,11 @@ public class XmlResponsesSaxParser {
                 ParserMediaInfoUtils.parseOrcInfo(response.getTerroristInfo().getOcrResults(), name, getText());
             } else if (in("Response", "JobsDetail", "AdsInfo", "OcrResults")) {
                 ParserMediaInfoUtils.parseOrcInfo(response.getAdsInfo().getOcrResults(), name, getText());
+            } else if (in("Response", "JobsDetail", "ListInfo", "ListResults")) {
+                List<ListResult> listResults = response.getListInfo().getListResults();
+                if (!listResults.isEmpty()) {
+                    ParserMediaInfoUtils.ParsingAuditingListResultInfo(listResults.get(listResults.size() - 1), name, getText());
+                }
             }
         }
 

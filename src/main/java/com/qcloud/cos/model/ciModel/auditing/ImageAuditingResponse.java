@@ -27,6 +27,7 @@ public class ImageAuditingResponse extends CosServiceResult {
     private AdsInfo adsInfo;
     private TeenagerInfo teenagerInfo = new TeenagerInfo();
     private UserInfo userInfo = new UserInfo();
+    private ListInfo listInfo = new ListInfo();
 
     public String getJobId() {
         return jobId;
@@ -208,30 +209,40 @@ public class ImageAuditingResponse extends CosServiceResult {
         this.teenagerInfo = teenagerInfo;
     }
 
+    public ListInfo getListInfo() {
+        return listInfo;
+    }
+
+    public void setListInfo(ListInfo listInfo) {
+        this.listInfo = listInfo;
+    }
+
     @Override
     public String toString() {
-        return "ImageAuditingResponse{" +
-                "jobId='" + jobId + '\'' +
-                ", object='" + object + '\'' +
-                ", compressionResult='" + compressionResult + '\'' +
-                ", result='" + result + '\'' +
-                ", label='" + label + '\'' +
-                ", category='" + category + '\'' +
-                ", subLabel='" + subLabel + '\'' +
-                ", score='" + score + '\'' +
-                ", text='" + text + '\'' +
-                ", creationTime='" + creationTime + '\'' +
-                ", code='" + code + '\'' +
-                ", message='" + message + '\'' +
-                ", state='" + state + '\'' +
-                ", dataId='" + dataId + '\'' +
-                ", url='" + url + '\'' +
-                ", pornInfo=" + pornInfo +
-                ", terroristInfo=" + terroristInfo +
-                ", politicsInfo=" + politicsInfo +
-                ", adsInfo=" + adsInfo +
-                ", teenagerInfo=" + teenagerInfo +
-                ", userInfo=" + userInfo +
-                '}';
+        final StringBuffer sb = new StringBuffer("ImageAuditingResponse{");
+        sb.append("jobId='").append(jobId).append('\'');
+        sb.append(", object='").append(object).append('\'');
+        sb.append(", compressionResult='").append(compressionResult).append('\'');
+        sb.append(", result='").append(result).append('\'');
+        sb.append(", label='").append(label).append('\'');
+        sb.append(", category='").append(category).append('\'');
+        sb.append(", subLabel='").append(subLabel).append('\'');
+        sb.append(", score='").append(score).append('\'');
+        sb.append(", text='").append(text).append('\'');
+        sb.append(", creationTime='").append(creationTime).append('\'');
+        sb.append(", code='").append(code).append('\'');
+        sb.append(", message='").append(message).append('\'');
+        sb.append(", state='").append(state).append('\'');
+        sb.append(", dataId='").append(dataId).append('\'');
+        sb.append(", url='").append(url).append('\'');
+        sb.append(", pornInfo=").append(pornInfo);
+        sb.append(", terroristInfo=").append(terroristInfo);
+        sb.append(", politicsInfo=").append(politicsInfo);
+        sb.append(", adsInfo=").append(adsInfo);
+        sb.append(", teenagerInfo=").append(teenagerInfo);
+        sb.append(", userInfo=").append(userInfo);
+        sb.append(", listInfo=").append(listInfo);
+        sb.append('}');
+        return sb.toString();
     }
 }
