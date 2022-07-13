@@ -409,9 +409,12 @@ public class DefaultCosHttpClient implements CosHttpClient {
     private HttpResponse executeOneRequest(HttpContext context, HttpRequestBase httpRequest) {
         HttpResponse httpResponse = null;
         try {
+            log.info("httpClient start to execute: " + System.currentTimeMillis());
             httpResponse = httpClient.execute(httpRequest, context);
         } catch (IOException e) {
+            log.info("IOException: " + System.currentTimeMillis() + "exp: " + e);
             httpRequest.abort();
+            log.info("after abort: " + System.currentTimeMillis());
             throw ExceptionUtils.createClientException(e);
         }
         return httpResponse;
@@ -432,7 +435,7 @@ public class DefaultCosHttpClient implements CosHttpClient {
     public <X, Y extends CosServiceRequest> X exeute(CosHttpRequest<Y> request,
             HttpResponseHandler<CosServiceResponse<X>> responseHandler)
             throws CosClientException, CosServiceException {
-
+        log.info("start to exeute: " + System.currentTimeMillis());
         HttpResponse httpResponse = null;
         HttpRequestBase httpRequest = null;
         bufferAndResetAbleContent(request);
@@ -452,6 +455,7 @@ public class DefaultCosHttpClient implements CosHttpClient {
         int retryIndex = 0;
         while (true) {
             try {
+                log.info("start to while: " + System.currentTimeMillis());
                 checkInterrupted();
                 if (originalContent instanceof BufferedInputStream
                         && originalContent.markSupported()) {
@@ -471,6 +475,7 @@ public class DefaultCosHttpClient implements CosHttpClient {
                 HttpContext context = HttpClientContext.create();
                 httpRequest = buildHttpRequest(request);
                 httpResponse = null;
+                log.info("before executeOneRequest: " + System.currentTimeMillis());
                 httpResponse = executeOneRequest(context, httpRequest);
                 checkResponse(request, httpRequest, httpResponse);
                 break;
