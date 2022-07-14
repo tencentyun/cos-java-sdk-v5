@@ -64,6 +64,12 @@ public class ClientConfig {
      * The sleep time interval between exception occured and retry
      **/
     public static final BackoffStrategy DEFAULT_BACKOFF_STRATEGY = PredefinedBackoffStrategies.DEFAULT;
+
+    /**
+     * The default on whether to use TCP KeepAlive.
+     */
+    public static final boolean DEFAULT_TCP_KEEP_ALIVE = false;
+
     private Region region;
     private HttpProtocol httpProtocol = HttpProtocol.https;
     private String endPointSuffix = null;
@@ -89,6 +95,8 @@ public class ClientConfig {
 
     // 数据万象特殊请求配置
     private boolean ciSpecialRequest = false;
+
+    private boolean tcpKeepAlive = DEFAULT_TCP_KEEP_ALIVE;
 
     // 不传入region 用于后续调用List Buckets(获取所有的bucket信息)
     public ClientConfig() {
@@ -281,5 +289,13 @@ public class ClientConfig {
 
     public void setCiSpecialRequest(boolean ciSpecialRequest) {
         this.ciSpecialRequest = ciSpecialRequest;
+    }
+
+    public boolean useTcpKeepAlive() {
+        return tcpKeepAlive;
+    }
+
+    public void setUseTcpKeepAlive(final boolean use) {
+        this.tcpKeepAlive = use;
     }
 }
