@@ -15,6 +15,15 @@ public class WebpageAuditingJobsDetail {
     private String url;
     private String creationTime;
     private UserInfo userInfo = new UserInfo();
+    private ListInfo listInfo = new ListInfo();
+
+    public ListInfo getListInfo() {
+        return listInfo;
+    }
+
+    public void setListInfo(ListInfo listInfo) {
+        this.listInfo = listInfo;
+    }
 
     public List<ResultsImageAuditingDetail> getImageResults() {
         return imageResults;

@@ -62,7 +62,8 @@ public class DocumentAuditingJobsDetail {
      */
     private DocumentResultInfo labels;
 
-    private UserInfo userInfo;
+    private UserInfo userInfo = new UserInfo();
+    private ListInfo listInfo = new ListInfo();
 
     public String getJobId() {
         return jobId;
@@ -175,6 +176,14 @@ public class DocumentAuditingJobsDetail {
 
     public void setUserInfo(UserInfo userInfo) {
         this.userInfo = userInfo;
+    }
+
+    public ListInfo getListInfo() {
+        return listInfo;
+    }
+
+    public void setListInfo(ListInfo listInfo) {
+        this.listInfo = listInfo;
     }
 
     @Override
