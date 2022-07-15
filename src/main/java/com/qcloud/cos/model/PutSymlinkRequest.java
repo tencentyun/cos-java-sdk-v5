@@ -9,10 +9,6 @@ public class PutSymlinkRequest extends CosServiceRequest implements Serializable
     private String bucketName;
     private String symlink;
     private String target;
-    private String versionId;
-
-    private AccessControlList accessControlList;
-    private CannedAccessControlList cannedAccessControlList;
 
     public PutSymlinkRequest() {
     }
@@ -38,18 +34,6 @@ public class PutSymlinkRequest extends CosServiceRequest implements Serializable
         return this;
     }
 
-    public PutSymlinkRequest withAccessControlList(
-            AccessControlList accessControlList) {
-        this.accessControlList = accessControlList;
-        return this;
-    }
-
-    public PutSymlinkRequest withCannedAccessControlList(
-            CannedAccessControlList cannedAccessControlList) {
-        this.cannedAccessControlList = cannedAccessControlList;
-        return this;
-    }
-
     public String getBucketName() {
         return bucketName;
     }
@@ -72,29 +56,5 @@ public class PutSymlinkRequest extends CosServiceRequest implements Serializable
 
     public void setTarget(String target) {
         this.target = target;
-    }
-
-    public String getVersionId() {
-        return versionId;
-    }
-
-    public void setVersionId(String versionId) {
-        this.versionId = versionId;
-    }
-
-    public AccessControlList getAccessControlList() {
-        return accessControlList;
-    }
-
-    public void setAccessControlList(AccessControlList accessControlList) {
-        this.accessControlList = accessControlList;
-    }
-
-    public CannedAccessControlList getCannedAccessControlList() {
-        return cannedAccessControlList;
-    }
-
-    public void setCannedAccessControlList(CannedAccessControlList cannedAccessControlList) {
-        this.cannedAccessControlList = cannedAccessControlList;
     }
 }
