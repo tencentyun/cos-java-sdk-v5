@@ -1177,6 +1177,54 @@ public class COSClient implements COS {
     }
 
     @Override
+    public PutSymlinkResult putSymlink(PutSymlinkRequest putSymlinkRequest) {
+        rejectNull(putSymlinkRequest, "The request must not be null.");
+        rejectNull(putSymlinkRequest.getBucketName(),
+                "The bucket name parameter must be specified when create symlink.");
+        rejectNull(putSymlinkRequest.getSymlink(), "The symlink name must be specified when create symlink");
+        rejectNull(putSymlinkRequest.getTarget(), "The target object must be specified when create symlink");
+
+        CosHttpRequest<CosServiceRequest> request = createRequest(putSymlinkRequest.getBucketName(),
+                putSymlinkRequest.getSymlink(), putSymlinkRequest, HttpMethodName.PUT);
+        request.addParameter("symlink", null);
+        addParameterIfNotNull(request,"versionId", putSymlinkRequest.getVersionId());
+
+        request.addHeader(Headers.SYMLINK_TARGET, putSymlinkRequest.getTarget());
+
+        // Set acl
+        // canned acl
+        addHeaderIfNotNull(request, Headers.COS_CANNED_ACL,
+                putSymlinkRequest.getCannedAccessControlList() != null ?
+                        putSymlinkRequest.getCannedAccessControlList().toString() : null);
+
+        // custom acl
+        if (putSymlinkRequest.getAccessControlList() != null) {
+            byte[] aclAsXml = new AclXmlFactory().convertToXmlByteArray(putSymlinkRequest.getAccessControlList());
+            request.addHeader(Headers.CONTENT_TYPE, "application/xml");
+            request.addHeader(Headers.CONTENT_LENGTH, String.valueOf(aclAsXml.length));
+            request.setContent(new ByteArrayInputStream(aclAsXml));
+        }
+
+        return invoke(request, new PutSymlinkResultHandler());
+    }
+
+    @Override
+    public GetSymlinkResult getSymlink(GetSymlinkRequest getSymlinkRequest) {
+        rejectNull(getSymlinkRequest, "The request must not be null.");
+        rejectNull(getSymlinkRequest.getBucketName(),
+                "The bucket name parameter must be specified when getting symlink.");
+        rejectNull(getSymlinkRequest.getSymlink(), "The requested symbolic link must be specified.");
+
+        CosHttpRequest<CosServiceRequest> request = createRequest(getSymlinkRequest.getBucketName(),
+                getSymlinkRequest.getSymlink(), getSymlinkRequest, HttpMethodName.GET);
+        request.addParameter("symlink", null);
+        addParameterIfNotNull(request,"versionId", getSymlinkRequest.getVersionId());
+
+        return invoke(request, new GetSymlinkResultHandler());
+    }
+
+
+    @Override
     public boolean doesObjectExist(String bucketName, String objectName)
             throws CosClientException, CosServiceException {
         try {
@@ -1686,8 +1734,6 @@ public class COSClient implements COS {
         invoke(request, voidCosResponseHandler);
 
     }
-
-
 
     @Override
     public CompleteMultipartUploadResult completeMultipartUpload(
