@@ -552,7 +552,7 @@ public class COSClient implements COS {
     private <X, Y extends CosServiceRequest> X invoke(CosHttpRequest<Y> request,
             HttpResponseHandler<CosServiceResponse<X>> responseHandler)
             throws CosClientException, CosServiceException {
-        log.info("start to invoke: " + System.currentTimeMillis());
+
         COSSigner cosSigner = clientConfig.getCosSigner();
         COSCredentials cosCredentials;
         CosServiceRequest cosServiceRequest = request.getOriginalRequest();
@@ -564,10 +564,7 @@ public class COSClient implements COS {
         Date expiredTime = new Date(System.currentTimeMillis() + clientConfig.getSignExpired() * 1000);
         boolean isCIWorkflowRequest = cosServiceRequest instanceof  CIWorkflowServiceRequest;
         cosSigner.setCIWorkflowRequest(isCIWorkflowRequest);
-        log.info("start to sign: " + System.currentTimeMillis());
         cosSigner.sign(request, cosCredentials, expiredTime);
-
-        log.info("start to cosHttpClient.exeute: " + System.currentTimeMillis());
         return this.cosHttpClient.exeute(request, responseHandler);
     }
 
@@ -810,7 +807,6 @@ public class COSClient implements COS {
     protected <UploadObjectRequest extends PutObjectRequest>
         ObjectMetadata uploadObjectInternal(UploadMode uploadMode, UploadObjectRequest uploadObjectRequest)
             throws CosClientException, CosServiceException {
-        log.info("start to uploadObjectInternal: " + System.currentTimeMillis());
         rejectNull(uploadObjectRequest,
                 "The PutObjectRequest parameter must be specified when uploading an object");
         rejectNull(clientConfig.getRegion(),
