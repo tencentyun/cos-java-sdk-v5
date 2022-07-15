@@ -1187,23 +1187,8 @@ public class COSClient implements COS {
         CosHttpRequest<CosServiceRequest> request = createRequest(putSymlinkRequest.getBucketName(),
                 putSymlinkRequest.getSymlink(), putSymlinkRequest, HttpMethodName.PUT);
         request.addParameter("symlink", null);
-        addParameterIfNotNull(request,"versionId", putSymlinkRequest.getVersionId());
 
         request.addHeader(Headers.SYMLINK_TARGET, putSymlinkRequest.getTarget());
-
-        // Set acl
-        // canned acl
-        addHeaderIfNotNull(request, Headers.COS_CANNED_ACL,
-                putSymlinkRequest.getCannedAccessControlList() != null ?
-                        putSymlinkRequest.getCannedAccessControlList().toString() : null);
-
-        // custom acl
-        if (putSymlinkRequest.getAccessControlList() != null) {
-            byte[] aclAsXml = new AclXmlFactory().convertToXmlByteArray(putSymlinkRequest.getAccessControlList());
-            request.addHeader(Headers.CONTENT_TYPE, "application/xml");
-            request.addHeader(Headers.CONTENT_LENGTH, String.valueOf(aclAsXml.length));
-            request.setContent(new ByteArrayInputStream(aclAsXml));
-        }
 
         return invoke(request, new PutSymlinkResultHandler());
     }
