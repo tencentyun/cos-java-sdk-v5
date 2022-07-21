@@ -19,4 +19,12 @@ public class ListInfo {
     public void setListResults(List<ListResult> listResults) {
         this.listResults = listResults;
     }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("ListInfo{");
+        sb.append("listResults=").append(listResults);
+        sb.append('}');
+        return sb.toString();
+    }
 }

@@ -35,6 +35,8 @@ import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.exception.MultiObjectDeleteException.DeleteError;
 import com.qcloud.cos.internal.cihandler.DetectCarHandler;
+import com.qcloud.cos.internal.cihandler.GenerateQrcodeHandler;
+import com.qcloud.cos.internal.cihandler.GetImageStyleHandler;
 import com.qcloud.cos.internal.cihandler.SearchImageHandler;
 import com.qcloud.cos.internal.cihandler.TriggerWorkflowListHandler;
 import com.qcloud.cos.model.AbortIncompleteMultipartUpload;
@@ -871,6 +873,24 @@ public class XmlResponsesSaxParser {
 
     public TriggerWorkflowListHandler parsetriggerWorkflowListResponse(InputStream inputStream) throws IOException {
         TriggerWorkflowListHandler handler = new TriggerWorkflowListHandler();
+        parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
+        return handler;
+    }
+
+    public GenerateQrcodeHandler parseGenerateQrcodeResponse(InputStream inputStream) throws IOException {
+        GenerateQrcodeHandler handler = new GenerateQrcodeHandler();
+        parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
+        return handler;
+    }
+
+    public GenerateQrcodeHandler parseImageStyleResponse(InputStream inputStream) throws IOException {
+        GenerateQrcodeHandler handler = new GenerateQrcodeHandler();
+        parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
+        return handler;
+    }
+
+    public GetImageStyleHandler parseGetImageStyleResponse(InputStream inputStream) throws IOException {
+        GetImageStyleHandler handler = new GetImageStyleHandler();
         parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
         return handler;
     }

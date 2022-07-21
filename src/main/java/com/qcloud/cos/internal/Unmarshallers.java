@@ -63,6 +63,7 @@ import com.qcloud.cos.model.ciModel.bucket.MediaBucketResponse;
 import com.qcloud.cos.model.ciModel.image.ImageLabelResponse;
 import com.qcloud.cos.model.ciModel.image.ImageLabelV2Response;
 import com.qcloud.cos.model.ciModel.image.ImageSearchResponse;
+import com.qcloud.cos.model.ciModel.image.ImageStyleResponse;
 import com.qcloud.cos.model.ciModel.job.DocJobListResponse;
 import com.qcloud.cos.model.ciModel.job.DocJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaJobResponse;
@@ -805,6 +806,24 @@ public class Unmarshallers {
         public MediaWorkflowListResponse unmarshall(InputStream in) throws Exception {
             return new XmlResponsesSaxParser()
                     .parsetriggerWorkflowListResponse(in).getResponse();
+        }
+    }
+
+    public static final class GenerateQrcodeUnmarshaller
+            implements Unmarshaller<String, InputStream> {
+
+        public String unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser()
+                    .parseGenerateQrcodeResponse(in).getResponse();
+        }
+    }
+
+    public static final class getImageStyleUnmarshaller
+            implements Unmarshaller<ImageStyleResponse, InputStream> {
+
+        public ImageStyleResponse unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser()
+                    .parseGetImageStyleResponse(in).getResponse();
         }
     }
 }

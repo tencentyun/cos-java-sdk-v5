@@ -3030,6 +3030,14 @@ public interface COS extends COSDirectSpi {
     MediaWorkflowListResponse triggerWorkflowList(MediaWorkflowListRequest request);
 
     InputStream getSnapshot(CosSnapshotRequest request);
+
+    String generateQrcode(GenerateQrcodeRequest request);
+
+    Boolean addImageStyle(ImageStyleRequest request);
+
+    ImageStyleResponse getImageStyle(ImageStyleRequest request);
+
+    Boolean deleteImageStyle(ImageStyleRequest request);
 }
 
 
