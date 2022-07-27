@@ -1,6 +1,9 @@
 package com.qcloud.cos.model.ciModel.auditing;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class BatchImageJobDetail {
     private String dataId;
     private String jobId;
@@ -14,6 +17,7 @@ public class BatchImageJobDetail {
     private String code;
     private String message;
     private String url;
+    private String state;
     private String compressionResult;
     private PornInfo pornInfo;
     private TerroristInfo terroristInfo;
@@ -195,27 +199,39 @@ public class BatchImageJobDetail {
         this.listInfo = listInfo;
     }
 
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
     @Override
     public String toString() {
-        return "BatchImageJobDetail{" +
-                "dataId='" + dataId + '\'' +
-                ", jobId='" + jobId + '\'' +
-                ", category='" + category + '\'' +
-                ", label='" + label + '\'' +
-                ", result='" + result + '\'' +
-                ", object='" + object + '\'' +
-                ", score='" + score + '\'' +
-                ", subLabel='" + subLabel + '\'' +
-                ", text='" + text + '\'' +
-                ", code='" + code + '\'' +
-                ", message='" + message + '\'' +
-                ", url='" + url + '\'' +
-                ", pornInfo=" + pornInfo +
-                ", terroristInfo=" + terroristInfo +
-                ", politicsInfo=" + politicsInfo +
-                ", adsInfo=" + adsInfo +
-                ", userInfo=" + userInfo +
-                ", ocrResults=" + ocrResults +
-                '}';
+        final StringBuffer sb = new StringBuffer("BatchImageJobDetail{");
+        sb.append("dataId='").append(dataId).append('\'');
+        sb.append(", jobId='").append(jobId).append('\'');
+        sb.append(", category='").append(category).append('\'');
+        sb.append(", label='").append(label).append('\'');
+        sb.append(", result='").append(result).append('\'');
+        sb.append(", object='").append(object).append('\'');
+        sb.append(", score='").append(score).append('\'');
+        sb.append(", subLabel='").append(subLabel).append('\'');
+        sb.append(", text='").append(text).append('\'');
+        sb.append(", code='").append(code).append('\'');
+        sb.append(", message='").append(message).append('\'');
+        sb.append(", url='").append(url).append('\'');
+        sb.append(", state='").append(state).append('\'');
+        sb.append(", compressionResult='").append(compressionResult).append('\'');
+        sb.append(", pornInfo=").append(pornInfo);
+        sb.append(", terroristInfo=").append(terroristInfo);
+        sb.append(", politicsInfo=").append(politicsInfo);
+        sb.append(", adsInfo=").append(adsInfo);
+        sb.append(", userInfo=").append(userInfo);
+        sb.append(", listInfo=").append(listInfo);
+        sb.append(", ocrResults=").append(ocrResults);
+        sb.append('}');
+        return sb.toString();
     }
 }
