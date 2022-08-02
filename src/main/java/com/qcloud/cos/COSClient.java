@@ -48,6 +48,7 @@ import com.qcloud.cos.auth.COSCredentialsProvider;
 import com.qcloud.cos.auth.COSSessionCredentials;
 import com.qcloud.cos.auth.COSSigner;
 import com.qcloud.cos.auth.COSStaticCredentialsProvider;
+import com.qcloud.cos.endpoint.CIPicRegionEndpointBuilder;
 import com.qcloud.cos.endpoint.CIRegionEndpointBuilder;
 import com.qcloud.cos.endpoint.EndpointBuilder;
 import com.qcloud.cos.endpoint.RegionEndpointBuilder;
@@ -64,6 +65,7 @@ import com.qcloud.cos.http.HttpProtocol;
 import com.qcloud.cos.http.HttpResponseHandler;
 import com.qcloud.cos.internal.BucketNameUtils;
 import com.qcloud.cos.internal.CIGetSnapshotResponseHandler;
+import com.qcloud.cos.internal.CIPicServiceRequest;
 import com.qcloud.cos.internal.CIServiceRequest;
 import com.qcloud.cos.internal.CIWorkflowServiceRequest;
 import com.qcloud.cos.internal.COSDefaultAclHeaderHandler;
@@ -107,12 +109,15 @@ import com.qcloud.cos.model.ciModel.bucket.MediaBucketRequest;
 import com.qcloud.cos.model.ciModel.bucket.MediaBucketResponse;
 import com.qcloud.cos.model.ciModel.common.ImageProcessRequest;
 import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
+import com.qcloud.cos.model.ciModel.image.GenerateQrcodeRequest;
 import com.qcloud.cos.model.ciModel.image.ImageLabelRequest;
 import com.qcloud.cos.model.ciModel.image.ImageLabelResponse;
 import com.qcloud.cos.model.ciModel.image.ImageLabelV2Request;
 import com.qcloud.cos.model.ciModel.image.ImageLabelV2Response;
 import com.qcloud.cos.model.ciModel.image.ImageSearchRequest;
 import com.qcloud.cos.model.ciModel.image.ImageSearchResponse;
+import com.qcloud.cos.model.ciModel.image.ImageStyleRequest;
+import com.qcloud.cos.model.ciModel.image.ImageStyleResponse;
 import com.qcloud.cos.model.ciModel.image.OpenImageSearchRequest;
 import com.qcloud.cos.model.ciModel.job.DocHtmlRequest;
 import com.qcloud.cos.model.ciModel.job.DocJobListRequest;
@@ -526,6 +531,8 @@ public class COSClient implements COS {
             bucket = formatBucket(bucket, fetchCredential().getCOSAppId());
             if (isCIRequest) {
                 endpoint = new CIRegionEndpointBuilder(clientConfig.getRegion()).buildGeneralApiEndpoint(bucket);
+            } else if (request.getOriginalRequest() instanceof CIPicServiceRequest) {
+                endpoint = new CIPicRegionEndpointBuilder(clientConfig.getRegion()).buildGeneralApiEndpoint(bucket);
             } else {
                 endpoint = clientConfig.getEndpointBuilder().buildGeneralApiEndpoint(bucket);
             }
@@ -4234,7 +4241,7 @@ public class COSClient implements COS {
         CosHttpRequest<PutAsyncFetchTaskRequest> request = createRequest(putAsyncFetchTaskRequest.getBucketName(),
                 String.format("/%s/", putAsyncFetchTaskRequest.getBucketName()), putAsyncFetchTaskRequest, HttpMethodName.POST);
         PutAsyncFetchTaskSerializer serializer = new PutAsyncFetchTaskSerializer(PutAsyncFetchTaskRequest.class);
-        SimpleModule module = 
+        SimpleModule module =
             new SimpleModule("PutAsyncFetchTaskSerializer", new Version(1, 0, 0, null, null, null));
         module.addSerializer(PutAsyncFetchTaskRequest.class, serializer);
 
@@ -4377,6 +4384,59 @@ public class COSClient implements COS {
         addParameterIfNotNull(request, "rotate", snapshotRequest.getRotate());
         addParameterIfNotNull(request, "mode", snapshotRequest.getMode());
         return this.invoke(request, new CIGetSnapshotResponseHandler());
+    }
+
+    @Override
+    public String generateQrcode(GenerateQrcodeRequest generateQrcodeRequest) {
+        rejectNull(generateQrcodeRequest,
+                "The request parameter must be specified setting the object tags");
+        rejectNull(generateQrcodeRequest.getBucketName(),
+                "The bucketName parameter must be specified setting the object tags");
+        CosHttpRequest<GenerateQrcodeRequest> request = this.createRequest(generateQrcodeRequest.getBucketName(), "/", generateQrcodeRequest, HttpMethodName.GET);
+        addParameterIfNotNull(request, "ci-process", "qrcode-generate");
+        addParameterIfNotNull(request, "qrcode-content", generateQrcodeRequest.getQrcodeContent());
+        addParameterIfNotNull(request, "mode", generateQrcodeRequest.getMode());
+        addParameterIfNotNull(request, "width", generateQrcodeRequest.getWidth());
+        return this.invoke(request, new Unmarshallers.GenerateQrcodeUnmarshaller());
+    }
+
+    @Override
+    public Boolean addImageStyle(ImageStyleRequest imageStyleRequest) {
+        rejectNull(imageStyleRequest,
+                "The request parameter must be specified setting the object tags");
+        rejectNull(imageStyleRequest.getBucketName(),
+                "The bucketName parameter must be specified setting the object tags");
+        CosHttpRequest<ImageStyleRequest> request = createRequest(imageStyleRequest.getBucketName(), "/", imageStyleRequest, HttpMethodName.PUT);
+        request.addParameter("style", "");
+        this.setContent(request, CImageXmlFactory.addStyleConvertToXmlByteArray(imageStyleRequest), "application/xml", false);
+        invoke(request, voidCosResponseHandler);
+        return true;
+    }
+
+    @Override
+    public ImageStyleResponse getImageStyle(ImageStyleRequest imageStyleRequest) {
+        rejectNull(imageStyleRequest,
+                "The request parameter must be specified setting the object tags");
+        rejectNull(imageStyleRequest.getBucketName(),
+                "The bucketName parameter must be specified setting the object tags");
+        CosHttpRequest<ImageStyleRequest> request = createRequest(imageStyleRequest.getBucketName(), "/", imageStyleRequest, HttpMethodName.GET);
+        request.addParameter("style", "");
+        this.setContent(request, CImageXmlFactory.getStyleConvertToXmlByteArray(imageStyleRequest), "application/xml", false);
+        invoke(request,  new Unmarshallers.getImageStyleUnmarshaller());
+        return null;
+    }
+
+    @Override
+    public Boolean deleteImageStyle(ImageStyleRequest imageStyleRequest) {
+        rejectNull(imageStyleRequest,
+                "The request parameter must be specified setting the object tags");
+        rejectNull(imageStyleRequest.getBucketName(),
+                "The bucketName parameter must be specified setting the object tags");
+        CosHttpRequest<ImageStyleRequest> request = createRequest(imageStyleRequest.getBucketName(), "/", imageStyleRequest, HttpMethodName.DELETE);
+        request.addParameter("style", "");
+        this.setContent(request, CImageXmlFactory.deleteStyleConvertToXmlByteArray(imageStyleRequest), "application/xml", false);
+        invoke(request, voidCosResponseHandler);
+        return true;
     }
 
 }

@@ -2,6 +2,7 @@ package com.qcloud.cos.model.ciModel.xml;
 
 import com.qcloud.cos.internal.XmlWriter;
 import com.qcloud.cos.model.ciModel.image.ImageSearchRequest;
+import com.qcloud.cos.model.ciModel.image.ImageStyleRequest;
 import com.qcloud.cos.model.ciModel.image.OpenImageSearchRequest;
 
 /**
@@ -33,4 +34,37 @@ public class CImageXmlFactory {
         xml.end();
         return xml.getBytes();
     }
+
+    /**
+     * 增加样式请求转换
+     */
+    public static byte[] addStyleConvertToXmlByteArray(ImageStyleRequest imageStyleRequest) {
+        XmlWriter xml = new XmlWriter();
+        xml.start("AddStyle");
+        CIMediaXmlFactory.addIfNotNull(xml, "StyleName", imageStyleRequest.getStyleName());
+        CIMediaXmlFactory.addIfNotNull(xml, "StyleBody", imageStyleRequest.getStyleBody());
+        xml.end();
+        return xml.getBytes();
+    }
+    /**
+     * 查询样式请求转换
+     */
+    public static byte[] getStyleConvertToXmlByteArray(ImageStyleRequest imageStyleRequest) {
+        XmlWriter xml = new XmlWriter();
+        xml.start("GetStyle");
+        CIMediaXmlFactory.addIfNotNull(xml, "StyleName", imageStyleRequest.getStyleName());
+        xml.end();
+        return xml.getBytes();
+    }
+    /**
+     * 删除样式请求转换
+     */
+    public static byte[] deleteStyleConvertToXmlByteArray(ImageStyleRequest imageStyleRequest) {
+        XmlWriter xml = new XmlWriter();
+        xml.start("DeleteStyle");
+        CIMediaXmlFactory.addIfNotNull(xml, "StyleName", imageStyleRequest.getStyleName());
+        xml.end();
+        return xml.getBytes();
+    }
+
 }

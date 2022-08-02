@@ -13,6 +13,7 @@ import com.qcloud.cos.model.PutObjectResult;
 import com.qcloud.cos.model.UploadPartRequest;
 import com.qcloud.cos.model.UploadPartResult;
 import com.qcloud.cos.model.UploadResult;
+import com.qcloud.cos.model.ciModel.image.GenerateQrcodeRequest;
 import com.qcloud.cos.model.ciModel.persistence.CIObject;
 import com.qcloud.cos.model.ciModel.persistence.CIUploadResult;
 import com.qcloud.cos.model.ciModel.persistence.PicOperations;
@@ -27,6 +28,22 @@ import java.util.List;
 
 
 public class QRCodeDemo {
+
+    /**
+     * 二维码生成 https://cloud.tencent.com/document/product/460/53491
+     */
+    public static void generateQrcode(COSClient cosClient) {
+        //1.创建二维码生成请求对象
+        GenerateQrcodeRequest request = new GenerateQrcodeRequest();
+        //2.添加请求参数 参数详情请见api接口文档
+        request.setBucketName("examplebucket-1250000000");
+        request.setQrcodeContent("数据万象");
+        request.setWidth("400");
+        request.setMode("0");
+        String imageBase64 = cosClient.generateQrcode(request);
+        System.out.println(imageBase64);
+    }
+
     public static void identifyQrCode(COSClient cosClient) {
         // bucket名需包含appid
         // api 请参考 https://cloud.tencent.com/document/product/436/54070
@@ -50,7 +67,7 @@ public class QRCodeDemo {
             CIUploadResult ciUploadResult = putObjectResult.getCiUploadResult();
             System.out.println(putObjectResult.getRequestId());
             System.out.println(ciUploadResult.getOriginalInfo().getEtag());
-            for(CIObject ciObject:ciUploadResult.getProcessResults().getObjectList()) {
+            for (CIObject ciObject : ciUploadResult.getProcessResults().getObjectList()) {
                 System.out.println(ciObject.getLocation());
             }
         } catch (CosServiceException e) {
@@ -107,7 +124,7 @@ public class QRCodeDemo {
         CIUploadResult ciUploadResult = completeMultipartUploadResult.getCiUploadResult();
         System.out.println(completeMultipartUploadResult.getRequestId());
         System.out.println(ciUploadResult.getOriginalInfo().getEtag());
-        for(CIObject ciObject:ciUploadResult.getProcessResults().getObjectList()) {
+        for (CIObject ciObject : ciUploadResult.getProcessResults().getObjectList()) {
             System.out.println(ciObject.getLocation());
         }
 
@@ -136,14 +153,15 @@ public class QRCodeDemo {
         CIUploadResult ciUploadResult = uploadResult.getCiUploadResult();
         System.out.println(uploadResult.getRequestId());
         System.out.println(ciUploadResult.getOriginalInfo().getEtag());
-        for(CIObject ciObject:ciUploadResult.getProcessResults().getObjectList()) {
+        for (CIObject ciObject : ciUploadResult.getProcessResults().getObjectList()) {
             System.out.println(ciObject.getLocation());
         }
     }
+
     public static void main(String[] args) throws Exception {
         COSClient cosClient = ClientUtils.getTestClient();
         // 小于5GB文件用简单上传
-        identifyQrCode(cosClient);
+        generateQrcode(cosClient);
         cosClient.shutdown();
     }
 }

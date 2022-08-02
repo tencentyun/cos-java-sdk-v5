@@ -2,7 +2,8 @@ package com.qcloud.cos.internal;
 
 import com.qcloud.cos.model.ciModel.auditing.AudioSectionInfo;
 import com.qcloud.cos.model.ciModel.auditing.AudtingCommonInfo;
-import com.qcloud.cos.model.ciModel.auditing.ListInfo;
+import com.qcloud.cos.model.ciModel.auditing.BatchImageJobDetail;
+import com.qcloud.cos.model.ciModel.auditing.LibResult;
 import com.qcloud.cos.model.ciModel.auditing.ListResult;
 import com.qcloud.cos.model.ciModel.auditing.OcrResults;
 import com.qcloud.cos.model.ciModel.auditing.PoliticsInfoObjectResults;
@@ -28,6 +29,8 @@ import com.qcloud.cos.model.ciModel.template.MediaWaterMarkImage;
 import com.qcloud.cos.model.ciModel.template.MediaWaterMarkText;
 import com.qcloud.cos.model.ciModel.template.MediaWatermark;
 import com.qcloud.cos.model.ciModel.template.SpriteSnapshotConfig;
+
+import java.util.List;
 
 /**
  * MediaInfo 解析工具类
@@ -600,7 +603,13 @@ public class ParserMediaInfoUtils {
         }
     }
 
-    public static void ParsingAuditingListResultInfo(ListResult result, String name, String value) {
+    public static void parsingLastLibResult(List<LibResult> results, String name, String value) {
+        if (!results.isEmpty()) {
+            parsingLibResults(results.get(results.size() - 1), name, value);
+        }
+    }
+
+    public static void parsingAuditingListResultInfo(ListResult result, String name, String value) {
         switch (name) {
             case "ListName":
                 result.setListName(value);
@@ -610,6 +619,19 @@ public class ParserMediaInfoUtils {
                 break;
             case "ListType":
                 result.setListType(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void parsingLibResults(LibResult result, String name, String value) {
+        switch (name) {
+            case "ImageId":
+                result.setImageId(value);
+                break;
+            case "Score":
+                result.setScore(value);
                 break;
             default:
                 break;
@@ -838,4 +860,53 @@ public class ParserMediaInfoUtils {
                 break;
         }
     }
+
+    public static void ParsingAuditingBatchImageJobDetail(BatchImageJobDetail jobsDetail, String name, String value) {
+        switch (name) {
+            case "Object":
+                jobsDetail.setObject(value);
+                break;
+            case "DataId":
+                jobsDetail.setDataId(value);
+                break;
+            case "Label":
+                jobsDetail.setLabel(value);
+                break;
+            case "Result":
+                jobsDetail.setResult(value);
+                break;
+            case "Score":
+                jobsDetail.setScore(value);
+            case "Text":
+                jobsDetail.setText(value);
+            case "SubLabel":
+                jobsDetail.setSubLabel(value);
+                break;
+            case "Code":
+                jobsDetail.setCode(value);
+                break;
+            case "Message":
+                jobsDetail.setMessage(value);
+                break;
+            case "Url":
+                jobsDetail.setUrl(value);
+                break;
+            case "JobId":
+                jobsDetail.setJobId(value);
+                break;
+            case "Category":
+                jobsDetail.setCategory(value);
+                break;
+            case "CompressionResult":
+                jobsDetail.setCompressionResult(value);
+                break;
+            case "State":
+                jobsDetail.setState(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+
 }
