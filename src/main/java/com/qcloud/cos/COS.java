@@ -376,6 +376,28 @@ public interface COS extends COSDirectSpi {
             throws CosClientException, CosServiceException;
 
     /**
+     * <p>
+     *     Create a Symlink for the specified object.
+     *     The <code>PutSymlinkRequest</code> contains all the details of the request, including the bucket created to,
+     *     the symLink name referred to the target object, the target object key.
+     * <p/>
+     * @param putSymlinkRequest the request object containing all the parameter to create a symlink.
+     * @return the result creating symlink.
+     */
+    public PutSymlinkResult putSymlink(PutSymlinkRequest putSymlinkRequest);
+
+    /**
+     * <p>
+     *     Get the object the symbolic link actually points to.
+     *     The <code>GetSymlinkRequest</code> contains all the details of the request, including the bucket created to,
+     *     the symbolic link queried.
+     * </p>
+     * @param getSymlinkRequest the request object containing all the parameter to get a symlink.
+     * @return the target the symbolic link referred to.
+     */
+    public GetSymlinkResult getSymlink(GetSymlinkRequest getSymlinkRequest);
+
+    /**
      * @param bucketName Name of bucket that presumably contains object
      * @param objectName Name of object that has to be checked
      * @return true if exist. otherwise false;
