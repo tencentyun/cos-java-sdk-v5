@@ -4439,6 +4439,50 @@ public class COSClient implements COS {
         return true;
     }
 
+  public String postObjectDecompression(DecompressionRequest decompressionRequest) {
+      rejectNull(decompressionRequest.getSourceBucketName(),
+          "The sourceBucketName parameter must be specified getting object decompression status");
+      rejectNull(decompressionRequest,
+          "The decompressionRequest parameter must be specified getting object decompression "
+              + "status");
+      rejectNull(decompressionRequest.getStatus(),
+          "The status parameter must be specified getting object decompression status");
+      rejectNull(decompressionRequest.getTargetBucketName(),
+          "The targetBucketName parameter must be specified getting object decompression status");
+      rejectNull(decompressionRequest.getResourcesPrefix(),
+          "The resourcesPrefix parameter must be specified getting object decompression status");
+      rejectNull(decompressionRequest.getDecompressionPrefix(),
+          "The decompressionPrefix parameter must be specified getting object decompression "
+          + "status");
+      if (decompressionRequest.getPrefixReplaced()) {
+          rejectNull(decompressionRequest.getTargetKeyPrefix(),
+              "The targetKeyPrefix parameter must be specified getting object decompression "
+              + "status when prefixReplaced is true");
+      }
+      CosHttpRequest<DecompressionRequest> request =
+          createRequest(decompressionRequest.getSourceBucketName(),
+              decompressionRequest.getObjectKey(), decompressionRequest, HttpMethodName.POST);
+      request.addParameter("decompression", null);
+      byte[] content = DecompressionRequest.convertToByteArray(decompressionRequest);
+      request.addHeader("Content-Length", String.valueOf(content.length));
+      request.addHeader("Content-Type", "application/xml");
+      request.setContent(new ByteArrayInputStream(content));
+      return invoke(request, new COSStringResponseHandler());
+  }
+
+    @Override
+    public String getObjectDecompressionStatus(String bucketName, String objectKey) {
+        rejectNull(bucketName,
+            "The bucketName parameter must be specified getting object decompression status");
+        rejectNull(objectKey,
+            "The objectKey parameter must be specified getting object decompression status");
+        CosHttpRequest<CosServiceRequest> request =
+            createRequest(bucketName, objectKey, new CosServiceRequest(), HttpMethodName.GET);
+        request.addParameter("decompression", null);
+        request.addParameter("jobId", objectKey);
+        return invoke(request, new COSStringResponseHandler());
+    }
+
   public DecompressionResult postObjectDecompression(DecompressionRequest decompressionRequest) {
       rejectNull(decompressionRequest.getSourceBucketName(),
               "The sourceBucketName parameter must be specified post object decompression");
