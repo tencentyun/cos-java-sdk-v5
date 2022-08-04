@@ -949,15 +949,15 @@ public class COSClient implements COS {
                 }
             }
 
-            if (metadata.getContentMD5() == null
-                    && !skipMd5CheckStrategy.skipClientSideValidationPerRequest(uploadObjectRequest)) {
-                /*
-                 * If the user hasn't set the content MD5, then we don't want to buffer the whole
-                 * stream in memory just to calculate it. Instead, we can calculate it on the fly
-                 * and validate it with the returned ETag from the object upload.
-                 */
-                input = md5DigestStream = new MD5DigestCalculatingInputStream(input);
-            }
+//            if (metadata.getContentMD5() == null
+//                    && !skipMd5CheckStrategy.skipClientSideValidationPerRequest(uploadObjectRequest)) {
+//                /*
+//                 * If the user hasn't set the content MD5, then we don't want to buffer the whole
+//                 * stream in memory just to calculate it. Instead, we can calculate it on the fly
+//                 * and validate it with the returned ETag from the object upload.
+//                 */
+//                input = md5DigestStream = new MD5DigestCalculatingInputStream(input);
+//            }
 
             populateRequestMetadata(request, metadata);
             request.setContent(input);
@@ -976,38 +976,38 @@ public class COSClient implements COS {
             CosDataSource.Utils.cleanupDataSource(uploadObjectRequest, file, isOrig, input, log);
         }
 
-        String contentMd5 = metadata.getContentMD5();
-        if (md5DigestStream != null) {
-            contentMd5 = Base64.encodeAsString(md5DigestStream.getMd5Digest());
-        }
+//        String contentMd5 = metadata.getContentMD5();
+//        if (md5DigestStream != null) {
+//            contentMd5 = Base64.encodeAsString(md5DigestStream.getMd5Digest());
+//        }
 
-        final String etag = returnedMetadata.getETag();
-        if (contentMd5 != null && uploadMode.equals(UploadMode.PUT_OBJECT)
-                && !skipMd5CheckStrategy.skipClientSideValidationPerPutResponse(returnedMetadata) ) {
-            byte[] clientSideHash = BinaryUtils.fromBase64(contentMd5);
-            byte[] serverSideHash = null;
-            try {
-                serverSideHash = BinaryUtils.fromHex(etag);
-            } catch (DecoderException e) {
-                throw new CosClientException("Unable to verify integrity of data upload.  "
-                        + "Client calculated content hash (contentMD5: " + contentMd5
-                        + " in base 64) didn't match hash (etag: " + etag
-                        + " in hex) calculated by COS .  "
-                        + "You may need to delete the data stored in COS . (metadata.contentMD5: "
-                        + metadata.getContentMD5() + ", bucketName: " + bucketName + ", key: " + key
-                        + ")");
-            }
-
-            if (!Arrays.equals(clientSideHash, serverSideHash)) {
-                throw new CosClientException("Unable to verify integrity of data upload.  "
-                        + "Client calculated content hash (contentMD5: " + contentMd5
-                        + " in base 64) didn't match hash (etag: " + etag
-                        + " in hex) calculated by COS .  "
-                        + "You may need to delete the data stored in COS . (metadata.contentMD5: "
-                        + metadata.getContentMD5() + ", bucketName: " + bucketName + ", key: " + key
-                        + ")");
-            }
-        }
+//        final String etag = returnedMetadata.getETag();
+//        if (contentMd5 != null && uploadMode.equals(UploadMode.PUT_OBJECT)
+//                && !skipMd5CheckStrategy.skipClientSideValidationPerPutResponse(returnedMetadata) ) {
+//            byte[] clientSideHash = BinaryUtils.fromBase64(contentMd5);
+//            byte[] serverSideHash = null;
+//            try {
+//                serverSideHash = BinaryUtils.fromHex(etag);
+//            } catch (DecoderException e) {
+//                throw new CosClientException("Unable to verify integrity of data upload.  "
+//                        + "Client calculated content hash (contentMD5: " + contentMd5
+//                        + " in base 64) didn't match hash (etag: " + etag
+//                        + " in hex) calculated by COS .  "
+//                        + "You may need to delete the data stored in COS . (metadata.contentMD5: "
+//                        + metadata.getContentMD5() + ", bucketName: " + bucketName + ", key: " + key
+//                        + ")");
+//            }
+//
+//            if (!Arrays.equals(clientSideHash, serverSideHash)) {
+//                throw new CosClientException("Unable to verify integrity of data upload.  "
+//                        + "Client calculated content hash (contentMD5: " + contentMd5
+//                        + " in base 64) didn't match hash (etag: " + etag
+//                        + " in hex) calculated by COS .  "
+//                        + "You may need to delete the data stored in COS . (metadata.contentMD5: "
+//                        + metadata.getContentMD5() + ", bucketName: " + bucketName + ", key: " + key
+//                        + ")");
+//            }
+//        }
         return returnedMetadata;
     }
 
@@ -1599,24 +1599,24 @@ public class COSClient implements COS {
             final String etag = metadata.getETag();
 
 
-            if (md5DigestStream != null && !skipMd5CheckStrategy
-                    .skipClientSideValidationPerUploadPartResponse(metadata)) {
-                byte[] clientSideHash = md5DigestStream.getMd5Digest();
-                byte[] serverSideHash = BinaryUtils.fromHex(etag);
-
-                if (!Arrays.equals(clientSideHash, serverSideHash)) {
-                    final String info = "bucketName: " + bucketName + ", key: " + key
-                            + ", uploadId: " + uploadId + ", partNumber: " + partNumber
-                            + ", partSize: " + partSize;
-                    throw new CosClientException("Unable to verify integrity of data upload.  "
-                            + "Client calculated content hash (contentMD5: "
-                            + BinaryUtils.toHex(clientSideHash)
-                            + " in hex) didn't match hash (etag: " + etag
-                            + " in hex) calculated by Qcloud COS.  "
-                            + "You may need to delete the data stored in Qcloud COS. " + "(" + info
-                            + ")");
-                }
-            }
+//            if (md5DigestStream != null && !skipMd5CheckStrategy
+//                    .skipClientSideValidationPerUploadPartResponse(metadata)) {
+//                byte[] clientSideHash = md5DigestStream.getMd5Digest();
+//                byte[] serverSideHash = BinaryUtils.fromHex(etag);
+//
+//                if (!Arrays.equals(clientSideHash, serverSideHash)) {
+//                    final String info = "bucketName: " + bucketName + ", key: " + key
+//                            + ", uploadId: " + uploadId + ", partNumber: " + partNumber
+//                            + ", partSize: " + partSize;
+//                    throw new CosClientException("Unable to verify integrity of data upload.  "
+//                            + "Client calculated content hash (contentMD5: "
+//                            + BinaryUtils.toHex(clientSideHash)
+//                            + " in hex) didn't match hash (etag: " + etag
+//                            + " in hex) calculated by Qcloud COS.  "
+//                            + "You may need to delete the data stored in Qcloud COS. " + "(" + info
+//                            + ")");
+//                }
+//            }
 
             UploadPartResult result = new UploadPartResult();
             result.setETag(etag);
