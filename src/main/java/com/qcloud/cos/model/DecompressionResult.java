@@ -38,7 +38,7 @@ public class DecompressionResult implements Serializable {
 
   @Override
   public String toString() {
-    return Jackson.toJsonString(this);
+    return Jackson.toJsonPrettyString(this);
   }
 
 }

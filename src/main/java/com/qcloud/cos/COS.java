@@ -3073,7 +3073,7 @@ public interface COS extends COSDirectSpi {
      * 查询解压任务的状态
      * @param bucketName 桶名
      * @param objectKey 对象的key
-     * @param jobId 可选参数，可查看指定jobId，也可以填null，则返回最新的解压任务
+     * @param jobId 指定jobId（可以是null）
      * @return 解压状态
      */
     DecompressionResult getObjectDecompressionStatus(String bucketName, String objectKey, String jobId);
@@ -3081,14 +3081,13 @@ public interface COS extends COSDirectSpi {
     /**
      * 列出解压缩任务列表.
      * @param bucketName 桶名称
-     * @param jobStatus 支持Running|Success|Failed|Pending等选项进行查询过滤
-     * @param sortType 支持asc/dsc两个选项， 分别代表升序和降序
-     * @param maxResults 每一页最多列出的项数
-     * @param nextToken 可选项，用于翻页
+     * @param jobStatus 支持Running|Success|Failed|Pending等选项进行查询过滤（可以是null）
+     * @param sortType 支持asc/dsc两个选项， 分别代表升序和降序（可以是null）
+     * @param maxResults 每一页最多列出的项数（可以是null）
+     * @param nextToken 可选项，用于翻页（可以是null）
      * @return 解压缩任务列表
      */
-    ListJobsResult listObjectDecompressionJobs(String bucketName, String jobStatus,
-        String sortType, int maxResults, String nextToken);
+    ListJobsResult listObjectDecompressionJobs(String bucketName, String jobStatus, String sortType, String maxResults, String nextToken);
 
 }
 

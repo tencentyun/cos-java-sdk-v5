@@ -2,9 +2,10 @@ package com.qcloud.cos.model;
 
 import com.qcloud.cos.utils.Jackson;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class ListJobsResult {
+public class ListJobsResult implements Serializable {
 
     private List<DecompressionJob> jobs;
 
@@ -26,7 +27,7 @@ public class ListJobsResult {
         this.nextToken = nextToken;
     }
 
-    public static class DecompressionJob {
+    public static class DecompressionJob implements Serializable{
 
         private String key;
         private String decompressionPrefix;
@@ -85,13 +86,13 @@ public class ListJobsResult {
 
         @Override
         public String toString() {
-            return Jackson.toJsonString(this);
+            return Jackson.toJsonPrettyString(this);
         }
     }
 
     @Override
     public String toString() {
-        return Jackson.toJsonString(this);
+        return Jackson.toJsonPrettyString(this);
     }
 
 
