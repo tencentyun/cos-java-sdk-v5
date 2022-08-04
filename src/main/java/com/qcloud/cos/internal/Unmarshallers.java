@@ -38,12 +38,14 @@ import com.qcloud.cos.model.BucketReplicationConfiguration;
 import com.qcloud.cos.model.BucketTaggingConfiguration;
 import com.qcloud.cos.model.BucketVersioningConfiguration;
 import com.qcloud.cos.model.BucketWebsiteConfiguration;
+import com.qcloud.cos.model.DecompressionResult;
 import com.qcloud.cos.model.DeleteBucketInventoryConfigurationResult;
 import com.qcloud.cos.model.DeleteObjectTaggingResult;
 import com.qcloud.cos.model.GetBucketInventoryConfigurationResult;
 import com.qcloud.cos.model.GetObjectTaggingResult;
 import com.qcloud.cos.model.InitiateMultipartUploadResult;
 import com.qcloud.cos.model.ListBucketInventoryConfigurationsResult;
+import com.qcloud.cos.model.ListJobsResult;
 import com.qcloud.cos.model.MultipartUploadListing;
 import com.qcloud.cos.model.ObjectListing;
 import com.qcloud.cos.model.ObjectMetadata;
@@ -824,6 +826,23 @@ public class Unmarshallers {
         public ImageStyleResponse unmarshall(InputStream in) throws Exception {
             return new XmlResponsesSaxParser()
                     .parseGetImageStyleResponse(in).getResponse();
+        }
+    }
+
+    public static final class DecompressionResultUnmarshaller
+        implements Unmarshaller<DecompressionResult, InputStream> {
+
+        public DecompressionResult unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser().parseDecompressionResult(in)
+                .getDecompressionResult();
+        }
+    }
+
+    public static final class ListJobsResultUnmarshaller
+        implements Unmarshaller<ListJobsResult, InputStream> {
+
+        public ListJobsResult unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser().parseListJobsResult(in).getResult();
         }
     }
 }
