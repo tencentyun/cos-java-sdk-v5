@@ -4439,5 +4439,58 @@ public class COSClient implements COS {
         return true;
     }
 
+  public DecompressionResult postObjectDecompression(DecompressionRequest decompressionRequest) {
+      rejectNull(decompressionRequest.getSourceBucketName(),
+              "The sourceBucketName parameter must be specified post object decompression");
+      rejectNull(decompressionRequest,
+              "The decompressionRequest parameter must be specified post object decompression");
+      rejectNull(decompressionRequest.getTargetBucketName(),
+              "The decompressionRequest parameter must be specified post object decompression");
+      rejectNull(decompressionRequest.getResourcesPrefix(),
+              "The decompressionRequest parameter must be specified post object decompression");
+      if (decompressionRequest.getPrefixReplaced()) {
+          rejectNull(decompressionRequest.getTargetKeyPrefix(),
+                  "The targetKeyPrefix parameter must be specified post object decompression "
+                          + "when prefixReplaced is true");
+      }
+      CosHttpRequest<DecompressionRequest> request =
+              createRequest(decompressionRequest.getSourceBucketName(),
+                      decompressionRequest.getObjectKey(), decompressionRequest, HttpMethodName.POST);
+      request.addParameter("decompression", null);
+      byte[] content = DecompressionRequest.convertToByteArray(decompressionRequest);
+      request.addHeader("Content-Length", String.valueOf(content.length));
+      request.addHeader("Content-Type", "application/xml");
+      request.setContent(new ByteArrayInputStream(content));
+      return invoke(request, new COSXmlResponseHandler<>(new Unmarshallers.DecompressionResultUnmarshaller()));
+  }
+
+    @Override
+    public DecompressionResult getObjectDecompressionStatus(String bucketName, String objectKey, String jobId) {
+        rejectNull(bucketName, "The bucketName parameter must be specified getting object decompression status");
+        rejectNull(objectKey, "The objectKey parameter must be specified getting object decompression status");
+        CosHttpRequest<CosServiceRequest> request = createRequest(bucketName, objectKey, new CosServiceRequest(), HttpMethodName.GET);
+        if (jobId != null) {
+            request.addParameter("jobId", jobId);
+        }
+        request.addParameter("decompression", null);
+        return invoke(request, new COSXmlResponseHandler<>(new Unmarshallers.DecompressionResultUnmarshaller()));
+    }
+
+    @Override
+    public ListJobsResult listObjectDecompressionJobs(String bucketName, String jobStatus,
+                                                      String sortType, int maxResults, String nextToken) {
+        rejectNull(bucketName, "The bucketName parameter must be specified list object decompression status");
+        rejectNull(jobStatus, "The jobStatus parameter must be specified list object decompression status");
+        rejectNull(sortType, "The sortType parameter must be specified list object decompression status");
+        CosHttpRequest<CosServiceRequest> request =
+                createRequest(bucketName, "/", new CosServiceRequest(), HttpMethodName.GET);
+        request.addParameter("decompression", null);
+        request.addParameter("jobStatus", jobStatus);
+        request.addParameter("sortBy", sortType);
+        request.addParameter("maxResults", String.valueOf(maxResults));
+        request.addParameter("nextToken", nextToken);
+        return invoke(request, new COSXmlResponseHandler<>(new Unmarshallers.ListJobsResultUnmarshaller()));
+    }
+
 }
 

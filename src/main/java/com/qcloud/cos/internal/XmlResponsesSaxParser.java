@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URLDecoder;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -61,6 +62,7 @@ import com.qcloud.cos.model.COSObjectSummary;
 import com.qcloud.cos.model.COSVersionSummary;
 import com.qcloud.cos.model.CompleteMultipartUploadResult;
 import com.qcloud.cos.model.CopyObjectResult;
+import com.qcloud.cos.model.DecompressionResult;
 import com.qcloud.cos.model.DeleteObjectsResult.DeletedObject;
 import com.qcloud.cos.model.DomainRule;
 import com.qcloud.cos.model.GetBucketInventoryConfigurationResult;
@@ -69,6 +71,7 @@ import com.qcloud.cos.model.Grantee;
 import com.qcloud.cos.model.GroupGrantee;
 import com.qcloud.cos.model.InitiateMultipartUploadResult;
 import com.qcloud.cos.model.ListBucketInventoryConfigurationsResult;
+import com.qcloud.cos.model.ListJobsResult;
 import com.qcloud.cos.model.MultipartUpload;
 import com.qcloud.cos.model.MultipartUploadListing;
 import com.qcloud.cos.model.ObjectListing;
@@ -892,6 +895,19 @@ public class XmlResponsesSaxParser {
         parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
         return handler;
     }
+
+    public DecompressionHandler parseDecompressionResult(InputStream inputStream) throws IOException {
+        DecompressionHandler handler = new DecompressionHandler();
+        parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
+        return handler;
+    }
+
+    public ListJobsResultHandler parseListJobsResult(InputStream inputStream) throws IOException {
+        ListJobsResultHandler handler = new ListJobsResultHandler();
+        parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
+        return handler;
+    }
+
 
     /**
      * @param inputStream
@@ -6832,6 +6848,97 @@ public class XmlResponsesSaxParser {
             this.response = response;
         }
 
+    }
+
+    public static class DecompressionHandler extends AbstractHandler {
+
+        private final DecompressionResult decompressionResult = new DecompressionResult();
+        @Override
+        protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
+        }
+
+        @Override
+        protected void doEndElement(String uri, String name, String qName) {
+            if(in("DecompressionResult")) {
+                switch (name) {
+                    case "JobId":
+                        decompressionResult.setJobId(getText());
+                        break;
+                    case "Status":
+                        decompressionResult.setStatus(getText());
+                        break;
+                    case "Msg":
+                        decompressionResult.setMsg(getText());
+                        break;
+                }
+            }
+        }
+
+        public DecompressionResult getDecompressionResult() {
+            return decompressionResult;
+        }
+    }
+
+    public static class ListJobsResultHandler extends AbstractHandler {
+
+        private final ListJobsResult listJobsResult;
+
+
+        private final List<ListJobsResult.DecompressionJob> jobList;
+        private ListJobsResult.DecompressionJob job;
+
+        public ListJobsResultHandler() {
+            listJobsResult = new ListJobsResult();
+            jobList = new ArrayList<>();
+            listJobsResult.setJobs(jobList);
+        }
+
+        @Override
+        protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
+            if(in("ListJobsResult", "Jobs")) {
+                if(name.equals("Job")) {
+                    job = new ListJobsResult.DecompressionJob();
+                }
+            }
+        }
+
+        @Override
+        protected void doEndElement(String uri, String name, String qName) {
+            if(in("ListJobsResult", "Jobs", "Job")) {
+                switch (name) {
+                    case "Key":
+                        job.setKey(getText());
+                        break;
+                    case "DecompressionPrefix":
+                        job.setDecompressionPrefix(getText());
+                        break;
+                    case "CreationTime":
+                        job.setCreationTime(getText());
+                        break;
+                    case "TerminationTime":
+                        job.setTerminationTime(getText());
+                        break;
+                    case "JobId":
+                        job.setJobId(getText());
+                        break;
+                    case "Status":
+                        job.setStatus(getText());
+                        break;
+                }
+            } else if (in("ListJobsResult", "Jobs")) {
+                if (name.equals("Job")) {
+                    jobList.add(job);
+                }
+            } else if (in("ListJobsResult")) {
+                if (name.equals("NextToken")) {
+                    listJobsResult.setNextToken(getText());
+                }
+            }
+        }
+
+        public ListJobsResult getResult() {
+            return listJobsResult;
+        }
     }
 }
 
