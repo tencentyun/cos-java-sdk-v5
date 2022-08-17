@@ -21,7 +21,6 @@ public class DecompressDemo {
         COSCredentials cosCredentials = new BasicCOSCredentials(secretId, secretKey);
         ClientConfig clientConfig = new ClientConfig(new Region(region));
         COSClient cosClient = new COSClient(cosCredentials, clientConfig);
-
         try {
             DecompressionRequest decompressionRequest =
                     new DecompressionRequest()
@@ -58,7 +57,7 @@ public class DecompressDemo {
         COSClient cosClient = new COSClient(cosCredentials, clientConfig);
         try {
             ListJobsResult result =
-                    cosClient.listObjectDecompressionJobs(bucket, "Success", "asc", 1000, null);
+                    cosClient.listObjectDecompressionJobs(bucket, "Success", "asc", "1000", null);
             System.out.println(result);
         } finally {
             cosClient.shutdown();

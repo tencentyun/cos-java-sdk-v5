@@ -4478,17 +4478,23 @@ public class COSClient implements COS {
 
     @Override
     public ListJobsResult listObjectDecompressionJobs(String bucketName, String jobStatus,
-                                                      String sortType, int maxResults, String nextToken) {
-        rejectNull(bucketName, "The bucketName parameter must be specified list object decompression status");
-        rejectNull(jobStatus, "The jobStatus parameter must be specified list object decompression status");
-        rejectNull(sortType, "The sortType parameter must be specified list object decompression status");
+                                                      String sortBy, String maxResults, String nextToken) {
+        rejectNull(bucketName,"The bucketName parameter must be specified list object decompression status");
         CosHttpRequest<CosServiceRequest> request =
                 createRequest(bucketName, "/", new CosServiceRequest(), HttpMethodName.GET);
         request.addParameter("decompression", null);
-        request.addParameter("jobStatus", jobStatus);
-        request.addParameter("sortBy", sortType);
-        request.addParameter("maxResults", String.valueOf(maxResults));
-        request.addParameter("nextToken", nextToken);
+        if (jobStatus != null) {
+            request.addParameter("jobStatus", jobStatus);
+        }
+        if (sortBy != null) {
+            request.addParameter("sortBy", sortBy);
+        }
+        if (maxResults != null) {
+            request.addParameter("maxResults", maxResults);
+        }
+        if (nextToken != null) {
+            request.addParameter("nextToken", nextToken);
+        }
         return invoke(request, new COSXmlResponseHandler<>(new Unmarshallers.ListJobsResultUnmarshaller()));
     }
 
