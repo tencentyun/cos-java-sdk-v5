@@ -67,6 +67,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.config.ConnectionConfig;
 import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
@@ -105,6 +106,10 @@ public class DefaultCosHttpClient implements CosHttpClient {
         this.connectionManager.setMaxTotal(this.clientConfig.getMaxConnectionsCount());
         this.connectionManager.setDefaultMaxPerRoute(this.clientConfig.getMaxConnectionsCount());
         this.connectionManager.setValidateAfterInactivity(1);
+
+        ConnectionConfig connectionConfig = ConnectionConfig.custom().setBufferSize(clientConfig.getSocketBufferSize()).build();
+        connectionManager.setDefaultConnectionConfig(connectionConfig);
+
         HttpClientBuilder httpClientBuilder =
                 HttpClients.custom().setConnectionManager(connectionManager);
         if (this.clientConfig.getHttpProxyIp() != null

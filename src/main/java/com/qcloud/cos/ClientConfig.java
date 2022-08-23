@@ -43,6 +43,8 @@ public class ClientConfig {
     // 默认的维护最大HTTP连接数
     private static final int DEFAULT_MAX_CONNECTIONS_COUNT = 1024;
     private static final int DEFAULT_IDLE_CONNECTION_ALIVE = 60 * 1000;
+
+    private static final int DEFAULT_SOCKET_BUFFER_SIZE = 8 * 1024;
     // 多次签名的默认过期时间,单位秒
     private static final long DEFAULT_SIGN_EXPIRED = 3600;
     // 默认的user_agent标识
@@ -85,6 +87,7 @@ public class ClientConfig {
     private int socketTimeout = DEFAULT_SOCKET_TIMEOUT;
     private int maxConnectionsCount = DEFAULT_MAX_CONNECTIONS_COUNT;
     private int idleConnectionAlive = DEFAULT_IDLE_CONNECTION_ALIVE;
+    private int socketBufferSize = DEFAULT_SOCKET_BUFFER_SIZE;
     private String userAgent = DEFAULT_USER_AGENT;
     private int readLimit = DEFAULT_READ_LIMIT;
     private COSSigner cosSigner = new COSSigner();
@@ -291,5 +294,13 @@ public class ClientConfig {
 
     public void setCiSpecialRequest(boolean ciSpecialRequest) {
         this.ciSpecialRequest = ciSpecialRequest;
+    }
+
+    public int getSocketBufferSize() {
+        return socketBufferSize;
+    }
+
+    public void setSocketBufferSize(int socketBufferSize) {
+        this.socketBufferSize = socketBufferSize;
     }
 }
