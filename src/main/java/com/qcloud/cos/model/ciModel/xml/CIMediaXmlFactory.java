@@ -1,8 +1,8 @@
 package com.qcloud.cos.model.ciModel.xml;
 
-import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.internal.RequestXmlFactory;
 import com.qcloud.cos.internal.XmlWriter;
+import com.qcloud.cos.model.CSVOutput;
 import com.qcloud.cos.model.ciModel.common.MediaInputObject;
 import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
 import com.qcloud.cos.model.ciModel.job.ExtractDigitalWatermark;
@@ -512,7 +512,7 @@ public class CIMediaXmlFactory {
         if (object == null) {
             return true;
         }
-        if (object instanceof String && (object.toString().equals(""))) {
+        if (object instanceof String && (((String) object).isEmpty())) {
             return true;
         }
         if (object instanceof Collection && ((Collection) object).isEmpty()) {
@@ -537,6 +537,9 @@ public class CIMediaXmlFactory {
             field.setAccessible(true);
             try {
                 Object o = field.get(obj);
+                if (field.isSynthetic()) {
+                    continue;
+                }
                 if (!isEmpty(o)) {
                     //不为空
                     return true;

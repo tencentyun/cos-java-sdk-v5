@@ -508,6 +508,7 @@ public class RequestXmlFactory {
         addIfNotNull(xml, "Type", request.getNotifyConfig().getType());
         addIfNotNull(xml, "Url", request.getNotifyConfig().getUrl());
         addIfNotNull(xml, "Event", request.getNotifyConfig().getEvent());
+        addIfNotNull(xml, "State", request.getNotifyConfig().getState());
         xml.end();
         xml.end();
         return xml.getBytes();
@@ -898,6 +899,7 @@ public class RequestXmlFactory {
             addIfNotNull(xml, "MaxFrames", inputObject.getMaxFrames());
             addIfNotNull(xml, "Interval", inputObject.getInterval());
             addIfNotNull(xml, "LargeImageDetect", inputObject.getLargeImageDetect());
+            addIfNotNull(xml, "Content", inputObject.getContent());
             addUserInfo(xml,inputObject.getUserInfo());
             xml.end();
         }

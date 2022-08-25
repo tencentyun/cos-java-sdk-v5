@@ -39,14 +39,6 @@ public class DocHtmlRequest extends CosServiceRequest {
      */
     private String sheet;
 
-    /**
-     * 转换输出目标文件类型：
-     * png，转成 png 格式的图片文件
-     * jpg，转成 jpg 格式的图片文件
-     * pdf，转成pdf 格式文件
-     * 如果传入的格式未能识别，默认使用 jpg 格式
-     */
-    private String dstType;
 
     /**
      * 文档的打开密码，如果需要转换有密码的文档，请设置该字段
@@ -74,14 +66,22 @@ public class DocHtmlRequest extends CosServiceRequest {
      */
     private String scale;
 
+    private String imageDpi;
 
-    private DocType type = DocType.html;
+    private DocType dstType = DocType.html;
 
 
     public enum DocType {
         html, jpg, png
     }
 
+    public String getImageDpi() {
+        return imageDpi;
+    }
+
+    public void setImageDpi(String imageDpi) {
+        this.imageDpi = imageDpi;
+    }
 
     public String getObjectKey() {
         return objectKey;
@@ -123,13 +123,6 @@ public class DocHtmlRequest extends CosServiceRequest {
         this.sheet = sheet;
     }
 
-    public String getDstType() {
-        return dstType;
-    }
-
-    public void setDstType(String dstType) {
-        this.dstType = dstType;
-    }
 
     public String getPassword() {
         return password;
@@ -171,14 +164,6 @@ public class DocHtmlRequest extends CosServiceRequest {
         this.scale = scale;
     }
 
-    public DocType getType() {
-        return type;
-    }
-
-    public void setType(DocType type) {
-        this.type = type;
-    }
-
 
     public String getBucketName() {
         return bucketName;
@@ -186,6 +171,14 @@ public class DocHtmlRequest extends CosServiceRequest {
 
     public void setBucketName(String bucketName) {
         this.bucketName = bucketName;
+    }
+
+    public DocType getDstType() {
+        return dstType;
+    }
+
+    public void setDstType(DocType dstType) {
+        this.dstType = dstType;
     }
 
     @Override
@@ -203,7 +196,7 @@ public class DocHtmlRequest extends CosServiceRequest {
         sb.append(", excelPaperDirection='").append(excelPaperDirection).append('\'');
         sb.append(", quality='").append(quality).append('\'');
         sb.append(", scale='").append(scale).append('\'');
-        sb.append(", type=").append(type);
+        sb.append(", imageDpi='").append(imageDpi).append('\'');
         sb.append('}');
         return sb.toString();
     }

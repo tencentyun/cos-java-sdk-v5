@@ -845,4 +845,14 @@ public class Unmarshallers {
             return new XmlResponsesSaxParser().parseListJobsResult(in).getResult();
         }
     }
+
+    public static final class ReportBadCaseUnmarshaller
+            implements Unmarshaller<String, InputStream> {
+
+        public String unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser()
+                    .parseReportBadCase(in).getResponse();
+        }
+    }
+
 }
