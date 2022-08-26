@@ -38,6 +38,7 @@ import com.qcloud.cos.exception.MultiObjectDeleteException.DeleteError;
 import com.qcloud.cos.internal.cihandler.DetectCarHandler;
 import com.qcloud.cos.internal.cihandler.GenerateQrcodeHandler;
 import com.qcloud.cos.internal.cihandler.GetImageStyleHandler;
+import com.qcloud.cos.internal.cihandler.ReportBadCaseHandler;
 import com.qcloud.cos.internal.cihandler.SearchImageHandler;
 import com.qcloud.cos.internal.cihandler.TriggerWorkflowListHandler;
 import com.qcloud.cos.model.AbortIncompleteMultipartUpload;
@@ -420,6 +421,12 @@ public class XmlResponsesSaxParser {
     public ListVersionsHandler parseListVersionsResponse(InputStream inputStream,
             boolean shouldSDKDecodeResponse) throws IOException {
         ListVersionsHandler handler = new ListVersionsHandler(shouldSDKDecodeResponse);
+        parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
+        return handler;
+    }
+
+    public ReportBadCaseHandler parseReportBadCase(InputStream inputStream) throws IOException {
+        ReportBadCaseHandler handler = new ReportBadCaseHandler();
         parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
         return handler;
     }

@@ -3,8 +3,11 @@ package com.qcloud.cos.demo.ci;
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.exception.CosServiceException;
+import com.qcloud.cos.model.COSObject;
+import com.qcloud.cos.model.COSObjectInputStream;
 import com.qcloud.cos.model.CompleteMultipartUploadRequest;
 import com.qcloud.cos.model.CompleteMultipartUploadResult;
+import com.qcloud.cos.model.GetObjectRequest;
 import com.qcloud.cos.model.InitiateMultipartUploadRequest;
 import com.qcloud.cos.model.InitiateMultipartUploadResult;
 import com.qcloud.cos.model.PartETag;
@@ -19,10 +22,12 @@ import com.qcloud.cos.model.ciModel.persistence.CIUploadResult;
 import com.qcloud.cos.model.ciModel.persistence.PicOperations;
 import com.qcloud.cos.transfer.TransferManager;
 import com.qcloud.cos.transfer.Upload;
+import com.qcloud.cos.utils.IOUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -42,6 +47,23 @@ public class QRCodeDemo {
         request.setMode("0");
         String imageBase64 = cosClient.generateQrcode(request);
         System.out.println(imageBase64);
+    }
+
+    /**
+     * 下载时二维码识别 https://cloud.tencent.com/document/product/460/37513
+     */
+    public static void identifyQrCodeWithGetObject(COSClient cosClient) throws IOException {
+        //图片所在bucket名称
+        String bucketName = "examplebucket-1250000000";
+        //图片在bucket中的相对位置，比如根目录下file文件夹中的demo.png路径为file/demo.png
+        String key = "数据万象.png";
+        GetObjectRequest request = new GetObjectRequest(bucketName, key);
+        request.putCustomQueryParameter("ci-process", "QRcode");
+        request.putCustomQueryParameter("cover", "0");
+        COSObject object = cosClient.getObject(request);
+        COSObjectInputStream content = object.getObjectContent();
+        String response = IOUtils.toString(content);
+        System.out.println(response);
     }
 
     public static void identifyQrCode(COSClient cosClient) {
@@ -161,7 +183,6 @@ public class QRCodeDemo {
     public static void main(String[] args) throws Exception {
         COSClient cosClient = ClientUtils.getTestClient();
         // 小于5GB文件用简单上传
-        generateQrcode(cosClient);
         cosClient.shutdown();
     }
 }

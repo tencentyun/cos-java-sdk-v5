@@ -152,6 +152,7 @@ import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowExecutionsResponse;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowListRequest;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowListResponse;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowRequest;
+import com.qcloud.cos.model.ciModel.xml.CIAuditingXmlFactory;
 import com.qcloud.cos.model.ciModel.xml.CIMediaXmlFactory;
 import com.qcloud.cos.model.ciModel.xml.CImageXmlFactory;
 import com.qcloud.cos.model.fetch.GetAsyncFetchTaskRequest;
@@ -4119,6 +4120,14 @@ public class COSClient implements COS {
         return invoke(request, new Unmarshallers.WebpageAuditingDescribeJobUnmarshaller());
     }
 
+    @Override
+    public String reportBadCase(ReportBadCaseRequest reportBadCaseRequest) {
+        this.checkCIRequestCommon(reportBadCaseRequest);
+        CosHttpRequest<ReportBadCaseRequest> request = createRequest(reportBadCaseRequest.getBucketName(), "/report/badcase", reportBadCaseRequest, HttpMethodName.POST);
+        this.setContent(request, CIAuditingXmlFactory.convertToXmlByteArray(reportBadCaseRequest), "application/xml", false);
+        return invoke(request, new Unmarshallers.ReportBadCaseUnmarshaller());
+    }
+
 
     private String buildDocPreview(CosHttpRequest<DocHtmlRequest> request) throws URISyntaxException {
         String urlStr = request.getProtocol().toString() + "://" + request.getEndpoint() + request.getResourcePath();
@@ -4129,7 +4138,7 @@ public class COSClient implements COS {
                 request.getHeaders(), request.getParameters(), fetchCredential(), expiredTime, true);
         DocHtmlRequest originalRequest = request.getOriginalRequest();
         uriBuilder.addParameter("ci-process", "doc-preview");
-        uriBuilder.addParameter("dsttype", originalRequest.getType().toString());
+        uriBuilder.addParameter("dstType", originalRequest.getDstType().toString());
         uriBuilder.addParameter("srcType", originalRequest.getSrcType());
         uriBuilder.addParameter("page", originalRequest.getPage());
         uriBuilder.addParameter("ImageParams", originalRequest.getImageParams());
@@ -4139,6 +4148,7 @@ public class COSClient implements COS {
         uriBuilder.addParameter("excelPaperDirection", originalRequest.getExcelPaperDirection());
         uriBuilder.addParameter("quality", originalRequest.getQuality());
         uriBuilder.addParameter("scale", originalRequest.getScale());
+        uriBuilder.addParameter("imageDpi", originalRequest.getImageDpi());
         return uriBuilder.build().toString() + "&" + authoriationStr;
     }
 
@@ -4437,6 +4447,19 @@ public class COSClient implements COS {
         this.setContent(request, CImageXmlFactory.deleteStyleConvertToXmlByteArray(imageStyleRequest), "application/xml", false);
         invoke(request, voidCosResponseHandler);
         return true;
+    }
+
+    @Override
+    public String getObjectDecompressionStatus(String bucketName, String objectKey) {
+        rejectNull(bucketName,
+            "The bucketName parameter must be specified getting object decompression status");
+        rejectNull(objectKey,
+            "The objectKey parameter must be specified getting object decompression status");
+        CosHttpRequest<CosServiceRequest> request =
+            createRequest(bucketName, objectKey, new CosServiceRequest(), HttpMethodName.GET);
+        request.addParameter("decompression", null);
+        request.addParameter("jobId", objectKey);
+        return invoke(request, new COSStringResponseHandler());
     }
 
   public DecompressionResult postObjectDecompression(DecompressionRequest decompressionRequest) {

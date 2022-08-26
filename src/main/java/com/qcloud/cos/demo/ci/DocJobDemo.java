@@ -105,8 +105,8 @@ public class DocJobDemo {
         //1.创建任务请求对象
         DocHtmlRequest request = new DocHtmlRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("markjrzhang-1251704708");
-        request.setType(DocHtmlRequest.DocType.html);
+        request.setBucketName("demo-123456789");
+        request.setDstType(DocHtmlRequest.DocType.html);
         request.setObjectKey("1.pptx");
         //3.调用接口,获取任务响应对象
         String previewUrl = client.GenerateDocPreviewUrl(request);

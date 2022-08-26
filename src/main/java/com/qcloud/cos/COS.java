@@ -3061,6 +3061,10 @@ public interface COS extends COSDirectSpi {
 
     Boolean deleteImageStyle(ImageStyleRequest request);
 
+    String getObjectDecompressionStatus(String bucketName, String objectKey);
+
+    String reportBadCase(ReportBadCaseRequest reportBadCaseRequest);
+
     /**
      *提交一个解压任务
      * @param decompressionRequest 解压请求体
