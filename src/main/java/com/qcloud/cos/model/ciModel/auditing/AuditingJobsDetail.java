@@ -337,6 +337,9 @@ public class AuditingJobsDetail {
     }
 
     public TeenagerInfo getTeenagerInfo() {
+        if (teenagerInfo == null){
+            teenagerInfo = new TeenagerInfo();
+        }
         return teenagerInfo;
     }
 
@@ -353,6 +356,9 @@ public class AuditingJobsDetail {
     }
 
     public SectionInfo getAudioSection() {
+        if (audioSection == null){
+            audioSection = new AudioSectionInfo();
+        }
         return audioSection;
     }
 
