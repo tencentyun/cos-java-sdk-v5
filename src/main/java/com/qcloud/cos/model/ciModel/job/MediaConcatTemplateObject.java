@@ -11,6 +11,7 @@ public class MediaConcatTemplateObject {
     private MediaAudioObject audio;
     private MediaVideoObject video;
     private MediaContainerObject container;
+    private MediaAudioMixObject audioMix;
     private String index;
     /**
      * 简单拼接方式（不转码直接拼接），其他的视频和音频参数失效 true、false
@@ -52,7 +53,7 @@ public class MediaConcatTemplateObject {
     }
 
     public MediaContainerObject getContainer() {
-        if (container == null){
+        if (container == null) {
             container = new MediaContainerObject();
         }
         return container;
@@ -78,6 +79,17 @@ public class MediaConcatTemplateObject {
         this.directConcat = directConcat;
     }
 
+    public MediaAudioMixObject getAudioMix() {
+        if (audioMix == null) {
+            audioMix = new MediaAudioMixObject();
+        }
+        return audioMix;
+    }
+
+    public void setAudioMix(MediaAudioMixObject audioMix) {
+        this.audioMix = audioMix;
+    }
+
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("MediaConcatTemplateObject{");
@@ -85,6 +97,7 @@ public class MediaConcatTemplateObject {
         sb.append(", audio=").append(audio);
         sb.append(", video=").append(video);
         sb.append(", container=").append(container);
+        sb.append(", audioMix=").append(audioMix);
         sb.append(", index='").append(index).append('\'');
         sb.append(", directConcat='").append(directConcat).append('\'');
         sb.append('}');

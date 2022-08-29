@@ -189,6 +189,7 @@ public class CIMediaXmlFactory {
             addIfNotNull(xml, "MixMode", audioMix.getMixMode());
             addIfNotNull(xml, "AudioSource", audioMix.getAudioSource());
             addIfNotNull(xml, "Replace", audioMix.getReplace());
+            addIfNotNull(xml, "EffectConfig", audioMix.getEffectConfig());
             xml.end();
         }
     }
@@ -211,6 +212,7 @@ public class CIMediaXmlFactory {
             addIfNotNull(xml, "Index", mediaConcatTemplate.getIndex());
             addIfNotNull(xml, "DirectConcat", mediaConcatTemplate.getDirectConcat());
             addContainer(xml, mediaConcatTemplate.getContainer());
+            addAudioMix(xml, mediaConcatTemplate.getAudioMix());
             xml.end();
         }
     }
@@ -313,7 +315,7 @@ public class CIMediaXmlFactory {
             addVideo(xml, video);
             addAudio(xml, audio);
             addTransConfig(xml, transConfig);
-
+            addAudioMix(xml, transcode.getAudioMix());
             xml.end();
         }
     }
