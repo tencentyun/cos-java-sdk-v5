@@ -113,7 +113,7 @@ public abstract class AbstractCosResponseHandler<T>
             } else if (key.equalsIgnoreCase(Headers.DELETE_MARKER)) {
                 metadata.setDeleteMarker(Boolean.parseBoolean(header.getValue()));
             } else if (key.equalsIgnoreCase(Headers.ETAG)) {
-                metadata.setHeader(key, StringUtils.removeQuotes(header.getValue()));
+                metadata.setETag(StringUtils.removeQuotes(header.getValue()));
             } else if (key.equalsIgnoreCase(Headers.EXPIRES)) {
                 try {
                     metadata.setHttpExpiresDate(DateUtils.parseRFC822Date(header.getValue()));

@@ -572,6 +572,10 @@ public class ObjectMetadata extends CosServiceResult implements ServerSideEncryp
         return (String) metadata.get(Headers.ETAG);
     }
 
+    public void setETag(String etagValve){
+        metadata.put(Headers.ETAG,etagValve);
+    }
+
     /**
      * Gets the version ID of the associated Qcloud COS object if available. Version IDs are only
      * assigned to objects when an object is uploaded to an Qcloud COS bucket that has object
