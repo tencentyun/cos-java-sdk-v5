@@ -17,6 +17,9 @@ import java.util.List;
 
 public class MediaJobOperation {
     private String templateId;
+    private String jobLevel;
+    private String UserData;
+    private String templateName;
     private MediaOutputObject output;
     private MediaAnimationObject mediaAnimation;
     private MediaInfoObjcet mediaInfo;
@@ -33,6 +36,7 @@ public class MediaJobOperation {
     private MediaDigitalWatermark digitalWatermark = new MediaDigitalWatermark();
     private ExtractDigitalWatermark extractDigitalWatermark = new ExtractDigitalWatermark();
     private MediaPicProcessTemplateObject picProcess = new MediaPicProcessTemplateObject();
+    private MediaResult mediaResult = new MediaResult();
 
     public MediaJobOperation() {
         this.output = new MediaOutputObject();
@@ -151,14 +155,6 @@ public class MediaJobOperation {
         this.extractDigitalWatermark = extractDigitalWatermark;
     }
 
-    public MediaPicProcessTemplateObject getPicProcess() {
-        return picProcess;
-    }
-
-    public void setPicProcess(MediaPicProcessTemplateObject picProcess) {
-        this.picProcess = picProcess;
-    }
-
     public MediaSnapshotObject getSnapshot() {
         return snapshot;
     }
@@ -202,10 +198,55 @@ public class MediaJobOperation {
         this.videoMontage = videoMontage;
     }
 
+    public String getJobLevel() {
+        return jobLevel;
+    }
+
+    public void setJobLevel(String jobLevel) {
+        this.jobLevel = jobLevel;
+    }
+
+    public MediaPicProcessTemplateObject getPicProcess() {
+        if (picProcess ==null ){
+            picProcess = new MediaPicProcessTemplateObject();
+        }
+        return picProcess;
+    }
+
+    public void setPicProcess(MediaPicProcessTemplateObject picProcess) {
+        this.picProcess = picProcess;
+    }
+
+    public String getUserData() {
+        return UserData;
+    }
+
+    public void setUserData(String userData) {
+        UserData = userData;
+    }
+
+    public String getTemplateName() {
+        return templateName;
+    }
+
+    public void setTemplateName(String templateName) {
+        this.templateName = templateName;
+    }
+
+    public MediaResult getMediaResult() {
+        return mediaResult;
+    }
+
+    public void setMediaResult(MediaResult mediaResult) {
+        this.mediaResult = mediaResult;
+    }
+
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("MediaJobOperation{");
+        final StringBuilder sb = new StringBuilder("MediaJobOperation{");
         sb.append("templateId='").append(templateId).append('\'');
+        sb.append(", jobLevel='").append(jobLevel).append('\'');
+        sb.append(", UserData='").append(UserData).append('\'');
         sb.append(", output=").append(output);
         sb.append(", mediaAnimation=").append(mediaAnimation);
         sb.append(", mediaInfo=").append(mediaInfo);

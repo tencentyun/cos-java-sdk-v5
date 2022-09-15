@@ -3093,6 +3093,7 @@ public interface COS extends COSDirectSpi {
      */
     ListJobsResult listObjectDecompressionJobs(String bucketName, String jobStatus, String sortType, String maxResults, String nextToken);
 
+    MediaJobResponse createPicProcessJob(MediaJobsRequest req);
 }
 
 

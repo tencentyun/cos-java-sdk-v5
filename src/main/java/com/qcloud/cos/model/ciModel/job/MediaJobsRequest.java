@@ -67,6 +67,31 @@ public class MediaJobsRequest extends CIServiceRequest implements Serializable {
      */
     private String callBackFormat;
 
+    /**
+     * 任务回调类型，Url 或 TDMQ，默认 Url，优先级高于队列的回调类型
+     */
+    private String callBackType;
+
+    private CallBackMqConfig callBackMqConfig;
+
+    public String getCallBackType() {
+        return callBackType;
+    }
+
+    public void setCallBackType(String callBackType) {
+        this.callBackType = callBackType;
+    }
+
+    public CallBackMqConfig getCallBackMqConfig() {
+        if (callBackMqConfig == null) {
+            callBackMqConfig = new CallBackMqConfig();
+        }
+        return callBackMqConfig;
+    }
+
+    public void setCallBackMqConfig(CallBackMqConfig callBackMqConfig) {
+        this.callBackMqConfig = callBackMqConfig;
+    }
 
     public String getBucketName() {
         return bucketName;

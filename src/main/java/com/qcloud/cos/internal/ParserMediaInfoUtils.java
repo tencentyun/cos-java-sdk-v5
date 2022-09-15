@@ -11,14 +11,17 @@ import com.qcloud.cos.model.ciModel.auditing.SectionInfo;
 import com.qcloud.cos.model.ciModel.auditing.SnapshotInfo;
 import com.qcloud.cos.model.ciModel.auditing.UserInfo;
 import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
+import com.qcloud.cos.model.ciModel.job.Md5Info;
 import com.qcloud.cos.model.ciModel.job.MediaAudioObject;
 import com.qcloud.cos.model.ciModel.job.MediaDigitalWatermark;
 import com.qcloud.cos.model.ciModel.job.MediaJobObject;
 import com.qcloud.cos.model.ciModel.job.MediaRemoveWaterMark;
+import com.qcloud.cos.model.ciModel.job.MediaResult;
 import com.qcloud.cos.model.ciModel.job.MediaTimeIntervalObject;
 import com.qcloud.cos.model.ciModel.job.MediaTransConfigObject;
 import com.qcloud.cos.model.ciModel.job.MediaTranscodeVideoObject;
 import com.qcloud.cos.model.ciModel.job.MediaVideoObject;
+import com.qcloud.cos.model.ciModel.job.OutputFile;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaFormat;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoAudio;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoSubtitle;
@@ -909,4 +912,35 @@ public class ParserMediaInfoUtils {
     }
 
 
+    public static void ParsingMediaResult(OutputFile outputFile, String name, String value) {
+        switch (name) {
+            case "Region":
+                outputFile.setRegion(value);
+                break;
+            case "Bucket":
+                outputFile.setBucket(value);
+                break;
+            case "ObjectPrefix":
+                outputFile.setObjectPrefix(value);
+                break;
+            case "ObjectName":
+                outputFile.setObjectName(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParsingMd5Info(Md5Info md5Info, String name, String value) {
+        switch (name) {
+            case "Md5":
+                md5Info.setMd5Info(value);
+                break;
+            case "ObjectName":
+                md5Info.setObjectName(value);
+                break;
+            default:
+                break;
+        }
+    }
 }
