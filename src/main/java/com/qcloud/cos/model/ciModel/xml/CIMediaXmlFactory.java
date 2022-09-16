@@ -2,7 +2,6 @@ package com.qcloud.cos.model.ciModel.xml;
 
 import com.qcloud.cos.internal.RequestXmlFactory;
 import com.qcloud.cos.internal.XmlWriter;
-import com.qcloud.cos.model.CSVOutput;
 import com.qcloud.cos.model.ciModel.common.MediaInputObject;
 import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
 import com.qcloud.cos.model.ciModel.job.ExtractDigitalWatermark;
@@ -138,6 +137,8 @@ public class CIMediaXmlFactory {
         xml.start("Operation");
 
         addIfNotNull(xml, "TemplateId", operation.getTemplateId());
+        addIfNotNull(xml, "JobLevel", operation.getJobLevel());
+
         addWatermarkTemplateId(xml, operation.getWatermarkTemplateId());
         addWatermar(xml, operation.getWatermark());
         addWatermarList(xml, operation.getWatermarkList());
@@ -147,12 +148,21 @@ public class CIMediaXmlFactory {
         addExtractDigitalWatermark(xml, operation.getExtractDigitalWatermark());
         addMediaDigitalWatermark(xml, operation.getDigitalWatermark());
         addOutput(xml, operation.getOutput());
-        addPicProcess(xml, operation.getPicProcess());
         addSnapshot(xml, operation.getSnapshot());
         addSegment(xml, operation.getSegment());
         addSmartCover(xml, operation.getSmartCover());
         addVideoMontage(xml, operation.getVideoMontage());
+        addPicProcess(xml,request.getOperation().getPicProcess());
         xml.end();
+    }
+
+    private static void addPicProcess(XmlWriter xml, MediaPicProcessTemplateObject picProcess) {
+        if (objIsNotValid(picProcess)) {
+            xml.start("PicProcess");
+            addIfNotNull(xml, "IsPicInfo", picProcess.getIsPicInfo());
+            addIfNotNull(xml, "ProcessRule", picProcess.getProcessRule());
+            xml.end();
+        }
     }
 
     private static void addWatermarList(XmlWriter xml, List<MediaWatermark> watermarkList) {
@@ -189,6 +199,7 @@ public class CIMediaXmlFactory {
             addIfNotNull(xml, "MixMode", audioMix.getMixMode());
             addIfNotNull(xml, "AudioSource", audioMix.getAudioSource());
             addIfNotNull(xml, "Replace", audioMix.getReplace());
+            addIfNotNull(xml, "EffectConfig", audioMix.getEffectConfig());
             xml.end();
         }
     }
@@ -211,6 +222,7 @@ public class CIMediaXmlFactory {
             addIfNotNull(xml, "Index", mediaConcatTemplate.getIndex());
             addIfNotNull(xml, "DirectConcat", mediaConcatTemplate.getDirectConcat());
             addContainer(xml, mediaConcatTemplate.getContainer());
+            addAudioMix(xml, mediaConcatTemplate.getAudioMix());
             xml.end();
         }
     }
@@ -289,15 +301,7 @@ public class CIMediaXmlFactory {
             xml.start("QueueId").value(request.getQueueId()).end();
             addIfNotNull(xml, "CallBack", request.getCallBack());
             addIfNotNull(xml, "CallBackFormat", request.getCallBackFormat());
-        }
-    }
-
-    private static void addPicProcess(XmlWriter xml, MediaPicProcessTemplateObject picProcess) {
-        if (objIsNotValid(picProcess)) {
-            xml.start("PicProcess");
-            addIfNotNull(xml, "IsPicInfo", picProcess.getIsPicInfo());
-            addIfNotNull(xml, "ProcessRule", picProcess.getIsPicInfo());
-            xml.end();
+            addIfNotNull(xml, "CallBackType", request.getCallBackType());
         }
     }
 
@@ -313,7 +317,7 @@ public class CIMediaXmlFactory {
             addVideo(xml, video);
             addAudio(xml, audio);
             addTransConfig(xml, transConfig);
-
+            addAudioMix(xml, transcode.getAudioMix());
             xml.end();
         }
     }

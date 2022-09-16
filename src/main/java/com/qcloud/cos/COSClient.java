@@ -128,6 +128,7 @@ import com.qcloud.cos.model.ciModel.job.MediaJobObject;
 import com.qcloud.cos.model.ciModel.job.MediaJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaJobsRequest;
 import com.qcloud.cos.model.ciModel.job.MediaListJobResponse;
+import com.qcloud.cos.model.ciModel.job.PicProcessRequest;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoRequest;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoResponse;
 import com.qcloud.cos.model.ciModel.persistence.CIUploadResult;
@@ -4519,6 +4520,32 @@ public class COSClient implements COS {
             request.addParameter("nextToken", nextToken);
         }
         return invoke(request, new COSXmlResponseHandler<>(new Unmarshallers.ListJobsResultUnmarshaller()));
+    }
+
+    @Override
+    public MediaJobResponse createPicProcessJob(MediaJobsRequest req) {
+        this.checkCIRequestCommon(req);
+        rejectNull(req.getTag(),
+                "The tag parameter must be specified setting the object tags");
+        rejectNull(req.getQueueId(),
+                "The queueId parameter must be specified setting the object tags");
+        rejectNull(req.getInput().getObject(),
+                "The input parameter must be specified setting the object tags");
+        this.rejectStartWith(req.getCallBack(),"http","The CallBack parameter mush start with http or https");
+        CosHttpRequest<MediaJobsRequest> request = createRequest(req.getBucketName(), "/pic_jobs", req, HttpMethodName.POST);
+        this.setContent(request, CIMediaXmlFactory.convertToXmlByteArray(req), "application/xml", false);
+        return invoke(request, new Unmarshallers.JobCreatUnmarshaller());
+    }
+
+    @Override
+    public MediaListQueueResponse describePicProcessQueues(MediaQueueRequest req) {
+        this.checkCIRequestCommon(req);
+        CosHttpRequest<MediaQueueRequest> request = createRequest(req.getBucketName(), "/picqueue", req, HttpMethodName.GET);
+        addParameterIfNotNull(request, "queueIds", req.getQueueId());
+        addParameterIfNotNull(request, "state", req.getState());
+        addParameterIfNotNull(request, "pageNumber", req.getPageNumber());
+        addParameterIfNotNull(request, "pageSize", req.getPageSize());
+        return invoke(request, new Unmarshallers.ListQueueUnmarshaller());
     }
 
 }

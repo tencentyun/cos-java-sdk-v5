@@ -11,18 +11,23 @@ import com.qcloud.cos.model.ciModel.auditing.SectionInfo;
 import com.qcloud.cos.model.ciModel.auditing.SnapshotInfo;
 import com.qcloud.cos.model.ciModel.auditing.UserInfo;
 import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
+import com.qcloud.cos.model.ciModel.job.Md5Info;
 import com.qcloud.cos.model.ciModel.job.MediaAudioObject;
 import com.qcloud.cos.model.ciModel.job.MediaDigitalWatermark;
 import com.qcloud.cos.model.ciModel.job.MediaJobObject;
 import com.qcloud.cos.model.ciModel.job.MediaRemoveWaterMark;
+import com.qcloud.cos.model.ciModel.job.MediaResult;
 import com.qcloud.cos.model.ciModel.job.MediaTimeIntervalObject;
 import com.qcloud.cos.model.ciModel.job.MediaTransConfigObject;
 import com.qcloud.cos.model.ciModel.job.MediaTranscodeVideoObject;
 import com.qcloud.cos.model.ciModel.job.MediaVideoObject;
+import com.qcloud.cos.model.ciModel.job.OutputFile;
+import com.qcloud.cos.model.ciModel.job.ProcessResult;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaFormat;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoAudio;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoSubtitle;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoVideo;
+import com.qcloud.cos.model.ciModel.persistence.ImageInfo;
 import com.qcloud.cos.model.ciModel.template.MediaSegmentObject;
 import com.qcloud.cos.model.ciModel.template.MediaSnapshotObject;
 import com.qcloud.cos.model.ciModel.template.MediaWaterMarkImage;
@@ -905,6 +910,97 @@ public class ParserMediaInfoUtils {
                 break;
             default:
                 break;
+        }
+    }
+
+
+    public static void ParsingMediaResult(OutputFile outputFile, String name, String value) {
+        switch (name) {
+            case "Region":
+                outputFile.setRegion(value);
+                break;
+            case "Bucket":
+                outputFile.setBucket(value);
+                break;
+            case "ObjectPrefix":
+                outputFile.setObjectPrefix(value);
+                break;
+            case "ObjectName":
+                outputFile.setObjectName(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParsingMd5Info(Md5Info md5Info, String name, String value) {
+        switch (name) {
+            case "Md5":
+                md5Info.setMd5Info(value);
+                break;
+            case "ObjectName":
+                md5Info.setObjectName(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParsingImageInfo(ImageInfo imageInfo, String name, String value) {
+        switch (name) {
+            case "Ave":
+                imageInfo.setAve(value);
+                break;
+            case "Format":
+                imageInfo.setFormat(value);
+                break;
+            case "Height":
+                imageInfo.setHeight(string2int(value));
+                break;
+            case "Orientation":
+                imageInfo.setOrientation(string2int(value));
+                break;
+            case "Quality":
+                imageInfo.setQuality(string2int(value));
+                break;
+            case "Width":
+                imageInfo.setWidth(string2int(value));
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParsingProcessResult(ProcessResult processResult, String name, String value) {
+        switch (name) {
+            case "Etag":
+                processResult.setEtag(value);
+                break;
+            case "Format":
+                processResult.setFormat(value);
+                break;
+            case "Height":
+                processResult.setHeight(value);
+                break;
+            case "Quality":
+                processResult.setQuality(value);
+                break;
+            case "Size":
+                processResult.setSize(value);
+                break;
+            case "Width":
+                processResult.setWidth(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    private static int string2int(String str) {
+        try {
+            return Integer.parseInt(str);
+        } catch (RuntimeException e) {
+            return 0;
         }
     }
 

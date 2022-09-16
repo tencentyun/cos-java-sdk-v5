@@ -25,6 +25,13 @@ public class MediaAudioMixObject implements Serializable {
      */
     private String replace;
 
+    /**
+     * 混音淡入淡出配置
+     * true/false
+     * 默认为false
+     */
+    private String effectConfig;
+
     public String getAudioSource() {
         return audioSource;
     }
@@ -47,6 +54,14 @@ public class MediaAudioMixObject implements Serializable {
 
     public void setReplace(String replace) {
         this.replace = replace;
+    }
+
+    public String getEffectConfig() {
+        return effectConfig;
+    }
+
+    public void setEffectConfig(String effectConfig) {
+        this.effectConfig = effectConfig;
     }
 
     @Override

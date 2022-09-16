@@ -23,6 +23,9 @@ public class OriginalInfo {
     }
 
     public ImageInfo getImageInfo() {
+        if (imageInfo == null) {
+            imageInfo = new ImageInfo();
+        }
         return imageInfo;
     }
 
