@@ -22,10 +22,12 @@ import com.qcloud.cos.model.ciModel.job.MediaTransConfigObject;
 import com.qcloud.cos.model.ciModel.job.MediaTranscodeVideoObject;
 import com.qcloud.cos.model.ciModel.job.MediaVideoObject;
 import com.qcloud.cos.model.ciModel.job.OutputFile;
+import com.qcloud.cos.model.ciModel.job.ProcessResult;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaFormat;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoAudio;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoSubtitle;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoVideo;
+import com.qcloud.cos.model.ciModel.persistence.ImageInfo;
 import com.qcloud.cos.model.ciModel.template.MediaSegmentObject;
 import com.qcloud.cos.model.ciModel.template.MediaSnapshotObject;
 import com.qcloud.cos.model.ciModel.template.MediaWaterMarkImage;
@@ -943,4 +945,64 @@ public class ParserMediaInfoUtils {
                 break;
         }
     }
+
+    public static void ParsingImageInfo(ImageInfo imageInfo, String name, String value) {
+        switch (name) {
+            case "Ave":
+                imageInfo.setAve(value);
+                break;
+            case "Format":
+                imageInfo.setFormat(value);
+                break;
+            case "Height":
+                imageInfo.setHeight(string2int(value));
+                break;
+            case "Orientation":
+                imageInfo.setOrientation(string2int(value));
+                break;
+            case "Quality":
+                imageInfo.setQuality(string2int(value));
+                break;
+            case "Width":
+                imageInfo.setWidth(string2int(value));
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParsingProcessResult(ProcessResult processResult, String name, String value) {
+        switch (name) {
+            case "Etag":
+                processResult.setEtag(value);
+                break;
+            case "Format":
+                processResult.setFormat(value);
+                break;
+            case "Height":
+                processResult.setHeight(value);
+                break;
+            case "Quality":
+                processResult.setQuality(value);
+                break;
+            case "Size":
+                processResult.setSize(value);
+                break;
+            case "Width":
+                processResult.setWidth(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    private static int string2int(String str) {
+        try {
+            return Integer.parseInt(str);
+        } catch (RuntimeException e) {
+            return 0;
+        }
+    }
+
+
 }

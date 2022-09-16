@@ -5,11 +5,14 @@ import com.qcloud.cos.model.ciModel.job.MediaJobObject;
 import com.qcloud.cos.model.ciModel.job.MediaJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaJobsRequest;
 import com.qcloud.cos.model.ciModel.job.MediaListJobResponse;
+import com.qcloud.cos.model.ciModel.queue.MediaListQueueResponse;
+import com.qcloud.cos.model.ciModel.queue.MediaQueueRequest;
+import com.qcloud.cos.utils.Jackson;
 
 import java.util.List;
 
 /**
- * 媒体处理 图片处理异步接口相关demo 详情见https://cloud.tencent.com/document/product/460/48216
+ * 图片处理异步接口相关demo 详情见https://cloud.tencent.com/document/product/460/77012
  */
 public class PicProcessJobDemo {
 
@@ -17,7 +20,7 @@ public class PicProcessJobDemo {
         // 1 初始化用户身份信息（secretId, secretKey）。
         COSClient client = ClientUtils.getTestClient();
         // 2 调用要使用的方法。
-        createPicProcessJob(client);
+        describePicProcessQueues(client);
     }
 
     /**
@@ -38,7 +41,7 @@ public class PicProcessJobDemo {
         request.getOperation().getOutput().setObject("2.png");
         request.getOperation().getPicProcess().setProcessRule("imageMogr2/rotate/90");
         request.getOperation().getPicProcess().setIsPicInfo("true");
-        request.setQueueId("p9900025e4ec44b5e8225e70a52170834");
+        request.setQueueId("p86ede0188f844ac99d50f5fa63005237");
         request.setCallBack("https://cloud.tencent.com/xxx");
         //3.调用接口,获取任务响应对象
         MediaJobResponse response = client.createPicProcessJob(request);
@@ -46,33 +49,33 @@ public class PicProcessJobDemo {
     }
 
     /**
-     * describeMediaJob 根据jobId查询任务信息
+     * describeJob 根据jobId查询任务信息
      *
      * @param client
      */
-    public static void describeMediaJob(COSClient client) {
+    public static void describeJob(COSClient client) {
         //1.创建任务请求对象
         MediaJobsRequest request = new MediaJobsRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("DemoBucket-123456789");
-        request.setJobId("j2b27107ee3ad11ebbf6d73cb5317****");
+        request.setBucketName("demo-1234567890");
+        request.setJobId("cabd41ea0355b11ed847a618901112dcf");
         //3.调用接口,获取任务响应对象
         MediaJobResponse response = client.describeMediaJob(request);
-        System.out.println(response.getJobsDetail().getOperation().getTranscode());
+        System.out.println(Jackson.toJsonString(response.getJobsDetail().getOperation()));
     }
 
     /**
-     * describeMediaJobs 查询任务列表
+     * describeJobs 查询任务列表
      *
      * @param client
      */
-    public static void describeMediaJobs(COSClient client) {
+    public static void describeJobs(COSClient client) {
         //1.创建任务请求对象
         MediaJobsRequest request = new MediaJobsRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("DemoBucket-123456789");
+        request.setBucketName("demo-1234567890");
         request.setQueueId("p9900025e4ec44b5e8225e70a5217****");
-        request.setTag("Transcode");
+        request.setTag("PicProcess");
         //3.调用接口,获取任务响应对象
         MediaListJobResponse response = client.describeMediaJobs(request);
         List<MediaJobObject> jobsDetail = response.getJobsDetailList();
@@ -82,18 +85,16 @@ public class PicProcessJobDemo {
     }
 
     /**
-     * cancelMediaJob 取消任务
-     *
+     * describePicProcessQueues 接口用于搜索队列。
      * @param client
      */
-    public static void cancelMediaJob(COSClient client) {
-        //1.创建任务请求对象
-        MediaJobsRequest request = new MediaJobsRequest();
+    public static void describePicProcessQueues(COSClient client){
+        //1.创建队列请求对象
+        MediaQueueRequest request = new MediaQueueRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("DemoBucket-123456789");
-        request.setJobId("jbfb0d02a092111ebb3167781d*****");
-        //3.调用接口,获取任务响应对象
-        Boolean response = client.cancelMediaJob(request);
+        request.setBucketName("demo-1234567890");
+        //3.调用接口,获取队列响应对象
+        MediaListQueueResponse response = client.describePicProcessQueues(request);
         System.out.println(response);
     }
 }

@@ -146,6 +146,7 @@ import com.qcloud.cos.model.ciModel.job.MediaTransConfigObject;
 import com.qcloud.cos.model.ciModel.job.MediaTranscodeVideoObject;
 import com.qcloud.cos.model.ciModel.job.MediaVideoObject;
 import com.qcloud.cos.model.ciModel.job.OutputFile;
+import com.qcloud.cos.model.ciModel.job.ProcessResult;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaFormat;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoAudio;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoResponse;
@@ -4289,10 +4290,25 @@ public class XmlResponsesSaxParser {
             } else if (in("Response", "JobsDetail", "Input")) {
                 jobsDetail.getInput().setObject(getText());
             } else if (in("Response", "JobsDetail", "Operation")) {
-                if ("TemplateId".equalsIgnoreCase(name)) {
-                    jobsDetail.getOperation().setTemplateId(getText());
-                } else if ("WatermarkTemplateId".equalsIgnoreCase(name)) {
-                    jobsDetail.getOperation().getWatermarkTemplateId().add(getText());
+                MediaJobOperation operation = jobsDetail.getOperation();
+                switch (name) {
+                    case "TemplateId":
+                        operation.setTemplateId(getText());
+                        break;
+                    case "WatermarkTemplateId":
+                        operation.getWatermarkTemplateId().add(getText());
+                        break;
+                    case "UserData":
+                        operation.setUserData(getText());
+                        break;
+                    case "JobLevel":
+                        operation.setJobLevel(getText());
+                        break;
+                    case "TemplateName":
+                        operation.setTemplateName(getText());
+                        break;
+                    default:
+                        break;
                 }
             } else if (in("Response", "JobsDetail", "Operation", "MediaInfo", "Format")) {
                 MediaFormat format = jobsDetail.getOperation().getMediaInfo().getFormat();
@@ -4384,6 +4400,34 @@ public class XmlResponsesSaxParser {
             } else if (in("Response", "JobsDetail", "Operation", "MediaResult", "OutputFile", "Md5Info")) {
                 Md5Info md5Info = jobsDetail.getOperation().getMediaResult().getOutputFile().getMd5Info();
                 ParserMediaInfoUtils.ParsingMd5Info(md5Info, name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "PicProcess")) {
+                MediaPicProcessTemplateObject picProcess = jobsDetail.getOperation().getPicProcess();
+                if ("IsPicInfo".equalsIgnoreCase(name)) {
+                    picProcess.setIsPicInfo(getText());
+                } else if ("ProcessRule".equalsIgnoreCase(name)) {
+                    picProcess.setProcessRule(getText());
+                }
+            } else if (in("Response", "JobsDetail", "Operation", "PicProcess")) {
+                MediaPicProcessTemplateObject picProcess = jobsDetail.getOperation().getPicProcess();
+                if ("IsPicInfo".equalsIgnoreCase(name)) {
+                    picProcess.setIsPicInfo(getText());
+                } else if ("ProcessRule".equalsIgnoreCase(name)) {
+                    picProcess.setProcessRule(getText());
+                }
+            } else if (in("Response", "JobsDetail", "Operation", "PicProcessResult")) {
+                if ("ObjectName".equalsIgnoreCase(name)) {
+                    jobsDetail.getOperation().getPicProcessResult().setObjectName(getText());
+                }
+            } else if (in("Response", "JobsDetail", "Operation", "PicProcessResult", "OriginalInfo")) {
+                if ("Etag".equalsIgnoreCase(name)) {
+                    jobsDetail.getOperation().getPicProcessResult().getOriginalInfo().setEtag(getText());
+                }
+            } else if (in("Response", "JobsDetail", "Operation", "PicProcessResult", "OriginalInfo", "ImageInfo")) {
+                ImageInfo imageInfo = jobsDetail.getOperation().getPicProcessResult().getOriginalInfo().getImageInfo();
+                ParserMediaInfoUtils.ParsingImageInfo(imageInfo, name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "PicProcessResult", "ProcessResult")) {
+                ProcessResult processResult = jobsDetail.getOperation().getPicProcessResult().getProcessResult();
+                ParserMediaInfoUtils.ParsingProcessResult(processResult, name, getText());
             }
         }
 
@@ -4566,6 +4610,34 @@ public class XmlResponsesSaxParser {
             } else if (in("Response", "JobsDetail", "Operation", "MediaResult", "OutputFile", "Md5Info")) {
                 Md5Info md5Info = jobsDetail.getOperation().getMediaResult().getOutputFile().getMd5Info();
                 ParserMediaInfoUtils.ParsingMd5Info(md5Info, name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "PicProcess")) {
+                MediaPicProcessTemplateObject picProcess = jobsDetail.getOperation().getPicProcess();
+                if ("IsPicInfo".equalsIgnoreCase(name)) {
+                    picProcess.setIsPicInfo(getText());
+                } else if ("ProcessRule".equalsIgnoreCase(name)) {
+                    picProcess.setProcessRule(getText());
+                }
+            } else if (in("Response", "JobsDetail", "Operation", "PicProcess")) {
+                MediaPicProcessTemplateObject picProcess = jobsDetail.getOperation().getPicProcess();
+                if ("IsPicInfo".equalsIgnoreCase(name)) {
+                    picProcess.setIsPicInfo(getText());
+                } else if ("ProcessRule".equalsIgnoreCase(name)) {
+                    picProcess.setProcessRule(getText());
+                }
+            } else if (in("Response", "JobsDetail", "Operation", "PicProcessResult")) {
+                if ("ObjectName".equalsIgnoreCase(name)) {
+                    jobsDetail.getOperation().getPicProcessResult().setObjectName(getText());
+                }
+            } else if (in("Response", "JobsDetail", "Operation", "PicProcessResult", "OriginalInfo")) {
+                if ("Etag".equalsIgnoreCase(name)) {
+                    jobsDetail.getOperation().getPicProcessResult().getOriginalInfo().setEtag(getText());
+                }
+            } else if (in("Response", "JobsDetail", "Operation", "PicProcessResult", "OriginalInfo", "ImageInfo")) {
+                ImageInfo imageInfo = jobsDetail.getOperation().getPicProcessResult().getOriginalInfo().getImageInfo();
+                ParserMediaInfoUtils.ParsingImageInfo(imageInfo, name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "PicProcessResult", "ProcessResult")) {
+                ProcessResult processResult = jobsDetail.getOperation().getPicProcessResult().getProcessResult();
+                ParserMediaInfoUtils.ParsingProcessResult(processResult, name, getText());
             }
         }
 

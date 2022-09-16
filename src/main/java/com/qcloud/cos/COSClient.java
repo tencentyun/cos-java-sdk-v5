@@ -4537,5 +4537,16 @@ public class COSClient implements COS {
         return invoke(request, new Unmarshallers.JobCreatUnmarshaller());
     }
 
+    @Override
+    public MediaListQueueResponse describePicProcessQueues(MediaQueueRequest req) {
+        this.checkCIRequestCommon(req);
+        CosHttpRequest<MediaQueueRequest> request = createRequest(req.getBucketName(), "/picqueue", req, HttpMethodName.GET);
+        addParameterIfNotNull(request, "queueIds", req.getQueueId());
+        addParameterIfNotNull(request, "state", req.getState());
+        addParameterIfNotNull(request, "pageNumber", req.getPageNumber());
+        addParameterIfNotNull(request, "pageSize", req.getPageSize());
+        return invoke(request, new Unmarshallers.ListQueueUnmarshaller());
+    }
+
 }
 
