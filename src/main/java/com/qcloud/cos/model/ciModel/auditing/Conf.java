@@ -48,6 +48,8 @@ public class Conf {
      */
     private String async;
 
+    private String callbackType;
+
 
     public String getBizType() {
         return bizType;
@@ -116,6 +118,14 @@ public class Conf {
         this.async = async;
     }
 
+    public String getCallbackType() {
+        return callbackType;
+    }
+
+    public void setCallbackType(String callbackType) {
+        this.callbackType = callbackType;
+    }
+
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("Conf{");
@@ -127,6 +137,7 @@ public class Conf {
         sb.append(", callbackVersion=").append(callbackVersion);
         sb.append(", returnHighlightHtml=").append(returnHighlightHtml);
         sb.append(", async='").append(async).append('\'');
+        sb.append(", callbackType='").append(callbackType).append('\'');
         sb.append('}');
         return sb.toString();
     }

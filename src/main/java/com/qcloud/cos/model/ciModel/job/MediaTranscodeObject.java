@@ -88,8 +88,8 @@ public class MediaTranscodeObject extends MediaVideoCommon {
     }
 
     public MediaAudioMixObject getAudioMix() {
-        if (audio == null) {
-            audio = new MediaAudioObject();
+        if (audioMix == null) {
+            audioMix = new MediaAudioMixObject();
         }
         return audioMix;
     }
