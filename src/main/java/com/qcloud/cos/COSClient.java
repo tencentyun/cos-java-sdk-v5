@@ -29,6 +29,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
@@ -1381,6 +1382,11 @@ public class COSClient implements COS {
     @Override
     public Bucket createBucket(CreateBucketRequest createBucketRequest)
             throws CosClientException, CosServiceException {
+        return createBucket(createBucketRequest,false);
+    }
+
+    public Bucket createBucket(CreateBucketRequest createBucketRequest,boolean isMAZ)
+            throws CosClientException, CosServiceException{
         rejectNull(createBucketRequest,
                 "The CreateBucketRequest parameter must be specified when creating a bucket");
 
@@ -1401,6 +1407,29 @@ public class COSClient implements COS {
         } else if (createBucketRequest.getCannedAcl() != null) {
             request.addHeader(Headers.COS_CANNED_ACL,
                     createBucketRequest.getCannedAcl().toString());
+        }
+
+        if (isMAZ){
+            ObjectMetadata metadata = new ObjectMetadata();
+
+            String MAZStr = "<CreateBucketConfiguration>\n" +
+                    "    <BucketAZConfig>MAZ</BucketAZConfig>\n" +
+                    "</CreateBucketConfiguration>";
+
+            byte[] contentByteArray = MAZStr.getBytes(StringUtils.UTF8);
+            String contentMd5 = Md5Utils.md5AsBase64(contentByteArray);
+
+            InputStream contentInput = new ByteArrayInputStream(contentByteArray);
+
+            metadata.setContentType("application/xml");
+            metadata.setContentLength(contentByteArray.length);
+            metadata.setContentMD5(contentMd5);
+
+            MD5DigestCalculatingInputStream md5DigestStream = null;
+            md5DigestStream = new MD5DigestCalculatingInputStream(contentInput);
+
+            populateRequestMetadata(request, metadata);
+            request.setContent(md5DigestStream);
         }
 
         invoke(request, voidCosResponseHandler);
