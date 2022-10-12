@@ -157,6 +157,9 @@ public class ImagePersistenceDemo {
         }
     }
 
+    /**
+     * 云上图片处理
+     */
     public static void persistenceImagePost(COSClient cosClient) {
         String bucketName = "examplebucket-1250000000";
         String key = "test.jpg";

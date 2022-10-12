@@ -8,6 +8,7 @@ import com.qcloud.cos.model.ciModel.auditing.Conf;
 import com.qcloud.cos.model.ciModel.auditing.ReportBadCaseRequest;
 import com.qcloud.cos.model.ciModel.auditing.UserInfo;
 import com.qcloud.cos.model.ciModel.auditing.VideoAuditingRequest;
+import com.qcloud.cos.model.ciModel.auditing.WebpageAuditingRequest;
 
 /**
  * 数据万象内容审核xml格式化
@@ -30,6 +31,9 @@ public class CIAuditingXmlFactory {
         return xml.getBytes();
     }
 
+    /**
+     * 视频审核请求
+     */
     public static byte[] convertToXmlByteArray(VideoAuditingRequest request) {
         XmlWriter xml = new XmlWriter();
 
@@ -38,6 +42,16 @@ public class CIAuditingXmlFactory {
         addAuditingConf(xml, request.getConf());
         xml.end();
 
+        return xml.getBytes();
+    }
+
+    public static byte[] convertToXmlByteArray(WebpageAuditingRequest request) {
+        XmlWriter xml = new XmlWriter();
+
+        xml.start("Request");
+        addAuditingInput(xml,request.getInput());
+        addAuditingConf(xml,request.getConf());
+        xml.end();
         return xml.getBytes();
     }
 
@@ -85,6 +99,7 @@ public class CIAuditingXmlFactory {
             CIMediaXmlFactory.addIfNotNull(xml, "DetectContent", conf.getDetectContent());
             CIMediaXmlFactory.addIfNotNull(xml, "CallbackVersion", conf.getCallbackVersion());
             CIMediaXmlFactory.addIfNotNull(xml, "Callback", conf.getCallback());
+            CIMediaXmlFactory.addIfNotNull(xml, "ReturnHighlightHtml", conf.getReturnHighlightHtml());
             addAuditingSnapshot(xml, conf.getSnapshot());
             xml.end();
         }

@@ -71,6 +71,11 @@ public class AuditingJobsDetail {
     private String label;
 
     /**
+     * 二级标签
+     */
+    private String subLabel;
+
+    /**
      * 审核结果 鉴黄信息
      */
     private PornInfo pornInfo;
@@ -374,6 +379,14 @@ public class AuditingJobsDetail {
         this.listInfo = listInfo;
     }
 
+    public String getSubLabel() {
+        return subLabel;
+    }
+
+    public void setSubLabel(String subLabel) {
+        this.subLabel = subLabel;
+    }
+
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("AuditingJobsDetail{");
@@ -391,6 +404,7 @@ public class AuditingJobsDetail {
         sb.append(", url='").append(url).append('\'');
         sb.append(", dataId='").append(dataId).append('\'');
         sb.append(", label='").append(label).append('\'');
+        sb.append(", subLabel='").append(subLabel).append('\'');
         sb.append(", pornInfo=").append(pornInfo);
         sb.append(", terroristInfo=").append(terroristInfo);
         sb.append(", politicsInfo=").append(politicsInfo);

@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.qcloud.cos.model.ciModel.common.CImageProcessRequest;
 import com.qcloud.cos.model.ciModel.image.*;
 import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.exception.CosServiceException;
@@ -3096,6 +3097,8 @@ public interface COS extends COSDirectSpi {
     MediaJobResponse createPicProcessJob(MediaJobsRequest req);
 
     MediaListQueueResponse describePicProcessQueues(MediaQueueRequest request);
+
+    boolean processImage2(CImageProcessRequest imageProcessRequest);
 }
 
 

@@ -5,7 +5,8 @@ public class BaseAuditingDetail {
     private TerroristInfo terroristInfo;
     private PoliticsInfo politicsInfo;
     private AdsInfo adsInfo;
-
+    private String label;
+    private String suggestion;
     public PornInfo getPornInfo() {
         if (pornInfo == null) {
             pornInfo = new PornInfo();
@@ -50,6 +51,22 @@ public class BaseAuditingDetail {
         this.adsInfo = adsInfo;
     }
 
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
+    public String getSuggestion() {
+        return suggestion;
+    }
+
+    public void setSuggestion(String suggestion) {
+        this.suggestion = suggestion;
+    }
+
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("BaseAuditingDetail{");
@@ -57,6 +74,8 @@ public class BaseAuditingDetail {
         sb.append(", terroristInfo=").append(terroristInfo);
         sb.append(", politicsInfo=").append(politicsInfo);
         sb.append(", adsInfo=").append(adsInfo);
+        sb.append(", label='").append(label).append('\'');
+        sb.append(", suggestion='").append(suggestion).append('\'');
         sb.append('}');
         return sb.toString();
     }
