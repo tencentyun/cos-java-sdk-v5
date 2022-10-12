@@ -3,6 +3,7 @@ package com.qcloud.cos.internal;
 import com.qcloud.cos.model.ciModel.auditing.AudioSectionInfo;
 import com.qcloud.cos.model.ciModel.auditing.AudtingCommonInfo;
 import com.qcloud.cos.model.ciModel.auditing.BatchImageJobDetail;
+import com.qcloud.cos.model.ciModel.auditing.LanguageResult;
 import com.qcloud.cos.model.ciModel.auditing.LibResult;
 import com.qcloud.cos.model.ciModel.auditing.ListResult;
 import com.qcloud.cos.model.ciModel.auditing.OcrResults;
@@ -669,6 +670,9 @@ public class ParserMediaInfoUtils {
             case "Count":
                 obj.setCount(value);
                 break;
+            case "SubLabel":
+                obj.setSubLabel(value);
+                break;
             default:
                 break;
         }
@@ -1005,4 +1009,22 @@ public class ParserMediaInfoUtils {
     }
 
 
+    public static void parseLanguageResult(LanguageResult result, String name, String value) {
+        switch (name) {
+            case "EndTime":
+                result.setEndTime(value);
+                break;
+            case "Label":
+                result.setLabel(value);
+                break;
+            case "Score":
+                result.setScore(value);
+                break;
+            case "StartTime":
+                result.setStartTime(value);
+                break;
+            default:
+                break;
+        }
+    }
 }
