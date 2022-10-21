@@ -2430,7 +2430,7 @@ public interface COS extends COSDirectSpi {
      * @throws CosServiceException If any errors occurred in COS while processing the
      *                             request.
      */
-    public void deleteBucketDomainConfiguration(DeleteBucketDomainConfigurationRequest deleteBucketDomainConfigurationReqeuest)
+    public void deleteBucketDomainConfiguration(DeleteBucketDomainConfigurationRequest deleteBucketDomainConfigurationRequest)
             throws CosClientException, CosServiceException;
 
     /**
@@ -2484,6 +2484,86 @@ public interface COS extends COSDirectSpi {
      * @throws CosServiceException If any errors occurred in COS while processing the request.
      */
     public BucketDomainConfiguration getBucketDomainConfiguration(GetBucketDomainConfigurationRequest getBucketDomainConfigurationRequest)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * This operation removes the domain certificate for a bucket.
+     *
+     * @param bucketName The name of the bucket whose domain certificate is being
+     *                   deleted.
+     * @parm domainName The name of the bucket's domain whose certificate is being deleted.
+     * @throws CosClientException  If any errors are encountered on the client while making the
+     *                             request or handling the response.
+     * @throws CosServiceException If any errors occurred in COS while processing the
+     *                             request.
+     */
+    public void deleteBucketDomainCertificate(String bucketName,String domainName)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * This operation removes the domain certificate for a bucket.
+     *
+     * @param deleteBucketDomainCertificateRequest The request object specifying the name of the bucket whose
+     *                                               domain certificate is to be deleted.
+     * @throws CosClientException  If any errors are encountered on the client while making the
+     *                             request or handling the response.
+     * @throws CosServiceException If any errors occurred in COS while processing the
+     *                             request.
+     */
+    public void deleteBucketDomainCertificate(BucketDomainCertificateRequest deleteBucketDomainCertificateRequest)
+            throws CosClientException, CosServiceException;
+    /**
+     * Sets the domain certificate for the specified bucket.
+     *
+     * @param bucketName    The name of the bucket whose domain certificate is being set.
+     * @param domainCertificate The certificate describing the specified bucket custom domain
+     * @throws CosClientException  If any errors are encountered on the client while making the
+     *                             request or handling the response.
+     * @throws CosServiceException If any errors occurred in COS while processing the request.
+     */
+    public void setBucketDomainCertificate(String bucketName, BucketPutDomainCertificate domainCertificate)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * Sets the domain certificate for the specified bucket.
+     *
+     * @param setBucketDomainCertificateRequest The request object containing the name of the bucket whose
+     *                                            domain certificate is being updated, and the new domain
+     *                                            certificate values.
+     * @throws CosClientException  If any errors are encountered on the client while making the
+     *                             request or handling the response.
+     * @throws CosServiceException If any errors occurred in COS while processing the request.
+     */
+    public void setBucketDomainCertificate(SetBucketDomainCertificateRequest setBucketDomainCertificateRequest)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * Returns the domain certificate for the specified bucket.
+     *
+     * @param bucketName The name of the bucket whose domain certificate is being retrieved.
+     * @param domainName The name of the bucket's domain whose certificate is being retrieved.
+     * @return The bucket domain certificate for the specified bucket,
+     * otherwise null if there is no domain certificate set for the
+     * specified bucket.
+     * @throws CosClientException  If any errors are encountered on the client while making the
+     *                             request or handling the response.
+     * @throws CosServiceException If any errors occurred in COS while processing the request.
+     */
+    public BucketGetDomainCertificate getBucketDomainCertificate(String bucketName,String domainName)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * Returns the domain certificate for the specified bucket.
+     *
+     * @param getBucketDomainCertificateRequest The request object for retrieving the bucket domain certificate.
+     * @return The bucket domain certificate for the specified bucket,
+     * otherwise null if there is no domain certificate set for the
+     * specified bucket.
+     * @throws CosClientException  If any errors are encountered on the client while making the
+     *                             request or handling the response.
+     * @throws CosServiceException If any errors occurred in COS while processing the request.
+     */
+    public BucketGetDomainCertificate getBucketDomainCertificate(BucketDomainCertificateRequest getBucketDomainCertificateRequest)
             throws CosClientException, CosServiceException;
 
     /**

@@ -668,4 +668,27 @@ public class BucketConfigurationXmlFactory {
         return xml.getBytes();
     }
 
+    public byte[] convertToXmlByteArray(BucketPutDomainCertificate domainCertificate)
+            throws CosClientException{
+        XmlWriter xml = new XmlWriter();
+        xml.start("DomainCertificate");
+        BucketDomainCertificateInfo certificateInfo = domainCertificate.getBucketDomainCertificateInfo();
+        xml.start("CertificateInfo");
+        xml.start("CertType").value(certificateInfo.getCertType()).end();
+
+        xml.start("CustomCert");
+        xml.start("Cert").value(certificateInfo.getCert()).end();
+        xml.start("PrivateKey").value(certificateInfo.getPrivateKey()).end();
+        xml.end();
+        xml.end();
+
+        xml.start("DomainList");
+        for (String domain : domainCertificate.getDomainList()) {
+            xml.start("DomainName").value(domain).end();
+        }
+        xml.end();
+        xml.end();
+
+        return xml.getBytes();
+    }
 }

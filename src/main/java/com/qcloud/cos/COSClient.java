@@ -128,7 +128,6 @@ import com.qcloud.cos.model.ciModel.job.MediaJobObject;
 import com.qcloud.cos.model.ciModel.job.MediaJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaJobsRequest;
 import com.qcloud.cos.model.ciModel.job.MediaListJobResponse;
-import com.qcloud.cos.model.ciModel.job.PicProcessRequest;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoRequest;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoResponse;
 import com.qcloud.cos.model.ciModel.persistence.CIUploadResult;
@@ -3267,6 +3266,106 @@ public class COSClient implements COS {
                     throw cse;
             }
         }
+    }
+
+    @Override
+    public void setBucketDomainCertificate(String bucketName, BucketPutDomainCertificate domainCertificate)
+            throws CosClientException, CosServiceException{
+        setBucketDomainCertificate(new SetBucketDomainCertificateRequest(bucketName,domainCertificate));
+    }
+
+    @Override
+    public void setBucketDomainCertificate(SetBucketDomainCertificateRequest setBucketDomainCertificateRequest)
+            throws CosClientException, CosServiceException {
+        rejectNull(setBucketDomainCertificateRequest,
+                "The request object parameter setBucketDomainCertificateRequest must be specified.");
+        String bucketName = setBucketDomainCertificateRequest.getBucketName();
+        BucketPutDomainCertificate domainCertificate = setBucketDomainCertificateRequest.getBucketPutDomainCertificate();
+
+        rejectNull(bucketName,
+                "The bucket name parameter must be specified when setting a bucket's domain certificate");
+        rejectNull(domainCertificate,
+                "The bucket domain certificate parameter must be specified when setting a bucket's domain certificate");
+        rejectNull(domainCertificate.getBucketDomainCertificateInfo(),
+                "The bucket domain certificate parameter must be specified when setting a bucket's domain certificate");
+        rejectNull(domainCertificate.getDomainList(),
+                "The bucket domain lists must specify the index document suffix when setting a bucket's domain certificate");
+
+        CosHttpRequest<SetBucketDomainCertificateRequest> request = createRequest(bucketName,
+                null, setBucketDomainCertificateRequest, HttpMethodName.PUT);
+        request.addParameter("domaincertificate", null);
+        request.addHeader("Content-Type", "application/xml");
+
+        byte[] bytes = new BucketConfigurationXmlFactory().convertToXmlByteArray(domainCertificate);
+        request.setContent(new ByteArrayInputStream(bytes));
+
+        invoke(request, voidCosResponseHandler);
+    }
+
+    @Override
+    public BucketGetDomainCertificate getBucketDomainCertificate(String bucketName,String domainName)
+            throws CosClientException, CosServiceException {
+        BucketDomainCertificateRequest getBucketDomainCertificateRequest = new BucketDomainCertificateRequest(bucketName);
+        getBucketDomainCertificateRequest.setDomainName(domainName);
+        return getBucketDomainCertificate(getBucketDomainCertificateRequest);
+    }
+
+    @Override
+    public BucketGetDomainCertificate getBucketDomainCertificate(BucketDomainCertificateRequest getBucketDomainCertificateRequest)
+            throws CosClientException, CosServiceException {
+        rejectNull(getBucketDomainCertificateRequest,
+                "The request object parameter getBucketDomainCertificateRequest must be specified.");
+        String bucketName = getBucketDomainCertificateRequest.getBucketName();
+        String domainName = getBucketDomainCertificateRequest.getDomainName();
+        rejectNull(bucketName,
+                "The bucket name must be specified when retrieving the bucket domain Certificate.");
+
+        rejectNull(domainName,
+                "The domain name must be specified when retrieving the bucket domain Certificate.");
+
+        CosHttpRequest<BucketDomainCertificateRequest> request = createRequest(bucketName,
+                null, getBucketDomainCertificateRequest, HttpMethodName.GET);
+        request.addParameter("domaincertificate", null);
+        request.addParameter("domainname",domainName);
+
+
+        try {
+            return invoke(request, new Unmarshallers.BucketDomainCertificateUnmarshaller());
+        } catch (CosServiceException cse) {
+            switch (cse.getStatusCode()) {
+                case 404:
+                    return null;
+                default:
+                    throw cse;
+            }
+        }
+    }
+
+    @Override
+    public void deleteBucketDomainCertificate(String bucketName,String domainName)
+            throws CosClientException, CosServiceException{
+        BucketDomainCertificateRequest deleteBucketDomainCertificateRequest = new BucketDomainCertificateRequest(bucketName);
+        deleteBucketDomainCertificateRequest.setDomainName(domainName);
+        deleteBucketDomainCertificate(deleteBucketDomainCertificateRequest);
+    }
+
+    @Override
+    public void deleteBucketDomainCertificate(BucketDomainCertificateRequest deleteBucketDomainCertificateRequest)
+            throws CosClientException, CosServiceException{
+        rejectNull(deleteBucketDomainCertificateRequest,
+                "The request object parameter deleteBucketDomainCertificateRequest must be specified.");
+        String bucketName = deleteBucketDomainCertificateRequest.getBucketName();
+        String domainName = deleteBucketDomainCertificateRequest.getDomainName();
+        rejectNull(bucketName,
+                "The bucket name must be specified when removing the bucket domain Certificate.");
+
+        rejectNull(domainName,
+                "The domain name must be specified when removing the bucket domain Certificate.");
+        CosHttpRequest<BucketDomainCertificateRequest> request = createRequest(bucketName,
+                null, deleteBucketDomainCertificateRequest, HttpMethodName.DELETE);
+        request.addParameter("domaincertificate", null);
+        request.addParameter("domainname",domainName);
+        invoke(request, voidCosResponseHandler);
     }
 
     @Override
