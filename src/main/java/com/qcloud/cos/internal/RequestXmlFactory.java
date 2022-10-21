@@ -837,6 +837,7 @@ public class RequestXmlFactory {
         addIfNotNull(xml, "Callback", conf.getCallback());
         addIfNotNull(xml, "BizType", conf.getBizType());
         addIfNotNull(xml, "CallbackVersion", conf.getCallbackVersion());
+        addIfNotNull(xml, "CallbackType", conf.getCallbackType());
         xml.end();
 
         xml.end();

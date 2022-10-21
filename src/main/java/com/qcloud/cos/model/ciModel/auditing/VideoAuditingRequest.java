@@ -2,7 +2,6 @@ package com.qcloud.cos.model.ciModel.auditing;
 
 
 import com.qcloud.cos.internal.CIServiceRequest;
-import com.qcloud.cos.model.ciModel.common.MediaInputObject;
 
 /**
  * 视频审核请求实体 参数详情参考：https://cloud.tencent.com/document/product/460/46427

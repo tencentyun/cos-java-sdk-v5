@@ -58,6 +58,7 @@ import com.qcloud.cos.model.ciModel.auditing.DocumentAuditingJobsDetail;
 import com.qcloud.cos.model.ciModel.auditing.DocumentAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.DocumentResultInfo;
 import com.qcloud.cos.model.ciModel.auditing.ImageAuditingResponse;
+import com.qcloud.cos.model.ciModel.auditing.LanguageResult;
 import com.qcloud.cos.model.ciModel.auditing.LibResult;
 import com.qcloud.cos.model.ciModel.auditing.ListResult;
 import com.qcloud.cos.model.ciModel.auditing.ObjectResults;
@@ -5784,8 +5785,14 @@ public class XmlResponsesSaxParser {
             List<SectionInfo> sectionList = response.getJobsDetail().getSectionList();
             if (in("Response", "JobsDetail") && "Section".equals(name)) {
                 sectionList.add(new SectionInfo());
-            }else if (in("Response", "JobsDetail", "ListInfo") && "ListResults".equals(name)) {
+            } else if (in("Response", "JobsDetail", "ListInfo") && "ListResults".equals(name)) {
                 response.getJobsDetail().getListInfo().getListResults().add(new ListResult());
+            } else if (in("Response", "JobsDetail", "Section") && "LanguageResults".equals(name)) {
+                if (!sectionList.isEmpty()) {
+                    SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
+                    List<LanguageResult> languageResult = sectionInfo.getLanguageResult();
+                    languageResult.add(new LanguageResult());
+                }
             }
         }
 
@@ -5827,6 +5834,9 @@ public class XmlResponsesSaxParser {
                     case "Label":
                         jobsDetail.setLabel(getText());
                         break;
+                    case "SubLabel":
+                        jobsDetail.setSubLabel(getText());
+                        break;
                     default:
                         break;
                 }
@@ -5838,6 +5848,8 @@ public class XmlResponsesSaxParser {
                 ParserMediaInfoUtils.ParsingAuditingCommonInfo(response.getJobsDetail().getTerroristInfo(), name, getText());
             } else if (in("Response", "JobsDetail", "AdsInfo")) {
                 ParserMediaInfoUtils.ParsingAuditingCommonInfo(response.getJobsDetail().getAdsInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "TeenagerInfo")) {
+                ParserMediaInfoUtils.ParsingAuditingCommonInfo(response.getJobsDetail().getTeenagerInfo(), name, getText());
             } else if (in("Response", "JobsDetail", "Section", "PornInfo")) {
                 List<SectionInfo> sectionList = response.getJobsDetail().getSectionList();
                 SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
@@ -5854,7 +5866,11 @@ public class XmlResponsesSaxParser {
                 List<SectionInfo> sectionList = response.getJobsDetail().getSectionList();
                 SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
                 ParserMediaInfoUtils.ParsingAuditingCommonInfo(sectionInfo.getAdsInfo(), name, getText());
-            }else if (in("Response", "JobsDetail", "Section")){
+            } else if (in("Response", "JobsDetail", "Section", "TeenagerInfo")) {
+                List<SectionInfo> sectionList = response.getJobsDetail().getSectionList();
+                SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
+                ParserMediaInfoUtils.ParsingAuditingCommonInfo(sectionInfo.getTeenagerInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "Section")) {
                 List<SectionInfo> sectionList = response.getJobsDetail().getSectionList();
                 SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
                 ParserMediaInfoUtils.parseSectionInfo(sectionInfo, name, getText());
@@ -5864,6 +5880,14 @@ public class XmlResponsesSaxParser {
                 List<ListResult> listResults = response.getJobsDetail().getListInfo().getListResults();
                 if (!listResults.isEmpty()) {
                     ParserMediaInfoUtils.parsingAuditingListResultInfo(listResults.get(listResults.size() - 1), name, getText());
+                }
+            } else if (in("Response", "JobsDetail", "Section", "LanguageResults")) {
+                List<SectionInfo> sectionList = response.getJobsDetail().getSectionList();
+                SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
+                List<LanguageResult> languageResults = sectionInfo.getLanguageResult();
+                if (!languageResults.isEmpty()) {
+                    LanguageResult result = languageResults.get(languageResults.size() - 1);
+                    ParserMediaInfoUtils.parseLanguageResult(result, name, getText());
                 }
             }
         }
@@ -6244,6 +6268,9 @@ public class XmlResponsesSaxParser {
                         break;
                     case "Label":
                         jobsDetail.setLabel(getText());
+                        break;
+                    case "SubLabel":
+                        jobsDetail.setSubLabel(getText());
                         break;
                     case "Content":
                         jobsDetail.setContent(getText());
@@ -6797,6 +6824,18 @@ public class XmlResponsesSaxParser {
                     case "Label":
                         jobsDetail.setLabel(getText());
                         break;
+                    case "Code":
+                        jobsDetail.setCode(getText());
+                        break;
+                    case "Message":
+                        jobsDetail.setMessage(getText());
+                        break;
+                    case "dataId":
+                        jobsDetail.setDataId(getText());
+                        break;
+                    case "HighlightHtml":
+                        jobsDetail.setHighlightHtml(getText());
+                        break;
                     default:
                         break;
                 }
@@ -6808,12 +6847,28 @@ public class XmlResponsesSaxParser {
                     case "Url":
                         imageAuditingDetail.setUrl(getText());
                         break;
+                    case "Label":
+                        imageAuditingDetail.setLabel(getText());
+                        break;
+                    case "Suggestion":
+                        imageAuditingDetail.setSuggestion(getText());
+                        break;
                     default:
                         break;
                 }
             } else if (in("Response", "JobsDetail", "TextResults", "Results")) {
-                if ("Text".equals(name)) {
-                    textAuditingDetail.setText(getText());
+                switch (name) {
+                    case "Text":
+                        textAuditingDetail.setText(getText());
+                        break;
+                    case "Label":
+                        textAuditingDetail.setLabel(getText());
+                        break;
+                    case "Suggestion":
+                        textAuditingDetail.setSuggestion(getText());
+                        break;
+                    default:
+                        break;
                 }
             } else if (in("Response", "JobsDetail", "ImageResults", "Results","PoliticsInfo")) {
                 parseInfo(imageAuditingDetail.getPoliticsInfo(), name, getText());
@@ -6838,6 +6893,14 @@ public class XmlResponsesSaxParser {
                 if (!listResults.isEmpty()) {
                     ParserMediaInfoUtils.parsingAuditingListResultInfo(listResults.get(listResults.size() - 1), name, getText());
                 }
+            } else if (in("Response", "JobsDetail", "Labels", "PoliticsInfo")) {
+                parseInfo(response.getJobsDetail().getLabels().getPoliticsInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "Labels", "PornInfo")) {
+                parseInfo(response.getJobsDetail().getLabels().getPornInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "Labels", "TerrorismInfo")) {
+                parseInfo(response.getJobsDetail().getLabels().getTerroristInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "Labels", "AdsInfo")) {
+                parseInfo(response.getJobsDetail().getLabels().getAdsInfo(), name, getText());
             }
         }
 
