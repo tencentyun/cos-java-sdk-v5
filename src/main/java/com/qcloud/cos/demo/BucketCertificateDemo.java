@@ -4,9 +4,10 @@ import com.qcloud.cos.COSClient;
 import com.qcloud.cos.ClientConfig;
 import com.qcloud.cos.auth.BasicCOSCredentials;
 import com.qcloud.cos.auth.COSCredentials;
-import com.qcloud.cos.model.BucketDomainCertificateInfo;
-import com.qcloud.cos.model.BucketGetDomainCertificate;
-import com.qcloud.cos.model.BucketPutDomainCertificate;
+import com.qcloud.cos.model.bucketCertificate.BucketDomainCertificateInfo;
+import com.qcloud.cos.model.bucketCertificate.BucketDomainCertificateParameters;
+import com.qcloud.cos.model.bucketCertificate.BucketGetDomainCertificate;
+import com.qcloud.cos.model.bucketCertificate.BucketPutDomainCertificate;
 import com.qcloud.cos.region.Region;
 import com.qcloud.cos.utils.StringUtils;
 
@@ -21,46 +22,29 @@ public class BucketCertificateDemo {
         COSCredentials cred = new BasicCOSCredentials("xxxxxxxxxxxxxxxxxxxxxxxxxxxx", "yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
         ClientConfig clientConfig = new ClientConfig(new Region("ap-beijing"));
-        // 3 生成cos客户端
-        COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名需包含appid
         String bucketName = "mybucket-1251668577";
 
         BucketPutDomainCertificate bucketPutDomainCertificate = new BucketPutDomainCertificate();
         BucketDomainCertificateInfo bucketDomainCertificateInfo = new BucketDomainCertificateInfo();
 
-        bucketDomainCertificateInfo.setCertType(StringUtils.Custom_CertType);
+        bucketDomainCertificateInfo.setCertType(BucketDomainCertificateParameters.Custom_CertType);
         List<String> domainlist = new LinkedList<>();
         domainlist.add("test.com");
 
         bucketPutDomainCertificate.setDomainList(domainlist);
-
-        File keyfile = new File("src/test/resources/test.com.key");
-        File pemfile = new File("src/test/resources/test.com.pem");
         try {
-
-            InputStream is = new FileInputStream(keyfile);
-            InputStreamReader isr = new InputStreamReader(is);
-            char charArray[] = new char[(int)keyfile.length()];
-            isr.read(charArray);
-            String key = new String(charArray);
+            String key = getStreamContent("src/test/resources/test.com.key");
             bucketDomainCertificateInfo.setPrivateKey(key);
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            InputStream is = new FileInputStream(pemfile);
-            InputStreamReader isr = new InputStreamReader(is);
-            char charArray[] = new char[(int)pemfile.length()];
-            isr.read(charArray);
-            String pem = new String(charArray);
+            String pem = getStreamContent("src/test/resources/test.com.pem");
             bucketDomainCertificateInfo.setCert(pem);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
+            return;
         }
+        // 生成cos客户端
+        COSClient cosclient = new COSClient(cred, clientConfig);
+
         bucketPutDomainCertificate.setBucketDomainCertificateInfo(bucketDomainCertificateInfo);
         cosclient.setBucketDomainCertificate(bucketName,bucketPutDomainCertificate);
 
@@ -70,6 +54,24 @@ public class BucketCertificateDemo {
         cosclient.deleteBucketDomainCertificate(bucketName,"test.com");
 
         cosclient.shutdown();
+    }
+
+    private static String getStreamContent(String filePath) throws IOException{
+        InputStream is = new FileInputStream(filePath);
+        StringBuilder stringBuilder = new StringBuilder();
+        BufferedReader br =
+                new BufferedReader(new InputStreamReader(is, StringUtils.UTF8));
+
+        char[] buf = new char[8192];
+        int read = -1;
+        while ((read = br.read(buf)) != -1) {
+            stringBuilder.append(buf, 0, read);
+        }
+        is.close();
+        br.close();
+
+        String content = stringBuilder.toString();
+        return content;
     }
 
     public static void main(String[] args) {

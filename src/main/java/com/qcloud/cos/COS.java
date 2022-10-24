@@ -27,6 +27,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.qcloud.cos.model.bucketCertificate.BucketDomainCertificateRequest;
+import com.qcloud.cos.model.bucketCertificate.BucketGetDomainCertificate;
+import com.qcloud.cos.model.bucketCertificate.BucketPutDomainCertificate;
+import com.qcloud.cos.model.bucketCertificate.SetBucketDomainCertificateRequest;
 import com.qcloud.cos.model.ciModel.common.CImageProcessRequest;
 import com.qcloud.cos.model.ciModel.image.*;
 import com.qcloud.cos.exception.CosClientException;
@@ -2550,7 +2554,7 @@ public interface COS extends COSDirectSpi {
      *                             request or handling the response.
      * @throws CosServiceException If any errors occurred in COS while processing the request.
      */
-    public BucketGetDomainCertificate getBucketDomainCertificate(String bucketName,String domainName)
+    public BucketGetDomainCertificate getBucketDomainCertificate(String bucketName, String domainName)
             throws CosClientException, CosServiceException;
 
     /**

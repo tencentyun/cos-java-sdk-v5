@@ -102,6 +102,10 @@ import com.qcloud.cos.internal.VoidCosResponseHandler;
 import com.qcloud.cos.internal.XmlResponsesSaxParser.CompleteMultipartUploadHandler;
 import com.qcloud.cos.internal.XmlResponsesSaxParser.CopyObjectResultHandler;
 import com.qcloud.cos.model.*;
+import com.qcloud.cos.model.bucketCertificate.BucketDomainCertificateRequest;
+import com.qcloud.cos.model.bucketCertificate.BucketGetDomainCertificate;
+import com.qcloud.cos.model.bucketCertificate.BucketPutDomainCertificate;
+import com.qcloud.cos.model.bucketCertificate.SetBucketDomainCertificateRequest;
 import com.qcloud.cos.model.ciModel.auditing.*;
 import com.qcloud.cos.model.ciModel.bucket.DocBucketRequest;
 import com.qcloud.cos.model.ciModel.bucket.DocBucketResponse;
@@ -3304,7 +3308,7 @@ public class COSClient implements COS {
     }
 
     @Override
-    public BucketGetDomainCertificate getBucketDomainCertificate(String bucketName,String domainName)
+    public BucketGetDomainCertificate getBucketDomainCertificate(String bucketName, String domainName)
             throws CosClientException, CosServiceException {
         BucketDomainCertificateRequest getBucketDomainCertificateRequest = new BucketDomainCertificateRequest(bucketName);
         getBucketDomainCertificateRequest.setDomainName(domainName);

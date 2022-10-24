@@ -28,6 +28,9 @@ import com.qcloud.cos.model.BucketLifecycleConfiguration.Transition;
 import com.qcloud.cos.model.CORSRule.AllowedMethods;
 import com.qcloud.cos.model.Tag.LifecycleTagPredicate;
 import com.qcloud.cos.model.Tag.Tag;
+import com.qcloud.cos.model.bucketCertificate.BucketDomainCertificateInfo;
+import com.qcloud.cos.model.bucketCertificate.BucketDomainCertificateParameters;
+import com.qcloud.cos.model.bucketCertificate.BucketPutDomainCertificate;
 import com.qcloud.cos.model.inventory.InventoryConfiguration;
 import com.qcloud.cos.model.inventory.InventoryCosBucketDestination;
 import com.qcloud.cos.model.inventory.InventoryDestination;
@@ -671,20 +674,20 @@ public class BucketConfigurationXmlFactory {
     public byte[] convertToXmlByteArray(BucketPutDomainCertificate domainCertificate)
             throws CosClientException{
         XmlWriter xml = new XmlWriter();
-        xml.start("DomainCertificate");
+        xml.start(BucketDomainCertificateParameters.Element_Domain_Certificate);
         BucketDomainCertificateInfo certificateInfo = domainCertificate.getBucketDomainCertificateInfo();
-        xml.start("CertificateInfo");
-        xml.start("CertType").value(certificateInfo.getCertType()).end();
+        xml.start(BucketDomainCertificateParameters.Element_CertificateInfo);
+        xml.start(BucketDomainCertificateParameters.Element_CertType).value(certificateInfo.getCertType()).end();
 
-        xml.start("CustomCert");
-        xml.start("Cert").value(certificateInfo.getCert()).end();
-        xml.start("PrivateKey").value(certificateInfo.getPrivateKey()).end();
+        xml.start(BucketDomainCertificateParameters.Element_CustomCert);
+        xml.start(BucketDomainCertificateParameters.Element_Cert).value(certificateInfo.getCert()).end();
+        xml.start(BucketDomainCertificateParameters.Element_PrivateKey).value(certificateInfo.getPrivateKey()).end();
         xml.end();
         xml.end();
 
-        xml.start("DomainList");
+        xml.start(BucketDomainCertificateParameters.Element_DomainList);
         for (String domain : domainCertificate.getDomainList()) {
-            xml.start("DomainName").value(domain).end();
+            xml.start(BucketDomainCertificateParameters.Element_DomainName).value(domain).end();
         }
         xml.end();
         xml.end();

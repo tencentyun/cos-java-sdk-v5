@@ -15,7 +15,7 @@
  * According to cos feature, we modify some class，comment, field name, etc.
  */
 
-package com.qcloud.cos.model;
+package com.qcloud.cos.model.bucketCertificate;
 
 import com.qcloud.cos.internal.CosServiceRequest;
 

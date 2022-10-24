@@ -48,6 +48,8 @@ import com.qcloud.cos.model.CORSRule.AllowedMethods;
 import com.qcloud.cos.model.DeleteObjectsResult.DeletedObject;
 import com.qcloud.cos.model.Tag.LifecycleTagPredicate;
 import com.qcloud.cos.model.Tag.Tag;
+import com.qcloud.cos.model.bucketCertificate.BucketDomainCertificateParameters;
+import com.qcloud.cos.model.bucketCertificate.BucketGetDomainCertificate;
 import com.qcloud.cos.model.ciModel.auditing.AudioAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.AudioSectionInfo;
 import com.qcloud.cos.model.ciModel.auditing.AuditingJobsDetail;
@@ -100,7 +102,6 @@ import com.qcloud.cos.model.ciModel.job.MediaJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaListJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaPicProcessTemplateObject;
 import com.qcloud.cos.model.ciModel.job.MediaRemoveWaterMark;
-import com.qcloud.cos.model.ciModel.job.MediaResult;
 import com.qcloud.cos.model.ciModel.job.MediaTimeIntervalObject;
 import com.qcloud.cos.model.ciModel.job.MediaTransConfigObject;
 import com.qcloud.cos.model.ciModel.job.MediaTranscodeVideoObject;
@@ -2934,28 +2935,18 @@ public class XmlResponsesSaxParser {
         private final BucketGetDomainCertificate domainCertificate =
                 new BucketGetDomainCertificate();
 
-        private String status;
-
         public BucketGetDomainCertificate getBucketDomainCertificate(){
             return domainCertificate;
         }
 
         @Override
-        protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
-
-            if (in("DomainCertificate")) {
-                if (name.equals("Status")) {
-                    status = new String();
-                }
-            }
-        }
+        protected void doStartElement(String uri, String name, String qName, Attributes attrs) {}
 
         @Override
         protected void doEndElement(String uri, String name, String qName) {
-            if (in("DomainCertificate")) {
-                if (name.equals("Status")) {
-                    status = getText();
-                    domainCertificate.setStatus(status);
+            if (in(BucketDomainCertificateParameters.Element_Domain_Certificate)) {
+                if (BucketDomainCertificateParameters.Element_Status.equals(name)) {
+                    domainCertificate.setStatus(getText());
                 }
             }
         }

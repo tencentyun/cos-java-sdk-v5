@@ -36,8 +36,6 @@ public class StringUtils {
 
     public static final Charset UTF8 = Charset.forName(DEFAULT_ENCODING);
 
-    public static final String Custom_CertType = "CustomCert";
-
     public static Integer toInteger(StringBuilder value) {
         return Integer.parseInt(value.toString());
     }
