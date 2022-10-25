@@ -67,14 +67,7 @@ public class COSSigner {
         needSignedHeaderSet.add("if-unmodified-since");
         needSignedHeaderSet.add("origin");
         needSignedHeaderSet.add("range");
-        needSignedHeaderSet.add("response-cache-control");
-        needSignedHeaderSet.add("response-content-disposition");
-        needSignedHeaderSet.add("response-content-encoding");
-        needSignedHeaderSet.add("response-content-language");
-        needSignedHeaderSet.add("response-content-type");
-        needSignedHeaderSet.add("response-expires");
         needSignedHeaderSet.add("transfer-encoding");
-        needSignedHeaderSet.add("versionid");
     }
 
     private boolean isAnonymous(COSCredentials cred) {

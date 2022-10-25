@@ -26,33 +26,8 @@ import java.util.List;
 
 import com.qcloud.cos.internal.XmlResponsesSaxParser.CompleteMultipartUploadHandler;
 import com.qcloud.cos.internal.XmlResponsesSaxParser.CopyObjectResultHandler;
-import com.qcloud.cos.model.AccessControlList;
-import com.qcloud.cos.model.Bucket;
-import com.qcloud.cos.model.BucketCrossOriginConfiguration;
-import com.qcloud.cos.model.BucketDomainConfiguration;
-import com.qcloud.cos.model.BucketIntelligentTierConfiguration;
-import com.qcloud.cos.model.BucketLifecycleConfiguration;
-import com.qcloud.cos.model.BucketLoggingConfiguration;
-import com.qcloud.cos.model.BucketRefererConfiguration;
-import com.qcloud.cos.model.BucketReplicationConfiguration;
-import com.qcloud.cos.model.BucketTaggingConfiguration;
-import com.qcloud.cos.model.BucketVersioningConfiguration;
-import com.qcloud.cos.model.BucketWebsiteConfiguration;
-import com.qcloud.cos.model.DecompressionResult;
-import com.qcloud.cos.model.DeleteBucketInventoryConfigurationResult;
-import com.qcloud.cos.model.DeleteObjectTaggingResult;
-import com.qcloud.cos.model.GetBucketInventoryConfigurationResult;
-import com.qcloud.cos.model.GetObjectTaggingResult;
-import com.qcloud.cos.model.InitiateMultipartUploadResult;
-import com.qcloud.cos.model.ListBucketInventoryConfigurationsResult;
-import com.qcloud.cos.model.ListJobsResult;
-import com.qcloud.cos.model.MultipartUploadListing;
-import com.qcloud.cos.model.ObjectListing;
-import com.qcloud.cos.model.ObjectMetadata;
-import com.qcloud.cos.model.PartListing;
-import com.qcloud.cos.model.SetBucketInventoryConfigurationResult;
-import com.qcloud.cos.model.SetObjectTaggingResult;
-import com.qcloud.cos.model.VersionListing;
+import com.qcloud.cos.model.*;
+import com.qcloud.cos.model.bucketcertificate.BucketGetDomainCertificate;
 import com.qcloud.cos.model.ciModel.auditing.AudioAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.BatchImageAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.DocumentAuditingResponse;
@@ -333,6 +308,17 @@ public class Unmarshallers {
             }
             return new XmlResponsesSaxParser().parseBucketDomainConfigurationResponse(in)
                     .getConfiguration();
+        }
+    }
+
+    public static final class BucketDomainCertificateUnmarshaller
+            implements Unmarshaller<BucketGetDomainCertificate, InputStream> {
+        public BucketGetDomainCertificate unmarshall(InputStream in) throws Exception {
+            if (in.available() == 0) {
+                return null;
+            }
+            return new XmlResponsesSaxParser().parseBucketDomainCertificateResponse(in)
+                    .getBucketDomainCertificate();
         }
     }
 

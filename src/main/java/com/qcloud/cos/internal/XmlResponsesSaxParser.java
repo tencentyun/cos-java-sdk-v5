@@ -40,55 +40,16 @@ import com.qcloud.cos.internal.cihandler.GetImageStyleHandler;
 import com.qcloud.cos.internal.cihandler.ReportBadCaseHandler;
 import com.qcloud.cos.internal.cihandler.SearchImageHandler;
 import com.qcloud.cos.internal.cihandler.TriggerWorkflowListHandler;
-import com.qcloud.cos.model.AbortIncompleteMultipartUpload;
-import com.qcloud.cos.model.AccessControlList;
-import com.qcloud.cos.model.Bucket;
-import com.qcloud.cos.model.BucketCrossOriginConfiguration;
-import com.qcloud.cos.model.BucketDomainConfiguration;
-import com.qcloud.cos.model.BucketIntelligentTierConfiguration;
-import com.qcloud.cos.model.BucketLifecycleConfiguration;
+import com.qcloud.cos.model.*;
 import com.qcloud.cos.model.BucketLifecycleConfiguration.NoncurrentVersionTransition;
 import com.qcloud.cos.model.BucketLifecycleConfiguration.Rule;
 import com.qcloud.cos.model.BucketLifecycleConfiguration.Transition;
-import com.qcloud.cos.model.BucketLoggingConfiguration;
-import com.qcloud.cos.model.BucketRefererConfiguration;
-import com.qcloud.cos.model.BucketReplicationConfiguration;
-import com.qcloud.cos.model.BucketTaggingConfiguration;
-import com.qcloud.cos.model.BucketVersioningConfiguration;
-import com.qcloud.cos.model.BucketWebsiteConfiguration;
-import com.qcloud.cos.model.CORSRule;
 import com.qcloud.cos.model.CORSRule.AllowedMethods;
-import com.qcloud.cos.model.COSObjectSummary;
-import com.qcloud.cos.model.COSVersionSummary;
-import com.qcloud.cos.model.CompleteMultipartUploadResult;
-import com.qcloud.cos.model.CopyObjectResult;
-import com.qcloud.cos.model.DecompressionResult;
 import com.qcloud.cos.model.DeleteObjectsResult.DeletedObject;
-import com.qcloud.cos.model.DomainRule;
-import com.qcloud.cos.model.GetBucketInventoryConfigurationResult;
-import com.qcloud.cos.model.GetObjectTaggingResult;
-import com.qcloud.cos.model.Grantee;
-import com.qcloud.cos.model.GroupGrantee;
-import com.qcloud.cos.model.InitiateMultipartUploadResult;
-import com.qcloud.cos.model.ListBucketInventoryConfigurationsResult;
-import com.qcloud.cos.model.ListJobsResult;
-import com.qcloud.cos.model.MultipartUpload;
-import com.qcloud.cos.model.MultipartUploadListing;
-import com.qcloud.cos.model.ObjectListing;
-import com.qcloud.cos.model.Owner;
-import com.qcloud.cos.model.PartListing;
-import com.qcloud.cos.model.PartSummary;
-import com.qcloud.cos.model.Permission;
-import com.qcloud.cos.model.RedirectRule;
-import com.qcloud.cos.model.ReplicationDestinationConfig;
-import com.qcloud.cos.model.ReplicationRule;
-import com.qcloud.cos.model.RoutingRule;
-import com.qcloud.cos.model.RoutingRuleCondition;
-import com.qcloud.cos.model.TagSet;
-import com.qcloud.cos.model.UinGrantee;
-import com.qcloud.cos.model.VersionListing;
 import com.qcloud.cos.model.Tag.LifecycleTagPredicate;
 import com.qcloud.cos.model.Tag.Tag;
+import com.qcloud.cos.model.bucketcertificate.BucketDomainCertificateParameters;
+import com.qcloud.cos.model.bucketcertificate.BucketGetDomainCertificate;
 import com.qcloud.cos.model.ciModel.auditing.AudioAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.AudioSectionInfo;
 import com.qcloud.cos.model.ciModel.auditing.AuditingJobsDetail;
@@ -141,7 +102,6 @@ import com.qcloud.cos.model.ciModel.job.MediaJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaListJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaPicProcessTemplateObject;
 import com.qcloud.cos.model.ciModel.job.MediaRemoveWaterMark;
-import com.qcloud.cos.model.ciModel.job.MediaResult;
 import com.qcloud.cos.model.ciModel.job.MediaTimeIntervalObject;
 import com.qcloud.cos.model.ciModel.job.MediaTransConfigObject;
 import com.qcloud.cos.model.ciModel.job.MediaTranscodeVideoObject;
@@ -515,6 +475,13 @@ public class XmlResponsesSaxParser {
     public BucketDomainConfigurationHandler parseBucketDomainConfigurationResponse(
             InputStream inputStream) throws IOException {
         BucketDomainConfigurationHandler handler = new BucketDomainConfigurationHandler();
+        parseXmlInputStream(handler, inputStream);
+        return handler;
+    }
+
+    public BucketDomainCertificateHandler parseBucketDomainCertificateResponse(
+            InputStream inputStream) throws IOException {
+        BucketDomainCertificateHandler handler = new BucketDomainCertificateHandler();
         parseXmlInputStream(handler, inputStream);
         return handler;
     }
@@ -2961,6 +2928,28 @@ public class XmlResponsesSaxParser {
             }
         }
 
+    }
+
+    public static class BucketDomainCertificateHandler extends AbstractHandler {
+
+        private final BucketGetDomainCertificate domainCertificate =
+                new BucketGetDomainCertificate();
+
+        public BucketGetDomainCertificate getBucketDomainCertificate(){
+            return domainCertificate;
+        }
+
+        @Override
+        protected void doStartElement(String uri, String name, String qName, Attributes attrs) {}
+
+        @Override
+        protected void doEndElement(String uri, String name, String qName) {
+            if (in(BucketDomainCertificateParameters.Element_Domain_Certificate)) {
+                if (BucketDomainCertificateParameters.Element_Status.equals(name)) {
+                    domainCertificate.setStatus(getText());
+                }
+            }
+        }
     }
 
     public static class BucketRefererConfigurationHandler extends AbstractHandler {
