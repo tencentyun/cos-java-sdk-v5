@@ -1,4 +1,4 @@
-package com.qcloud.cos.model.bucketCertificate;
+package com.qcloud.cos.model.bucketcertificate;
 
 public class BucketDomainCertificateParameters {
 
@@ -22,4 +22,7 @@ public class BucketDomainCertificateParameters {
 
     public static final String Custom_CertType = "CustomCert";
 
+    public static final String Parameter_Domain_Certificate = "domaincertificate";
+
+    public static final String Parameter_Domain_Name = "domainname";
 }

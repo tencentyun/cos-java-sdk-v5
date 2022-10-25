@@ -4,10 +4,10 @@ import com.qcloud.cos.COSClient;
 import com.qcloud.cos.ClientConfig;
 import com.qcloud.cos.auth.BasicCOSCredentials;
 import com.qcloud.cos.auth.COSCredentials;
-import com.qcloud.cos.model.bucketCertificate.BucketDomainCertificateInfo;
-import com.qcloud.cos.model.bucketCertificate.BucketDomainCertificateParameters;
-import com.qcloud.cos.model.bucketCertificate.BucketGetDomainCertificate;
-import com.qcloud.cos.model.bucketCertificate.BucketPutDomainCertificate;
+import com.qcloud.cos.model.bucketcertificate.BucketDomainCertificateInfo;
+import com.qcloud.cos.model.bucketcertificate.BucketDomainCertificateParameters;
+import com.qcloud.cos.model.bucketcertificate.BucketGetDomainCertificate;
+import com.qcloud.cos.model.bucketcertificate.BucketPutDomainCertificate;
 import com.qcloud.cos.region.Region;
 import com.qcloud.cos.utils.StringUtils;
 
@@ -62,16 +62,18 @@ public class BucketCertificateDemo {
         BufferedReader br =
                 new BufferedReader(new InputStreamReader(is, StringUtils.UTF8));
 
-        char[] buf = new char[8192];
-        int read = -1;
-        while ((read = br.read(buf)) != -1) {
-            stringBuilder.append(buf, 0, read);
+        try {
+            char[] buf = new char[8192];
+            int read = -1;
+            while ((read = br.read(buf)) != -1) {
+                stringBuilder.append(buf, 0, read);
+            }
+        }finally {
+            is.close();
+            br.close();
         }
-        is.close();
-        br.close();
 
-        String content = stringBuilder.toString();
-        return content;
+        return stringBuilder.toString();
     }
 
     public static void main(String[] args) {

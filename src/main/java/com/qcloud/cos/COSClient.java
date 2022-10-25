@@ -102,10 +102,11 @@ import com.qcloud.cos.internal.VoidCosResponseHandler;
 import com.qcloud.cos.internal.XmlResponsesSaxParser.CompleteMultipartUploadHandler;
 import com.qcloud.cos.internal.XmlResponsesSaxParser.CopyObjectResultHandler;
 import com.qcloud.cos.model.*;
-import com.qcloud.cos.model.bucketCertificate.BucketDomainCertificateRequest;
-import com.qcloud.cos.model.bucketCertificate.BucketGetDomainCertificate;
-import com.qcloud.cos.model.bucketCertificate.BucketPutDomainCertificate;
-import com.qcloud.cos.model.bucketCertificate.SetBucketDomainCertificateRequest;
+import com.qcloud.cos.model.bucketcertificate.BucketDomainCertificateRequest;
+import com.qcloud.cos.model.bucketcertificate.BucketGetDomainCertificate;
+import com.qcloud.cos.model.bucketcertificate.BucketPutDomainCertificate;
+import com.qcloud.cos.model.bucketcertificate.SetBucketDomainCertificateRequest;
+import com.qcloud.cos.model.bucketcertificate.BucketDomainCertificateParameters;
 import com.qcloud.cos.model.ciModel.auditing.*;
 import com.qcloud.cos.model.ciModel.bucket.DocBucketRequest;
 import com.qcloud.cos.model.ciModel.bucket.DocBucketResponse;
@@ -3298,7 +3299,7 @@ public class COSClient implements COS {
 
         CosHttpRequest<SetBucketDomainCertificateRequest> request = createRequest(bucketName,
                 null, setBucketDomainCertificateRequest, HttpMethodName.PUT);
-        request.addParameter("domaincertificate", null);
+        request.addParameter(BucketDomainCertificateParameters.Parameter_Domain_Certificate, null);
         request.addHeader("Content-Type", "application/xml");
 
         byte[] bytes = new BucketConfigurationXmlFactory().convertToXmlByteArray(domainCertificate);
@@ -3330,8 +3331,8 @@ public class COSClient implements COS {
 
         CosHttpRequest<BucketDomainCertificateRequest> request = createRequest(bucketName,
                 null, getBucketDomainCertificateRequest, HttpMethodName.GET);
-        request.addParameter("domaincertificate", null);
-        request.addParameter("domainname",domainName);
+        request.addParameter(BucketDomainCertificateParameters.Parameter_Domain_Certificate, null);
+        request.addParameter(BucketDomainCertificateParameters.Parameter_Domain_Name,domainName);
 
 
         try {
@@ -3368,8 +3369,8 @@ public class COSClient implements COS {
                 "The domain name must be specified when removing the bucket domain Certificate.");
         CosHttpRequest<BucketDomainCertificateRequest> request = createRequest(bucketName,
                 null, deleteBucketDomainCertificateRequest, HttpMethodName.DELETE);
-        request.addParameter("domaincertificate", null);
-        request.addParameter("domainname",domainName);
+        request.addParameter(BucketDomainCertificateParameters.Parameter_Domain_Certificate, null);
+        request.addParameter(BucketDomainCertificateParameters.Parameter_Domain_Name,domainName);
         invoke(request, voidCosResponseHandler);
     }
 

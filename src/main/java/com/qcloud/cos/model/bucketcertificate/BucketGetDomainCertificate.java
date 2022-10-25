@@ -14,7 +14,7 @@
 
  * According to cos feature, we modify some class，comment, field name, etc.
  */
-package com.qcloud.cos.model.bucketCertificate;
+package com.qcloud.cos.model.bucketcertificate;
 
 import java.io.Serializable;
 

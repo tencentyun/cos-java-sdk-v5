@@ -27,10 +27,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import com.qcloud.cos.model.bucketCertificate.BucketDomainCertificateRequest;
-import com.qcloud.cos.model.bucketCertificate.BucketGetDomainCertificate;
-import com.qcloud.cos.model.bucketCertificate.BucketPutDomainCertificate;
-import com.qcloud.cos.model.bucketCertificate.SetBucketDomainCertificateRequest;
+import com.qcloud.cos.model.bucketcertificate.BucketDomainCertificateRequest;
+import com.qcloud.cos.model.bucketcertificate.BucketGetDomainCertificate;
+import com.qcloud.cos.model.bucketcertificate.BucketPutDomainCertificate;
+import com.qcloud.cos.model.bucketcertificate.SetBucketDomainCertificateRequest;
 import com.qcloud.cos.model.ciModel.common.CImageProcessRequest;
 import com.qcloud.cos.model.ciModel.image.*;
 import com.qcloud.cos.exception.CosClientException;

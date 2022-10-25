@@ -27,7 +27,7 @@ import java.util.List;
 import com.qcloud.cos.internal.XmlResponsesSaxParser.CompleteMultipartUploadHandler;
 import com.qcloud.cos.internal.XmlResponsesSaxParser.CopyObjectResultHandler;
 import com.qcloud.cos.model.*;
-import com.qcloud.cos.model.bucketCertificate.BucketGetDomainCertificate;
+import com.qcloud.cos.model.bucketcertificate.BucketGetDomainCertificate;
 import com.qcloud.cos.model.ciModel.auditing.AudioAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.BatchImageAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.DocumentAuditingResponse;
