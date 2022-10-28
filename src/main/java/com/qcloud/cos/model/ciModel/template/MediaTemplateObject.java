@@ -1,6 +1,7 @@
 package com.qcloud.cos.model.ciModel.template;
 
 import com.qcloud.cos.model.ciModel.common.MediaCommonResponse;
+import com.qcloud.cos.model.ciModel.job.MediaConcatTemplateObject;
 import com.qcloud.cos.model.ciModel.job.MediaTransConfigObject;
 
 /**
@@ -26,6 +27,8 @@ public class MediaTemplateObject extends MediaCommonResponse {
     private MediaWatermark watermark;
 
     private MediaTransConfigObject transConfig;
+
+    private MediaConcatTemplateObject concatTemplate;
 
     public String getTemplateId() {
         return templateId;
@@ -76,7 +79,7 @@ public class MediaTemplateObject extends MediaCommonResponse {
     }
 
     public MediaTemplateTransTplObject getTransTpl() {
-        if (transTpl==null){
+        if (transTpl == null) {
             transTpl = new MediaTemplateTransTplObject();
         }
         return transTpl;
@@ -87,7 +90,7 @@ public class MediaTemplateObject extends MediaCommonResponse {
     }
 
     public MediaSnapshotObject getSnapshot() {
-        if (snapshot==null){
+        if (snapshot == null) {
             snapshot = new MediaSnapshotObject();
         }
         return snapshot;
@@ -98,7 +101,7 @@ public class MediaTemplateObject extends MediaCommonResponse {
     }
 
     public MediaWatermark getWatermark() {
-        if (watermark==null){
+        if (watermark == null) {
             watermark = new MediaWatermark();
         }
         return watermark;
@@ -116,19 +119,32 @@ public class MediaTemplateObject extends MediaCommonResponse {
         this.transConfig = transConfig;
     }
 
+    public MediaConcatTemplateObject getConcatTemplate() {
+        if (concatTemplate == null) {
+            concatTemplate = new MediaConcatTemplateObject();
+        }
+        return concatTemplate;
+    }
+
+    public void setConcatTemplate(MediaConcatTemplateObject concatTemplate) {
+        this.concatTemplate = concatTemplate;
+    }
+
     @Override
     public String toString() {
-        return "MediaTemplateObject{" +
-                "templateId='" + templateId + '\'' +
-                ", name='" + name + '\'' +
-                ", tag='" + tag + '\'' +
-                ", state='" + state + '\'' +
-                ", bucketId='" + bucketId + '\'' +
-                ", category='" + category + '\'' +
-                ", transTpl=" + transTpl +
-                ", snapshot=" + snapshot +
-                ", watermark=" + watermark +
-                ", transConfig=" + transConfig +
-                '}';
+        final StringBuilder sb = new StringBuilder("MediaTemplateObject{");
+        sb.append("templateId='").append(templateId).append('\'');
+        sb.append(", name='").append(name).append('\'');
+        sb.append(", tag='").append(tag).append('\'');
+        sb.append(", state='").append(state).append('\'');
+        sb.append(", bucketId='").append(bucketId).append('\'');
+        sb.append(", category='").append(category).append('\'');
+        sb.append(", transTpl=").append(transTpl);
+        sb.append(", snapshot=").append(snapshot);
+        sb.append(", watermark=").append(watermark);
+        sb.append(", transConfig=").append(transConfig);
+        sb.append(", concatTemplate=").append(concatTemplate);
+        sb.append('}');
+        return sb.toString();
     }
 }

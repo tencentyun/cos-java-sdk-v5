@@ -127,6 +127,11 @@ public class CIMediaXmlFactory {
             addAudio(xml, request.getAudio());
             addVideo(xml, request.getVideo());
             addTransConfig(xml, request.getTransConfig());
+        } else if ("Concat".equalsIgnoreCase(tag)) {
+            addConcat(xml, request.getConcat());
+            addAudio(xml,request.getAudio());
+            addAudioMix(xml,request.getAudioMix());
+            addContainer(xml, request.getContainer());
         }
         xml.end();
         return xml.getBytes();

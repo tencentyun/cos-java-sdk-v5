@@ -4822,6 +4822,13 @@ public class XmlResponsesSaxParser {
             if ("TemplateList".equalsIgnoreCase(name)) {
                 List<MediaTemplateObject> templateList = response.getTemplateList();
                 templateList.add(new MediaTemplateObject());
+            } else if (in("Response", "TemplateList", "ConcatTemplate") && "ConcatFragment".equalsIgnoreCase(name)) {
+                List<MediaTemplateObject> templateList = response.getTemplateList();
+                if (templateList != null && !templateList.isEmpty()) {
+                    MediaTemplateObject mediaTemplateObject = templateList.get(templateList.size() - 1);
+                    List<MediaConcatFragmentObject> concatFragmentList = mediaTemplateObject.getConcatTemplate().getConcatFragmentList();
+                    concatFragmentList.add(new MediaConcatFragmentObject());
+                }
             }
         }
 
@@ -4908,6 +4915,27 @@ public class XmlResponsesSaxParser {
             } else if (in("Response", "TemplateList", "Watermark", "Image")) {
                 MediaWaterMarkImage image = template.getWatermark().getImage();
                 ParserMediaInfoUtils.ParsingWatermarkImage(image, name, getText());
+            } else if (in("Response", "TemplateList", "ConcatTemplate", "ConcatFragment")) {
+                ParserMediaInfoUtils.ParseConcatFragment(getConcatFragment(template), name, getText());
+            } else if (in("Response", "TemplateList", "ConcatTemplate", "Audio")) {
+                ParserMediaInfoUtils.ParsingMediaAudio(template.getConcatTemplate().getAudio(), name, getText());
+            } else if (in("Response", "TemplateList", "ConcatTemplate", "Video")) {
+                ParserMediaInfoUtils.ParsingMediaVideo(template.getConcatTemplate().getVideo(), name, getText());
+            } else if (in("Response", "TemplateList", "ConcatTemplate", "Container")) {
+                if (name.equalsIgnoreCase("Format")) {
+                    template.getConcatTemplate().getContainer().setFormat(getText());
+                }
+            } else if (in("Response", "TemplateList", "ConcatTemplate", "AudioMix")) {
+                ParserMediaInfoUtils.ParseAudioMix(template.getConcatTemplate().getAudioMix(), name, getText());
+            }
+        }
+
+        public MediaConcatFragmentObject getConcatFragment(MediaTemplateObject template) {
+            List<MediaConcatFragmentObject> concatFragmentList = template.getConcatTemplate().getConcatFragmentList();
+            if (concatFragmentList != null && !concatFragmentList.isEmpty()) {
+                return concatFragmentList.get(concatFragmentList.size() - 1);
+            } else {
+                return new MediaConcatFragmentObject();
             }
         }
 

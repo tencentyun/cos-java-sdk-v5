@@ -13,11 +13,12 @@ import com.qcloud.cos.model.ciModel.auditing.SnapshotInfo;
 import com.qcloud.cos.model.ciModel.auditing.UserInfo;
 import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
 import com.qcloud.cos.model.ciModel.job.Md5Info;
+import com.qcloud.cos.model.ciModel.job.MediaAudioMixObject;
 import com.qcloud.cos.model.ciModel.job.MediaAudioObject;
+import com.qcloud.cos.model.ciModel.job.MediaConcatFragmentObject;
 import com.qcloud.cos.model.ciModel.job.MediaDigitalWatermark;
 import com.qcloud.cos.model.ciModel.job.MediaJobObject;
 import com.qcloud.cos.model.ciModel.job.MediaRemoveWaterMark;
-import com.qcloud.cos.model.ciModel.job.MediaResult;
 import com.qcloud.cos.model.ciModel.job.MediaTimeIntervalObject;
 import com.qcloud.cos.model.ciModel.job.MediaTransConfigObject;
 import com.qcloud.cos.model.ciModel.job.MediaTranscodeVideoObject;
@@ -1022,6 +1023,44 @@ public class ParserMediaInfoUtils {
                 break;
             case "StartTime":
                 result.setStartTime(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParseConcatFragment(MediaConcatFragmentObject result, String name, String value) {
+        switch (name) {
+            case "Mode":
+                result.setMode(value);
+                break;
+            case "Url":
+                result.setUrl(value);
+                break;
+            case "StartTime":
+                result.setStartTime(value);
+                break;
+            case "EndTime":
+                result.setEndTime(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParseAudioMix(MediaAudioMixObject result, String name, String value) {
+        switch (name) {
+            case "AudioSource":
+                result.setAudioSource(value);
+                break;
+            case "MixMode":
+                result.setMixMode(value);
+                break;
+            case "Replace":
+                result.setReplace(value);
+                break;
+            case "DirectMix":
+                result.setDirectMix(value);
                 break;
             default:
                 break;
