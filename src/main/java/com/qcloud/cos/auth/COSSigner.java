@@ -201,7 +201,11 @@ public class COSSigner {
                 continue;
             }
             String lowerKey = header.getKey().toLowerCase();
-            sortedSignHeaders.put(lowerKey, header.getValue().trim());
+            String value = "";
+            if (header.getValue()!=null){
+                value = header.getValue().trim();
+            }
+            sortedSignHeaders.put(lowerKey, value);
         }
         return sortedSignHeaders;
     }
