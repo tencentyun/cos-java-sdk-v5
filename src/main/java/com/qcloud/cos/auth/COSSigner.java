@@ -133,11 +133,8 @@ public class COSSigner {
 
         Map<String, String> signHeaders = buildSignHeaders(headerMap, signHost);
         // 签名中的参数和http 头部 都要进行字符串排序
-        TreeMap<String, String> sortedSignHeaders = new TreeMap<>();
-        TreeMap<String, String> sortedParams = new TreeMap<>();
-
-        sortedSignHeaders.putAll(signHeaders);
-        sortedParams.putAll(paramMap);
+        TreeMap<String, String> sortedSignHeaders = buildSortedMemberMap(signHeaders);
+        TreeMap<String, String> sortedParams = buildSortedMemberMap(paramMap);
 
         String qHeaderListStr = buildSignMemberStr(sortedSignHeaders);
         String qUrlParamListStr = buildSignMemberStr(sortedParams);
@@ -196,6 +193,19 @@ public class COSSigner {
         return signHeaders;
     }
 
+    private TreeMap<String, String> buildSortedMemberMap(Map<String, String> signHeaders){
+        TreeMap<String, String> sortedSignHeaders = new TreeMap<>();
+
+        for (Entry<String, String> header : signHeaders.entrySet()) {
+            if (header.getKey() == null) {
+                continue;
+            }
+            String lowerKey = header.getKey().toLowerCase();
+            sortedSignHeaders.put(lowerKey, header.getValue().trim());
+        }
+        return sortedSignHeaders;
+    }
+
     private String buildSignMemberStr(Map<String, String> signHeaders) {
         StringBuilder strBuilder = new StringBuilder();
         boolean seenOne = false;
@@ -205,7 +215,7 @@ public class COSSigner {
             } else {
                 strBuilder.append(";");
             }
-            strBuilder.append(UrlEncoderUtils.encode(key).toLowerCase());
+            strBuilder.append(UrlEncoderUtils.encode(key));
         }
         return strBuilder.toString();
     }
