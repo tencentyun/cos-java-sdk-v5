@@ -197,10 +197,10 @@ public class COSSigner {
         return signHeaders;
     }
 
-    private TreeMap<String, String> buildEncodeSortedMemberMap(Map<String, String> signHeaders){
+    private TreeMap<String, String> buildEncodeSortedMemberMap(Map<String, String> signElements){
         TreeMap<String, String> encodeSortedSignElements = new TreeMap<>();
 
-        for (Entry<String, String> header : signHeaders.entrySet()) {
+        for (Entry<String, String> header : signElements.entrySet()) {
             if (header.getKey() == null) {
                 continue;
             }
