@@ -133,21 +133,22 @@ public class COSSigner {
 
         Map<String, String> signHeaders = buildSignHeaders(headerMap, signHost);
         // 签名中的参数和http 头部 都要进行字符串排序
-        TreeMap<String, String> sortedSignHeaders = new TreeMap<>();
-        TreeMap<String, String> sortedParams = new TreeMap<>();
+        //对请求中的参数和http头部进行处理：对key先urlencode再小写处理，对value进行urlencode处理;
+        //生成 key 到 value 的映射 Map,根据key按照字典序排序
+        TreeMap<String, String> encodedSortedSignHeaders = buildEncodeSortedMemberMap(signHeaders);
+        TreeMap<String, String> encodedSortedParams = buildEncodeSortedMemberMap(paramMap);
 
-        sortedSignHeaders.putAll(signHeaders);
-        sortedParams.putAll(paramMap);
+        //生成keylist
+        String qHeaderListStr = buildSignMemberStr(encodedSortedSignHeaders);
+        String qUrlParamListStr = buildSignMemberStr(encodedSortedParams);
 
-        String qHeaderListStr = buildSignMemberStr(sortedSignHeaders);
-        String qUrlParamListStr = buildSignMemberStr(sortedParams);
         String qKeyTimeStr, qSignTimeStr;
         qKeyTimeStr = qSignTimeStr = buildTimeStr(startTime, expiredTime);
         String signKey = HmacUtils.hmacSha1Hex(cred.getCOSSecretKey(), qKeyTimeStr);
         String formatMethod = methodName.toString().toLowerCase();
         String formatUri = resouce_path;
-        String formatParameters = formatMapToStr(sortedParams);
-        String formatHeaders = formatMapToStr(sortedSignHeaders);
+        String formatParameters = formatMapToStr(encodedSortedParams);
+        String formatHeaders = formatMapToStr(encodedSortedSignHeaders);
 
         String formatStr = new StringBuilder().append(formatMethod).append(LINE_SEPARATOR)
                 .append(formatUri).append(LINE_SEPARATOR).append(formatParameters)
@@ -196,6 +197,24 @@ public class COSSigner {
         return signHeaders;
     }
 
+    private TreeMap<String, String> buildEncodeSortedMemberMap(Map<String, String> signElements){
+        TreeMap<String, String> encodeSortedSignElements = new TreeMap<>();
+
+        for (Entry<String, String> header : signElements.entrySet()) {
+            if (header.getKey() == null) {
+                continue;
+            }
+            String encodeLowerKey = UrlEncoderUtils.encode(header.getKey().trim()).toLowerCase();
+            String value = "";
+            if (header.getValue()!=null){
+                value = header.getValue().trim();
+            }
+            String encodeValue = UrlEncoderUtils.encode(value);
+            encodeSortedSignElements.put(encodeLowerKey, encodeValue);
+        }
+        return encodeSortedSignElements;
+    }
+
     private String buildSignMemberStr(Map<String, String> signHeaders) {
         StringBuilder strBuilder = new StringBuilder();
         boolean seenOne = false;
@@ -205,7 +224,7 @@ public class COSSigner {
             } else {
                 strBuilder.append(";");
             }
-            strBuilder.append(UrlEncoderUtils.encode(key).toLowerCase());
+            strBuilder.append(key);
         }
         return strBuilder.toString();
     }
@@ -216,18 +235,12 @@ public class COSSigner {
         for (Entry<String, String> entry : kVMap.entrySet()) {
             String key = entry.getKey();
             String value = entry.getValue();
-            String encodeKey = UrlEncoderUtils.encode(key);
-            String lowerEncodeKey = encodeKey.toLowerCase();
-            String encodedValue = "";
-            if (value != null) {
-                encodedValue = UrlEncoderUtils.encode(value);
-            }
             if (!seeOne) {
                 seeOne = true;
             } else {
                 strBuilder.append("&");
             }
-            strBuilder.append(lowerEncodeKey).append("=").append(encodedValue);
+            strBuilder.append(key).append("=").append(value);
         }
         return strBuilder.toString();
     }
