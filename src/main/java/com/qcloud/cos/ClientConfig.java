@@ -89,6 +89,9 @@ public class ClientConfig {
     private int readLimit = DEFAULT_READ_LIMIT;
     private COSSigner cosSigner = new COSSigner();
 
+    //是否区分host与endpoint
+    private  boolean isDistinguishHost = false;
+
     // 数据万象特殊请求配置
     private boolean ciSpecialRequest = false;
 
@@ -291,5 +294,13 @@ public class ClientConfig {
 
     public void setCiSpecialRequest(boolean ciSpecialRequest) {
         this.ciSpecialRequest = ciSpecialRequest;
+    }
+
+    public void setIsDistinguishHost(boolean isDistinguishHost) {
+        this.isDistinguishHost = isDistinguishHost;
+    }
+
+    public boolean getIsDistinguishHost() {
+        return isDistinguishHost;
     }
 }
