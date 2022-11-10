@@ -547,7 +547,13 @@ public class COSClient implements COS {
                     "endpointAddr is null, please check your endpoint resolver");
         }
 
-        request.addHeader(Headers.HOST, endpoint);
+        if (clientConfig.getIsDistinguishHost()) {
+            String host = String.format("%s.%s.myqcloud.com", bucket, Region.formatRegion(clientConfig.getRegion()));
+            request.addHeader(Headers.HOST,host);
+        }else{
+            request.addHeader(Headers.HOST, endpoint);
+        }
+
         if (isCIRequest && !clientConfig.getCiSpecialRequest()) {
             //万象请求只支持https
             request.setProtocol(HttpProtocol.https);
