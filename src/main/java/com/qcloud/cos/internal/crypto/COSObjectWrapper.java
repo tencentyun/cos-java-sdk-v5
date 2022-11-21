@@ -155,7 +155,7 @@ public class COSObjectWrapper implements Closeable {
         }
         ObjectMetadata meta = cosobj.getObjectMetadata();
         Map<String, String> userMeta = meta.getUserMetadata();
-        String cekAlgo = userMeta.get(Headers.CRYPTO_CEK_ALGORITHM);
+        String cekAlgo = userMeta.get(Headers.ENCRYPTION_CEK_ALG);
         return ContentCryptoScheme.fromCEKAlgo(cekAlgo);
     }
 }
