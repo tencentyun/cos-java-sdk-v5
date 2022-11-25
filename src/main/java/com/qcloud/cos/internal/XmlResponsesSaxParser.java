@@ -83,6 +83,7 @@ import com.qcloud.cos.model.ciModel.image.ImageLabelV2Response;
 import com.qcloud.cos.model.ciModel.image.Lobel;
 import com.qcloud.cos.model.ciModel.image.LobelV2;
 import com.qcloud.cos.model.ciModel.image.LocationLabel;
+import com.qcloud.cos.model.ciModel.job.MediaBodyInfo;
 import com.qcloud.cos.model.ciModel.job.DocJobDetail;
 import com.qcloud.cos.model.ciModel.job.DocJobListResponse;
 import com.qcloud.cos.model.ciModel.job.DocJobResponse;
@@ -101,19 +102,22 @@ import com.qcloud.cos.model.ciModel.job.MediaJobOperation;
 import com.qcloud.cos.model.ciModel.job.MediaJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaListJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaPicProcessTemplateObject;
+import com.qcloud.cos.model.ciModel.job.MediaRecognition;
 import com.qcloud.cos.model.ciModel.job.MediaRemoveWaterMark;
 import com.qcloud.cos.model.ciModel.job.MediaTimeIntervalObject;
+import com.qcloud.cos.model.ciModel.job.MediaTopkRecognition;
 import com.qcloud.cos.model.ciModel.job.MediaTransConfigObject;
 import com.qcloud.cos.model.ciModel.job.MediaTranscodeVideoObject;
 import com.qcloud.cos.model.ciModel.job.MediaVideoObject;
 import com.qcloud.cos.model.ciModel.job.OutputFile;
 import com.qcloud.cos.model.ciModel.job.ProcessResult;
+import com.qcloud.cos.model.ciModel.job.VideoTargetRec;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaFormat;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoAudio;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoResponse;
+import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoStream;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoSubtitle;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoVideo;
-import com.qcloud.cos.model.ciModel.mediaInfo.MediaStream;
 import com.qcloud.cos.model.ciModel.persistence.CIObject;
 import com.qcloud.cos.model.ciModel.persistence.CIUploadResult;
 import com.qcloud.cos.model.ciModel.persistence.ImageInfo;
@@ -4236,8 +4240,33 @@ public class XmlResponsesSaxParser {
 
         @Override
         protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
-            if ("ConcatFragment".equals(name)){
+            VideoTargetRec videoTargetRec = response.getJobsDetail().getOperation().getVideoTargetRec();
+            if ("ConcatFragment".equals(name)) {
                 concatFragmentList.add(new MediaConcatFragmentObject());
+            } else if (in("Response", "JobsDetail", "Operation", "VideoTargetRecResult", "BodyRecognition") && "BodyInfo".equalsIgnoreCase(name)) {
+                MediaRecognition bodyRecognition = videoTargetRec.getBodyRecognition();
+                bodyRecognition.getInfoList().add(new MediaBodyInfo());
+            } else if (in("Response", "JobsDetail", "Operation", "VideoTargetRecResult", "CarRecognition") && "CarInfo".equalsIgnoreCase(name)) {
+                MediaRecognition carRecognition = videoTargetRec.getCarRecognition();
+                carRecognition.getInfoList().add(new MediaBodyInfo());
+            } else if (in("Response", "JobsDetail", "Operation", "VideoTargetRecResult", "PetRecognition") && "PetInfo".equalsIgnoreCase(name)) {
+                MediaRecognition petRecognition = videoTargetRec.getPetRecognition();
+                petRecognition.getInfoList().add(new MediaBodyInfo());
+            } else if (in("Response", "JobsDetail", "Operation", "VideoTargetRecResult") && "TopKRecognition".equalsIgnoreCase(name)) {
+                List<MediaTopkRecognition> topKRecognition = videoTargetRec.getTopKRecognition();
+                topKRecognition.add(new MediaTopkRecognition());
+            } else if (in("Response", "JobsDetail", "Operation", "VideoTargetRecResult", "TopKRecognition")){
+                List<MediaTopkRecognition> topKRecognition = videoTargetRec.getTopKRecognition();
+                if (!topKRecognition.isEmpty()){
+                    MediaTopkRecognition mediaTopkRecognition = topKRecognition.get(topKRecognition.size() - 1);
+                    if ("BodyInfo".equalsIgnoreCase(name)) {
+                        mediaTopkRecognition.getBodyInfoList().add(new MediaBodyInfo());
+                    } else if ("CarInfo".equalsIgnoreCase(name)) {
+                        mediaTopkRecognition.getCarInfoList().add(new MediaBodyInfo());
+                    } else if ("PetInfo".equalsIgnoreCase(name)) {
+                        mediaTopkRecognition.getPetInfoList().add(new MediaBodyInfo());
+                    }
+                }
             }
         }
 
@@ -4296,6 +4325,9 @@ public class XmlResponsesSaxParser {
                         break;
                     case "TemplateName":
                         operation.setTemplateName(getText());
+                        break;
+                    case "DecryptKey":
+                        operation.setDecryptKey(getText());
                         break;
                     default:
                         break;
@@ -4418,6 +4450,127 @@ public class XmlResponsesSaxParser {
             } else if (in("Response", "JobsDetail", "Operation", "PicProcessResult", "ProcessResult")) {
                 ProcessResult processResult = jobsDetail.getOperation().getPicProcessResult().getProcessResult();
                 ParserMediaInfoUtils.ParsingProcessResult(processResult, name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "VideoTargetRec")) {
+                VideoTargetRec videoTargetRec = jobsDetail.getOperation().getVideoTargetRec();
+                ParserMediaInfoUtils.ParsingVideoTargetRec(videoTargetRec, name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "VideoTargetRecResult", "BodyRecognition")) {
+                VideoTargetRec videoTargetRec = jobsDetail.getOperation().getVideoTargetRec();
+                ParserMediaInfoUtils.ParseMediaRecognition(videoTargetRec.getBodyRecognition(), name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "VideoTargetRecResult", "CarRecognition")) {
+                VideoTargetRec videoTargetRec = jobsDetail.getOperation().getVideoTargetRec();
+                ParserMediaInfoUtils.ParseMediaRecognition(videoTargetRec.getCarRecognition(), name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "VideoTargetRecResult", "PetRecognition")) {
+                VideoTargetRec videoTargetRec = jobsDetail.getOperation().getVideoTargetRec();
+                ParserMediaInfoUtils.ParseMediaRecognition(videoTargetRec.getPetRecognition(), name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "VideoTargetRecResult", "TopKRecognition")) {
+                VideoTargetRec videoTargetRec = jobsDetail.getOperation().getVideoTargetRec();
+                List<MediaTopkRecognition> topKRecognition = videoTargetRec.getTopKRecognition();
+                if (!topKRecognition.isEmpty()){
+                    MediaTopkRecognition mediaTopkRecognition = topKRecognition.get(topKRecognition.size() - 1);
+                    ParserMediaInfoUtils.ParseMediaRecognition(mediaTopkRecognition, name, getText());
+                }
+            } else if (in("Response", "JobsDetail", "Operation", "VideoTargetRecResult", "BodyRecognition", "BodyInfo")) {
+                VideoTargetRec videoTargetRec = jobsDetail.getOperation().getVideoTargetRec();
+                List<MediaBodyInfo> bodyInfoList = videoTargetRec.getBodyRecognition().getInfoList();
+                if (!bodyInfoList.isEmpty()) {
+                    MediaBodyInfo mediaBodyInfo = bodyInfoList.get(bodyInfoList.size() - 1);
+                    ParserMediaInfoUtils.ParseMediaBodyInfo(mediaBodyInfo, name, getText());
+                }
+            } else if (in("Response", "JobsDetail", "Operation", "VideoTargetRecResult", "CarRecognition", "CarInfo")) {
+                VideoTargetRec videoTargetRec = jobsDetail.getOperation().getVideoTargetRec();
+                List<MediaBodyInfo> catInfoList = videoTargetRec.getCarRecognition().getInfoList();
+                if (!catInfoList.isEmpty()) {
+                    MediaBodyInfo mediaBodyInfo = catInfoList.get(catInfoList.size() - 1);
+                    ParserMediaInfoUtils.ParseMediaBodyInfo(mediaBodyInfo, name, getText());
+                }
+            } else if (in("Response", "JobsDetail", "Operation", "VideoTargetRecResult", "PetRecognition", "PetInfo")) {
+                VideoTargetRec videoTargetRec = jobsDetail.getOperation().getVideoTargetRec();
+                List<MediaBodyInfo> petInfo = videoTargetRec.getPetRecognition().getInfoList();
+                if (!petInfo.isEmpty()) {
+                    MediaBodyInfo mediaBodyInfo = petInfo.get(petInfo.size() - 1);
+                    ParserMediaInfoUtils.ParseMediaBodyInfo(mediaBodyInfo, name, getText());
+                }
+            } else if (in("Response", "JobsDetail", "Operation", "VideoTargetRecResult", "BodyRecognition", "BodyInfo", "Location")) {
+                VideoTargetRec videoTargetRec = jobsDetail.getOperation().getVideoTargetRec();
+                List<MediaBodyInfo> bodyInfoList = videoTargetRec.getBodyRecognition().getInfoList();
+                if (!bodyInfoList.isEmpty()) {
+                    MediaBodyInfo mediaBodyInfo = bodyInfoList.get(bodyInfoList.size() - 1);
+                    ParserMediaInfoUtils.ParseLocation(mediaBodyInfo.getLocation(), name, getText());
+                }
+            } else if (in("Response", "JobsDetail", "Operation", "VideoTargetRecResult", "CarRecognition", "CarInfo", "Location")) {
+                VideoTargetRec videoTargetRec = jobsDetail.getOperation().getVideoTargetRec();
+                List<MediaBodyInfo> catInfoList = videoTargetRec.getCarRecognition().getInfoList();
+                if (!catInfoList.isEmpty()) {
+                    MediaBodyInfo mediaBodyInfo = catInfoList.get(catInfoList.size() - 1);
+                    ParserMediaInfoUtils.ParseLocation(mediaBodyInfo.getLocation(), name, getText());
+                }
+            } else if (in("Response", "JobsDetail", "Operation", "VideoTargetRecResult", "PetRecognition", "PetInfo", "Location")) {
+                VideoTargetRec videoTargetRec = jobsDetail.getOperation().getVideoTargetRec();
+                List<MediaBodyInfo> petInfo = videoTargetRec.getPetRecognition().getInfoList();
+                if (!petInfo.isEmpty()) {
+                    MediaBodyInfo mediaBodyInfo = petInfo.get(petInfo.size() - 1);
+                    ParserMediaInfoUtils.ParseLocation(mediaBodyInfo.getLocation(), name, getText());
+                }
+            } else if (in("Response", "JobsDetail", "Operation", "VideoTargetRecResult", "TopKRecognition", "BodyInfo")) {
+                VideoTargetRec videoTargetRec = jobsDetail.getOperation().getVideoTargetRec();
+                List<MediaTopkRecognition> topKRecognition = videoTargetRec.getTopKRecognition();
+                if (!topKRecognition.isEmpty()) {
+                    List<MediaBodyInfo> bodyInfoList = topKRecognition.get(topKRecognition.size() - 1).getBodyInfoList();
+                    if (!bodyInfoList.isEmpty()) {
+                        MediaBodyInfo mediaBodyInfo = bodyInfoList.get(bodyInfoList.size() - 1);
+                        ParserMediaInfoUtils.ParseMediaBodyInfo(mediaBodyInfo, name, getText());
+                    }
+                }
+            } else if (in("Response", "JobsDetail", "Operation", "VideoTargetRecResult", "TopKRecognition", "CarInfo")) {
+                VideoTargetRec videoTargetRec = jobsDetail.getOperation().getVideoTargetRec();
+                List<MediaTopkRecognition> topKRecognition = videoTargetRec.getTopKRecognition();
+                if (!topKRecognition.isEmpty()) {
+                    List<MediaBodyInfo> bodyInfoList = topKRecognition.get(topKRecognition.size() - 1).getCarInfoList();
+                    if (!bodyInfoList.isEmpty()) {
+                        MediaBodyInfo mediaBodyInfo = bodyInfoList.get(bodyInfoList.size() - 1);
+                        ParserMediaInfoUtils.ParseMediaBodyInfo(mediaBodyInfo, name, getText());
+                    }
+                }
+            } else if (in("Response", "JobsDetail", "Operation", "VideoTargetRecResult", "TopKRecognition", "PetInfo")) {
+                VideoTargetRec videoTargetRec = jobsDetail.getOperation().getVideoTargetRec();
+                List<MediaTopkRecognition> topKRecognition = videoTargetRec.getTopKRecognition();
+                if (!topKRecognition.isEmpty()) {
+                    List<MediaBodyInfo> bodyInfoList = topKRecognition.get(topKRecognition.size() - 1).getPetInfoList();
+                    if (!bodyInfoList.isEmpty()) {
+                        MediaBodyInfo mediaBodyInfo = bodyInfoList.get(bodyInfoList.size() - 1);
+                        ParserMediaInfoUtils.ParseMediaBodyInfo(mediaBodyInfo, name, getText());
+                    }
+                }
+            } else if (in("Response", "JobsDetail", "Operation", "VideoTargetRecResult", "TopKRecognition", "BodyInfo", "Location")) {
+                VideoTargetRec videoTargetRec = jobsDetail.getOperation().getVideoTargetRec();
+                List<MediaTopkRecognition> topKRecognition = videoTargetRec.getTopKRecognition();
+                if (!topKRecognition.isEmpty()) {
+                    List<MediaBodyInfo> bodyInfoList = topKRecognition.get(topKRecognition.size() - 1).getBodyInfoList();
+                    if (!bodyInfoList.isEmpty()) {
+                        MediaBodyInfo mediaBodyInfo = bodyInfoList.get(bodyInfoList.size() - 1);
+                        ParserMediaInfoUtils.ParseLocation(mediaBodyInfo.getLocation(), name, getText());
+                    }
+                }
+            } else if (in("Response", "JobsDetail", "Operation", "VideoTargetRecResult", "TopKRecognition", "CarInfo", "Location")) {
+                VideoTargetRec videoTargetRec = jobsDetail.getOperation().getVideoTargetRec();
+                List<MediaTopkRecognition> topKRecognition = videoTargetRec.getTopKRecognition();
+                if (!topKRecognition.isEmpty()) {
+                    List<MediaBodyInfo> bodyInfoList = topKRecognition.get(topKRecognition.size() - 1).getCarInfoList();
+                    if (!bodyInfoList.isEmpty()) {
+                        MediaBodyInfo mediaBodyInfo = bodyInfoList.get(bodyInfoList.size() - 1);
+                        ParserMediaInfoUtils.ParseLocation(mediaBodyInfo.getLocation(), name, getText());
+                    }
+                }
+            } else if (in("Response", "JobsDetail", "Operation", "VideoTargetRecResult", "TopKRecognition", "PetInfo", "Location")) {
+                VideoTargetRec videoTargetRec = jobsDetail.getOperation().getVideoTargetRec();
+                List<MediaTopkRecognition> topKRecognition = videoTargetRec.getTopKRecognition();
+                if (!topKRecognition.isEmpty()) {
+                    List<MediaBodyInfo> bodyInfoList = topKRecognition.get(topKRecognition.size() - 1).getPetInfoList();
+                    if (!bodyInfoList.isEmpty()) {
+                        MediaBodyInfo mediaBodyInfo = bodyInfoList.get(bodyInfoList.size() - 1);
+                        ParserMediaInfoUtils.ParseLocation(mediaBodyInfo.getLocation(), name, getText());
+                    }
+                }
             }
         }
 
@@ -4628,6 +4781,9 @@ public class XmlResponsesSaxParser {
             } else if (in("Response", "JobsDetail", "Operation", "PicProcessResult", "ProcessResult")) {
                 ProcessResult processResult = jobsDetail.getOperation().getPicProcessResult().getProcessResult();
                 ParserMediaInfoUtils.ParsingProcessResult(processResult, name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "VideoTargetRec")) {
+                VideoTargetRec videoTargetRec = jobsDetail.getOperation().getVideoTargetRec();
+                ParserMediaInfoUtils.ParsingVideoTargetRec(videoTargetRec, name, getText());
             }
         }
 
@@ -4779,6 +4935,9 @@ public class XmlResponsesSaxParser {
             } else if (in("Response", "Template", "Watermark", "Image")) {
                 MediaWaterMarkImage image = response.getTemplate().getWatermark().getImage();
                 ParserMediaInfoUtils.ParsingWatermarkImage(image, name, getText());
+            } else if (in("Response", "Template", "VideoTargetRec")) {
+                VideoTargetRec videoTargetRec = response.getTemplate().getVideoTargetRec();
+                ParserMediaInfoUtils.ParsingVideoTargetRec(videoTargetRec, name, getText());
             }
         }
 
@@ -4927,6 +5086,8 @@ public class XmlResponsesSaxParser {
                 }
             } else if (in("Response", "TemplateList", "ConcatTemplate", "AudioMix")) {
                 ParserMediaInfoUtils.ParseAudioMix(template.getConcatTemplate().getAudioMix(), name, getText());
+            } else if (in("Response", "TemplateList", "ConcatTemplate", "VideoTargetRec")) {
+                ParserMediaInfoUtils.ParsingVideoTargetRec(template.getVideoTargetRec(), name, getText());
             }
         }
 
@@ -4949,24 +5110,36 @@ public class XmlResponsesSaxParser {
 
         @Override
         protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
-
+            if (in("Response", "MediaInfo", "Stream") && "Video".equalsIgnoreCase(name)) {
+                List<MediaInfoVideo> mediaInfoVideoList = response.getMediaInfo().getStream().getMediaInfoVideoList();
+                mediaInfoVideoList.add(new MediaInfoVideo());
+            }if (in("Response", "MediaInfo", "Stream") && "Audio".equalsIgnoreCase(name)) {
+                List<MediaInfoAudio> mediaInfoAudioList = response.getMediaInfo().getStream().getMediaInfoAudioList();
+                mediaInfoAudioList.add(new MediaInfoAudio());
+            }
         }
 
         @Override
         protected void doEndElement(String uri, String name, String qName) {
-            MediaStream stream = response.getMediaInfo().getStream();
+            MediaInfoStream stream = response.getMediaInfo().getStream();
             if (in("Response", "MediaInfo", "Format")) {
                 MediaFormat format = response.getMediaInfo().getFormat();
                 ParserMediaInfoUtils.ParsingMediaFormat(format, name, getText());
             } else if (in("Response", "MediaInfo", "Stream", "Audio")) {
-                MediaInfoAudio audio = stream.getAudio();
-                ParserMediaInfoUtils.ParsingStreamAudio(audio, name, getText());
+                List<MediaInfoAudio> mediaInfoAudioList = stream.getMediaInfoAudioList();
+                if (!mediaInfoAudioList.isEmpty()) {
+                    MediaInfoAudio audio = stream.getMediaInfoAudioList().get(mediaInfoAudioList.size() - 1);
+                    ParserMediaInfoUtils.ParsingStreamAudio(audio, name, getText());
+                }
             } else if (in("Response", "MediaInfo", "Stream", "Subtitle")) {
                 MediaInfoSubtitle subtitle = stream.getSubtitle();
                 ParserMediaInfoUtils.ParsingSubtitle(subtitle, name, getText());
             } else if (in("Response", "MediaInfo", "Stream", "Video")) {
-                MediaInfoVideo video = stream.getVideo();
-                ParserMediaInfoUtils.ParsingMediaVideo(video, name, getText());
+                List<MediaInfoVideo> mediaInfoVideoList = stream.getMediaInfoVideoList();
+                if (!mediaInfoVideoList.isEmpty()) {
+                    MediaInfoVideo video = stream.getMediaInfoVideoList().get(mediaInfoVideoList.size() - 1);
+                    ParserMediaInfoUtils.ParsingMediaVideo(video, name, getText());
+                }
             }
         }
 

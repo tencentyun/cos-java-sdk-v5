@@ -58,6 +58,8 @@ public class MediaTemplateRequest extends CIServiceRequest implements Serializab
 
     private MediaAudioMixObject audioMix;
 
+    private VideoTargetRec videoTargetRec;
+
     /**
      * 第几页
      */
@@ -224,6 +226,17 @@ public class MediaTemplateRequest extends CIServiceRequest implements Serializab
 
     public void setAudioMix(MediaAudioMixObject audioMix) {
         this.audioMix = audioMix;
+    }
+
+    public VideoTargetRec getVideoTargetRec() {
+        if (videoTargetRec == null) {
+            videoTargetRec = new VideoTargetRec();
+        }
+        return videoTargetRec;
+    }
+
+    public void setVideoTargetRec(VideoTargetRec videoTargetRec) {
+        this.videoTargetRec = videoTargetRec;
     }
 
     @Override

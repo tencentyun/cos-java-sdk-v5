@@ -6,6 +6,7 @@ import com.qcloud.cos.model.ciModel.auditing.BatchImageJobDetail;
 import com.qcloud.cos.model.ciModel.auditing.LanguageResult;
 import com.qcloud.cos.model.ciModel.auditing.LibResult;
 import com.qcloud.cos.model.ciModel.auditing.ListResult;
+import com.qcloud.cos.model.ciModel.auditing.ObjectResults;
 import com.qcloud.cos.model.ciModel.auditing.OcrResults;
 import com.qcloud.cos.model.ciModel.auditing.PoliticsInfoObjectResults;
 import com.qcloud.cos.model.ciModel.auditing.SectionInfo;
@@ -15,16 +16,20 @@ import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
 import com.qcloud.cos.model.ciModel.job.Md5Info;
 import com.qcloud.cos.model.ciModel.job.MediaAudioMixObject;
 import com.qcloud.cos.model.ciModel.job.MediaAudioObject;
+import com.qcloud.cos.model.ciModel.job.MediaBodyInfo;
 import com.qcloud.cos.model.ciModel.job.MediaConcatFragmentObject;
 import com.qcloud.cos.model.ciModel.job.MediaDigitalWatermark;
 import com.qcloud.cos.model.ciModel.job.MediaJobObject;
+import com.qcloud.cos.model.ciModel.job.MediaRecognition;
 import com.qcloud.cos.model.ciModel.job.MediaRemoveWaterMark;
 import com.qcloud.cos.model.ciModel.job.MediaTimeIntervalObject;
+import com.qcloud.cos.model.ciModel.job.MediaTopkRecognition;
 import com.qcloud.cos.model.ciModel.job.MediaTransConfigObject;
 import com.qcloud.cos.model.ciModel.job.MediaTranscodeVideoObject;
 import com.qcloud.cos.model.ciModel.job.MediaVideoObject;
 import com.qcloud.cos.model.ciModel.job.OutputFile;
 import com.qcloud.cos.model.ciModel.job.ProcessResult;
+import com.qcloud.cos.model.ciModel.job.VideoTargetRec;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaFormat;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoAudio;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoSubtitle;
@@ -1061,6 +1066,87 @@ public class ParserMediaInfoUtils {
                 break;
             case "DirectMix":
                 result.setDirectMix(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParsingVideoTargetRec(VideoTargetRec videoTargetRec, String name, String value) {
+        switch (name) {
+            case "Body":
+                videoTargetRec.setBody(value);
+                break;
+            case "Pet":
+                videoTargetRec.setPet(value);
+                break;
+            case "Car":
+                videoTargetRec.setCar(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParseMediaBodyInfo(MediaBodyInfo videoTargetRec, String name, String value) {
+        switch (name) {
+            case "Score":
+                videoTargetRec.setScore(value);
+                break;
+            case "Name":
+                videoTargetRec.setName(value);
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    public static void ParseMediaRecognition(MediaRecognition recognition, String name, String value) {
+        switch (name) {
+            case "Time":
+                recognition.setTime(value);
+                break;
+            case "Url":
+                recognition.setUrl(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParseMediaRecognition(MediaTopkRecognition recognition, String name, String value) {
+        switch (name) {
+            case "Time":
+                recognition.setTime(value);
+                break;
+            case "Url":
+                recognition.setUrl(value);
+                break;
+            case "Score":
+                recognition.setScore(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParseLocation(ObjectResults.Location location, String name, String value) {
+        switch (name) {
+            case "Height":
+                location.setHeight(value);
+                break;
+           case "Width":
+                location.setWidth(value);
+                break;
+           case "Rotate":
+                location.setRotate(value);
+                break;
+           case "X":
+                location.setX(value);
+                break;
+           case "Y":
+                location.setY(value);
                 break;
             default:
                 break;

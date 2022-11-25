@@ -32,7 +32,7 @@ public class DocHtmlRequest extends CosServiceRequest {
      * 基础图片处理 https://cloud.tencent.com/document/product/460/6924
      * 管道操作符 https://cloud.tencent.com/document/product/460/15293
      */
-    private String ImageParams;
+    private String imageParams;
 
     /**
      * 表格文件参数，转换第 X 个表，默认为1
@@ -66,10 +66,11 @@ public class DocHtmlRequest extends CosServiceRequest {
      */
     private String scale;
 
+    private String excelPaperSize;
+
     private String imageDpi;
 
     private DocType dstType = DocType.html;
-
 
     public enum DocType {
         html, jpg, png
@@ -108,11 +109,11 @@ public class DocHtmlRequest extends CosServiceRequest {
     }
 
     public String getImageParams() {
-        return ImageParams;
+        return imageParams;
     }
 
     public void setImageParams(String imageParams) {
-        ImageParams = imageParams;
+        this.imageParams = imageParams;
     }
 
     public String getSheet() {
@@ -181,6 +182,14 @@ public class DocHtmlRequest extends CosServiceRequest {
         this.dstType = dstType;
     }
 
+    public String getExcelPaperSize() {
+        return excelPaperSize;
+    }
+
+    public void setExcelPaperSize(String excelPaperSize) {
+        this.excelPaperSize = excelPaperSize;
+    }
+
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("DocHtmlRequest{");
@@ -188,15 +197,16 @@ public class DocHtmlRequest extends CosServiceRequest {
         sb.append(", objectKey='").append(objectKey).append('\'');
         sb.append(", srcType='").append(srcType).append('\'');
         sb.append(", page='").append(page).append('\'');
-        sb.append(", ImageParams='").append(ImageParams).append('\'');
+        sb.append(", imageParams='").append(imageParams).append('\'');
         sb.append(", sheet='").append(sheet).append('\'');
-        sb.append(", dstType='").append(dstType).append('\'');
         sb.append(", password='").append(password).append('\'');
         sb.append(", comment='").append(comment).append('\'');
         sb.append(", excelPaperDirection='").append(excelPaperDirection).append('\'');
         sb.append(", quality='").append(quality).append('\'');
         sb.append(", scale='").append(scale).append('\'');
+        sb.append(", excelPaperSize='").append(excelPaperSize).append('\'');
         sb.append(", imageDpi='").append(imageDpi).append('\'');
+        sb.append(", dstType=").append(dstType);
         sb.append('}');
         return sb.toString();
     }
