@@ -92,6 +92,9 @@ public class ClientConfig {
     // 数据万象特殊请求配置
     private boolean ciSpecialRequest = false;
 
+    //是否区分host与endpoint
+    private  boolean isDistinguishHost = false;
+
     // 不传入region 用于后续调用List Buckets(获取所有的bucket信息)
     public ClientConfig() {
         super();
@@ -291,5 +294,13 @@ public class ClientConfig {
 
     public void setCiSpecialRequest(boolean ciSpecialRequest) {
         this.ciSpecialRequest = ciSpecialRequest;
+    }
+
+    public void setIsDistinguishHost(boolean isDistinguishHost) {
+        this.isDistinguishHost = isDistinguishHost;
+    }
+
+    public boolean getIsDistinguishHost() {
+        return isDistinguishHost;
     }
 }
