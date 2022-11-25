@@ -20,6 +20,7 @@ import com.qcloud.cos.model.ciModel.job.MediaTransConfigObject;
 import com.qcloud.cos.model.ciModel.job.MediaTranscodeObject;
 import com.qcloud.cos.model.ciModel.job.MediaTranscodeVideoObject;
 import com.qcloud.cos.model.ciModel.job.MediaVideoObject;
+import com.qcloud.cos.model.ciModel.job.VideoTargetRec;
 import com.qcloud.cos.model.ciModel.template.MediaHlsEncryptObject;
 import com.qcloud.cos.model.ciModel.template.MediaSegmentObject;
 import com.qcloud.cos.model.ciModel.template.MediaSmartCoverObject;
@@ -127,8 +128,17 @@ public class CIMediaXmlFactory {
             addAudio(xml, request.getAudio());
             addVideo(xml, request.getVideo());
             addTransConfig(xml, request.getTransConfig());
+        } else if ("Concat".equalsIgnoreCase(tag)) {
+            addConcat(xml, request.getConcat());
+            addAudio(xml, request.getAudio());
+            addAudioMix(xml, request.getAudioMix());
+            addContainer(xml, request.getContainer());
+        } else if ("VideoTargetRec".equalsIgnoreCase(tag)) {
+            VideoTargetRec videoTargetRec = request.getVideoTargetRec();
+            addVideoTargetRec(xml, videoTargetRec);
         }
         xml.end();
+        System.out.println(xml);
         return xml.getBytes();
     }
 
@@ -138,6 +148,8 @@ public class CIMediaXmlFactory {
 
         addIfNotNull(xml, "TemplateId", operation.getTemplateId());
         addIfNotNull(xml, "JobLevel", operation.getJobLevel());
+        addIfNotNull(xml, "DecryptKey", operation.getDecryptKey());
+        addIfNotNull(xml, "UserData", operation.getUserData());
 
         addWatermarkTemplateId(xml, operation.getWatermarkTemplateId());
         addWatermar(xml, operation.getWatermark());
@@ -152,7 +164,8 @@ public class CIMediaXmlFactory {
         addSegment(xml, operation.getSegment());
         addSmartCover(xml, operation.getSmartCover());
         addVideoMontage(xml, operation.getVideoMontage());
-        addPicProcess(xml,request.getOperation().getPicProcess());
+        addPicProcess(xml, operation.getPicProcess());
+        addVideoTargetRec(xml, operation.getVideoTargetRec());
         xml.end();
     }
 
@@ -161,6 +174,16 @@ public class CIMediaXmlFactory {
             xml.start("PicProcess");
             addIfNotNull(xml, "IsPicInfo", picProcess.getIsPicInfo());
             addIfNotNull(xml, "ProcessRule", picProcess.getProcessRule());
+            xml.end();
+        }
+    }
+
+    private static void addVideoTargetRec(XmlWriter xml, VideoTargetRec videoTargetRec) {
+        if (objIsNotValid(videoTargetRec)) {
+            xml.start("VideoTargetRec");
+            addIfNotNull(xml, "Body", videoTargetRec.getBody());
+            addIfNotNull(xml, "Car", videoTargetRec.getCar());
+            addIfNotNull(xml, "Pet", videoTargetRec.getPet());
             xml.end();
         }
     }

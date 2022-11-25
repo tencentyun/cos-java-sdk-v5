@@ -3770,7 +3770,7 @@ public class COSClient implements COS {
     }
 
     @Override
-    public MediaJobResponse createMediaJobs(MediaJobsRequest req) throws UnsupportedEncodingException {
+    public MediaJobResponse createMediaJobs(MediaJobsRequest req)  {
         this.checkCIRequestCommon(req);
         rejectNull(req.getTag(),
                 "The tag parameter must be specified setting the object tags");
@@ -4258,6 +4258,7 @@ public class COSClient implements COS {
         uriBuilder.addParameter("password", originalRequest.getPassword());
         uriBuilder.addParameter("comment", originalRequest.getComment());
         uriBuilder.addParameter("excelPaperDirection", originalRequest.getExcelPaperDirection());
+        uriBuilder.addParameter("excelPaperSize", originalRequest.getExcelPaperSize());
         uriBuilder.addParameter("quality", originalRequest.getQuality());
         uriBuilder.addParameter("scale", originalRequest.getScale());
         uriBuilder.addParameter("imageDpi", originalRequest.getImageDpi());

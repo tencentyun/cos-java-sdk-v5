@@ -13,4 +13,12 @@ public class MediaResult {
     public void setOutputFile(OutputFile outputFile) {
         this.outputFile = outputFile;
     }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("MediaResult{");
+        sb.append("outputFile=").append(outputFile);
+        sb.append('}');
+        return sb.toString();
+    }
 }

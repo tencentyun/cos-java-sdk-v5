@@ -2909,7 +2909,7 @@ public interface COS extends COSDirectSpi {
      *
      * @param req
      */
-    MediaJobResponse createMediaJobs(MediaJobsRequest req) throws UnsupportedEncodingException;
+    MediaJobResponse createMediaJobs(MediaJobsRequest req) ;
 
     /**
      * CancelMediaJob 接口用于取消一个任务。  https://cloud.tencent.com/document/product/460/38939
