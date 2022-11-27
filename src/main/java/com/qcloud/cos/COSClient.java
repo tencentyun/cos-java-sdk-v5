@@ -3776,8 +3776,6 @@ public class COSClient implements COS {
                 "The tag parameter must be specified setting the object tags");
         rejectNull(req.getQueueId(),
                 "The queueId parameter must be specified setting the object tags");
-        rejectNull(req.getInput().getObject(),
-                "The input parameter must be specified setting the object tags");
         this.rejectStartWith(req.getCallBack(),"http","The CallBack parameter mush start with http or https");
         CosHttpRequest<MediaJobsRequest> request = createRequest(req.getBucketName(), "/jobs", req, HttpMethodName.POST);
         this.setContent(request, CIMediaXmlFactory.convertToXmlByteArray(req), "application/xml", false);

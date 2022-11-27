@@ -484,7 +484,8 @@ public class CIMediaXmlFactory {
 
     private static void addInput(XmlWriter xml, MediaInputObject inputObject) {
         xml.start("Input");
-        xml.start("Object").value(inputObject.getObject()).end();
+        addIfNotNull(xml, "Object", inputObject.getObject());
+        addIfNotNull(xml, "Url", inputObject.getUrl());
         xml.end();
     }
 
