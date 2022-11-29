@@ -2,6 +2,7 @@ package com.qcloud.cos.demo.ci;
 
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.model.ciModel.workflow.*;
+import com.qcloud.cos.utils.Jackson;
 
 import java.util.List;
 
@@ -80,6 +81,22 @@ public class WorkFlowDemo {
         for (MediaWorkflowExecutionObject mediaWorkflowExecutionObject : workflowExecutionList) {
             System.out.println(mediaWorkflowExecutionObject);
         }
+    }
+
+    /**
+     * triggerWorkflowList 接口手动调用工作流处理资源
+     *
+     * @param client
+     */
+    public static void triggerWorkflowList(COSClient client) {
+        //1.创建工作流请求对象
+        MediaWorkflowListRequest request = new MediaWorkflowListRequest();
+        //2.添加请求参数 参数详情请见api接口文档
+        request.setBucketName("DemoBucket-123456789");
+        request.setWorkflowId("we32f75950afe4a4682463d8158d*****");
+        request.setObject("1.mp4");
+        MediaWorkflowListResponse response = client.triggerWorkflowList(request);
+        System.out.println(Jackson.toJsonString(response));
     }
 
 }

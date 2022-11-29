@@ -8,8 +8,9 @@ import com.qcloud.cos.internal.CosServiceRequest;
  */
 public class ImageAuditingRequest extends CosServiceRequest {
     /**
-     * 审核类型，拥有 porn（涉黄识别）、terrorist（涉暴恐识别）、politics（涉政识别）、ads（广告识别）四种。用户可选择多种识别类型，
+     * 审核类型，拥有 porn（涉黄识别）、terrorism（涉暴恐识别）、politics（涉政识别）、ads（广告识别）四种。用户可选择多种识别类型，
      * 例如 detectType=porn,ads 表示对图片进行涉黄及广告审核
+     * 为空时则表示审核全部类型
      */
     private String detectType;
 
@@ -54,6 +55,26 @@ public class ImageAuditingRequest extends CosServiceRequest {
      * 注意：最大支持压缩32MB的图片。
      */
     private String largeImageDetect;
+
+    /**
+     * 图片标识，该字段在结果中返回原始内容，长度限制为512字节
+     */
+    private String dataId;
+
+    /**
+     * 任务id 用于查询
+     */
+    private String jobId;
+
+    /**
+     * 是否开启异步审核 0 不开启 1开启  默认为0
+     */
+    private String async;
+
+    /**
+     * 审核结果（Detail版本）以回调形式发送至您的回调地址，异步审核时生效，支持以 http:// 或者 https:// 开头的地址，例如： http://www.callback.com
+     */
+    private String callback;
 
     public String getDetectType() {
         return detectType;
@@ -120,9 +141,41 @@ public class ImageAuditingRequest extends CosServiceRequest {
         this.largeImageDetect = largeImageDetect;
     }
 
+    public String getJobId() {
+        return jobId;
+    }
+
+    public void setJobId(String jobId) {
+        this.jobId = jobId;
+    }
+
+    public String getDataId() {
+        return dataId;
+    }
+
+    public void setDataId(String dataId) {
+        this.dataId = dataId;
+    }
+
+    public String getAsync() {
+        return async;
+    }
+
+    public void setAsync(String async) {
+        this.async = async;
+    }
+
+    public String getCallback() {
+        return callback;
+    }
+
+    public void setCallback(String callback) {
+        this.callback = callback;
+    }
+
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("ImageAuditingRequest{");
+        final StringBuffer sb = new StringBuffer("ImageAuditingRequest{");
         sb.append("detectType='").append(detectType).append('\'');
         sb.append(", bucketName='").append(bucketName).append('\'');
         sb.append(", objectKey='").append(objectKey).append('\'');
@@ -131,6 +184,10 @@ public class ImageAuditingRequest extends CosServiceRequest {
         sb.append(", bizType='").append(bizType).append('\'');
         sb.append(", detectUrl='").append(detectUrl).append('\'');
         sb.append(", largeImageDetect='").append(largeImageDetect).append('\'');
+        sb.append(", dataId='").append(dataId).append('\'');
+        sb.append(", jobId='").append(jobId).append('\'');
+        sb.append(", async='").append(async).append('\'');
+        sb.append(", callback='").append(callback).append('\'');
         sb.append('}');
         return sb.toString();
     }

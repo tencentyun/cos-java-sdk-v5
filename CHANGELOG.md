@@ -4,6 +4,75 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [5.6.109]
+- add Media Process ConcatTemplate API
+- 
+- ## [5.6.107]
+- update Auditing API
+
+## [5.6.105]
+- update PicProcess API 
+
+## [5.6.103]
+- update auditing bean
+- add video transcoding parameters
+
+## [5.6.101]
+- add CI ReportBadCase API
+- update CI DocumentPreview API
+- update QRCode API
+
+## [5.6.99]
+- update CI image processing API
+
+## [5.6.97]
+- update Auditing API
+
+## [5.6.95]
+- add media processing parameter
+
+## [5.6.93]
+- update ImageAuditing API
+
+## [5.6.91]
+- update media processing and repackaging tasks
+- add SmartCover API
+- add VideoMontage API
+
+## [5.6.89]
+- add media processing and repackaging tasks
+- update media transcoding api
+
+- ## [5.6.87]
+- add ImageSearch api
+
+## [5.6.83]
+- update ImageAuditing XmlResponsesSaxParser
+
+- ## [5.6.81]
+- update ImageAuditing api
+
+## [5.6.79]
+-  update DetectCar api
+-  update LabelImage api
+
+## [5.6.78]
+- add the isMetaAccBucket
+
+## [5.6.77]
+-  add DetectCar api
+
+## [5.6.75]
+-  fix etag verification exception
+
+- ## [5.6.74]
+- add media DigitalWatermark api
+- update ImageAuditing  api
+
+## [5.6.73]
+-  add the gitignore file
+
 ## [5.6.72]
 -  update content auditing api
 

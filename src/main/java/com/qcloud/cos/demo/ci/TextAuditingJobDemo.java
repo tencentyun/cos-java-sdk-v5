@@ -5,6 +5,8 @@ import java.util.List;
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.model.ciModel.auditing.AuditingInfo;
 import com.qcloud.cos.model.ciModel.auditing.CallbackVersion;
+import com.qcloud.cos.model.ciModel.auditing.ReportBadCaseRequest;
+import com.qcloud.cos.model.ciModel.auditing.SuggestedLabel;
 import com.qcloud.cos.model.ciModel.auditing.TextAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.TextAuditingResponse;
 
@@ -57,5 +59,24 @@ public class TextAuditingJobDemo {
         request.setJobId("st68d08596f35011eb9324525400*****");
         //3.调用接口,获取任务响应对象
         TextAuditingResponse response = client.describeAuditingTextJob(request);
+    }
+
+    /**
+     * reportBadCase 接口用于文本审核结果反馈。
+     *
+     * @param client
+     */
+    public static void reportBadCase(COSClient client) {
+        //1.创建任务请求对象
+        ReportBadCaseRequest request = new ReportBadCaseRequest();
+        //2.添加请求参数 参数详情请见api接口文档
+        request.setBucketName("demo-123456789");
+        request.setContentType("1");
+        request.setLabel("porn");
+        request.setSuggestedLabel(SuggestedLabel.Normal);
+        request.setText("6L+Z5piv5Li65LuA5LmI");
+        request.setJobId("st68d08596f35011eb9324525400*****");
+        //3.调用接口,获取任务响应对象 上报成功则返回
+        String requestId = client.reportBadCase(request);
     }
 }

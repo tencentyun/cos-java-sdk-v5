@@ -46,7 +46,11 @@ public class AudtingCommonInfo {
 
     private OcrResults ocrResults;
 
+    private String category;
+
     private List<ObjectResults> objectResults = new ArrayList<>();
+
+    private List<LibResult> libResults;
 
     public AudtingCommonInfo() {
     }
@@ -143,19 +147,41 @@ public class AudtingCommonInfo {
         this.keywords = keywords;
     }
 
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public List<LibResult> getLibResults() {
+        if (libResults == null) {
+            libResults = new ArrayList<>();
+        }
+        return libResults;
+    }
+
+    public void setLibResults(List<LibResult> libResults) {
+        this.libResults = libResults;
+    }
+
     @Override
     public String toString() {
-        return "AudtingCommonInfo{" +
-                "code='" + code + '\'' +
-                ", msg='" + msg + '\'' +
-                ", hitFlag='" + hitFlag + '\'' +
-                ", score='" + score + '\'' +
-                ", label='" + label + '\'' +
-                ", keywords='" + keywords + '\'' +
-                ", count='" + count + '\'' +
-                ", subLabel='" + subLabel + '\'' +
-                ", ocrResults=" + ocrResults +
-                ", objectResults=" + objectResults +
-                '}';
+        final StringBuffer sb = new StringBuffer("AudtingCommonInfo{");
+        sb.append("code='").append(code).append('\'');
+        sb.append(", msg='").append(msg).append('\'');
+        sb.append(", hitFlag='").append(hitFlag).append('\'');
+        sb.append(", score='").append(score).append('\'');
+        sb.append(", label='").append(label).append('\'');
+        sb.append(", keywords='").append(keywords).append('\'');
+        sb.append(", count='").append(count).append('\'');
+        sb.append(", subLabel='").append(subLabel).append('\'');
+        sb.append(", ocrResults=").append(ocrResults);
+        sb.append(", category='").append(category).append('\'');
+        sb.append(", objectResults=").append(objectResults);
+        sb.append(", libResults=").append(libResults);
+        sb.append('}');
+        return sb.toString();
     }
 }

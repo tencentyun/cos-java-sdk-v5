@@ -178,6 +178,14 @@ public class DefaultCosHttpClient implements CosHttpClient {
         String paramStr = paramBuffer.toString();
         if (!paramStr.isEmpty()) {
             urlBuffer.append("?").append(paramStr);
+            //万象接口特殊逻辑 要求某些特定的参数置于末尾
+            if (request.getCiSpecialEndParameter() != null) {
+                urlBuffer.append("&").append(request.getCiSpecialEndParameter());
+            }
+        } else {
+            if (request.getCiSpecialEndParameter() != null) {
+                urlBuffer.append("?").append(request.getCiSpecialEndParameter());
+            }
         }
 
         try {
@@ -497,8 +505,9 @@ public class DefaultCosHttpClient implements CosHttpClient {
                     throw cce;
                 }
             } catch (Exception exp) {
-                String errorMsg = String.format("httpClient execute occur a unknow exception, httpRequest: %s",
-                        request.toString());
+                String expName = exp.getClass().getName();
+                String errorMsg = String.format("httpClient execute occur an unknown exception:%s, httpRequest: %s"
+                        , expName, request);
                 closeHttpResponseStream(httpResponse);
                 log.error(errorMsg, exp);
                 throw new CosClientException(errorMsg, exp);

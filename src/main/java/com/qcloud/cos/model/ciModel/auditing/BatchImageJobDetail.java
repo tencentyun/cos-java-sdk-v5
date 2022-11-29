@@ -1,8 +1,13 @@
 package com.qcloud.cos.model.ciModel.auditing;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class BatchImageJobDetail {
     private String dataId;
+    private String jobId;
+    private String category;
     private String label;
     private String result;
     private String object;
@@ -12,11 +17,15 @@ public class BatchImageJobDetail {
     private String code;
     private String message;
     private String url;
+    private String state;
+    private String compressionResult;
     private PornInfo pornInfo;
     private TerroristInfo terroristInfo;
     private PoliticsInfo politicsInfo;
     private AdsInfo adsInfo;
     private UserInfo userInfo = new UserInfo();
+    private ListInfo listInfo = new ListInfo();
+    private OcrResults ocrResults = new OcrResults();
 
     public String getDataId() {
         return dataId;
@@ -98,6 +107,22 @@ public class BatchImageJobDetail {
         this.url = url;
     }
 
+    public String getJobId() {
+        return jobId;
+    }
+
+    public void setJobId(String jobId) {
+        this.jobId = jobId;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
     public PornInfo getPornInfo() {
         if (pornInfo == null) {
             pornInfo = new PornInfo();
@@ -138,6 +163,14 @@ public class BatchImageJobDetail {
         return adsInfo;
     }
 
+    public OcrResults getOcrResults() {
+        return ocrResults;
+    }
+
+    public void setOcrResults(OcrResults ocrResults) {
+        this.ocrResults = ocrResults;
+    }
+
     public void setAdsInfo(AdsInfo adsInfo) {
         this.adsInfo = adsInfo;
     }
@@ -150,24 +183,55 @@ public class BatchImageJobDetail {
         this.userInfo = userInfo;
     }
 
+    public String getCompressionResult() {
+        return compressionResult;
+    }
+
+    public void setCompressionResult(String compressionResult) {
+        this.compressionResult = compressionResult;
+    }
+
+    public ListInfo getListInfo() {
+        return listInfo;
+    }
+
+    public void setListInfo(ListInfo listInfo) {
+        this.listInfo = listInfo;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
     @Override
     public String toString() {
-        return "BatchImageJobDetail{" +
-                "dataId='" + dataId + '\'' +
-                ", label='" + label + '\'' +
-                ", result='" + result + '\'' +
-                ", object='" + object + '\'' +
-                ", score='" + score + '\'' +
-                ", subLabel='" + subLabel + '\'' +
-                ", text='" + text + '\'' +
-                ", code='" + code + '\'' +
-                ", message='" + message + '\'' +
-                ", url='" + url + '\'' +
-                ", pornInfo=" + pornInfo +
-                ", terroristInfo=" + terroristInfo +
-                ", politicsInfo=" + politicsInfo +
-                ", adsInfo=" + adsInfo +
-                ", userInfo=" + userInfo +
-                '}';
+        final StringBuffer sb = new StringBuffer("BatchImageJobDetail{");
+        sb.append("dataId='").append(dataId).append('\'');
+        sb.append(", jobId='").append(jobId).append('\'');
+        sb.append(", category='").append(category).append('\'');
+        sb.append(", label='").append(label).append('\'');
+        sb.append(", result='").append(result).append('\'');
+        sb.append(", object='").append(object).append('\'');
+        sb.append(", score='").append(score).append('\'');
+        sb.append(", subLabel='").append(subLabel).append('\'');
+        sb.append(", text='").append(text).append('\'');
+        sb.append(", code='").append(code).append('\'');
+        sb.append(", message='").append(message).append('\'');
+        sb.append(", url='").append(url).append('\'');
+        sb.append(", state='").append(state).append('\'');
+        sb.append(", compressionResult='").append(compressionResult).append('\'');
+        sb.append(", pornInfo=").append(pornInfo);
+        sb.append(", terroristInfo=").append(terroristInfo);
+        sb.append(", politicsInfo=").append(politicsInfo);
+        sb.append(", adsInfo=").append(adsInfo);
+        sb.append(", userInfo=").append(userInfo);
+        sb.append(", listInfo=").append(listInfo);
+        sb.append(", ocrResults=").append(ocrResults);
+        sb.append('}');
+        return sb.toString();
     }
 }

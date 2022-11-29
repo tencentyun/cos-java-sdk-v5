@@ -52,9 +52,11 @@ import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
 import com.qcloud.cos.model.ciModel.job.DocJobObject;
 import com.qcloud.cos.model.ciModel.job.DocJobRequest;
 import com.qcloud.cos.model.ciModel.job.DocProcessObject;
+import com.qcloud.cos.model.ciModel.job.ExtractDigitalWatermark;
 import com.qcloud.cos.model.ciModel.job.MediaAudioObject;
 import com.qcloud.cos.model.ciModel.job.MediaConcatFragmentObject;
 import com.qcloud.cos.model.ciModel.job.MediaConcatTemplateObject;
+import com.qcloud.cos.model.ciModel.job.MediaDigitalWatermark;
 import com.qcloud.cos.model.ciModel.job.MediaJobOperation;
 import com.qcloud.cos.model.ciModel.job.MediaJobsRequest;
 import com.qcloud.cos.model.ciModel.job.MediaRemoveWaterMark;
@@ -455,11 +457,31 @@ public class RequestXmlFactory {
             xml.end();
         }
 
-        xml.start("Output");
-        xml.start("Region").value(operation.getOutput().getRegion()).end();
-        xml.start("Object").value(operation.getOutput().getObject()).end();
-        xml.start("Bucket").value(operation.getOutput().getBucket()).end();
-        xml.end();
+        MediaDigitalWatermark digitalWatermark = operation.getDigitalWatermark();
+        if (CheckObjectUtils.objIsNotValid(digitalWatermark)) {
+            xml.start("DigitalWatermark");
+            addIfNotNull(xml, "Message",digitalWatermark.getMessage());
+            addIfNotNull(xml, "Type",digitalWatermark.getType());
+            addIfNotNull(xml, "Version",digitalWatermark.getVersion());
+            xml.end();
+        }
+
+        ExtractDigitalWatermark extractDigitalWatermark = operation.getExtractDigitalWatermark();
+        if (extractDigitalWatermark.getType() != null || extractDigitalWatermark.getMessage() != null) {
+            xml.start("ExtractDigitalWatermark");
+            addIfNotNull(xml, "Message",extractDigitalWatermark.getMessage());
+            addIfNotNull(xml, "Type",extractDigitalWatermark.getType());
+            addIfNotNull(xml, "Version",extractDigitalWatermark.getVersion());
+            xml.end();
+        }
+        MediaOutputObject output = operation.getOutput();
+        if (CheckObjectUtils.objIsNotValid(output)){
+            xml.start("Output");
+            addIfNotNull(xml,"Region",output.getRegion());
+            addIfNotNull(xml,"Object",output.getObject());
+            addIfNotNull(xml,"Bucket",output.getBucket());
+            xml.end();
+        }
 
         xml.end();
         xml.start("QueueId").value(request.getQueueId()).end();
@@ -486,6 +508,7 @@ public class RequestXmlFactory {
         addIfNotNull(xml, "Type", request.getNotifyConfig().getType());
         addIfNotNull(xml, "Url", request.getNotifyConfig().getUrl());
         addIfNotNull(xml, "Event", request.getNotifyConfig().getEvent());
+        addIfNotNull(xml, "State", request.getNotifyConfig().getState());
         xml.end();
         xml.end();
         return xml.getBytes();
@@ -620,6 +643,9 @@ public class RequestXmlFactory {
     }
 
     private static void addAudio(XmlWriter xml, MediaAudioObject audio) {
+        if (CheckObjectUtils.objIsValid(audio)) {
+            return;
+        }
         xml.start("Audio");
         addIfNotNull(xml, "Bitrate", audio.getBitrate());
         addIfNotNull(xml, "Channels", audio.getChannels());
@@ -732,27 +758,24 @@ public class RequestXmlFactory {
 
         xml.start("Request");
         xml.start("Input");
-        addIfNotNull(xml,"Object",request.getInput().getObject());
+        addIfNotNull(xml, "Object", request.getInput().getObject());
         addIfNotNull(xml, "Url", request.getInput().getUrl());
         addIfNotNull(xml, "DataId", request.getInput().getDataId());
-        addUserInfo(xml,request.getInput().getUserInfo());
+        addUserInfo(xml, request.getInput().getUserInfo());
         xml.end();
         Conf conf = request.getConf();
         xml.start("Conf");
         String detectType = conf.getDetectType();
-        if ("all".equalsIgnoreCase(detectType)) {
-            detectType = "Porn,Terrorism,Politics,Ads,Illegal,Abuse,Teenager";
-        }
-        addIfNotNull(xml,"DetectType", detectType);
-        addIfNotNull(xml,"BizType", conf.getBizType());
-        addIfNotNull(xml,"DetectContent", conf.getDetectContent());
-        addIfNotNull(xml,"CallbackVersion", conf.getCallbackVersion());
+        addAuditingDetectType(xml, detectType);
+        addIfNotNull(xml, "BizType", conf.getBizType());
+        addIfNotNull(xml, "DetectContent", conf.getDetectContent());
+        addIfNotNull(xml, "CallbackVersion", conf.getCallbackVersion());
         xml.start("Snapshot");
-        addIfNotNull(xml,"Mode", conf.getSnapshot().getMode());
-        addIfNotNull(xml,"TimeInterval", conf.getSnapshot().getTimeInterval());
-        addIfNotNull(xml,"Count", conf.getSnapshot().getCount());
+        addIfNotNull(xml, "Mode", conf.getSnapshot().getMode());
+        addIfNotNull(xml, "TimeInterval", conf.getSnapshot().getTimeInterval());
+        addIfNotNull(xml, "Count", conf.getSnapshot().getCount());
         xml.end();
-        addIfNotNull(xml,"Callback", conf.getCallback());
+        addIfNotNull(xml, "Callback", conf.getCallback());
         xml.end();
 
         xml.end();
@@ -774,15 +797,12 @@ public class RequestXmlFactory {
         addIfNotNull(xml, "Object", request.getInput().getObject());
         addIfNotNull(xml, "Url", request.getInput().getUrl());
         addIfNotNull(xml, "DataId", request.getInput().getDataId());
-        addUserInfo(xml,request.getInput().getUserInfo());
+        addUserInfo(xml, request.getInput().getUserInfo());
         xml.end();
         Conf conf = request.getConf();
         xml.start("Conf");
         String detectType = conf.getDetectType();
-        if ("all".equalsIgnoreCase(detectType)) {
-            detectType = "Porn,Terrorism,Politics,Ads,Illegal,Abuse";
-        }
-        addIfNotNull(xml, "DetectType", detectType);
+        addAuditingDetectType(xml,detectType);
         addIfNotNull(xml, "Callback", conf.getCallback());
         addIfNotNull(xml, "CallbackVersion", conf.getCallbackVersion());
         addIfNotNull(xml, "BizType", conf.getBizType());
@@ -808,18 +828,16 @@ public class RequestXmlFactory {
         addIfNotNull(xml, "Content", request.getInput().getContent());
         addIfNotNull(xml, "Url", request.getInput().getUrl());
         addIfNotNull(xml, "DataId", request.getInput().getDataId());
-        addUserInfo(xml,request.getInput().getUserInfo());
+        addUserInfo(xml, request.getInput().getUserInfo());
         xml.end();
         Conf conf = request.getConf();
         xml.start("Conf");
         String detectType = conf.getDetectType();
-        if ("all".equalsIgnoreCase(detectType)) {
-            detectType = "Porn,Terrorism,Politics,Ads,Illegal,Abuse";
-        }
-        addIfNotNull(xml, "DetectType", detectType);
+        addAuditingDetectType(xml,detectType);
         addIfNotNull(xml, "Callback", conf.getCallback());
         addIfNotNull(xml, "BizType", conf.getBizType());
         addIfNotNull(xml, "CallbackVersion", conf.getCallbackVersion());
+        addIfNotNull(xml, "CallbackType", conf.getCallbackType());
         xml.end();
 
         xml.end();
@@ -835,15 +853,12 @@ public class RequestXmlFactory {
         addIfNotNull(xml, "Object", request.getInput().getObject());
         addIfNotNull(xml, "Type", request.getInput().getType());
         addIfNotNull(xml, "DataId", request.getInput().getDataId());
-        addUserInfo(xml,request.getInput().getUserInfo());
+        addUserInfo(xml, request.getInput().getUserInfo());
         xml.end();
         Conf conf = request.getConf();
         xml.start("Conf");
         String detectType = conf.getDetectType();
-        if ("all".equalsIgnoreCase(detectType)) {
-            detectType = "Porn,Terrorism,Politics,Ads,Illegal,Abuse";
-        }
-        addIfNotNull(xml, "DetectType", detectType);
+        addAuditingDetectType(xml,detectType);
         addIfNotNull(xml, "Callback", conf.getCallback());
         addIfNotNull(xml, "BizType", conf.getBizType());
         xml.end();
@@ -862,10 +877,7 @@ public class RequestXmlFactory {
         Conf conf = request.getConf();
         xml.start("Conf");
         String detectType = conf.getDetectType();
-        if ("all".equalsIgnoreCase(detectType)) {
-            detectType = "Porn,Terrorism,Politics,Ads,Illegal,Abuse";
-        }
-        addIfNotNull(xml, "DetectType", detectType);
+        addAuditingDetectType(xml,detectType);
         addIfNotNull(xml, "Callback", conf.getCallback());
         addIfNotNull(xml, "BizType", conf.getBizType());
         addIfNotNull(xml, "ReturnHighlightHtml", conf.getReturnHighlightHtml());
@@ -888,6 +900,7 @@ public class RequestXmlFactory {
             addIfNotNull(xml, "MaxFrames", inputObject.getMaxFrames());
             addIfNotNull(xml, "Interval", inputObject.getInterval());
             addIfNotNull(xml, "LargeImageDetect", inputObject.getLargeImageDetect());
+            addIfNotNull(xml, "Content", inputObject.getContent());
             addUserInfo(xml,inputObject.getUserInfo());
             xml.end();
         }
@@ -895,12 +908,10 @@ public class RequestXmlFactory {
         Conf conf = request.getConf();
         xml.start("Conf");
         String detectType = conf.getDetectType();
-        if ("all".equalsIgnoreCase(detectType)) {
-            detectType = "Porn,Terrorism,Politics,Ads";
-        }
-        addIfNotNull(xml, "DetectType", detectType);
-        addIfNotNull(xml, "Callback", conf.getCallback());
+        addAuditingDetectType(xml,detectType);
         addIfNotNull(xml, "BizType", conf.getBizType());
+        addIfNotNull(xml, "Async", conf.getAsync());
+        addIfNotNull(xml, "Callback", conf.getCallback());
         xml.end();
 
         xml.end();
@@ -986,7 +997,17 @@ public class RequestXmlFactory {
             addIfNotNull(xml, "Room", userInfo.getRoom());
             addIfNotNull(xml, "IP", userInfo.getIp());
             addIfNotNull(xml, "Type", userInfo.getType());
+            addIfNotNull(xml, "ReceiveTokenId", userInfo.getReceiveTokenId());
+            addIfNotNull(xml, "Gender", userInfo.getGender());
+            addIfNotNull(xml, "Level", userInfo.getLevel());
+            addIfNotNull(xml, "Role", userInfo.getRole());
             xml.end();
+        }
+    }
+
+    private static void addAuditingDetectType(XmlWriter xml, String detectType) {
+        if (!"all".equalsIgnoreCase(detectType)) {
+            addIfNotNull(xml, "DetectType", detectType);
         }
     }
 
@@ -994,7 +1015,7 @@ public class RequestXmlFactory {
     /**
      * 对象校验内部静态工具类
      */
-    private static class CheckObjectUtils {
+    public static class CheckObjectUtils {
 
         /**
          * 校验对象是否有效，判断对象中是否含有有效的字段。

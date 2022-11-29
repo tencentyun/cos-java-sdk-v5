@@ -25,6 +25,13 @@ public class MediaTranscodeObject extends MediaVideoCommon {
      */
     private MediaTimeIntervalObject timeInterval;
 
+    /**
+     * 混音
+     *
+     * @return
+     */
+    private MediaAudioMixObject audioMix;
+
     public MediaContainerObject getContainer() {
         if (container == null) {
             container = new MediaContainerObject();
@@ -78,6 +85,17 @@ public class MediaTranscodeObject extends MediaVideoCommon {
 
     public void setTimeInterval(MediaTimeIntervalObject timeInterval) {
         this.timeInterval = timeInterval;
+    }
+
+    public MediaAudioMixObject getAudioMix() {
+        if (audioMix == null) {
+            audioMix = new MediaAudioMixObject();
+        }
+        return audioMix;
+    }
+
+    public void setAudioMix(MediaAudioMixObject audioMix) {
+        this.audioMix = audioMix;
     }
 
     @Override

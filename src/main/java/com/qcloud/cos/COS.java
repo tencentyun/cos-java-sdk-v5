@@ -27,35 +27,24 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.qcloud.cos.model.bucketcertificate.BucketDomainCertificateRequest;
+import com.qcloud.cos.model.bucketcertificate.BucketGetDomainCertificate;
+import com.qcloud.cos.model.bucketcertificate.BucketPutDomainCertificate;
+import com.qcloud.cos.model.bucketcertificate.SetBucketDomainCertificateRequest;
+import com.qcloud.cos.model.ciModel.common.CImageProcessRequest;
+import com.qcloud.cos.model.ciModel.image.*;
 import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.exception.MultiObjectDeleteException;
 import com.qcloud.cos.http.HttpMethodName;
 import com.qcloud.cos.internal.COSDirectSpi;
 import com.qcloud.cos.model.*;
-import com.qcloud.cos.model.ciModel.auditing.AudioAuditingRequest;
-import com.qcloud.cos.model.ciModel.auditing.AudioAuditingResponse;
-import com.qcloud.cos.model.ciModel.auditing.BatchImageAuditingRequest;
-import com.qcloud.cos.model.ciModel.auditing.BatchImageAuditingResponse;
-import com.qcloud.cos.model.ciModel.auditing.DocumentAuditingRequest;
-import com.qcloud.cos.model.ciModel.auditing.DocumentAuditingResponse;
-import com.qcloud.cos.model.ciModel.auditing.ImageAuditingRequest;
-import com.qcloud.cos.model.ciModel.auditing.ImageAuditingResponse;
-import com.qcloud.cos.model.ciModel.auditing.TextAuditingRequest;
-import com.qcloud.cos.model.ciModel.auditing.TextAuditingResponse;
-import com.qcloud.cos.model.ciModel.auditing.VideoAuditingRequest;
-import com.qcloud.cos.model.ciModel.auditing.VideoAuditingResponse;
-import com.qcloud.cos.model.ciModel.auditing.WebpageAuditingRequest;
-import com.qcloud.cos.model.ciModel.auditing.WebpageAuditingResponse;
+import com.qcloud.cos.model.ciModel.auditing.*;
 import com.qcloud.cos.model.ciModel.bucket.DocBucketRequest;
 import com.qcloud.cos.model.ciModel.bucket.DocBucketResponse;
 import com.qcloud.cos.model.ciModel.bucket.MediaBucketRequest;
 import com.qcloud.cos.model.ciModel.bucket.MediaBucketResponse;
 import com.qcloud.cos.model.ciModel.common.ImageProcessRequest;
-import com.qcloud.cos.model.ciModel.image.ImageLabelRequest;
-import com.qcloud.cos.model.ciModel.image.ImageLabelResponse;
-import com.qcloud.cos.model.ciModel.image.ImageLabelV2Request;
-import com.qcloud.cos.model.ciModel.image.ImageLabelV2Response;
 import com.qcloud.cos.model.ciModel.job.DocHtmlRequest;
 import com.qcloud.cos.model.ciModel.job.DocJobListRequest;
 import com.qcloud.cos.model.ciModel.job.DocJobListResponse;
@@ -67,11 +56,16 @@ import com.qcloud.cos.model.ciModel.job.MediaListJobResponse;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoRequest;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoResponse;
 import com.qcloud.cos.model.ciModel.persistence.CIUploadResult;
+import com.qcloud.cos.model.ciModel.persistence.DetectCarRequest;
+import com.qcloud.cos.model.ciModel.persistence.DetectCarResponse;
 import com.qcloud.cos.model.ciModel.queue.DocListQueueResponse;
 import com.qcloud.cos.model.ciModel.queue.DocQueueRequest;
 import com.qcloud.cos.model.ciModel.queue.MediaListQueueResponse;
 import com.qcloud.cos.model.ciModel.queue.MediaQueueRequest;
 import com.qcloud.cos.model.ciModel.queue.MediaQueueResponse;
+import com.qcloud.cos.model.ciModel.snapshot.CosSnapshotRequest;
+import com.qcloud.cos.model.ciModel.snapshot.PrivateM3U8Request;
+import com.qcloud.cos.model.ciModel.snapshot.PrivateM3U8Response;
 import com.qcloud.cos.model.ciModel.snapshot.SnapshotRequest;
 import com.qcloud.cos.model.ciModel.snapshot.SnapshotResponse;
 import com.qcloud.cos.model.ciModel.template.MediaListTemplateResponse;
@@ -385,6 +379,28 @@ public interface COS extends COSDirectSpi {
      */
     public ObjectMetadata getObject(GetObjectRequest getObjectRequest, File destinationFile)
             throws CosClientException, CosServiceException;
+
+    /**
+     * <p>
+     *     Create a Symlink for the specified object.
+     *     The <code>PutSymlinkRequest</code> contains all the details of the request, including the bucket created to,
+     *     the symLink name referred to the target object, the target object key.
+     * <p/>
+     * @param putSymlinkRequest the request object containing all the parameter to create a symlink.
+     * @return the result creating symlink.
+     */
+    public PutSymlinkResult putSymlink(PutSymlinkRequest putSymlinkRequest);
+
+    /**
+     * <p>
+     *     Get the object the symbolic link actually points to.
+     *     The <code>GetSymlinkRequest</code> contains all the details of the request, including the bucket created to,
+     *     the symbolic link queried.
+     * </p>
+     * @param getSymlinkRequest the request object containing all the parameter to get a symlink.
+     * @return the target the symbolic link referred to.
+     */
+    public GetSymlinkResult getSymlink(GetSymlinkRequest getSymlinkRequest);
 
     /**
      * @param bucketName Name of bucket that presumably contains object
@@ -2419,7 +2435,7 @@ public interface COS extends COSDirectSpi {
      * @throws CosServiceException If any errors occurred in COS while processing the
      *                             request.
      */
-    public void deleteBucketDomainConfiguration(DeleteBucketDomainConfigurationRequest deleteBucketDomainConfigurationReqeuest)
+    public void deleteBucketDomainConfiguration(DeleteBucketDomainConfigurationRequest deleteBucketDomainConfigurationRequest)
             throws CosClientException, CosServiceException;
 
     /**
@@ -2473,6 +2489,86 @@ public interface COS extends COSDirectSpi {
      * @throws CosServiceException If any errors occurred in COS while processing the request.
      */
     public BucketDomainConfiguration getBucketDomainConfiguration(GetBucketDomainConfigurationRequest getBucketDomainConfigurationRequest)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * This operation removes the domain certificate for a bucket.
+     *
+     * @param bucketName The name of the bucket whose domain certificate is being
+     *                   deleted.
+     * @parm domainName The name of the bucket's domain whose certificate is being deleted.
+     * @throws CosClientException  If any errors are encountered on the client while making the
+     *                             request or handling the response.
+     * @throws CosServiceException If any errors occurred in COS while processing the
+     *                             request.
+     */
+    public void deleteBucketDomainCertificate(String bucketName,String domainName)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * This operation removes the domain certificate for a bucket.
+     *
+     * @param deleteBucketDomainCertificateRequest The request object specifying the name of the bucket whose
+     *                                               domain certificate is to be deleted.
+     * @throws CosClientException  If any errors are encountered on the client while making the
+     *                             request or handling the response.
+     * @throws CosServiceException If any errors occurred in COS while processing the
+     *                             request.
+     */
+    public void deleteBucketDomainCertificate(BucketDomainCertificateRequest deleteBucketDomainCertificateRequest)
+            throws CosClientException, CosServiceException;
+    /**
+     * Sets the domain certificate for the specified bucket.
+     *
+     * @param bucketName    The name of the bucket whose domain certificate is being set.
+     * @param domainCertificate The certificate describing the specified bucket custom domain
+     * @throws CosClientException  If any errors are encountered on the client while making the
+     *                             request or handling the response.
+     * @throws CosServiceException If any errors occurred in COS while processing the request.
+     */
+    public void setBucketDomainCertificate(String bucketName, BucketPutDomainCertificate domainCertificate)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * Sets the domain certificate for the specified bucket.
+     *
+     * @param setBucketDomainCertificateRequest The request object containing the name of the bucket whose
+     *                                            domain certificate is being updated, and the new domain
+     *                                            certificate values.
+     * @throws CosClientException  If any errors are encountered on the client while making the
+     *                             request or handling the response.
+     * @throws CosServiceException If any errors occurred in COS while processing the request.
+     */
+    public void setBucketDomainCertificate(SetBucketDomainCertificateRequest setBucketDomainCertificateRequest)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * Returns the domain certificate for the specified bucket.
+     *
+     * @param bucketName The name of the bucket whose domain certificate is being retrieved.
+     * @param domainName The name of the bucket's domain whose certificate is being retrieved.
+     * @return The bucket domain certificate for the specified bucket,
+     * otherwise null if there is no domain certificate set for the
+     * specified bucket.
+     * @throws CosClientException  If any errors are encountered on the client while making the
+     *                             request or handling the response.
+     * @throws CosServiceException If any errors occurred in COS while processing the request.
+     */
+    public BucketGetDomainCertificate getBucketDomainCertificate(String bucketName, String domainName)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * Returns the domain certificate for the specified bucket.
+     *
+     * @param getBucketDomainCertificateRequest The request object for retrieving the bucket domain certificate.
+     * @return The bucket domain certificate for the specified bucket,
+     * otherwise null if there is no domain certificate set for the
+     * specified bucket.
+     * @throws CosClientException  If any errors are encountered on the client while making the
+     *                             request or handling the response.
+     * @throws CosServiceException If any errors occurred in COS while processing the request.
+     */
+    public BucketGetDomainCertificate getBucketDomainCertificate(BucketDomainCertificateRequest getBucketDomainCertificateRequest)
             throws CosClientException, CosServiceException;
 
     /**
@@ -2813,7 +2909,7 @@ public interface COS extends COSDirectSpi {
      *
      * @param req
      */
-    MediaJobResponse createMediaJobs(MediaJobsRequest req) throws UnsupportedEncodingException;
+    MediaJobResponse createMediaJobs(MediaJobsRequest req) ;
 
     /**
      * CancelMediaJob 接口用于取消一个任务。  https://cloud.tencent.com/document/product/460/38939
@@ -3023,6 +3119,70 @@ public interface COS extends COSDirectSpi {
     PutAsyncFetchTaskResult putAsyncFetchTask(PutAsyncFetchTaskRequest request);
 
     GetAsyncFetchTaskResult getAsyncFetchTask(GetAsyncFetchTaskRequest request);
+
+    ImageAuditingResponse describeAuditingImageJob(DescribeImageAuditingRequest imageAuditingRequest);
+
+    PrivateM3U8Response getPrivateM3U8(PrivateM3U8Request request);
+
+    DetectCarResponse detectCar(DetectCarRequest request);
+
+    boolean openImageSearch(OpenImageSearchRequest imageSearchRequest);
+
+    boolean addGalleryImages(ImageSearchRequest request);
+
+    boolean deleteGalleryImages(ImageSearchRequest request);
+
+    ImageSearchResponse searchGalleryImages(ImageSearchRequest request);
+
+    MediaWorkflowListResponse triggerWorkflowList(MediaWorkflowListRequest request);
+
+    InputStream getSnapshot(CosSnapshotRequest request);
+
+    String generateQrcode(GenerateQrcodeRequest request);
+
+    Boolean addImageStyle(ImageStyleRequest request);
+
+    ImageStyleResponse getImageStyle(ImageStyleRequest request);
+
+    Boolean deleteImageStyle(ImageStyleRequest request);
+
+    String getObjectDecompressionStatus(String bucketName, String objectKey);
+
+    String reportBadCase(ReportBadCaseRequest reportBadCaseRequest);
+
+    /**
+     *提交一个解压任务
+     * @param decompressionRequest 解压请求体
+     * @return 解压状态
+     */
+    DecompressionResult postObjectDecompression(DecompressionRequest decompressionRequest);
+
+
+    /**
+     * 查询解压任务的状态
+     * @param bucketName 桶名
+     * @param objectKey 对象的key
+     * @param jobId 指定jobId（可以是null）
+     * @return 解压状态
+     */
+    DecompressionResult getObjectDecompressionStatus(String bucketName, String objectKey, String jobId);
+
+    /**
+     * 列出解压缩任务列表.
+     * @param bucketName 桶名称
+     * @param jobStatus 支持Running|Success|Failed|Pending等选项进行查询过滤（可以是null）
+     * @param sortType 支持asc/dsc两个选项， 分别代表升序和降序（可以是null）
+     * @param maxResults 每一页最多列出的项数（可以是null）
+     * @param nextToken 可选项，用于翻页（可以是null）
+     * @return 解压缩任务列表
+     */
+    ListJobsResult listObjectDecompressionJobs(String bucketName, String jobStatus, String sortType, String maxResults, String nextToken);
+
+    MediaJobResponse createPicProcessJob(MediaJobsRequest req);
+
+    MediaListQueueResponse describePicProcessQueues(MediaQueueRequest request);
+
+    boolean processImage2(CImageProcessRequest imageProcessRequest);
 }
 
 

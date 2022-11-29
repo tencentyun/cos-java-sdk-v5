@@ -59,6 +59,7 @@ public class CosServiceRequest implements Cloneable, ReadLimitInfo  {
      */
     private CosServiceRequest cloneSource;
 
+    private String ciSpecialEndParameter;
     /**
      * Sets the optional progress listener for receiving updates about the progress of the request.
      *
@@ -271,5 +272,13 @@ public class CosServiceRequest implements Cloneable, ReadLimitInfo  {
 
     public void setCosCredentials(COSCredentials cosCredentials) {
         this.cosCredentials = cosCredentials;
+    }
+
+    public String getCiSpecialEndParameter() {
+        return ciSpecialEndParameter;
+    }
+
+    public void setCiSpecialEndParameter(String ciSpecialEndParameter) {
+        this.ciSpecialEndParameter = ciSpecialEndParameter;
     }
 }

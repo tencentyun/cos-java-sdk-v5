@@ -25,6 +25,10 @@ public class MediaWaterMarkImage {
      * 透明度
      */
     private String transparency;
+    /**
+     * 是否背景图 true、false
+     */
+    private String background;
 
 
     public String getUrl() {
@@ -67,6 +71,13 @@ public class MediaWaterMarkImage {
         this.transparency = transparency;
     }
 
+    public String getBackground() {
+        return background;
+    }
+
+    public void setBackground(String background) {
+        this.background = background;
+    }
 
     @Override
     public String toString() {
@@ -76,6 +87,7 @@ public class MediaWaterMarkImage {
                 ", width='" + width + '\'' +
                 ", height='" + height + '\'' +
                 ", transparency='" + transparency + '\'' +
+                ", background='" + background + '\'' +
                 '}';
     }
 }

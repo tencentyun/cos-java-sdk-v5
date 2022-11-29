@@ -10,16 +10,16 @@ public class MediaInfoResponse extends CiServiceResult {
     /**
      * 媒体信息实体对象
      */
-    private MediaInfoObjcet mediaInfo;
+    private MediaInfoStreamObject mediaInfo;
 
-    public MediaInfoObjcet getMediaInfo() {
+    public MediaInfoStreamObject getMediaInfo() {
         if (mediaInfo==null){
-            mediaInfo = new MediaInfoObjcet();
+            mediaInfo = new MediaInfoStreamObject();
         }
         return mediaInfo;
     }
 
-    public void setMediaInfo(MediaInfoObjcet mediaInfo) {
+    public void setMediaInfo(MediaInfoStreamObject mediaInfo) {
         this.mediaInfo = mediaInfo;
     }
 

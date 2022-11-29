@@ -16,6 +16,11 @@ public class ImageLabelRequest extends CosServiceRequest {
      */
     private String bucketName;
 
+    /**
+     * url资源地址
+     */
+    private String detectUrl;
+
     public String getObjectKey() {
         return objectKey;
     }
@@ -30,5 +35,23 @@ public class ImageLabelRequest extends CosServiceRequest {
 
     public void setBucketName(String bucketName) {
         this.bucketName = bucketName;
+    }
+
+    public String getDetectUrl() {
+        return detectUrl;
+    }
+
+    public void setDetectUrl(String detectUrl) {
+        this.detectUrl = detectUrl;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("ImageLabelRequest{");
+        sb.append("objectKey='").append(objectKey).append('\'');
+        sb.append(", bucketName='").append(bucketName).append('\'');
+        sb.append(", detectUrl='").append(detectUrl).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 }

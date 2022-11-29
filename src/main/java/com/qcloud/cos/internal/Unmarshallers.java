@@ -18,37 +18,16 @@
 
 package com.qcloud.cos.internal;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.List;
 
 import com.qcloud.cos.internal.XmlResponsesSaxParser.CompleteMultipartUploadHandler;
 import com.qcloud.cos.internal.XmlResponsesSaxParser.CopyObjectResultHandler;
-import com.qcloud.cos.model.AccessControlList;
-import com.qcloud.cos.model.Bucket;
-import com.qcloud.cos.model.BucketCrossOriginConfiguration;
-import com.qcloud.cos.model.BucketDomainConfiguration;
-import com.qcloud.cos.model.BucketIntelligentTierConfiguration;
-import com.qcloud.cos.model.BucketLifecycleConfiguration;
-import com.qcloud.cos.model.BucketLoggingConfiguration;
-import com.qcloud.cos.model.BucketRefererConfiguration;
-import com.qcloud.cos.model.BucketReplicationConfiguration;
-import com.qcloud.cos.model.BucketTaggingConfiguration;
-import com.qcloud.cos.model.BucketVersioningConfiguration;
-import com.qcloud.cos.model.BucketWebsiteConfiguration;
-import com.qcloud.cos.model.DeleteBucketInventoryConfigurationResult;
-import com.qcloud.cos.model.DeleteObjectTaggingResult;
-import com.qcloud.cos.model.GetBucketInventoryConfigurationResult;
-import com.qcloud.cos.model.GetObjectTaggingResult;
-import com.qcloud.cos.model.InitiateMultipartUploadResult;
-import com.qcloud.cos.model.ListBucketInventoryConfigurationsResult;
-import com.qcloud.cos.model.MultipartUploadListing;
-import com.qcloud.cos.model.ObjectListing;
-import com.qcloud.cos.model.ObjectMetadata;
-import com.qcloud.cos.model.PartListing;
-import com.qcloud.cos.model.SetBucketInventoryConfigurationResult;
-import com.qcloud.cos.model.SetObjectTaggingResult;
-import com.qcloud.cos.model.VersionListing;
+import com.qcloud.cos.model.*;
+import com.qcloud.cos.model.bucketcertificate.BucketGetDomainCertificate;
 import com.qcloud.cos.model.ciModel.auditing.AudioAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.BatchImageAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.DocumentAuditingResponse;
@@ -60,14 +39,18 @@ import com.qcloud.cos.model.ciModel.bucket.DocBucketResponse;
 import com.qcloud.cos.model.ciModel.bucket.MediaBucketResponse;
 import com.qcloud.cos.model.ciModel.image.ImageLabelResponse;
 import com.qcloud.cos.model.ciModel.image.ImageLabelV2Response;
+import com.qcloud.cos.model.ciModel.image.ImageSearchResponse;
+import com.qcloud.cos.model.ciModel.image.ImageStyleResponse;
 import com.qcloud.cos.model.ciModel.job.DocJobListResponse;
 import com.qcloud.cos.model.ciModel.job.DocJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaListJobResponse;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoResponse;
+import com.qcloud.cos.model.ciModel.persistence.DetectCarResponse;
 import com.qcloud.cos.model.ciModel.queue.DocListQueueResponse;
 import com.qcloud.cos.model.ciModel.queue.MediaListQueueResponse;
 import com.qcloud.cos.model.ciModel.queue.MediaQueueResponse;
+import com.qcloud.cos.model.ciModel.snapshot.PrivateM3U8Response;
 import com.qcloud.cos.model.ciModel.snapshot.SnapshotResponse;
 import com.qcloud.cos.model.ciModel.template.MediaListTemplateResponse;
 import com.qcloud.cos.model.ciModel.template.MediaTemplateResponse;
@@ -325,6 +308,17 @@ public class Unmarshallers {
             }
             return new XmlResponsesSaxParser().parseBucketDomainConfigurationResponse(in)
                     .getConfiguration();
+        }
+    }
+
+    public static final class BucketDomainCertificateUnmarshaller
+            implements Unmarshaller<BucketGetDomainCertificate, InputStream> {
+        public BucketGetDomainCertificate unmarshall(InputStream in) throws Exception {
+            if (in.available() == 0) {
+                return null;
+            }
+            return new XmlResponsesSaxParser().parseBucketDomainCertificateResponse(in)
+                    .getBucketDomainCertificate();
         }
     }
 
@@ -747,4 +741,104 @@ public class Unmarshallers {
                     .parseDWebpageAuditingDescribeResponse(in).getResponse();
         }
     }
+
+    public static final class ImageAuditingDescribeJobUnmarshaller
+            implements Unmarshaller<ImageAuditingResponse, InputStream> {
+
+        public ImageAuditingResponse unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser()
+                    .parseImageAuditingDescribeResponse(in).getResponse();
+        }
+    }
+
+    public static final class PrivateM3U8Unmarshaller
+            implements Unmarshaller<PrivateM3U8Response, InputStream> {
+        public PrivateM3U8Response unmarshall(InputStream in) throws Exception {
+            PrivateM3U8Response privateM3U8Response = new PrivateM3U8Response();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+            StringBuffer sb = new StringBuffer("");
+            String line = "";
+            String NL = System.getProperty("line.separator");
+            while ((line = reader.readLine()) != null) {
+                sb.append(line + NL);
+            }
+            privateM3U8Response.setM3u8(sb.toString());
+            if (privateM3U8Response.getM3u8() == null)
+                privateM3U8Response.setM3u8("Unknown Error");
+
+            return privateM3U8Response;
+        }
+    }
+
+    public static final class DetectCarUnmarshaller
+            implements Unmarshaller<DetectCarResponse, InputStream> {
+
+        public DetectCarResponse unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser()
+                    .parseDetectCarResponse(in).getResponse();
+        }
+    }
+
+    public static final class SearchImagesUnmarshaller
+            implements Unmarshaller<ImageSearchResponse, InputStream> {
+
+        public ImageSearchResponse unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser()
+                    .parseSearchImagesResponse(in).getResponse();
+        }
+    }
+
+    public static final class triggerWorkflowListUnmarshaller
+            implements Unmarshaller<MediaWorkflowListResponse, InputStream> {
+
+        public MediaWorkflowListResponse unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser()
+                    .parsetriggerWorkflowListResponse(in).getResponse();
+        }
+    }
+
+    public static final class GenerateQrcodeUnmarshaller
+            implements Unmarshaller<String, InputStream> {
+
+        public String unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser()
+                    .parseGenerateQrcodeResponse(in).getResponse();
+        }
+    }
+
+    public static final class getImageStyleUnmarshaller
+            implements Unmarshaller<ImageStyleResponse, InputStream> {
+
+        public ImageStyleResponse unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser()
+                    .parseGetImageStyleResponse(in).getResponse();
+        }
+    }
+
+    public static final class DecompressionResultUnmarshaller
+        implements Unmarshaller<DecompressionResult, InputStream> {
+
+        public DecompressionResult unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser().parseDecompressionResult(in)
+                .getDecompressionResult();
+        }
+    }
+
+    public static final class ListJobsResultUnmarshaller
+        implements Unmarshaller<ListJobsResult, InputStream> {
+
+        public ListJobsResult unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser().parseListJobsResult(in).getResult();
+        }
+    }
+
+    public static final class ReportBadCaseUnmarshaller
+            implements Unmarshaller<String, InputStream> {
+
+        public String unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser()
+                    .parseReportBadCase(in).getResponse();
+        }
+    }
+
 }

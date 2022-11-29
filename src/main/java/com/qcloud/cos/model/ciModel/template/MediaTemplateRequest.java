@@ -50,6 +50,16 @@ public class MediaTemplateRequest extends CIServiceRequest implements Serializab
      * 水印
      */
     private MediaWatermark watermark;
+
+    /**
+     * 拼接参数
+     */
+    private MediaConcatTemplateObject concat;
+
+    private MediaAudioMixObject audioMix;
+
+    private VideoTargetRec videoTargetRec;
+
     /**
      * 第几页
      */
@@ -194,6 +204,39 @@ public class MediaTemplateRequest extends CIServiceRequest implements Serializab
 
     public void setWatermark(MediaWatermark watermark) {
         this.watermark = watermark;
+    }
+
+    public MediaConcatTemplateObject getConcat() {
+        if (concat == null) {
+            concat = new MediaConcatTemplateObject();
+        }
+        return concat;
+    }
+
+    public void setConcat(MediaConcatTemplateObject concat) {
+        this.concat = concat;
+    }
+
+    public MediaAudioMixObject getAudioMix() {
+        if (audioMix == null) {
+            audioMix = new MediaAudioMixObject();
+        }
+        return audioMix;
+    }
+
+    public void setAudioMix(MediaAudioMixObject audioMix) {
+        this.audioMix = audioMix;
+    }
+
+    public VideoTargetRec getVideoTargetRec() {
+        if (videoTargetRec == null) {
+            videoTargetRec = new VideoTargetRec();
+        }
+        return videoTargetRec;
+    }
+
+    public void setVideoTargetRec(VideoTargetRec videoTargetRec) {
+        this.videoTargetRec = videoTargetRec;
     }
 
     @Override

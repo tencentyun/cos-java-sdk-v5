@@ -7,12 +7,25 @@ public class MediaContainerObject {
      */
     private String format;
 
+    /**
+     * 分片配置,当format为hls和dash时有效
+     */
+    private MediaClipConfig clipConfig = new MediaClipConfig();
+
     public String getFormat() {
         return format;
     }
 
     public void setFormat(String format) {
         this.format = format;
+    }
+
+    public MediaClipConfig getClipConfig() {
+        return clipConfig;
+    }
+
+    public void setClipConfig(MediaClipConfig clipConfig) {
+        this.clipConfig = clipConfig;
     }
 
     @Override

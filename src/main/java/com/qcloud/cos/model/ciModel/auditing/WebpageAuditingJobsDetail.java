@@ -14,7 +14,21 @@ public class WebpageAuditingJobsDetail {
     private String suggestion;
     private String url;
     private String creationTime;
+    private String code;
+    private String message;
+    private String dataId;
+    private AuditingLabels labels;
+    private String highlightHtml;
     private UserInfo userInfo = new UserInfo();
+    private ListInfo listInfo = new ListInfo();
+
+    public ListInfo getListInfo() {
+        return listInfo;
+    }
+
+    public void setListInfo(ListInfo listInfo) {
+        this.listInfo = listInfo;
+    }
 
     public List<ResultsImageAuditingDetail> getImageResults() {
         return imageResults;
@@ -96,6 +110,50 @@ public class WebpageAuditingJobsDetail {
         this.userInfo = userInfo;
     }
 
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public String getDataId() {
+        return dataId;
+    }
+
+    public void setDataId(String dataId) {
+        this.dataId = dataId;
+    }
+
+
+    public String getHighlightHtml() {
+        return highlightHtml;
+    }
+
+    public void setHighlightHtml(String highlightHtml) {
+        this.highlightHtml = highlightHtml;
+    }
+
+    public AuditingLabels getLabels() {
+        if (labels == null) {
+            labels = new AuditingLabels();
+        }
+        return labels;
+    }
+
+    public void setLabels(AuditingLabels labels) {
+        this.labels = labels;
+    }
+
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("WebpageAuditingJobsDetail{");
@@ -108,6 +166,13 @@ public class WebpageAuditingJobsDetail {
         sb.append(", suggestion='").append(suggestion).append('\'');
         sb.append(", url='").append(url).append('\'');
         sb.append(", creationTime='").append(creationTime).append('\'');
+        sb.append(", code='").append(code).append('\'');
+        sb.append(", message='").append(message).append('\'');
+        sb.append(", dataId='").append(dataId).append('\'');
+        sb.append(", labels='").append(labels).append('\'');
+        sb.append(", highlightHtml='").append(highlightHtml).append('\'');
+        sb.append(", userInfo=").append(userInfo);
+        sb.append(", listInfo=").append(listInfo);
         sb.append('}');
         return sb.toString();
     }

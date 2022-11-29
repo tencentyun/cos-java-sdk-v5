@@ -60,6 +60,11 @@ public class MediaWorkflowListRequest extends CIServiceRequest implements Serial
      */
     private String runId;
 
+    /**
+     * 需要进行工作流处理的对象名称
+     */
+    private String object;
+
     public String getRunId() {
         return runId;
     }
@@ -156,21 +161,32 @@ public class MediaWorkflowListRequest extends CIServiceRequest implements Serial
         this.nextToken = nextToken;
     }
 
+    public String getObject() {
+        return object;
+    }
+
+    public void setObject(String object) {
+        this.object = object;
+    }
+
     @Override
     public String toString() {
-        return "WorkflowRequest{" +
-                "ids='" + ids + '\'' +
-                ", name='" + name + '\'' +
-                ", pageNumber='" + pageNumber + '\'' +
-                ", pageSize='" + pageSize + '\'' +
-                ", workflowId='" + workflowId + '\'' +
-                ", orderByTime='" + orderByTime + '\'' +
-                ", size='" + size + '\'' +
-                ", states='" + states + '\'' +
-                ", startCreationTime='" + startCreationTime + '\'' +
-                ", endCreationTime='" + endCreationTime + '\'' +
-                ", nextToken='" + nextToken + '\'' +
-                '}';
+        final StringBuffer sb = new StringBuffer("MediaWorkflowListRequest{");
+        sb.append("ids='").append(ids).append('\'');
+        sb.append(", name='").append(name).append('\'');
+        sb.append(", pageNumber='").append(pageNumber).append('\'');
+        sb.append(", pageSize='").append(pageSize).append('\'');
+        sb.append(", workflowId='").append(workflowId).append('\'');
+        sb.append(", orderByTime='").append(orderByTime).append('\'');
+        sb.append(", size='").append(size).append('\'');
+        sb.append(", states='").append(states).append('\'');
+        sb.append(", startCreationTime='").append(startCreationTime).append('\'');
+        sb.append(", endCreationTime='").append(endCreationTime).append('\'');
+        sb.append(", nextToken='").append(nextToken).append('\'');
+        sb.append(", runId='").append(runId).append('\'');
+        sb.append(", object='").append(object).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 
 }

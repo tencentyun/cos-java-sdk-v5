@@ -9,7 +9,11 @@ public class SnapshotInfo {
     private TerroristInfo terroristInfo;
     private PoliticsInfo politicsInfo;
     private AdsInfo adsInfo;
+    private TeenagerInfo teenagerInfo = new TeenagerInfo();
     private String text;
+    private String label;
+    private String result;
+    private String snapshotTime;
 
     public String getUrl() {
         return url;
@@ -69,6 +73,38 @@ public class SnapshotInfo {
 
     public void setText(String text) {
         this.text = text;
+    }
+
+    public TeenagerInfo getTeenagerInfo() {
+        return teenagerInfo;
+    }
+
+    public void setTeenagerInfo(TeenagerInfo teenagerInfo) {
+        this.teenagerInfo = teenagerInfo;
+    }
+
+    public String getSnapshotTime() {
+        return snapshotTime;
+    }
+
+    public void setSnapshotTime(String snapshotTime) {
+        this.snapshotTime = snapshotTime;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
+    public String getResult() {
+        return result;
+    }
+
+    public void setResult(String result) {
+        this.result = result;
     }
 
     @Override

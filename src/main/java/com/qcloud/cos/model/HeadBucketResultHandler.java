@@ -37,7 +37,9 @@ public class HeadBucketResultHandler extends AbstractCosResponseHandler<HeadBuck
         boolean isMergeBucket = false;
         for (Map.Entry<String, String> header : response.getHeaders().entrySet()) {
             String key = header.getKey();
-            if (key.equalsIgnoreCase(Headers.BUCKET_ARCH)) {
+            String value = header.getValue();
+            if (key.equalsIgnoreCase(Headers.BUCKET_ARCH) &&
+                    value.equalsIgnoreCase("OFS")) {
                 isMergeBucket = true;
                 break;
             }

@@ -71,6 +71,11 @@ public class AuditingJobsDetail {
     private String label;
 
     /**
+     * 二级标签
+     */
+    private String subLabel;
+
+    /**
      * 审核结果 鉴黄信息
      */
     private PornInfo pornInfo;
@@ -107,15 +112,26 @@ public class AuditingJobsDetail {
 
     private List<SnapshotInfo> snapshotList;
 
+    private List<AudioSectionInfo> audioSectionList = new ArrayList<>();
+
     /**
      * 具体文本分片的审核结果信息，只返回带有违规结果的分片
      */
     private List<SectionInfo> sectionList;
 
     /**
+     *
+     */
+    private SectionInfo audioSection;
+
+    /**
      * 用户自定义信息
      */
     private UserInfo userInfo = new UserInfo();
+    /**
+     * 黑白名单信息
+     */
+    private ListInfo listInfo = new ListInfo();
 
     public String getJobId() {
         return jobId;
@@ -326,11 +342,49 @@ public class AuditingJobsDetail {
     }
 
     public TeenagerInfo getTeenagerInfo() {
+        if (teenagerInfo == null){
+            teenagerInfo = new TeenagerInfo();
+        }
         return teenagerInfo;
     }
 
     public void setTeenagerInfo(TeenagerInfo teenagerInfo) {
         this.teenagerInfo = teenagerInfo;
+    }
+
+    public List<AudioSectionInfo> getAudioSectionList() {
+        return audioSectionList;
+    }
+
+    public void setAudioSectionList(List<AudioSectionInfo> audioSectionList) {
+        this.audioSectionList = audioSectionList;
+    }
+
+    public SectionInfo getAudioSection() {
+        if (audioSection == null){
+            audioSection = new AudioSectionInfo();
+        }
+        return audioSection;
+    }
+
+    public void setAudioSection(SectionInfo audioSection) {
+        this.audioSection = audioSection;
+    }
+
+    public ListInfo getListInfo() {
+        return listInfo;
+    }
+
+    public void setListInfo(ListInfo listInfo) {
+        this.listInfo = listInfo;
+    }
+
+    public String getSubLabel() {
+        return subLabel;
+    }
+
+    public void setSubLabel(String subLabel) {
+        this.subLabel = subLabel;
     }
 
     @Override
@@ -350,6 +404,7 @@ public class AuditingJobsDetail {
         sb.append(", url='").append(url).append('\'');
         sb.append(", dataId='").append(dataId).append('\'');
         sb.append(", label='").append(label).append('\'');
+        sb.append(", subLabel='").append(subLabel).append('\'');
         sb.append(", pornInfo=").append(pornInfo);
         sb.append(", terroristInfo=").append(terroristInfo);
         sb.append(", politicsInfo=").append(politicsInfo);
@@ -358,8 +413,11 @@ public class AuditingJobsDetail {
         sb.append(", illegalInfo=").append(illegalInfo);
         sb.append(", teenagerInfo=").append(teenagerInfo);
         sb.append(", snapshotList=").append(snapshotList);
+        sb.append(", audioSectionList=").append(audioSectionList);
         sb.append(", sectionList=").append(sectionList);
+        sb.append(", audioSection=").append(audioSection);
         sb.append(", userInfo=").append(userInfo);
+        sb.append(", listInfo=").append(listInfo);
         sb.append('}');
         return sb.toString();
     }

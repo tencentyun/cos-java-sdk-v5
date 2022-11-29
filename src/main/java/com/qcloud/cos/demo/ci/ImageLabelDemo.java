@@ -28,7 +28,9 @@ public class ImageLabelDemo {
         ImageLabelRequest request = new ImageLabelRequest();
         //2.添加请求参数 参数详情请见api接口文档
         request.setBucketName("demo-123456789");
-        request.setObjectKey("1.png");
+        //2.1设置图片位置或直接传入图片的url
+//        request.setObjectKey("1.png");
+        request.setDetectUrl("https://demo-123456789.cos.ap-chongqing.myqcloud.com/1.png");
         //3.调用接口,获取任务响应对象
         ImageLabelResponse response = client.getImageLabel(request);
         String jsonStr = responseToJsonStr(response);

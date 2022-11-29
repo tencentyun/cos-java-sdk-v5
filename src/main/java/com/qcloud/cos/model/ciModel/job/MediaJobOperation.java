@@ -2,6 +2,10 @@ package com.qcloud.cos.model.ciModel.job;
 
 import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoObjcet;
+import com.qcloud.cos.model.ciModel.template.MediaSegmentObject;
+import com.qcloud.cos.model.ciModel.template.MediaSmartCoverObject;
+import com.qcloud.cos.model.ciModel.template.MediaSnapshotObject;
+import com.qcloud.cos.model.ciModel.template.MediaVideoMontageObject;
 import com.qcloud.cos.model.ciModel.template.MediaWatermark;
 
 import java.util.ArrayList;
@@ -13,6 +17,10 @@ import java.util.List;
 
 public class MediaJobOperation {
     private String templateId;
+    private String jobLevel;
+    private String UserData;
+    private String templateName;
+    private String decryptKey;
     private MediaOutputObject output;
     private MediaAnimationObject mediaAnimation;
     private MediaInfoObjcet mediaInfo;
@@ -20,7 +28,18 @@ public class MediaJobOperation {
     private MediaWatermark watermark;
     private MediaTranscodeObject transcode;
     private List<String> watermarkTemplateId;
+    private List<MediaWatermark> watermarkList;
     private MediaConcatTemplateObject mediaConcatTemplate;
+    private MediaSnapshotObject snapshot = new MediaSnapshotObject();
+    private MediaSegmentObject segment = new MediaSegmentObject();
+    private MediaSmartCoverObject smartCover = new MediaSmartCoverObject();
+    private MediaVideoMontageObject videoMontage = new MediaVideoMontageObject();
+    private MediaDigitalWatermark digitalWatermark = new MediaDigitalWatermark();
+    private ExtractDigitalWatermark extractDigitalWatermark = new ExtractDigitalWatermark();
+    private MediaPicProcessTemplateObject picProcess = new MediaPicProcessTemplateObject();
+    private MediaResult mediaResult = new MediaResult();
+    private PicProcessResult picProcessResult = new PicProcessResult();
+    private VideoTargetRec videoTargetRec = new VideoTargetRec();
 
     public MediaJobOperation() {
         this.output = new MediaOutputObject();
@@ -123,10 +142,143 @@ public class MediaJobOperation {
         this.transcode = transcode;
     }
 
+    public MediaDigitalWatermark getDigitalWatermark() {
+        return digitalWatermark;
+    }
+
+    public void setDigitalWatermark(MediaDigitalWatermark digitalWatermark) {
+        this.digitalWatermark = digitalWatermark;
+    }
+
+    public ExtractDigitalWatermark getExtractDigitalWatermark() {
+        return extractDigitalWatermark;
+    }
+
+    public void setExtractDigitalWatermark(ExtractDigitalWatermark extractDigitalWatermark) {
+        this.extractDigitalWatermark = extractDigitalWatermark;
+    }
+
+    public MediaSnapshotObject getSnapshot() {
+        return snapshot;
+    }
+
+    public void setSnapshot(MediaSnapshotObject snapshot) {
+        this.snapshot = snapshot;
+    }
+
+    public MediaSegmentObject getSegment() {
+        return segment;
+    }
+
+    public void setSegment(MediaSegmentObject segment) {
+        this.segment = segment;
+    }
+
+    public List<MediaWatermark> getWatermarkList() {
+        if (watermarkList == null) {
+            watermarkList = new ArrayList<>();
+        }
+        return watermarkList;
+    }
+
+    public void setWatermarkList(List<MediaWatermark> watermarkList) {
+        this.watermarkList = watermarkList;
+    }
+
+    public MediaSmartCoverObject getSmartCover() {
+        return smartCover;
+    }
+
+    public void setSmartCover(MediaSmartCoverObject smartCover) {
+        this.smartCover = smartCover;
+    }
+
+    public MediaVideoMontageObject getVideoMontage() {
+        return videoMontage;
+    }
+
+    public void setVideoMontage(MediaVideoMontageObject videoMontage) {
+        this.videoMontage = videoMontage;
+    }
+
+    public String getJobLevel() {
+        return jobLevel;
+    }
+
+    public void setJobLevel(String jobLevel) {
+        this.jobLevel = jobLevel;
+    }
+
+    public MediaPicProcessTemplateObject getPicProcess() {
+        if (picProcess == null) {
+            picProcess = new MediaPicProcessTemplateObject();
+        }
+        return picProcess;
+    }
+
+    public void setPicProcess(MediaPicProcessTemplateObject picProcess) {
+        this.picProcess = picProcess;
+    }
+
+    public String getUserData() {
+        return UserData;
+    }
+
+    public void setUserData(String userData) {
+        UserData = userData;
+    }
+
+    public String getTemplateName() {
+        return templateName;
+    }
+
+    public void setTemplateName(String templateName) {
+        this.templateName = templateName;
+    }
+
+    public MediaResult getMediaResult() {
+        return mediaResult;
+    }
+
+    public void setMediaResult(MediaResult mediaResult) {
+        this.mediaResult = mediaResult;
+    }
+
+    public PicProcessResult getPicProcessResult() {
+        return picProcessResult;
+    }
+
+    public void setPicProcessResult(PicProcessResult picProcessResult) {
+        this.picProcessResult = picProcessResult;
+    }
+
+    public String getDecryptKey() {
+        return decryptKey;
+    }
+
+    public void setDecryptKey(String decryptKey) {
+        this.decryptKey = decryptKey;
+    }
+
+    public VideoTargetRec getVideoTargetRec() {
+        if (videoTargetRec == null) {
+            videoTargetRec = new VideoTargetRec();
+        }
+        return videoTargetRec;
+    }
+
+    public void setVideoTargetRec(VideoTargetRec videoTargetRec) {
+        this.videoTargetRec = videoTargetRec;
+    }
+
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("MediaJobOperation{");
+        final StringBuilder sb = new StringBuilder("MediaJobOperation{");
         sb.append("templateId='").append(templateId).append('\'');
+        sb.append(", jobLevel='").append(jobLevel).append('\'');
+        sb.append(", UserData='").append(UserData).append('\'');
+        sb.append(", templateName='").append(templateName).append('\'');
+        sb.append(", decryptKey='").append(decryptKey).append('\'');
         sb.append(", output=").append(output);
         sb.append(", mediaAnimation=").append(mediaAnimation);
         sb.append(", mediaInfo=").append(mediaInfo);
@@ -134,7 +286,18 @@ public class MediaJobOperation {
         sb.append(", watermark=").append(watermark);
         sb.append(", transcode=").append(transcode);
         sb.append(", watermarkTemplateId=").append(watermarkTemplateId);
+        sb.append(", watermarkList=").append(watermarkList);
         sb.append(", mediaConcatTemplate=").append(mediaConcatTemplate);
+        sb.append(", snapshot=").append(snapshot);
+        sb.append(", segment=").append(segment);
+        sb.append(", smartCover=").append(smartCover);
+        sb.append(", videoMontage=").append(videoMontage);
+        sb.append(", digitalWatermark=").append(digitalWatermark);
+        sb.append(", extractDigitalWatermark=").append(extractDigitalWatermark);
+        sb.append(", picProcess=").append(picProcess);
+        sb.append(", mediaResult=").append(mediaResult);
+        sb.append(", picProcessResult=").append(picProcessResult);
+        sb.append(", videoTargetRec=").append(videoTargetRec);
         sb.append('}');
         return sb.toString();
     }

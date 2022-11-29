@@ -62,6 +62,36 @@ public class MediaJobsRequest extends CIServiceRequest implements Serializable {
      */
     private String callBack;
 
+    /**
+     * 回调类型  json / xml  默认为xml
+     */
+    private String callBackFormat;
+
+    /**
+     * 任务回调类型，Url 或 TDMQ，默认 Url，优先级高于队列的回调类型
+     */
+    private String callBackType;
+
+    private CallBackMqConfig callBackMqConfig;
+
+    public String getCallBackType() {
+        return callBackType;
+    }
+
+    public void setCallBackType(String callBackType) {
+        this.callBackType = callBackType;
+    }
+
+    public CallBackMqConfig getCallBackMqConfig() {
+        if (callBackMqConfig == null) {
+            callBackMqConfig = new CallBackMqConfig();
+        }
+        return callBackMqConfig;
+    }
+
+    public void setCallBackMqConfig(CallBackMqConfig callBackMqConfig) {
+        this.callBackMqConfig = callBackMqConfig;
+    }
 
     public String getBucketName() {
         return bucketName;
@@ -173,23 +203,31 @@ public class MediaJobsRequest extends CIServiceRequest implements Serializable {
         this.callBack = callBack;
     }
 
+    public String getCallBackFormat() {
+        return callBackFormat;
+    }
+
+    public void setCallBackFormat(String callBackFormat) {
+        this.callBackFormat = callBackFormat;
+    }
+
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("MediaJobsRequest{");
-        sb.append("bucketName='").append(bucketName).append('\'');
-        sb.append(", queueId='").append(queueId).append('\'');
-        sb.append(", tag='").append(tag).append('\'');
-        sb.append(", orderByTime='").append(orderByTime).append('\'');
-        sb.append(", nextToken='").append(nextToken).append('\'');
-        sb.append(", size=").append(size);
-        sb.append(", states='").append(states).append('\'');
-        sb.append(", startCreationTime='").append(startCreationTime).append('\'');
-        sb.append(", endCreationTime='").append(endCreationTime).append('\'');
-        sb.append(", jobId='").append(jobId).append('\'');
-        sb.append(", input=").append(input);
-        sb.append(", operation=").append(operation);
-        sb.append(", callBack='").append(callBack).append('\'');
-        sb.append('}');
-        return sb.toString();
+        return "MediaJobsRequest{" +
+                "bucketName='" + bucketName + '\'' +
+                ", queueId='" + queueId + '\'' +
+                ", tag='" + tag + '\'' +
+                ", orderByTime='" + orderByTime + '\'' +
+                ", nextToken='" + nextToken + '\'' +
+                ", size=" + size +
+                ", states='" + states + '\'' +
+                ", startCreationTime='" + startCreationTime + '\'' +
+                ", endCreationTime='" + endCreationTime + '\'' +
+                ", jobId='" + jobId + '\'' +
+                ", input=" + input +
+                ", operation=" + operation +
+                ", callBack='" + callBack + '\'' +
+                ", callBackFormat='" + callBackFormat + '\'' +
+                '}';
     }
 }
