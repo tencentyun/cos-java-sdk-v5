@@ -2,18 +2,100 @@ package com.qcloud.cos.model.ciModel.xml;
 
 import com.qcloud.cos.internal.RequestXmlFactory;
 import com.qcloud.cos.internal.XmlWriter;
+import com.qcloud.cos.model.ciModel.auditing.AudioAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.AuditingInputObject;
 import com.qcloud.cos.model.ciModel.auditing.AuditingSnapshotObject;
+import com.qcloud.cos.model.ciModel.auditing.BatchImageAuditingInputObject;
+import com.qcloud.cos.model.ciModel.auditing.BatchImageAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.Conf;
+import com.qcloud.cos.model.ciModel.auditing.DocumentAuditingRequest;
+import com.qcloud.cos.model.ciModel.auditing.Freeze;
 import com.qcloud.cos.model.ciModel.auditing.ReportBadCaseRequest;
+import com.qcloud.cos.model.ciModel.auditing.TextAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.UserInfo;
 import com.qcloud.cos.model.ciModel.auditing.VideoAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.WebpageAuditingRequest;
+
+import java.util.List;
 
 /**
  * 数据万象内容审核xml格式化
  */
 public class CIAuditingXmlFactory {
+
+    /**
+     * 批量图片处理xml
+     */
+    public static byte[] convertToXmlByteArray(BatchImageAuditingRequest request) {
+        XmlWriter xml = new XmlWriter();
+
+        xml.start("Request");
+        List<BatchImageAuditingInputObject> inputList = request.getInputList();
+        for (BatchImageAuditingInputObject inputObject : inputList) {
+            xml.start("Input");
+            CIMediaXmlFactory.addIfNotNull(xml, "Url", inputObject.getUrl());
+            CIMediaXmlFactory.addIfNotNull(xml, "Object", inputObject.getObject());
+            CIMediaXmlFactory.addIfNotNull(xml, "DataId", inputObject.getDataId());
+            CIMediaXmlFactory.addIfNotNull(xml, "MaxFrames", inputObject.getMaxFrames());
+            CIMediaXmlFactory.addIfNotNull(xml, "Interval", inputObject.getInterval());
+            CIMediaXmlFactory.addIfNotNull(xml, "LargeImageDetect", inputObject.getLargeImageDetect());
+            CIMediaXmlFactory.addIfNotNull(xml, "Content", inputObject.getContent());
+            addUserInfo(xml, inputObject.getUserInfo());
+            xml.end();
+        }
+
+        addAuditingConf(xml, request.getConf());
+        xml.end();
+        return xml.getBytes();
+    }
+
+    /**
+     * 文本审核处理xml
+     */
+    public static byte[] convertToXmlByteArray(TextAuditingRequest request) {
+        XmlWriter xml = new XmlWriter();
+
+        xml.start("Request");
+        addAuditingInput(xml, request.getInput());
+        addAuditingConf(xml, request.getConf());
+        xml.end();
+
+        return xml.getBytes();
+    }
+
+    /**
+     * 文档审核处理xml
+     */
+    public static byte[] convertToXmlByteArray(DocumentAuditingRequest request) {
+        XmlWriter xml = new XmlWriter();
+
+        xml.start("Request");
+        xml.start("Input");
+        CIMediaXmlFactory.addIfNotNull(xml, "Url", request.getInput().getUrl());
+        CIMediaXmlFactory.addIfNotNull(xml, "Object", request.getInput().getObject());
+        CIMediaXmlFactory.addIfNotNull(xml, "Type", request.getInput().getType());
+        CIMediaXmlFactory.addIfNotNull(xml, "DataId", request.getInput().getDataId());
+        addUserInfo(xml, request.getInput().getUserInfo());
+        xml.end();
+        addAuditingConf(xml, request.getConf());
+
+        xml.end();
+        return xml.getBytes();
+    }
+
+    /**
+     * 音频审核处理xml
+     */
+    public static byte[] convertToXmlByteArray(AudioAuditingRequest request) {
+        XmlWriter xml = new XmlWriter();
+
+        xml.start("Request");
+        addAuditingInput(xml, request.getInput());
+        addAuditingConf(xml, request.getConf());
+        xml.end();
+
+        return xml.getBytes();
+    }
 
     /**
      * 文本审核结果反馈
@@ -49,8 +131,8 @@ public class CIAuditingXmlFactory {
         XmlWriter xml = new XmlWriter();
 
         xml.start("Request");
-        addAuditingInput(xml,request.getInput());
-        addAuditingConf(xml,request.getConf());
+        addAuditingInput(xml, request.getInput());
+        addAuditingConf(xml, request.getConf());
         xml.end();
         return xml.getBytes();
     }
@@ -85,6 +167,7 @@ public class CIAuditingXmlFactory {
             CIMediaXmlFactory.addIfNotNull(xml, "Object", inputObject.getObject());
             CIMediaXmlFactory.addIfNotNull(xml, "Url", inputObject.getUrl());
             CIMediaXmlFactory.addIfNotNull(xml, "DataId", inputObject.getDataId());
+            CIMediaXmlFactory.addIfNotNull(xml, "Content", inputObject.getContent());
             addUserInfo(xml, inputObject.getUserInfo());
             xml.end();
         }
@@ -100,7 +183,21 @@ public class CIAuditingXmlFactory {
             CIMediaXmlFactory.addIfNotNull(xml, "CallbackVersion", conf.getCallbackVersion());
             CIMediaXmlFactory.addIfNotNull(xml, "Callback", conf.getCallback());
             CIMediaXmlFactory.addIfNotNull(xml, "ReturnHighlightHtml", conf.getReturnHighlightHtml());
+            CIMediaXmlFactory.addIfNotNull(xml, "Async", conf.getAsync());
+
             addAuditingSnapshot(xml, conf.getSnapshot());
+            addFreeze(xml, conf.getFreeze());
+            xml.end();
+        }
+    }
+
+    private static void addFreeze(XmlWriter xml, Freeze freeze) {
+        if (RequestXmlFactory.CheckObjectUtils.objIsNotValid(freeze)) {
+            xml.start("Freeze");
+            CIMediaXmlFactory.addIfNotNull(xml, "PornScore", freeze.getPornScore());
+            CIMediaXmlFactory.addIfNotNull(xml, "AdsScore", freeze.getAdsScore());
+            CIMediaXmlFactory.addIfNotNull(xml, "TerrorismScore", freeze.getTerrorismScore());
+            CIMediaXmlFactory.addIfNotNull(xml, "PoliticsScore", freeze.getPoliticsScore());
             xml.end();
         }
     }

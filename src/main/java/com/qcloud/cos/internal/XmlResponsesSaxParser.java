@@ -5745,6 +5745,9 @@ public class XmlResponsesSaxParser {
                     case "State":
                         response.setState(getText());
                         break;
+                    case "forbidState":
+                        response.setForbidState(getText());
+                        break;
                     default:
                         break;
                 }
@@ -5866,6 +5869,9 @@ public class XmlResponsesSaxParser {
                         break;
                     case "Label":
                         jobsDetail.setLabel(getText());
+                        break;
+                    case "ForbidState":
+                        jobsDetail.setForbidState(getText());
                         break;
                     default:
                         break;
@@ -6028,6 +6034,9 @@ public class XmlResponsesSaxParser {
                         break;
                     case "SubLabel":
                         jobsDetail.setSubLabel(getText());
+                        break;
+                    case "ForbidState":
+                        jobsDetail.setForbidState(getText());
                         break;
                     default:
                         break;
@@ -6467,6 +6476,9 @@ public class XmlResponsesSaxParser {
                     case "Content":
                         jobsDetail.setContent(getText());
                         break;
+                    case "ForbidState":
+                        jobsDetail.setForbidState(getText());
+                        break;
                     default:
                         break;
                 }
@@ -6661,6 +6673,9 @@ public class XmlResponsesSaxParser {
                         break;
                     case "DataId":
                         jobsDetail.setDataId(getText());
+                        break;
+                    case "ForbidState":
+                        jobsDetail.setForbidState(getText());
                         break;
                     default:
                         break;
@@ -7185,6 +7200,9 @@ public class XmlResponsesSaxParser {
                         break;
                     case "Category":
                         response.setCategory(getText());
+                        break;
+                    case "ForbidState":
+                        response.setForbidState(getText());
                         break;
                     default:
                         break;

@@ -918,6 +918,9 @@ public class ParserMediaInfoUtils {
             case "State":
                 jobsDetail.setState(value);
                 break;
+            case "ForbidState":
+                jobsDetail.setForbidState(value);
+                break;
             default:
                 break;
         }
@@ -1136,16 +1139,16 @@ public class ParserMediaInfoUtils {
             case "Height":
                 location.setHeight(value);
                 break;
-           case "Width":
+            case "Width":
                 location.setWidth(value);
                 break;
-           case "Rotate":
+            case "Rotate":
                 location.setRotate(value);
                 break;
-           case "X":
+            case "X":
                 location.setX(value);
                 break;
-           case "Y":
+            case "Y":
                 location.setY(value);
                 break;
             default:

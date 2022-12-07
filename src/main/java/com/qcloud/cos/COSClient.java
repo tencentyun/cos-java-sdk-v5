@@ -4091,7 +4091,7 @@ public class COSClient implements COS {
         this.checkCIRequestCommon(videoAuditingRequest);
         this.rejectStartWith(videoAuditingRequest.getConf().getCallback(), "http", "The Conf.CallBack parameter mush start with http or https");
         CosHttpRequest<VideoAuditingRequest> request = createRequest(videoAuditingRequest.getBucketName(), "/video/auditing", videoAuditingRequest, HttpMethodName.POST);
-        this.setContent(request, RequestXmlFactory.convertToXmlByteArray(videoAuditingRequest), "application/xml", false);
+        this.setContent(request, CIAuditingXmlFactory.convertToXmlByteArray(videoAuditingRequest), "application/xml", false);
         return invoke(request, new Unmarshallers.VideoAuditingUnmarshaller());
     }
 
@@ -4109,7 +4109,7 @@ public class COSClient implements COS {
         this.checkCIRequestCommon(audioAuditingRequest);
         this.rejectStartWith(audioAuditingRequest.getConf().getCallback(), "http", "The Conf.CallBack parameter mush start with http or https");
         CosHttpRequest<AudioAuditingRequest> request = createRequest(audioAuditingRequest.getBucketName(), "/audio/auditing", audioAuditingRequest, HttpMethodName.POST);
-        this.setContent(request, RequestXmlFactory.convertToXmlByteArray(audioAuditingRequest), "application/xml", false);
+        this.setContent(request, CIAuditingXmlFactory.convertToXmlByteArray(audioAuditingRequest), "application/xml", false);
         return invoke(request, new Unmarshallers.AudioAuditingUnmarshaller());
     }
 
@@ -4152,7 +4152,7 @@ public class COSClient implements COS {
         this.checkCIRequestCommon(textAuditingRequest);
         this.rejectStartWith(textAuditingRequest.getConf().getCallback(), "http", "The Conf.CallBack parameter mush start with http or https");
         CosHttpRequest<TextAuditingRequest> request = createRequest(textAuditingRequest.getBucketName(), "/text/auditing", textAuditingRequest, HttpMethodName.POST);
-        this.setContent(request, RequestXmlFactory.convertToXmlByteArray(textAuditingRequest), "application/xml", false);
+        this.setContent(request, CIAuditingXmlFactory.convertToXmlByteArray(textAuditingRequest), "application/xml", false);
         return invoke(request, new Unmarshallers.TextAuditingJobUnmarshaller());
     }
 
@@ -4170,7 +4170,7 @@ public class COSClient implements COS {
         this.checkCIRequestCommon(documentAuditingRequest);
         this.rejectStartWith(documentAuditingRequest.getConf().getCallback(), "http", "The Conf.CallBack parameter mush start with http or https");
         CosHttpRequest<DocumentAuditingRequest> request = createRequest(documentAuditingRequest.getBucketName(), "/document/auditing", documentAuditingRequest, HttpMethodName.POST);
-        this.setContent(request, RequestXmlFactory.convertToXmlByteArray(documentAuditingRequest), "application/xml", false);
+        this.setContent(request, CIAuditingXmlFactory.convertToXmlByteArray(documentAuditingRequest), "application/xml", false);
         return invoke(request, new Unmarshallers.DocumentAuditingJobUnmarshaller());
     }
 
@@ -4188,7 +4188,7 @@ public class COSClient implements COS {
         this.checkCIRequestCommon(batchImageAuditingRequest);
         this.rejectStartWith(batchImageAuditingRequest.getConf().getCallback(), "http", "The Conf.CallBack parameter mush start with http or https");
         CosHttpRequest<BatchImageAuditingRequest> request = createRequest(batchImageAuditingRequest.getBucketName(), "/image/auditing", batchImageAuditingRequest, HttpMethodName.POST);
-        this.setContent(request, RequestXmlFactory.convertToXmlByteArray(batchImageAuditingRequest), "application/xml", false);
+        this.setContent(request, CIAuditingXmlFactory.convertToXmlByteArray(batchImageAuditingRequest), "application/xml", false);
         return invoke(request, new Unmarshallers.BatchImageAuditingJobUnmarshaller());
     }
 
