@@ -35,6 +35,7 @@ import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.exception.MultiObjectDeleteException.DeleteError;
 import com.qcloud.cos.internal.cihandler.DetectCarHandler;
+import com.qcloud.cos.internal.cihandler.FileProcessResponseHandler;
 import com.qcloud.cos.internal.cihandler.GenerateQrcodeHandler;
 import com.qcloud.cos.internal.cihandler.GetImageStyleHandler;
 import com.qcloud.cos.internal.cihandler.ReportBadCaseHandler;
@@ -887,6 +888,11 @@ public class XmlResponsesSaxParser {
 
     public ListJobsResultHandler parseListJobsResult(InputStream inputStream) throws IOException {
         ListJobsResultHandler handler = new ListJobsResultHandler();
+        parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
+        return handler;
+    }
+    public FileProcessResponseHandler parseFileProcessResponse(InputStream inputStream) throws IOException {
+        FileProcessResponseHandler handler = new FileProcessResponseHandler();
         parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
         return handler;
     }

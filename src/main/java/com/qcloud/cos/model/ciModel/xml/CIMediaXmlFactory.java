@@ -278,7 +278,7 @@ public class CIMediaXmlFactory {
         }
     }
 
-    private static void addOutput(XmlWriter xml, MediaOutputObject output) {
+    protected static void addOutput(XmlWriter xml, MediaOutputObject output) {
         if (objIsNotValid(output)) {
             xml.start("Output");
             addIfNotNull(xml, "Region", output.getRegion());

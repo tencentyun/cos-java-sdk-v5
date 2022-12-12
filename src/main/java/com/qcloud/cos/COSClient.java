@@ -130,6 +130,8 @@ import com.qcloud.cos.model.ciModel.job.DocJobListRequest;
 import com.qcloud.cos.model.ciModel.job.DocJobListResponse;
 import com.qcloud.cos.model.ciModel.job.DocJobRequest;
 import com.qcloud.cos.model.ciModel.job.DocJobResponse;
+import com.qcloud.cos.model.ciModel.job.FileProcessJobResponse;
+import com.qcloud.cos.model.ciModel.job.FileProcessRequest;
 import com.qcloud.cos.model.ciModel.job.MediaJobObject;
 import com.qcloud.cos.model.ciModel.job.MediaJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaJobsRequest;
@@ -159,6 +161,7 @@ import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowListRequest;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowListResponse;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowRequest;
 import com.qcloud.cos.model.ciModel.xml.CIAuditingXmlFactory;
+import com.qcloud.cos.model.ciModel.xml.CIFileProcessXmlFactory;
 import com.qcloud.cos.model.ciModel.xml.CIMediaXmlFactory;
 import com.qcloud.cos.model.ciModel.xml.CImageXmlFactory;
 import com.qcloud.cos.model.fetch.GetAsyncFetchTaskRequest;
@@ -4679,6 +4682,26 @@ public class COSClient implements COS {
         }
         invoke(request, voidCosResponseHandler);
         return true;
+    }
+
+    @Override
+    public FileProcessJobResponse createFileProcessJob(FileProcessRequest req) {
+        this.checkCIRequestCommon(req);
+        rejectNull(req.getTag(),
+                "The tag parameter must be specified setting the object tags");
+        rejectNull(req.getQueueId(),
+                "The queueId parameter must be specified setting the object tags");
+        rejectNull(req.getInput().getObject(),
+                "The input parameter must be specified setting the object tags");
+        this.rejectStartWith(req.getCallBack(),"http","The CallBack parameter mush start with http or https");
+        CosHttpRequest<FileProcessRequest> request = createRequest(req.getBucketName(), "/file_jobs", req, HttpMethodName.POST);
+        this.setContent(request, CIFileProcessXmlFactory.convertToXmlByteArray(req), "application/xml", false);
+        return invoke(request, new Unmarshallers.CreateFileProcessUnmarshaller());
+    }
+
+    @Override
+    public FileProcessJobResponse describeFileProcessJob(FileProcessRequest request) {
+        return null;
     }
 
 }

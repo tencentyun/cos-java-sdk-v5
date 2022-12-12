@@ -50,6 +50,8 @@ import com.qcloud.cos.model.ciModel.job.DocJobListRequest;
 import com.qcloud.cos.model.ciModel.job.DocJobListResponse;
 import com.qcloud.cos.model.ciModel.job.DocJobRequest;
 import com.qcloud.cos.model.ciModel.job.DocJobResponse;
+import com.qcloud.cos.model.ciModel.job.FileProcessJobResponse;
+import com.qcloud.cos.model.ciModel.job.FileProcessRequest;
 import com.qcloud.cos.model.ciModel.job.MediaJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaJobsRequest;
 import com.qcloud.cos.model.ciModel.job.MediaListJobResponse;
@@ -3183,6 +3185,9 @@ public interface COS extends COSDirectSpi {
     MediaListQueueResponse describePicProcessQueues(MediaQueueRequest request);
 
     boolean processImage2(CImageProcessRequest imageProcessRequest);
+
+    FileProcessJobResponse createFileProcessJob(FileProcessRequest request);
+    FileProcessJobResponse describeFileProcessJob(FileProcessRequest request);
 }
 
 

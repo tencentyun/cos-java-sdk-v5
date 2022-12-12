@@ -1,0 +1,84 @@
+package com.qcloud.cos.model.ciModel.xml;
+
+import com.qcloud.cos.internal.XmlWriter;
+import com.qcloud.cos.model.ciModel.common.MediaInputObject;
+import com.qcloud.cos.model.ciModel.job.FileCompressConfig;
+import com.qcloud.cos.model.ciModel.job.FileHashCodeConfig;
+import com.qcloud.cos.model.ciModel.job.FileProcessOperation;
+import com.qcloud.cos.model.ciModel.job.FileProcessRequest;
+import com.qcloud.cos.model.ciModel.job.FileUnCompressConfig;
+
+/**
+ * 数据万象文件处理xml
+ */
+public class CIFileProcessXmlFactory {
+
+    /**
+     * 文件处理xml转换
+     */
+    public static byte[] convertToXmlByteArray(FileProcessRequest request) {
+        XmlWriter xml = new XmlWriter();
+        xml.start("Request");
+        xml.start("Tag").value(request.getTag().toString()).end();
+        addInput(xml, request.getInput());
+        addOperation(xml, request.getOperation());
+        CIMediaXmlFactory.addOutput(xml,request.getOutput());
+
+        CIMediaXmlFactory.addIfNotNull(xml, "QueueId", request.getQueueId());
+        CIMediaXmlFactory.addIfNotNull(xml, "CallBack", request.getCallBack());
+        CIMediaXmlFactory.addIfNotNull(xml, "CallBackFormat", request.getCallBackFormat());
+        CIMediaXmlFactory.addIfNotNull(xml, "CallBackType", request.getCallBackType());
+        CIMediaXmlFactory.addIfNotNull(xml, "CallBackMqConfig", request.getCallBackMqConfig());
+        xml.end();
+        return xml.getBytes();
+    }
+
+    private static void addInput(XmlWriter xml, MediaInputObject input) {
+        if (CIMediaXmlFactory.objIsNotValid(input)) {
+            xml.start("Input");
+            xml.start("Object").value(input.getObject()).end();
+            xml.end();
+        }
+    }
+
+    private static void addOperation(XmlWriter xml, FileProcessOperation operation) {
+        if (CIMediaXmlFactory.objIsNotValid(operation)) {
+            xml.start("Operation");
+            CIMediaXmlFactory.addIfNotNull(xml, "UserData", operation.getUserData());
+            FileCompressConfig fileCompressConfig = operation.getFileCompressConfig();
+            if (CIMediaXmlFactory.objIsNotValid(fileCompressConfig)) {
+                xml.start("FileCompressConfig");
+                CIMediaXmlFactory.addIfNotNull(xml, "Flatten", fileCompressConfig.getFlatten());
+                CIMediaXmlFactory.addIfNotNull(xml, "Format", fileCompressConfig.getFormat());
+                CIMediaXmlFactory.addIfNotNull(xml, "UrlList", fileCompressConfig.getUrlList());
+                CIMediaXmlFactory.addIfNotNull(xml, "Prefix", fileCompressConfig.getPrefix());
+                String[] key = fileCompressConfig.getKey();
+                if (key != null && key.length > 0) {
+                    for (String s : key) {
+                        xml.start("Key").value(s).end();
+                    }
+                }
+                xml.end();
+            } else {
+                FileUnCompressConfig fileUnCompressConfig = operation.getFileUnCompressConfig();
+                if (CIMediaXmlFactory.objIsNotValid(fileUnCompressConfig)) {
+                    xml.start("FileUncompressConfig");
+                    CIMediaXmlFactory.addIfNotNull(xml, "Prefix", fileUnCompressConfig.getPrefix());
+                    CIMediaXmlFactory.addIfNotNull(xml, "PrefixReplaced", fileUnCompressConfig.getPrefixReplaced());
+                    xml.end();
+                } else {
+                    FileHashCodeConfig fileHashCodeConfig = operation.getFileHashCodeConfig();
+                    if (CIMediaXmlFactory.objIsNotValid(fileHashCodeConfig)) {
+                        xml.start("FileHashCodeConfig");
+                        CIMediaXmlFactory.addIfNotNull(xml, "Type", fileHashCodeConfig.getType());
+                        CIMediaXmlFactory.addIfNotNull(xml, "AddToHeader", fileHashCodeConfig.getAddToHeader());
+                        xml.end();
+                    }
+                }
+            }
+            xml.end();
+        }
+    }
+
+
+}
