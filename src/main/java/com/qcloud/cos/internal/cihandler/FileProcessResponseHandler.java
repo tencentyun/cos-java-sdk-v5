@@ -69,7 +69,9 @@ public class FileProcessResponseHandler extends CIAbstractHandler {
             }
 
         } else if (in("Response", "JobsDetail", "Operation")) {
-
+            if ("UserData".equalsIgnoreCase(name)) {
+                response.getJobDetail().getOperation().setUserData(getText());
+            }
         } else if (in("Response", "JobsDetail", "Operation", "FileCompressConfig")) {
             FileCompressConfig fileCompressConfig = response.getJobDetail().getOperation().getFileCompressConfig();
             switch (name) {
@@ -83,7 +85,7 @@ public class FileProcessResponseHandler extends CIAbstractHandler {
                     fileCompressConfig.setFlatten(getText());
                     break;
                 case "Key":
-                    fileCompressConfig.setKey();
+                    fileCompressConfig.setKey(null);
                     break;
                 case "UrlList":
                     fileCompressConfig.setUrlList(getText());

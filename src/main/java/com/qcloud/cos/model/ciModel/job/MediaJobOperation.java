@@ -40,6 +40,16 @@ public class MediaJobOperation {
     private MediaResult mediaResult = new MediaResult();
     private PicProcessResult picProcessResult = new PicProcessResult();
     private VideoTargetRec videoTargetRec = new VideoTargetRec();
+    private VoiceSeparate voiceSeparate = new VoiceSeparate();
+    private MediaTimeIntervalObject timeInterval = new MediaTimeIntervalObject();
+
+    public MediaTimeIntervalObject getTimeInterval() {
+        return timeInterval;
+    }
+
+    public void setTimeInterval(MediaTimeIntervalObject timeInterval) {
+        this.timeInterval = timeInterval;
+    }
 
     public MediaJobOperation() {
         this.output = new MediaOutputObject();
@@ -271,6 +281,14 @@ public class MediaJobOperation {
         this.videoTargetRec = videoTargetRec;
     }
 
+    public VoiceSeparate getVoiceSeparate() {
+        return voiceSeparate;
+    }
+
+    public void setVoiceSeparate(VoiceSeparate voiceSeparate) {
+        this.voiceSeparate = voiceSeparate;
+    }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("MediaJobOperation{");
@@ -298,6 +316,7 @@ public class MediaJobOperation {
         sb.append(", mediaResult=").append(mediaResult);
         sb.append(", picProcessResult=").append(picProcessResult);
         sb.append(", videoTargetRec=").append(videoTargetRec);
+        sb.append(", voiceSeparate=").append(voiceSeparate);
         sb.append('}');
         return sb.toString();
     }

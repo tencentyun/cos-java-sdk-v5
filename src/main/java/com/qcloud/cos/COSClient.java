@@ -25,7 +25,6 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -125,6 +124,8 @@ import com.qcloud.cos.model.ciModel.image.ImageSearchResponse;
 import com.qcloud.cos.model.ciModel.image.ImageStyleRequest;
 import com.qcloud.cos.model.ciModel.image.ImageStyleResponse;
 import com.qcloud.cos.model.ciModel.image.OpenImageSearchRequest;
+import com.qcloud.cos.model.ciModel.job.BatchJobRequest;
+import com.qcloud.cos.model.ciModel.job.BatchJobResponse;
 import com.qcloud.cos.model.ciModel.job.DocHtmlRequest;
 import com.qcloud.cos.model.ciModel.job.DocJobListRequest;
 import com.qcloud.cos.model.ciModel.job.DocJobListResponse;
@@ -4691,17 +4692,31 @@ public class COSClient implements COS {
                 "The tag parameter must be specified setting the object tags");
         rejectNull(req.getQueueId(),
                 "The queueId parameter must be specified setting the object tags");
-        rejectNull(req.getInput().getObject(),
-                "The input parameter must be specified setting the object tags");
         this.rejectStartWith(req.getCallBack(),"http","The CallBack parameter mush start with http or https");
         CosHttpRequest<FileProcessRequest> request = createRequest(req.getBucketName(), "/file_jobs", req, HttpMethodName.POST);
         this.setContent(request, CIFileProcessXmlFactory.convertToXmlByteArray(req), "application/xml", false);
-        return invoke(request, new Unmarshallers.CreateFileProcessUnmarshaller());
+        return invoke(request, new Unmarshallers.FileProcessUnmarshaller());
     }
 
     @Override
     public FileProcessJobResponse describeFileProcessJob(FileProcessRequest request) {
-        return null;
+        this.checkCIRequestCommon(request);
+        CosHttpRequest<FileProcessRequest> httpRequest = this.createRequest(request.getBucketName(), "/file_jobs/" + request.getJobId(), request, HttpMethodName.GET);
+        return this.invoke(httpRequest, new Unmarshallers.FileProcessUnmarshaller());
+    }
+
+    @Override
+    public BatchJobResponse createInventoryTriggerJob(BatchJobRequest req) {
+        CosHttpRequest<BatchJobRequest> request = createRequest(req.getBucketName(), "/inventorytriggerjob", req, HttpMethodName.POST);
+        this.setContent(request, CIMediaXmlFactory.convertToXmlByteArray(req), "application/xml", false);
+        return invoke(request, new Unmarshallers.BatchJobUnmarshaller());
+    }
+
+    @Override
+    public BatchJobResponse describeInventoryTriggerJob(BatchJobRequest request) {
+        this.checkCIRequestCommon(request);
+        CosHttpRequest<BatchJobRequest> httpRequest = this.createRequest(request.getBucketName(), "/inventorytriggerjob/" + request.getJobId(), request, HttpMethodName.GET);
+        return this.invoke(httpRequest, new Unmarshallers.BatchJobUnmarshaller());
     }
 
 }

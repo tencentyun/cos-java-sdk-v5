@@ -12,7 +12,10 @@ import com.qcloud.cos.model.ciModel.auditing.PoliticsInfoObjectResults;
 import com.qcloud.cos.model.ciModel.auditing.SectionInfo;
 import com.qcloud.cos.model.ciModel.auditing.SnapshotInfo;
 import com.qcloud.cos.model.ciModel.auditing.UserInfo;
+import com.qcloud.cos.model.ciModel.common.BatchInputObject;
+import com.qcloud.cos.model.ciModel.common.MediaInputObject;
 import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
+import com.qcloud.cos.model.ciModel.job.AudioConfig;
 import com.qcloud.cos.model.ciModel.job.Md5Info;
 import com.qcloud.cos.model.ciModel.job.MediaAudioMixObject;
 import com.qcloud.cos.model.ciModel.job.MediaAudioObject;
@@ -1150,6 +1153,41 @@ public class ParserMediaInfoUtils {
                 break;
             case "Y":
                 location.setY(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParseAudioConfig(AudioConfig audioConfig, String name, String value) {
+        switch (name) {
+            case "Channels":
+                audioConfig.setChannels(value);
+                break;
+            case "Codec":
+                audioConfig.setCodec(value);
+                break;
+            case "Samplerate":
+                audioConfig.setSamplerate(value);
+                break;
+            case "Bitrate":
+                audioConfig.setBitrate(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParsingInput(BatchInputObject input, String name, String value) {
+        switch (name) {
+            case "Manifest":
+                input.setManifest(value);
+                break;
+            case "Prefix":
+                input.setPrefix(value);
+                break;
+            case "UrlFile":
+                input.setUrlFile(value);
                 break;
             default:
                 break;

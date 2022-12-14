@@ -4,8 +4,6 @@ import com.qcloud.cos.internal.CIServiceRequest;
 import com.qcloud.cos.model.ciModel.common.MediaInputObject;
 import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
 
-import javax.print.attribute.standard.Media;
-
 /**
  * 文件处理请求类
  */
@@ -16,8 +14,8 @@ public class FileProcessRequest extends CIServiceRequest {
     private String callBackType;
     private String callBack;
     private String callBackMqConfig;
+    private String jobId;
     private MediaInputObject input;
-    private MediaOutputObject output;
     private FileProcessOperation operation;
 
     public FileProcessJobType getTag() {
@@ -90,15 +88,12 @@ public class FileProcessRequest extends CIServiceRequest {
         this.input = input;
     }
 
-    public MediaOutputObject getOutput() {
-        if (output == null) {
-            output = new MediaOutputObject();
-        }
-        return output;
+    public String getJobId() {
+        return jobId;
     }
 
-    public void setOutput(MediaOutputObject out) {
-        this.output = out;
+    public void setJobId(String jobId) {
+        this.jobId = jobId;
     }
 
     @Override
