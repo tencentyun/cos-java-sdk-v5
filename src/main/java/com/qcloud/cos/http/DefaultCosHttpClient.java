@@ -48,6 +48,7 @@ import com.qcloud.cos.retry.BackoffStrategy;
 import com.qcloud.cos.retry.RetryPolicy;
 import com.qcloud.cos.utils.CodecUtils;
 import com.qcloud.cos.utils.ExceptionUtils;
+import com.qcloud.cos.utils.IOUtils;
 import com.qcloud.cos.utils.UrlEncoderUtils;
 import com.qcloud.cos.utils.ValidationUtils;
 
@@ -68,6 +69,7 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.entity.InputStreamEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
@@ -130,6 +132,7 @@ public class DefaultCosHttpClient implements CosHttpClient {
     @Override
     public void shutdown() {
         this.idleConnectionMonitor.shutdown();
+        IOUtils.closeQuietly((CloseableHttpClient)this.httpClient, log);
     }
 
     // 因为Apache HTTP库自带的URL Encode对一些特殊字符如*等不进行转换, 和COS HTTP服务的URL Encode标准不一致
