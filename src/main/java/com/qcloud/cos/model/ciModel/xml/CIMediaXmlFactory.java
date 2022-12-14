@@ -2,9 +2,15 @@ package com.qcloud.cos.model.ciModel.xml;
 
 import com.qcloud.cos.internal.RequestXmlFactory;
 import com.qcloud.cos.internal.XmlWriter;
+import com.qcloud.cos.model.ciModel.common.BatchInputObject;
 import com.qcloud.cos.model.ciModel.common.MediaInputObject;
 import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
+import com.qcloud.cos.model.ciModel.job.AudioConfig;
+import com.qcloud.cos.model.ciModel.job.BatchJobOperation;
+import com.qcloud.cos.model.ciModel.job.BatchJobRequest;
+import com.qcloud.cos.model.ciModel.job.CallBackMqConfig;
 import com.qcloud.cos.model.ciModel.job.ExtractDigitalWatermark;
+import com.qcloud.cos.model.ciModel.job.JobParam;
 import com.qcloud.cos.model.ciModel.job.MediaAudioMixObject;
 import com.qcloud.cos.model.ciModel.job.MediaAudioObject;
 import com.qcloud.cos.model.ciModel.job.MediaConcatFragmentObject;
@@ -21,6 +27,7 @@ import com.qcloud.cos.model.ciModel.job.MediaTranscodeObject;
 import com.qcloud.cos.model.ciModel.job.MediaTranscodeVideoObject;
 import com.qcloud.cos.model.ciModel.job.MediaVideoObject;
 import com.qcloud.cos.model.ciModel.job.VideoTargetRec;
+import com.qcloud.cos.model.ciModel.job.VoiceSeparate;
 import com.qcloud.cos.model.ciModel.template.MediaHlsEncryptObject;
 import com.qcloud.cos.model.ciModel.template.MediaSegmentObject;
 import com.qcloud.cos.model.ciModel.template.MediaSmartCoverObject;
@@ -66,6 +73,27 @@ public class CIMediaXmlFactory {
         addOperation(xml, request);
         xml.end();
         return xml.getBytes();
+    }
+
+    /**
+     * 媒体任务xml转换
+     */
+    public static byte[] convertToXmlByteArray(BatchJobRequest request) {
+        XmlWriter xml = new XmlWriter();
+        xml.start("Request");
+        addBatchCommonParams(xml, request);
+        addInput(xml, request.getInput());
+        addBatchOperation(xml, request.getOperation());
+        xml.end();
+        System.out.println(xml);
+        return xml.getBytes();
+    }
+
+    private static void addBatchCommonParams(XmlWriter xml, BatchJobRequest request) {
+        if (objIsNotValid(request)) {
+            addIfNotNull(xml, "Name", request.getName());
+            addIfNotNull(xml, "Type", request.getType());
+        }
     }
 
     /**
@@ -166,7 +194,44 @@ public class CIMediaXmlFactory {
         addVideoMontage(xml, operation.getVideoMontage());
         addPicProcess(xml, operation.getPicProcess());
         addVideoTargetRec(xml, operation.getVideoTargetRec());
+        addVoiceSeparate(xml,operation.getVoiceSeparate());
         xml.end();
+    }
+
+    private static void addBatchOperation(XmlWriter xml, BatchJobOperation operation) {
+        xml.start("Operation");
+        addTimeInterval(xml,operation.getTimeInterval());
+        addIfNotNull(xml, "QueueId", operation.getQueueId());
+        addIfNotNull(xml, "UserData", operation.getUserData());
+        addIfNotNull(xml, "CallBack", operation.getCallBack());
+        addIfNotNull(xml, "Tag", operation.getTag());
+        addIfNotNull(xml, "JobLevel", operation.getJobLevel());
+        addIfNotNull(xml, "WorkflowIds", operation.getWorkflowIds());
+
+        addJobParam(xml,operation.getJobParam());
+        addOutput(xml,operation.getOutput());
+        addCallBackMqConfig(xml,operation.getCallBackMqConfig());
+
+        xml.end();
+    }
+
+    private static void addJobParam(XmlWriter xml, JobParam jobParam) {
+        if (objIsNotValid(jobParam)) {
+            xml.start("JobParam");
+            addIfNotNull(xml, "TemplateId", jobParam.getTemplateId());
+            addPicProcess(xml, jobParam.getPicProcess());
+            xml.end();
+        }
+    }
+
+    private static void addCallBackMqConfig(XmlWriter xml, CallBackMqConfig callBackMqConfig) {
+        if (objIsNotValid(callBackMqConfig)) {
+            xml.start("CallBackMqConfig");
+            addIfNotNull(xml, "MqMode", callBackMqConfig.getMqMode());
+            addIfNotNull(xml, "MqName", callBackMqConfig.getMqName());
+            addIfNotNull(xml, "MqRegion", callBackMqConfig.getMqRegion());
+            xml.end();
+        }
     }
 
     private static void addPicProcess(XmlWriter xml, MediaPicProcessTemplateObject picProcess) {
@@ -174,6 +239,23 @@ public class CIMediaXmlFactory {
             xml.start("PicProcess");
             addIfNotNull(xml, "IsPicInfo", picProcess.getIsPicInfo());
             addIfNotNull(xml, "ProcessRule", picProcess.getProcessRule());
+            xml.end();
+        }
+    }
+
+    private static void addVoiceSeparate(XmlWriter xml, VoiceSeparate voiceSeparate) {
+        if (objIsNotValid(voiceSeparate)) {
+            xml.start("VoiceSeparate");
+            addIfNotNull(xml, "AudioMode", voiceSeparate.getAudioMode());
+            AudioConfig audioConfig = voiceSeparate.getAudioConfig();
+            if (objIsNotValid(audioConfig)){
+                xml.start("AudioConfig");
+                addIfNotNull(xml, "Bitrate", audioConfig.getBitrate());
+                addIfNotNull(xml, "Channels", audioConfig.getChannels());
+                addIfNotNull(xml, "Codec", audioConfig.getCodec());
+                addIfNotNull(xml, "Samplerate", audioConfig.getSamplerate());
+                xml.end();
+            }
             xml.end();
         }
     }
@@ -278,7 +360,7 @@ public class CIMediaXmlFactory {
         }
     }
 
-    private static void addOutput(XmlWriter xml, MediaOutputObject output) {
+    protected static void addOutput(XmlWriter xml, MediaOutputObject output) {
         if (objIsNotValid(output)) {
             xml.start("Output");
             addIfNotNull(xml, "Region", output.getRegion());
@@ -461,6 +543,7 @@ public class CIMediaXmlFactory {
             xml.start("TimeInterval");
             addIfNotNull(xml, "Duration", timeInterval.getDuration());
             addIfNotNull(xml, "Start", timeInterval.getStart());
+            addIfNotNull(xml, "End", timeInterval.getEnd());
             xml.end();
         }
     }
@@ -484,7 +567,18 @@ public class CIMediaXmlFactory {
 
     private static void addInput(XmlWriter xml, MediaInputObject inputObject) {
         xml.start("Input");
-        xml.start("Object").value(inputObject.getObject()).end();
+        addIfNotNull(xml, "Object", inputObject.getObject());
+        addIfNotNull(xml, "Url", inputObject.getUrl());
+        xml.end();
+    }
+
+    private static void addInput(XmlWriter xml, BatchInputObject inputObject) {
+        xml.start("Input");
+        addIfNotNull(xml, "Object", inputObject.getObject());
+        addIfNotNull(xml, "Url", inputObject.getUrl());
+        addIfNotNull(xml, "Manifest", inputObject.getManifest());
+        addIfNotNull(xml, "Prefix", inputObject.getPrefix());
+        addIfNotNull(xml, "UrlFile", inputObject.getUrlFile());
         xml.end();
     }
 

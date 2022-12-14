@@ -27,7 +27,6 @@ public class ClientUtils {
         Region region = new Region(_region);
         ClientConfig clientConfig = new ClientConfig(region);
         clientConfig.setHttpProtocol(HttpProtocol.http);
-//        clientConfig.setEndPointSuffix("pic.ap-chongqing.myqcloud.com");
         // 3 生成 cos 客户端。
         return new COSClient(cred, clientConfig);
     }

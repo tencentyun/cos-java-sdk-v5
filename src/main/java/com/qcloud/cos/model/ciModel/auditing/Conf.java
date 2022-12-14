@@ -50,6 +50,7 @@ public class Conf {
 
     private String callbackType;
 
+    private Freeze freeze;
 
     public String getBizType() {
         return bizType;
@@ -125,6 +126,17 @@ public class Conf {
 
     public void setReturnHighlightHtml(String returnHighlightHtml) {
         this.returnHighlightHtml = returnHighlightHtml;
+    }
+
+    public Freeze getFreeze() {
+        if (freeze == null) {
+            freeze = new Freeze();
+        }
+        return freeze;
+    }
+
+    public void setFreeze(Freeze freeze) {
+        this.freeze = freeze;
     }
 
     @Override

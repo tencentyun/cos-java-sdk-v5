@@ -62,11 +62,11 @@ public class DocJobDemo {
     }
 
     /**
-     * describeMediaJob 根据jobId查询任务信息
+     * describeDocProcessJob 根据jobId查询任务信息
      *
      * @param client
      */
-    public static void describeMediaJob(COSClient client) {
+    public static void describeDocProcessJob(COSClient client) {
         //1.创建任务请求对象
         DocJobRequest request = new DocJobRequest();
         //2.添加请求参数 参数详情请见api接口文档
@@ -78,11 +78,11 @@ public class DocJobDemo {
     }
 
     /**
-     * describeMediaJobs 查询任务列表
+     * describeDocProcessJobs 查询任务列表
      *
      * @param client
      */
-    public static void describeMediaJobs(COSClient client) {
+    public static void describeDocProcessJobs(COSClient client) {
         //1.创建任务请求对象
         DocJobListRequest request = new DocJobListRequest();
         //2.添加请求参数 参数详情请见api接口文档

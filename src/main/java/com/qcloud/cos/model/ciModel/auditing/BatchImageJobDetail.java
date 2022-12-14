@@ -19,6 +19,7 @@ public class BatchImageJobDetail {
     private String url;
     private String state;
     private String compressionResult;
+    private String forbidState;
     private PornInfo pornInfo;
     private TerroristInfo terroristInfo;
     private PoliticsInfo politicsInfo;
@@ -207,6 +208,14 @@ public class BatchImageJobDetail {
         this.state = state;
     }
 
+    public String getForbidState() {
+        return forbidState;
+    }
+
+    public void setForbidState(String forbidState) {
+        this.forbidState = forbidState;
+    }
+
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("BatchImageJobDetail{");
@@ -224,6 +233,7 @@ public class BatchImageJobDetail {
         sb.append(", url='").append(url).append('\'');
         sb.append(", state='").append(state).append('\'');
         sb.append(", compressionResult='").append(compressionResult).append('\'');
+        sb.append(", forbidState='").append(forbidState).append('\'');
         sb.append(", pornInfo=").append(pornInfo);
         sb.append(", terroristInfo=").append(terroristInfo);
         sb.append(", politicsInfo=").append(politicsInfo);

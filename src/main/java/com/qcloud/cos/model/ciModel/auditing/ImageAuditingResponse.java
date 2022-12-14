@@ -21,6 +21,7 @@ public class ImageAuditingResponse extends CosServiceResult {
     private String state;
     private String dataId;
     private String url;
+    private String forbidState;
     private PornInfo pornInfo;
     private TerroristInfo terroristInfo;
     private PoliticsInfo politicsInfo;
@@ -217,6 +218,14 @@ public class ImageAuditingResponse extends CosServiceResult {
         this.listInfo = listInfo;
     }
 
+    public String getForbidState() {
+        return forbidState;
+    }
+
+    public void setForbidState(String forbidState) {
+        this.forbidState = forbidState;
+    }
+
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("ImageAuditingResponse{");
@@ -235,6 +244,7 @@ public class ImageAuditingResponse extends CosServiceResult {
         sb.append(", state='").append(state).append('\'');
         sb.append(", dataId='").append(dataId).append('\'');
         sb.append(", url='").append(url).append('\'');
+        sb.append(", forbidState='").append(forbidState).append('\'');
         sb.append(", pornInfo=").append(pornInfo);
         sb.append(", terroristInfo=").append(terroristInfo);
         sb.append(", politicsInfo=").append(politicsInfo);

@@ -18,6 +18,8 @@ public class MediaJobObject extends CIServiceRequest implements Serializable {
     private String endTime;
     private String queueId;
     private String tag;
+    private String name;
+    private String type;
     private MediaInputObject input = new MediaInputObject();
     private MediaJobOperation operation = new MediaJobOperation();
 
@@ -78,7 +80,7 @@ public class MediaJobObject extends CIServiceRequest implements Serializable {
     }
 
     public MediaInputObject getInput() {
-        if (input==null){
+        if (input == null) {
             input = new MediaInputObject();
         }
         return input;
@@ -97,7 +99,7 @@ public class MediaJobObject extends CIServiceRequest implements Serializable {
     }
 
     public MediaJobOperation getOperation() {
-        if (operation==null){
+        if (operation == null) {
             operation = new MediaJobOperation();
         }
         return operation;
@@ -105,6 +107,22 @@ public class MediaJobObject extends CIServiceRequest implements Serializable {
 
     public void setOperation(MediaJobOperation operation) {
         this.operation = operation;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     @Override
@@ -118,6 +136,8 @@ public class MediaJobObject extends CIServiceRequest implements Serializable {
         sb.append(", endTime='").append(endTime).append('\'');
         sb.append(", queueId='").append(queueId).append('\'');
         sb.append(", tag='").append(tag).append('\'');
+        sb.append(", name='").append(name).append('\'');
+        sb.append(", type='").append(type).append('\'');
         sb.append(", input=").append(input);
         sb.append(", operation=").append(operation);
         sb.append('}');
