@@ -4179,18 +4179,7 @@ public class XmlResponsesSaxParser {
                 MediaTimeIntervalObject timeInterval = jobsDetail.getOperation().getTranscode().getTimeInterval();
                 ParserMediaInfoUtils.ParsingMediaTimeInterval(timeInterval, name, getText());
             } else if (in("Response", "JobsDetail", "Operation", "Output")) {
-                MediaOutputObject output = jobsDetail.getOperation().getOutput();
-                switch (name) {
-                    case "Bucket":
-                        output.setBucket(getText());
-                        break;
-                    case "Object":
-                        output.setObject(getText());
-                        break;
-                    case "Region":
-                        output.setRegion(getText());
-                        break;
-                }
+                ParserMediaInfoUtils.ParsingOutput(jobsDetail.getOperation().getOutput(), name, getText());
             }
             MediaConcatTemplateObject mediaConcatTemplate = response.getJobsDetail().getOperation().getMediaConcatTemplate();
             if (in("Response", "JobsDetail", "Operation", "ConcatTemplate", "ConcatFragment")) {

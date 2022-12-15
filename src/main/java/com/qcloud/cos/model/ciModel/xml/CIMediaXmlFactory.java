@@ -85,7 +85,6 @@ public class CIMediaXmlFactory {
         addInput(xml, request.getInput());
         addBatchOperation(xml, request.getOperation());
         xml.end();
-        System.out.println(xml);
         return xml.getBytes();
     }
 
@@ -166,7 +165,6 @@ public class CIMediaXmlFactory {
             addVideoTargetRec(xml, videoTargetRec);
         }
         xml.end();
-        System.out.println(xml);
         return xml.getBytes();
     }
 
@@ -367,6 +365,7 @@ public class CIMediaXmlFactory {
             addIfNotNull(xml, "Object", output.getObject());
             addIfNotNull(xml, "Bucket", output.getBucket());
             addIfNotNull(xml, "SpriteObject", output.getSpriteObject());
+            addIfNotNull(xml, "AuObject", output.getAuObject());
             xml.end();
         }
     }

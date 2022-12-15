@@ -21,6 +21,11 @@ public class MediaOutputObject {
      */
     private String spriteObject;
 
+    /**
+     * 人声结果文件名，不能与 Object 同时为空
+     */
+    private String auObject;
+
     public String getRegion() {
         return region;
     }
@@ -51,6 +56,14 @@ public class MediaOutputObject {
 
     public void setSpriteObject(String spriteObject) {
         this.spriteObject = spriteObject;
+    }
+
+    public String getAuObject() {
+        return auObject;
+    }
+
+    public void setAuObject(String auObject) {
+        this.auObject = auObject;
     }
 
     @Override

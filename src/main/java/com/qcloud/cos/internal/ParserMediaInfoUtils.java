@@ -861,6 +861,9 @@ public class ParserMediaInfoUtils {
             case "SpriteObject":
                 output.setSpriteObject(value);
                 break;
+            case "AuObject":
+                output.setAuObject(value);
+                break;
             default:
                 break;
         }
