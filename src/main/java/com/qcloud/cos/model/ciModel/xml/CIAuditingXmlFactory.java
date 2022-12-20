@@ -9,6 +9,7 @@ import com.qcloud.cos.model.ciModel.auditing.BatchImageAuditingInputObject;
 import com.qcloud.cos.model.ciModel.auditing.BatchImageAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.Conf;
 import com.qcloud.cos.model.ciModel.auditing.DocumentAuditingRequest;
+import com.qcloud.cos.model.ciModel.auditing.Encryption;
 import com.qcloud.cos.model.ciModel.auditing.Freeze;
 import com.qcloud.cos.model.ciModel.auditing.ReportBadCaseRequest;
 import com.qcloud.cos.model.ciModel.auditing.TextAuditingRequest;
@@ -41,6 +42,7 @@ public class CIAuditingXmlFactory {
             CIMediaXmlFactory.addIfNotNull(xml, "LargeImageDetect", inputObject.getLargeImageDetect());
             CIMediaXmlFactory.addIfNotNull(xml, "Content", inputObject.getContent());
             addUserInfo(xml, inputObject.getUserInfo());
+            addEncryption(xml, inputObject.getEncryption());
             xml.end();
         }
 
@@ -169,6 +171,19 @@ public class CIAuditingXmlFactory {
             CIMediaXmlFactory.addIfNotNull(xml, "DataId", inputObject.getDataId());
             CIMediaXmlFactory.addIfNotNull(xml, "Content", inputObject.getContent());
             addUserInfo(xml, inputObject.getUserInfo());
+            addEncryption(xml,inputObject.getEncryption());
+            xml.end();
+        }
+    }
+
+    private static void addEncryption(XmlWriter xml, Encryption encryption) {
+        if (RequestXmlFactory.CheckObjectUtils.objIsNotValid(encryption)) {
+            xml.start("Encryption");
+            CIMediaXmlFactory.addIfNotNull(xml, "Algorithm", encryption.getAlgorithm());
+            CIMediaXmlFactory.addIfNotNull(xml, "IV", encryption.getIV());
+            CIMediaXmlFactory.addIfNotNull(xml, "Key", encryption.getKey());
+            CIMediaXmlFactory.addIfNotNull(xml, "KeyId", encryption.getKeyId());
+            CIMediaXmlFactory.addIfNotNull(xml, "KeyType", encryption.getKeyType());
             xml.end();
         }
     }
@@ -184,6 +199,7 @@ public class CIAuditingXmlFactory {
             CIMediaXmlFactory.addIfNotNull(xml, "Callback", conf.getCallback());
             CIMediaXmlFactory.addIfNotNull(xml, "ReturnHighlightHtml", conf.getReturnHighlightHtml());
             CIMediaXmlFactory.addIfNotNull(xml, "Async", conf.getAsync());
+            CIMediaXmlFactory.addIfNotNull(xml, "CallbackType", conf.getCallbackType());
 
             addAuditingSnapshot(xml, conf.getSnapshot());
             addFreeze(xml, conf.getFreeze());
