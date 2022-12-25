@@ -64,6 +64,33 @@ public class DocProcessObject {
      */
     private String zoom;
 
+    /**
+     * 是否转换成单张长图，设置为 1 时，最多仅支持将 20 标准页面合成单张长图，超过可能会报错，分页范围可以通过 StartPage、EndPage 控制。
+     * 默认值为 0 ，按页导出图片，TgtType="png"/"jpg" 时生效
+     */
+    private String picPagination;
+
+    /**
+     * 按指定 dpi 渲染图片，该参数与 Zoom 共同作用，取值范围 96-600 ，默认值为 96 。转码后的图片单边宽度需小于65500像素
+     */
+    private String imageDpi;
+
+    public String getPicPagination() {
+        return picPagination;
+    }
+
+    public void setPicPagination(String picPagination) {
+        this.picPagination = picPagination;
+    }
+
+    public String getImageDpi() {
+        return imageDpi;
+    }
+
+    public void setImageDpi(String imageDpi) {
+        this.imageDpi = imageDpi;
+    }
+
     public String getSrcType() {
         return srcType;
     }

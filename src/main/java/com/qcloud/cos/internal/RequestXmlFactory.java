@@ -714,6 +714,8 @@ public class RequestXmlFactory {
             addIfNotNull(xml, "PaperDirection", docProcess.getPaperDirection());
             addIfNotNull(xml, "Quality", docProcess.getQuality());
             addIfNotNull(xml, "Zoom", docProcess.getZoom());
+            addIfNotNull(xml, "PicPagination", docProcess.getPicPagination());
+            addIfNotNull(xml, "ImageDpi", docProcess.getImageDpi());
             xml.end();
 
             xml.end();
