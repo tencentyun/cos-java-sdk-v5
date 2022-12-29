@@ -1233,4 +1233,39 @@ public class ParserMediaInfoUtils {
                 break;
         }
     }
+
+    public static void ParseTtsConfig(MediaTtsConfig ttsConfig, String name, String value) {
+        switch (name) {
+            case "Input":
+                ttsConfig.setInput(value);
+                break;
+            case "InputType":
+                ttsConfig.setInputType(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParseTtsTpl(TtsTpl ttsTpl, String name, String value) {
+        switch (name) {
+            case "Codec":
+                ttsTpl.setCodec(value);
+                break;
+            case "Mode":
+                ttsTpl.setMode(value);
+                break;
+            case "Speed":
+                ttsTpl.setSpeed(value);
+                break;
+            case "Volume":
+                ttsTpl.setVolume(value);
+                break;
+            case "VoiceType":
+                ttsTpl.setVoiceType(value);
+                break;
+            default:
+                break;
+        }
+    }
 }

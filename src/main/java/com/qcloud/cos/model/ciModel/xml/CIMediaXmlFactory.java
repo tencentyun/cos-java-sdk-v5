@@ -219,6 +219,27 @@ public class CIMediaXmlFactory {
         }
     }
 
+    private static void addTtsTpl(XmlWriter xml, TtsTpl ttsTpl) {
+        if (objIsNotValid(ttsTpl)) {
+            xml.start("TtsTpl");
+            addIfNotNull(xml, "Codec", ttsTpl.getCodec());
+            addIfNotNull(xml, "Mode", ttsTpl.getMode());
+            addIfNotNull(xml, "Speed", ttsTpl.getSpeed());
+            addIfNotNull(xml, "Volume", ttsTpl.getVolume());
+            addIfNotNull(xml, "VoiceType", ttsTpl.getVoiceType());
+            xml.end();
+        }
+    }
+
+    private static void addTtsConfig(XmlWriter xml, MediaTtsConfig ttsConfig) {
+        if (objIsNotValid(ttsConfig)) {
+            xml.start("TtsConfig");
+            addIfNotNull(xml, "Input", ttsConfig.getInput());
+            addIfNotNull(xml, "InputType", ttsConfig.getInputType());
+            xml.end();
+        }
+    }
+
     private static void addTtsConfig(XmlWriter xml, MediaTtsConfig ttsConfig) {
         if (objIsNotValid(ttsConfig)) {
             xml.start("TtsConfig");
