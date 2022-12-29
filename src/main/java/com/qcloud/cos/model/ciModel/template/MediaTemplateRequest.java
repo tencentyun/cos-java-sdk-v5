@@ -77,6 +77,52 @@ public class MediaTemplateRequest extends CIServiceRequest implements Serializab
      */
     private String ids;
 
+    private String mode;
+    private String codec;
+    private String voiceType;
+    private String volume;
+    private String speed;
+
+    public String getMode() {
+        return mode;
+    }
+
+    public void setMode(String mode) {
+        this.mode = mode;
+    }
+
+    public String getCodec() {
+        return codec;
+    }
+
+    public void setCodec(String codec) {
+        this.codec = codec;
+    }
+
+    public String getVoiceType() {
+        return voiceType;
+    }
+
+    public void setVoiceType(String voiceType) {
+        this.voiceType = voiceType;
+    }
+
+    public String getVolume() {
+        return volume;
+    }
+
+    public void setVolume(String volume) {
+        this.volume = volume;
+    }
+
+    public String getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(String speed) {
+        this.speed = speed;
+    }
+
     public String getPageNumber() {
         return pageNumber;
     }
@@ -110,8 +156,7 @@ public class MediaTemplateRequest extends CIServiceRequest implements Serializab
     }
 
     public MediaContainerObject getContainer() {
-        if (container == null)
-            container = new MediaContainerObject();
+        if (container == null) container = new MediaContainerObject();
         return container;
     }
 
@@ -120,8 +165,7 @@ public class MediaTemplateRequest extends CIServiceRequest implements Serializab
     }
 
     public MediaTimeIntervalObject getTimeInterval() {
-        if (timeInterval == null)
-            timeInterval = new MediaTimeIntervalObject();
+        if (timeInterval == null) timeInterval = new MediaTimeIntervalObject();
         return timeInterval;
     }
 
@@ -130,8 +174,7 @@ public class MediaTemplateRequest extends CIServiceRequest implements Serializab
     }
 
     public MediaVideoObject getVideo() {
-        if (video == null)
-            video = new MediaVideoObject();
+        if (video == null) video = new MediaVideoObject();
         return video;
     }
 
@@ -140,8 +183,7 @@ public class MediaTemplateRequest extends CIServiceRequest implements Serializab
     }
 
     public MediaSnapshotObject getSnapshot() {
-        if (snapshot == null)
-            snapshot = new MediaSnapshotObject();
+        if (snapshot == null) snapshot = new MediaSnapshotObject();
         return snapshot;
     }
 
@@ -241,21 +283,6 @@ public class MediaTemplateRequest extends CIServiceRequest implements Serializab
 
     @Override
     public String toString() {
-        return "MediaTemplateRequest{" +
-                "templateId='" + templateId + '\'' +
-                ", tag='" + tag + '\'' +
-                ", name='" + name + '\'' +
-                ", container=" + container +
-                ", video=" + video +
-                ", audio=" + audio +
-                ", transConfig=" + transConfig +
-                ", timeInterval=" + timeInterval +
-                ", snapshot=" + snapshot +
-                ", waterMark=" + watermark +
-                ", pageNumber='" + pageNumber + '\'' +
-                ", pageSize='" + pageSize + '\'' +
-                ", category='" + category + '\'' +
-                ", ids='" + ids + '\'' +
-                '}';
+        return "MediaTemplateRequest{" + "templateId='" + templateId + '\'' + ", tag='" + tag + '\'' + ", name='" + name + '\'' + ", container=" + container + ", video=" + video + ", audio=" + audio + ", transConfig=" + transConfig + ", timeInterval=" + timeInterval + ", snapshot=" + snapshot + ", waterMark=" + watermark + ", pageNumber='" + pageNumber + '\'' + ", pageSize='" + pageSize + '\'' + ", category='" + category + '\'' + ", ids='" + ids + '\'' + '}';
     }
 }

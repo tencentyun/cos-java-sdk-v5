@@ -379,6 +379,10 @@ public class MediaJobResponseHandler extends CIAbstractHandler {
             }
         } else if (in("Response", "JobsDetail", "Operation", "VoiceSeparate", "AudioConfig")) {
             ParserMediaInfoUtils.ParseAudioConfig(jobsDetail.getOperation().getVoiceSeparate().getAudioConfig(), name, getText());
+        } else if (in("Response", "JobsDetail", "Operation", "TtsConfig")) {
+            ParserMediaInfoUtils.ParseTtsConfig(jobsDetail.getOperation().getTtsConfig(), name, getText());
+        } else if (in("Response", "JobsDetail", "Operation", "TtsTpl")) {
+            ParserMediaInfoUtils.ParseTtsTpl(jobsDetail.getOperation().getTtsTpl(), name, getText());
         }
     }
 

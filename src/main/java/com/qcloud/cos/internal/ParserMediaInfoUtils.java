@@ -29,9 +29,11 @@ import com.qcloud.cos.model.ciModel.job.MediaTimeIntervalObject;
 import com.qcloud.cos.model.ciModel.job.MediaTopkRecognition;
 import com.qcloud.cos.model.ciModel.job.MediaTransConfigObject;
 import com.qcloud.cos.model.ciModel.job.MediaTranscodeVideoObject;
+import com.qcloud.cos.model.ciModel.job.MediaTtsConfig;
 import com.qcloud.cos.model.ciModel.job.MediaVideoObject;
 import com.qcloud.cos.model.ciModel.job.OutputFile;
 import com.qcloud.cos.model.ciModel.job.ProcessResult;
+import com.qcloud.cos.model.ciModel.job.TtsTpl;
 import com.qcloud.cos.model.ciModel.job.VideoTargetRec;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaFormat;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoAudio;
@@ -1191,6 +1193,41 @@ public class ParserMediaInfoUtils {
                 break;
             case "UrlFile":
                 input.setUrlFile(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParseTtsConfig(MediaTtsConfig ttsConfig, String name, String value) {
+        switch (name) {
+            case "Input":
+                ttsConfig.setInput(value);
+                break;
+            case "InputType":
+                ttsConfig.setInputType(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParseTtsTpl(TtsTpl ttsTpl, String name, String value) {
+        switch (name) {
+            case "Codec":
+                ttsTpl.setCodec(value);
+                break;
+            case "Mode":
+                ttsTpl.setMode(value);
+                break;
+            case "Speed":
+                ttsTpl.setSpeed(value);
+                break;
+            case "Volume":
+                ttsTpl.setVolume(value);
+                break;
+            case "VoiceType":
+                ttsTpl.setVoiceType(value);
                 break;
             default:
                 break;

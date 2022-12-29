@@ -25,7 +25,9 @@ import com.qcloud.cos.model.ciModel.job.MediaTimeIntervalObject;
 import com.qcloud.cos.model.ciModel.job.MediaTransConfigObject;
 import com.qcloud.cos.model.ciModel.job.MediaTranscodeObject;
 import com.qcloud.cos.model.ciModel.job.MediaTranscodeVideoObject;
+import com.qcloud.cos.model.ciModel.job.MediaTtsConfig;
 import com.qcloud.cos.model.ciModel.job.MediaVideoObject;
+import com.qcloud.cos.model.ciModel.job.TtsTpl;
 import com.qcloud.cos.model.ciModel.job.VideoTargetRec;
 import com.qcloud.cos.model.ciModel.job.VoiceSeparate;
 import com.qcloud.cos.model.ciModel.template.MediaHlsEncryptObject;
@@ -72,6 +74,7 @@ public class CIMediaXmlFactory {
         addInput(xml, request.getInput());
         addOperation(xml, request);
         xml.end();
+        System.out.println(xml);
         return xml.getBytes();
     }
 
@@ -163,6 +166,12 @@ public class CIMediaXmlFactory {
         } else if ("VideoTargetRec".equalsIgnoreCase(tag)) {
             VideoTargetRec videoTargetRec = request.getVideoTargetRec();
             addVideoTargetRec(xml, videoTargetRec);
+        } else if ("Tts".equalsIgnoreCase(tag)) {
+            addIfNotNull(xml, "Codec", request.getCodec());
+            addIfNotNull(xml, "Mode", request.getMode());
+            addIfNotNull(xml, "Speed", request.getSpeed());
+            addIfNotNull(xml, "Volume", request.getVolume());
+            addIfNotNull(xml, "VoiceType", request.getVoiceType());
         }
         xml.end();
         return xml.getBytes();
@@ -192,13 +201,36 @@ public class CIMediaXmlFactory {
         addVideoMontage(xml, operation.getVideoMontage());
         addPicProcess(xml, operation.getPicProcess());
         addVideoTargetRec(xml, operation.getVideoTargetRec());
-        addVoiceSeparate(xml,operation.getVoiceSeparate());
+        addVoiceSeparate(xml, operation.getVoiceSeparate());
+        addTtsConfig(xml, operation.getTtsConfig());
+        addTtsTpl(xml, operation.getTtsTpl());
         xml.end();
+    }
+
+    private static void addTtsTpl(XmlWriter xml, TtsTpl ttsTpl) {
+        if (objIsNotValid(ttsTpl)) {
+            xml.start("TtsTpl");
+            addIfNotNull(xml, "Codec", ttsTpl.getCodec());
+            addIfNotNull(xml, "Mode", ttsTpl.getMode());
+            addIfNotNull(xml, "Speed", ttsTpl.getSpeed());
+            addIfNotNull(xml, "Volume", ttsTpl.getVolume());
+            addIfNotNull(xml, "VoiceType", ttsTpl.getVoiceType());
+            xml.end();
+        }
+    }
+
+    private static void addTtsConfig(XmlWriter xml, MediaTtsConfig ttsConfig) {
+        if (objIsNotValid(ttsConfig)) {
+            xml.start("TtsConfig");
+            addIfNotNull(xml, "Input", ttsConfig.getInput());
+            addIfNotNull(xml, "InputType", ttsConfig.getInputType());
+            xml.end();
+        }
     }
 
     private static void addBatchOperation(XmlWriter xml, BatchJobOperation operation) {
         xml.start("Operation");
-        addTimeInterval(xml,operation.getTimeInterval());
+        addTimeInterval(xml, operation.getTimeInterval());
         addIfNotNull(xml, "QueueId", operation.getQueueId());
         addIfNotNull(xml, "UserData", operation.getUserData());
         addIfNotNull(xml, "CallBack", operation.getCallBack());
@@ -206,9 +238,9 @@ public class CIMediaXmlFactory {
         addIfNotNull(xml, "JobLevel", operation.getJobLevel());
         addIfNotNull(xml, "WorkflowIds", operation.getWorkflowIds());
 
-        addJobParam(xml,operation.getJobParam());
-        addOutput(xml,operation.getOutput());
-        addCallBackMqConfig(xml,operation.getCallBackMqConfig());
+        addJobParam(xml, operation.getJobParam());
+        addOutput(xml, operation.getOutput());
+        addCallBackMqConfig(xml, operation.getCallBackMqConfig());
 
         xml.end();
     }
@@ -246,7 +278,7 @@ public class CIMediaXmlFactory {
             xml.start("VoiceSeparate");
             addIfNotNull(xml, "AudioMode", voiceSeparate.getAudioMode());
             AudioConfig audioConfig = voiceSeparate.getAudioConfig();
-            if (objIsNotValid(audioConfig)){
+            if (objIsNotValid(audioConfig)) {
                 xml.start("AudioConfig");
                 addIfNotNull(xml, "Bitrate", audioConfig.getBitrate());
                 addIfNotNull(xml, "Channels", audioConfig.getChannels());
@@ -565,10 +597,12 @@ public class CIMediaXmlFactory {
     }
 
     private static void addInput(XmlWriter xml, MediaInputObject inputObject) {
-        xml.start("Input");
-        addIfNotNull(xml, "Object", inputObject.getObject());
-        addIfNotNull(xml, "Url", inputObject.getUrl());
-        xml.end();
+        if (objIsNotValid(inputObject)) {
+            xml.start("Input");
+            addIfNotNull(xml, "Object", inputObject.getObject());
+            addIfNotNull(xml, "Url", inputObject.getUrl());
+            xml.end();
+        }
     }
 
     private static void addInput(XmlWriter xml, BatchInputObject inputObject) {
