@@ -4179,18 +4179,7 @@ public class XmlResponsesSaxParser {
                 MediaTimeIntervalObject timeInterval = jobsDetail.getOperation().getTranscode().getTimeInterval();
                 ParserMediaInfoUtils.ParsingMediaTimeInterval(timeInterval, name, getText());
             } else if (in("Response", "JobsDetail", "Operation", "Output")) {
-                MediaOutputObject output = jobsDetail.getOperation().getOutput();
-                switch (name) {
-                    case "Bucket":
-                        output.setBucket(getText());
-                        break;
-                    case "Object":
-                        output.setObject(getText());
-                        break;
-                    case "Region":
-                        output.setRegion(getText());
-                        break;
-                }
+                ParserMediaInfoUtils.ParsingOutput(jobsDetail.getOperation().getOutput(), name, getText());
             }
             MediaConcatTemplateObject mediaConcatTemplate = response.getJobsDetail().getOperation().getMediaConcatTemplate();
             if (in("Response", "JobsDetail", "Operation", "ConcatTemplate", "ConcatFragment")) {
@@ -4246,6 +4235,10 @@ public class XmlResponsesSaxParser {
                 }
             } else if (in("Response", "JobsDetail", "Operation", "VoiceSeparate", "AudioConfig")) {
                 ParserMediaInfoUtils.ParseAudioConfig(jobsDetail.getOperation().getVoiceSeparate().getAudioConfig(), name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "TtsConfig")) {
+                ParserMediaInfoUtils.ParseTtsConfig(jobsDetail.getOperation().getTtsConfig(), name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "TtsTpl")) {
+                ParserMediaInfoUtils.ParseTtsTpl(jobsDetail.getOperation().getTtsTpl(), name, getText());
             }
         }
 
@@ -4459,6 +4452,10 @@ public class XmlResponsesSaxParser {
             } else if (in("Response", "JobsDetail", "Operation", "VideoTargetRec")) {
                 VideoTargetRec videoTargetRec = jobsDetail.getOperation().getVideoTargetRec();
                 ParserMediaInfoUtils.ParsingVideoTargetRec(videoTargetRec, name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "TtsConfig")) {
+                ParserMediaInfoUtils.ParseTtsConfig(jobsDetail.getOperation().getTtsConfig(), name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "TtsTpl")) {
+                ParserMediaInfoUtils.ParseTtsTpl(jobsDetail.getOperation().getTtsTpl(), name, getText());
             }
         }
 
@@ -4763,6 +4760,8 @@ public class XmlResponsesSaxParser {
                 ParserMediaInfoUtils.ParseAudioMix(template.getConcatTemplate().getAudioMix(), name, getText());
             } else if (in("Response", "TemplateList", "ConcatTemplate", "VideoTargetRec")) {
                 ParserMediaInfoUtils.ParsingVideoTargetRec(template.getVideoTargetRec(), name, getText());
+            } else if (in("Response", "TemplateList", "TtsTpl")) {
+                ParserMediaInfoUtils.ParseTtsTpl(template.getTtsTpl(), name, getText());
             }
         }
 

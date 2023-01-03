@@ -12,6 +12,7 @@ public class AuditingInputObject {
     private String dataId;
     private UserInfo userInfo = new UserInfo();
     private ListInfo listInfo = new ListInfo();
+    private Encryption encryption = new Encryption();
 
     public String getObject() {
         return object;
@@ -59,6 +60,14 @@ public class AuditingInputObject {
 
     public void setListInfo(ListInfo listInfo) {
         this.listInfo = listInfo;
+    }
+
+    public Encryption getEncryption() {
+        return encryption;
+    }
+
+    public void setEncryption(Encryption encryption) {
+        this.encryption = encryption;
     }
 
     @Override

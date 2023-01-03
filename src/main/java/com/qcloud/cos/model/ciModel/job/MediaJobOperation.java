@@ -42,6 +42,8 @@ public class MediaJobOperation {
     private VideoTargetRec videoTargetRec = new VideoTargetRec();
     private VoiceSeparate voiceSeparate = new VoiceSeparate();
     private MediaTimeIntervalObject timeInterval = new MediaTimeIntervalObject();
+    private MediaTtsConfig ttsConfig = new MediaTtsConfig();
+    private TtsTpl ttsTpl = new TtsTpl();
 
     public MediaTimeIntervalObject getTimeInterval() {
         return timeInterval;
@@ -289,6 +291,22 @@ public class MediaJobOperation {
         this.voiceSeparate = voiceSeparate;
     }
 
+    public MediaTtsConfig getTtsConfig() {
+        return ttsConfig;
+    }
+
+    public void setTtsConfig(MediaTtsConfig ttsConfig) {
+        this.ttsConfig = ttsConfig;
+    }
+
+    public TtsTpl getTtsTpl() {
+        return ttsTpl;
+    }
+
+    public void setTtsTpl(TtsTpl ttsTpl) {
+        this.ttsTpl = ttsTpl;
+    }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("MediaJobOperation{");
@@ -317,6 +335,8 @@ public class MediaJobOperation {
         sb.append(", picProcessResult=").append(picProcessResult);
         sb.append(", videoTargetRec=").append(videoTargetRec);
         sb.append(", voiceSeparate=").append(voiceSeparate);
+        sb.append(", timeInterval=").append(timeInterval);
+        sb.append(", ttsConfig=").append(ttsConfig);
         sb.append('}');
         return sb.toString();
     }
