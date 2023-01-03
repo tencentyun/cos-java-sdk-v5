@@ -1,6 +1,5 @@
 package com.qcloud.cos.model.ciModel.xml;
 
-import com.qcloud.cos.internal.RequestXmlFactory;
 import com.qcloud.cos.internal.XmlWriter;
 import com.qcloud.cos.model.ciModel.auditing.AudioAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.AuditingInputObject;
@@ -140,7 +139,7 @@ public class CIAuditingXmlFactory {
     }
 
     private static void addUserInfo(XmlWriter xml, UserInfo userInfo) {
-        if (RequestXmlFactory.CheckObjectUtils.objIsNotValid(userInfo)) {
+        if (CIMediaXmlFactory.objIsNotValid(userInfo)) {
             xml.start("UserInfo");
             CIMediaXmlFactory.addIfNotNull(xml, "TokenId", userInfo.getTokenId());
             CIMediaXmlFactory.addIfNotNull(xml, "Nickname", userInfo.getNickname());
@@ -164,7 +163,7 @@ public class CIAuditingXmlFactory {
     }
 
     private static void addAuditingInput(XmlWriter xml, AuditingInputObject inputObject) {
-        if (RequestXmlFactory.CheckObjectUtils.objIsNotValid(inputObject)) {
+        if (CIMediaXmlFactory.objIsNotValid(inputObject)) {
             xml.start("Input");
             CIMediaXmlFactory.addIfNotNull(xml, "Object", inputObject.getObject());
             CIMediaXmlFactory.addIfNotNull(xml, "Url", inputObject.getUrl());
@@ -177,7 +176,7 @@ public class CIAuditingXmlFactory {
     }
 
     private static void addEncryption(XmlWriter xml, Encryption encryption) {
-        if (RequestXmlFactory.CheckObjectUtils.objIsNotValid(encryption)) {
+        if (CIMediaXmlFactory.objIsNotValid(encryption)) {
             xml.start("Encryption");
             CIMediaXmlFactory.addIfNotNull(xml, "Algorithm", encryption.getAlgorithm());
             CIMediaXmlFactory.addIfNotNull(xml, "IV", encryption.getIV());
@@ -189,7 +188,7 @@ public class CIAuditingXmlFactory {
     }
 
     private static void addAuditingConf(XmlWriter xml, Conf conf) {
-        if (RequestXmlFactory.CheckObjectUtils.objIsNotValid(conf)) {
+        if (CIMediaXmlFactory.objIsNotValid(conf)) {
             xml.start("Conf");
             String detectType = conf.getDetectType();
             addAuditingDetectType(xml, detectType);
@@ -208,7 +207,7 @@ public class CIAuditingXmlFactory {
     }
 
     private static void addFreeze(XmlWriter xml, Freeze freeze) {
-        if (RequestXmlFactory.CheckObjectUtils.objIsNotValid(freeze)) {
+        if (CIMediaXmlFactory.objIsNotValid(freeze)) {
             xml.start("Freeze");
             CIMediaXmlFactory.addIfNotNull(xml, "PornScore", freeze.getPornScore());
             CIMediaXmlFactory.addIfNotNull(xml, "AdsScore", freeze.getAdsScore());
@@ -219,7 +218,7 @@ public class CIAuditingXmlFactory {
     }
 
     private static void addAuditingSnapshot(XmlWriter xml, AuditingSnapshotObject snapshot) {
-        if (RequestXmlFactory.CheckObjectUtils.objIsNotValid(snapshot)) {
+        if (CIMediaXmlFactory.objIsNotValid(snapshot)) {
             xml.start("Snapshot");
             CIMediaXmlFactory.addIfNotNull(xml, "Mode", snapshot.getMode());
             CIMediaXmlFactory.addIfNotNull(xml, "TimeInterval", snapshot.getTimeInterval());
