@@ -6351,6 +6351,9 @@ public class XmlResponsesSaxParser {
                     case "ForbidState":
                         jobsDetail.setForbidState(getText());
                         break;
+                    case "Label":
+                        jobsDetail.setLabel(getText());
+                        break;
                     default:
                         break;
                 }
@@ -6384,29 +6387,29 @@ public class XmlResponsesSaxParser {
                 } else if ("SheetNumber".equalsIgnoreCase(name)) {
                     resultDetail.setSheetNumber(getText());
                 }
-            } else if (in("Response", "JobsDetail", "PageSegment", "Results", "PornInfo","OcrResults")) {
+            } else if (in("Response", "JobsDetail", "PageSegment", "Results", "PornInfo", "OcrResults")) {
                 parseResultInfo(resultDetail.getPornInfo().getOcrResults(), name, getText());
-            }else if (in("Response", "JobsDetail", "PageSegment", "Results", "PoliticsInfo","OcrResults")) {
+            } else if (in("Response", "JobsDetail", "PageSegment", "Results", "PoliticsInfo", "OcrResults")) {
                 parseResultInfo(resultDetail.getPoliticsInfo().getOcrResults(), name, getText());
-            }else if (in("Response", "JobsDetail", "PageSegment", "Results", "TerrorismInfo","OcrResults")) {
+            } else if (in("Response", "JobsDetail", "PageSegment", "Results", "TerrorismInfo", "OcrResults")) {
                 parseResultInfo(resultDetail.getTerroristInfo().getOcrResults(), name, getText());
-            }else if (in("Response", "JobsDetail", "PageSegment", "Results", "AdsInfo","OcrResults")) {
+            } else if (in("Response", "JobsDetail", "PageSegment", "Results", "AdsInfo", "OcrResults")) {
                 parseResultInfo(resultDetail.getAdsInfo().getOcrResults(), name, getText());
-            }else if (in("Response", "JobsDetail", "PageSegment", "Results", "PornInfo","ObjectResults")) {
+            } else if (in("Response", "JobsDetail", "PageSegment", "Results", "PornInfo", "ObjectResults")) {
                 parseResultInfo(resultDetail.getPornInfo().getObjectResults(), name, getText());
-            }else if (in("Response", "JobsDetail", "PageSegment", "Results", "PoliticsInfo","ObjectResults")) {
+            } else if (in("Response", "JobsDetail", "PageSegment", "Results", "PoliticsInfo", "ObjectResults")) {
                 parseResultInfo(resultDetail.getPoliticsInfo().getObjectResults(), name, getText());
-            }else if (in("Response", "JobsDetail", "PageSegment", "Results", "TerrorismInfo","ObjectResults")) {
+            } else if (in("Response", "JobsDetail", "PageSegment", "Results", "TerrorismInfo", "ObjectResults")) {
                 parseResultInfo(resultDetail.getTerroristInfo().getObjectResults(), name, getText());
-            }else if (in("Response", "JobsDetail", "PageSegment", "Results", "AdsInfo","ObjectResults")) {
+            } else if (in("Response", "JobsDetail", "PageSegment", "Results", "AdsInfo", "ObjectResults")) {
                 parseResultInfo(resultDetail.getAdsInfo().getObjectResults(), name, getText());
-            }else if (in("Response", "JobsDetail", "PageSegment", "Results", "PornInfo","ObjectResults","Location")) {
+            } else if (in("Response", "JobsDetail", "PageSegment", "Results", "PornInfo", "ObjectResults", "Location")) {
                 parseResultInfo(resultDetail.getPornInfo().getObjectResults(), name, getText());
-            }else if (in("Response", "JobsDetail", "PageSegment", "Results", "PoliticsInfo","ObjectResults","Location")) {
+            } else if (in("Response", "JobsDetail", "PageSegment", "Results", "PoliticsInfo", "ObjectResults", "Location")) {
                 parseResultInfo(resultDetail.getPoliticsInfo().getObjectResults(), name, getText());
-            }else if (in("Response", "JobsDetail", "PageSegment", "Results", "TerrorismInfo","ObjectResults","Location")) {
+            } else if (in("Response", "JobsDetail", "PageSegment", "Results", "TerrorismInfo", "ObjectResults", "Location")) {
                 parseResultInfo(resultDetail.getTerroristInfo().getObjectResults(), name, getText());
-            }else if (in("Response", "JobsDetail", "PageSegment", "Results", "AdsInfo","ObjectResults","Location")) {
+            } else if (in("Response", "JobsDetail", "PageSegment", "Results", "AdsInfo", "ObjectResults", "Location")) {
                 parseResultInfo(resultDetail.getAdsInfo().getObjectResults(), name, getText());
             } else if (in("Response", "JobsDetail", "UserInfo")) {
                 ParserMediaInfoUtils.ParsingAuditingUserInfo(response.getJobsDetail().getUserInfo(), name, getText());
@@ -6438,15 +6441,23 @@ public class XmlResponsesSaxParser {
                     obj.setScore(getText());
                     break;
                 case "Keywords":
-                    obj.setLabel(getText());
+                    obj.setKeywords(getText());
                     break;
                 case "Count":
                     obj.setCount(getText());
                     break;
+                case "Label":
+                    obj.setLabel(getText());
+                    break;
+                case "Category":
+                    obj.setCategory(getText());
+                    break;
+                case "SubLabel":
+                    obj.setSubLabel(getText());
+                    break;
                 default:
                     break;
             }
-
         }
 
         private void parseResultInfo(List<ObjectResults> obj, String name, String value) {
