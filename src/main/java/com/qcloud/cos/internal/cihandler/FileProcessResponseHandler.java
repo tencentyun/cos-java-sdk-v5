@@ -1,8 +1,9 @@
 package com.qcloud.cos.internal.cihandler;
 
 import com.qcloud.cos.model.ciModel.common.FileProcessInputObject;
-import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
 import com.qcloud.cos.model.ciModel.job.FileCompressConfig;
+import com.qcloud.cos.model.ciModel.job.FileHashCodeConfig;
+import com.qcloud.cos.model.ciModel.job.FileHashCodeResult;
 import com.qcloud.cos.model.ciModel.job.FileProcessJobDetail;
 import com.qcloud.cos.model.ciModel.job.FileProcessJobResponse;
 import com.qcloud.cos.model.ciModel.job.FileUnCompressConfig;
@@ -93,8 +94,6 @@ public class FileProcessResponseHandler extends CIAbstractHandler {
                 default:
                     break;
             }
-
-
         } else if (in("Response", "JobsDetail", "Operation", "FileUncompressConfig")) {
             FileUnCompressConfig fileUnCompressConfig = response.getJobDetail().getOperation().getFileUnCompressConfig();
             switch (name) {
@@ -107,26 +106,43 @@ public class FileProcessResponseHandler extends CIAbstractHandler {
                 default:
                     break;
             }
-
-        } else if (in("Response", "JobsDetail", "Operation", "FileUncompressConfig")) {
-
-        } else if (in("Response", "JobsDetail", "Operation", "Output")) {
-            MediaOutputObject output = response.getJobDetail().getOperation().getOutput();
+        } else if (in("Response", "JobsDetail", "Operation", "FileHashCodeConfig")) {
+            FileHashCodeConfig fileHashCodeConfig = response.getJobDetail().getOperation().getFileHashCodeConfig();
             switch (name) {
-                case "Bucket":
-                    output.setBucket(getText());
+                case "Type":
+                    fileHashCodeConfig.setType(getText());
                     break;
-                case "Object":
-                    output.setObject(getText());
+                case "AddToHeader":
+                    fileHashCodeConfig.setAddToHeader(getText());
                     break;
-                case "Region":
-                    output.setRegion(getText());
+                default:
+                    break;
+            }
+        } else if (in("Response", "JobsDetail", "Operation", "FileHashCodeResult")) {
+            FileHashCodeResult fileHashCodeResult = response.getJobDetail().getOperation().getFileHashCodeResult();
+            switch (name) {
+                case "MD5":
+                    fileHashCodeResult.setMd5(getText());
+                    break;
+                case "FileSize":
+                    fileHashCodeResult.setFileSize(getText());
+                    break;
+                case "LastModified":
+                    fileHashCodeResult.setLastModified(getText());
+                    break;
+                case "Etag":
+                    fileHashCodeResult.setEtag(getText());
+                    break;
+                case "SHA1":
+                    fileHashCodeResult.setSha1(getText());
+                    break;
+                case "SHA256":
+                    fileHashCodeResult.setSha256(getText());
                     break;
                 default:
                     break;
             }
         }
-
     }
 
     public FileProcessJobResponse getResponse() {
