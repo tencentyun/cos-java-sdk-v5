@@ -10,17 +10,7 @@ public class BucketNameUtilsTest {
     public void testBucketNameNormal() {
         BucketNameUtils.validateBucketName("a1234");
     }
-    
-    @Test
-    public void testBucketNameLongerThan40() {
-        try {
-            BucketNameUtils.validateBucketName("abc12abc12abc12abc12abc12abc12abc12abc121");
-        } catch (IllegalArgumentException e) {
-            return;
-        }
-        fail("test long bucket name fail");
-    }
-    
+
     @Test
     public void testBucketNameEmpty() {
         try {

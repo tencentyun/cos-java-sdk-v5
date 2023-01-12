@@ -266,7 +266,7 @@ public interface Headers {
     /**
      * Header for the original, unencrypted size of an encrypted object
      */
-    public static final String UNENCRYPTED_CONTENT_LENGTH = "x-cos-unencrypted-content-length";
+    public static final String UNENCRYPTED_CONTENT_LENGTH = "client-side-encryption-unencrypted-content-length";
 
     /**
      * Header for the optional original unencrypted Content MD5 of an encrypted object

@@ -160,7 +160,7 @@ public class AbstractCOSClientTest {
         bucket = System.getenv("bucket");
         generalApiEndpoint = System.getenv("generalApiEndpoint");
         serviceApiEndpoint = System.getenv("serviceApiEndpoint");
-        cmk = System.getenv("cmk");
+        cmk = System.getenv("KMS_ID");
 
         File propFile = new File("ut_account.prop");
         if (propFile.exists() && propFile.canRead()) {
@@ -180,7 +180,7 @@ public class AbstractCOSClientTest {
                 useCPMInstanceCredentials = Boolean.parseBoolean(prop.getProperty("useCPMInstanceCredentials", "false"
                 ));
                 useCVMInstanceCredentials = Boolean.parseBoolean(prop.getProperty("useCVMInstanceCredentials", "false"));
-                cmk = prop.getProperty("cmk");
+                cmk = prop.getProperty("KMS_ID");
             } finally {
                 if (fis != null) {
                     try {
@@ -783,8 +783,7 @@ public class AbstractCOSClientTest {
         }
     }
 
-    protected String testInitMultipart(String key) {
-        InitiateMultipartUploadRequest request = new InitiateMultipartUploadRequest(bucket, key);
+    protected String testInitMultipart(InitiateMultipartUploadRequest request) {
         request.setStorageClass(StorageClass.Standard_IA);
         InitiateMultipartUploadResult initResult = cosclient.initiateMultipartUpload(request);
         return initResult.getUploadId();
@@ -893,7 +892,11 @@ public class AbstractCOSClientTest {
                 partSize, System.currentTimeMillis(), ThreadLocalRandom.current().nextLong());
 
         try {
-            String uploadId = testInitMultipart(key);
+            InitiateMultipartUploadRequest initiateMultipartUploadRequest = new InitiateMultipartUploadRequest(bucket,key);
+            if (useClientEncryption) {
+                initiateMultipartUploadRequest.setDataSizePartSize(filesize, partSize);
+            }
+            String uploadId = testInitMultipart(initiateMultipartUploadRequest);
             assertNotNull(uploadId);
             int partNum = 0;
             long byteUploaded = 0;
