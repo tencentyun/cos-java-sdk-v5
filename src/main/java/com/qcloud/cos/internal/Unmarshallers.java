@@ -41,8 +41,10 @@ import com.qcloud.cos.model.ciModel.image.ImageLabelResponse;
 import com.qcloud.cos.model.ciModel.image.ImageLabelV2Response;
 import com.qcloud.cos.model.ciModel.image.ImageSearchResponse;
 import com.qcloud.cos.model.ciModel.image.ImageStyleResponse;
+import com.qcloud.cos.model.ciModel.job.BatchJobResponse;
 import com.qcloud.cos.model.ciModel.job.DocJobListResponse;
 import com.qcloud.cos.model.ciModel.job.DocJobResponse;
+import com.qcloud.cos.model.ciModel.job.FileProcessJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaListJobResponse;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoResponse;
@@ -565,6 +567,15 @@ public class Unmarshallers {
         }
     }
 
+    public static final class BatchJobUnmarshaller
+            implements Unmarshaller<BatchJobResponse, InputStream> {
+
+        public BatchJobResponse unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser()
+                    .parseBatchJobResponse(in).getResponse();
+        }
+    }
+
 
     public static final class ListBucketUnmarshaller
             implements Unmarshaller<MediaBucketResponse, InputStream> {
@@ -838,6 +849,15 @@ public class Unmarshallers {
         public String unmarshall(InputStream in) throws Exception {
             return new XmlResponsesSaxParser()
                     .parseReportBadCase(in).getResponse();
+        }
+    }
+
+    public static final class FileProcessUnmarshaller
+            implements Unmarshaller<FileProcessJobResponse, InputStream> {
+
+        public FileProcessJobResponse unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser()
+                    .parseFileProcessResponse(in).getResponse();
         }
     }
 

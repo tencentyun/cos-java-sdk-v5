@@ -328,5 +328,5 @@ public interface Headers {
     public static final String ENCRYPTION_DATA_SIZE = "client-side-encryption-data-size";
     public static final String ENCRYPTION_PART_SIZE = "client-side-encryption-part-size";
 
-    public static final String SYMLINK_TARGET= "x-cos-symlink-target";
+    public static final String SYMLINK_TARGET = "x-cos-symlink-target";
 }

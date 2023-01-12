@@ -25,7 +25,6 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -125,11 +124,15 @@ import com.qcloud.cos.model.ciModel.image.ImageSearchResponse;
 import com.qcloud.cos.model.ciModel.image.ImageStyleRequest;
 import com.qcloud.cos.model.ciModel.image.ImageStyleResponse;
 import com.qcloud.cos.model.ciModel.image.OpenImageSearchRequest;
+import com.qcloud.cos.model.ciModel.job.BatchJobRequest;
+import com.qcloud.cos.model.ciModel.job.BatchJobResponse;
 import com.qcloud.cos.model.ciModel.job.DocHtmlRequest;
 import com.qcloud.cos.model.ciModel.job.DocJobListRequest;
 import com.qcloud.cos.model.ciModel.job.DocJobListResponse;
 import com.qcloud.cos.model.ciModel.job.DocJobRequest;
 import com.qcloud.cos.model.ciModel.job.DocJobResponse;
+import com.qcloud.cos.model.ciModel.job.FileProcessJobResponse;
+import com.qcloud.cos.model.ciModel.job.FileProcessRequest;
 import com.qcloud.cos.model.ciModel.job.MediaJobObject;
 import com.qcloud.cos.model.ciModel.job.MediaJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaJobsRequest;
@@ -159,6 +162,7 @@ import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowListRequest;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowListResponse;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowRequest;
 import com.qcloud.cos.model.ciModel.xml.CIAuditingXmlFactory;
+import com.qcloud.cos.model.ciModel.xml.CIFileProcessXmlFactory;
 import com.qcloud.cos.model.ciModel.xml.CIMediaXmlFactory;
 import com.qcloud.cos.model.ciModel.xml.CImageXmlFactory;
 import com.qcloud.cos.model.fetch.GetAsyncFetchTaskRequest;
@@ -3776,8 +3780,6 @@ public class COSClient implements COS {
                 "The tag parameter must be specified setting the object tags");
         rejectNull(req.getQueueId(),
                 "The queueId parameter must be specified setting the object tags");
-        rejectNull(req.getInput().getObject(),
-                "The input parameter must be specified setting the object tags");
         this.rejectStartWith(req.getCallBack(),"http","The CallBack parameter mush start with http or https");
         CosHttpRequest<MediaJobsRequest> request = createRequest(req.getBucketName(), "/jobs", req, HttpMethodName.POST);
         this.setContent(request, CIMediaXmlFactory.convertToXmlByteArray(req), "application/xml", false);
@@ -4093,7 +4095,7 @@ public class COSClient implements COS {
         this.checkCIRequestCommon(videoAuditingRequest);
         this.rejectStartWith(videoAuditingRequest.getConf().getCallback(), "http", "The Conf.CallBack parameter mush start with http or https");
         CosHttpRequest<VideoAuditingRequest> request = createRequest(videoAuditingRequest.getBucketName(), "/video/auditing", videoAuditingRequest, HttpMethodName.POST);
-        this.setContent(request, RequestXmlFactory.convertToXmlByteArray(videoAuditingRequest), "application/xml", false);
+        this.setContent(request, CIAuditingXmlFactory.convertToXmlByteArray(videoAuditingRequest), "application/xml", false);
         return invoke(request, new Unmarshallers.VideoAuditingUnmarshaller());
     }
 
@@ -4111,7 +4113,7 @@ public class COSClient implements COS {
         this.checkCIRequestCommon(audioAuditingRequest);
         this.rejectStartWith(audioAuditingRequest.getConf().getCallback(), "http", "The Conf.CallBack parameter mush start with http or https");
         CosHttpRequest<AudioAuditingRequest> request = createRequest(audioAuditingRequest.getBucketName(), "/audio/auditing", audioAuditingRequest, HttpMethodName.POST);
-        this.setContent(request, RequestXmlFactory.convertToXmlByteArray(audioAuditingRequest), "application/xml", false);
+        this.setContent(request, CIAuditingXmlFactory.convertToXmlByteArray(audioAuditingRequest), "application/xml", false);
         return invoke(request, new Unmarshallers.AudioAuditingUnmarshaller());
     }
 
@@ -4154,7 +4156,7 @@ public class COSClient implements COS {
         this.checkCIRequestCommon(textAuditingRequest);
         this.rejectStartWith(textAuditingRequest.getConf().getCallback(), "http", "The Conf.CallBack parameter mush start with http or https");
         CosHttpRequest<TextAuditingRequest> request = createRequest(textAuditingRequest.getBucketName(), "/text/auditing", textAuditingRequest, HttpMethodName.POST);
-        this.setContent(request, RequestXmlFactory.convertToXmlByteArray(textAuditingRequest), "application/xml", false);
+        this.setContent(request, CIAuditingXmlFactory.convertToXmlByteArray(textAuditingRequest), "application/xml", false);
         return invoke(request, new Unmarshallers.TextAuditingJobUnmarshaller());
     }
 
@@ -4172,7 +4174,7 @@ public class COSClient implements COS {
         this.checkCIRequestCommon(documentAuditingRequest);
         this.rejectStartWith(documentAuditingRequest.getConf().getCallback(), "http", "The Conf.CallBack parameter mush start with http or https");
         CosHttpRequest<DocumentAuditingRequest> request = createRequest(documentAuditingRequest.getBucketName(), "/document/auditing", documentAuditingRequest, HttpMethodName.POST);
-        this.setContent(request, RequestXmlFactory.convertToXmlByteArray(documentAuditingRequest), "application/xml", false);
+        this.setContent(request, CIAuditingXmlFactory.convertToXmlByteArray(documentAuditingRequest), "application/xml", false);
         return invoke(request, new Unmarshallers.DocumentAuditingJobUnmarshaller());
     }
 
@@ -4190,7 +4192,7 @@ public class COSClient implements COS {
         this.checkCIRequestCommon(batchImageAuditingRequest);
         this.rejectStartWith(batchImageAuditingRequest.getConf().getCallback(), "http", "The Conf.CallBack parameter mush start with http or https");
         CosHttpRequest<BatchImageAuditingRequest> request = createRequest(batchImageAuditingRequest.getBucketName(), "/image/auditing", batchImageAuditingRequest, HttpMethodName.POST);
-        this.setContent(request, RequestXmlFactory.convertToXmlByteArray(batchImageAuditingRequest), "application/xml", false);
+        this.setContent(request, CIAuditingXmlFactory.convertToXmlByteArray(batchImageAuditingRequest), "application/xml", false);
         return invoke(request, new Unmarshallers.BatchImageAuditingJobUnmarshaller());
     }
 
@@ -4681,6 +4683,40 @@ public class COSClient implements COS {
         }
         invoke(request, voidCosResponseHandler);
         return true;
+    }
+
+    @Override
+    public FileProcessJobResponse createFileProcessJob(FileProcessRequest req) {
+        this.checkCIRequestCommon(req);
+        rejectNull(req.getTag(),
+                "The tag parameter must be specified setting the object tags");
+        rejectNull(req.getQueueId(),
+                "The queueId parameter must be specified setting the object tags");
+        this.rejectStartWith(req.getCallBack(),"http","The CallBack parameter mush start with http or https");
+        CosHttpRequest<FileProcessRequest> request = createRequest(req.getBucketName(), "/file_jobs", req, HttpMethodName.POST);
+        this.setContent(request, CIFileProcessXmlFactory.convertToXmlByteArray(req), "application/xml", false);
+        return invoke(request, new Unmarshallers.FileProcessUnmarshaller());
+    }
+
+    @Override
+    public FileProcessJobResponse describeFileProcessJob(FileProcessRequest request) {
+        this.checkCIRequestCommon(request);
+        CosHttpRequest<FileProcessRequest> httpRequest = this.createRequest(request.getBucketName(), "/file_jobs/" + request.getJobId(), request, HttpMethodName.GET);
+        return this.invoke(httpRequest, new Unmarshallers.FileProcessUnmarshaller());
+    }
+
+    @Override
+    public BatchJobResponse createInventoryTriggerJob(BatchJobRequest req) {
+        CosHttpRequest<BatchJobRequest> request = createRequest(req.getBucketName(), "/inventorytriggerjob", req, HttpMethodName.POST);
+        this.setContent(request, CIMediaXmlFactory.convertToXmlByteArray(req), "application/xml", false);
+        return invoke(request, new Unmarshallers.BatchJobUnmarshaller());
+    }
+
+    @Override
+    public BatchJobResponse describeInventoryTriggerJob(BatchJobRequest request) {
+        this.checkCIRequestCommon(request);
+        CosHttpRequest<BatchJobRequest> httpRequest = this.createRequest(request.getBucketName(), "/inventorytriggerjob/" + request.getJobId(), request, HttpMethodName.GET);
+        return this.invoke(httpRequest, new Unmarshallers.BatchJobUnmarshaller());
     }
 
 }

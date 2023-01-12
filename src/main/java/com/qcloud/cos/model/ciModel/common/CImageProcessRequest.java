@@ -5,6 +5,8 @@ import com.qcloud.cos.internal.CIPicServiceRequest;
 import com.qcloud.cos.model.DeleteObjectRequest;
 import com.qcloud.cos.model.ciModel.persistence.PicOperations;
 
+import java.util.Map;
+
 public class CImageProcessRequest extends CIPicServiceRequest {
     /**
      * The name of the Qcloud COS bucket containing the object to image process
@@ -19,6 +21,8 @@ public class CImageProcessRequest extends CIPicServiceRequest {
      *  pic operations
      */
     private PicOperations picOperations;
+
+    private Map<String,String> queryParams;
 
     /**
      * Constructs a new {@link CImageProcessRequest}, specifying the object's bucket name and key.
@@ -123,5 +127,13 @@ public class CImageProcessRequest extends CIPicServiceRequest {
     public CImageProcessRequest withKey(PicOperations picOperations) {
         setPicOperations(picOperations);
         return this;
+    }
+
+    public Map<String, String> getQueryParams() {
+        return queryParams;
+    }
+
+    public void setQueryParams(Map<String, String> queryParams) {
+        this.queryParams = queryParams;
     }
 }

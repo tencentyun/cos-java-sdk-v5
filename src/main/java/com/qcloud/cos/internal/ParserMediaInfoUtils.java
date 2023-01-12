@@ -12,7 +12,10 @@ import com.qcloud.cos.model.ciModel.auditing.PoliticsInfoObjectResults;
 import com.qcloud.cos.model.ciModel.auditing.SectionInfo;
 import com.qcloud.cos.model.ciModel.auditing.SnapshotInfo;
 import com.qcloud.cos.model.ciModel.auditing.UserInfo;
+import com.qcloud.cos.model.ciModel.common.BatchInputObject;
+import com.qcloud.cos.model.ciModel.common.MediaInputObject;
 import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
+import com.qcloud.cos.model.ciModel.job.AudioConfig;
 import com.qcloud.cos.model.ciModel.job.Md5Info;
 import com.qcloud.cos.model.ciModel.job.MediaAudioMixObject;
 import com.qcloud.cos.model.ciModel.job.MediaAudioObject;
@@ -26,9 +29,11 @@ import com.qcloud.cos.model.ciModel.job.MediaTimeIntervalObject;
 import com.qcloud.cos.model.ciModel.job.MediaTopkRecognition;
 import com.qcloud.cos.model.ciModel.job.MediaTransConfigObject;
 import com.qcloud.cos.model.ciModel.job.MediaTranscodeVideoObject;
+import com.qcloud.cos.model.ciModel.job.MediaTtsConfig;
 import com.qcloud.cos.model.ciModel.job.MediaVideoObject;
 import com.qcloud.cos.model.ciModel.job.OutputFile;
 import com.qcloud.cos.model.ciModel.job.ProcessResult;
+import com.qcloud.cos.model.ciModel.job.TtsTpl;
 import com.qcloud.cos.model.ciModel.job.VideoTargetRec;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaFormat;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoAudio;
@@ -858,6 +863,9 @@ public class ParserMediaInfoUtils {
             case "SpriteObject":
                 output.setSpriteObject(value);
                 break;
+            case "AuObject":
+                output.setAuObject(value);
+                break;
             default:
                 break;
         }
@@ -917,6 +925,9 @@ public class ParserMediaInfoUtils {
                 break;
             case "State":
                 jobsDetail.setState(value);
+                break;
+            case "ForbidState":
+                jobsDetail.setForbidState(value);
                 break;
             default:
                 break;
@@ -1136,17 +1147,87 @@ public class ParserMediaInfoUtils {
             case "Height":
                 location.setHeight(value);
                 break;
-           case "Width":
+            case "Width":
                 location.setWidth(value);
                 break;
-           case "Rotate":
+            case "Rotate":
                 location.setRotate(value);
                 break;
-           case "X":
+            case "X":
                 location.setX(value);
                 break;
-           case "Y":
+            case "Y":
                 location.setY(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParseAudioConfig(AudioConfig audioConfig, String name, String value) {
+        switch (name) {
+            case "Channels":
+                audioConfig.setChannels(value);
+                break;
+            case "Codec":
+                audioConfig.setCodec(value);
+                break;
+            case "Samplerate":
+                audioConfig.setSamplerate(value);
+                break;
+            case "Bitrate":
+                audioConfig.setBitrate(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParsingInput(BatchInputObject input, String name, String value) {
+        switch (name) {
+            case "Manifest":
+                input.setManifest(value);
+                break;
+            case "Prefix":
+                input.setPrefix(value);
+                break;
+            case "UrlFile":
+                input.setUrlFile(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParseTtsConfig(MediaTtsConfig ttsConfig, String name, String value) {
+        switch (name) {
+            case "Input":
+                ttsConfig.setInput(value);
+                break;
+            case "InputType":
+                ttsConfig.setInputType(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParseTtsTpl(TtsTpl ttsTpl, String name, String value) {
+        switch (name) {
+            case "Codec":
+                ttsTpl.setCodec(value);
+                break;
+            case "Mode":
+                ttsTpl.setMode(value);
+                break;
+            case "Speed":
+                ttsTpl.setSpeed(value);
+                break;
+            case "Volume":
+                ttsTpl.setVolume(value);
+                break;
+            case "VoiceType":
+                ttsTpl.setVoiceType(value);
                 break;
             default:
                 break;
