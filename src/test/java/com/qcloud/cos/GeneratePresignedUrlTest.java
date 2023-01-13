@@ -144,9 +144,9 @@ public class GeneratePresignedUrlTest extends AbstractCOSClientTest {
             assertTrue(putUrl.toString().startsWith("https://"));
             assertTrue(getUrl.toString().startsWith("https://"));
             assertTrue(delUrl.toString().startsWith("https://"));
-            assertTrue(putUrl.toString().contains("sign="));
-            assertTrue(getUrl.toString().contains("sign="));
-            assertTrue(delUrl.toString().contains("sign="));
+            assertTrue(putUrl.toString().contains("q-signature="));
+            assertTrue(getUrl.toString().contains("q-signature="));
+            assertTrue(delUrl.toString().contains("q-signature="));
             testPutFileWithUrl(putUrl, localFile);
             headSimpleObject(key, localFile.length(), Md5Utils.md5Hex(localFile));
             testGetFileWithUrl(getUrl, downLoadFile);
@@ -188,9 +188,9 @@ public class GeneratePresignedUrlTest extends AbstractCOSClientTest {
             assertTrue(putUrl.toString().startsWith("https://"));
             assertTrue(getUrl.toString().startsWith("https://"));
             assertTrue(delUrl.toString().startsWith("https://"));
-            assertFalse(putUrl.toString().contains("sign="));
-            assertFalse(getUrl.toString().contains("sign="));
-            assertFalse(delUrl.toString().contains("sign="));
+            assertFalse(putUrl.toString().contains("q-signature="));
+            assertFalse(getUrl.toString().contains("q-signature="));
+            assertFalse(delUrl.toString().contains("q-signature="));
             testPutFileWithUrl(putUrl, localFile);
             headSimpleObject(key, localFile.length(), Md5Utils.md5Hex(localFile));
             testGetFileWithUrl(getUrl, downLoadFile);
@@ -225,9 +225,9 @@ public class GeneratePresignedUrlTest extends AbstractCOSClientTest {
             assertTrue(putUrl.toString().startsWith("https://"));
             assertTrue(getUrl.toString().startsWith("https://"));
             assertTrue(delUrl.toString().startsWith("https://"));
-            assertTrue(putUrl.toString().contains("sign="));
-            assertTrue(getUrl.toString().contains("sign="));
-            assertTrue(delUrl.toString().contains("sign="));
+            assertTrue(putUrl.toString().contains("q-signature="));
+            assertTrue(getUrl.toString().contains("q-signature="));
+            assertTrue(delUrl.toString().contains("q-signature="));
             assertTrue(putUrl.toString().contains("&" + Headers.SECURITY_TOKEN));
             assertTrue(getUrl.toString().contains("&" + Headers.SECURITY_TOKEN));
             assertTrue(delUrl.toString().contains("&" + Headers.SECURITY_TOKEN));
