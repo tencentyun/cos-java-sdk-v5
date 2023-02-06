@@ -95,6 +95,8 @@ public class ClientConfig {
     //是否区分host与endpoint
     private  boolean isDistinguishHost = false;
 
+    private boolean isShortConnection = false;
+
     // 不传入region 用于后续调用List Buckets(获取所有的bucket信息)
     public ClientConfig() {
         super();
@@ -302,5 +304,17 @@ public class ClientConfig {
 
     public boolean getIsDistinguishHost() {
         return isDistinguishHost;
+    }
+
+    /**
+     * 显示的设置使用短链接，在请求头中增加"Connection: close"
+     * HTTP 1.1默认使用长链接
+     */
+    public void setShortConnection() {
+        isShortConnection = true;
+    }
+
+    public boolean isShortConnection() {
+        return isShortConnection;
     }
 }
