@@ -252,6 +252,10 @@ public class DefaultCosHttpClient implements CosHttpClient {
             httpRequestBase.addHeader(Headers.SDK_LOG_DEBUG, "off");
         }
 
+        if (clientConfig.isShortConnection()) {
+            httpRequestBase.addHeader(Headers.CONNECTION, "close");
+        }
+
         if (request.getContent() != null) {
             InputStreamEntity reqEntity =
                     new InputStreamEntity(request.getContent(), contentLength);
