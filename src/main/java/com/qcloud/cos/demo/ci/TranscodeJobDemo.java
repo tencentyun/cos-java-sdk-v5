@@ -78,7 +78,6 @@ public class TranscodeJobDemo {
         //3.调用接口,获取任务响应对象
         MediaJobResponse response = client.createMediaJobs(request);
         System.out.println(response.getJobsDetail().getJobId());
-        System.out.println(Jackson.toJsonString(response));
     }
 
     /**

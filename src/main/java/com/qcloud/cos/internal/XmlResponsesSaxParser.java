@@ -4456,6 +4456,20 @@ public class XmlResponsesSaxParser {
                 ParserMediaInfoUtils.ParseTtsConfig(jobsDetail.getOperation().getTtsConfig(), name, getText());
             } else if (in("Response", "JobsDetail", "Operation", "TtsTpl")) {
                 ParserMediaInfoUtils.ParseTtsTpl(jobsDetail.getOperation().getTtsTpl(), name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "VideoEnhance", "Transcode", "Container")) {
+                ParserMediaInfoUtils.ParseContainer(jobsDetail.getOperation().getVideoEnhance().getTrascode().getContainer(), name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "VideoEnhance", "Transcode", "Video")) {
+                ParserMediaInfoUtils.ParsingMediaVideo(jobsDetail.getOperation().getVideoEnhance().getTrascode().getVideo(), name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "VideoEnhance", "Transcode", "Audio")) {
+                ParserMediaInfoUtils.ParsingMediaAudio(jobsDetail.getOperation().getVideoEnhance().getTrascode().getAudio(), name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "VideoEnhance", "SuperResolution")) {
+                ParserMediaInfoUtils.ParsingSuperResolution(jobsDetail.getOperation().getVideoEnhance().getSuperResolution(), name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "VideoEnhance", "ColorEnhance")) {
+                ParserMediaInfoUtils.ParsingColorEnhance(jobsDetail.getOperation().getVideoEnhance().getColorEnhance(), name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "VideoEnhance", "MsSharpen")) {
+                ParserMediaInfoUtils.ParsingMsSharpen(jobsDetail.getOperation().getVideoEnhance().getMsSharpen(), name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "VideoEnhance", "SDRtoHDR")) {
+                ParserMediaInfoUtils.ParsingSDRtoHDR(jobsDetail.getOperation().getVideoEnhance().getSdrToHDR(), name, getText());
             }
         }
 

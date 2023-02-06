@@ -6,6 +6,7 @@ public class FileProcessOperation {
     private FileCompressConfig fileCompressConfig;
     private FileUnCompressConfig fileUnCompressConfig;
     private FileHashCodeConfig fileHashCodeConfig;
+    private FileHashCodeResult fileHashCodeResult;
     private String userData;
     private MediaOutputObject output;
 
@@ -59,6 +60,17 @@ public class FileProcessOperation {
 
     public void setFileHashCodeConfig(FileHashCodeConfig fileHashCodeConfig) {
         this.fileHashCodeConfig = fileHashCodeConfig;
+    }
+
+    public FileHashCodeResult getFileHashCodeResult() {
+        if (fileHashCodeResult == null) {
+            fileHashCodeResult = new FileHashCodeResult();
+        }
+        return fileHashCodeResult;
+    }
+
+    public void setFileHashCodeResult(FileHashCodeResult fileHashCodeResult) {
+        this.fileHashCodeResult = fileHashCodeResult;
     }
 
     @Override
