@@ -4776,6 +4776,20 @@ public class XmlResponsesSaxParser {
                 ParserMediaInfoUtils.ParsingVideoTargetRec(template.getVideoTargetRec(), name, getText());
             } else if (in("Response", "TemplateList", "TtsTpl")) {
                 ParserMediaInfoUtils.ParseTtsTpl(template.getTtsTpl(), name, getText());
+            } else if (in("Response", "TemplateList", "VideoEnhance", "Transcode", "Container")) {
+                ParserMediaInfoUtils.ParseContainer(template.getVideoEnhance().getTrascode().getContainer(), name, getText());
+            } else if (in("Response", "TemplateList", "VideoEnhance", "Transcode", "Video")) {
+                ParserMediaInfoUtils.ParsingMediaVideo(template.getVideoEnhance().getTrascode().getVideo(), name, getText());
+            } else if (in("Response", "TemplateList", "VideoEnhance", "Transcode", "Audio")) {
+                ParserMediaInfoUtils.ParsingMediaAudio(template.getVideoEnhance().getTrascode().getAudio(), name, getText());
+            } else if (in("Response", "TemplateList", "VideoEnhance", "SuperResolution")) {
+                ParserMediaInfoUtils.ParsingSuperResolution(template.getVideoEnhance().getSuperResolution(), name, getText());
+            } else if (in("Response", "TemplateList", "VideoEnhance", "ColorEnhance")) {
+                ParserMediaInfoUtils.ParsingColorEnhance(template.getVideoEnhance().getColorEnhance(), name, getText());
+            } else if (in("Response", "TemplateList", "VideoEnhance", "MsSharpen")) {
+                ParserMediaInfoUtils.ParsingMsSharpen(template.getVideoEnhance().getMsSharpen(), name, getText());
+            } else if (in("Response", "TemplateList", "VideoEnhance", "SDRtoHDR")) {
+                ParserMediaInfoUtils.ParsingSDRtoHDR(template.getVideoEnhance().getSdrToHDR(), name, getText());
             }
         }
 
