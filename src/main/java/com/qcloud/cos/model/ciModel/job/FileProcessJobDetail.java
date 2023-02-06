@@ -1,7 +1,6 @@
 package com.qcloud.cos.model.ciModel.job;
 
 import com.qcloud.cos.model.ciModel.common.FileProcessInputObject;
-import com.qcloud.cos.model.ciModel.common.MediaInputObject;
 
 public class FileProcessJobDetail {
     private String code;

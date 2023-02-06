@@ -170,7 +170,7 @@ public class CIAuditingXmlFactory {
             CIMediaXmlFactory.addIfNotNull(xml, "DataId", inputObject.getDataId());
             CIMediaXmlFactory.addIfNotNull(xml, "Content", inputObject.getContent());
             addUserInfo(xml, inputObject.getUserInfo());
-            addEncryption(xml,inputObject.getEncryption());
+            addEncryption(xml, inputObject.getEncryption());
             xml.end();
         }
     }
