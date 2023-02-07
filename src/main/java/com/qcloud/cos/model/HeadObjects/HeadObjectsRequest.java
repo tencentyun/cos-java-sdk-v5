@@ -14,7 +14,6 @@ public class HeadObjectsRequest {
     private LinkedBlockingQueue<GetObjectMetadataRequest> headRequests;
 
     public HeadObjectsRequest(String bucketName, List<GetObjectMetadataRequest> requests) {
-        headRequests = new LinkedBlockingQueue<>(requests.size());
         setBucketName(bucketName);
         setHeadRequests(requests);
     }
@@ -32,7 +31,7 @@ public class HeadObjectsRequest {
      * @param requests The list of requests to head
      */
     public void setHeadRequests(List<GetObjectMetadataRequest> requests) {
-        this.headRequests.clear();
+        this.headRequests = new LinkedBlockingQueue<>(requests.size());
         for (GetObjectMetadataRequest getObjectMetadataRequest : requests) {
             if (getObjectMetadataRequest == null) {
                 throw new IllegalArgumentException("The head object request must be specified");
