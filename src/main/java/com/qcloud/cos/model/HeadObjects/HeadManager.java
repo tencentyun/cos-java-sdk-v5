@@ -5,6 +5,7 @@ import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.model.GetObjectMetadataRequest;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
 
@@ -40,13 +41,13 @@ public class HeadManager {
         return request_timeout;
     }
 
-    public HeadObjectsResult headObjects(String bucketName, List<GetObjectMetadataRequest> requests)
+    public List<HeadObjectResult> headObjects(String bucketName, List<GetObjectMetadataRequest> requests)
             throws CosClientException, CosServiceException {
         HeadObjectsRequest headObjectsRequest = new HeadObjectsRequest(bucketName, requests);
         return headObjects(headObjectsRequest);
     }
 
-    public HeadObjectsResult headObjects(HeadObjectsRequest headObjectsRequest) {
+    public List<HeadObjectResult> headObjects(HeadObjectsRequest headObjectsRequest) {
         if (nThreads <= 0) {
             throw new IllegalArgumentException("The thread counts must be greater than 0");
         }
@@ -60,7 +61,7 @@ public class HeadManager {
         }
 
         CountDownLatch countDownLatch = new CountDownLatch(nThreads);
-        LinkedBlockingQueue<HeadObjectsResult.HeadedObject> headedObjects = new LinkedBlockingQueue<>(count_of_keys);
+        LinkedBlockingQueue<HeadObjectResult> headedObjects = new LinkedBlockingQueue<>(count_of_keys);
         for (int i = 0; i < nThreads; i++) {
             HeadConsumer headConsumer = new HeadConsumer(headObjectsRequest.getRequests(), headedObjects, countDownLatch, cos);
             new Thread(headConsumer).start();
@@ -75,6 +76,6 @@ public class HeadManager {
             throw new CosClientException(e.getMessage(),e);
         }
 
-        return new HeadObjectsResult(headedObjects);
+        return new ArrayList<>(headedObjects);
     }
 }

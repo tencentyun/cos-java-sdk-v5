@@ -6,7 +6,7 @@ import com.qcloud.cos.auth.BasicCOSCredentials;
 import com.qcloud.cos.auth.COSCredentials;
 import com.qcloud.cos.model.GetObjectMetadataRequest;
 import com.qcloud.cos.model.HeadObjects.HeadManager;
-import com.qcloud.cos.model.HeadObjects.HeadObjectsResult;
+import com.qcloud.cos.model.HeadObjects.HeadObjectResult;
 import com.qcloud.cos.region.Region;
 
 import java.util.ArrayList;
@@ -33,13 +33,12 @@ public class HeadObjectsDemo {
         HeadManager headManager = new HeadManager(cosclient);
         //headManager.setRequestTimeout(1000);
 
-        HeadObjectsResult headObjectsResult = headManager.headObjects(bucketName, requests);
-        List<HeadObjectsResult.HeadedObject> headedObjects = headObjectsResult.getHeadedObjects();
+        List<HeadObjectResult> headedObjects = headManager.headObjects(bucketName, requests);
 
         long endTime = System.currentTimeMillis();
         System.out.println("used time: " + (endTime - startTime));
 
-        for (HeadObjectsResult.HeadedObject object : headedObjects) {
+        for (HeadObjectResult object : headedObjects) {
             if (object.isSuccess()) {
                 if (object.isExist()){
                     System.out.println(object.getKey() +" true");
