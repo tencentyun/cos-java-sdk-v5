@@ -11,24 +11,30 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.LinkedBlockingQueue;
 
-public class HeadConsumer implements Runnable{
+public class HeadConsumer extends Thread {
     private final LinkedBlockingQueue<GetObjectMetadataRequest> requests;
     private final COS cos;
     private final LinkedBlockingQueue<HeadObjectResult> headObjects;
     private final CountDownLatch countDownLatch;
     private static final Logger log = LoggerFactory.getLogger(HeadConsumer.class);
+    private boolean isInterrupted;
 
     public HeadConsumer(LinkedBlockingQueue<GetObjectMetadataRequest> requests, LinkedBlockingQueue<HeadObjectResult> headObjects, CountDownLatch countDownLatch, COS cos) {
         this.requests = requests;
         this.headObjects = headObjects;
         this.countDownLatch = countDownLatch;
         this.cos = cos;
+        this.isInterrupted = false;
+    }
+
+    public void setInterruptFlag(boolean isInterrupted) {
+        this.isInterrupted = isInterrupted;
     }
 
     @Override
     public void run() {
         try {
-            while (!Thread.currentThread().isInterrupted()) {
+            while (!isInterrupted) {
                 GetObjectMetadataRequest request = requests.poll();
                 if (request == null) {
                     break;
