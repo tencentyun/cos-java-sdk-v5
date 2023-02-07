@@ -45,6 +45,7 @@ public class MediaJobOperation {
     private MediaTtsConfig ttsConfig = new MediaTtsConfig();
     private VideoEnhance videoEnhance = new VideoEnhance();
     private TtsTpl ttsTpl = new TtsTpl();
+    private Subtitles subtitles = new Subtitles();
 
     public MediaTimeIntervalObject getTimeInterval() {
         return timeInterval;
@@ -314,6 +315,14 @@ public class MediaJobOperation {
 
     public void setVideoEnhance(VideoEnhance videoEnhance) {
         this.videoEnhance = videoEnhance;
+    }
+
+    public Subtitles getSubtitles() {
+        return subtitles;
+    }
+
+    public void setSubtitles(Subtitles subtitles) {
+        this.subtitles = subtitles;
     }
 
     @Override
