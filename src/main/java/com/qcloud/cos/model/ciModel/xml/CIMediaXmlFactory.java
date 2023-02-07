@@ -83,7 +83,6 @@ public class CIMediaXmlFactory {
         addInput(xml, request.getInput());
         addOperation(xml, request);
         xml.end();
-        System.out.println(xml);
         return xml.getBytes();
     }
 
