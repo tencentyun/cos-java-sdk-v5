@@ -13,11 +13,6 @@ public class HeadObjectsRequest {
 
     private LinkedBlockingQueue<GetObjectMetadataRequest> headRequests;
 
-
-    public HeadObjectsRequest(String bucketName) {
-        setBucketName(bucketName);
-    }
-
     public HeadObjectsRequest(String bucketName, List<GetObjectMetadataRequest> requests) {
         headRequests = new LinkedBlockingQueue<>(requests.size());
         setBucketName(bucketName);
