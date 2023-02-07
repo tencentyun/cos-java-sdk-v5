@@ -65,13 +65,19 @@ public class HeadManager {
 
         CountDownLatch countDownLatch = new CountDownLatch(nThreads);
         LinkedBlockingQueue<HeadObjectResult> headedObjects = new LinkedBlockingQueue<>(count_of_keys);
+        List<Thread> threads = new ArrayList<>(nThreads);
         for (int i = 0; i < nThreads; i++) {
             HeadConsumer headConsumer = new HeadConsumer(headObjectsRequest.getRequests(), headedObjects, countDownLatch, cos);
-            new Thread(headConsumer).start();
+            Thread thread = new Thread(headConsumer);
+            threads.add(thread);
+            thread.start();
         }
         try {
             boolean isTimeout = countDownLatch.await(request_timeout, TimeUnit.MILLISECONDS);
             if (!isTimeout) {
+                for (Thread thread : threads) {
+                    thread.interrupt();
+                }
                 throw new CosClientException("ExecutorService: The wait " + request_timeout + " timed out: ");
             }
         }catch (InterruptedException e){

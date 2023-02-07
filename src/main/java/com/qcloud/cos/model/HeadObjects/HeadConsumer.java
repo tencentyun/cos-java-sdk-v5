@@ -28,7 +28,7 @@ public class HeadConsumer implements Runnable{
     @Override
     public void run() {
         try {
-            while (true) {
+            while (!Thread.currentThread().isInterrupted()) {
                 GetObjectMetadataRequest request = requests.poll();
                 if (request == null) {
                     break;
