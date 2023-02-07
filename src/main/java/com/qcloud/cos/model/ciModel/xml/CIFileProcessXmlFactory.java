@@ -30,7 +30,6 @@ public class CIFileProcessXmlFactory {
         CIMediaXmlFactory.addIfNotNull(xml, "CallBackType", request.getCallBackType());
         CIMediaXmlFactory.addIfNotNull(xml, "CallBackMqConfig", request.getCallBackMqConfig());
         xml.end();
-        System.out.println(xml);
         return xml.getBytes();
     }
 

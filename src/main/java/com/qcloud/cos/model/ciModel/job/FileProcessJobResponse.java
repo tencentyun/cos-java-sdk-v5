@@ -9,8 +9,6 @@ import com.qcloud.cos.model.CiServiceResult;
 public class FileProcessJobResponse extends CiServiceResult {
     private FileProcessJobDetail jobDetail;
 
-
-
     public FileProcessJobDetail getJobDetail() {
         if (jobDetail == null) {
             jobDetail = new FileProcessJobDetail();

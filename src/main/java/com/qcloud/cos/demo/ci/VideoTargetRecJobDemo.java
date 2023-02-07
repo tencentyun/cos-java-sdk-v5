@@ -1,20 +1,14 @@
 package com.qcloud.cos.demo.ci;
 
 import com.qcloud.cos.COSClient;
-import com.qcloud.cos.model.ciModel.job.MediaJobObject;
 import com.qcloud.cos.model.ciModel.job.MediaJobOperation;
 import com.qcloud.cos.model.ciModel.job.MediaJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaJobsRequest;
-import com.qcloud.cos.model.ciModel.job.MediaListJobResponse;
 import com.qcloud.cos.model.ciModel.job.VideoTargetRec;
 import com.qcloud.cos.model.ciModel.template.MediaTemplateRequest;
 import com.qcloud.cos.model.ciModel.template.MediaTemplateResponse;
-import com.qcloud.cos.model.ciModel.template.MediaWaterMarkImage;
-import com.qcloud.cos.model.ciModel.template.MediaWatermark;
-import com.qcloud.cos.utils.Jackson;
 
 import java.io.UnsupportedEncodingException;
-import java.util.List;
 
 /**
  * 媒体处理 目标检测任务 job接口相关demo

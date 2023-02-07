@@ -2,8 +2,6 @@ package com.qcloud.cos.demo.ci;
 
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
-import com.qcloud.cos.model.ciModel.job.DocJobRequest;
-import com.qcloud.cos.model.ciModel.job.DocJobResponse;
 import com.qcloud.cos.model.ciModel.job.FileCompressConfig;
 import com.qcloud.cos.model.ciModel.job.FileHashCodeConfig;
 import com.qcloud.cos.model.ciModel.job.FileProcessJobResponse;

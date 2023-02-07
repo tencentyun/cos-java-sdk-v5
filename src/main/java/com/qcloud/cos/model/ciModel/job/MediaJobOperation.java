@@ -43,6 +43,7 @@ public class MediaJobOperation {
     private VoiceSeparate voiceSeparate = new VoiceSeparate();
     private MediaTimeIntervalObject timeInterval = new MediaTimeIntervalObject();
     private MediaTtsConfig ttsConfig = new MediaTtsConfig();
+    private VideoEnhance videoEnhance = new VideoEnhance();
     private TtsTpl ttsTpl = new TtsTpl();
 
     public MediaTimeIntervalObject getTimeInterval() {
@@ -305,6 +306,14 @@ public class MediaJobOperation {
 
     public void setTtsTpl(TtsTpl ttsTpl) {
         this.ttsTpl = ttsTpl;
+    }
+
+    public VideoEnhance getVideoEnhance() {
+        return videoEnhance;
+    }
+
+    public void setVideoEnhance(VideoEnhance videoEnhance) {
+        this.videoEnhance = videoEnhance;
     }
 
     @Override

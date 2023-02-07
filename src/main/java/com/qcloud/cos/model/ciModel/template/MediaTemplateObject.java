@@ -4,6 +4,7 @@ import com.qcloud.cos.model.ciModel.common.MediaCommonResponse;
 import com.qcloud.cos.model.ciModel.job.MediaConcatTemplateObject;
 import com.qcloud.cos.model.ciModel.job.MediaTransConfigObject;
 import com.qcloud.cos.model.ciModel.job.TtsTpl;
+import com.qcloud.cos.model.ciModel.job.VideoEnhance;
 import com.qcloud.cos.model.ciModel.job.VideoTargetRec;
 
 /**
@@ -35,6 +36,8 @@ public class MediaTemplateObject extends MediaCommonResponse {
     private VideoTargetRec videoTargetRec;
 
     private TtsTpl ttsTpl;
+
+    private VideoEnhance videoEnhance;
 
     public String getTemplateId() {
         return templateId;
@@ -156,6 +159,17 @@ public class MediaTemplateObject extends MediaCommonResponse {
 
     public void setTtsTpl(TtsTpl ttsTpl) {
         this.ttsTpl = ttsTpl;
+    }
+
+    public VideoEnhance getVideoEnhance() {
+        if (videoEnhance == null) {
+            videoEnhance = new VideoEnhance();
+        }
+        return videoEnhance;
+    }
+
+    public void setVideoEnhance(VideoEnhance videoEnhance) {
+        this.videoEnhance = videoEnhance;
     }
 
     @Override

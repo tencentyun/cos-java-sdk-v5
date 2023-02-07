@@ -9,6 +9,7 @@ import com.qcloud.cos.model.ciModel.job.AudioConfig;
 import com.qcloud.cos.model.ciModel.job.BatchJobOperation;
 import com.qcloud.cos.model.ciModel.job.BatchJobRequest;
 import com.qcloud.cos.model.ciModel.job.CallBackMqConfig;
+import com.qcloud.cos.model.ciModel.job.ColorEnhance;
 import com.qcloud.cos.model.ciModel.job.ExtractDigitalWatermark;
 import com.qcloud.cos.model.ciModel.job.JobParam;
 import com.qcloud.cos.model.ciModel.job.MediaAudioMixObject;
@@ -27,7 +28,11 @@ import com.qcloud.cos.model.ciModel.job.MediaTranscodeObject;
 import com.qcloud.cos.model.ciModel.job.MediaTranscodeVideoObject;
 import com.qcloud.cos.model.ciModel.job.MediaTtsConfig;
 import com.qcloud.cos.model.ciModel.job.MediaVideoObject;
+import com.qcloud.cos.model.ciModel.job.MsSharpen;
+import com.qcloud.cos.model.ciModel.job.SDRtoHDR;
+import com.qcloud.cos.model.ciModel.job.SuperResolution;
 import com.qcloud.cos.model.ciModel.job.TtsTpl;
+import com.qcloud.cos.model.ciModel.job.VideoEnhance;
 import com.qcloud.cos.model.ciModel.job.VideoTargetRec;
 import com.qcloud.cos.model.ciModel.job.VoiceSeparate;
 import com.qcloud.cos.model.ciModel.template.MediaHlsEncryptObject;
@@ -74,7 +79,6 @@ public class CIMediaXmlFactory {
         addInput(xml, request.getInput());
         addOperation(xml, request);
         xml.end();
-        System.out.println(xml);
         return xml.getBytes();
     }
 
@@ -172,6 +176,8 @@ public class CIMediaXmlFactory {
             addIfNotNull(xml, "Speed", request.getSpeed());
             addIfNotNull(xml, "Volume", request.getVolume());
             addIfNotNull(xml, "VoiceType", request.getVoiceType());
+        } else if ("VideoEnhance".equalsIgnoreCase(tag)) {
+            addVideoEnhance(xml, request.getVideoEnhance());
         }
         xml.end();
         return xml.getBytes();
@@ -204,7 +210,56 @@ public class CIMediaXmlFactory {
         addVoiceSeparate(xml, operation.getVoiceSeparate());
         addTtsConfig(xml, operation.getTtsConfig());
         addTtsTpl(xml, operation.getTtsTpl());
+        addVideoEnhance(xml,operation.getVideoEnhance());
         xml.end();
+    }
+
+    private static void addVideoEnhance(XmlWriter xml, VideoEnhance videoEnhance) {
+        if (objIsNotValid(videoEnhance)) {
+            xml.start("VideoEnhance");
+            addTranscode(xml, videoEnhance.getTrascode());
+            addSuperResolution(xml, videoEnhance.getSuperResolution());
+            addColorEnhance(xml,videoEnhance.getColorEnhance());
+            addMsSharpen(xml,videoEnhance.getMsSharpen());
+            addSdrToHDR(xml,videoEnhance.getSdrToHDR());
+            xml.end();
+        }
+    }
+
+    private static void addSdrToHDR(XmlWriter xml, SDRtoHDR sdrToHDR) {
+        if (objIsNotValid(sdrToHDR)) {
+            xml.start("SDRtoHDR");
+            addIfNotNull(xml, "HdrMode", sdrToHDR.getHdrMode());
+            xml.end();
+        }
+    }
+
+    private static void addMsSharpen(XmlWriter xml, MsSharpen msSharpen) {
+        if (objIsNotValid(msSharpen)) {
+            xml.start("MsSharpen");
+            addIfNotNull(xml, "SharpenLevel", msSharpen.getSharpenLevel());
+            xml.end();
+        }
+    }
+
+    private static void addColorEnhance(XmlWriter xml, ColorEnhance colorEnhance) {
+        if (objIsNotValid(colorEnhance)) {
+            xml.start("ColorEnhance");
+            addIfNotNull(xml, "Contrast", colorEnhance.getContrast());
+            addIfNotNull(xml, "Correction", colorEnhance.getCorrection());
+            addIfNotNull(xml, "Saturation", colorEnhance.getSaturation());
+            xml.end();
+        }
+    }
+
+    private static void addSuperResolution(XmlWriter xml, SuperResolution superResolution) {
+        if (objIsNotValid(superResolution)) {
+            xml.start("SuperResolution");
+            addIfNotNull(xml, "Resolution", superResolution.getResolution());
+            addIfNotNull(xml, "EnableScaleUp", superResolution.getEnableScaleUp());
+            addIfNotNull(xml, "Version", superResolution.getVersion());
+            xml.end();
+        }
     }
 
     private static void addTtsTpl(XmlWriter xml, TtsTpl ttsTpl) {
