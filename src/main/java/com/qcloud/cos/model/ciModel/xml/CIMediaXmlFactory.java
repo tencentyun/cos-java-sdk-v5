@@ -10,7 +10,9 @@ import com.qcloud.cos.model.ciModel.job.BatchJobOperation;
 import com.qcloud.cos.model.ciModel.job.BatchJobRequest;
 import com.qcloud.cos.model.ciModel.job.CallBackMqConfig;
 import com.qcloud.cos.model.ciModel.job.ColorEnhance;
+import com.qcloud.cos.model.ciModel.job.EffectConfig;
 import com.qcloud.cos.model.ciModel.job.ExtractDigitalWatermark;
+import com.qcloud.cos.model.ciModel.job.FrameEnhance;
 import com.qcloud.cos.model.ciModel.job.JobParam;
 import com.qcloud.cos.model.ciModel.job.MediaAudioMixObject;
 import com.qcloud.cos.model.ciModel.job.MediaAudioObject;
@@ -30,6 +32,8 @@ import com.qcloud.cos.model.ciModel.job.MediaTtsConfig;
 import com.qcloud.cos.model.ciModel.job.MediaVideoObject;
 import com.qcloud.cos.model.ciModel.job.MsSharpen;
 import com.qcloud.cos.model.ciModel.job.SDRtoHDR;
+import com.qcloud.cos.model.ciModel.job.Subtitle;
+import com.qcloud.cos.model.ciModel.job.Subtitles;
 import com.qcloud.cos.model.ciModel.job.SuperResolution;
 import com.qcloud.cos.model.ciModel.job.TtsTpl;
 import com.qcloud.cos.model.ciModel.job.VideoEnhance;
@@ -165,7 +169,7 @@ public class CIMediaXmlFactory {
         } else if ("Concat".equalsIgnoreCase(tag)) {
             addConcat(xml, request.getConcat());
             addAudio(xml, request.getAudio());
-            addAudioMix(xml, request.getAudioMix());
+            addAudioMix(xml, request.getAudioMix(), "AudioMix");
             addContainer(xml, request.getContainer());
         } else if ("VideoTargetRec".equalsIgnoreCase(tag)) {
             VideoTargetRec videoTargetRec = request.getVideoTargetRec();
@@ -210,8 +214,24 @@ public class CIMediaXmlFactory {
         addVoiceSeparate(xml, operation.getVoiceSeparate());
         addTtsConfig(xml, operation.getTtsConfig());
         addTtsTpl(xml, operation.getTtsTpl());
-        addVideoEnhance(xml,operation.getVideoEnhance());
+        addVideoEnhance(xml, operation.getVideoEnhance());
+        addSubtitles(xml, operation.getSubtitles());
         xml.end();
+    }
+
+    private static void addSubtitles(XmlWriter xml, Subtitles subtitles) {
+        if (objIsNotValid(subtitles)) {
+            xml.start("Subtitles");
+            List<Subtitle> subtitle = subtitles.getSubtitle();
+            for (Subtitle sub : subtitle) {
+                if (objIsNotValid(subtitle)) {
+                    xml.start("Subtitle");
+                    addIfNotNull(xml, "Url", sub.getUrl());
+                    xml.end();
+                }
+            }
+            xml.end();
+        }
     }
 
     private static void addVideoEnhance(XmlWriter xml, VideoEnhance videoEnhance) {
@@ -219,9 +239,18 @@ public class CIMediaXmlFactory {
             xml.start("VideoEnhance");
             addTranscode(xml, videoEnhance.getTrascode());
             addSuperResolution(xml, videoEnhance.getSuperResolution());
-            addColorEnhance(xml,videoEnhance.getColorEnhance());
-            addMsSharpen(xml,videoEnhance.getMsSharpen());
-            addSdrToHDR(xml,videoEnhance.getSdrToHDR());
+            addColorEnhance(xml, videoEnhance.getColorEnhance());
+            addMsSharpen(xml, videoEnhance.getMsSharpen());
+            addSdrToHDR(xml, videoEnhance.getSdrToHDR());
+            addFrameEnhance(xml,videoEnhance.getFrameEnhance());
+            xml.end();
+        }
+    }
+
+    private static void addFrameEnhance(XmlWriter xml, FrameEnhance frameEnhance) {
+        if (objIsNotValid(frameEnhance)) {
+            xml.start("FrameEnhance");
+            addIfNotNull(xml, "FrameDoubling", frameEnhance.getFrameDoubling());
             xml.end();
         }
     }
@@ -377,19 +406,28 @@ public class CIMediaXmlFactory {
             addIfNotNull(xml, "Duration", videoMontage.getDuration());
             addVideo(xml, videoMontage.getVideo());
             addAudio(xml, videoMontage.getAudio());
-            addAudioMix(xml, videoMontage.getAudioMix());
+            addAudioMix(xml, videoMontage.getAudioMix(), "AudioMix");
             addContainer(xml, videoMontage.getContainer());
             xml.end();
         }
     }
 
-    private static void addAudioMix(XmlWriter xml, MediaAudioMixObject audioMix) {
+    private static void addAudioMix(XmlWriter xml, MediaAudioMixObject audioMix, String key) {
         if (objIsNotValid(audioMix)) {
-            xml.start("AudioMix");
+            xml.start(key);
             addIfNotNull(xml, "MixMode", audioMix.getMixMode());
             addIfNotNull(xml, "AudioSource", audioMix.getAudioSource());
             addIfNotNull(xml, "Replace", audioMix.getReplace());
-            addIfNotNull(xml, "EffectConfig", audioMix.getEffectConfig());
+            addIfNotNull(xml, "DirectMix", audioMix.getDirectMix());
+            EffectConfig effectConfig = audioMix.getEffectConfig();
+            if (objIsNotValid(effectConfig)) {
+                addIfNotNull(xml, "BgmFadeTime", effectConfig.getBgmFadeTime());
+                addIfNotNull(xml, "EnableBgmFade", effectConfig.getEnableBgmFade());
+                addIfNotNull(xml, "EnableEndFadeout", effectConfig.getEnableEndFadeout());
+                addIfNotNull(xml, "EnableStartFadein", effectConfig.getEnableStartFadein());
+                addIfNotNull(xml, "EndFadeoutTime", effectConfig.getEndFadeoutTime());
+                addIfNotNull(xml, "StartFadeinTime", effectConfig.getStartFadeinTime());
+            }
             xml.end();
         }
     }
@@ -412,7 +450,7 @@ public class CIMediaXmlFactory {
             addIfNotNull(xml, "Index", mediaConcatTemplate.getIndex());
             addIfNotNull(xml, "DirectConcat", mediaConcatTemplate.getDirectConcat());
             addContainer(xml, mediaConcatTemplate.getContainer());
-            addAudioMix(xml, mediaConcatTemplate.getAudioMix());
+            addAudioMix(xml, mediaConcatTemplate.getAudioMix(), "AudioMix");
             xml.end();
         }
     }
@@ -508,8 +546,17 @@ public class CIMediaXmlFactory {
             addVideo(xml, video);
             addAudio(xml, audio);
             addTransConfig(xml, transConfig);
-            addAudioMix(xml, transcode.getAudioMix());
+            addAudioMix(xml, transcode.getAudioMix(), "AudioMix");
+            addAudioMixArray(xml, transcode.getAudioMixArray());
             xml.end();
+        }
+    }
+
+    private static void addAudioMixArray(XmlWriter xml, List<MediaAudioMixObject> audioMixArray) {
+        if (objIsNotValid(audioMixArray)) {
+            for (MediaAudioMixObject mediaAudioMixObject : audioMixArray) {
+                addAudioMix(xml, mediaAudioMixObject, "AudioMixArray");
+            }
         }
     }
 

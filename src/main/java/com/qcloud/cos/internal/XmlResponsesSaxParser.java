@@ -4470,6 +4470,14 @@ public class XmlResponsesSaxParser {
                 ParserMediaInfoUtils.ParsingMsSharpen(jobsDetail.getOperation().getVideoEnhance().getMsSharpen(), name, getText());
             } else if (in("Response", "JobsDetail", "Operation", "VideoEnhance", "SDRtoHDR")) {
                 ParserMediaInfoUtils.ParsingSDRtoHDR(jobsDetail.getOperation().getVideoEnhance().getSdrToHDR(), name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "VideoEnhance", "FrameEnhance")) {
+                ParserMediaInfoUtils.ParsingFrameEnhance(jobsDetail.getOperation().getVideoEnhance().getFrameEnhance(), name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "Transcode", "AudioMixArray")) {
+                ParserMediaInfoUtils.ParsingAudioMixArray(jobsDetail.getOperation().getTranscode().getAudioMixArray(), name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "Transcode", "AudioMixArray", "EffectConfig")) {
+                ParserMediaInfoUtils.ParsingEffectConfig(jobsDetail.getOperation().getTranscode().getAudioMixArray(), name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "Subtitles", "Subtitle")) {
+                ParserMediaInfoUtils.ParsingSubtitles(jobsDetail.getOperation().getSubtitles(), name, getText());
             }
         }
 

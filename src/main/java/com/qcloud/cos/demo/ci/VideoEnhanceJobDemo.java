@@ -33,7 +33,7 @@ public class VideoEnhanceJobDemo {
 
     /**
      * createMediaJobs 接口用于创建媒体任务
-     * demo 使用画质增强参数创建任务 推荐使用模板创建媒体任务
+     * demo 使用画质增强参数创建任务
      */
     public static void createMediaJobs(COSClient client) throws UnsupportedEncodingException {
         //1.创建任务请求对象
@@ -70,6 +70,7 @@ public class VideoEnhanceJobDemo {
 
         videoEnhance.getMsSharpen().setSharpenLevel("5");
         videoEnhance.getSdrToHDR().setHdrMode("HDR10");
+        videoEnhance.getFrameEnhance().setFrameDoubling("true");
 
         request.getOperation().getOutput().setBucket("demo-1234567890");
         request.getOperation().getOutput().setRegion("ap-chongqing");
@@ -83,14 +84,12 @@ public class VideoEnhanceJobDemo {
 
     /**
      * describeMediaJob 根据jobId查询任务信息
-     *
-     * @param client
      */
     public static void describeMediaJob(COSClient client) {
         //1.创建任务请求对象
         MediaJobsRequest request = new MediaJobsRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("demo-1234567890");
+        request.setBucketName("demo-1234567890.");
         request.setJobId("j5ff9acb6a63f11ed8d022552f0a5c600");
         //3.调用接口,获取任务响应对象
         MediaJobResponse response = client.describeMediaJob(request);
@@ -99,15 +98,13 @@ public class VideoEnhanceJobDemo {
     }
 
     /**
-     * CreateMediaTemplate 用于新增水印模板。
-     *
-     * @param client
+     * CreateMediaTemplate 新增模板。
      */
     public static void createMediaTemplate(COSClient client) throws UnsupportedEncodingException {
         //1.创建模板请求对象
         MediaTemplateRequest request = new MediaTemplateRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("demo-1234567890");
+        request.setBucketName("demo-1234567890.");
         request.setTag("VideoEnhance");
         request.setName("mark-VideoEnhance");
 
@@ -150,7 +147,7 @@ public class VideoEnhanceJobDemo {
         //1.创建模板请求对象
         MediaTemplateRequest request = new MediaTemplateRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("demo-1234567890");
+        request.setBucketName("demo-1234567890.");
         request.setName("mark-VideoEnhance");
         MediaListTemplateResponse response = client.describeMediaTemplates(request);
         List<MediaTemplateObject> templateList = response.getTemplateList();

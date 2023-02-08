@@ -11,6 +11,7 @@ public class VideoEnhance {
     private SDRtoHDR sdrToHDR;
     private ColorEnhance colorEnhance;
     private MsSharpen msSharpen;
+    private FrameEnhance frameEnhance;
 
     public MediaTranscodeObject getTrascode() {
         if (trascode == null) {
@@ -67,6 +68,17 @@ public class VideoEnhance {
         this.msSharpen = msSharpen;
     }
 
+    public FrameEnhance getFrameEnhance() {
+        if (frameEnhance == null) {
+            frameEnhance = new FrameEnhance();
+        }
+        return frameEnhance;
+    }
+
+    public void setFrameEnhance(FrameEnhance frameEnhance) {
+        this.frameEnhance = frameEnhance;
+    }
+
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("VideoEnhance{");
@@ -75,6 +87,7 @@ public class VideoEnhance {
         sb.append(", sdrToHDR=").append(sdrToHDR);
         sb.append(", colorEnhance=").append(colorEnhance);
         sb.append(", msSharpen=").append(msSharpen);
+        sb.append(", frameEnhance=").append(frameEnhance);
         sb.append('}');
         return sb.toString();
     }
