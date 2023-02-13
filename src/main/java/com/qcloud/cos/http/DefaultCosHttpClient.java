@@ -78,9 +78,9 @@ import org.slf4j.LoggerFactory;
 
 public class DefaultCosHttpClient implements CosHttpClient {
 
-    private ClientConfig clientConfig;
+    protected ClientConfig clientConfig;
     private RequestConfig requestConfig;
-    private HttpClient httpClient;
+    protected HttpClient httpClient;
     private PoolingHttpClientConnectionManager connectionManager;
     private IdleConnectionMonitorThread idleConnectionMonitor;
     private int maxErrorRetry;
@@ -419,7 +419,7 @@ public class DefaultCosHttpClient implements CosHttpClient {
         return false;
     }
 
-    private HttpResponse executeOneRequest(HttpContext context, HttpRequestBase httpRequest) {
+    public HttpResponse executeOneRequest(HttpContext context, HttpRequestBase httpRequest) {
         HttpResponse httpResponse = null;
         try {
             httpResponse = httpClient.execute(httpRequest, context);
