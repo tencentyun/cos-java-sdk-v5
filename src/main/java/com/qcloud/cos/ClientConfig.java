@@ -40,9 +40,9 @@ public class ClientConfig {
     private static final int DEFAULT_CONNECTION_TIMEOUT = 30 * 1000;
     // 默认的SOCKET读取超时时间, 单位ms
     private static final int DEFAULT_SOCKET_TIMEOUT = 30 * 1000;
-    // 默认请求超时时间
-    private static final int DEFAULT_REQUEST_TIMEOUT = 60 * 1000;
-    // 线程池关闭最长等待时间
+    // 默认请求超时时间, 单位ms
+    private static final int DEFAULT_REQUEST_TIMEOUT = 5 * 60 * 1000;
+    // 线程池关闭最长等待时间, 单位ms
     private static final int DEFAULT_SHUTDOWN_TIMEOUT = 60 * 1000;
     // 默认的维护最大HTTP连接数
     private static final int DEFAULT_MAX_CONNECTIONS_COUNT = 1024;

@@ -1,17 +1,17 @@
 package com.qcloud.cos.http;
 
 import com.qcloud.cos.ClientConfig;
-import com.qcloud.cos.exception.CosClientException;
-import com.qcloud.cos.exception.CosServiceException;
-import com.qcloud.cos.utils.ExceptionUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.protocol.HttpContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.Callable;
 
 public class TimeOutCosHttpClient  extends DefaultCosHttpClient{
     private ExecutorService threadPool;
@@ -23,28 +23,10 @@ public class TimeOutCosHttpClient  extends DefaultCosHttpClient{
     }
 
     @Override
-    public HttpResponse executeOneRequest(HttpContext context, HttpRequestBase httpRequest) {
-        HttpResponse httpResponse = null;
+    protected HttpResponse executeOneRequest(HttpContext context, HttpRequestBase httpRequest) throws Exception{
         HttpRequestTask httpRequestTask = new HttpRequestTask(httpRequest, context);
         Future<HttpResponse> future = threadPool.submit(httpRequestTask);
-
-        try {
-            httpResponse = future.get(this.clientConfig.getRequestTimeout(), TimeUnit.MILLISECONDS);
-        } catch (InterruptedException e) {
-            httpRequest.abort();
-            throw new CosClientException(e.getMessage(),e);
-        } catch (TimeoutException e) {
-            httpRequest.abort();
-            throw new CosClientException("ExecutorService: time out after waiting  " + this.clientConfig.getRequestTimeout()/1000 + " seconds");
-        } catch (Exception e) {
-            httpRequest.abort();
-            if (e.getCause() instanceof IOException) {
-                throw ExceptionUtils.createClientException((IOException)e.getCause());
-            }
-            throw new CosServiceException(e.getMessage(),e);
-        }
-
-        return httpResponse;
+        return future.get(this.clientConfig.getRequestTimeout(), TimeUnit.MILLISECONDS);
     }
 
     @Override
