@@ -23,6 +23,7 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -48,7 +49,9 @@ import com.qcloud.cos.internal.ReleasableInputStream;
 import com.qcloud.cos.internal.ResettableInputStream;
 import com.qcloud.cos.internal.SdkBufferedInputStream;
 import com.qcloud.cos.retry.BackoffStrategy;
+import com.qcloud.cos.retry.RetryMode;
 import com.qcloud.cos.retry.RetryPolicy;
+import com.qcloud.cos.retry.RetryTokenBucket;
 import com.qcloud.cos.utils.CodecUtils;
 import com.qcloud.cos.utils.ExceptionUtils;
 import com.qcloud.cos.utils.UrlEncoderUtils;
@@ -70,6 +73,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
@@ -91,6 +95,14 @@ public class DefaultCosHttpClient implements CosHttpClient {
     private BackoffStrategy backoffStrategy;
 
     private CosErrorResponseHandler errorResponseHandler;
+
+    private final RetryTokenBucket retryTokenBucket;
+
+    private static final int TIMEOUT_RETRY_COST = 10;
+    private static final int THROTTLED_RETRY_COST = 5;
+
+    private final RetryMode retryMode;
+
     private static final Logger log = LoggerFactory.getLogger(DefaultCosHttpClient.class);
 
     public DefaultCosHttpClient(ClientConfig clientConfig) {
@@ -101,6 +113,11 @@ public class DefaultCosHttpClient implements CosHttpClient {
         this.maxErrorRetry = clientConfig.getMaxErrorRetry();
         this.retryPolicy = ValidationUtils.assertNotNull(clientConfig.getRetryPolicy(), "retry policy");
         this.backoffStrategy = ValidationUtils.assertNotNull(clientConfig.getBackoffStrategy(), "backoff strategy");
+
+        int maxCapacity = clientConfig.isDoThrottleRetry() ? THROTTLED_RETRY_COST * clientConfig.getMaxConsecutiveRetriesBeforeThrottling() : -1;
+        this.retryTokenBucket = new RetryTokenBucket(maxCapacity);
+        this.retryMode = clientConfig.getRetryMode() == null ? RetryMode.LEGACY : clientConfig.getRetryMode();
+
         initHttpClient();
     }
 
@@ -385,8 +402,7 @@ public class DefaultCosHttpClient implements CosHttpClient {
     }
 
     private <X extends CosServiceRequest> void checkResponse(CosHttpRequest<X> request,
-            HttpRequestBase httpRequest,
-            HttpResponse httpResponse) {
+            HttpRequestBase httpRequest, HttpResponse httpResponse, ExecuteOneRequestParams execParams) {
         if (!isRequestSuccessful(httpResponse)) {
             try {
                 throw handlerErrorMessage(request, httpRequest, httpResponse);
@@ -398,6 +414,12 @@ public class DefaultCosHttpClient implements CosHttpClient {
             } finally {
                 httpRequest.abort();
             }
+        } else {
+            if (execParams.getRetryIndex() > 0 && execParams.isLastRetryCapacityUsed()){
+                retryTokenBucket.release(execParams.lastRetryCapacity);
+            } else {
+                retryTokenBucket.release();
+            }
         }
     }
 
@@ -407,7 +429,7 @@ public class DefaultCosHttpClient implements CosHttpClient {
 
     private <X extends CosServiceRequest> boolean shouldRetry(CosHttpRequest<X> request, HttpResponse response,
             Exception exception, int retryIndex,
-            RetryPolicy retryPolicy) {
+            RetryPolicy retryPolicy, ExecuteOneRequestParams execParams) {
         if (retryIndex >= maxErrorRetry) {
             return false;
         }
@@ -417,7 +439,7 @@ public class DefaultCosHttpClient implements CosHttpClient {
         }
 
         if (retryPolicy.shouldRetry(request, response, exception, retryIndex)) {
-            return true;
+            return applyRetryCapacity(exception, execParams);
         }
         return false;
     }
@@ -445,6 +467,7 @@ public class DefaultCosHttpClient implements CosHttpClient {
         HttpResponse httpResponse = null;
         HttpRequestBase httpRequest = null;
         bufferAndResetAbleContent(request);
+        ExecuteOneRequestParams execParams = new ExecuteOneRequestParams();
 
         // Always mark the input stream before execution.
         ProgressListener progressListener = request.getProgressListener();
@@ -475,13 +498,15 @@ public class DefaultCosHttpClient implements CosHttpClient {
                 }
                 if (retryIndex != 0) {
                     long delay = backoffStrategy.computeDelayBeforeNextRetry(retryIndex);
+                    execParams.setLastRetryCapacityUsed(true);
+                    execParams.setRetryIndex(retryIndex);
                     Thread.sleep(delay);
                 }
                 HttpContext context = HttpClientContext.create();
                 httpRequest = buildHttpRequest(request);
                 httpResponse = null;
                 httpResponse = executeRequest(context, httpRequest);
-                checkResponse(request, httpRequest, httpResponse);
+                checkResponse(request, httpRequest, httpResponse, execParams);
                 break;
             } catch (CosServiceException cse) {
                 if (cse.getStatusCode() >= 500) {
@@ -491,7 +516,7 @@ public class DefaultCosHttpClient implements CosHttpClient {
                     log.error(errorMsg, cse);
                 }
                 closeHttpResponseStream(httpResponse);
-                if (!shouldRetry(request, httpResponse, cse, retryIndex, retryPolicy)) {
+                if (!shouldRetry(request, httpResponse, cse, retryIndex, retryPolicy, execParams)) {
                     throw cse;
                 }
             } catch (CosClientException cce) {
@@ -500,7 +525,7 @@ public class DefaultCosHttpClient implements CosHttpClient {
                         request.toString(), retryIndex, maxErrorRetry);
                 log.info(errorMsg, cce);
                 closeHttpResponseStream(httpResponse);
-                if (!shouldRetry(request, httpResponse, cce, retryIndex, retryPolicy)) {
+                if (!shouldRetry(request, httpResponse, cce, retryIndex, retryPolicy, execParams)) {
                     log.error(errorMsg, cce);
                     throw cce;
                 }
@@ -603,5 +628,72 @@ public class DefaultCosHttpClient implements CosHttpClient {
         }
 
         return httpResponse;
+    }
+
+    private boolean applyRetryCapacity(Exception ex, ExecuteOneRequestParams execParams) {
+        switch (retryMode) {
+            case LEGACY:
+                return legacyApplyRetryCapacity(ex, execParams);
+            case STANDARD:
+                return standardApplyRetryCapacity(ex, execParams);
+            default:
+                throw new IllegalStateException("Unsupported retry mode: " + retryMode);
+        }
+    }
+
+    private boolean standardApplyRetryCapacity(Exception ex, ExecuteOneRequestParams execParams) {
+        Throwable cause = ex.getCause();
+        if (cause instanceof ConnectTimeoutException || cause instanceof SocketTimeoutException || cause instanceof TimeoutException) {
+            return doApplyRetryCapacity(execParams, TIMEOUT_RETRY_COST);
+        }
+
+        return doApplyRetryCapacity(execParams, THROTTLED_RETRY_COST);
+    }
+
+    private boolean legacyApplyRetryCapacity(Exception ex, ExecuteOneRequestParams execParams) {
+        // only try to apply the retry capacity for retryable CosServiceException，for default retry mode（legacy mode）
+        if (ex instanceof CosServiceException) {
+            return doApplyRetryCapacity(execParams, THROTTLED_RETRY_COST);
+        }
+        return true;
+    }
+
+    private boolean doApplyRetryCapacity(ExecuteOneRequestParams execParams, int applyCost) {
+        if (!retryTokenBucket.apply(applyCost)) {
+            return false;
+        }
+        execParams.setLastRetryCapacity(applyCost);
+        return true;
+    }
+
+    private class ExecuteOneRequestParams {
+        private int lastRetryCapacity = 0;
+        private boolean lastRetryCapacityUsed = false;
+        private int retryIndex = 0;
+
+
+        public void setLastRetryCapacity(int capacity) {
+            this.lastRetryCapacity = capacity;
+        }
+
+        public int getLastRetryCapacity() {
+            return lastRetryCapacity;
+        }
+
+        public void setLastRetryCapacityUsed(boolean capacityUsed) {
+            this.lastRetryCapacityUsed = capacityUsed;
+        }
+
+        public boolean isLastRetryCapacityUsed() {
+            return lastRetryCapacityUsed;
+        }
+
+        public void setRetryIndex(int retryIndex) {
+            this.retryIndex = retryIndex;
+        }
+
+        public int getRetryIndex() {
+            return retryIndex;
+        }
     }
 }

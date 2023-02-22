@@ -30,6 +30,7 @@ import com.qcloud.cos.retry.BackoffStrategy;
 import com.qcloud.cos.retry.PredefinedBackoffStrategies;
 import com.qcloud.cos.retry.PredefinedRetryPolicies;
 import com.qcloud.cos.retry.RetryPolicy;
+import com.qcloud.cos.retry.RetryMode;
 import com.qcloud.cos.utils.VersionInfoUtils;
 
 public class ClientConfig {
@@ -57,6 +58,14 @@ public class ClientConfig {
      * default retry times is 3 when retryable exception occured
      **/
     private static final int DEFAULT_RETRY_TIMES = 3;
+
+    private static final int DEFAULT_MAX_CONSECUTIVE_RETRIES_BEFORE_THROTTLING = 100;
+    /**
+     * The default on whether to throttle retries.
+     */
+    private static final boolean DEFAULT_THROTTLE_RETRIES = true;
+
+    private RetryMode retryMode;
     /**
      * The max retry times if retryable exception occured
      **/
@@ -65,6 +74,15 @@ public class ClientConfig {
      * The retry policy if exception occured
      **/
     private static final RetryPolicy DEFAULT_RETRY_POLICY = PredefinedRetryPolicies.DEFAULT;
+
+    /**
+     * The maximum number of throttled retries if the initial request
+     * fails.
+     */
+    private int maxConsecutiveRetriesBeforeThrottling = DEFAULT_MAX_CONSECUTIVE_RETRIES_BEFORE_THROTTLING;
+
+    private boolean dothrottleRetries = DEFAULT_THROTTLE_RETRIES;
+
     /**
      * The sleep time interval between exception occured and retry
      **/
@@ -348,5 +366,29 @@ public class ClientConfig {
 
     public int getShutdownTimeout() {
         return shutdown_timeout;
+    }
+
+    public void setDoThrottleRetry(boolean throttleRetries) {
+        this.dothrottleRetries = throttleRetries;
+    }
+
+    public boolean isDoThrottleRetry() {
+        return dothrottleRetries;
+    }
+
+    public int getMaxConsecutiveRetriesBeforeThrottling() {
+        return  maxConsecutiveRetriesBeforeThrottling;
+    }
+
+    public void setMaxConsecutiveRetriesBeforeThrottling(int maxConsecutiveRetries) {
+        maxConsecutiveRetriesBeforeThrottling = maxConsecutiveRetries;
+    }
+
+    public void setRetryMode(RetryMode mode) {
+        retryMode = mode;
+    }
+
+    public RetryMode getRetryMode() {
+        return retryMode;
     }
 }
