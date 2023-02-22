@@ -63,7 +63,7 @@ public class ClientConfig {
     /**
      * The default on whether to throttle retries.
      */
-    private static final boolean DEFAULT_THROTTLE_RETRIES = true;
+    private static final boolean DEFAULT_THROTTLE_RETRIES = false;
 
     private RetryMode retryMode;
     /**
