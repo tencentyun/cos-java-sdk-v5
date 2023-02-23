@@ -57,7 +57,6 @@ public class ClientConfig {
      * default retry times is 3 when retryable exception occured
      **/
     private static final int DEFAULT_RETRY_TIMES = 3;
-
     /**
      * The max retry times if retryable exception occured
      **/
@@ -66,7 +65,6 @@ public class ClientConfig {
      * The retry policy if exception occured
      **/
     private static final RetryPolicy DEFAULT_RETRY_POLICY = PredefinedRetryPolicies.DEFAULT;
-
     /**
      * The sleep time interval between exception occured and retry
      **/

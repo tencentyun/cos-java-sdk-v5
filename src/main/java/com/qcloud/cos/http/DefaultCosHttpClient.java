@@ -93,7 +93,6 @@ public class DefaultCosHttpClient implements CosHttpClient {
     private BackoffStrategy backoffStrategy;
 
     private CosErrorResponseHandler errorResponseHandler;
-
     private static final Logger log = LoggerFactory.getLogger(DefaultCosHttpClient.class);
 
     public DefaultCosHttpClient(ClientConfig clientConfig) {
@@ -104,7 +103,6 @@ public class DefaultCosHttpClient implements CosHttpClient {
         this.maxErrorRetry = clientConfig.getMaxErrorRetry();
         this.retryPolicy = ValidationUtils.assertNotNull(clientConfig.getRetryPolicy(), "retry policy");
         this.backoffStrategy = ValidationUtils.assertNotNull(clientConfig.getBackoffStrategy(), "backoff strategy");
-
         initHttpClient();
     }
 
