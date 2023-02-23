@@ -52,6 +52,10 @@ public class CosHttpRequest<T extends CosServiceRequest> {
 
     private String ciSpecialEndParameter;
 
+    private int lastRetryTokens = 0;
+
+    private int retryIndex = 0;
+
     public CosHttpRequest(T originRequest) {
         this.originRequest = originRequest;
         this.ciSpecialEndParameter = originRequest.getCiSpecialEndParameter();
@@ -146,6 +150,22 @@ public class CosHttpRequest<T extends CosServiceRequest> {
 
     public void setCiSpecialEndParameter(String ciSpecialEndParameter) {
         this.ciSpecialEndParameter = ciSpecialEndParameter;
+    }
+
+    public void setLastRetryTokens(int lastRetryTokens) {
+        this.lastRetryTokens = lastRetryTokens;
+    }
+
+    public int getLastRetryTokens() {
+        return lastRetryTokens;
+    }
+
+    public void setRetryIndex(int retryIndex) {
+        this.retryIndex = retryIndex;
+    }
+
+    public boolean isRetryRequset() {
+        return retryIndex > 0;
     }
 
     @Override
