@@ -3,21 +3,29 @@ package com.qcloud.cos;
 import java.io.File;
 import java.io.IOException;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import com.qcloud.cos.exception.CosServiceException;
+import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.model.CopyObjectRequest;
 import com.qcloud.cos.model.CopyObjectResult;
 import com.qcloud.cos.model.ObjectMetadata;
 import com.qcloud.cos.model.PutObjectResult;
 import com.qcloud.cos.model.StorageClass;
+import com.qcloud.cos.region.Region;
+import com.qcloud.cos.model.PutObjectRequest;
+import com.qcloud.cos.model.InitiateMultipartUploadRequest;
+import com.qcloud.cos.model.InitiateMultipartUploadResult;
+import com.qcloud.cos.model.SSECustomerKey;
+import com.qcloud.cos.model.CopyPartRequest;
+import com.qcloud.cos.model.CopyPartResult;
+import com.qcloud.cos.model.PartETag;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.utils.Md5Utils;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+
 import static org.junit.Assert.assertNotNull;
 
 public class PutObjectCopyTest extends AbstractCOSClientTest {
@@ -141,5 +149,60 @@ public class PutObjectCopyTest extends AbstractCOSClientTest {
         testUpdateDiffSize(0, newMetadata);
     }
 
-    
+    @Test
+    public void testCopyPart() throws IOException {
+        String bucketName = bucket;
+
+        String srckey = "copysrc.txt";
+        String dstkey = "copydst.txt";
+
+        File localFile = buildTestFile(10 * 1024 * 1024L);
+
+        PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, srckey, localFile);
+        PutObjectResult putObjectResult = cosclient.putObject(putObjectRequest);
+
+        InitiateMultipartUploadRequest request = new InitiateMultipartUploadRequest(bucketName, dstkey);
+        // 设置存储类型, 默认是标准(Standard), 低频(Standard_IA), 归档(Archive)
+        request.setStorageClass(StorageClass.Standard);
+        String uploadId = "";
+        try {
+            InitiateMultipartUploadResult initResult = cosclient.initiateMultipartUpload(request);
+            // 获取uploadid
+            uploadId = initResult.getUploadId();
+        } catch (CosClientException e) {
+            throw e;
+        }
+
+        SSECustomerKey sseCustomerKey = new SSECustomerKey("MDEyMzQ1Njc4OUFCQ0RFRjAxMjM0NTY3ODlBQkNERUY=");
+
+        CopyPartRequest copyPartRequest = new CopyPartRequest();
+
+        copyPartRequest.setSourceSSECustomerKey(sseCustomerKey);
+
+        // 要拷贝的源文件所在的region
+        copyPartRequest.setSourceBucketRegion(new Region(region));
+        // 要拷贝的源文件的bucket名称
+        copyPartRequest.setSourceBucketName(bucketName);
+        // 要拷贝的源文件的路径
+        copyPartRequest.setSourceKey(srckey);
+        copyPartRequest.setSourceAppid(appid);
+        // 指定要拷贝的源文件的数据范围(类似content-range)
+        copyPartRequest.setFirstByte(0L);
+        copyPartRequest.setLastByte(5 * 1024 * 1024L);
+        // 目的bucket名称
+        copyPartRequest.setDestinationBucketName(bucketName);
+        // 目的路径名称
+        copyPartRequest.setDestinationKey(dstkey);
+        copyPartRequest.setPartNumber(1);
+        // uploadId
+        copyPartRequest.setUploadId(uploadId);
+        try {
+            CopyPartResult copyPartResult = cosclient.copyPart(copyPartRequest);
+            PartETag partETag = copyPartResult.getPartETag();
+        } catch (CosServiceException e) {
+            e.printStackTrace();
+        } catch (CosClientException e) {
+            e.printStackTrace();
+        }
+    }
 }
