@@ -89,20 +89,23 @@ public class AclTest extends AbstractCOSClientTest {
         if (!judgeUserInfoValid()) {
             return;
         }
+
+        String ownerId = String.format("qcs::cam::uin/%s:uin/%s", ownerUin, ownerUin);
         AccessControlList acl = new AccessControlList();
         Owner owner = new Owner();
-        owner.setId("qcs::cam::uin/2779643970:uin/2779643970");
+        owner.setId(ownerId);
         acl.setOwner(owner);
-        String id = "qcs::cam::uin/2779643970:uin/734505014";
-        UinGrantee uinGrantee = new UinGrantee(id);
-        uinGrantee.setIdentifier(id);
+
+        String granteeUin = String.format("qcs::cam::uin/%s:uin/734505014", ownerUin);
+        UinGrantee uinGrantee = new UinGrantee(granteeUin);
+        uinGrantee.setIdentifier(granteeUin);
         acl.grantPermission(uinGrantee, Permission.FullControl);
         cosclient.setBucketAcl(bucket, acl);
 
         AccessControlList aclGet = cosclient.getBucketAcl(bucket);
         List<Grant> grants = aclGet.getGrantsAsList();
         assertEquals(1L, grants.size());
-        assertEquals(id, grants.get(0).getGrantee().getIdentifier());
+        assertEquals(granteeUin, grants.get(0).getGrantee().getIdentifier());
         assertEquals(Permission.FullControl.toString(), grants.get(0).getPermission().toString());
     }
 
@@ -127,17 +130,18 @@ public class AclTest extends AbstractCOSClientTest {
         try {
             AccessControlList acl = new AccessControlList();
             Owner owner = new Owner();
-            owner.setId("qcs::cam::uin/2779643970:uin/2779643970");
+            String ownerId = String.format("qcs::cam::uin/%s:uin/%s", ownerUin, ownerUin);
+            owner.setId(ownerId);
             acl.setOwner(owner);
-            String id = "qcs::cam::uin/2779643970:uin/734505014";
-            UinGrantee uinGrantee = new UinGrantee(id);
+            String granteeUin = String.format("qcs::cam::uin/%s:uin/734505014", ownerUin);
+            UinGrantee uinGrantee = new UinGrantee(granteeUin);
             acl.grantPermission(uinGrantee, Permission.FullControl);
             cosclient.setObjectAcl(bucket, key, acl);
 
             AccessControlList aclGet = cosclient.getObjectAcl(bucket, key);
             List<Grant> grants = aclGet.getGrantsAsList();
             assertEquals(1L, grants.size());
-            assertEquals(id, grants.get(0).getGrantee().getIdentifier());
+            assertEquals(granteeUin, grants.get(0).getGrantee().getIdentifier());
             assertEquals(Permission.FullControl.toString(),
                     grants.get(0).getPermission().toString());
         } finally {

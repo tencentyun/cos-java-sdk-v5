@@ -100,6 +100,7 @@ public class AbstractCOSClientTest {
     protected static COSClient cosclient = null;
     protected static File tmpDir = null;
     protected static String cmk = null;
+    protected static String ownerUin = null;
 
     protected static boolean useClientEncryption = false;
     protected static boolean useServerEncryption = false;
@@ -157,10 +158,11 @@ public class AbstractCOSClientTest {
         secretId = System.getenv("secretId");
         secretKey = System.getenv("secretKey");
         region = System.getenv("region");
-        bucket = System.getenv("bucket");
+        bucket = System.getenv("bucket") + (int) (Math.random() * 100) + "-" + appid;
         generalApiEndpoint = System.getenv("generalApiEndpoint");
         serviceApiEndpoint = System.getenv("serviceApiEndpoint");
         cmk = System.getenv("KMS_ID");
+        ownerUin = System.getenv("owner_uin");
 
         File propFile = new File("ut_account.prop");
         if (propFile.exists() && propFile.canRead()) {
@@ -181,6 +183,7 @@ public class AbstractCOSClientTest {
                 ));
                 useCVMInstanceCredentials = Boolean.parseBoolean(prop.getProperty("useCVMInstanceCredentials", "false"));
                 cmk = prop.getProperty("KMS_ID");
+                ownerUin = System.getenv("owner_uin");
             } finally {
                 if (fis != null) {
                     try {
@@ -288,11 +291,11 @@ public class AbstractCOSClientTest {
         createBucket();             // 然后再重新创建
     }
 
-    private static void createBucket() throws Exception {
+    protected static void createBucket(String bucketname) throws Exception {
         try {
             // 避免有查询缓存，导致创建bucket失败
             Thread.sleep(5000L);
-            String bucketName = bucket;
+            String bucketName = bucketname;
             CreateBucketRequest createBucketRequest = new CreateBucketRequest(bucketName);
             Bucket createdBucket = cosclient.createBucket(createBucketRequest);
             assertEquals(bucketName, createdBucket.getName());
@@ -301,6 +304,10 @@ public class AbstractCOSClientTest {
         } catch (CosServiceException cse) {
             fail(cse.toString());
         }
+    }
+
+    protected static void createBucket() throws Exception {
+        createBucket(bucket);
     }
 
     private static void abortAllNotFinishedMultipartUpload() throws Exception {
@@ -346,11 +353,11 @@ public class AbstractCOSClientTest {
         }
     }
 
-    private static void clearBucket() throws Exception {
+    protected static void clearBucket(String bucketName) throws Exception{
         abortAllNotFinishedMultipartUpload();
         // 先判断bucket是否开启了版本控制
         GetBucketVersioningConfigurationRequest getBucketVersioningConfigurationRequest =
-                new GetBucketVersioningConfigurationRequest(bucket);
+                new GetBucketVersioningConfigurationRequest(bucketName);
         BucketVersioningConfiguration bucketVersioningConfiguration = cosclient.getBucketVersioningConfiguration(
                 getBucketVersioningConfigurationRequest
         );
@@ -361,7 +368,7 @@ public class AbstractCOSClientTest {
         boolean isTruncated = false;
         do {
             ListObjectsRequest listObjectsRequest = new ListObjectsRequest();
-            listObjectsRequest.setBucketName(bucket);
+            listObjectsRequest.setBucketName(bucketName);
             listObjectsRequest.setMaxKeys(1000);
             listObjectsRequest.setPrefix("");
             listObjectsRequest.setDelimiter("");
@@ -371,27 +378,35 @@ public class AbstractCOSClientTest {
                 String key = cosObjectSummary.getKey();
                 // 删除这个key
                 System.out.println(key);
-                cosclient.deleteObject(bucket, key);
+                cosclient.deleteObject(bucketName, key);
             }
             nextMarker = objectListing.getNextMarker();
             isTruncated = objectListing.isTruncated();
         } while (isTruncated);
     }
 
-    private static void deleteBucket() throws Exception {
-        if (!cosclient.doesBucketExist(bucket)) {
+    protected static void clearBucket() throws Exception {
+        clearBucket(bucket);
+    }
+
+    protected static void deleteBucket(String bucketname) throws Exception {
+        if (!cosclient.doesBucketExist(bucketname)) {
             return;
         }
 
         try {
             clearBucket();
-            cosclient.deleteBucket(bucket);
+            cosclient.deleteBucket(bucketname);
             // 删除bucket后, 由于server端有缓存 需要稍后查询, 这里sleep 5 秒
             Thread.sleep(5000L);
-            assertFalse(cosclient.doesBucketExist(bucket));
+            assertFalse(cosclient.doesBucketExist(bucketname));
         } catch (CosServiceException cse) {
             fail(cse.toString());
         }
+    }
+
+    protected static void deleteBucket() throws Exception {
+        deleteBucket(bucket);
     }
 
     public static void destoryCosClient() throws Exception {
@@ -578,6 +593,7 @@ public class AbstractCOSClientTest {
             }
             fail(se.toString());
         } catch (Exception e) {
+            e.printStackTrace();
             fail(e.toString());
         }
     }
