@@ -84,11 +84,7 @@ public class BucketInventoryTest extends AbstractCOSClientTest {
         assertEquals(2, listBucketInventoryConfigurationsResult.getInventoryConfigurationList().size());
 
         // 删除指定清单
-        DeleteBucketInventoryConfigurationRequest deleteBucketInventoryConfigurationRequest = new DeleteBucketInventoryConfigurationRequest();
-        deleteBucketInventoryConfigurationRequest.setBucketName(bucket);
-        deleteBucketInventoryConfigurationRequest.setId("1");
-        cosclient.deleteBucketInventoryConfiguration(deleteBucketInventoryConfigurationRequest);
-
+        cosclient.deleteBucketInventoryConfiguration(bucket,"1");
         // 获取剩余清单
         ListBucketInventoryConfigurationsResult listBucketInventoryConfigurationsResult1 = cosclient.listBucketInventoryConfigurations(listBucketInventoryConfigurationsRequest);
         assertEquals(1, listBucketInventoryConfigurationsResult1.getInventoryConfigurationList().size());

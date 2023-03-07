@@ -3,6 +3,7 @@ package com.qcloud.cos;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URL;
 import java.util.List;
 
 import org.junit.AfterClass;
@@ -249,6 +250,7 @@ public class ListVersionsTest extends AbstractCOSClientTest {
                 long expectedLength = versionInfo.getSize();
                 String expectedEtag = versionInfo.getETag();
                 headAndGetVersion(key, versionId, expectedEtag, expectedLength, downFile);
+                URL url = cosclient.getObjectUrl(bucket, key, versionId);
                 //delVersion(versionInfo.getKey(), versionInfo.getVersionId());
 
                 // 对于开启了多版本的 versionid不是null

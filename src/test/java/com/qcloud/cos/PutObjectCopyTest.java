@@ -203,6 +203,10 @@ public class PutObjectCopyTest extends AbstractCOSClientTest {
             e.printStackTrace();
         } catch (CosClientException e) {
             e.printStackTrace();
+        } finally {
+            if (localFile.exists()) {
+                assertTrue(localFile.delete());
+            }
         }
     }
 }
