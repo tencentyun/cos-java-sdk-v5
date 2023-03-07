@@ -388,17 +388,13 @@ public class AbstractCOSClientTest {
         } while (isTruncated);
     }
 
-    protected static void clearBucket() throws Exception {
-        clearBucket(bucket);
-    }
-
     protected static void deleteBucket(String bucketname) throws Exception {
         if (!cosclient.doesBucketExist(bucketname)) {
             return;
         }
 
         try {
-            clearBucket();
+            clearBucket(bucketname);
             cosclient.deleteBucket(bucketname);
             // 删除bucket后, 由于server端有缓存 需要稍后查询, 这里sleep 5 秒
             Thread.sleep(5000L);

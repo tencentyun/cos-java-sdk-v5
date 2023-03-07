@@ -1,11 +1,5 @@
 package com.qcloud.cos;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
@@ -26,6 +20,7 @@ import com.qcloud.cos.model.GetObjectRequest;
 import com.qcloud.cos.model.ObjectMetadata;
 import com.qcloud.cos.model.PutObjectRequest;
 import com.qcloud.cos.model.UploadResult;
+import com.qcloud.cos.model.StorageClass;
 import com.qcloud.cos.region.Region;
 import com.qcloud.cos.transfer.Copy;
 import com.qcloud.cos.transfer.Download;
@@ -37,6 +32,8 @@ import com.qcloud.cos.transfer.PersistableUpload;
 import com.qcloud.cos.transfer.PersistableDownload;
 import com.qcloud.cos.transfer.TransferManagerConfiguration;
 import com.qcloud.cos.utils.Md5Utils;
+
+import static org.junit.Assert.*;
 
 public class TransferManagerTest extends AbstractCOSClientTest {
     private static TransferManager transferManager = null;
@@ -331,6 +328,35 @@ public class TransferManagerTest extends AbstractCOSClientTest {
             e.printStackTrace();
         } finally {
             downloadFile.delete();
+        }
+    }
+
+    @Test
+    public void testPartCopy() throws Exception {
+        TransferManagerConfiguration configuration = transferManager.getConfiguration();
+        configuration.setMultipartCopyThreshold(2 * 1024 * 1024L);
+        File localFile = buildTestFile(4L * 1024 * 1024);
+        String key = "testPartCopy.txt";
+        PutObjectRequest putObjectRequest = new PutObjectRequest(bucket, key, localFile);
+        Upload upload = transferManager.upload(putObjectRequest);
+        upload.waitForCompletion();
+
+        String dst_bucket = System.getenv("dst_bucket") + (int) (Math.random() * 100) + "-" + appid;
+        deleteBucket(dst_bucket);
+        createBucket(dst_bucket);
+        CopyObjectRequest copyObjectRequest = new CopyObjectRequest(bucket, key, dst_bucket, "dstObj.txt");
+        copyObjectRequest.setStorageClass(StorageClass.Archive);
+        ObjectMetadata objectMetadata = new ObjectMetadata();
+        objectMetadata.setContentType("text/plain");
+        copyObjectRequest.setNewObjectMetadata(objectMetadata);
+        try {
+            Copy copy = transferManager.copy(copyObjectRequest);
+            copy.waitForCompletion();
+        } catch (CosServiceException cse) {
+            fail(cse.toString());
+        } finally {
+            deleteBucket(dst_bucket);
+            localFile.delete();
         }
     }
 
