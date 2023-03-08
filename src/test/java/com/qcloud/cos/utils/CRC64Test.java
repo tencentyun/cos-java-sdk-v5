@@ -12,8 +12,7 @@ public class CRC64Test {
         String str1 = "hello ";
         String str2 = "world!";
         String str3 = str1 + str2;
-        CRC64 crc1 = new CRC64(0);
-        crc1.update(str1.getBytes(), str1.length());
+        CRC64 crc1 = new CRC64(str1.getBytes(), str1.length());
         assertEquals(crc1.getValue(), 1796661072844795914L);
 
         crc1.reset();
@@ -29,7 +28,9 @@ public class CRC64Test {
         crc3.update(str2.getBytes(), str2.length());
 
         CRC64 crc4 = CRC64.combine(crc1, crc2, str2.length());
+        long crc4_l = CRC64.combine(crc1.getValue(), crc2.getValue(), str2.length());
         assertEquals(crc3.getValue(), crc4.getValue());
+        assertEquals(crc4_l, crc4.getValue());
 
         String serverCrc64Str = "9548687815775124833";
         BigInteger bigInteger = new BigInteger(serverCrc64Str);
@@ -39,5 +40,7 @@ public class CRC64Test {
         crc5.update(str3.getBytes(), str3.length());
         assertEquals(crc3.getValue(), crc5.getValue());
 
+        CRC64 crc6 = CRC64.fromBytes(str1.getBytes());
+        assertEquals(crc6.getValue(), 1751477356L);
     }
 }
