@@ -172,8 +172,8 @@ public class PutObjectCopyTest extends AbstractCOSClientTest {
         } catch (CosClientException e) {
             throw e;
         }
-
-        SSECustomerKey sseCustomerKey = new SSECustomerKey("MDEyMzQ1Njc4OUFCQ0RFRjAxMjM0NTY3ODlBQkNERUY=");
+        String base64EncodedKey = System.getenv("sse_customer_key");
+        SSECustomerKey sseCustomerKey = new SSECustomerKey(base64EncodedKey);
 
         CopyPartRequest copyPartRequest = new CopyPartRequest();
 

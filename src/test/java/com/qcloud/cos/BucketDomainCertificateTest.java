@@ -46,6 +46,7 @@ public class BucketDomainCertificateTest extends AbstractCOSClientTest{
             fail(cse.toString());
         }
 
+        cosclient.getBucketDomainConfiguration(bucket);
 
         BucketPutDomainCertificate bucketPutDomainCertificate = new BucketPutDomainCertificate();
         BucketDomainCertificateInfo bucketDomainCertificateInfo = new BucketDomainCertificateInfo();

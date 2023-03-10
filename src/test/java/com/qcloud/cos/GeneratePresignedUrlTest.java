@@ -182,7 +182,7 @@ public class GeneratePresignedUrlTest extends AbstractCOSClientTest {
         File downLoadFile = new File(localFile.getAbsolutePath() + ".down");
         try {
             Date expirationTime = new Date(System.currentTimeMillis() + 30 * 60 * 1000);
-            URL putUrl = anoyCOSClient.generatePresignedUrl(bucket, key, expirationTime, HttpMethodName.PUT, new HashMap<String, String>(), new HashMap<String, String>());
+            URL putUrl = anoyCOSClient.generatePresignedUrl(bucket, key, expirationTime, HttpMethodName.PUT, new HashMap<String, String>(), new HashMap<String, String>(), false, false);
             URL getUrl = anoyCOSClient.generatePresignedUrl(bucket, key, expirationTime, HttpMethodName.GET, new HashMap<String, String>(), new HashMap<String, String>());
             URL delUrl = anoyCOSClient.generatePresignedUrl(bucket, key, expirationTime, HttpMethodName.DELETE, new HashMap<String, String>(), new HashMap<String, String>());
             assertTrue(putUrl.toString().startsWith("https://"));
