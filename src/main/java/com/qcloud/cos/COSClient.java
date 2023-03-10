@@ -183,6 +183,7 @@ import com.qcloud.cos.utils.Md5Utils;
 import com.qcloud.cos.utils.ServiceUtils;
 import com.qcloud.cos.utils.StringUtils;
 import com.qcloud.cos.utils.UrlEncoderUtils;
+import com.qcloud.cos.http.TimeOutCosHttpClient;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.http.client.methods.HttpRequestBase;
@@ -212,7 +213,11 @@ public class COSClient implements COS {
         super();
         this.credProvider = credProvider;
         this.clientConfig = clientConfig;
-        this.cosHttpClient = new DefaultCosHttpClient(clientConfig);
+        if (clientConfig.getRequestTimeOutEnable()) {
+            this.cosHttpClient = new TimeOutCosHttpClient(clientConfig);
+        } else {
+            this.cosHttpClient = new DefaultCosHttpClient(clientConfig);
+        }
     }
 
     public void shutdown() {
@@ -2878,6 +2883,13 @@ public class COSClient implements COS {
         if (customHeaders != null) {
             for (Map.Entry<String, String> e : customHeaders.entrySet()) {
                 request.addHeader(e.getKey(), e.getValue());
+            }
+        }
+
+        if (!signHost) {
+            Map<String, String> headers = request.getHeaders();
+            if (headers.containsKey(Headers.HOST)) {
+                headers.remove(Headers.HOST);
             }
         }
 

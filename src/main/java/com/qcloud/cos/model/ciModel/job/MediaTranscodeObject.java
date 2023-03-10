@@ -1,5 +1,8 @@
 package com.qcloud.cos.model.ciModel.job;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 媒体处理 任务转码实体 https://cloud.tencent.com/document/product/460/48234
  */
@@ -31,6 +34,8 @@ public class MediaTranscodeObject extends MediaVideoCommon {
      * @return
      */
     private MediaAudioMixObject audioMix;
+
+    private List<MediaAudioMixObject> audioMixArray;
 
     public MediaContainerObject getContainer() {
         if (container == null) {
@@ -96,6 +101,17 @@ public class MediaTranscodeObject extends MediaVideoCommon {
 
     public void setAudioMix(MediaAudioMixObject audioMix) {
         this.audioMix = audioMix;
+    }
+
+    public List<MediaAudioMixObject> getAudioMixArray() {
+        if (audioMixArray == null) {
+            audioMixArray = new ArrayList<>();
+        }
+        return audioMixArray;
+    }
+
+    public void setAudioMixArray(List<MediaAudioMixObject> audioMixArray) {
+        this.audioMixArray = audioMixArray;
     }
 
     @Override

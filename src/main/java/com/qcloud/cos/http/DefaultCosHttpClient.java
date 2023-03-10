@@ -29,11 +29,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 import com.qcloud.cos.ClientConfig;
 import com.qcloud.cos.Headers;
 import com.qcloud.cos.event.ProgressInputStream;
 import com.qcloud.cos.event.ProgressListener;
+import com.qcloud.cos.exception.ClientExceptionConstants;
 import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.exception.CosServiceException.ErrorType;
@@ -78,9 +81,9 @@ import org.slf4j.LoggerFactory;
 
 public class DefaultCosHttpClient implements CosHttpClient {
 
-    private ClientConfig clientConfig;
+    protected ClientConfig clientConfig;
     private RequestConfig requestConfig;
-    private HttpClient httpClient;
+    protected HttpClient httpClient;
     private PoolingHttpClientConnectionManager connectionManager;
     private IdleConnectionMonitorThread idleConnectionMonitor;
     private int maxErrorRetry;
@@ -252,6 +255,10 @@ public class DefaultCosHttpClient implements CosHttpClient {
             httpRequestBase.addHeader(Headers.SDK_LOG_DEBUG, "off");
         }
 
+        if (clientConfig.isShortConnection()) {
+            httpRequestBase.addHeader(Headers.CONNECTION, "close");
+        }
+
         if (request.getContent() != null) {
             InputStreamEntity reqEntity =
                     new InputStreamEntity(request.getContent(), contentLength);
@@ -415,15 +422,8 @@ public class DefaultCosHttpClient implements CosHttpClient {
         return false;
     }
 
-    private HttpResponse executeOneRequest(HttpContext context, HttpRequestBase httpRequest) {
-        HttpResponse httpResponse = null;
-        try {
-            httpResponse = httpClient.execute(httpRequest, context);
-        } catch (IOException e) {
-            httpRequest.abort();
-            throw ExceptionUtils.createClientException(e);
-        }
-        return httpResponse;
+    protected HttpResponse executeOneRequest(HttpContext context, HttpRequestBase httpRequest) throws Exception{
+        return httpClient.execute(httpRequest, context);
     }
 
     private void closeHttpResponseStream(HttpResponse httpResponse) {
@@ -480,7 +480,7 @@ public class DefaultCosHttpClient implements CosHttpClient {
                 HttpContext context = HttpClientContext.create();
                 httpRequest = buildHttpRequest(request);
                 httpResponse = null;
-                httpResponse = executeOneRequest(context, httpRequest);
+                httpResponse = executeRequest(context, httpRequest);
                 checkResponse(request, httpRequest, httpResponse);
                 break;
             } catch (CosServiceException cse) {
@@ -580,4 +580,28 @@ public class DefaultCosHttpClient implements CosHttpClient {
         }
     }
 
+    private HttpResponse executeRequest(HttpContext context, HttpRequestBase httpRequest) throws Exception{
+        HttpResponse httpResponse = null;
+        try {
+            httpResponse = executeOneRequest(context, httpRequest);
+        } catch (IOException e) {
+            httpRequest.abort();
+            throw ExceptionUtils.createClientException(e);
+        } catch (InterruptedException e) {
+            httpRequest.abort();
+            throw new CosClientException(e.getMessage(), e);
+        } catch (TimeoutException e) {
+            httpRequest.abort();
+            String errorMsg = "ExecutorService: time out after waiting  " + this.clientConfig.getRequestTimeout()/1000 + " seconds";
+            throw new CosClientException(errorMsg, ClientExceptionConstants.REQUEST_TIMEOUT,e);
+        } catch (ExecutionException e) {
+            httpRequest.abort();
+            if (e.getCause() instanceof IOException) {
+                throw ExceptionUtils.createClientException((IOException)e.getCause());
+            }
+            throw new CosServiceException(e.getMessage(),e);
+        }
+
+        return httpResponse;
+    }
 }

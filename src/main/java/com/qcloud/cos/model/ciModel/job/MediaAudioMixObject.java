@@ -27,10 +27,8 @@ public class MediaAudioMixObject implements Serializable {
 
     /**
      * 混音淡入淡出配置
-     * true/false
-     * 默认为false
      */
-    private String effectConfig;
+    private EffectConfig effectConfig;
 
     private String directMix;
 
@@ -58,11 +56,14 @@ public class MediaAudioMixObject implements Serializable {
         this.replace = replace;
     }
 
-    public String getEffectConfig() {
+    public EffectConfig getEffectConfig() {
+        if (effectConfig == null) {
+            effectConfig = new EffectConfig();
+        }
         return effectConfig;
     }
 
-    public void setEffectConfig(String effectConfig) {
+    public void setEffectConfig(EffectConfig effectConfig) {
         this.effectConfig = effectConfig;
     }
 

@@ -40,6 +40,10 @@ public class ClientConfig {
     private static final int DEFAULT_CONNECTION_TIMEOUT = 30 * 1000;
     // 默认的SOCKET读取超时时间, 单位ms
     private static final int DEFAULT_SOCKET_TIMEOUT = 30 * 1000;
+    // 默认请求超时时间, 单位ms
+    private static final int DEFAULT_REQUEST_TIMEOUT = 5 * 60 * 1000;
+    // 线程池关闭最长等待时间, 单位ms
+    private static final int DEFAULT_SHUTDOWN_TIMEOUT = 60 * 1000;
     // 默认的维护最大HTTP连接数
     private static final int DEFAULT_MAX_CONNECTIONS_COUNT = 1024;
     private static final int DEFAULT_IDLE_CONNECTION_ALIVE = 60 * 1000;
@@ -89,11 +93,17 @@ public class ClientConfig {
     private int readLimit = DEFAULT_READ_LIMIT;
     private COSSigner cosSigner = new COSSigner();
 
+    private int request_timeout = DEFAULT_REQUEST_TIMEOUT;
+    private int shutdown_timeout = DEFAULT_SHUTDOWN_TIMEOUT;
+    private boolean isRequestTimeOutEnable = false;
+
     // 数据万象特殊请求配置
     private boolean ciSpecialRequest = false;
 
     //是否区分host与endpoint
     private  boolean isDistinguishHost = false;
+
+    private boolean isShortConnection = false;
 
     // 不传入region 用于后续调用List Buckets(获取所有的bucket信息)
     public ClientConfig() {
@@ -302,5 +312,41 @@ public class ClientConfig {
 
     public boolean getIsDistinguishHost() {
         return isDistinguishHost;
+    }
+
+    /**
+     * 显示的设置使用短链接，在请求头中增加"Connection: close"
+     * HTTP 1.1默认使用长链接
+     */
+    public void setShortConnection() {
+        isShortConnection = true;
+    }
+
+    public boolean isShortConnection() {
+        return isShortConnection;
+    }
+
+    public int getRequestTimeout () {
+        return request_timeout;
+    }
+
+    public void setRequestTimeout (int requestTimeout) {
+        this.request_timeout = requestTimeout;
+    }
+
+    public void setRequestTimeOutEnable(boolean requestTimeOutEnable) {
+        this.isRequestTimeOutEnable = requestTimeOutEnable;
+    }
+
+    public boolean getRequestTimeOutEnable() {
+        return isRequestTimeOutEnable;
+    }
+
+    public void setShutdownTimeout(int shutdownTimeout) {
+        this.shutdown_timeout = shutdownTimeout;
+    }
+
+    public int getShutdownTimeout() {
+        return shutdown_timeout;
     }
 }

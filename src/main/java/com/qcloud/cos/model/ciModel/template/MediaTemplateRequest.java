@@ -60,6 +60,8 @@ public class MediaTemplateRequest extends CIServiceRequest implements Serializab
 
     private VideoTargetRec videoTargetRec;
 
+    private VideoEnhance videoEnhance;
+
     /**
      * 第几页
      */
@@ -279,6 +281,17 @@ public class MediaTemplateRequest extends CIServiceRequest implements Serializab
 
     public void setVideoTargetRec(VideoTargetRec videoTargetRec) {
         this.videoTargetRec = videoTargetRec;
+    }
+
+    public VideoEnhance getVideoEnhance() {
+        if (videoEnhance == null) {
+            videoEnhance = new VideoEnhance();
+        }
+        return videoEnhance;
+    }
+
+    public void setVideoEnhance(VideoEnhance videoEnhance) {
+        this.videoEnhance = videoEnhance;
     }
 
     @Override

@@ -4456,6 +4456,28 @@ public class XmlResponsesSaxParser {
                 ParserMediaInfoUtils.ParseTtsConfig(jobsDetail.getOperation().getTtsConfig(), name, getText());
             } else if (in("Response", "JobsDetail", "Operation", "TtsTpl")) {
                 ParserMediaInfoUtils.ParseTtsTpl(jobsDetail.getOperation().getTtsTpl(), name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "VideoEnhance", "Transcode", "Container")) {
+                ParserMediaInfoUtils.ParseContainer(jobsDetail.getOperation().getVideoEnhance().getTrascode().getContainer(), name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "VideoEnhance", "Transcode", "Video")) {
+                ParserMediaInfoUtils.ParsingMediaVideo(jobsDetail.getOperation().getVideoEnhance().getTrascode().getVideo(), name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "VideoEnhance", "Transcode", "Audio")) {
+                ParserMediaInfoUtils.ParsingMediaAudio(jobsDetail.getOperation().getVideoEnhance().getTrascode().getAudio(), name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "VideoEnhance", "SuperResolution")) {
+                ParserMediaInfoUtils.ParsingSuperResolution(jobsDetail.getOperation().getVideoEnhance().getSuperResolution(), name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "VideoEnhance", "ColorEnhance")) {
+                ParserMediaInfoUtils.ParsingColorEnhance(jobsDetail.getOperation().getVideoEnhance().getColorEnhance(), name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "VideoEnhance", "MsSharpen")) {
+                ParserMediaInfoUtils.ParsingMsSharpen(jobsDetail.getOperation().getVideoEnhance().getMsSharpen(), name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "VideoEnhance", "SDRtoHDR")) {
+                ParserMediaInfoUtils.ParsingSDRtoHDR(jobsDetail.getOperation().getVideoEnhance().getSdrToHDR(), name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "VideoEnhance", "FrameEnhance")) {
+                ParserMediaInfoUtils.ParsingFrameEnhance(jobsDetail.getOperation().getVideoEnhance().getFrameEnhance(), name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "Transcode", "AudioMixArray")) {
+                ParserMediaInfoUtils.ParsingAudioMixArray(jobsDetail.getOperation().getTranscode().getAudioMixArray(), name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "Transcode", "AudioMixArray", "EffectConfig")) {
+                ParserMediaInfoUtils.ParsingEffectConfig(jobsDetail.getOperation().getTranscode().getAudioMixArray(), name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "Subtitles", "Subtitle")) {
+                ParserMediaInfoUtils.ParsingSubtitles(jobsDetail.getOperation().getSubtitles(), name, getText());
             }
         }
 
@@ -4762,6 +4784,20 @@ public class XmlResponsesSaxParser {
                 ParserMediaInfoUtils.ParsingVideoTargetRec(template.getVideoTargetRec(), name, getText());
             } else if (in("Response", "TemplateList", "TtsTpl")) {
                 ParserMediaInfoUtils.ParseTtsTpl(template.getTtsTpl(), name, getText());
+            } else if (in("Response", "TemplateList", "VideoEnhance", "Transcode", "Container")) {
+                ParserMediaInfoUtils.ParseContainer(template.getVideoEnhance().getTrascode().getContainer(), name, getText());
+            } else if (in("Response", "TemplateList", "VideoEnhance", "Transcode", "Video")) {
+                ParserMediaInfoUtils.ParsingMediaVideo(template.getVideoEnhance().getTrascode().getVideo(), name, getText());
+            } else if (in("Response", "TemplateList", "VideoEnhance", "Transcode", "Audio")) {
+                ParserMediaInfoUtils.ParsingMediaAudio(template.getVideoEnhance().getTrascode().getAudio(), name, getText());
+            } else if (in("Response", "TemplateList", "VideoEnhance", "SuperResolution")) {
+                ParserMediaInfoUtils.ParsingSuperResolution(template.getVideoEnhance().getSuperResolution(), name, getText());
+            } else if (in("Response", "TemplateList", "VideoEnhance", "ColorEnhance")) {
+                ParserMediaInfoUtils.ParsingColorEnhance(template.getVideoEnhance().getColorEnhance(), name, getText());
+            } else if (in("Response", "TemplateList", "VideoEnhance", "MsSharpen")) {
+                ParserMediaInfoUtils.ParsingMsSharpen(template.getVideoEnhance().getMsSharpen(), name, getText());
+            } else if (in("Response", "TemplateList", "VideoEnhance", "SDRtoHDR")) {
+                ParserMediaInfoUtils.ParsingSDRtoHDR(template.getVideoEnhance().getSdrToHDR(), name, getText());
             }
         }
 
@@ -6351,6 +6387,9 @@ public class XmlResponsesSaxParser {
                     case "ForbidState":
                         jobsDetail.setForbidState(getText());
                         break;
+                    case "Label":
+                        jobsDetail.setLabel(getText());
+                        break;
                     default:
                         break;
                 }
@@ -6384,29 +6423,29 @@ public class XmlResponsesSaxParser {
                 } else if ("SheetNumber".equalsIgnoreCase(name)) {
                     resultDetail.setSheetNumber(getText());
                 }
-            } else if (in("Response", "JobsDetail", "PageSegment", "Results", "PornInfo","OcrResults")) {
+            } else if (in("Response", "JobsDetail", "PageSegment", "Results", "PornInfo", "OcrResults")) {
                 parseResultInfo(resultDetail.getPornInfo().getOcrResults(), name, getText());
-            }else if (in("Response", "JobsDetail", "PageSegment", "Results", "PoliticsInfo","OcrResults")) {
+            } else if (in("Response", "JobsDetail", "PageSegment", "Results", "PoliticsInfo", "OcrResults")) {
                 parseResultInfo(resultDetail.getPoliticsInfo().getOcrResults(), name, getText());
-            }else if (in("Response", "JobsDetail", "PageSegment", "Results", "TerrorismInfo","OcrResults")) {
+            } else if (in("Response", "JobsDetail", "PageSegment", "Results", "TerrorismInfo", "OcrResults")) {
                 parseResultInfo(resultDetail.getTerroristInfo().getOcrResults(), name, getText());
-            }else if (in("Response", "JobsDetail", "PageSegment", "Results", "AdsInfo","OcrResults")) {
+            } else if (in("Response", "JobsDetail", "PageSegment", "Results", "AdsInfo", "OcrResults")) {
                 parseResultInfo(resultDetail.getAdsInfo().getOcrResults(), name, getText());
-            }else if (in("Response", "JobsDetail", "PageSegment", "Results", "PornInfo","ObjectResults")) {
+            } else if (in("Response", "JobsDetail", "PageSegment", "Results", "PornInfo", "ObjectResults")) {
                 parseResultInfo(resultDetail.getPornInfo().getObjectResults(), name, getText());
-            }else if (in("Response", "JobsDetail", "PageSegment", "Results", "PoliticsInfo","ObjectResults")) {
+            } else if (in("Response", "JobsDetail", "PageSegment", "Results", "PoliticsInfo", "ObjectResults")) {
                 parseResultInfo(resultDetail.getPoliticsInfo().getObjectResults(), name, getText());
-            }else if (in("Response", "JobsDetail", "PageSegment", "Results", "TerrorismInfo","ObjectResults")) {
+            } else if (in("Response", "JobsDetail", "PageSegment", "Results", "TerrorismInfo", "ObjectResults")) {
                 parseResultInfo(resultDetail.getTerroristInfo().getObjectResults(), name, getText());
-            }else if (in("Response", "JobsDetail", "PageSegment", "Results", "AdsInfo","ObjectResults")) {
+            } else if (in("Response", "JobsDetail", "PageSegment", "Results", "AdsInfo", "ObjectResults")) {
                 parseResultInfo(resultDetail.getAdsInfo().getObjectResults(), name, getText());
-            }else if (in("Response", "JobsDetail", "PageSegment", "Results", "PornInfo","ObjectResults","Location")) {
+            } else if (in("Response", "JobsDetail", "PageSegment", "Results", "PornInfo", "ObjectResults", "Location")) {
                 parseResultInfo(resultDetail.getPornInfo().getObjectResults(), name, getText());
-            }else if (in("Response", "JobsDetail", "PageSegment", "Results", "PoliticsInfo","ObjectResults","Location")) {
+            } else if (in("Response", "JobsDetail", "PageSegment", "Results", "PoliticsInfo", "ObjectResults", "Location")) {
                 parseResultInfo(resultDetail.getPoliticsInfo().getObjectResults(), name, getText());
-            }else if (in("Response", "JobsDetail", "PageSegment", "Results", "TerrorismInfo","ObjectResults","Location")) {
+            } else if (in("Response", "JobsDetail", "PageSegment", "Results", "TerrorismInfo", "ObjectResults", "Location")) {
                 parseResultInfo(resultDetail.getTerroristInfo().getObjectResults(), name, getText());
-            }else if (in("Response", "JobsDetail", "PageSegment", "Results", "AdsInfo","ObjectResults","Location")) {
+            } else if (in("Response", "JobsDetail", "PageSegment", "Results", "AdsInfo", "ObjectResults", "Location")) {
                 parseResultInfo(resultDetail.getAdsInfo().getObjectResults(), name, getText());
             } else if (in("Response", "JobsDetail", "UserInfo")) {
                 ParserMediaInfoUtils.ParsingAuditingUserInfo(response.getJobsDetail().getUserInfo(), name, getText());
@@ -6438,15 +6477,23 @@ public class XmlResponsesSaxParser {
                     obj.setScore(getText());
                     break;
                 case "Keywords":
-                    obj.setLabel(getText());
+                    obj.setKeywords(getText());
                     break;
                 case "Count":
                     obj.setCount(getText());
                     break;
+                case "Label":
+                    obj.setLabel(getText());
+                    break;
+                case "Category":
+                    obj.setCategory(getText());
+                    break;
+                case "SubLabel":
+                    obj.setSubLabel(getText());
+                    break;
                 default:
                     break;
             }
-
         }
 
         private void parseResultInfo(List<ObjectResults> obj, String name, String value) {

@@ -4,6 +4,7 @@ import com.qcloud.cos.internal.ParserMediaInfoUtils;
 import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
 import com.qcloud.cos.model.ciModel.job.ExtractDigitalWatermark;
 import com.qcloud.cos.model.ciModel.job.Md5Info;
+import com.qcloud.cos.model.ciModel.job.MediaAudioMixObject;
 import com.qcloud.cos.model.ciModel.job.MediaAudioObject;
 import com.qcloud.cos.model.ciModel.job.MediaBodyInfo;
 import com.qcloud.cos.model.ciModel.job.MediaConcatFragmentObject;
@@ -23,6 +24,8 @@ import com.qcloud.cos.model.ciModel.job.MediaTranscodeVideoObject;
 import com.qcloud.cos.model.ciModel.job.MediaVideoObject;
 import com.qcloud.cos.model.ciModel.job.OutputFile;
 import com.qcloud.cos.model.ciModel.job.ProcessResult;
+import com.qcloud.cos.model.ciModel.job.Subtitle;
+import com.qcloud.cos.model.ciModel.job.Subtitles;
 import com.qcloud.cos.model.ciModel.job.VideoTargetRec;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaFormat;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoAudio;
@@ -69,6 +72,12 @@ public class MediaJobResponseHandler extends CIAbstractHandler {
                     mediaTopkRecognition.getPetInfoList().add(new MediaBodyInfo());
                 }
             }
+        } else if (in("Response", "JobsDetail", "Operation", "Transcode") && "AudioMixArray".equalsIgnoreCase(name)) {
+            List<MediaAudioMixObject> audioMixArray = response.getJobsDetail().getOperation().getTranscode().getAudioMixArray();
+            audioMixArray.add(new MediaAudioMixObject());
+        } else if (in("Response", "JobsDetail", "Operation", "Subtitles") && "Subtitle".equalsIgnoreCase(name)) {
+            List<Subtitle> subtitle = response.getJobsDetail().getOperation().getSubtitles().getSubtitle();
+            subtitle.add(new Subtitle());
         }
     }
 
@@ -383,6 +392,28 @@ public class MediaJobResponseHandler extends CIAbstractHandler {
             ParserMediaInfoUtils.ParseTtsConfig(jobsDetail.getOperation().getTtsConfig(), name, getText());
         } else if (in("Response", "JobsDetail", "Operation", "TtsTpl")) {
             ParserMediaInfoUtils.ParseTtsTpl(jobsDetail.getOperation().getTtsTpl(), name, getText());
+        } else if (in("Response", "JobsDetail", "Operation", "VideoEnhance", "Transcode", "Container")) {
+            ParserMediaInfoUtils.ParseContainer(jobsDetail.getOperation().getVideoEnhance().getTrascode().getContainer(), name, getText());
+        } else if (in("Response", "JobsDetail", "Operation", "VideoEnhance", "Transcode", "Video")) {
+            ParserMediaInfoUtils.ParsingMediaVideo(jobsDetail.getOperation().getVideoEnhance().getTrascode().getVideo(), name, getText());
+        } else if (in("Response", "JobsDetail", "Operation", "VideoEnhance", "Transcode", "Audio")) {
+            ParserMediaInfoUtils.ParsingMediaAudio(jobsDetail.getOperation().getVideoEnhance().getTrascode().getAudio(), name, getText());
+        } else if (in("Response", "JobsDetail", "Operation", "VideoEnhance", "SuperResolution")) {
+            ParserMediaInfoUtils.ParsingSuperResolution(jobsDetail.getOperation().getVideoEnhance().getSuperResolution(), name, getText());
+        } else if (in("Response", "JobsDetail", "Operation", "VideoEnhance", "ColorEnhance")) {
+            ParserMediaInfoUtils.ParsingColorEnhance(jobsDetail.getOperation().getVideoEnhance().getColorEnhance(), name, getText());
+        } else if (in("Response", "JobsDetail", "Operation", "VideoEnhance", "MsSharpen")) {
+            ParserMediaInfoUtils.ParsingMsSharpen(jobsDetail.getOperation().getVideoEnhance().getMsSharpen(), name, getText());
+        } else if (in("Response", "JobsDetail", "Operation", "VideoEnhance", "SDRtoHDR")) {
+            ParserMediaInfoUtils.ParsingSDRtoHDR(jobsDetail.getOperation().getVideoEnhance().getSdrToHDR(), name, getText());
+        } else if (in("Response", "JobsDetail", "Operation", "VideoEnhance", "FrameEnhance")) {
+            ParserMediaInfoUtils.ParsingFrameEnhance(jobsDetail.getOperation().getVideoEnhance().getFrameEnhance(), name, getText());
+        } else if (in("Response", "JobsDetail", "Operation", "Transcode", "AudioMixArray")) {
+            ParserMediaInfoUtils.ParsingAudioMixArray(jobsDetail.getOperation().getTranscode().getAudioMixArray(), name, getText());
+        } else if (in("Response", "JobsDetail", "Operation", "Transcode", "AudioMixArray", "EffectConfig")) {
+            ParserMediaInfoUtils.ParsingEffectConfig(jobsDetail.getOperation().getTranscode().getAudioMixArray(), name, getText());
+        } else if (in("Response", "JobsDetail", "Operation", "Subtitles", "Subtitle")) {
+            ParserMediaInfoUtils.ParsingSubtitles(jobsDetail.getOperation().getSubtitles(), name, getText());
         }
     }
 

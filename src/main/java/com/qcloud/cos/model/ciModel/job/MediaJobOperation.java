@@ -43,7 +43,9 @@ public class MediaJobOperation {
     private VoiceSeparate voiceSeparate = new VoiceSeparate();
     private MediaTimeIntervalObject timeInterval = new MediaTimeIntervalObject();
     private MediaTtsConfig ttsConfig = new MediaTtsConfig();
+    private VideoEnhance videoEnhance = new VideoEnhance();
     private TtsTpl ttsTpl = new TtsTpl();
+    private Subtitles subtitles = new Subtitles();
 
     public MediaTimeIntervalObject getTimeInterval() {
         return timeInterval;
@@ -305,6 +307,22 @@ public class MediaJobOperation {
 
     public void setTtsTpl(TtsTpl ttsTpl) {
         this.ttsTpl = ttsTpl;
+    }
+
+    public VideoEnhance getVideoEnhance() {
+        return videoEnhance;
+    }
+
+    public void setVideoEnhance(VideoEnhance videoEnhance) {
+        this.videoEnhance = videoEnhance;
+    }
+
+    public Subtitles getSubtitles() {
+        return subtitles;
+    }
+
+    public void setSubtitles(Subtitles subtitles) {
+        this.subtitles = subtitles;
     }
 
     @Override
