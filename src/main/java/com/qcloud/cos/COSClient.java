@@ -2886,6 +2886,13 @@ public class COSClient implements COS {
             }
         }
 
+        if (!signHost) {
+            Map<String, String> headers = request.getHeaders();
+            if (headers.containsKey(Headers.HOST)) {
+                headers.remove(Headers.HOST);
+            }
+        }
+
         addResponseHeaderParameters(request, req.getResponseHeaders());
 
         COSSigner cosSigner = new COSSigner();

@@ -150,22 +150,22 @@ public class RequestXmlFactory {
         xml.end();
     }
 
-    private static void addSelectParametersIfNotNull(XmlWriter xml, SelectParameters selectParameters) {
-        if (selectParameters == null) {
-            return;
-        }
-
-        xml.start("SelectParameters");
-
-        addInputSerializationIfNotNull(xml, selectParameters.getInputSerialization());
-
-        addIfNotNull(xml, "ExpressionType", selectParameters.getExpressionType());
-        addIfNotNull(xml, "Expression", selectParameters.getExpression());
-
-        addOutputSerializationIfNotNull(xml, selectParameters.getOutputSerialization());
-
-        xml.end();
-    }
+//    private static void addSelectParametersIfNotNull(XmlWriter xml, SelectParameters selectParameters) {
+//        if (selectParameters == null) {
+//            return;
+//        }
+//
+//        xml.start("SelectParameters");
+//
+//        addInputSerializationIfNotNull(xml, selectParameters.getInputSerialization());
+//
+//        addIfNotNull(xml, "ExpressionType", selectParameters.getExpressionType());
+//        addIfNotNull(xml, "Expression", selectParameters.getExpression());
+//
+//        addOutputSerializationIfNotNull(xml, selectParameters.getOutputSerialization());
+//
+//        xml.end();
+//    }
 
     private static void addScanRangeIfNotNull(XmlWriter xml, ScanRange scanRange) {
         if (scanRange != null) {

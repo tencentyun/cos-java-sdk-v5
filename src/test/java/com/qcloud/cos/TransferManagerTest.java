@@ -1,13 +1,8 @@
 package com.qcloud.cos;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
 import java.io.File;
 import java.io.IOException;
+import java.util.Date;
 import java.util.concurrent.Executors;
 
 import org.junit.AfterClass;
@@ -25,6 +20,7 @@ import com.qcloud.cos.model.GetObjectRequest;
 import com.qcloud.cos.model.ObjectMetadata;
 import com.qcloud.cos.model.PutObjectRequest;
 import com.qcloud.cos.model.UploadResult;
+import com.qcloud.cos.model.StorageClass;
 import com.qcloud.cos.region.Region;
 import com.qcloud.cos.transfer.Copy;
 import com.qcloud.cos.transfer.Download;
@@ -32,7 +28,12 @@ import com.qcloud.cos.transfer.MultipleFileDownload;
 import com.qcloud.cos.transfer.MultipleFileUpload;
 import com.qcloud.cos.transfer.TransferManager;
 import com.qcloud.cos.transfer.Upload;
+import com.qcloud.cos.transfer.PersistableUpload;
+import com.qcloud.cos.transfer.PersistableDownload;
+import com.qcloud.cos.transfer.TransferManagerConfiguration;
 import com.qcloud.cos.utils.Md5Utils;
+
+import static org.junit.Assert.*;
 
 public class TransferManagerTest extends AbstractCOSClientTest {
     private static TransferManager transferManager = null;
@@ -43,6 +44,8 @@ public class TransferManagerTest extends AbstractCOSClientTest {
         if (cosclient != null) {
             transferManager = new TransferManager(AbstractCOSClientTest.cosclient,
                     Executors.newFixedThreadPool(32));
+            TransferManagerConfiguration configuration = new TransferManagerConfiguration();
+            transferManager.setConfiguration(configuration);
         }
     }
 
@@ -67,8 +70,7 @@ public class TransferManagerTest extends AbstractCOSClientTest {
         String key = "ut/" + localFile.getName();
         String destKey = key + ".copy";
         try {
-            PutObjectRequest putObjectRequest = new PutObjectRequest(bucket, key, localFile);
-            Upload upload = transferManager.upload(putObjectRequest);
+            Upload upload = transferManager.upload(bucket, key, localFile);
             UploadResult uploadResult = upload.waitForUploadResult();
             // head object
             headSimpleObject(key, localFile.length(), Md5Utils.md5Hex(localFile));
@@ -227,6 +229,134 @@ public class TransferManagerTest extends AbstractCOSClientTest {
             clearObject(key1);
             clearObject(key2);
             deleteDir(downloaddir);
+        }
+    }
+
+    @Test
+    public void testResumableDownload2M() throws Exception {
+        testResumableDownload(2L * 1024 * 1024);
+    }
+
+    @Test
+    public void testResumableDownload40M() throws Exception {
+        testResumableDownload(40L * 1024 * 1024);
+    }
+
+    private static void testResumableDownload(long filesize) throws Exception {
+        File localFile = buildTestFile(filesize);
+        String key = "testResumableDownload.txt";
+        Upload upload = transferManager.upload(bucket, key, localFile);
+        UploadResult uploadResult = upload.waitForUploadResult();
+
+        GetObjectRequest getObj = new GetObjectRequest(bucket, key);
+        File dstFile = new File("dstFile");
+        Download download = transferManager.download(getObj, dstFile, true);
+
+        try {
+            download.waitForCompletion();
+        } catch (CosServiceException e) {
+            e.printStackTrace();
+        } catch (CosClientException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            dstFile.delete();
+            localFile.delete();
+        }
+    }
+
+    @Test
+    public void testAbortMultipartUploads() throws Exception {
+        File localFile = buildTestFile(10L * 1024 * 1024);
+        String key = "testAbortMultipartUploads.txt";
+        PutObjectRequest putObjectRequest = new PutObjectRequest(bucket, key, localFile);
+        try {
+            // 返回一个异步结果Upload, 可同步的调用waitForUploadResult等待upload结束, 成功返回UploadResult, 失败抛出异常.
+            Upload upload = transferManager.upload(putObjectRequest);
+            Thread.sleep(1000);
+            PersistableUpload persistableUpload = upload.pause();
+            transferManager.abortMultipartUploads(bucket, new Date(System.currentTimeMillis()));
+        } catch (CosServiceException e) {
+            e.printStackTrace();
+        } catch (CosClientException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }finally {
+            localFile.delete();
+        }
+    }
+
+    @Test
+    public void testResumeUploadAndDownload() throws Exception {
+        File localFile = buildTestFile(10L * 1024 * 1024);
+        String key = "testAbortMultipartUploads.txt";
+        PutObjectRequest putObjectRequest = new PutObjectRequest(bucket, key, localFile);
+
+        try {
+            // 返回一个异步结果Upload, 可同步的调用waitForUploadResult等待upload结束, 成功返回UploadResult, 失败抛出异常.
+            Upload upload = transferManager.upload(putObjectRequest);
+            Thread.sleep(1000);
+            PersistableUpload persistableUpload = upload.pause();
+            upload = transferManager.resumeUpload(persistableUpload);
+            upload.waitForUploadResult();
+        } catch (CosServiceException e) {
+            e.printStackTrace();
+        } catch (CosClientException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            localFile.delete();
+        }
+
+        File downloadFile = new File("download.txt");
+        GetObjectRequest getObjectRequest = new GetObjectRequest(bucket, key);
+        try {
+            // 返回一个异步结果copy, 可同步的调用waitForCompletion等待download结束, 成功返回void, 失败抛出异常.
+            Download download = transferManager.download(getObjectRequest, downloadFile);
+            Thread.sleep(1000);
+            PersistableDownload persistableDownload = download.pause();
+            download = transferManager.resumeDownload(persistableDownload);
+            download.waitForCompletion();
+        } catch (CosServiceException e) {
+            e.printStackTrace();
+        } catch (CosClientException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            downloadFile.delete();
+        }
+    }
+
+    @Test
+    public void testPartCopy() throws Exception {
+        TransferManagerConfiguration configuration = transferManager.getConfiguration();
+        configuration.setMultipartCopyThreshold(2 * 1024 * 1024L);
+        File localFile = buildTestFile(4L * 1024 * 1024);
+        String key = "testPartCopy.txt";
+        PutObjectRequest putObjectRequest = new PutObjectRequest(bucket, key, localFile);
+        Upload upload = transferManager.upload(putObjectRequest);
+        upload.waitForCompletion();
+
+        String dst_bucket = System.getenv("dst_bucket") + (int) (Math.random() * 100) + "-" + appid;
+        deleteBucket(dst_bucket);
+        createBucket(dst_bucket);
+        CopyObjectRequest copyObjectRequest = new CopyObjectRequest(bucket, key, dst_bucket, "dstObj.txt");
+        copyObjectRequest.setStorageClass(StorageClass.Archive);
+        ObjectMetadata objectMetadata = new ObjectMetadata();
+        objectMetadata.setContentType("text/plain");
+        copyObjectRequest.setNewObjectMetadata(objectMetadata);
+        try {
+            Copy copy = transferManager.copy(copyObjectRequest);
+            copy.waitForCompletion();
+        } catch (CosServiceException cse) {
+            fail(cse.toString());
+        } finally {
+            deleteBucket(dst_bucket);
+            localFile.delete();
         }
     }
 
