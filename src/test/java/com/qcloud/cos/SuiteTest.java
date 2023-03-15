@@ -1,5 +1,6 @@
 package com.qcloud.cos;
 
+import com.qcloud.cos.ci.MediaJobTest;
 import com.qcloud.cos.utils.CRC64Test;
 import com.qcloud.cos.utils.UrlEncoderUtilsTest;
 
