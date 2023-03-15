@@ -11,10 +11,12 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
+import com.qcloud.cos.exception.CosClientException;
 import org.apache.http.client.CredentialsProvider;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -529,4 +531,37 @@ public class PutGetDelTest extends AbstractCOSClientTest {
             cosclient.shutdown();
         }
     }
+
+    @Test
+    public void testDeleteEmptyObj() throws Exception {
+        String key = "";
+        try {
+            cosclient.deleteObject(bucket, key);
+        } catch (Exception e) {
+            if (!Objects.equals(e.getMessage(), "The length of the key must be greater than 0")) {
+                fail(e.getMessage());
+            }
+        }
+    }
+
+    @Test
+    public void testPutObjectWithSizeLargeThan5GB() throws Exception {
+        File temFile = buildTestFile(6 * 1024L * 1024 * 1024);
+        String key = "file6G.txt";
+        PutObjectRequest request = new PutObjectRequest(bucket, key, temFile);
+
+        try {
+            PutObjectResult result = cosclient.putObject(request);
+        } catch (CosServiceException cse) {
+            fail(cse.getMessage());
+        } catch (CosClientException cce) {
+            String eMsg = "max size 5GB is allowed by putObject Method, your filesize is " + temFile.length() + ", please use transferManager to upload big file!";
+            if (!Objects.equals(cce.getMessage(), eMsg)) {
+                fail(cce.getMessage());
+            }
+        }finally {
+            temFile.delete();
+        }
+    }
+
 }

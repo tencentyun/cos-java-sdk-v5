@@ -3,6 +3,7 @@ package com.qcloud.cos;
 import java.io.File;
 import java.io.IOException;
 
+import com.qcloud.cos.endpoint.RegionEndpointBuilder;
 import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.model.CopyObjectRequest;
 import com.qcloud.cos.model.CopyObjectResult;
@@ -54,6 +55,9 @@ public class PutObjectCopyTest extends AbstractCOSClientTest {
                     new CopyObjectRequest(bucket, srcKey, bucket, destKey);
             copyObjectRequest.setSourceVersionId(putObjectResult.getVersionId());
             copyObjectRequest.setStorageClass(StorageClass.Standard_IA);
+            copyObjectRequest.setSourceBucketRegion(new Region(region));
+            copyObjectRequest.setSourceEndpointBuilder(new RegionEndpointBuilder(new Region(region)));
+            copyObjectRequest.setSourceAppid(appid);
             if (newObjectMetaData != null) {
                 copyObjectRequest.setNewObjectMetadata(newObjectMetaData);
             }
