@@ -23,9 +23,9 @@ public class AbstractCOSClientCITest {
     protected static COSClient cosclient = null;
 
     protected static boolean initConfig() throws IOException {
-        appid = System.getenv("appid");
-        secretId = System.getenv("secretId");
-        secretKey = System.getenv("secretKey");
+        appid = System.getenv("ciAppid");
+        secretId = System.getenv("ciSecretId");
+        secretKey = System.getenv("ciSecretKey");
         region = System.getenv("ciRegion");
         bucket = System.getenv("ciBucket");
 
@@ -36,14 +36,11 @@ public class AbstractCOSClientCITest {
             try {
                 fis = new FileInputStream(propFile);
                 prop.load(fis);
-                appid = prop.getProperty("appid");
-                secretId = prop.getProperty("secretId");
-                secretKey = prop.getProperty("secretKey");
+                appid = prop.getProperty("ciAppid");
+                secretId = prop.getProperty("ciSecretId");
+                secretKey = prop.getProperty("ciSecretKey");
                 region = prop.getProperty("ciRegion");
                 bucket = prop.getProperty("ciBucket");
-                mediaQueueId = prop.getProperty("MediaQueueId");
-                docQueueId = prop.getProperty("DocQueueId");
-                auditingQueueId = prop.getProperty("AuditingQueueId");
             } finally {
                 if (fis != null) {
                     try {
