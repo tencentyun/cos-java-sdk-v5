@@ -122,18 +122,18 @@ public abstract class COSCryptoModuleBase extends COSCryptoModule {
         this.contentCryptoScheme.setIV(cryptoConfig.getIV());
     }
 
-    /**
-     * For testing purposes only.
-     */
-    protected COSCryptoModuleBase(COSDirect cos, COSCredentialsProvider credentialsProvider,
-            EncryptionMaterialsProvider kekMaterialsProvider, CryptoConfiguration cryptoConfig) {
-        this.kekMaterialsProvider = kekMaterialsProvider;
-        this.cos = cos;
-        this.cryptoConfig = cryptoConfig;
-        this.cryptoScheme = COSCryptoScheme.from(cryptoConfig.getCryptoMode());
-        this.contentCryptoScheme = cryptoScheme.getContentCryptoScheme();
-        this.kms = null;
-    }
+//    /**
+//     * For testing purposes only.
+//     */
+//    protected COSCryptoModuleBase(COSDirect cos, COSCredentialsProvider credentialsProvider,
+//            EncryptionMaterialsProvider kekMaterialsProvider, CryptoConfiguration cryptoConfig) {
+//        this.kekMaterialsProvider = kekMaterialsProvider;
+//        this.cos = cos;
+//        this.cryptoConfig = cryptoConfig;
+//        this.cryptoScheme = COSCryptoScheme.from(cryptoConfig.getCryptoMode());
+//        this.contentCryptoScheme = cryptoScheme.getContentCryptoScheme();
+//        this.kms = null;
+//    }
 
     /**
      * Returns the length of the ciphertext computed from the length of the plaintext.
