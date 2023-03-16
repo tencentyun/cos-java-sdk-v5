@@ -37,6 +37,7 @@ import com.qcloud.cos.model.ciModel.auditing.VideoAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.WebpageAuditingResponse;
 import com.qcloud.cos.model.ciModel.bucket.DocBucketResponse;
 import com.qcloud.cos.model.ciModel.bucket.MediaBucketResponse;
+import com.qcloud.cos.model.ciModel.image.AutoTranslationBlockResponse;
 import com.qcloud.cos.model.ciModel.image.ImageLabelResponse;
 import com.qcloud.cos.model.ciModel.image.ImageLabelV2Response;
 import com.qcloud.cos.model.ciModel.image.ImageSearchResponse;
@@ -859,6 +860,15 @@ public class Unmarshallers {
             return new XmlResponsesSaxParser()
                     .parseFileProcessResponse(in).getResponse();
         }
+    }
+
+    public static final class AutoTranslationBlockUnmarshaller
+                implements Unmarshaller<AutoTranslationBlockResponse, InputStream> {
+
+            public AutoTranslationBlockResponse unmarshall(InputStream in) throws Exception {
+                return new XmlResponsesSaxParser()
+                        .parseAutoTranslationBlockResponse(in).getResponse();
+            }
     }
 
 }

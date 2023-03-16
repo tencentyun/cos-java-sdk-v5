@@ -182,7 +182,6 @@ public class QRCodeDemo {
 
     public static void main(String[] args) throws Exception {
         COSClient cosClient = ClientUtils.getTestClient();
-        // 小于5GB文件用简单上传
         cosClient.shutdown();
     }
 }

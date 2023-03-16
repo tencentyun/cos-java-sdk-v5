@@ -3,12 +3,9 @@ package com.qcloud.cos.endpoint;
 import com.qcloud.cos.region.Region;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.junit.Assert.assertEquals;
 
-@RunWith(MockitoJUnitRunner.class)
 public class CIPicRegionEndpointBuilderTest {
 
     private Region mockRegion = new Region("ap-chongqing");
