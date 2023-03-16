@@ -23,7 +23,6 @@ import org.junit.Test;
 import static com.qcloud.cos.model.InstructionFileId.DEFAULT_INSTRUCTION_FILE_SUFFIX;
 import static org.junit.Assert.fail;
 
-@Ignore
 public class SymmetricCOSEncryptionClientWithInstructionCryptoModeTest
         extends AbstractCOSEncryptionClientTest {
 

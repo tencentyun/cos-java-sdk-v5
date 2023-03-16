@@ -72,6 +72,7 @@ public class TimeoutCosClientTest extends AbstractCOSClientTest{
         System.setProperty(DISABLE_GET_OBJECT_MD5_VALIDATION_PROPERTY, "false");
         try {
             PutObjectRequest request = new PutObjectRequest(bucket, "testRequestNotTimeoutFile.txt", tempFile);
+            request.setTrafficLimit(1024 * 1024);
             cosclient.putObject(request);
             GetObjectRequest getObjectRequest = new GetObjectRequest(bucket, "testRequestNotTimeoutFile.txt");
             COSObject cosObject = cosclient.getObject(getObjectRequest);

@@ -1,5 +1,6 @@
 package com.qcloud.cos;
 
+import static com.qcloud.cos.internal.SkipMd5CheckStrategy.DISABLE_GET_OBJECT_MD5_VALIDATION_PROPERTY;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertEquals;
@@ -561,6 +562,23 @@ public class PutGetDelTest extends AbstractCOSClientTest {
             }
         }finally {
             temFile.delete();
+        }
+    }
+
+    @Test
+    public void testGetWithMD5Check() throws Exception {
+        File tempFile = buildTestFile(1 * 1024 * 1024L);
+        System.setProperty(DISABLE_GET_OBJECT_MD5_VALIDATION_PROPERTY, "false");
+        try {
+            PutObjectRequest request = new PutObjectRequest(bucket, "testGetWithMD5Check", tempFile);
+            request.setTrafficLimit(1024 * 1024);
+            cosclient.putObject(request);
+            GetObjectRequest getObjectRequest = new GetObjectRequest(bucket, "testGetWithMD5Check");
+            COSObject cosObject = cosclient.getObject(getObjectRequest);
+        } catch (CosClientException cce) {
+            fail(cce.getMessage());
+        } finally {
+            tempFile.delete();
         }
     }
 

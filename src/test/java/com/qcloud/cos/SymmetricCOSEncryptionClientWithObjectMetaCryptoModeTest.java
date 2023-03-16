@@ -24,7 +24,6 @@ import org.junit.Test;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-@Ignore
 public class SymmetricCOSEncryptionClientWithObjectMetaCryptoModeTest
         extends AbstractCOSClientTest {
 
