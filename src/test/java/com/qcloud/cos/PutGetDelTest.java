@@ -7,10 +7,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -579,6 +582,22 @@ public class PutGetDelTest extends AbstractCOSClientTest {
             fail(cce.getMessage());
         } finally {
             tempFile.delete();
+        }
+    }
+
+    @Test
+    public void testUploadStream() throws Exception {
+        int inputStreamLength = 1024 * 1024;
+        byte data[] = new byte[inputStreamLength];
+        InputStream inputStream = new ByteArrayInputStream(data);
+        String key = "testUploadStream";
+        ObjectMetadata objectMetadata = new ObjectMetadata();
+        objectMetadata.setHttpExpiresDate(new Date(System.currentTimeMillis() + 30L * 60 * 1000));
+        try {
+            cosclient.putObject(bucket, key, inputStream, objectMetadata);
+            COSObject cosObject = cosclient.getObject(bucket, key);
+        } catch (Exception e) {
+            fail(e.getMessage());
         }
     }
 
