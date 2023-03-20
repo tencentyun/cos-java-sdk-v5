@@ -7,13 +7,16 @@ import com.qcloud.cos.auth.COSStaticCredentialsProvider;
 import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.model.COSObject;
 import com.qcloud.cos.model.GetObjectRequest;
+import com.qcloud.cos.model.ObjectMetadata;
 import com.qcloud.cos.model.PutObjectRequest;
 import com.qcloud.cos.region.Region;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.InputStream;
 
 import static com.qcloud.cos.internal.SkipMd5CheckStrategy.DISABLE_GET_OBJECT_MD5_VALIDATION_PROPERTY;
 import static org.junit.Assert.fail;
@@ -48,10 +51,12 @@ public class TimeoutCosClientTest extends AbstractCOSClientTest{
         ClientConfig config = cosclient.getClientConfig();
         clientConfig.setShortConnection();
         config.setRequestTimeout(100);
-        File tempFile = buildTestFile(100 * 1024 * 1024L);
+        int inputStreamLength = 10 * 1024 * 1024;
+        byte data[] = new byte[inputStreamLength];
+        InputStream inputStream = new ByteArrayInputStream(data);
 
         try {
-            PutObjectRequest request = new PutObjectRequest(bucket.substring(0, bucket.lastIndexOf("-")), "testRequestTimeoutFile.txt", tempFile);
+            PutObjectRequest request = new PutObjectRequest(bucket.substring(0, bucket.lastIndexOf("-")), "testRequestTimeoutFile.txt", inputStream, new ObjectMetadata());
             request.setTrafficLimit(100);
             cosclient.putObject(request);
         } catch (CosClientException cce) {
@@ -60,7 +65,7 @@ public class TimeoutCosClientTest extends AbstractCOSClientTest{
             }
         } finally {
             config.setRequestTimeout(5 * 60 * 1000);
-            tempFile.delete();
+            inputStream.close();
         }
     }
 
@@ -68,11 +73,13 @@ public class TimeoutCosClientTest extends AbstractCOSClientTest{
     public void testPutGetNotTimeout() throws Exception {
         ClientConfig config = cosclient.getClientConfig();
         config.setRequestTimeout(60 * 1000);
-        File tempFile = buildTestFile(1 * 1024 * 1024L);
+        int inputStreamLength = 10 * 1024 * 1024;
+        byte data[] = new byte[inputStreamLength];
+        InputStream inputStream = new ByteArrayInputStream(data);
         System.setProperty(DISABLE_GET_OBJECT_MD5_VALIDATION_PROPERTY, "false");
         try {
-            PutObjectRequest request = new PutObjectRequest(bucket, "testRequestNotTimeoutFile.txt", tempFile);
-            request.setTrafficLimit(1024 * 1024);
+            PutObjectRequest request = new PutObjectRequest(bucket, "testRequestNotTimeoutFile.txt", inputStream, new ObjectMetadata());
+            request.setTrafficLimit(10 * 1024 * 1024);
             cosclient.putObject(request);
             GetObjectRequest getObjectRequest = new GetObjectRequest(bucket, "testRequestNotTimeoutFile.txt");
             COSObject cosObject = cosclient.getObject(getObjectRequest);
@@ -80,7 +87,7 @@ public class TimeoutCosClientTest extends AbstractCOSClientTest{
             fail(cce.getMessage());
         } finally {
             config.setRequestTimeout(5 * 60 * 1000);
-            tempFile.delete();
+            inputStream.close();
         }
     }
 }

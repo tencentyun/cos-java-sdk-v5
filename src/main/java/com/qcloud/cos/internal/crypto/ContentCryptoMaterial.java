@@ -526,39 +526,39 @@ final class ContentCryptoMaterial {
                 .createCipherLite(cek, iv, Cipher.DECRYPT_MODE, securityProvider), null);
     }
 
-    /**
-     * Parses instruction data retrieved from COS and returns a JSON string representing the
-     * instruction. Made for testing purposes.
-     */
-    static String parseInstructionFile(COSObject instructionFile) {
-        try {
-            return convertStreamToString(instructionFile.getObjectContent());
-        } catch (Exception e) {
-            throw new CosClientException("Error parsing JSON instruction file", e);
-        }
-    }
-
-    /**
-     * Converts the contents of an input stream to a String
-     */
-    private static String convertStreamToString(InputStream inputStream) throws IOException {
-        if (inputStream == null) {
-            return "";
-        } else {
-            StringBuilder stringBuilder = new StringBuilder();
-            String line;
-            try {
-                BufferedReader reader =
-                        new BufferedReader(new InputStreamReader(inputStream, StringUtils.UTF8));
-                while ((line = reader.readLine()) != null) {
-                    stringBuilder.append(line);
-                }
-            } finally {
-                inputStream.close();
-            }
-            return stringBuilder.toString();
-        }
-    }
+//    /**
+//     * Parses instruction data retrieved from COS and returns a JSON string representing the
+//     * instruction. Made for testing purposes.
+//     */
+//    static String parseInstructionFile(COSObject instructionFile) {
+//        try {
+//            return convertStreamToString(instructionFile.getObjectContent());
+//        } catch (Exception e) {
+//            throw new CosClientException("Error parsing JSON instruction file", e);
+//        }
+//    }
+//
+//    /**
+//     * Converts the contents of an input stream to a String
+//     */
+//    private static String convertStreamToString(InputStream inputStream) throws IOException {
+//        if (inputStream == null) {
+//            return "";
+//        } else {
+//            StringBuilder stringBuilder = new StringBuilder();
+//            String line;
+//            try {
+//                BufferedReader reader =
+//                        new BufferedReader(new InputStreamReader(inputStream, StringUtils.UTF8));
+//                while ((line = reader.readLine()) != null) {
+//                    stringBuilder.append(line);
+//                }
+//            } finally {
+//                inputStream.close();
+//            }
+//            return stringBuilder.toString();
+//        }
+//    }
 
     /**
      * Return the cipher lite used for content encryption/decryption purposes.
