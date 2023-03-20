@@ -161,7 +161,7 @@ public class AbstractCOSClientTest {
         secretId = System.getenv("secretId");
         secretKey = System.getenv("secretKey");
         region = System.getenv("region");
-        bucket = System.getenv("bucket") + (int) (Math.random() * 100) + "-" + appid;
+        bucket = System.getenv("bucket") + (int) (Math.random() * 10000) + "-" + appid;
         generalApiEndpoint = System.getenv("generalApiEndpoint");
         serviceApiEndpoint = System.getenv("serviceApiEndpoint");
         cmk = System.getenv("KMS_ID");
