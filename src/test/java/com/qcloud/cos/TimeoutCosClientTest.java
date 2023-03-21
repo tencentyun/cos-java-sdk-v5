@@ -50,14 +50,13 @@ public class TimeoutCosClientTest extends AbstractCOSClientTest{
     public void testRequestTimeout() throws Exception {
         ClientConfig config = cosclient.getClientConfig();
         clientConfig.setShortConnection();
-        config.setRequestTimeout(100);
+        config.setRequestTimeout(50);
         int inputStreamLength = 10 * 1024 * 1024;
         byte data[] = new byte[inputStreamLength];
         InputStream inputStream = new ByteArrayInputStream(data);
 
         try {
             PutObjectRequest request = new PutObjectRequest(bucket.substring(0, bucket.lastIndexOf("-")), "testRequestTimeoutFile.txt", inputStream, new ObjectMetadata());
-            request.setTrafficLimit(100);
             cosclient.putObject(request);
         } catch (CosClientException cce) {
             if (!cce.isRequestTimeout()) {
