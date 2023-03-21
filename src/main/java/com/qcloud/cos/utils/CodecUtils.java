@@ -111,12 +111,12 @@ public enum CodecUtils {
      * @throws IllegalArgumentException if the given decoded position is
      * not a possible value produced via the respective encoding 
      */
-    static void sanityCheckLastPos(int pos, int mask) {
-        if ((pos & mask) != 0) {
-            throw new IllegalArgumentException
-                ("Invalid last non-pad character detected");
-        }
-    }
+//    static void sanityCheckLastPos(int pos, int mask) {
+//        if ((pos & mask) != 0) {
+//            throw new IllegalArgumentException
+//                ("Invalid last non-pad character detected");
+//        }
+//    }
 
     public static String convertFromUtf8ToIso88591(String value) {
         if(value == null) {
