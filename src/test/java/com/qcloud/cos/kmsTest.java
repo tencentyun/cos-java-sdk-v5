@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 
 @RunWith(PowerMockRunner.class)
@@ -85,8 +86,11 @@ public class kmsTest {
                 cosEncryptionClient.createBucket(bucketName);
                 switch_stop_create = false;
             } catch (CosServiceException cse) {
-                bucketName = System.getenv("bucket") + (int) (Math.random() * 1000) + "-" + appid_;
-                continue;
+                if (cse.getStatusCode() == 409) {
+                    bucketName = System.getenv("bucket") + (int) (Math.random() * 1000) + "-" + appid_;
+                    continue;
+                }
+                fail(cse.getErrorMessage());
             }
         }
 
@@ -113,9 +117,4 @@ public class kmsTest {
             cosEncryptionClient.shutdown();
         }
     }
-
-//    @Test
-//    public void testParseInstructionFile() {
-//        ContentCryptoMaterial material = new ContentCryptoMaterial();
-//    }
 }

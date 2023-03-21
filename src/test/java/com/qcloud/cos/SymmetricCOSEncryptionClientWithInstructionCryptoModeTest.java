@@ -106,7 +106,7 @@ public class SymmetricCOSEncryptionClientWithInstructionCryptoModeTest
             ((COSEncryptionClient) cosclient).putInstructionFile(putInstructionFileRequest);
         } catch (Exception e) {
             System.out.println(e.getMessage());
-        }finally {
+        } finally {
             inputStream.close();
         }
     }
