@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.net.URL;
 
 import static org.junit.Assert.fail;
 
@@ -110,6 +111,7 @@ public class DefaultHttpClientTest extends AbstractCOSClientTest{
 
         try {
             cosClient.putObject(putObjectRequest);
+            URL url = cosClient.getObjectUrl(bucket_, "test");
         } finally {
             inputStream.close();
             try {
