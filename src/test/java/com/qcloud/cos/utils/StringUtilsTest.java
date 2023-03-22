@@ -3,8 +3,9 @@ package com.qcloud.cos.utils;
 import org.junit.Test;
 
 import java.math.BigInteger;
+import java.util.Date;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 public class StringUtilsTest {
     @Test
@@ -26,10 +27,38 @@ public class StringUtilsTest {
         String str_after_replace = StringUtils.replace(str_combine, str3, "");
         assertEquals(str2, str_after_replace);
 
-        assertEquals(null, StringUtils.trim(null));
-        assertEquals("hello", StringUtils.trim(str2));
-        assertEquals(true, StringUtils.isNullOrEmpty(null));
-        assertEquals(false, StringUtils.isNullOrEmpty(str2));
-        assertEquals(null, StringUtils.removeQuotes(null));
+        String str_trim = StringUtils.trim(null);
+        assertNull(str_trim);
+        str_trim = StringUtils.trim(str2);
+        assertEquals("hello", str_trim);
+
+        Boolean is_null_or_empty = StringUtils.isNullOrEmpty(null);
+        assertTrue(is_null_or_empty);
+        is_null_or_empty = StringUtils.isNullOrEmpty(str2);
+        assertFalse(is_null_or_empty);
+
+        String str_remove_quotes = StringUtils.removeQuotes(null);
+        assertNull(str_remove_quotes);
+
+        String str4 = "true";
+        assertFalse(StringUtils.toBoolean(new StringBuilder(str4)));
+        String str_from_bool = StringUtils.fromBoolean(true);
+        assertEquals(str4, str_from_bool);
+
+        long l1 = 1024;
+        assertEquals("1024", StringUtils.fromLong(l1));
+
+        Double d = 3.14;
+        String str_from_double = StringUtils.fromDouble(d);
+        assertEquals("3.14", str_from_double);
+
+        Float f = 3.14f;
+        String str_from_float = StringUtils.fromFloat(f);
+        assertEquals("3.14", str_from_float);
+
+        String time_str = "2023-03-29T10:05:45.000Z";
+        Date date = DateUtils.parseISO8601Date(time_str);
+        String str_from_date = StringUtils.fromDate(date);
+        assertEquals(time_str, str_from_date);
     }
 }

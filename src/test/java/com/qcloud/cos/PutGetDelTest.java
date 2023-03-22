@@ -601,4 +601,30 @@ public class PutGetDelTest extends AbstractCOSClientTest {
         }
     }
 
+    @Test
+    public void testGetWithIntegrityCheck() throws Exception{
+        System.setProperty(DISABLE_GET_OBJECT_MD5_VALIDATION_PROPERTY, "false");
+        int inputStreamLength = 1024 * 1024;
+        byte data[] = new byte[inputStreamLength];
+        InputStream inputStream = new ByteArrayInputStream(data);
+        String key = "testGetWithIntegrityCheck";
+        ObjectMetadata objectMetadata = new ObjectMetadata();
+
+        File localFile = buildTestFile(0L);
+        File downLoadFile = new File(localFile.getAbsolutePath() + ".down");
+        try {
+            cosclient.putObject(bucket, key, inputStream, objectMetadata);
+            GetObjectRequest getObjectRequest = new GetObjectRequest(bucket, key);
+            ObjectMetadata metadata = cosclient.getObject(getObjectRequest, downLoadFile);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (localFile.exists()) {
+                assertTrue(localFile.delete());
+            }
+            if (downLoadFile.exists()) {
+                assertTrue(downLoadFile.delete());
+            }
+        }
+    }
 }
