@@ -3,6 +3,7 @@ package com.qcloud.cos;
 import com.qcloud.cos.auth.BasicCOSCredentials;
 import com.qcloud.cos.auth.COSCredentials;
 import com.qcloud.cos.exception.CosServiceException;
+import com.qcloud.cos.internal.CosServiceRequest;
 import com.qcloud.cos.model.GetObjectRequest;
 import com.qcloud.cos.model.ObjectMetadata;
 import com.qcloud.cos.model.PutObjectRequest;
@@ -13,6 +14,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.URL;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 public class DefaultHttpClientTest extends AbstractCOSClientTest{
@@ -107,6 +109,20 @@ public class DefaultHttpClientTest extends AbstractCOSClientTest{
 
         PutObjectRequest putObjectRequest = new PutObjectRequest(bucket_, "test", inputStream, new ObjectMetadata());
         putObjectRequest.putCustomRequestHeader(Headers.CONTENT_LENGTH, "1048576");
+
+
+        try {
+            putObjectRequest.putCustomRequestHeader("x-cos-acl", null);
+        } catch (Exception e) {
+            assertEquals("custom header value cann't be null", e.getMessage());
+        }
+
+        try {
+            putObjectRequest.putCustomRequestHeader(null, "public-read");
+        } catch (Exception e) {
+            assertEquals("custom header key cann't be null", e.getMessage());
+        }
+
         putObjectRequest.putCustomRequestHeader("x-cos-acl", "public-read");
 
         try {
