@@ -1,11 +1,14 @@
 package com.qcloud.cos;
 
 
+import com.qcloud.cos.http.CosHttpResponse;
 import com.qcloud.cos.model.ObjectMetadata;
 import com.qcloud.cos.model.PutObjectRequest;
 import com.qcloud.cos.model.StorageClass;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+
+import org.apache.http.HttpResponse;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -39,6 +42,7 @@ public class RestoreObjectTest extends AbstractCOSClientTest {
         } catch (Exception e) {
             assertEquals("The expiration in days parameter must be specified when copying a cas object", e.getMessage());
         }
+        ObjectMetadata metadata = cosclient.getObjectMetadata(bucket, key);
         cosclient.deleteObject(bucket, key);
     }
 }

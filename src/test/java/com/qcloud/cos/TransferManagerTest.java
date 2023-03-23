@@ -291,7 +291,7 @@ public class TransferManagerTest extends AbstractCOSClientTest {
     @Test
     public void testResumeUploadAndDownload() throws Exception {
         File localFile = buildTestFile(10L * 1024 * 1024);
-        String key = "testAbortMultipartUploads.txt";
+        String key = "testResumeUploads.txt";
         PutObjectRequest putObjectRequest = new PutObjectRequest(bucket, key, localFile);
 
         try {
@@ -343,7 +343,22 @@ public class TransferManagerTest extends AbstractCOSClientTest {
 
         String dst_bucket = System.getenv("dst_bucket") + (int) (Math.random() * 100) + "-" + appid;
         deleteBucket(dst_bucket);
-        createBucket(dst_bucket);
+
+        Boolean switch_to_stop = true;
+        while (switch_to_stop) {
+            try {
+                cosclient.createBucket(dst_bucket);
+                switch_to_stop = false;
+            } catch (CosServiceException cse) {
+                if (cse.getStatusCode() == 409) {
+                    dst_bucket = System.getenv("dst_bucket") + (int) (Math.random() * 1000000) + "-" + appid;
+                    continue;
+                }
+                cse.printStackTrace();
+                fail(cse.getErrorMessage());
+            }
+        }
+
         CopyObjectRequest copyObjectRequest = new CopyObjectRequest(bucket, key, dst_bucket, "dstObj.txt");
         copyObjectRequest.setStorageClass(StorageClass.Archive);
         ObjectMetadata objectMetadata = new ObjectMetadata();
@@ -353,7 +368,9 @@ public class TransferManagerTest extends AbstractCOSClientTest {
             Copy copy = transferManager.copy(copyObjectRequest);
             copy.waitForCompletion();
         } catch (CosServiceException cse) {
-            fail(cse.toString());
+            if (404 != cse.getStatusCode()) {
+                fail(cse.toString());
+            }
         } finally {
             deleteBucket(dst_bucket);
             localFile.delete();

@@ -1,5 +1,6 @@
 package com.qcloud.cos;
 
+import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.model.BucketReplicationConfiguration;
 import com.qcloud.cos.model.BucketVersioningConfiguration;
 import com.qcloud.cos.model.ReplicationDestinationConfig;
@@ -23,7 +24,20 @@ public class BucketReplicationTest extends AbstractCOSClientTest {
         AbstractCOSClientTest.initCosClient();
         bucketQCS = System.getenv("bucketQCS") + "-" + appid;
         deleteBucket(bucketQCS);
-        createBucket(bucketQCS);
+        Boolean switch_to_stop = true;
+        while (switch_to_stop) {
+            try {
+                cosclient.createBucket(bucketQCS);
+                switch_to_stop = false;
+            } catch (CosServiceException cse) {
+                if (cse.getStatusCode() == 409) {
+                    bucketQCS = System.getenv("bucketQCS") + (int) (Math.random() * 1000000) + "-" + appid;
+                    continue;
+                }
+                cse.printStackTrace();
+                fail(cse.getErrorMessage());
+            }
+        }
 
         BucketVersioningConfiguration bucketVersioningEnabled =
                 new BucketVersioningConfiguration(BucketVersioningConfiguration.ENABLED);
