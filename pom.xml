@@ -336,6 +336,10 @@
                         <goals>
                             <goal>report</goal>
                         </goals>
+                        <configuration>
+                            <dataFile>target/jacoco.exec</dataFile>
+                            <outputDirectory>target/site/jacoco</outputDirectory>
+                        </configuration>
                     </execution>
                     <execution>
                         <id>default-check</id>

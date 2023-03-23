@@ -66,7 +66,7 @@ public class CreateDeleteHeadBucketTest extends AbstractCOSClientTest {
             return;
         }
         try {
-            String bucketName = String.format("java-pubrw-%s", appid);
+            String bucketName = "java-pubrw-" + (int) (Math.random() * 1000000) + "-" + appid;
             CreateBucketRequest createBucketRequest = new CreateBucketRequest(bucketName);
             createBucketRequest.setCannedAcl(CannedAccessControlList.PublicReadWrite);
             AccessControlList accessControlList = new AccessControlList();

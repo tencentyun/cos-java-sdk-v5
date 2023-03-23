@@ -22,8 +22,7 @@ public class BucketReplicationTest extends AbstractCOSClientTest {
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
         AbstractCOSClientTest.initCosClient();
-        bucketQCS = System.getenv("bucketQCS") + "-" + appid;
-        deleteBucket(bucketQCS);
+        bucketQCS = System.getenv("bucketQCS") + (int) (Math.random() * 1000000) + "-" + appid;
         Boolean switch_to_stop = true;
         while (switch_to_stop) {
             try {
