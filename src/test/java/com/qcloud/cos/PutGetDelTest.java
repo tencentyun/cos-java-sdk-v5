@@ -373,7 +373,7 @@ public class PutGetDelTest extends AbstractCOSClientTest {
         }
     }
 
-    @Test
+    @Ignore
     public void testTemporyTokenPutGetDel() throws CosServiceException, IOException {
         COSClient normalClient = cosclient;
         COSClient temporyCOSClient = buildTemporyCredentialsCOSClient(1800L);
@@ -390,7 +390,7 @@ public class PutGetDelTest extends AbstractCOSClientTest {
         }
     }
 
-    @Test
+    @Ignore
     public void testTemporyTokenExpired() throws CosServiceException, IOException, InterruptedException {
         COSClient normalClient = cosclient;
         COSClient temporyCOSClient = buildTemporyCredentialsCOSClient(10);

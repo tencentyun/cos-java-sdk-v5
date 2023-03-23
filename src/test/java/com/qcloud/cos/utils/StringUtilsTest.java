@@ -2,6 +2,7 @@ package com.qcloud.cos.utils;
 
 import org.junit.Test;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Date;
 
@@ -60,5 +61,13 @@ public class StringUtilsTest {
         Date date = DateUtils.parseISO8601Date(time_str);
         String str_from_date = StringUtils.fromDate(date);
         assertEquals(time_str, str_from_date);
+
+        BigInteger bigInteger = StringUtils.toBigInteger("1024");
+        String str_from_bigInteger = StringUtils.fromBigInteger(bigInteger);
+        assertEquals("1024", str_from_bigInteger);
+
+        BigDecimal bigDecimal = StringUtils.toBigDecimal("1024");
+        String str_from_bigDecimal = StringUtils.fromBigDecimal(bigDecimal);
+        assertEquals("1024", str_from_bigDecimal);
     }
 }

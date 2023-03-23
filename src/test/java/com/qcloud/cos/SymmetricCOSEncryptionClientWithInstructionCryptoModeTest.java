@@ -29,7 +29,7 @@ import static com.qcloud.cos.model.InstructionFileId.DEFAULT_INSTRUCTION_FILE_SU
 import static org.junit.Assert.fail;
 
 public class SymmetricCOSEncryptionClientWithInstructionCryptoModeTest
-        extends AbstractCOSEncryptionClientTest {
+        extends AbstractCOSClientTest {
 
     private static void initEncryptionInfo() throws NoSuchAlgorithmException {
         KeyGenerator symKeyGenerator = KeyGenerator.getInstance("AES");
@@ -44,12 +44,17 @@ public class SymmetricCOSEncryptionClientWithInstructionCryptoModeTest
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
         initEncryptionInfo();
-        AbstractCOSEncryptionClientTest.setUpBeforeClass();
+        if (cryptoConfiguration == null && qcloudkms == null && encryptionMaterials == null) {
+            return;
+        }
+        useClientEncryption = true;
+        AbstractCOSClientTest.initCosClient();
     }
 
     @AfterClass
     public static void tearDownAfterClass() throws Exception {
-        AbstractCOSEncryptionClientTest.tearDownAfterClass();
+        AbstractCOSClientTest.destoryCosClient();
+        useClientEncryption = false;
     }
 
     @Test

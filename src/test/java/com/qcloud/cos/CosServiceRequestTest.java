@@ -22,6 +22,7 @@ public class CosServiceRequestTest {
 
         PutObjectRequest putObjectRequest = new PutObjectRequest("test_bucket", "test", inputStream, new ObjectMetadata());
         putObjectRequest.putCustomQueryParameter("response-content-disposition", "attachment");
+        putObjectRequest.putCustomRequestHeader(Headers.CONTENT_LENGTH, "1048576");
         PutObjectRequest putObjectRequest_clone = putObjectRequest.clone();
 
         String secretId_ = System.getenv("secretId");
