@@ -21,6 +21,7 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
 import com.qcloud.cos.exception.CosClientException;
+import com.qcloud.cos.model.*;
 import org.apache.http.client.CredentialsProvider;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -31,17 +32,9 @@ import com.qcloud.cos.auth.COSCredentialsProvider;
 import com.qcloud.cos.auth.AnonymousCOSCredentials;
 import com.qcloud.cos.auth.COSCredentials;
 import com.qcloud.cos.auth.BasicCOSCredentials;
-import com.qcloud.cos.model.PutObjectRequest;
-import com.qcloud.cos.model.GetObjectRequest;
-import com.qcloud.cos.model.DeleteObjectRequest;
 import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.http.HttpProtocol;
-import com.qcloud.cos.model.COSObject;
 import com.qcloud.cos.model.GetObjectRequest;
-import com.qcloud.cos.model.ObjectMetadata;
-import com.qcloud.cos.model.PutObjectResult;
-import com.qcloud.cos.model.SSECOSKeyManagementParams;
-import com.qcloud.cos.model.SSECustomerKey;
 import com.qcloud.cos.region.Region;
 import com.qcloud.cos.utils.Md5Utils;
 import com.qcloud.cos.utils.StringUtils;
@@ -602,7 +595,7 @@ public class PutGetDelTest extends AbstractCOSClientTest {
     }
 
     @Test
-    public void testGetWithIntegrityCheck() throws Exception{
+    public void testGetWithIntegrityCheck() throws Exception {
         System.setProperty(DISABLE_GET_OBJECT_MD5_VALIDATION_PROPERTY, "false");
         int inputStreamLength = 1024 * 1024;
         byte data[] = new byte[inputStreamLength];
@@ -625,6 +618,79 @@ public class PutGetDelTest extends AbstractCOSClientTest {
             if (downLoadFile.exists()) {
                 assertTrue(downLoadFile.delete());
             }
+        }
+    }
+
+    @Test
+    public void testUploadWithRedirectLocation() {
+        int inputStreamLength = 1024 * 1024;
+        byte data[] = new byte[inputStreamLength];
+        InputStream inputStream = new ByteArrayInputStream(data);
+        String key = "testUploadWithWrongRedirectLocation";
+        ObjectMetadata objectMetadata = new ObjectMetadata();
+
+        PutObjectRequest putObjectRequest = new PutObjectRequest(bucket, key, inputStream, objectMetadata);
+        putObjectRequest.setRedirectLocation("testRedirection");
+
+        String ownerId = String.format("qcs::cam::uin/%s:uin/%s", ownerUin, ownerUin);
+        AccessControlList acl = new AccessControlList();
+        Owner owner = new Owner();
+        owner.setId(ownerId);
+        acl.setOwner(owner);
+
+        String granteeUin = String.format("qcs::cam::uin/%s:uin/734505014", ownerUin);
+        UinGrantee uinGrantee = new UinGrantee(granteeUin);
+        uinGrantee.setIdentifier(granteeUin);
+        acl.grantPermission(uinGrantee, Permission.FullControl);
+
+        putObjectRequest.setAccessControlList(acl);
+
+        try {
+            cosclient.putObject(putObjectRequest);
+        } catch (CosServiceException cse) {
+            cse.printStackTrace();
+        }
+
+        try {
+            cosclient.deleteObject(bucket, key);
+        } catch (CosServiceException cse) {
+            if (cse.getStatusCode() != 404) {
+                fail(cse.getMessage());
+            }
+        }
+    }
+
+    @Test
+    public void testInitiateMultipartUploadWithRedirectLocation() {
+        InitiateMultipartUploadRequest request = new InitiateMultipartUploadRequest(bucket, "testInitiateMultipartUploadWithRedirectLocation");
+        request.setRedirectLocation("testRedirection");
+
+        String ownerId = String.format("qcs::cam::uin/%s:uin/%s", ownerUin, ownerUin);
+        AccessControlList acl = new AccessControlList();
+        Owner owner = new Owner();
+        owner.setId(ownerId);
+        acl.setOwner(owner);
+
+        String granteeUin = String.format("qcs::cam::uin/%s:uin/734505014", ownerUin);
+        UinGrantee uinGrantee = new UinGrantee(granteeUin);
+        uinGrantee.setIdentifier(granteeUin);
+        acl.grantPermission(uinGrantee, Permission.FullControl);
+
+        request.setAccessControlList(acl);
+
+        try {
+            cosclient.initiateMultipartUpload(request);
+        } catch (CosServiceException cse) {
+            cse.printStackTrace();
+        }
+
+        InitiateMultipartUploadRequest initiateMultipartUploadRequest = new InitiateMultipartUploadRequest(bucket, "test2");
+        initiateMultipartUploadRequest.setCannedACL(CannedAccessControlList.PublicRead);
+
+        try {
+            cosclient.initiateMultipartUpload(initiateMultipartUploadRequest);
+        } catch (CosServiceException cse) {
+            cse.printStackTrace();
         }
     }
 }
