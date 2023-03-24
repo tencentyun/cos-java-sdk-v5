@@ -34,6 +34,7 @@ import java.util.Map;
 import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.exception.MultiObjectDeleteException.DeleteError;
+import com.qcloud.cos.internal.cihandler.AutoTranslationBlockResponseHandler;
 import com.qcloud.cos.internal.cihandler.BatchJobResponseHandler;
 import com.qcloud.cos.internal.cihandler.DetectCarHandler;
 import com.qcloud.cos.internal.cihandler.FileProcessResponseHandler;
@@ -901,6 +902,11 @@ public class XmlResponsesSaxParser {
     }
     public FileProcessResponseHandler parseFileProcessResponse(InputStream inputStream) throws IOException {
         FileProcessResponseHandler handler = new FileProcessResponseHandler();
+        parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
+        return handler;
+    }
+    public AutoTranslationBlockResponseHandler parseAutoTranslationBlockResponse(InputStream inputStream) throws IOException {
+        AutoTranslationBlockResponseHandler handler = new AutoTranslationBlockResponseHandler();
         parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
         return handler;
     }

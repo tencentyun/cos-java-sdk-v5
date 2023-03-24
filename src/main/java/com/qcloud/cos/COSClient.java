@@ -114,6 +114,8 @@ import com.qcloud.cos.model.ciModel.bucket.MediaBucketResponse;
 import com.qcloud.cos.model.ciModel.common.CImageProcessRequest;
 import com.qcloud.cos.model.ciModel.common.ImageProcessRequest;
 import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
+import com.qcloud.cos.model.ciModel.image.AutoTranslationBlockRequest;
+import com.qcloud.cos.model.ciModel.image.AutoTranslationBlockResponse;
 import com.qcloud.cos.model.ciModel.image.GenerateQrcodeRequest;
 import com.qcloud.cos.model.ciModel.image.ImageLabelRequest;
 import com.qcloud.cos.model.ciModel.image.ImageLabelResponse;
@@ -4728,6 +4730,22 @@ public class COSClient implements COS {
         this.checkCIRequestCommon(request);
         CosHttpRequest<BatchJobRequest> httpRequest = this.createRequest(request.getBucketName(), "/inventorytriggerjob/" + request.getJobId(), request, HttpMethodName.GET);
         return this.invoke(httpRequest, new Unmarshallers.BatchJobUnmarshaller());
+    }
+
+    @Override
+    public AutoTranslationBlockResponse autoTranslationBlock(AutoTranslationBlockRequest translationBlockRequest) {
+        rejectNull(translationBlockRequest,
+                "The request parameter must be specified setting the object tags");
+        rejectNull(translationBlockRequest.getBucketName(),
+                "The bucketName parameter must be specified setting the object tags");
+        CosHttpRequest<AutoTranslationBlockRequest> request = createRequest(translationBlockRequest.getBucketName(), "/", translationBlockRequest, HttpMethodName.GET);
+        request.addParameter("ci-process","AutoTranslationBlock");
+        addParameterIfNotNull(request,"InputText",translationBlockRequest.getInputText());
+        addParameterIfNotNull(request,"SourceLang",translationBlockRequest.getSourceLang());
+        addParameterIfNotNull(request,"TargetLang",translationBlockRequest.getTargetLang());
+        addParameterIfNotNull(request,"TextDomain",translationBlockRequest.getTextDomain());
+        addParameterIfNotNull(request,"TextStyle",translationBlockRequest.getTextStyle());
+        return this.invoke(request, new Unmarshallers.AutoTranslationBlockUnmarshaller());
     }
 
 }

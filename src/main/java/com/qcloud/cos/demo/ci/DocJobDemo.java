@@ -22,7 +22,7 @@ import java.util.List;
  * 文档预览任务相关demo
  */
 public class DocJobDemo {
-    public static void main(String[] args) throws MalformedURLException, URISyntaxException, InterruptedException {
+    public static void main(String[] args)  {
         // 1 初始化用户身份信息（secretId, secretKey）。
         COSClient client = ClientUtils.getTestClient();
         // 2 调用要使用的方法。
