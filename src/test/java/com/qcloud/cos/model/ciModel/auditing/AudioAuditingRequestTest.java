@@ -16,6 +16,6 @@ public class AudioAuditingRequestTest {
 
     @Test
     public void testToString() {
-        assertEquals("result", audioAuditingRequestUnderTest.toString());
+        assertEquals("AudioAuditingRequest{conf=null, input=null, jobId='null'}", audioAuditingRequestUnderTest.toString());
     }
 }
