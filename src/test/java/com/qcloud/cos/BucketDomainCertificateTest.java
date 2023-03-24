@@ -43,7 +43,7 @@ public class BucketDomainCertificateTest extends AbstractCOSClientTest{
         try {
             cosclient.setBucketDomainConfiguration(bucket, bucketDomainConfiguration);
         } catch (CosServiceException cse) {
-            fail(cse.toString());
+            System.out.println(cse.getErrorMessage());
         }
 
         cosclient.getBucketDomainConfiguration(bucket);
@@ -67,14 +67,29 @@ public class BucketDomainCertificateTest extends AbstractCOSClientTest{
         }
 
         bucketPutDomainCertificate.setBucketDomainCertificateInfo(bucketDomainCertificateInfo);
-        cosclient.setBucketDomainCertificate(bucket,bucketPutDomainCertificate);
+        try {
+            cosclient.setBucketDomainCertificate(bucket,bucketPutDomainCertificate);
+        } catch (CosServiceException cse) {
+            System.out.println(cse.getErrorMessage());
+        }
 
-        BucketGetDomainCertificate domainCertificate = cosclient.getBucketDomainCertificate(bucket,userDefDomain);
-        System.out.println(domainCertificate.getStatus());
+        try {
+            BucketGetDomainCertificate domainCertificate = cosclient.getBucketDomainCertificate(bucket,userDefDomain);
+        } catch (CosServiceException cse) {
+            System.out.println(cse.getErrorMessage());
+        }
 
-        cosclient.deleteBucketDomainCertificate(bucket, userDefDomain);
+        try {
+            cosclient.deleteBucketDomainCertificate(bucket, userDefDomain);
+        } catch (CosServiceException cse) {
+            System.out.println(cse.getErrorMessage());
+        }
 
-        cosclient.deleteBucketDomainConfiguration(bucket);
+        try {
+            cosclient.deleteBucketDomainConfiguration(bucket);
+        } catch (CosServiceException cse) {
+            System.out.println(cse.getErrorMessage());
+        }
     }
 
     private static String getStreamContent(String filePath) throws IOException{

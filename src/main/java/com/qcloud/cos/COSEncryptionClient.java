@@ -204,7 +204,7 @@ public class COSEncryptionClient extends COSClient implements COSEncryption {
      * An internal implementation used to provide limited but direct access to the underlying
      * methods of COSClient without any encryption or decryption operations.
      */
-    private final class COSDirectImpl extends COSDirect {
+    public final class COSDirectImpl extends COSDirect {
         @Override
         public PutObjectResult putObject(PutObjectRequest req) {
             return COSEncryptionClient.super.putObject(req);

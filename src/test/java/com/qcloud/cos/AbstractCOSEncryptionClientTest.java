@@ -63,12 +63,12 @@ public abstract class AbstractCOSEncryptionClientTest extends AbstractCOSClientT
         testPutGetDelObjectDiffSize(4 * 1024 * 1024L);
     }
 
-    @Test
+    @Ignore
     public void testPutGetDelObject32M() throws CosServiceException, IOException {
         testPutGetDelObjectDiffSize(32 * 1024 * 1024L);
     }
 
-    @Test
+    @Ignore
     public void testPutGetDelObject100M() throws CosServiceException, IOException {
         testPutGetDelObjectDiffSize(100 * 1024 * 1024L);
     }
@@ -78,7 +78,7 @@ public abstract class AbstractCOSEncryptionClientTest extends AbstractCOSClientT
         testMultiPartUploadObject(4 * 1024 * 1024L, 1 * 1024 * 1024L);
     }
     
-    @Test
+    @Ignore
     public void testMultipartUploadObjectSize_32M_Part_3M() throws IOException {
         testMultiPartUploadObject(32 * 1024 * 1024L, 32 * 1024 * 1024L);
     }

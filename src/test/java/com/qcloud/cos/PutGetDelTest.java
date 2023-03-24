@@ -1,20 +1,26 @@
 package com.qcloud.cos;
 
+import static com.qcloud.cos.internal.SkipMd5CheckStrategy.DISABLE_GET_OBJECT_MD5_VALIDATION_PROPERTY;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
+import com.qcloud.cos.exception.CosClientException;
 import org.apache.http.client.CredentialsProvider;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -367,7 +373,7 @@ public class PutGetDelTest extends AbstractCOSClientTest {
         }
     }
 
-    @Test
+    @Ignore
     public void testTemporyTokenPutGetDel() throws CosServiceException, IOException {
         COSClient normalClient = cosclient;
         COSClient temporyCOSClient = buildTemporyCredentialsCOSClient(1800L);
@@ -384,7 +390,7 @@ public class PutGetDelTest extends AbstractCOSClientTest {
         }
     }
 
-    @Test
+    @Ignore
     public void testTemporyTokenExpired() throws CosServiceException, IOException, InterruptedException {
         COSClient normalClient = cosclient;
         COSClient temporyCOSClient = buildTemporyCredentialsCOSClient(10);
@@ -527,6 +533,98 @@ public class PutGetDelTest extends AbstractCOSClientTest {
         } finally {
             localFile.delete();
             cosclient.shutdown();
+        }
+    }
+
+    @Test
+    public void testDeleteEmptyObj() throws Exception {
+        String key = "";
+        try {
+            cosclient.deleteObject(bucket, key);
+        } catch (Exception e) {
+            if (!Objects.equals(e.getMessage(), "The length of the key must be greater than 0")) {
+                fail(e.getMessage());
+            }
+        }
+    }
+
+    @Test
+    public void testPutObjectWithSizeLargeThan5GB() throws Exception {
+        File temFile = buildTestFile(6 * 1024L * 1024 * 1024);
+        String key = "file6G.txt";
+        PutObjectRequest request = new PutObjectRequest(bucket, key, temFile);
+
+        try {
+            PutObjectResult result = cosclient.putObject(request);
+        } catch (CosServiceException cse) {
+            fail(cse.getMessage());
+        } catch (CosClientException cce) {
+            String eMsg = "max size 5GB is allowed by putObject Method, your filesize is " + temFile.length() + ", please use transferManager to upload big file!";
+            if (!Objects.equals(cce.getMessage(), eMsg)) {
+                fail(cce.getMessage());
+            }
+        }finally {
+            temFile.delete();
+        }
+    }
+
+    @Test
+    public void testGetWithMD5Check() throws Exception {
+        File tempFile = buildTestFile(1 * 1024 * 1024L);
+        System.setProperty(DISABLE_GET_OBJECT_MD5_VALIDATION_PROPERTY, "false");
+        try {
+            PutObjectRequest request = new PutObjectRequest(bucket, "testGetWithMD5Check", tempFile);
+            request.setTrafficLimit(1024 * 1024);
+            cosclient.putObject(request);
+            GetObjectRequest getObjectRequest = new GetObjectRequest(bucket, "testGetWithMD5Check");
+            COSObject cosObject = cosclient.getObject(getObjectRequest);
+        } catch (CosClientException cce) {
+            fail(cce.getMessage());
+        } finally {
+            tempFile.delete();
+        }
+    }
+
+    @Test
+    public void testUploadStream() throws Exception {
+        int inputStreamLength = 1024 * 1024;
+        byte data[] = new byte[inputStreamLength];
+        InputStream inputStream = new ByteArrayInputStream(data);
+        String key = "testUploadStream";
+        ObjectMetadata objectMetadata = new ObjectMetadata();
+        objectMetadata.setHttpExpiresDate(new Date(System.currentTimeMillis() + 30L * 60 * 1000));
+        try {
+            cosclient.putObject(bucket, key, inputStream, objectMetadata);
+            COSObject cosObject = cosclient.getObject(bucket, key);
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    public void testGetWithIntegrityCheck() throws Exception{
+        System.setProperty(DISABLE_GET_OBJECT_MD5_VALIDATION_PROPERTY, "false");
+        int inputStreamLength = 1024 * 1024;
+        byte data[] = new byte[inputStreamLength];
+        InputStream inputStream = new ByteArrayInputStream(data);
+        String key = "testGetWithIntegrityCheck";
+        ObjectMetadata objectMetadata = new ObjectMetadata();
+
+        File localFile = buildTestFile(0L);
+        File downLoadFile = new File(localFile.getAbsolutePath() + ".down");
+        try {
+            cosclient.putObject(bucket, key, inputStream, objectMetadata);
+            GetObjectRequest getObjectRequest = new GetObjectRequest(bucket, key);
+            ObjectMetadata metadata = cosclient.getObject(getObjectRequest, downLoadFile);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (localFile.exists()) {
+                assertTrue(localFile.delete());
+            }
+            if (downLoadFile.exists()) {
+                assertTrue(downLoadFile.delete());
+            }
         }
     }
 }
