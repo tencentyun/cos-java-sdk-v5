@@ -22,6 +22,8 @@ import com.qcloud.cos.model.ciModel.auditing.TextAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.TextAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.VideoAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.VideoAuditingResponse;
+import com.qcloud.cos.model.ciModel.auditing.WebpageAuditingRequest;
+import com.qcloud.cos.model.ciModel.auditing.WebpageAuditingResponse;
 import com.qcloud.cos.utils.Jackson;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -36,6 +38,7 @@ public class ContentAudutingTest extends AbstractCOSClientCITest {
     private String audioId;
     private String textId;
     private String docId;
+    private String webId;
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
@@ -268,6 +271,33 @@ public class ContentAudutingTest extends AbstractCOSClientCITest {
         request.setJobId(docId);
         //3.调用接口,获取任务响应对象
         DocumentAuditingResponse response = cosclient.describeAuditingDocumentJob(request);
+    }
+
+    @Before
+    public void createWebpageAuditingJobTest() {
+        WebpageAuditingRequest request = new WebpageAuditingRequest();
+        request.setBucketName(bucket);
+        request.getInput().setUrl("https://console.cloud.tencent.com/");
+        request.getConf().setDetectType("all");
+        WebpageAuditingResponse response = cosclient.createWebpageAuditingJob(request);
+        webId = response.getJobsDetail().getJobId();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void createWebpageAuditingJobTest2() {
+        WebpageAuditingRequest request = null;
+        WebpageAuditingResponse response = cosclient.createWebpageAuditingJob(request);
+        webId = response.getJobsDetail().getJobId();
+    }
+
+    @Test
+    public void describeWebpageAuditingJobTest() {
+        //1.创建任务请求对象
+        WebpageAuditingRequest request = new WebpageAuditingRequest();
+        //2.添加请求参数 参数详情请见api接口文档
+        request.setBucketName(bucket);
+        request.setJobId(webId);
+        WebpageAuditingResponse webpageAuditingResponse = cosclient.describeWebpageAuditingJob(request);
     }
 
 

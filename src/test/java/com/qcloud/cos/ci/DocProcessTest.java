@@ -39,7 +39,6 @@ public class DocProcessTest extends AbstractCOSClientCITest {
 
     @Test
     public void testCreateDocProcessBucket() {
-        // Setup
         DocBucketRequest docBucketRequest = new DocBucketRequest();
         docBucketRequest.setBucketName(bucket);
         Boolean result = cosclient.createDocProcessBucket(docBucketRequest);
@@ -48,7 +47,6 @@ public class DocProcessTest extends AbstractCOSClientCITest {
 
     @Before
     public void testCreateDocProcessJobs() throws InterruptedException {
-        //1.获取队列id,需要先开启文档预览功能。
         DocQueueRequest queueRequest = new DocQueueRequest();
         queueRequest.setBucketName(bucket);
         DocListQueueResponse response = cosclient.describeDocProcessQueues(queueRequest);
@@ -59,8 +57,6 @@ public class DocProcessTest extends AbstractCOSClientCITest {
         } else {
             return;
         }
-        //2.发送文档预览任务
-        //2.1添加请求参数 参数详情请见api接口文档
         DocJobRequest request = new DocJobRequest();
         request.setBucketName(bucket);
         DocJobObject docJobObject = request.getDocJobObject();
@@ -76,10 +72,8 @@ public class DocProcessTest extends AbstractCOSClientCITest {
         output.setRegion(cosclient.getClientConfig().getRegion().getRegionName());
         output.setBucket(bucket);
         output.setObject("demo/pic-${Number}.jpg");
-        //2.2发送预览请求
         DocJobResponse docProcessJobs = cosclient.createDocProcessJobs(request);
 
-        //3.轮询查询任务结果（也可以配置队列的回调url,使用回调接口获取任务结果）
         DocJobRequest docJobRequest = new DocJobRequest();
         docJobRequest.setBucketName(bucket);
         String jobId = docProcessJobs.getJobsDetail().getJobId();
@@ -87,9 +81,7 @@ public class DocProcessTest extends AbstractCOSClientCITest {
         while (true) {
             DocJobResponse docJobResponse = cosclient.describeDocProcessJob(docJobRequest);
             String state = docJobResponse.getJobsDetail().getState();
-            //判断任务状态
             if ("Success".equalsIgnoreCase(state) || "Failed".equalsIgnoreCase(state)) {
-                //处理业务逻辑
                 System.out.println(docJobResponse);
                 break;
             } else {
@@ -101,7 +93,6 @@ public class DocProcessTest extends AbstractCOSClientCITest {
 
     @Test
     public void testDescribeDocProcessJobs() {
-        // Setup
         DocJobListRequest request = new DocJobListRequest();
         request.setBucketName(bucket);
         request.setQueueId(queueId);
@@ -135,7 +126,6 @@ public class DocProcessTest extends AbstractCOSClientCITest {
 
     @Test
     public void testGenerateDocPreviewUrl() throws URISyntaxException {
-        // Setup
         DocHtmlRequest docJobRequest = new DocHtmlRequest();
         docJobRequest.setImageDpi("imageDpi");
         docJobRequest.setObjectKey("destinationKey");
@@ -151,13 +141,11 @@ public class DocProcessTest extends AbstractCOSClientCITest {
         docJobRequest.setBucketName(bucket);
         docJobRequest.setDstType(DocHtmlRequest.DocType.html);
         docJobRequest.setExcelPaperSize("excelPaperSize");
-        // Run the test
         String result = cosclient.GenerateDocPreviewUrl(docJobRequest);
     }
 
     @Test
     public void testGenerateDocPreviewUrl_ThrowsURISyntaxException() {
-        // Setup
         DocHtmlRequest docJobRequest = new DocHtmlRequest();
         docJobRequest.setImageDpi("imageDpi");
         docJobRequest.setObjectKey("destinationKey");
@@ -179,6 +167,5 @@ public class DocProcessTest extends AbstractCOSClientCITest {
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
-
     }
 }

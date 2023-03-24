@@ -1,22 +1,34 @@
 package com.qcloud.cos.ci;
 
 import com.qcloud.cos.AbstractCOSClientCITest;
+import com.qcloud.cos.COSClient;
 import com.qcloud.cos.model.ciModel.job.MediaJobObject;
 import com.qcloud.cos.model.ciModel.job.MediaJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaJobsRequest;
 import com.qcloud.cos.model.ciModel.job.MediaListJobResponse;
+import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoRequest;
+import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoResponse;
 import com.qcloud.cos.model.ciModel.queue.MediaListQueueResponse;
 import com.qcloud.cos.model.ciModel.queue.MediaQueueRequest;
+import com.qcloud.cos.model.ciModel.snapshot.CosSnapshotRequest;
+import com.qcloud.cos.model.ciModel.snapshot.PrivateM3U8Request;
+import com.qcloud.cos.model.ciModel.snapshot.PrivateM3U8Response;
+import com.qcloud.cos.model.ciModel.snapshot.SnapshotRequest;
+import com.qcloud.cos.model.ciModel.snapshot.SnapshotResponse;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.io.InputStream;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class MediaJobTest extends AbstractCOSClientCITest {
 
+    private String jobId;
     public static final String TAG = "Transcode";
 
     @BeforeClass
@@ -29,31 +41,59 @@ public class MediaJobTest extends AbstractCOSClientCITest {
         AbstractCOSClientCITest.closeCosClient();
     }
 
+    @Before
+    public void createMediaJobTest() {
+        //1.创建任务请求对象
+        MediaJobsRequest request = new MediaJobsRequest();
+        //2.添加请求参数 参数详情请见api接口文档
+        request.setBucketName(bucket);
+        request.setTag("Transcode");
+        request.getInput().setObject("1.mp4");
+        request.getOperation().setTemplateId("t0e2b9f4cd25184c6ab73d0c85a6ee9cb5");
+        request.getOperation().getOutput().setBucket(bucket);
+        request.getOperation().getOutput().setRegion("ap-chongqing");
+        request.getOperation().getOutput().setObject("2.mp4");
+        request.setQueueId("p9900025e4ec44b5e8225e70a52170834");
+        //3.调用接口,获取任务响应对象
+        MediaJobResponse response = cosclient.createMediaJobs(request);
+        jobId = response.getJobsDetail().getJobId();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void createMediaJobTest2() {
+        //1.创建任务请求对象
+        MediaJobsRequest request = null;
+        MediaJobResponse response = cosclient.createMediaJobs(request);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void createMediaJobTest3() {
+        //1.创建任务请求对象
+        MediaJobsRequest request = new MediaJobsRequest();
+        MediaJobResponse response = cosclient.createMediaJobs(request);
+    }
+
+    @Test
+    public void cancelMediaJobTest() {
+        //1.创建任务请求对象
+        MediaJobsRequest request = new MediaJobsRequest();
+        //2.添加请求参数 参数详情请见api接口文档
+        request.setBucketName(bucket);
+        request.setJobId(jobId);
+        //3.调用接口,获取任务响应对象
+        Boolean response = cosclient.cancelMediaJob(request);
+        assertTrue(response);
+    }
+
     @Test
     public void describeMediaJobTest() {
         if (!judgeUserInfoValid()) {
             return;
         }
-        MediaQueueRequest queueRequest = new MediaQueueRequest();
-        queueRequest.setBucketName(bucket);
-        MediaListQueueResponse queueResponse = cosclient.describeMediaQueues(queueRequest);
-        if (queueResponse != null && queueResponse.getQueueList().size() != 0) {
-            MediaJobsRequest request = new MediaJobsRequest();
-            request.setBucketName(bucket);
-            String queueId = queueResponse.getQueueList().get(0).getQueueId();
-            request.setQueueId(queueId);
-            request.setTag(TAG);
-            MediaListJobResponse response = cosclient.describeMediaJobs(request);
-            List<MediaJobObject> jobsDetail = response.getJobsDetailList();
-            for (MediaJobObject mediaJobObject : jobsDetail) {
-                request = new MediaJobsRequest();
-                request.setBucketName(bucket);
-                request.setJobId(mediaJobObject.getJobId());
-                MediaJobResponse jobResponse = cosclient.describeMediaJob(request);
-                System.out.println(jobResponse);
-                assertEquals(queueId, jobResponse.getJobsDetail().getQueueId());
-            }
-        }
+        MediaJobsRequest request = new MediaJobsRequest();
+        request.setBucketName(bucket);
+        request.setJobId(jobId);
+        MediaJobResponse mediaJobResponse = cosclient.describeMediaJob(request);
     }
 
     @Test
@@ -78,5 +118,128 @@ public class MediaJobTest extends AbstractCOSClientCITest {
             }
         }
     }
+
+    @Test
+    public void generateSnapshotTest() {
+        //1.创建截图请求对象
+        SnapshotRequest request = new SnapshotRequest();
+        //2.添加请求参数 参数详情请见api接口文档
+        request.setBucketName(bucket);
+        request.getInput().setObject("1.mp4");
+        request.getOutput().setBucket(bucket);
+        request.getOutput().setRegion(region);
+        request.getOutput().setObject("test/1.jpg");
+        request.setTime("15");
+        //3.调用接口,获取截图响应对象
+        SnapshotResponse response = cosclient.generateSnapshot(request);
+        System.out.println(response);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void generateSnapshotTest2() {
+        //1.创建截图请求对象
+        SnapshotRequest request = new SnapshotRequest();
+        //2.添加请求参数 参数详情请见api接口文档
+        request.setBucketName(bucket);
+        request.getInput().setObject("1.mp4");
+        request.getOutput().setBucket(bucket);
+        request.getOutput().setRegion(region);
+        request.getOutput().setObject("test/1.jpg");
+        //3.调用接口,获取截图响应对象
+        SnapshotResponse response = cosclient.generateSnapshot(request);
+        System.out.println(response);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void generateSnapshotTest3() {
+        //1.创建截图请求对象
+        SnapshotRequest request = new SnapshotRequest();
+        //2.添加请求参数 参数详情请见api接口文档
+        request.setBucketName(bucket);
+        request.getOutput().setBucket(bucket);
+        request.getOutput().setRegion(region);
+        request.getOutput().setObject("test/1.jpg");
+        request.setTime("15");
+        //3.调用接口,获取截图响应对象
+        SnapshotResponse response = cosclient.generateSnapshot(request);
+        System.out.println(response);
+    }
+
+    @Test
+    public void generateMediainfoTest() {
+        //1.创建媒体信息请求对象
+        MediaInfoRequest request = new MediaInfoRequest();
+        //2.添加请求参数 参数详情请见api接口文档
+        request.setBucketName(bucket);
+        request.getInput().setObject("1.mp3");
+        //3.调用接口,获取媒体信息响应对象
+        MediaInfoResponse response = cosclient.generateMediainfo(request);
+    }
+
+
+    @Test(expected = IllegalArgumentException.class)
+    public void generateMediainfoTest2() {
+        //1.创建媒体信息请求对象
+        MediaInfoRequest request = new MediaInfoRequest();
+        //2.添加请求参数 参数详情请见api接口文档
+        request.setBucketName(bucket);
+        //3.调用接口,获取媒体信息响应对象
+        MediaInfoResponse response = cosclient.generateMediainfo(request);
+        System.out.println(response.getRequestId());
+    }
+
+    @Test
+    public void getPrivateM3U8Test() {
+        //1.创建截图请求对象
+        PrivateM3U8Request request = new PrivateM3U8Request();
+        //2.添加请求参数 参数详情请见api接口文档
+        request.setBucketName(bucket);
+        //私有 ts 资源 url 下载凭证的相对有效期，单位为秒，范围为[3600, 43200]
+        request.setExpires("3600");
+        request.setObject("1.m3u8");
+        //3.调用接口,获取截图响应对象
+        PrivateM3U8Response privateM3U8 = cosclient.getPrivateM3U8(request);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void getPrivateM3U8Test2() {
+        //1.创建截图请求对象
+        PrivateM3U8Request request = new PrivateM3U8Request();
+        //2.添加请求参数 参数详情请见api接口文档
+        request.setBucketName(bucket);
+        //私有 ts 资源 url 下载凭证的相对有效期，单位为秒，范围为[3600, 43200]
+        request.setObject("1.m3u8");
+        //3.调用接口,获取截图响应对象
+        PrivateM3U8Response privateM3U8 = cosclient.getPrivateM3U8(request);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void getPrivateM3U8Test3() {
+        //1.创建截图请求对象
+        PrivateM3U8Request request = new PrivateM3U8Request();
+        //2.添加请求参数 参数详情请见api接口文档
+        //私有 ts 资源 url 下载凭证的相对有效期，单位为秒，范围为[3600, 43200]
+        request.setObject("1.m3u8");
+        request.setExpires("3600");
+        //3.调用接口,获取截图响应对象
+        PrivateM3U8Response privateM3U8 = cosclient.getPrivateM3U8(request);
+    }
+
+    @Test
+    public void getSnapshot() {
+        CosSnapshotRequest request = new CosSnapshotRequest();
+        //2.添加请求参数 参数详情请见api接口文档
+        request.setBucketName(bucket);
+        request.setObjectKey("1.mp4");
+        request.setTime("15");
+        request.setFormat("jpg");
+        //3.调用接口,获取截图响应对象
+        InputStream snapshot = cosclient.getSnapshot(request);
+    }
+
+
+
+
+
 
 }

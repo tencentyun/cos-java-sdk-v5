@@ -5600,11 +5600,8 @@ public class XmlResponsesSaxParser {
                 ParserMediaInfoUtils.ParsingAuditingCommonInfo(response.getJobsDetail().getTerroristInfo(), name, getText());
             } else if (in("Response", "JobsDetail", "AdsInfo")) {
                 ParserMediaInfoUtils.ParsingAuditingCommonInfo(response.getJobsDetail().getAdsInfo(), name, getText());
-            }else if (in("Response", "JobsDetail", "TeenagerInfo")) {
+            } else if (in("Response", "JobsDetail", "TeenagerInfo")) {
                 ParserMediaInfoUtils.ParsingAuditingCommonInfo(response.getJobsDetail().getTeenagerInfo(), name, getText());
-            } else if (in("Response", "JobsDetail", "Snapshot")) {
-                if ("Url".equals(name))
-                    snapshotInfo.setUrl(URLDecoder.decode(getText()));
             } else if (in("Response", "JobsDetail", "Snapshot", "PornInfo")) {
                 ParserMediaInfoUtils.ParsingAuditingCommonInfo(snapshotInfo.getPornInfo(), name, getText());
             } else if (in("Response", "JobsDetail", "Snapshot", "PoliticsInfo")) {
