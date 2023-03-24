@@ -13,6 +13,8 @@ import com.qcloud.cos.internal.Constants;
 import com.qcloud.cos.internal.DeleteObjectsResponse;
 import com.qcloud.cos.internal.XmlResponsesSaxParser;
 import com.qcloud.cos.model.*;
+import com.qcloud.cos.model.bucketcertificate.BucketGetDomainCertificate;
+import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowListRequest;
 import com.qcloud.cos.region.Region;
 import com.qcloud.cos.utils.BinaryUtils;
 import org.apache.commons.codec.DecoderException;
@@ -37,8 +39,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({COSClient.class, ClientConfig.class, BinaryUtils.class, XmlResponsesSaxParser.CopyObjectResultHandler.class})
-public class CosClientWithErrorTest {
-
+public class CosClientWithMockTest {
     private String appid_ = System.getenv("appid");
     private String secretId_ = System.getenv("secretId");
     private String secretKey_ = System.getenv("secretKey");
@@ -372,5 +373,121 @@ public class CosClientWithErrorTest {
         } finally {
             cosClient.shutdown();
         }
+    }
+
+    @Test
+    public void testListVersions() throws Exception {
+        COSSigner signer = PowerMockito.mock(COSSigner.class);
+        PowerMockito.whenNew(COSSigner.class).withNoArguments().thenReturn(signer);
+        PowerMockito.when(signer, "sign", any(), any(), any()).thenAnswer((m)->{return null;});
+        ClientConfig clientConfig = new ClientConfig(new Region(region_));
+
+        DefaultCosHttpClient cosHttpClient = PowerMockito.mock(DefaultCosHttpClient.class);
+        PowerMockito.whenNew(DefaultCosHttpClient.class).withArguments(clientConfig).thenReturn(cosHttpClient);
+
+        VersionListing listing = new VersionListing();
+        listing.setBucketName(bucket_);
+
+        PowerMockito.when(cosHttpClient,"exeute", any(), any()).thenReturn(listing);
+
+        COSCredentials cred = new BasicCOSCredentials(secretId_, secretKey_);
+        COSClient cosClient = new COSClient(cred, clientConfig);
+
+        VersionListing result = cosClient.listVersions(bucket_, "test_prefix", null, null, null, null);
+        assertEquals(bucket_, result.getBucketName());
+        cosClient.shutdown();
+    }
+
+    @Test
+    public void testGetBucketInformationWith404() throws Exception {
+        COSSigner signer = PowerMockito.mock(COSSigner.class);
+        PowerMockito.whenNew(COSSigner.class).withNoArguments().thenReturn(signer);
+        PowerMockito.when(signer, "sign", any(), any(), any()).thenAnswer((m)->{return null;});
+        ClientConfig clientConfig = new ClientConfig(new Region(region_));
+
+        DefaultCosHttpClient cosHttpClient = PowerMockito.mock(DefaultCosHttpClient.class);
+        PowerMockito.whenNew(DefaultCosHttpClient.class).withArguments(clientConfig).thenReturn(cosHttpClient);
+
+        PowerMockito.when(cosHttpClient,"exeute", any(), any()).thenAnswer((m)->{
+            CosServiceException cse = new CosServiceException("Not found");
+            cse.setStatusCode(404);
+            throw cse;
+        });
+
+        COSCredentials cred = new BasicCOSCredentials(secretId_, secretKey_);
+        COSClient cosClient = new COSClient(cred, clientConfig);
+
+        BucketGetDomainCertificate domainCertificate = cosClient.getBucketDomainCertificate(bucket_, "userDefDomain");
+        assertEquals(null, domainCertificate);
+
+        BucketRefererConfiguration configuration = cosClient.getBucketRefererConfiguration(bucket_);
+        assertEquals(null, configuration);
+
+        BucketTaggingConfiguration bucketTaggingConfiguration = cosClient.getBucketTaggingConfiguration(bucket_);
+        assertEquals(null, bucketTaggingConfiguration);
+        cosClient.shutdown();
+    }
+
+    @Test
+    public void testGetBucketInformationWithCSE() throws Exception {
+        COSSigner signer = PowerMockito.mock(COSSigner.class);
+        PowerMockito.whenNew(COSSigner.class).withNoArguments().thenReturn(signer);
+        PowerMockito.when(signer, "sign", any(), any(), any()).thenAnswer((m)->{return null;});
+        ClientConfig clientConfig = new ClientConfig(new Region(region_));
+
+        DefaultCosHttpClient cosHttpClient = PowerMockito.mock(DefaultCosHttpClient.class);
+        PowerMockito.whenNew(DefaultCosHttpClient.class).withArguments(clientConfig).thenReturn(cosHttpClient);
+
+        PowerMockito.when(cosHttpClient,"exeute", any(), any()).thenAnswer((m)->{
+            CosServiceException cse = new CosServiceException("Access deny");
+            cse.setStatusCode(403);
+            throw cse;
+        });
+
+        COSCredentials cred = new BasicCOSCredentials(secretId_, secretKey_);
+        COSClient cosClient = new COSClient(cred, clientConfig);
+
+        try {
+            BucketGetDomainCertificate domainCertificate = cosClient.getBucketDomainCertificate(bucket_, "userDefDomain");
+        } catch (CosServiceException cse) {
+            assertEquals(403, cse.getStatusCode());
+        }
+
+        try {
+            BucketRefererConfiguration configuration = cosClient.getBucketRefererConfiguration(bucket_);
+        } catch (CosServiceException cse) {
+            assertEquals(403, cse.getStatusCode());
+        }
+
+        try {
+            BucketTaggingConfiguration configuration = cosClient.getBucketTaggingConfiguration(bucket_);
+        } catch (CosServiceException cse) {
+            assertEquals(403, cse.getStatusCode());
+        } finally {
+            cosClient.shutdown();
+        }
+    }
+
+    @Test
+    public void testDeleteWorkFlow() throws Exception {
+        COSSigner signer = PowerMockito.mock(COSSigner.class);
+        PowerMockito.whenNew(COSSigner.class).withNoArguments().thenReturn(signer);
+        PowerMockito.when(signer, "sign", any(), any(), any()).thenAnswer((m)->{return null;});
+        ClientConfig clientConfig = new ClientConfig(new Region(region_));
+
+        DefaultCosHttpClient cosHttpClient = PowerMockito.mock(DefaultCosHttpClient.class);
+        PowerMockito.whenNew(DefaultCosHttpClient.class).withArguments(clientConfig).thenReturn(cosHttpClient);
+
+        PowerMockito.when(cosHttpClient,"exeute", any(), any()).thenReturn(true);
+
+        COSCredentials cred = new BasicCOSCredentials(secretId_, secretKey_);
+        COSClient cosClient = new COSClient(cred, clientConfig);
+
+        MediaWorkflowListRequest request = new MediaWorkflowListRequest();
+        //2.添加请求参数 参数详情请见api接口文档
+        request.setBucketName(bucket_);
+        request.setWorkflowId("aaaa");
+        Boolean response = cosClient.deleteWorkflow(request);
+        assertEquals(true, response);
     }
 }

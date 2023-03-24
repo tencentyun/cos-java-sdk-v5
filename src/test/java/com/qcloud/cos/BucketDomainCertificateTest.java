@@ -74,7 +74,7 @@ public class BucketDomainCertificateTest extends AbstractCOSClientTest{
         }
 
         try {
-            BucketGetDomainCertificate domainCertificate = cosclient.getBucketDomainCertificate(bucket,userDefDomain);
+            BucketGetDomainCertificate domainCertificate = cosclient.getBucketDomainCertificate(bucket, userDefDomain);
         } catch (CosServiceException cse) {
             System.out.println(cse.getErrorMessage());
         }
