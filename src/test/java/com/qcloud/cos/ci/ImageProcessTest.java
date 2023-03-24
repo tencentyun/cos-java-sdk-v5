@@ -187,11 +187,11 @@ public class ImageProcessTest extends AbstractCOSClientCITest {
         }
     }
 
-    @Test
+    @Test(expected = CosServiceException.class)
     public void getImageLabelV2Test() {
         ImageLabelV2Request request = new ImageLabelV2Request();
         request.setBucketName(bucket);
-        request.setObjectKey("1.png");
+        request.setObjectKey("test/1.jpg");
         ImageLabelV2Response response = cosclient.getImageLabelV2(request);
     }
 
