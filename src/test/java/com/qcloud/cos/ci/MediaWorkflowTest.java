@@ -1,6 +1,10 @@
 package com.qcloud.cos.ci;
 
 import com.qcloud.cos.AbstractCOSClientCITest;
+import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
+import com.qcloud.cos.model.ciModel.job.BatchJobOperation;
+import com.qcloud.cos.model.ciModel.job.BatchJobRequest;
+import com.qcloud.cos.model.ciModel.job.BatchJobResponse;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoRequest;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoResponse;
 import com.qcloud.cos.model.ciModel.snapshot.SnapshotRequest;
@@ -8,11 +12,15 @@ import com.qcloud.cos.model.ciModel.snapshot.SnapshotResponse;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowExecutionResponse;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowExecutionsResponse;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowListRequest;
+import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowListResponse;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class MediaWorkflowTest extends AbstractCOSClientCITest {
+    private String batchJobId;
+
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
         AbstractCOSClientCITest.initCosClient();
@@ -23,44 +31,85 @@ public class MediaWorkflowTest extends AbstractCOSClientCITest {
         AbstractCOSClientCITest.closeCosClient();
     }
 
-//    @Test
-//    public void testGenerateSnapshot() {
-//        //1.创建截图请求对象
-//        SnapshotRequest request = new SnapshotRequest();
-//        //2.添加请求参数 参数详情请见api接口文档
-//        request.setBucketName(bucket);
-//        request.getInput().setObject("1.mp4");
-//        request.getOutput().setBucket(bucket);
-//        request.getOutput().setRegion(region);
-//        request.getOutput().setObject("test/1.jpg");
-//        request.setTime("15");
-//        //3.调用接口,获取截图响应对象
-//        SnapshotResponse response = cosclient.generateSnapshot(request);
-//    }
-//
-//    @Test
-//    public void testGenerateMediainfo() {
-//        MediaInfoRequest request = new MediaInfoRequest();
-//        request.setBucketName(bucket);
-//        request.getInput().setObject("1.mp3");
-//        MediaInfoResponse result = cosclient.generateMediainfo(request);
-//    }
-//
-//    @Test
-//    public void testDescribeWorkflowExecution() {
-//        MediaWorkflowListRequest request = new MediaWorkflowListRequest();
-//        request.setBucketName(bucket);
-//        request.setRunId(workflowId);
-//        MediaWorkflowExecutionResponse result = cosclient.describeWorkflowExecution(request);
-//
-//        // Verify the results
-//    }
-//
-//    @Test
-//    public void testDescribeWorkflowExecutions() {
-//        MediaWorkflowListRequest request = new MediaWorkflowListRequest();
-//        request.setBucketName(bucket);
-//        request.setWorkflowId(workflowId);
-//        MediaWorkflowExecutionsResponse result = cosclient.describeWorkflowExecutions(request);
-//    }
+    @Test
+    public void testGenerateSnapshot() {
+        SnapshotRequest request = new SnapshotRequest();
+        request.setBucketName(bucket);
+        request.getInput().setObject("1.mp4");
+        request.getOutput().setBucket(bucket);
+        request.getOutput().setRegion(region);
+        request.getOutput().setObject("test/1.jpg");
+        request.setTime("15");
+        SnapshotResponse response = cosclient.generateSnapshot(request);
+    }
+
+    @Test
+    public void testGenerateMediainfo() {
+        MediaInfoRequest request = new MediaInfoRequest();
+        request.setBucketName(bucket);
+        request.getInput().setObject("1.mp3");
+        MediaInfoResponse result = cosclient.generateMediainfo(request);
+    }
+
+    @Test
+    public void testDescribeWorkflowExecution() {
+        MediaWorkflowListRequest request = new MediaWorkflowListRequest();
+        request.setBucketName(bucket);
+        request.setWorkflowId(workflowId);
+        request.setObject("1.jpg");
+        request.setName("mark");
+        request.setRunId(runId);
+        request.setPageSize("2");
+        MediaWorkflowExecutionResponse result = cosclient.describeWorkflowExecution(request);
+
+        // Verify the results
+    }
+
+    @Test
+    public void testDescribeWorkflowExecutions() {
+        MediaWorkflowListRequest request = new MediaWorkflowListRequest();
+        request.setBucketName(bucket);
+        request.setWorkflowId(workflowId);
+        request.setObject("1.jpg");
+        request.setName("mark");
+        request.setRunId(runId);
+        request.setPageSize("2");
+        MediaWorkflowExecutionsResponse result = cosclient.describeWorkflowExecutions(request);
+    }
+
+    @Test
+    public void triggerWorkflowListTest() {
+        MediaWorkflowListRequest request = new MediaWorkflowListRequest();
+        request.setBucketName(bucket);
+        request.setWorkflowId(workflowId);
+        request.setObject("1.mp4");
+        MediaWorkflowListResponse response = cosclient.triggerWorkflowList(request);
+    }
+
+    @Before
+    public void createInventoryTriggerJobTest() {
+        BatchJobRequest request = new BatchJobRequest();
+        request.setBucketName(bucket);
+        request.setName("demo");
+        request.setType("Job");
+        request.getInput().setPrefix("media/");
+        BatchJobOperation operation = request.getOperation();
+        operation.setQueueId("p9900025e4ec44b5e8225e70a52170834");
+        operation.setTag("Transcode");
+        operation.getJobParam().setTemplateId("t0e2b9f4cd25184c6ab73d0c85a6ee9cb5");
+        MediaOutputObject output = operation.getOutput();
+        output.setRegion(region);
+        output.setBucket(bucket);
+        output.setObject("out/${InventoryTriggerJobId}.mp4");
+        BatchJobResponse response = cosclient.createInventoryTriggerJob(request);
+        batchJobId = response.getJobDetail().getJobId();
+    }
+
+    @Test
+    public void describeInventoryTriggerJobTest() {
+        BatchJobRequest request = new BatchJobRequest();
+        request.setBucketName(bucket);
+        request.setJobId(batchJobId);
+        BatchJobResponse response = cosclient.describeInventoryTriggerJob(request);
+    }
 }

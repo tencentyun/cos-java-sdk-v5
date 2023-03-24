@@ -4559,8 +4559,7 @@ public class COSClient implements COS {
         CosHttpRequest<ImageStyleRequest> request = createRequest(imageStyleRequest.getBucketName(), "/", imageStyleRequest, HttpMethodName.GET);
         request.addParameter("style", "");
         this.setContent(request, CImageXmlFactory.getStyleConvertToXmlByteArray(imageStyleRequest), "application/xml", false);
-        invoke(request,  new Unmarshallers.getImageStyleUnmarshaller());
-        return null;
+        return invoke(request,  new Unmarshallers.getImageStyleUnmarshaller());
     }
 
     @Override
