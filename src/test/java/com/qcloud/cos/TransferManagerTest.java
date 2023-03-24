@@ -312,8 +312,10 @@ public class TransferManagerTest extends AbstractCOSClientTest {
             PersistableUpload persistableUpload = upload.pause();
             upload = transManager.resumeUpload(persistableUpload);
             upload.waitForUploadResult();
-        } catch (CosServiceException e) {
-            e.printStackTrace();
+        } catch (CosServiceException cse) {
+            if (cse.getStatusCode() != 404) {
+                cse.printStackTrace();
+            }
         } catch (CosClientException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
