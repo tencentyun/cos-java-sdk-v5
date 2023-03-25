@@ -86,6 +86,7 @@ public class DefaultClientErrorTest {
         PowerMockito.whenNew(COSSigner.class).withNoArguments().thenReturn(signer);
         PowerMockito.when(signer, "sign", any(), any(), any()).thenAnswer((m)->{return null;});
         ClientConfig clientConfig = new ClientConfig(new Region(region_));
+        clientConfig.setUseBasicAuth(true);
 
         PoolingHttpClientConnectionManager manager = PowerMockito.mock(PoolingHttpClientConnectionManager.class);
         PowerMockito.whenNew(PoolingHttpClientConnectionManager.class).withNoArguments().thenReturn(manager);
