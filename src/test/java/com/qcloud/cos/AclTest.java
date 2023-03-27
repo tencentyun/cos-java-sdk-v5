@@ -66,12 +66,14 @@ public class AclTest extends AbstractCOSClientTest {
             // set to PublicReadWrite acl and get canned acl compare
             Thread.sleep(5000);
             cosclient.setBucketAcl(aclTestBucketName, CannedAccessControlList.PublicReadWrite);
+            Thread.sleep(5000);
             aclGet = cosclient.getBucketAcl(aclTestBucketName);
             assertEquals(aclGet.getCannedAccessControl(), CannedAccessControlList.PublicReadWrite);
 
             // set to private and get canned acl compare
             Thread.sleep(5000);
             cosclient.setBucketAcl(aclTestBucketName, CannedAccessControlList.Private);
+            Thread.sleep(5000);
             aclGet = cosclient.getBucketAcl(aclTestBucketName);
             assertEquals(aclGet.getCannedAccessControl(), CannedAccessControlList.Private);
 
@@ -96,7 +98,8 @@ public class AclTest extends AbstractCOSClientTest {
         owner.setId(ownerId);
         acl.setOwner(owner);
 
-        String granteeUin = String.format("qcs::cam::uin/%s:uin/734505014", ownerUin);
+//        String granteeUin = String.format("qcs::cam::uin/%s:uin/734505014", ownerUin);
+        String granteeUin = "qcs::cam::uin/734505014:uin/734505014";
         UinGrantee uinGrantee = new UinGrantee(granteeUin);
         uinGrantee.setIdentifier(granteeUin);
         acl.grantPermission(uinGrantee, Permission.FullControl);
