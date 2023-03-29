@@ -4304,14 +4304,14 @@ public class COSClient implements COS {
                 "The bucketName parameter must be specified setting the object tags");
     }
 
-    private void checkRequestOutput(MediaOutputObject output) {
-        rejectNull(output.getBucket(),
-                "The output.bucket parameter must be specified setting the object tags");
-        rejectNull(output.getRegion(),
-                "The output.region parameter must be specified setting the object tags");
-        rejectNull(output.getObject(),
-                "The output.object parameter must be specified setting the object tags");
-    }
+//    private void checkRequestOutput(MediaOutputObject output) {
+//        rejectNull(output.getBucket(),
+//                "The output.bucket parameter must be specified setting the object tags");
+//        rejectNull(output.getRegion(),
+//                "The output.region parameter must be specified setting the object tags");
+//        rejectNull(output.getObject(),
+//                "The output.object parameter must be specified setting the object tags");
+//    }
 
 
     private void checkMediaListJobResponse(MediaListJobResponse response) {

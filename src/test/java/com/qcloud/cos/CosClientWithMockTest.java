@@ -14,8 +14,18 @@ import com.qcloud.cos.internal.DeleteObjectsResponse;
 import com.qcloud.cos.internal.XmlResponsesSaxParser;
 import com.qcloud.cos.model.*;
 import com.qcloud.cos.model.bucketcertificate.BucketGetDomainCertificate;
+import com.qcloud.cos.model.ciModel.auditing.ImageAuditingRequest;
+import com.qcloud.cos.model.ciModel.auditing.ImageAuditingResponse;
+import com.qcloud.cos.model.ciModel.image.AutoTranslationBlockRequest;
+import com.qcloud.cos.model.ciModel.image.AutoTranslationBlockResponse;
+import com.qcloud.cos.model.ciModel.job.MediaJobObject;
+import com.qcloud.cos.model.ciModel.job.MediaJobsRequest;
+import com.qcloud.cos.model.ciModel.job.MediaListJobResponse;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowListRequest;
 import com.qcloud.cos.region.Region;
+import com.qcloud.cos.transfer.ImageAuditingImpl;
+import com.qcloud.cos.transfer.MultipleImageAuditingImpl;
+import com.qcloud.cos.transfer.TransferManager;
 import com.qcloud.cos.utils.BinaryUtils;
 import org.apache.commons.codec.DecoderException;
 import org.apache.http.client.methods.HttpGet;
@@ -31,7 +41,10 @@ import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static com.qcloud.cos.internal.SkipMd5CheckStrategy.DISABLE_GET_OBJECT_MD5_VALIDATION_PROPERTY;
 import static org.junit.Assert.*;
@@ -578,5 +591,144 @@ public class CosClientWithMockTest {
         } finally {
             cosClient.shutdown();
         }
+    }
+
+    @Test
+    public void testGetObjectDecompressionStatus_String() throws Exception {
+        COSSigner signer = PowerMockito.mock(COSSigner.class);
+        PowerMockito.whenNew(COSSigner.class).withNoArguments().thenReturn(signer);
+        PowerMockito.when(signer, "sign", any(), any(), any()).thenAnswer((m)->{return null;});
+        ClientConfig clientConfig = new ClientConfig(new Region(region_));
+
+        DefaultCosHttpClient cosHttpClient = PowerMockito.mock(DefaultCosHttpClient.class);
+        PowerMockito.whenNew(DefaultCosHttpClient.class).withArguments(clientConfig).thenReturn(cosHttpClient);
+
+//        DecompressionResult decompressionResult = new DecompressionResult();
+//        decompressionResult.setJobId("00000");
+//        decompressionResult.setMsg("test PostObjectDecompression");
+        String status_str = "test_status";
+
+        PowerMockito.when(cosHttpClient,"exeute", any(), any()).thenReturn(status_str);
+
+        COSCredentials cred = new BasicCOSCredentials(secretId_, secretKey_);
+        COSClient cosClient = new COSClient(cred, clientConfig);
+
+        try {
+            String result = cosClient.getObjectDecompressionStatus(bucket_, "test_obj");
+            System.out.println(result);
+        } finally {
+            cosClient.shutdown();
+        }
+    }
+
+    @Test
+    public void testDescribeMediaJobs() throws Exception {
+        COSSigner signer = PowerMockito.mock(COSSigner.class);
+        PowerMockito.whenNew(COSSigner.class).withNoArguments().thenReturn(signer);
+        PowerMockito.when(signer, "sign", any(), any(), any()).thenAnswer((m)->{return null;});
+        ClientConfig clientConfig = new ClientConfig(new Region(region_));
+
+        DefaultCosHttpClient cosHttpClient = PowerMockito.mock(DefaultCosHttpClient.class);
+        PowerMockito.whenNew(DefaultCosHttpClient.class).withArguments(clientConfig).thenReturn(cosHttpClient);
+
+        MediaListJobResponse response = new MediaListJobResponse();
+        List<MediaJobObject> jobsDetailList = new LinkedList<>();
+        MediaJobObject mediaJobObject = new MediaJobObject();
+        jobsDetailList.add(mediaJobObject);
+        response.setJobsDetailList(jobsDetailList);
+
+        PowerMockito.when(cosHttpClient,"exeute", any(), any()).thenReturn(response);
+
+        COSCredentials cred = new BasicCOSCredentials(secretId_, secretKey_);
+        COSClient cosClient = new COSClient(cred, clientConfig);
+
+        //1.创建任务请求对象
+        MediaJobsRequest request = new MediaJobsRequest();
+        //2.添加请求参数 参数详情请见api接口文档
+        request.setBucketName(bucket_);
+        request.setQueueId("p9900025e4ec44b5e8225e70a5217****");
+        request.setTag("Transcode");
+        //3.调用接口,获取任务响应对象
+        MediaListJobResponse mediaListJobResponse = cosClient.describeMediaJobs(request);
+        List<MediaJobObject> jobsDetail = mediaListJobResponse.getJobsDetailList();
+        assertEquals(0, jobsDetail.size());
+        cosClient.shutdown();
+    }
+
+    @Test
+    public void testAutoTranslationBlock() throws Exception {
+        COSSigner signer = PowerMockito.mock(COSSigner.class);
+        PowerMockito.whenNew(COSSigner.class).withNoArguments().thenReturn(signer);
+        PowerMockito.when(signer, "sign", any(), any(), any()).thenAnswer((m)->{return null;});
+        ClientConfig clientConfig = new ClientConfig(new Region(region_));
+
+        DefaultCosHttpClient cosHttpClient = PowerMockito.mock(DefaultCosHttpClient.class);
+        PowerMockito.whenNew(DefaultCosHttpClient.class).withArguments(clientConfig).thenReturn(cosHttpClient);
+
+        AutoTranslationBlockResponse response = new AutoTranslationBlockResponse();
+        response.setTranslationResult("test_AutoTranslationBlockResponse");
+
+        PowerMockito.when(cosHttpClient,"exeute", any(), any()).thenReturn(response);
+
+        COSCredentials cred = new BasicCOSCredentials(secretId_, secretKey_);
+        COSClient cosClient = new COSClient(cred, clientConfig);
+
+        //1.创建二维码生成请求对象
+        AutoTranslationBlockRequest request = new AutoTranslationBlockRequest();
+        //2.添加请求参数 参数详情请见api接口文档
+        request.setBucketName(bucket_);
+        //2.1 待翻译的文本 必填
+        request.setInputText("数据万象");
+        //2.2 输入语言 必填
+        request.setSourceLang("zh");
+        //2.3 输出语言 必填
+        request.setTargetLang("en");
+        AutoTranslationBlockResponse autoTranslationBlock = cosClient.autoTranslationBlock(request);
+        String translationResult = autoTranslationBlock.getTranslationResult();
+        System.out.println(translationResult);
+        cosClient.shutdown();
+    }
+
+    @Test
+    public void testImageAuditing() throws Exception {
+        COSSigner signer = PowerMockito.mock(COSSigner.class);
+        PowerMockito.whenNew(COSSigner.class).withNoArguments().thenReturn(signer);
+        PowerMockito.when(signer, "sign", any(), any(), any()).thenAnswer((m)->{return null;});
+        ClientConfig clientConfig = new ClientConfig(new Region(region_));
+
+        DefaultCosHttpClient cosHttpClient = PowerMockito.mock(DefaultCosHttpClient.class);
+        PowerMockito.whenNew(DefaultCosHttpClient.class).withArguments(clientConfig).thenReturn(cosHttpClient);
+
+        ImageAuditingResponse response = new ImageAuditingResponse();
+        response.setJobId("id00000");
+
+        PowerMockito.when(cosHttpClient,"exeute", any(), any()).thenReturn(response);
+
+        COSCredentials cred = new BasicCOSCredentials(secretId_, secretKey_);
+        COSClient cosClient = new COSClient(cred, clientConfig);
+
+        List<ImageAuditingRequest> requestList = new ArrayList<>();
+        ImageAuditingRequest request = new ImageAuditingRequest();
+        request.setBucketName(bucket_);
+        request.setObjectKey("1.png");
+        requestList.add(request);
+
+        request = new ImageAuditingRequest();
+        request.setBucketName(bucket_);
+        request.setObjectKey("1.jpg");
+        requestList.add(request);
+
+        // 传入一个threadpool, 若不传入线程池, 默认TransferManager中会生成一个单线程的线程池。
+        ExecutorService threadPool = Executors.newFixedThreadPool(4);
+        TransferManager transferManager = new TransferManager(cosClient, threadPool);
+        MultipleImageAuditingImpl multipleImageAuditing = transferManager.batchPostImageAuditing(requestList);
+        multipleImageAuditing.waitForCompletion();
+        List<ImageAuditingImpl> imageAuditingList = multipleImageAuditing.getImageAuditingList();
+        for (ImageAuditingImpl imageAuditing : imageAuditingList) {
+            System.out.println(imageAuditing.getState());
+            System.out.println(imageAuditing.getResponse());
+        }
+        transferManager.shutdownNow();
+        cosClient.shutdown();
     }
 }
