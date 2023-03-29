@@ -22,6 +22,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
@@ -39,6 +40,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({COSClient.class, ClientConfig.class, BinaryUtils.class, XmlResponsesSaxParser.CopyObjectResultHandler.class})
+@PowerMockIgnore({"javax.net.ssl.*"})
 public class CosClientWithMockTest {
     private String appid_ = System.getenv("appid");
     private String secretId_ = System.getenv("secretId");
@@ -489,5 +491,92 @@ public class CosClientWithMockTest {
         request.setWorkflowId("aaaa");
         Boolean response = cosClient.deleteWorkflow(request);
         assertEquals(true, response);
+    }
+
+    @Test
+    public void testListObjectDecompressionJobs() throws Exception {
+        COSSigner signer = PowerMockito.mock(COSSigner.class);
+        PowerMockito.whenNew(COSSigner.class).withNoArguments().thenReturn(signer);
+        PowerMockito.when(signer, "sign", any(), any(), any()).thenAnswer((m)->{return null;});
+        ClientConfig clientConfig = new ClientConfig(new Region(region_));
+
+        DefaultCosHttpClient cosHttpClient = PowerMockito.mock(DefaultCosHttpClient.class);
+        PowerMockito.whenNew(DefaultCosHttpClient.class).withArguments(clientConfig).thenReturn(cosHttpClient);
+
+        ListJobsResult listJobsResult = new ListJobsResult();
+        listJobsResult.setNextToken("test_next_token");
+        PowerMockito.when(cosHttpClient,"exeute", any(), any()).thenReturn(listJobsResult);
+
+        COSCredentials cred = new BasicCOSCredentials(secretId_, secretKey_);
+        COSClient cosClient = new COSClient(cred, clientConfig);
+
+        try {
+            ListJobsResult result =
+                    cosClient.listObjectDecompressionJobs(bucket_, "Success", "asc", "1000", "test_next_token");
+            System.out.println(result);
+        } finally {
+            cosClient.shutdown();
+        }
+    }
+
+    @Test
+    public void testPostObjectDecompression() throws Exception {
+        COSSigner signer = PowerMockito.mock(COSSigner.class);
+        PowerMockito.whenNew(COSSigner.class).withNoArguments().thenReturn(signer);
+        PowerMockito.when(signer, "sign", any(), any(), any()).thenAnswer((m)->{return null;});
+        ClientConfig clientConfig = new ClientConfig(new Region(region_));
+
+        DefaultCosHttpClient cosHttpClient = PowerMockito.mock(DefaultCosHttpClient.class);
+        PowerMockito.whenNew(DefaultCosHttpClient.class).withArguments(clientConfig).thenReturn(cosHttpClient);
+
+        DecompressionResult decompressionResult = new DecompressionResult();
+        decompressionResult.setJobId("00000");
+        decompressionResult.setMsg("test PostObjectDecompression");
+
+        PowerMockito.when(cosHttpClient,"exeute", any(), any()).thenReturn(decompressionResult);
+
+        COSCredentials cred = new BasicCOSCredentials(secretId_, secretKey_);
+        COSClient cosClient = new COSClient(cred, clientConfig);
+        try {
+            DecompressionRequest decompressionRequest =
+                    new DecompressionRequest()
+                            .setObjectKey("a.tar.gz")
+                            .setSourceBucketName(bucket_)
+                            .setTargetBucketName(bucket_)
+                            .setPrefixReplaced(true)
+                            .setResourcesPrefix("")
+                            .setTargetKeyPrefix("test_out/");
+            DecompressionResult result = cosClient.postObjectDecompression(decompressionRequest);
+            System.out.println(result);
+        } finally {
+            cosClient.shutdown();
+        }
+    }
+
+    @Test
+    public void testGetObjectDecompressionStatus() throws Exception {
+        COSSigner signer = PowerMockito.mock(COSSigner.class);
+        PowerMockito.whenNew(COSSigner.class).withNoArguments().thenReturn(signer);
+        PowerMockito.when(signer, "sign", any(), any(), any()).thenAnswer((m)->{return null;});
+        ClientConfig clientConfig = new ClientConfig(new Region(region_));
+
+        DefaultCosHttpClient cosHttpClient = PowerMockito.mock(DefaultCosHttpClient.class);
+        PowerMockito.whenNew(DefaultCosHttpClient.class).withArguments(clientConfig).thenReturn(cosHttpClient);
+
+        DecompressionResult decompressionResult = new DecompressionResult();
+        decompressionResult.setJobId("00000");
+        decompressionResult.setMsg("test PostObjectDecompression");
+
+        PowerMockito.when(cosHttpClient,"exeute", any(), any()).thenReturn(decompressionResult);
+
+        COSCredentials cred = new BasicCOSCredentials(secretId_, secretKey_);
+        COSClient cosClient = new COSClient(cred, clientConfig);
+
+        try {
+            DecompressionResult result = cosClient.getObjectDecompressionStatus(bucket_, "test_obj", "00000");
+            System.out.println(result);
+        } finally {
+            cosClient.shutdown();
+        }
     }
 }

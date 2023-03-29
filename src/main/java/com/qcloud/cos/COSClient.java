@@ -4281,21 +4281,21 @@ public class COSClient implements COS {
         return uriBuilder.build().toString() + "&" + authoriationStr;
     }
 
-    private void checkAuditingRequest(ImageAuditingRequest request) {
-        rejectNull(request.getDetectType(), "The detectType parameter must be specified setting the object tags");
-        rejectNull(request.getObjectKey(), "The objectKey parameter must be specified setting the object tags");
-    }
-
-    private void checkWorkflowParameter(MediaWorkflowRequest request) {
-        rejectNull(request.getName(),
-                "The name parameter must be specified setting the object tags");
-        rejectNull(request.getTopology(),
-                "The topology parameter must be specified setting the object tags");
-        rejectEmpty(request.getTopology().getMediaWorkflowNodes(),
-                "The Nodes parameter must be specified setting the object tags");
-        rejectEmpty(request.getTopology().getMediaWorkflowDependency(),
-                "The Dependency parameter must be specified setting the object tags");
-    }
+//    private void checkAuditingRequest(ImageAuditingRequest request) {
+//        rejectNull(request.getDetectType(), "The detectType parameter must be specified setting the object tags");
+//        rejectNull(request.getObjectKey(), "The objectKey parameter must be specified setting the object tags");
+//    }
+//
+//    private void checkWorkflowParameter(MediaWorkflowRequest request) {
+//        rejectNull(request.getName(),
+//                "The name parameter must be specified setting the object tags");
+//        rejectNull(request.getTopology(),
+//                "The topology parameter must be specified setting the object tags");
+//        rejectEmpty(request.getTopology().getMediaWorkflowNodes(),
+//                "The Nodes parameter must be specified setting the object tags");
+//        rejectEmpty(request.getTopology().getMediaWorkflowDependency(),
+//                "The Dependency parameter must be specified setting the object tags");
+//    }
 
     private void checkCIRequestCommon(CIServiceRequest request) {
         rejectNull(request,
