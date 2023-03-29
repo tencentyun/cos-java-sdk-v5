@@ -57,7 +57,16 @@ public class GetSetDelPolicyTest extends AbstractCOSClientTest {
             );
             cosclient.setBucketPolicy(bucket, bucketPolicyStr);
 
-            BucketPolicy bucketPolicy = cosclient.getBucketPolicy(bucket);
+            Thread.sleep(5000);
+
+            BucketPolicy bucketPolicy = new BucketPolicy();
+            try {
+                bucketPolicy = cosclient.getBucketPolicy(bucket);
+            } catch (CosServiceException cse) {
+                if (cse.getStatusCode() == 404) {
+                    bucketPolicy = cosclient.getBucketPolicy(bucket);
+                }
+            }
             assertNotNull(bucketPolicy.getPolicyText());
             assertFalse(bucketPolicy.getPolicyText().isEmpty());
 
