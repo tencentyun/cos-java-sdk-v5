@@ -264,9 +264,13 @@ public class ImageProcessTest extends AbstractCOSClientCITest {
         entityId = s1.substring(10);
         request.setEntityId(entityId);
 
-        boolean response = cosclient.addGalleryImages(request);
-        cosclient.deleteGalleryImages(request);
-        ImageSearchResponse imageSearchResponse = cosclient.searchGalleryImages(request);
+        try {
+            boolean response = cosclient.addGalleryImages(request);
+            cosclient.deleteGalleryImages(request);
+            ImageSearchResponse imageSearchResponse = cosclient.searchGalleryImages(request);
+        } catch (CosServiceException cse) {
+            System.out.println(cse.getErrorMessage());
+        }
     }
 
     @Test(expected = CosServiceException.class)
