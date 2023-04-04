@@ -24,7 +24,10 @@ import com.qcloud.cos.endpoint.EndpointBuilder;
 import com.qcloud.cos.endpoint.EndpointResolver;
 import com.qcloud.cos.endpoint.RegionEndpointBuilder;
 import com.qcloud.cos.endpoint.SuffixEndpointBuilder;
+import com.qcloud.cos.http.DefaultHandlerAfterProcess;
+import com.qcloud.cos.http.HandlerAfterProcess;
 import com.qcloud.cos.http.HttpProtocol;
+import com.qcloud.cos.model.RequestRebuildMode;
 import com.qcloud.cos.region.Region;
 import com.qcloud.cos.retry.BackoffStrategy;
 import com.qcloud.cos.retry.PredefinedBackoffStrategies;
@@ -104,6 +107,10 @@ public class ClientConfig {
     private  boolean isDistinguishHost = false;
 
     private boolean isShortConnection = false;
+
+    private HandlerAfterProcess handlerAfterProcess = new DefaultHandlerAfterProcess();
+
+    private RequestRebuildMode requestRebuildMode = com.qcloud.cos.model.RequestRebuildMode.Default;
 
     // 不传入region 用于后续调用List Buckets(获取所有的bucket信息)
     public ClientConfig() {
@@ -348,5 +355,21 @@ public class ClientConfig {
 
     public int getShutdownTimeout() {
         return shutdown_timeout;
+    }
+
+    public void setHandlerAfterProcess(HandlerAfterProcess handler) {
+        this.handlerAfterProcess = handler;
+    }
+
+    public HandlerAfterProcess getHandlerAfterProcess() {
+        return handlerAfterProcess;
+    }
+
+    public void setRequestRebuildMode(RequestRebuildMode mode) {
+        this.requestRebuildMode = mode;
+    }
+
+    public RequestRebuildMode getRequestRebuildMode() {
+        return requestRebuildMode;
     }
 }

@@ -290,7 +290,7 @@ public class COSClient implements COS {
 
     protected <X extends CosServiceRequest> CosHttpRequest<X> createRequest(String bucketName,
             String key, X originalRequest, HttpMethodName httpMethod) {
-        CosHttpRequest<X> httpRequest = new CosHttpRequest<X>(originalRequest);
+        CosHttpRequest<X> httpRequest = new CosHttpRequest<X>(originalRequest, bucketName);
         httpRequest.setHttpMethod(httpMethod);
         httpRequest.addHeader(Headers.USER_AGENT, clientConfig.getUserAgent());
         if (originalRequest instanceof ListBucketsRequest) {
@@ -586,6 +586,7 @@ public class COSClient implements COS {
         }
 
         request.setResourcePath(key);
+        request.setBucketName(bucket);
     }
 
     private <X, Y extends CosServiceRequest> X invoke(CosHttpRequest<Y> request,

@@ -29,7 +29,7 @@ public class CosHttpRequest<T extends CosServiceRequest> {
 
     /** The resource path being requested */
     private String resourcePath;
-
+    private String bucketName;
 
     private Map<String, String> parameters = new HashMap<String, String>();
 
@@ -55,6 +55,12 @@ public class CosHttpRequest<T extends CosServiceRequest> {
     public CosHttpRequest(T originRequest) {
         this.originRequest = originRequest;
         this.ciSpecialEndParameter = originRequest.getCiSpecialEndParameter();
+    }
+
+    public CosHttpRequest(T originRequest, String bucketName) {
+        this.originRequest = originRequest;
+        this.ciSpecialEndParameter = originRequest.getCiSpecialEndParameter();
+        this.bucketName = bucketName;
     }
 
     public void addHeader(String name, String value) {
@@ -146,6 +152,14 @@ public class CosHttpRequest<T extends CosServiceRequest> {
 
     public void setCiSpecialEndParameter(String ciSpecialEndParameter) {
         this.ciSpecialEndParameter = ciSpecialEndParameter;
+    }
+
+    public String getBucketName() {
+        return bucketName;
+    }
+
+    public void setBucketName(String bucketName) {
+        this.bucketName = bucketName;
     }
 
     @Override

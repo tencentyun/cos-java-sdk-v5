@@ -34,6 +34,10 @@ import java.util.concurrent.TimeoutException;
 
 import com.qcloud.cos.ClientConfig;
 import com.qcloud.cos.Headers;
+import com.qcloud.cos.endpoint.CIPicRegionEndpointBuilder;
+import com.qcloud.cos.endpoint.CIRegionEndpointBuilder;
+import com.qcloud.cos.model.RequestRebuildMode;
+import com.qcloud.cos.model.ListBucketsRequest;
 import com.qcloud.cos.event.ProgressInputStream;
 import com.qcloud.cos.event.ProgressListener;
 import com.qcloud.cos.exception.ClientExceptionConstants;
@@ -47,6 +51,8 @@ import com.qcloud.cos.internal.CosServiceResponse;
 import com.qcloud.cos.internal.ReleasableInputStream;
 import com.qcloud.cos.internal.ResettableInputStream;
 import com.qcloud.cos.internal.SdkBufferedInputStream;
+import com.qcloud.cos.internal.CIPicServiceRequest;
+import com.qcloud.cos.internal.CIServiceRequest;
 import com.qcloud.cos.retry.BackoffStrategy;
 import com.qcloud.cos.retry.RetryPolicy;
 import com.qcloud.cos.utils.CodecUtils;
@@ -91,6 +97,7 @@ public class DefaultCosHttpClient implements CosHttpClient {
     private BackoffStrategy backoffStrategy;
 
     private CosErrorResponseHandler errorResponseHandler;
+    private HandlerAfterProcess handlerAfterProcess;
     private static final Logger log = LoggerFactory.getLogger(DefaultCosHttpClient.class);
 
     public DefaultCosHttpClient(ClientConfig clientConfig) {
@@ -101,6 +108,7 @@ public class DefaultCosHttpClient implements CosHttpClient {
         this.maxErrorRetry = clientConfig.getMaxErrorRetry();
         this.retryPolicy = ValidationUtils.assertNotNull(clientConfig.getRetryPolicy(), "retry policy");
         this.backoffStrategy = ValidationUtils.assertNotNull(clientConfig.getBackoffStrategy(), "backoff strategy");
+        this.handlerAfterProcess = clientConfig.getHandlerAfterProcess();
         initHttpClient();
     }
 
@@ -458,6 +466,10 @@ public class DefaultCosHttpClient implements CosHttpClient {
             originalContent.mark(readLimit);
         }
 
+        long startTime = 0;
+        long endTime = 0;
+        int  response_status = 0;
+
         int retryIndex = 0;
         while (true) {
             try {
@@ -474,16 +486,22 @@ public class DefaultCosHttpClient implements CosHttpClient {
                     originalContent.reset();
                 }
                 if (retryIndex != 0) {
+                    response_status = 0;
+                    if (clientConfig.getRequestRebuildMode() == RequestRebuildMode.RefreshEndpointAddr) {
+                        refreshEndpointAddr(request);
+                    }
                     long delay = backoffStrategy.computeDelayBeforeNextRetry(retryIndex);
                     Thread.sleep(delay);
                 }
                 HttpContext context = HttpClientContext.create();
                 httpRequest = buildHttpRequest(request);
                 httpResponse = null;
+                startTime = System.currentTimeMillis();
                 httpResponse = executeRequest(context, httpRequest);
                 checkResponse(request, httpRequest, httpResponse);
                 break;
             } catch (CosServiceException cse) {
+                response_status = -1;
                 if (cse.getStatusCode() >= 500) {
                     String errorMsg = String.format("failed to execute http request, due to service exception,"
                                     + " httpRequest: %s, retryIdx:%d, maxErrorRetry:%d", request.toString(),
@@ -495,6 +513,7 @@ public class DefaultCosHttpClient implements CosHttpClient {
                     throw cse;
                 }
             } catch (CosClientException cce) {
+                response_status = -1;
                 String errorMsg = String.format("failed to execute http request, due to client exception,"
                                 + " httpRequest: %s, retryIdx:%d, maxErrorRetry:%d",
                         request.toString(), retryIndex, maxErrorRetry);
@@ -505,6 +524,7 @@ public class DefaultCosHttpClient implements CosHttpClient {
                     throw cce;
                 }
             } catch (Exception exp) {
+                response_status = -1;
                 String expName = exp.getClass().getName();
                 String errorMsg = String.format("httpClient execute occur an unknown exception:%s, httpRequest: %s"
                         , expName, request);
@@ -512,6 +532,8 @@ public class DefaultCosHttpClient implements CosHttpClient {
                 log.error(errorMsg, exp);
                 throw new CosClientException(errorMsg, exp);
             } finally {
+                endTime = System.currentTimeMillis();
+                handlerAfterProcess.handle(response_status, endTime - startTime);
                 ++retryIndex;
             }
         }
@@ -603,5 +625,42 @@ public class DefaultCosHttpClient implements CosHttpClient {
         }
 
         return httpResponse;
+    }
+
+    private <X extends CosServiceRequest> void refreshEndpointAddr(CosHttpRequest<X> request) throws CosClientException {
+        boolean isCIRequest = request.getOriginalRequest() instanceof CIServiceRequest;
+        boolean isServiceRequest = request.getOriginalRequest() instanceof ListBucketsRequest;
+        String endpoint = "";
+        String endpointAddr = "";
+        if (isServiceRequest) {
+            endpoint = clientConfig.getEndpointBuilder().buildGetServiceApiEndpoint();
+            endpointAddr =
+                    clientConfig.getEndpointResolver().resolveGetServiceApiEndpoint(endpoint);
+        } else {
+
+            if (request.getOriginalRequest() instanceof CIPicServiceRequest) {
+                endpoint = new CIPicRegionEndpointBuilder(clientConfig.getRegion()).buildGeneralApiEndpoint(request.getBucketName());
+            } else if (isCIRequest) {
+                endpoint = new CIRegionEndpointBuilder(clientConfig.getRegion()).buildGeneralApiEndpoint(request.getBucketName());
+            } else {
+                endpoint = clientConfig.getEndpointBuilder().buildGeneralApiEndpoint(request.getBucketName());
+            }
+            endpointAddr = clientConfig.getEndpointResolver().resolveGeneralApiEndpoint(endpoint);
+        }
+
+        if (endpoint == null) {
+            throw new CosClientException("endpoint is null, please check your endpoint builder");
+        }
+        if (endpointAddr == null) {
+            throw new CosClientException(
+                    "endpointAddr is null, please check your endpoint resolver");
+        }
+
+        String fixedEndpointAddr = request.getOriginalRequest().getFixedEndpointAddr();
+        if (fixedEndpointAddr != null) {
+            request.setEndpoint(fixedEndpointAddr);
+        } else {
+            request.setEndpoint(endpointAddr);
+        }
     }
 }
