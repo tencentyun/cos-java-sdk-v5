@@ -36,7 +36,6 @@ import com.qcloud.cos.ClientConfig;
 import com.qcloud.cos.Headers;
 import com.qcloud.cos.endpoint.CIPicRegionEndpointBuilder;
 import com.qcloud.cos.endpoint.CIRegionEndpointBuilder;
-import com.qcloud.cos.model.RequestRebuildMode;
 import com.qcloud.cos.model.ListBucketsRequest;
 import com.qcloud.cos.event.ProgressInputStream;
 import com.qcloud.cos.event.ProgressListener;
@@ -487,7 +486,7 @@ public class DefaultCosHttpClient implements CosHttpClient {
                 }
                 if (retryIndex != 0) {
                     response_status = 0;
-                    if (clientConfig.getRequestRebuildMode() == RequestRebuildMode.RefreshEndpointAddr) {
+                    if (clientConfig.IsRefreshEndpointAddr()) {
                         refreshEndpointAddr(request);
                     }
                     long delay = backoffStrategy.computeDelayBeforeNextRetry(retryIndex);

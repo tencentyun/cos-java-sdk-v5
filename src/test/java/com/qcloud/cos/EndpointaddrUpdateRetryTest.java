@@ -6,7 +6,6 @@ import com.qcloud.cos.auth.COSSigner;
 import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.http.DefaultCosHttpClient;
 import com.qcloud.cos.internal.CosErrorResponseHandler;
-import com.qcloud.cos.model.RequestRebuildMode;
 import com.qcloud.cos.region.Region;
 import org.apache.http.*;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -51,7 +50,7 @@ public class EndpointaddrUpdateRetryTest {
         PowerMockito.when(signer, "sign", any(), any(), any()).thenAnswer((m)->{return null;});
         ClientConfig clientConfig = new ClientConfig(new Region(region_));
         clientConfig.setUseBasicAuth(true);
-        clientConfig.setRequestRebuildMode(RequestRebuildMode.RefreshEndpointAddr);
+        clientConfig.turnOnRefreshEndpointAddrSwitch();
 
         PoolingHttpClientConnectionManager manager = PowerMockito.mock(PoolingHttpClientConnectionManager.class);
         PowerMockito.whenNew(PoolingHttpClientConnectionManager.class).withNoArguments().thenReturn(manager);
