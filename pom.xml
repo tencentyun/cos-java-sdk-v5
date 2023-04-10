@@ -289,81 +289,81 @@
                     <target>8</target>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.6</version>
-                <!--                覆盖率on-the-fly ===begin-->
-                <!--                <configuration>-->
-                <!--                    <skip>false</skip>-->
-                <!--                </configuration>-->
-                <!--                <executions>-->
-                <!--                    <execution>-->
-                <!--                        <id>pre-test</id>-->
-                <!--                        <goals>-->
-                <!--                            <goal>prepare-agent</goal>-->
-                <!--                        </goals>-->
-                <!--                    </execution>-->
-                <!--                    <execution>-->
-                <!--                        <id>post-test</id>-->
-                <!--                        <phase>test</phase>-->
-                <!--                        <goals>-->
-                <!--                            <goal>report</goal>-->
-                <!--                        </goals>-->
-                <!--                        <configuration>-->
-                <!--                            <dataFile>target/jacoco.exec</dataFile>-->
-                <!--                            <outputDirectory>target/site/jacoco</outputDirectory>-->
-                <!--                        </configuration>-->
-                <!--                    </execution>-->
-                <!--                </executions>-->
-                <!--                ===end-->
-                <!--                覆盖率offline===begin-->
-                <executions>
-                    <execution>
-                        <id>default-instrument</id>
-                        <goals>
-                            <goal>instrument</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>default-restore-instrumented-classes</id>
-                        <goals>
-                            <goal>restore-instrumented-classes</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>default-report</id>
-                        <goals>
-                            <goal>report</goal>
-                        </goals>
-                        <configuration>
-                            <dataFile>target/jacoco.exec</dataFile>
-                            <outputDirectory>target/site/jacoco</outputDirectory>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>default-check</id>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                        <!--                        <configuration>-->
-                        <!--                            <rules>-->
-                        <!--                                <rule>-->
-                        <!--                                    <element>BUNDLE</element>-->
-                        <!--                                    <limits>-->
-                        <!--                                        <limit>-->
-                        <!--                                            <counter>COMPLEXITY</counter>-->
-                        <!--                                            <value>COVEREDRATIO</value>-->
-                        <!--                                            <minimum>0.60</minimum>-->
-                        <!--                                        </limit>-->
-                        <!--                                    </limits>-->
-                        <!--                                </rule>-->
-                        <!--                            </rules>-->
-                        <!--                        </configuration>-->
-                    </execution>
-                </executions>
-                <!--                ===end-->
-            </plugin>
+<!--            <plugin>-->
+<!--                <groupId>org.jacoco</groupId>-->
+<!--                <artifactId>jacoco-maven-plugin</artifactId>-->
+<!--                <version>0.8.6</version>-->
+<!--                &lt;!&ndash;                覆盖率on-the-fly ===begin&ndash;&gt;-->
+<!--                &lt;!&ndash;                <configuration>&ndash;&gt;-->
+<!--                &lt;!&ndash;                    <skip>false</skip>&ndash;&gt;-->
+<!--                &lt;!&ndash;                </configuration>&ndash;&gt;-->
+<!--                &lt;!&ndash;                <executions>&ndash;&gt;-->
+<!--                &lt;!&ndash;                    <execution>&ndash;&gt;-->
+<!--                &lt;!&ndash;                        <id>pre-test</id>&ndash;&gt;-->
+<!--                &lt;!&ndash;                        <goals>&ndash;&gt;-->
+<!--                &lt;!&ndash;                            <goal>prepare-agent</goal>&ndash;&gt;-->
+<!--                &lt;!&ndash;                        </goals>&ndash;&gt;-->
+<!--                &lt;!&ndash;                    </execution>&ndash;&gt;-->
+<!--                &lt;!&ndash;                    <execution>&ndash;&gt;-->
+<!--                &lt;!&ndash;                        <id>post-test</id>&ndash;&gt;-->
+<!--                &lt;!&ndash;                        <phase>test</phase>&ndash;&gt;-->
+<!--                &lt;!&ndash;                        <goals>&ndash;&gt;-->
+<!--                &lt;!&ndash;                            <goal>report</goal>&ndash;&gt;-->
+<!--                &lt;!&ndash;                        </goals>&ndash;&gt;-->
+<!--                &lt;!&ndash;                        <configuration>&ndash;&gt;-->
+<!--                &lt;!&ndash;                            <dataFile>target/jacoco.exec</dataFile>&ndash;&gt;-->
+<!--                &lt;!&ndash;                            <outputDirectory>target/site/jacoco</outputDirectory>&ndash;&gt;-->
+<!--                &lt;!&ndash;                        </configuration>&ndash;&gt;-->
+<!--                &lt;!&ndash;                    </execution>&ndash;&gt;-->
+<!--                &lt;!&ndash;                </executions>&ndash;&gt;-->
+<!--                &lt;!&ndash;                ===end&ndash;&gt;-->
+<!--                &lt;!&ndash;                覆盖率offline===begin&ndash;&gt;-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <id>default-instrument</id>-->
+<!--                        <goals>-->
+<!--                            <goal>instrument</goal>-->
+<!--                        </goals>-->
+<!--                    </execution>-->
+<!--                    <execution>-->
+<!--                        <id>default-restore-instrumented-classes</id>-->
+<!--                        <goals>-->
+<!--                            <goal>restore-instrumented-classes</goal>-->
+<!--                        </goals>-->
+<!--                    </execution>-->
+<!--                    <execution>-->
+<!--                        <id>default-report</id>-->
+<!--                        <goals>-->
+<!--                            <goal>report</goal>-->
+<!--                        </goals>-->
+<!--                        <configuration>-->
+<!--                            <dataFile>target/jacoco.exec</dataFile>-->
+<!--                            <outputDirectory>target/site/jacoco</outputDirectory>-->
+<!--                        </configuration>-->
+<!--                    </execution>-->
+<!--                    <execution>-->
+<!--                        <id>default-check</id>-->
+<!--                        <goals>-->
+<!--                            <goal>check</goal>-->
+<!--                        </goals>-->
+<!--                        &lt;!&ndash;                        <configuration>&ndash;&gt;-->
+<!--                        &lt;!&ndash;                            <rules>&ndash;&gt;-->
+<!--                        &lt;!&ndash;                                <rule>&ndash;&gt;-->
+<!--                        &lt;!&ndash;                                    <element>BUNDLE</element>&ndash;&gt;-->
+<!--                        &lt;!&ndash;                                    <limits>&ndash;&gt;-->
+<!--                        &lt;!&ndash;                                        <limit>&ndash;&gt;-->
+<!--                        &lt;!&ndash;                                            <counter>COMPLEXITY</counter>&ndash;&gt;-->
+<!--                        &lt;!&ndash;                                            <value>COVEREDRATIO</value>&ndash;&gt;-->
+<!--                        &lt;!&ndash;                                            <minimum>0.60</minimum>&ndash;&gt;-->
+<!--                        &lt;!&ndash;                                        </limit>&ndash;&gt;-->
+<!--                        &lt;!&ndash;                                    </limits>&ndash;&gt;-->
+<!--                        &lt;!&ndash;                                </rule>&ndash;&gt;-->
+<!--                        &lt;!&ndash;                            </rules>&ndash;&gt;-->
+<!--                        &lt;!&ndash;                        </configuration>&ndash;&gt;-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--                &lt;!&ndash;                ===end&ndash;&gt;-->
+<!--            </plugin>-->
         </plugins>
     </build>
 
