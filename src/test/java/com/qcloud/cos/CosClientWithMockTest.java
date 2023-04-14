@@ -731,4 +731,35 @@ public class CosClientWithMockTest {
         transferManager.shutdownNow();
         cosClient.shutdown();
     }
+
+    @Test
+    public void testACL() throws Exception {
+        COSSigner signer = PowerMockito.mock(COSSigner.class);
+        PowerMockito.whenNew(COSSigner.class).withNoArguments().thenReturn(signer);
+        PowerMockito.when(signer, "sign", any(), any(), any()).thenAnswer((m)->{return null;});
+        ClientConfig clientConfig = new ClientConfig(new Region(region_));
+
+        DefaultCosHttpClient cosHttpClient = PowerMockito.mock(DefaultCosHttpClient.class);
+        PowerMockito.whenNew(DefaultCosHttpClient.class).withArguments(clientConfig).thenReturn(cosHttpClient);
+
+        PowerMockito.when(cosHttpClient,"exeute", any(), any()).thenAnswer((m)->{
+            return null;
+        });
+
+        COSCredentials cred = new BasicCOSCredentials(secretId_, secretKey_);
+        COSClient cosClient = new COSClient(cred, clientConfig);
+
+        String ownerUin = System.getenv("owner_uin");
+        String ownerId = String.format("qcs::cam::uin/%s:uin/%s", ownerUin, ownerUin);
+        AccessControlList acl = new AccessControlList();
+        Owner owner = new Owner();
+        owner.setId(ownerId);
+        acl.setOwner(owner);
+
+        String granteeUin = "qcs::cam::uin/734505014:uin/734505014";
+        UinGrantee uinGrantee = new UinGrantee(granteeUin);
+        uinGrantee.setIdentifier(granteeUin);
+        acl.grantPermission(uinGrantee, Permission.FullControl);
+        cosClient.setBucketAcl(bucket_, acl);
+    }
 }

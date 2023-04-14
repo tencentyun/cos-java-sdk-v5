@@ -1,11 +1,14 @@
 package com.qcloud.cos;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import com.qcloud.cos.model.*;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -15,13 +18,6 @@ import com.qcloud.cos.auth.BasicCOSCredentials;
 import com.qcloud.cos.auth.COSCredentials;
 import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.exception.CosServiceException;
-import com.qcloud.cos.model.CopyObjectRequest;
-import com.qcloud.cos.model.CopyResult;
-import com.qcloud.cos.model.GetObjectRequest;
-import com.qcloud.cos.model.ObjectMetadata;
-import com.qcloud.cos.model.PutObjectRequest;
-import com.qcloud.cos.model.UploadResult;
-import com.qcloud.cos.model.StorageClass;
 import com.qcloud.cos.region.Region;
 import com.qcloud.cos.transfer.Copy;
 import com.qcloud.cos.transfer.Download;
@@ -269,23 +265,17 @@ public class TransferManagerTest extends AbstractCOSClientTest {
 
     @Test
     public void testAbortMultipartUploads() throws Exception {
-        File localFile = buildTestFile(10L * 1024 * 1024);
         String key = "testAbortMultipartUploads.txt";
-        PutObjectRequest putObjectRequest = new PutObjectRequest(bucket, key, localFile);
         try {
-            // 返回一个异步结果Upload, 可同步的调用waitForUploadResult等待upload结束, 成功返回UploadResult, 失败抛出异常.
-            Upload upload = transferManager.upload(putObjectRequest);
-            Thread.sleep(1000);
-            PersistableUpload persistableUpload = upload.pause();
+            InitiateMultipartUploadRequest initiateMultipartUploadRequest = new InitiateMultipartUploadRequest(bucket, key);
+            cosclient.initiateMultipartUpload(initiateMultipartUploadRequest);
             transferManager.abortMultipartUploads(bucket, new Date(System.currentTimeMillis()));
         } catch (CosServiceException e) {
+            System.out.println(e.getErrorMessage());
             e.printStackTrace();
         } catch (CosClientException e) {
+            System.out.println(e.getMessage());
             e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }finally {
-            localFile.delete();
         }
     }
 
@@ -435,6 +425,48 @@ public class TransferManagerTest extends AbstractCOSClientTest {
             localFile.delete();
         }
     }
+
+    @Test
+    public void testCreateTransfWithError() {
+        ClientConfig config = new ClientConfig();
+        COSCredentials cred = new BasicCOSCredentials(secretId, secretKey);
+        COSClient cos_Client = new COSClient(cred, config);
+        try {
+            TransferManager transfer_manager = new TransferManager(cos_Client);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            assertEquals("region in clientConfig of cosClient must be specified!", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testDownloadWithRange() throws IOException {
+        int inputStreamLength = 10 * 1024 * 1024;
+        byte[] data = new byte[inputStreamLength];
+        InputStream inputStream = new ByteArrayInputStream(data);
+        ObjectMetadata objectMetadata = new ObjectMetadata();
+        objectMetadata.setContentLength(inputStreamLength);
+        PutObjectRequest putObjectRequest = new PutObjectRequest(bucket, "testDownloadWithRange", inputStream, objectMetadata);
+        File dstFile = new File("dstFile");
+        try {
+            Upload upload = transferManager.upload(putObjectRequest);
+            upload.waitForCompletion();
+
+            GetObjectRequest getObjectRequest = new GetObjectRequest(bucket, "testDownloadWithRange");
+            getObjectRequest.setRange(512, 1024);
+
+            Download download = transferManager.download(getObjectRequest, dstFile);
+            download.waitForCompletion();
+        } catch (InterruptedException e) {
+            System.out.println(e.getMessage());
+        } catch (CosClientException cce) {
+            System.out.println(cce.getMessage());
+        } finally {
+            dstFile.delete();
+            inputStream.close();
+        }
+    }
+
 
     // transfer manager对不同园区5G以上文件进行分块拷贝
     @Ignore
