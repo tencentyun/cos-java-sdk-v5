@@ -733,7 +733,7 @@ public class CosClientWithMockTest {
     }
 
     @Test
-    public void testACL() throws Exception {
+    public void testSetBucketACL() throws Exception {
         COSSigner signer = PowerMockito.mock(COSSigner.class);
         PowerMockito.whenNew(COSSigner.class).withNoArguments().thenReturn(signer);
         PowerMockito.when(signer, "sign", any(), any(), any()).thenAnswer((m)->{return null;});
@@ -761,5 +761,44 @@ public class CosClientWithMockTest {
         uinGrantee.setIdentifier(granteeUin);
         acl.grantPermission(uinGrantee, Permission.FullControl);
         cosClient.setBucketAcl(bucket_, acl);
+        cosClient.setObjectAcl(bucket_, "testSetObjACL", acl);
+
+        cosClient.shutdown();
+    }
+
+    @Test
+    public void testGetBucketACL() throws Exception {
+        COSSigner signer = PowerMockito.mock(COSSigner.class);
+        PowerMockito.whenNew(COSSigner.class).withNoArguments().thenReturn(signer);
+        PowerMockito.when(signer, "sign", any(), any(), any()).thenAnswer((m)->{return null;});
+        ClientConfig clientConfig = new ClientConfig(new Region(region_));
+
+        DefaultCosHttpClient cosHttpClient = PowerMockito.mock(DefaultCosHttpClient.class);
+        PowerMockito.whenNew(DefaultCosHttpClient.class).withArguments(clientConfig).thenReturn(cosHttpClient);
+
+        PowerMockito.when(cosHttpClient,"exeute", any(), any()).thenAnswer((m)->{
+            AccessControlList acl = new AccessControlList();
+            Owner owner = new Owner();
+            String ownerId = "qcs::cam::uin/100000000001:uin/100000000001";
+            owner.setId(ownerId);
+            acl.setOwner(owner);
+            String granteeUin = "qcs::cam::uin/100000000002:uin/100000000002";
+            UinGrantee uinGrantee = new UinGrantee(granteeUin);
+            acl.grantPermission(uinGrantee, Permission.FullControl);
+            return acl;
+        });
+
+        COSCredentials cred = new BasicCOSCredentials(secretId_, secretKey_);
+        COSClient cosClient = new COSClient(cred, clientConfig);
+
+        AccessControlList acl = cosClient.getBucketAcl(bucket_);
+        List<Grant> grants = acl.getGrantsAsList();
+        assertEquals(1L, grants.size());
+
+        acl = cosClient.getObjectAcl(bucket_, "testGetObjACL");
+        grants = acl.getGrantsAsList();
+        assertEquals(1L, grants.size());
+
+        cosClient.shutdown();
     }
 }

@@ -8,7 +8,10 @@ import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import com.qcloud.cos.event.COSProgressListenerChain;
+import com.qcloud.cos.event.TransferProgressUpdatingListener;
 import com.qcloud.cos.model.*;
+import com.qcloud.cos.transfer.*;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -19,15 +22,6 @@ import com.qcloud.cos.auth.COSCredentials;
 import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.region.Region;
-import com.qcloud.cos.transfer.Copy;
-import com.qcloud.cos.transfer.Download;
-import com.qcloud.cos.transfer.MultipleFileDownload;
-import com.qcloud.cos.transfer.MultipleFileUpload;
-import com.qcloud.cos.transfer.TransferManager;
-import com.qcloud.cos.transfer.Upload;
-import com.qcloud.cos.transfer.PersistableUpload;
-import com.qcloud.cos.transfer.PersistableDownload;
-import com.qcloud.cos.transfer.TransferManagerConfiguration;
 import com.qcloud.cos.utils.Md5Utils;
 
 import static org.junit.Assert.*;
@@ -467,6 +461,34 @@ public class TransferManagerTest extends AbstractCOSClientTest {
         }
     }
 
+    @Test
+    public void testDownloadImpl() {
+        GetObjectRequest getObjectRequest = new GetObjectRequest(bucket, "testDownloadImpl");
+        COSObject cosObject = new COSObject();
+        ObjectMetadata metadata = new ObjectMetadata();
+        cosObject.setObjectMetadata(metadata);
+        cosObject.setBucketName(bucket);
+        cosObject.setKey("testDownloadImpl");
+
+        File dstFile = new File("dstFile");
+        TransferProgress transferProgress = new TransferProgress();
+        String description = "test downloading from " + getObjectRequest.getBucketName() + "/"
+                + getObjectRequest.getKey();
+        COSProgressListenerChain listenerChain = new COSProgressListenerChain(
+                // The listener for updating transfer progress
+                new TransferProgressUpdatingListener(transferProgress),
+                getObjectRequest.getGeneralProgressListener(), null);
+
+        DownloadImpl download = new DownloadImpl(description, transferProgress, listenerChain,
+                null, null, getObjectRequest, dstFile);
+
+        download.setCosObject(cosObject);
+
+        ObjectMetadata objectMetadata = download.getObjectMetadata();
+        String bucketname = download.getBucketName();
+        String key = download.getKey();
+        dstFile.delete();
+    }
 
     // transfer manager对不同园区5G以上文件进行分块拷贝
     @Ignore
