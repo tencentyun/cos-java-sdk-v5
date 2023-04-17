@@ -147,7 +147,23 @@ public class CosClientWithMockTest {
             }
         } finally {
             inputStream.close();
+            client.shutdown();
         }
+    }
+
+    @Test
+    public void testPutWithDecoderException() throws Exception {
+        COSSigner signer = PowerMockito.mock(COSSigner.class);
+        PowerMockito.whenNew(COSSigner.class).withNoArguments().thenReturn(signer);
+        PowerMockito.when(signer, "sign", any(), any(), any()).thenAnswer((m)->{return null;});
+        ClientConfig clientConfig = new ClientConfig(new Region(region_));
+
+        DefaultCosHttpClient cosHttpClient = PowerMockito.mock(DefaultCosHttpClient.class);
+        PowerMockito.whenNew(DefaultCosHttpClient.class).withArguments(clientConfig).thenReturn(cosHttpClient);
+
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setETag("b6d81b360a5672d80c27430f39153e2c");
+        PowerMockito.when(cosHttpClient,"exeute", any(), any()).thenReturn(metadata);
 
         PowerMockito.mockStatic(BinaryUtils.class);
         PowerMockito.when(BinaryUtils.fromHex(anyString())).thenAnswer((m)->{
@@ -155,12 +171,15 @@ public class CosClientWithMockTest {
             throw de;
         });
 
-        data = new byte[inputStreamLength];
-        InputStream inputStream2 = new ByteArrayInputStream(data);
-        key = "testDecoderException";
-        objectMetadata = new ObjectMetadata();
+        COSCredentials cred = new BasicCOSCredentials(secretId_, secretKey_);
+        COSClient client = new COSClient(cred, clientConfig);
 
-        putObjectRequest = new PutObjectRequest(bucket_, key, inputStream2, objectMetadata);
+        byte[] data = new byte[1024 * 1024];
+        InputStream inputStream2 = new ByteArrayInputStream(data);
+        String key = "testDecoderException";
+        ObjectMetadata objectMetadata = new ObjectMetadata();
+
+        PutObjectRequest putObjectRequest = new PutObjectRequest(bucket_, key, inputStream2, objectMetadata);
 
         try {
             client.putObject(putObjectRequest);
@@ -287,6 +306,12 @@ public class CosClientWithMockTest {
         request.setSourceVersionId("1111111");
         request.setCannedAccessControlList(CannedAccessControlList.PublicRead);
 
+        CopyObjectRequest request_with_params = new CopyObjectRequest(bucket_, "testSrc", bucket_, "testDst");
+        AccessControlList acl = new AccessControlList();
+        request_with_params.setAccessControlList(acl);
+        request_with_params.setRedirectLocation("test_redirectLocation");
+        request_with_params.setMetadataDirective("metadata_directive");
+
         CopyPartRequest copyPartRequest = new CopyPartRequest();
         // 要拷贝的源文件所在的region
         UserSpecifiedEndpointBuilder endpointBuilder = new UserSpecifiedEndpointBuilder("testApiEndpoint", "getServiceApiEndpoint");
@@ -316,6 +341,12 @@ public class CosClientWithMockTest {
 
         try {
             cosClient.copyPart(copyPartRequest);
+        } catch (CosServiceException cse) {
+            assertEquals("Unknown", cse.getErrorCode());
+        }
+
+        try {
+            cosClient.copyObject(request_with_params);
         } catch (CosServiceException cse) {
             assertEquals("Unknown", cse.getErrorCode());
         }

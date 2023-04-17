@@ -39,33 +39,21 @@ public class AclTest extends AbstractCOSClientTest {
             createBucketRequest.setCannedAcl(CannedAccessControlList.PublicRead);
             cosclient.createBucket(createBucketRequest);
             AccessControlList aclGet = cosclient.getBucketAcl(aclTestBucketName);
-//            assertEquals(aclGet.getCannedAccessControl(), CannedAccessControlList.PublicRead);
-//            assertNotNull(aclGet.getOwner());
-//            assertNotNull(aclGet.getOwner().getId());
-//            assertNotNull(aclGet.getOwner().getDisplayName());
-            
-//            assertEquals(2, aclGet.getGrantsAsList().size());
-            Grant firstGrant = aclGet.getGrantsAsList().get(0);
-            //assertEquals(Permission.Read.toString(), firstGrant.getPermission().toString());
-//            assertTrue(firstGrant.getGrantee() instanceof GroupGrantee);
-            
-            Grant secondGrant = aclGet.getGrantsAsList().get(1);
-            //assertEquals(Permission.FullControl.toString(), secondGrant.getPermission().toString());
-//            assertTrue(secondGrant.getGrantee() instanceof UinGrantee);
+            System.out.println(aclGet.toString());
 
             // set to PublicReadWrite acl and get canned acl compare
             Thread.sleep(5000);
             cosclient.setBucketAcl(aclTestBucketName, CannedAccessControlList.PublicReadWrite);
             Thread.sleep(5000);
             aclGet = cosclient.getBucketAcl(aclTestBucketName);
-            //assertEquals(aclGet.getCannedAccessControl(), CannedAccessControlList.PublicReadWrite);
+            System.out.println(aclGet.toString());
 
             // set to private and get canned acl compare
             Thread.sleep(5000);
             cosclient.setBucketAcl(aclTestBucketName, CannedAccessControlList.Private);
             Thread.sleep(5000);
             aclGet = cosclient.getBucketAcl(aclTestBucketName);
-            //assertEquals(aclGet.getCannedAccessControl(), CannedAccessControlList.Private);
+            System.out.println(aclGet.toString());
 
         } finally {
             if (aclTestBucketName != null) {
@@ -175,15 +163,14 @@ public class AclTest extends AbstractCOSClientTest {
             cosclient.setObjectAcl(bucket, key, CannedAccessControlList.PublicRead);
             AccessControlList accessControlList = cosclient.getObjectAcl(bucket, key);
             System.out.println(accessControlList.toString());
-            //assertEquals(accessControlList.getCannedAccessControl(), CannedAccessControlList.PublicRead);
+
             cosclient.setObjectAcl(bucket, key, CannedAccessControlList.Private);
             accessControlList = cosclient.getObjectAcl(bucket, key);
             System.out.println(accessControlList.toString());
-            //assertEquals(accessControlList.getCannedAccessControl(), CannedAccessControlList.Private);
+
             cosclient.setObjectAcl(bucket, key, CannedAccessControlList.Default);
             accessControlList = cosclient.getObjectAcl(bucket, key);
             System.out.println(accessControlList.toString());
-            //assertEquals(accessControlList.getCannedAccessControl(), CannedAccessControlList.Default);
 
         } finally {
             assertTrue(localFile.delete());

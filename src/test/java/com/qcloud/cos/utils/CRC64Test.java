@@ -28,7 +28,9 @@ public class CRC64Test {
         crc3.update(str2.getBytes(), str2.length());
 
         CRC64 crc4 = CRC64.combine(crc1, crc2, str2.length());
+        CRC64 crc1_l = CRC64.combine(crc1, crc2, 0);
         long crc4_l = CRC64.combine(crc1.getValue(), crc2.getValue(), str2.length());
+        long crc4_l2 = CRC64.combine(crc1.getValue(), crc2.getValue(), 0);
         assertEquals(crc3.getValue(), crc4.getValue());
         assertEquals(crc4_l, crc4.getValue());
 
@@ -42,5 +44,11 @@ public class CRC64Test {
 
         CRC64 crc6 = CRC64.fromBytes(str1.getBytes());
         assertEquals(crc6.getValue(), 1751477356L);
+
+        crc1.update(1);
+        crc1.update(str1.getBytes(), 0, str1.length()-2);
+        byte[] b = crc1.getBytes();
+        String s = new String(b);
+        System.out.println(s);
     }
 }
