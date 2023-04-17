@@ -98,8 +98,7 @@ public class AclTest extends AbstractCOSClientTest {
         owner.setId(ownerId);
         acl.setOwner(owner);
 
-//        String granteeUin = String.format("qcs::cam::uin/%s:uin/734505014", ownerUin);
-        String granteeUin = "qcs::cam::uin/734505014:uin/734505014";
+        String granteeUin = "qcs::cam::uin/2832742109:uin/2832742109";
         UinGrantee uinGrantee = new UinGrantee(granteeUin);
         uinGrantee.setIdentifier(granteeUin);
         acl.grantPermission(uinGrantee, Permission.FullControl);
@@ -136,7 +135,7 @@ public class AclTest extends AbstractCOSClientTest {
             String ownerId = String.format("qcs::cam::uin/%s:uin/%s", ownerUin, ownerUin);
             owner.setId(ownerId);
             acl.setOwner(owner);
-            String granteeUin = String.format("qcs::cam::uin/%s:uin/734505014", ownerUin);
+            String granteeUin = String.format("qcs::cam::uin/%s:uin/2832742109", ownerUin);
             UinGrantee uinGrantee = new UinGrantee(granteeUin);
             acl.grantPermission(uinGrantee, Permission.FullControl);
             cosclient.setObjectAcl(bucket, key, acl);
