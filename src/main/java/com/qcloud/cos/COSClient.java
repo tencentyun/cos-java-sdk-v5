@@ -3539,10 +3539,20 @@ public class COSClient implements COS {
         request.addParameter("inventory", null);
         request.addParameter("id", id);
 
-        final byte[] bytes = new BucketConfigurationXmlFactory().convertToXmlByteArray(inventoryConfiguration);
-        request.addHeader("Content-Length", String.valueOf(bytes.length));
-        request.addHeader("Content-Type", "application/xml");
-        request.setContent(new ByteArrayInputStream(bytes));
+        if (!setBucketInventoryConfigurationRequest.IsUseInventoryText()) {
+            final byte[] bytes = new BucketConfigurationXmlFactory().convertToXmlByteArray(inventoryConfiguration);
+            request.addHeader("Content-Length", String.valueOf(bytes.length));
+            request.addHeader("Content-Type", "application/xml");
+            request.setContent(new ByteArrayInputStream(bytes));
+        } else {
+            final String contentStr = setBucketInventoryConfigurationRequest.getInventoryText();
+            if (contentStr == null || contentStr.length() <= 0) {
+                throw new IllegalArgumentException("The inventory text should be specified");
+            }
+            request.addHeader("Content-Length", String.valueOf(contentStr.length()));
+            request.addHeader("Content-Type", "application/xml");
+            request.setContent(new ByteArrayInputStream(contentStr.getBytes(StringUtils.UTF8)));
+        }
 
         return invoke(request, new Unmarshallers.SetBucketInventoryConfigurationUnmarshaller());
     }
