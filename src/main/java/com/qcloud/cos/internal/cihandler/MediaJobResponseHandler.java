@@ -85,64 +85,11 @@ public class MediaJobResponseHandler extends CIAbstractHandler {
     protected void doEndElement(String uri, String name, String qName) {
         MediaJobObject jobsDetail = response.getJobsDetail();
         if (in("Response", "JobsDetail")) {
-
-            switch (name) {
-                case "Code":
-                    jobsDetail.setCode(getText());
-                    break;
-                case "CreationTime":
-                    jobsDetail.setCreationTime(getText());
-                    break;
-                case "EndTime":
-                    jobsDetail.setEndTime(getText());
-                    break;
-                case "JobId":
-                    jobsDetail.setJobId(getText());
-                    break;
-                case "Message":
-                    jobsDetail.setMessage(getText());
-                    break;
-                case "QueueId":
-                    jobsDetail.setQueueId(getText());
-                    break;
-                case "State":
-                    jobsDetail.setState(getText());
-                    break;
-                case "Tag":
-                    jobsDetail.setTag(getText());
-                    break;
-                case "BucketName":
-                    jobsDetail.setBucketName(getText());
-                    break;
-                default:
-                    break;
-            }
+            ParserMediaInfoUtils.parseMediaJobsDetail(jobsDetail, name, getText());
         } else if (in("Response", "JobsDetail", "Input")) {
             jobsDetail.getInput().setObject(getText());
         } else if (in("Response", "JobsDetail", "Operation")) {
-            MediaJobOperation operation = jobsDetail.getOperation();
-            switch (name) {
-                case "TemplateId":
-                    operation.setTemplateId(getText());
-                    break;
-                case "WatermarkTemplateId":
-                    operation.getWatermarkTemplateId().add(getText());
-                    break;
-                case "UserData":
-                    operation.setUserData(getText());
-                    break;
-                case "JobLevel":
-                    operation.setJobLevel(getText());
-                    break;
-                case "TemplateName":
-                    operation.setTemplateName(getText());
-                    break;
-                case "DecryptKey":
-                    operation.setDecryptKey(getText());
-                    break;
-                default:
-                    break;
-            }
+            ParserMediaInfoUtils.parseMediaJobOperation(jobsDetail.getOperation(),name,getText());
         } else if (in("Response", "JobsDetail", "Operation", "MediaInfo", "Format")) {
             MediaFormat format = jobsDetail.getOperation().getMediaInfo().getFormat();
             ParserMediaInfoUtils.ParsingMediaFormat(format, name, getText());

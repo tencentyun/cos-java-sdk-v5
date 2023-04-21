@@ -6564,6 +6564,8 @@ public class XmlResponsesSaxParser {
                 jobList.get(jobList.size() - 1).getTerroristInfo().getLibResults().add(new LibResult());
             } else if (in("Response", "JobsDetail", "AdsInfo") && "LibResults".equals(name)) {
                 jobList.get(jobList.size() - 1).getAdsInfo().getLibResults().add(new LibResult());
+            } else if (in("Response", "JobsDetail", "TeenagerInfo") && "LibResults".equals(name)) {
+                jobList.get(jobList.size() - 1).getTeenagerInfo().getLibResults().add(new LibResult());
             }
         }
 
@@ -6587,6 +6589,8 @@ public class XmlResponsesSaxParser {
                 parseInfo(jobsDetail.getTerroristInfo(), name, getText());
             } else if (in("Response", "JobsDetail", "AdsInfo")) {
                 parseInfo(jobsDetail.getAdsInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "TeenagerInfo")) {
+                parseInfo(jobsDetail.getTeenagerInfo(), name, getText());
             } else if (in("Response", "JobsDetail", "PornInfo", "LibResults")) {
                 List<LibResult> libResults = jobsDetail.getPornInfo().getLibResults();
                 ParserMediaInfoUtils.parsingLastLibResult(libResults, name, getText());
@@ -6598,6 +6602,9 @@ public class XmlResponsesSaxParser {
                 ParserMediaInfoUtils.parsingLastLibResult(libResults, name, getText());
             } else if (in("Response", "JobsDetail", "AdsInfo", "LibResults")) {
                 List<LibResult> libResults = jobsDetail.getAdsInfo().getLibResults();
+                ParserMediaInfoUtils.parsingLastLibResult(libResults, name, getText());
+            } else if (in("Response", "JobsDetail", "TeenagerInfo", "LibResults")) {
+                List<LibResult> libResults = jobsDetail.getTeenagerInfo().getLibResults();
                 ParserMediaInfoUtils.parsingLastLibResult(libResults, name, getText());
             } else if (in("Response", "JobsDetail", "UserInfo")) {
                 ParserMediaInfoUtils.ParsingAuditingUserInfo(jobsDetail.getUserInfo(), name, getText());

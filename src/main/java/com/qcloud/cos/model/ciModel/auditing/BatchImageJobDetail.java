@@ -1,9 +1,5 @@
 package com.qcloud.cos.model.ciModel.auditing;
 
-
-import java.util.ArrayList;
-import java.util.List;
-
 public class BatchImageJobDetail {
     private String dataId;
     private String jobId;
@@ -24,6 +20,7 @@ public class BatchImageJobDetail {
     private TerroristInfo terroristInfo;
     private PoliticsInfo politicsInfo;
     private AdsInfo adsInfo;
+    private TeenagerInfo teenagerInfo;
     private UserInfo userInfo = new UserInfo();
     private ListInfo listInfo = new ListInfo();
     private OcrResults ocrResults = new OcrResults();
@@ -214,6 +211,17 @@ public class BatchImageJobDetail {
 
     public void setForbidState(String forbidState) {
         this.forbidState = forbidState;
+    }
+
+    public TeenagerInfo getTeenagerInfo() {
+        if (teenagerInfo == null) {
+            teenagerInfo = new TeenagerInfo();
+        }
+        return teenagerInfo;
+    }
+
+    public void setTeenagerInfo(TeenagerInfo teenagerInfo) {
+        this.teenagerInfo = teenagerInfo;
     }
 
     @Override
