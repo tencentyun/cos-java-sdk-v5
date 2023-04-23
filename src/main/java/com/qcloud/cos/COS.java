@@ -3196,6 +3196,8 @@ public interface COS extends COSDirectSpi {
     BatchJobResponse describeInventoryTriggerJob(BatchJobRequest request);
 
     AutoTranslationBlockResponse autoTranslationBlock(AutoTranslationBlockRequest request);
+
+    DetectFaceResponse detectFace(DetectFaceRequest request);
 }
 
 

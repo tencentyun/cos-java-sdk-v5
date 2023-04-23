@@ -11,11 +11,6 @@ public class CIUniversalDemo {
         customCIMethod(client);
     }
 
-    /**
-     * createImageAuditingJob 接口用于创建图片审核任务。(发送单个任务 推荐)
-     *
-     * @param client
-     */
     public static void customCIMethod(COSClient client) {
         //1.创建任务请求对象
         ImageAuditingRequest request = new ImageAuditingRequest();

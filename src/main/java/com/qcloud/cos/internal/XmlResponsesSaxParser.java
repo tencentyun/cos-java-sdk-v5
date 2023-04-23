@@ -37,6 +37,7 @@ import com.qcloud.cos.exception.MultiObjectDeleteException.DeleteError;
 import com.qcloud.cos.internal.cihandler.AutoTranslationBlockResponseHandler;
 import com.qcloud.cos.internal.cihandler.BatchJobResponseHandler;
 import com.qcloud.cos.internal.cihandler.DetectCarHandler;
+import com.qcloud.cos.internal.cihandler.DetectFaceResponseHandler;
 import com.qcloud.cos.internal.cihandler.FileProcessResponseHandler;
 import com.qcloud.cos.internal.cihandler.GenerateQrcodeHandler;
 import com.qcloud.cos.internal.cihandler.GetImageStyleHandler;
@@ -907,6 +908,12 @@ public class XmlResponsesSaxParser {
     }
     public AutoTranslationBlockResponseHandler parseAutoTranslationBlockResponse(InputStream inputStream) throws IOException {
         AutoTranslationBlockResponseHandler handler = new AutoTranslationBlockResponseHandler();
+        parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
+        return handler;
+    }
+
+    public DetectFaceResponseHandler parseDetectFaceResponse(InputStream inputStream) throws IOException {
+        DetectFaceResponseHandler handler = new DetectFaceResponseHandler();
         parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
         return handler;
     }
