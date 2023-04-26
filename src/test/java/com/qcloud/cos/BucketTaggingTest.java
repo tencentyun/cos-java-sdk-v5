@@ -34,8 +34,17 @@ public class BucketTaggingTest extends AbstractCOSClientTest{
         SetBucketTaggingConfigurationRequest setBucketTaggingConfigurationRequest =
                 new SetBucketTaggingConfigurationRequest(bucket, bucketTaggingConfiguration);
         cosclient.setBucketTaggingConfiguration(setBucketTaggingConfigurationRequest);
-        BucketTaggingConfiguration bucketTaggingConfiguration1 = cosclient.getBucketTaggingConfiguration(bucket);
-        assertEquals(tagSetList.size(), bucketTaggingConfiguration1.getAllTagSets().size());
+        try {
+            Thread.sleep(5000);
+            BucketTaggingConfiguration bucketTaggingConfiguration1 = cosclient.getBucketTaggingConfiguration(bucket);
+            if (bucketTaggingConfiguration1 == null) {
+                Thread.sleep(5000);
+                bucketTaggingConfiguration1 = cosclient.getBucketTaggingConfiguration(bucket);
+            }
+            assertEquals(tagSetList.size(), bucketTaggingConfiguration1.getAllTagSets().size());
+        } catch (InterruptedException e) {
+            System.out.println(e.getMessage());
+        }
         cosclient.deleteBucketTaggingConfiguration(bucket);
     }
 }
