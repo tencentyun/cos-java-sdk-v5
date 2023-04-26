@@ -1,16 +1,17 @@
 package com.qcloud.cos.demo.ci;
 
 import com.qcloud.cos.COSClient;
-import com.qcloud.cos.model.ciModel.auditing.*;
-import com.qcloud.cos.transfer.ImageAuditingImpl;
-import com.qcloud.cos.transfer.MultipleImageAuditingImpl;
-import com.qcloud.cos.transfer.TransferManager;
+import com.qcloud.cos.model.ciModel.auditing.AuditingInfo;
+import com.qcloud.cos.model.ciModel.auditing.BatchImageAuditingInputObject;
+import com.qcloud.cos.model.ciModel.auditing.BatchImageAuditingRequest;
+import com.qcloud.cos.model.ciModel.auditing.BatchImageAuditingResponse;
+import com.qcloud.cos.model.ciModel.auditing.BatchImageJobDetail;
+import com.qcloud.cos.model.ciModel.auditing.DescribeImageAuditingRequest;
+import com.qcloud.cos.model.ciModel.auditing.ImageAuditingRequest;
+import com.qcloud.cos.model.ciModel.auditing.ImageAuditingResponse;
 import com.qcloud.cos.utils.Jackson;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * 内容审核 图片审核接口相关demo 详情见https://cloud.tencent.com/document/product/460/37318
@@ -88,37 +89,6 @@ public class ImageAuditingDemo {
             List<AuditingInfo> imageInfoList = AuditingResultUtil.getBatchImageInfoList(batchImageJobDetail);
             System.out.println(imageInfoList);
         }
-    }
-
-
-    /**
-     * 批量发送图片审核任务 使用sdk并发发送
-     */
-    public static void batchPostImageAuditing(COSClient client) throws InterruptedException {
-        List<ImageAuditingRequest> requestList = new ArrayList<>();
-        ImageAuditingRequest request = new ImageAuditingRequest();
-        request.setBucketName("demo-1234567890");
-        request.setObjectKey("1.png");
-        requestList.add(request);
-
-        request = new ImageAuditingRequest();
-        request.setBucketName("demo-1234567890");
-        request.setObjectKey("1.jpg");
-        requestList.add(request);
-
-        // 传入一个threadpool, 若不传入线程池, 默认TransferManager中会生成一个单线程的线程池。
-        ExecutorService threadPool = Executors.newFixedThreadPool(4);
-        TransferManager transferManager = new TransferManager(client, threadPool);
-        MultipleImageAuditingImpl multipleImageAuditing = transferManager.batchPostImageAuditing(requestList);
-        multipleImageAuditing.waitForCompletion();
-        List<ImageAuditingImpl> imageAuditingList = multipleImageAuditing.getImageAuditingList();
-        for (ImageAuditingImpl imageAuditing : imageAuditingList) {
-            System.out.println(imageAuditing.getState());
-            System.out.println(imageAuditing.getResponse());
-            System.out.println(imageAuditing.getErrMsg());
-        }
-        transferManager.shutdownNow();
-        client.shutdown();
     }
 
     /**

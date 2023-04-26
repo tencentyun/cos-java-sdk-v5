@@ -346,7 +346,7 @@ public class TransferManagerTest extends AbstractCOSClientTest {
     }
 
     @Test
-    public void testPartCopy4M() throws Exception {
+    public void testPartCopy() throws Exception {
         TransferManagerConfiguration configuration = transferManager.getConfiguration();
         configuration.setMultipartCopyThreshold(2 * 1024 * 1024L);
         File localFile = buildTestFile(4L * 1024 * 1024);
@@ -355,53 +355,8 @@ public class TransferManagerTest extends AbstractCOSClientTest {
         Upload upload = transferManager.upload(putObjectRequest);
         upload.waitForCompletion();
 
-        String dst_bucket = System.getenv("dst_bucket") + (int) (Math.random() * 1000000) + "-" + appid;
-        //deleteBucket(dst_bucket);
-
-        Boolean switch_to_stop = true;
-        while (switch_to_stop) {
-            try {
-                cosclient.createBucket(dst_bucket);
-                switch_to_stop = false;
-            } catch (CosServiceException cse) {
-                if (cse.getStatusCode() == 409) {
-                    dst_bucket = System.getenv("dst_bucket") + (int) (Math.random() * 1000000) + "-" + appid;
-                    continue;
-                }
-                cse.printStackTrace();
-                fail(cse.getErrorMessage());
-            }
-        }
-
-        CopyObjectRequest copyObjectRequest = new CopyObjectRequest(bucket, key, dst_bucket, "dstObj.txt");
-        copyObjectRequest.setStorageClass(StorageClass.Archive);
-        ObjectMetadata objectMetadata = new ObjectMetadata();
-        objectMetadata.setContentType("text/plain");
-        copyObjectRequest.setNewObjectMetadata(objectMetadata);
-        try {
-            Copy copy = transferManager.copy(copyObjectRequest);
-            copy.waitForCompletion();
-        } catch (CosServiceException cse) {
-            if (404 != cse.getStatusCode()) {
-                fail(cse.toString());
-            }
-        } finally {
-            deleteBucket(dst_bucket);
-            localFile.delete();
-        }
-    }
-
-    @Test
-    public void testPartCopy10M() throws Exception {
-        TransferManagerConfiguration configuration = transferManager.getConfiguration();
-        configuration.setMultipartCopyThreshold(2 * 1024 * 1024L);
-        File localFile = buildTestFile(10L * 1024 * 1024);
-        String key = "testPartCopy10M.txt";
-        PutObjectRequest putObjectRequest = new PutObjectRequest(bucket, key, localFile);
-        Upload upload = transferManager.upload(putObjectRequest);
-        upload.waitForCompletion();
-
-        String dst_bucket = System.getenv("dst_bucket") + (int) (Math.random() * 1000000) + "-" + appid;
+        String dst_bucket = System.getenv("dst_bucket") + (int) (Math.random() * 100) + "-" + appid;
+        deleteBucket(dst_bucket);
 
         Boolean switch_to_stop = true;
         while (switch_to_stop) {

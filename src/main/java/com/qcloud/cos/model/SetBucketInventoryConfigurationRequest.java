@@ -30,6 +30,10 @@ public class SetBucketInventoryConfigurationRequest extends CosServiceRequest im
 
     private InventoryConfiguration inventoryConfiguration;
 
+    private String inventoryText;
+
+    private boolean switch_to_use_inventoryText = false;
+
     public SetBucketInventoryConfigurationRequest() {
     }
 
@@ -84,5 +88,21 @@ public class SetBucketInventoryConfigurationRequest extends CosServiceRequest im
     public SetBucketInventoryConfigurationRequest withInventoryConfiguration(InventoryConfiguration inventoryConfiguration) {
         setInventoryConfiguration(inventoryConfiguration);
         return this;
+    }
+
+    public void setInventoryText(String invStr) {
+        inventoryText = invStr;
+    }
+
+    public String getInventoryText() {
+        return inventoryText;
+    }
+
+    public void useInventoryText() {
+        switch_to_use_inventoryText = true;
+    }
+
+    public boolean IsUseInventoryText() {
+        return switch_to_use_inventoryText;
     }
 }

@@ -116,6 +116,8 @@ import com.qcloud.cos.model.ciModel.common.ImageProcessRequest;
 import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
 import com.qcloud.cos.model.ciModel.image.AutoTranslationBlockRequest;
 import com.qcloud.cos.model.ciModel.image.AutoTranslationBlockResponse;
+import com.qcloud.cos.model.ciModel.image.DetectFaceRequest;
+import com.qcloud.cos.model.ciModel.image.DetectFaceResponse;
 import com.qcloud.cos.model.ciModel.image.GenerateQrcodeRequest;
 import com.qcloud.cos.model.ciModel.image.ImageLabelRequest;
 import com.qcloud.cos.model.ciModel.image.ImageLabelResponse;
@@ -3539,10 +3541,20 @@ public class COSClient implements COS {
         request.addParameter("inventory", null);
         request.addParameter("id", id);
 
-        final byte[] bytes = new BucketConfigurationXmlFactory().convertToXmlByteArray(inventoryConfiguration);
-        request.addHeader("Content-Length", String.valueOf(bytes.length));
-        request.addHeader("Content-Type", "application/xml");
-        request.setContent(new ByteArrayInputStream(bytes));
+        if (!setBucketInventoryConfigurationRequest.IsUseInventoryText()) {
+            final byte[] bytes = new BucketConfigurationXmlFactory().convertToXmlByteArray(inventoryConfiguration);
+            request.addHeader("Content-Length", String.valueOf(bytes.length));
+            request.addHeader("Content-Type", "application/xml");
+            request.setContent(new ByteArrayInputStream(bytes));
+        } else {
+            final String contentStr = setBucketInventoryConfigurationRequest.getInventoryText();
+            if (contentStr == null || contentStr.length() <= 0) {
+                throw new IllegalArgumentException("The inventory text should be specified");
+            }
+            request.addHeader("Content-Length", String.valueOf(contentStr.length()));
+            request.addHeader("Content-Type", "application/xml");
+            request.setContent(new ByteArrayInputStream(contentStr.getBytes(StringUtils.UTF8)));
+        }
 
         return invoke(request, new Unmarshallers.SetBucketInventoryConfigurationUnmarshaller());
     }
@@ -4746,6 +4758,19 @@ public class COSClient implements COS {
         addParameterIfNotNull(request,"TextDomain",translationBlockRequest.getTextDomain());
         addParameterIfNotNull(request,"TextStyle",translationBlockRequest.getTextStyle());
         return this.invoke(request, new Unmarshallers.AutoTranslationBlockUnmarshaller());
+    }
+
+    @Override
+    public DetectFaceResponse detectFace(DetectFaceRequest detectFaceRequest) {
+        rejectNull(detectFaceRequest,
+                "The request parameter must be specified setting the object tags");
+        rejectNull(detectFaceRequest.getBucketName(),
+                "The bucketName parameter must be specified setting the object tags");
+        CosHttpRequest<DetectFaceRequest> request = createRequest(detectFaceRequest.getBucketName(), detectFaceRequest.getObjectKey(), detectFaceRequest, HttpMethodName.GET);
+        request.addParameter("ci-process","DetectFace");
+        addParameterIfNotNull(request,"max-face-num",detectFaceRequest.getMaxFaceNum());
+        addParameterIfNotNull(request,"detect-url",detectFaceRequest.getDetectUrl());
+        return this.invoke(request, new Unmarshallers.DetectFaceUnmarshaller());
     }
 
 }

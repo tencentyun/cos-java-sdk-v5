@@ -37,6 +37,7 @@ import com.qcloud.cos.exception.MultiObjectDeleteException.DeleteError;
 import com.qcloud.cos.internal.cihandler.AutoTranslationBlockResponseHandler;
 import com.qcloud.cos.internal.cihandler.BatchJobResponseHandler;
 import com.qcloud.cos.internal.cihandler.DetectCarHandler;
+import com.qcloud.cos.internal.cihandler.DetectFaceResponseHandler;
 import com.qcloud.cos.internal.cihandler.FileProcessResponseHandler;
 import com.qcloud.cos.internal.cihandler.GenerateQrcodeHandler;
 import com.qcloud.cos.internal.cihandler.GetImageStyleHandler;
@@ -907,6 +908,12 @@ public class XmlResponsesSaxParser {
     }
     public AutoTranslationBlockResponseHandler parseAutoTranslationBlockResponse(InputStream inputStream) throws IOException {
         AutoTranslationBlockResponseHandler handler = new AutoTranslationBlockResponseHandler();
+        parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
+        return handler;
+    }
+
+    public DetectFaceResponseHandler parseDetectFaceResponse(InputStream inputStream) throws IOException {
+        DetectFaceResponseHandler handler = new DetectFaceResponseHandler();
         parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
         return handler;
     }
@@ -5600,7 +5607,7 @@ public class XmlResponsesSaxParser {
                 ParserMediaInfoUtils.ParsingAuditingCommonInfo(response.getJobsDetail().getTerroristInfo(), name, getText());
             } else if (in("Response", "JobsDetail", "AdsInfo")) {
                 ParserMediaInfoUtils.ParsingAuditingCommonInfo(response.getJobsDetail().getAdsInfo(), name, getText());
-            }else if (in("Response", "JobsDetail", "TeenagerInfo")) {
+            } else if (in("Response", "JobsDetail", "TeenagerInfo")) {
                 ParserMediaInfoUtils.ParsingAuditingCommonInfo(response.getJobsDetail().getTeenagerInfo(), name, getText());
             }  else if (in("Response", "JobsDetail", "Snapshot", "PornInfo")) {
                 ParserMediaInfoUtils.ParsingAuditingCommonInfo(snapshotInfo.getPornInfo(), name, getText());
@@ -6564,6 +6571,8 @@ public class XmlResponsesSaxParser {
                 jobList.get(jobList.size() - 1).getTerroristInfo().getLibResults().add(new LibResult());
             } else if (in("Response", "JobsDetail", "AdsInfo") && "LibResults".equals(name)) {
                 jobList.get(jobList.size() - 1).getAdsInfo().getLibResults().add(new LibResult());
+            } else if (in("Response", "JobsDetail", "TeenagerInfo") && "LibResults".equals(name)) {
+                jobList.get(jobList.size() - 1).getTeenagerInfo().getLibResults().add(new LibResult());
             }
         }
 
@@ -6587,6 +6596,8 @@ public class XmlResponsesSaxParser {
                 parseInfo(jobsDetail.getTerroristInfo(), name, getText());
             } else if (in("Response", "JobsDetail", "AdsInfo")) {
                 parseInfo(jobsDetail.getAdsInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "TeenagerInfo")) {
+                parseInfo(jobsDetail.getTeenagerInfo(), name, getText());
             } else if (in("Response", "JobsDetail", "PornInfo", "LibResults")) {
                 List<LibResult> libResults = jobsDetail.getPornInfo().getLibResults();
                 ParserMediaInfoUtils.parsingLastLibResult(libResults, name, getText());
@@ -6598,6 +6609,9 @@ public class XmlResponsesSaxParser {
                 ParserMediaInfoUtils.parsingLastLibResult(libResults, name, getText());
             } else if (in("Response", "JobsDetail", "AdsInfo", "LibResults")) {
                 List<LibResult> libResults = jobsDetail.getAdsInfo().getLibResults();
+                ParserMediaInfoUtils.parsingLastLibResult(libResults, name, getText());
+            } else if (in("Response", "JobsDetail", "TeenagerInfo", "LibResults")) {
+                List<LibResult> libResults = jobsDetail.getTeenagerInfo().getLibResults();
                 ParserMediaInfoUtils.parsingLastLibResult(libResults, name, getText());
             } else if (in("Response", "JobsDetail", "UserInfo")) {
                 ParserMediaInfoUtils.ParsingAuditingUserInfo(jobsDetail.getUserInfo(), name, getText());

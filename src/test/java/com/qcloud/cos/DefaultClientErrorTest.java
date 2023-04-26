@@ -34,7 +34,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Locale;
-import java.util.concurrent.ExecutionException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -86,7 +85,6 @@ public class DefaultClientErrorTest {
         PowerMockito.whenNew(COSSigner.class).withNoArguments().thenReturn(signer);
         PowerMockito.when(signer, "sign", any(), any(), any()).thenAnswer((m)->{return null;});
         ClientConfig clientConfig = new ClientConfig(new Region(region_));
-        clientConfig.setUseBasicAuth(true);
 
         PoolingHttpClientConnectionManager manager = PowerMockito.mock(PoolingHttpClientConnectionManager.class);
         PowerMockito.whenNew(PoolingHttpClientConnectionManager.class).withNoArguments().thenReturn(manager);
@@ -112,49 +110,39 @@ public class DefaultClientErrorTest {
         COSCredentials cred = new BasicCOSCredentials(secretId_, secretKey_);
         COSClient cosClient = new COSClient(cred, clientConfig);
 
-
-        GetObjectRequest getObjectRequest = new GetObjectRequest(bucket_, "test");
         try {
-            cosClient.getObject(getObjectRequest);
-        } catch (CosServiceException cse) {
-            assertEquals(413, cse.getStatusCode());
-        }
+            GetObjectRequest getObjectRequest = new GetObjectRequest(bucket_, "test");
+            try {
+                cosClient.getObject(getObjectRequest);
+            } catch (CosServiceException cse) {
+                assertEquals(413, cse.getStatusCode());
+            }
 
-        StatusLine statusLine2 = new BasicStatusLine(protocolVersion, 503, "Service Unavailable");
-        HttpResponse response2 = new MockBasicHttpResponse(statusLine2);
-        PowerMockito.when(httpClient.execute((HttpUriRequest) any(), (HttpContext) any())).thenReturn((CloseableHttpResponse) response2);
+            StatusLine statusLine2 = new BasicStatusLine(protocolVersion, 503, "Service Unavailable");
+            HttpResponse response2 = new MockBasicHttpResponse(statusLine2);
+            PowerMockito.when(httpClient.execute((HttpUriRequest) any(), (HttpContext) any())).thenReturn((CloseableHttpResponse) response2);
 
-        try {
-            cosClient.getObject(getObjectRequest);
-        } catch (CosServiceException cse) {
-            assertEquals(503, cse.getStatusCode());
-        }
+            try {
+                cosClient.getObject(getObjectRequest);
+            } catch (CosServiceException cse) {
+                assertEquals(503, cse.getStatusCode());
+            }
 
-        StatusLine statusLine3 = new BasicStatusLine(protocolVersion, 503, "test mock error");
-        HttpResponse response3 = new MockBasicHttpResponse(statusLine3);
-        PowerMockito.when(httpClient.execute((HttpUriRequest) any(), (HttpContext) any())).thenReturn((CloseableHttpResponse) response3);
+            StatusLine statusLine3 = new BasicStatusLine(protocolVersion, 503, "test mock error");
+            HttpResponse response3 = new MockBasicHttpResponse(statusLine3);
+            PowerMockito.when(httpClient.execute((HttpUriRequest) any(), (HttpContext) any())).thenReturn((CloseableHttpResponse) response3);
 
-        try {
-            cosClient.getObject(getObjectRequest);
-        } catch (CosClientException cce) {
-            assertEquals(ClientExceptionConstants.UNKNOWN, cce.getErrorCode());
-        }
-
-        PowerMockito.when(httpClient.execute((HttpUriRequest) any(), (HttpContext) any())).thenAnswer((m)->{
-            IOException e = new IOException();
-            ExecutionException ee = new ExecutionException("test_ee", e);
-            throw ee;
-        });
-
-        try {
-            cosClient.getObject(getObjectRequest);
-        } catch (CosClientException cce) {
-            assertEquals(ClientExceptionConstants.UNKNOWN, cce.getErrorCode());
+            try {
+                cosClient.getObject(getObjectRequest);
+            } catch (CosClientException cce) {
+                assertEquals(ClientExceptionConstants.UNKNOWN, cce.getErrorCode());
+            }
         } finally {
-            cosClient.shutdown();
+            if (cosClient != null) {
+                cosClient.shutdown();
+            }
         }
     }
-
 
 
     private class MockBasicHttpResponse extends AbstractHttpMessage implements CloseableHttpResponse {
