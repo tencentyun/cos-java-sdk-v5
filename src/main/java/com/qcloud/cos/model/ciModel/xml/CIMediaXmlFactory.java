@@ -535,9 +535,9 @@ public class CIMediaXmlFactory {
 
     private static void addCommonParams(XmlWriter xml, MediaJobsRequest request) {
         if (objIsNotValid(request)) {
-            addIfNotNull(xml,"Tag",request.getTag());
-            addIfNotNull(xml,"BucketName",request.getBucketName());
-            addIfNotNull(xml,"QueueId",request.getQueueId());
+            addIfNotNull(xml, "Tag", request.getTag());
+            addIfNotNull(xml, "BucketName", request.getBucketName());
+            addIfNotNull(xml, "QueueId", request.getQueueId());
             addIfNotNull(xml, "CallBack", request.getCallBack());
             addIfNotNull(xml, "CallBackFormat", request.getCallBackFormat());
             addIfNotNull(xml, "CallBackType", request.getCallBackType());
