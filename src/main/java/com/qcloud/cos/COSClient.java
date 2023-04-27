@@ -113,7 +113,6 @@ import com.qcloud.cos.model.ciModel.bucket.MediaBucketRequest;
 import com.qcloud.cos.model.ciModel.bucket.MediaBucketResponse;
 import com.qcloud.cos.model.ciModel.common.CImageProcessRequest;
 import com.qcloud.cos.model.ciModel.common.ImageProcessRequest;
-import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
 import com.qcloud.cos.model.ciModel.image.AutoTranslationBlockRequest;
 import com.qcloud.cos.model.ciModel.image.AutoTranslationBlockResponse;
 import com.qcloud.cos.model.ciModel.image.DetectFaceRequest;
@@ -143,8 +142,9 @@ import com.qcloud.cos.model.ciModel.job.MediaJobsRequest;
 import com.qcloud.cos.model.ciModel.job.MediaListJobResponse;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoRequest;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoResponse;
+import com.qcloud.cos.model.ciModel.persistence.AIGameRecResponse;
 import com.qcloud.cos.model.ciModel.persistence.CIUploadResult;
-import com.qcloud.cos.model.ciModel.persistence.DetectCarRequest;
+import com.qcloud.cos.model.ciModel.persistence.AIRecRequest;
 import com.qcloud.cos.model.ciModel.persistence.DetectCarResponse;
 import com.qcloud.cos.model.ciModel.queue.DocListQueueResponse;
 import com.qcloud.cos.model.ciModel.queue.DocQueueRequest;
@@ -164,7 +164,6 @@ import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowExecutionResponse;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowExecutionsResponse;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowListRequest;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowListResponse;
-import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowRequest;
 import com.qcloud.cos.model.ciModel.xml.CIAuditingXmlFactory;
 import com.qcloud.cos.model.ciModel.xml.CIFileProcessXmlFactory;
 import com.qcloud.cos.model.ciModel.xml.CIMediaXmlFactory;
@@ -3801,11 +3800,6 @@ public class COSClient implements COS {
 
     @Override
     public MediaJobResponse createMediaJobs(MediaJobsRequest req)  {
-        this.checkCIRequestCommon(req);
-        rejectNull(req.getTag(),
-                "The tag parameter must be specified setting the object tags");
-        rejectNull(req.getQueueId(),
-                "The queueId parameter must be specified setting the object tags");
         this.rejectStartWith(req.getCallBack(),"http","The CallBack parameter mush start with http or https");
         CosHttpRequest<MediaJobsRequest> request = createRequest(req.getBucketName(), "/jobs", req, HttpMethodName.POST);
         this.setContent(request, CIMediaXmlFactory.convertToXmlByteArray(req), "application/xml", false);
@@ -3835,10 +3829,6 @@ public class COSClient implements COS {
     @Override
     public MediaListJobResponse describeMediaJobs(MediaJobsRequest req) {
         this.checkCIRequestCommon(req);
-        rejectNull(req.getQueueId(),
-                "The queueId parameter must be specified setting the object tags");
-        rejectNull(req.getTag(),
-                "The tag parameter must be specified setting the object tags");
         CosHttpRequest<MediaJobsRequest> request = createRequest(req.getBucketName(), "/jobs", req, HttpMethodName.GET);
         addParameterIfNotNull(request, "queueId", req.getQueueId());
         addParameterIfNotNull(request, "tag", req.getTag());
@@ -3866,13 +3856,6 @@ public class COSClient implements COS {
 
     @Override
     public MediaQueueResponse updateMediaQueue(MediaQueueRequest mediaQueueRequest) {
-        this.checkCIRequestCommon(mediaQueueRequest);
-        rejectNull(mediaQueueRequest.getQueueId(),
-                "The queueId parameter must be specified setting the object tags");
-        rejectNull(mediaQueueRequest.getName(),
-                "The name parameter must be specified setting the object tags");
-        rejectNull(mediaQueueRequest.getState(),
-                "The state parameter must be specified setting the object tags");
         CosHttpRequest<MediaQueueRequest> request = createRequest(mediaQueueRequest.getBucketName(), "/queue/" + mediaQueueRequest.getQueueId(), mediaQueueRequest, HttpMethodName.PUT);
         this.setContent(request, RequestXmlFactory.convertToXmlByteArray(mediaQueueRequest), "application/xml", false);
         return invoke(request, new Unmarshallers.QueueUnmarshaller());
@@ -3894,10 +3877,6 @@ public class COSClient implements COS {
     public MediaTemplateResponse createMediaTemplate(MediaTemplateRequest templateRequest) {
         rejectNull(templateRequest,
                 "The request parameter must be specified setting the object tags");
-        rejectNull(templateRequest.getTag(),
-                "The tag parameter must be specified setting the object tags");
-        rejectNull(templateRequest.getName(),
-                "The name parameter must be specified setting the object tags");
         CosHttpRequest<MediaTemplateRequest> request = this.createRequest(templateRequest.getBucketName(), "/template", templateRequest, HttpMethodName.POST);
         this.setContent(request, CIMediaXmlFactory.convertToXmlByteArray(templateRequest), "application/xml", false);
         return this.invoke(request, new Unmarshallers.TemplateUnmarshaller());
@@ -4047,12 +4026,6 @@ public class COSClient implements COS {
     @Override
     public boolean updateDocProcessQueue(DocQueueRequest docRequest) {
         this.checkCIRequestCommon(docRequest);
-        rejectNull(docRequest.getQueueId(),
-                "The queueId parameter must be specified setting the object tags");
-        rejectNull(docRequest.getName(),
-                "The name parameter must be specified setting the object tags");
-        rejectNull(docRequest.getState(),
-                "The state parameter must be specified setting the object tags");
         CosHttpRequest<DocQueueRequest> request = createRequest(docRequest.getBucketName(), "/docqueue/" + docRequest.getQueueId(), docRequest, HttpMethodName.PUT);
         this.setContent(request, RequestXmlFactory.convertToXmlByteArray(docRequest), "application/xml", false);
         invoke(request, voidCosResponseHandler);
@@ -4440,12 +4413,12 @@ public class COSClient implements COS {
     }
 
     @Override
-    public DetectCarResponse detectCar(DetectCarRequest detectCarRequest) {
-        rejectNull(detectCarRequest.getBucketName(),
+    public DetectCarResponse detectCar(AIRecRequest AIRecRequest) {
+        rejectNull(AIRecRequest.getBucketName(),
                 "The bucketName parameter must be specified setting the object tags");
-        CosHttpRequest<DetectCarRequest> request = createRequest(detectCarRequest.getBucketName(), detectCarRequest.getObjectKey(), detectCarRequest, HttpMethodName.GET);
+        CosHttpRequest<AIRecRequest> request = createRequest(AIRecRequest.getBucketName(), AIRecRequest.getObjectKey(), AIRecRequest, HttpMethodName.GET);
         request.addParameter("ci-process", "DetectCar");
-        addParameterIfNotNull(request, "detect-url", detectCarRequest.getDetectUrl());
+        addParameterIfNotNull(request, "detect-url", AIRecRequest.getDetectUrl());
         return invoke(request, new Unmarshallers.DetectCarUnmarshaller());
     }
 
@@ -4664,12 +4637,6 @@ public class COSClient implements COS {
     @Override
     public MediaJobResponse createPicProcessJob(MediaJobsRequest req) {
         this.checkCIRequestCommon(req);
-        rejectNull(req.getTag(),
-                "The tag parameter must be specified setting the object tags");
-        rejectNull(req.getQueueId(),
-                "The queueId parameter must be specified setting the object tags");
-        rejectNull(req.getInput().getObject(),
-                "The input parameter must be specified setting the object tags");
         this.rejectStartWith(req.getCallBack(),"http","The CallBack parameter mush start with http or https");
         CosHttpRequest<MediaJobsRequest> request = createRequest(req.getBucketName(), "/pic_jobs", req, HttpMethodName.POST);
         this.setContent(request, CIMediaXmlFactory.convertToXmlByteArray(req), "application/xml", false);
@@ -4712,11 +4679,6 @@ public class COSClient implements COS {
 
     @Override
     public FileProcessJobResponse createFileProcessJob(FileProcessRequest req) {
-        this.checkCIRequestCommon(req);
-        rejectNull(req.getTag(),
-                "The tag parameter must be specified setting the object tags");
-        rejectNull(req.getQueueId(),
-                "The queueId parameter must be specified setting the object tags");
         this.rejectStartWith(req.getCallBack(),"http","The CallBack parameter mush start with http or https");
         CosHttpRequest<FileProcessRequest> request = createRequest(req.getBucketName(), "/file_jobs", req, HttpMethodName.POST);
         this.setContent(request, CIFileProcessXmlFactory.convertToXmlByteArray(req), "application/xml", false);
@@ -4771,6 +4733,18 @@ public class COSClient implements COS {
         addParameterIfNotNull(request,"max-face-num",detectFaceRequest.getMaxFaceNum());
         addParameterIfNotNull(request,"detect-url",detectFaceRequest.getDetectUrl());
         return this.invoke(request, new Unmarshallers.DetectFaceUnmarshaller());
+    }
+
+    @Override
+    public AIGameRecResponse aiGameRec(AIRecRequest aiRecRequest) {
+        rejectNull(aiRecRequest,
+                "The request parameter must be specified setting the object tags");
+        rejectNull(aiRecRequest.getBucketName(),
+                "The bucketName parameter must be specified setting the object tags");
+        CosHttpRequest<AIRecRequest> request = createRequest(aiRecRequest.getBucketName(), aiRecRequest.getObjectKey(), aiRecRequest, HttpMethodName.GET);
+        request.addParameter("ci-process","AIGameRec");
+        addParameterIfNotNull(request,"detect-url",aiRecRequest.getDetectUrl());
+        return this.invoke(request, new Unmarshallers.AIGameRecUnmarshaller());
     }
 
 }

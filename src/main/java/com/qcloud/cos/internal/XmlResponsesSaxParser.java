@@ -34,6 +34,7 @@ import java.util.Map;
 import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.exception.MultiObjectDeleteException.DeleteError;
+import com.qcloud.cos.internal.cihandler.AIGameRecResponseHandler;
 import com.qcloud.cos.internal.cihandler.AutoTranslationBlockResponseHandler;
 import com.qcloud.cos.internal.cihandler.BatchJobResponseHandler;
 import com.qcloud.cos.internal.cihandler.DetectCarHandler;
@@ -914,6 +915,12 @@ public class XmlResponsesSaxParser {
 
     public DetectFaceResponseHandler parseDetectFaceResponse(InputStream inputStream) throws IOException {
         DetectFaceResponseHandler handler = new DetectFaceResponseHandler();
+        parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
+        return handler;
+    }
+
+    public AIGameRecResponseHandler parseAIGameRecResponse(InputStream inputStream) throws IOException {
+        AIGameRecResponseHandler handler = new AIGameRecResponseHandler();
         parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
         return handler;
     }
@@ -4252,6 +4259,8 @@ public class XmlResponsesSaxParser {
                 ParserMediaInfoUtils.ParseTtsConfig(jobsDetail.getOperation().getTtsConfig(), name, getText());
             } else if (in("Response", "JobsDetail", "Operation", "TtsTpl")) {
                 ParserMediaInfoUtils.ParseTtsTpl(jobsDetail.getOperation().getTtsTpl(), name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "VideoTag")) {
+                ParserMediaInfoUtils.ParseVideoTag(jobsDetail.getOperation().getVideoTag(), name, getText());
             }
         }
 
@@ -6941,6 +6950,9 @@ public class XmlResponsesSaxParser {
                         break;
                     case "ForbidState":
                         response.setForbidState(getText());
+                        break;
+                    case "Score":
+                        response.setScore(getText());
                         break;
                     default:
                         break;

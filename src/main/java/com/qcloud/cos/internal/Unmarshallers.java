@@ -50,6 +50,7 @@ import com.qcloud.cos.model.ciModel.job.FileProcessJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaListJobResponse;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoResponse;
+import com.qcloud.cos.model.ciModel.persistence.AIGameRecResponse;
 import com.qcloud.cos.model.ciModel.persistence.DetectCarResponse;
 import com.qcloud.cos.model.ciModel.queue.DocListQueueResponse;
 import com.qcloud.cos.model.ciModel.queue.MediaListQueueResponse;
@@ -878,6 +879,15 @@ public class Unmarshallers {
             public DetectFaceResponse unmarshall(InputStream in) throws Exception {
                 return new XmlResponsesSaxParser()
                         .parseDetectFaceResponse(in).getResponse();
+            }
+    }
+
+    public static final class AIGameRecUnmarshaller
+                implements Unmarshaller<AIGameRecResponse, InputStream> {
+
+            public AIGameRecResponse unmarshall(InputStream in) throws Exception {
+                return new XmlResponsesSaxParser()
+                        .parseAIGameRecResponse(in).getResponse();
             }
     }
 

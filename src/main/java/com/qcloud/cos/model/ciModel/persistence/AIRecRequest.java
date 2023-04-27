@@ -5,7 +5,7 @@ import com.qcloud.cos.internal.CosServiceRequest;
 /**
  * 车辆识别请求实体 参数详情参考：https://cloud.tencent.com/document/product/460/63225
  */
-public class DetectCarRequest extends CosServiceRequest {
+public class AIRecRequest extends CosServiceRequest {
     /**
      * 操作的bucket名称
      */

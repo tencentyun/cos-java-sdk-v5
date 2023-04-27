@@ -46,6 +46,8 @@ public class MediaJobOperation {
     private VideoEnhance videoEnhance = new VideoEnhance();
     private TtsTpl ttsTpl = new TtsTpl();
     private Subtitles subtitles = new Subtitles();
+    private VideoTag videoTag = new VideoTag();
+    private VideoTagResult videoTagResult = new VideoTagResult();
 
     public MediaTimeIntervalObject getTimeInterval() {
         return timeInterval;
@@ -323,6 +325,14 @@ public class MediaJobOperation {
 
     public void setSubtitles(Subtitles subtitles) {
         this.subtitles = subtitles;
+    }
+
+    public VideoTag getVideoTag() {
+        return videoTag;
+    }
+
+    public void setVideoTag(VideoTag videoTag) {
+        this.videoTag = videoTag;
     }
 
     @Override

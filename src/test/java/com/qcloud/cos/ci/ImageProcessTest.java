@@ -21,7 +21,7 @@ import com.qcloud.cos.model.ciModel.job.MediaJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaJobsRequest;
 import com.qcloud.cos.model.ciModel.persistence.CIObject;
 import com.qcloud.cos.model.ciModel.persistence.CIUploadResult;
-import com.qcloud.cos.model.ciModel.persistence.DetectCarRequest;
+import com.qcloud.cos.model.ciModel.persistence.AIRecRequest;
 import com.qcloud.cos.model.ciModel.persistence.DetectCarResponse;
 import com.qcloud.cos.model.ciModel.persistence.PicOperations;
 import com.qcloud.cos.model.ciModel.queue.MediaListQueueResponse;
@@ -211,7 +211,7 @@ public class ImageProcessTest extends AbstractCOSClientCITest {
     @Test
     public void detectCarTest() {
         //1.创建任务请求对象
-        DetectCarRequest request = new DetectCarRequest();
+        AIRecRequest request = new AIRecRequest();
         //2.添加请求参数 参数详情请见api接口文档
         //2.1设置请求bucket
         request.setBucketName(bucket);
@@ -226,7 +226,7 @@ public class ImageProcessTest extends AbstractCOSClientCITest {
     @Test(expected = IllegalArgumentException.class)
     public void detectCarTest2() {
         //1.创建任务请求对象
-        DetectCarRequest request = new DetectCarRequest();
+        AIRecRequest request = new AIRecRequest();
         request.setDetectUrl("https://" + bucket + ".cos.ap-chongqing.myqcloud.com/car.jpg");
         DetectCarResponse response = cosclient.detectCar(request);
     }

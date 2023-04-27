@@ -44,6 +44,7 @@ import com.qcloud.cos.model.ciModel.job.Subtitle;
 import com.qcloud.cos.model.ciModel.job.Subtitles;
 import com.qcloud.cos.model.ciModel.job.SuperResolution;
 import com.qcloud.cos.model.ciModel.job.TtsTpl;
+import com.qcloud.cos.model.ciModel.job.VideoTag;
 import com.qcloud.cos.model.ciModel.job.VideoTargetRec;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaFormat;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoAudio;
@@ -1392,6 +1393,16 @@ public class ParserMediaInfoUtils {
                 break;
             case "DecryptKey":
                 operation.setDecryptKey(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParseVideoTag(VideoTag videoTag, String name, String value) {
+        switch (name) {
+            case "Scenario":
+                videoTag.setScenario(value);
                 break;
             default:
                 break;

@@ -89,7 +89,7 @@ public class MediaJobResponseHandler extends CIAbstractHandler {
         } else if (in("Response", "JobsDetail", "Input")) {
             jobsDetail.getInput().setObject(getText());
         } else if (in("Response", "JobsDetail", "Operation")) {
-            ParserMediaInfoUtils.parseMediaJobOperation(jobsDetail.getOperation(),name,getText());
+            ParserMediaInfoUtils.parseMediaJobOperation(jobsDetail.getOperation(), name, getText());
         } else if (in("Response", "JobsDetail", "Operation", "MediaInfo", "Format")) {
             MediaFormat format = jobsDetail.getOperation().getMediaInfo().getFormat();
             ParserMediaInfoUtils.ParsingMediaFormat(format, name, getText());
@@ -361,6 +361,8 @@ public class MediaJobResponseHandler extends CIAbstractHandler {
             ParserMediaInfoUtils.ParsingEffectConfig(jobsDetail.getOperation().getTranscode().getAudioMixArray(), name, getText());
         } else if (in("Response", "JobsDetail", "Operation", "Subtitles", "Subtitle")) {
             ParserMediaInfoUtils.ParsingSubtitles(jobsDetail.getOperation().getSubtitles(), name, getText());
+        } else if (in("Response", "JobsDetail", "Operation", "VideoTag")) {
+            ParserMediaInfoUtils.ParseVideoTag(jobsDetail.getOperation().getVideoTag(), name, getText());
         }
     }
 

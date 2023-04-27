@@ -37,6 +37,7 @@ import com.qcloud.cos.model.ciModel.job.Subtitles;
 import com.qcloud.cos.model.ciModel.job.SuperResolution;
 import com.qcloud.cos.model.ciModel.job.TtsTpl;
 import com.qcloud.cos.model.ciModel.job.VideoEnhance;
+import com.qcloud.cos.model.ciModel.job.VideoTag;
 import com.qcloud.cos.model.ciModel.job.VideoTargetRec;
 import com.qcloud.cos.model.ciModel.job.VoiceSeparate;
 import com.qcloud.cos.model.ciModel.template.MediaHlsEncryptObject;
@@ -216,7 +217,16 @@ public class CIMediaXmlFactory {
         addTtsTpl(xml, operation.getTtsTpl());
         addVideoEnhance(xml, operation.getVideoEnhance());
         addSubtitles(xml, operation.getSubtitles());
+        addVideoTag(xml, operation.getVideoTag());
         xml.end();
+    }
+
+    private static void addVideoTag(XmlWriter xml, VideoTag videoTag) {
+        if (objIsNotValid(videoTag)) {
+            xml.start("VideoTag");
+            addIfNotNull(xml, "Scenario", videoTag.getScenario());
+            xml.end();
+        }
     }
 
     private static void addSubtitles(XmlWriter xml, Subtitles subtitles) {
@@ -242,7 +252,7 @@ public class CIMediaXmlFactory {
             addColorEnhance(xml, videoEnhance.getColorEnhance());
             addMsSharpen(xml, videoEnhance.getMsSharpen());
             addSdrToHDR(xml, videoEnhance.getSdrToHDR());
-            addFrameEnhance(xml,videoEnhance.getFrameEnhance());
+            addFrameEnhance(xml, videoEnhance.getFrameEnhance());
             xml.end();
         }
     }
