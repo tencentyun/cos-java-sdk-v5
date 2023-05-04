@@ -183,6 +183,14 @@ public class CIMediaXmlFactory {
             addIfNotNull(xml, "VoiceType", request.getVoiceType());
         } else if ("VideoEnhance".equalsIgnoreCase(tag)) {
             addVideoEnhance(xml, request.getVideoEnhance());
+        } else if ("VideoMontage".equalsIgnoreCase(tag)) {
+            addIfNotNull(xml, "Duration", request.getDuration());
+            addIfNotNull(xml, "Scene", request.getScene());
+            addVideo(xml, request.getVideo());
+            addAudio(xml, request.getAudio());
+            addAudioMix(xml, request.getAudioMix(), "AudioMix");
+            addAudioMixArray(xml, request.getAudioMixArray());
+            addContainer(xml, request.getContainer());
         }
         xml.end();
         return xml.getBytes();
@@ -414,9 +422,11 @@ public class CIMediaXmlFactory {
         if (objIsNotValid(videoMontage)) {
             xml.start("VideoMontage");
             addIfNotNull(xml, "Duration", videoMontage.getDuration());
+            addIfNotNull(xml, "Scene", videoMontage.getScene());
             addVideo(xml, videoMontage.getVideo());
             addAudio(xml, videoMontage.getAudio());
             addAudioMix(xml, videoMontage.getAudioMix(), "AudioMix");
+            addAudioMixArray(xml, videoMontage.getAudioMixArray());
             addContainer(xml, videoMontage.getContainer());
             xml.end();
         }
@@ -563,7 +573,7 @@ public class CIMediaXmlFactory {
     }
 
     private static void addAudioMixArray(XmlWriter xml, List<MediaAudioMixObject> audioMixArray) {
-        if (objIsNotValid(audioMixArray)) {
+        if (audioMixArray != null && !audioMixArray.isEmpty()) {
             for (MediaAudioMixObject mediaAudioMixObject : audioMixArray) {
                 addAudioMix(xml, mediaAudioMixObject, "AudioMixArray");
             }

@@ -6,7 +6,23 @@ import com.qcloud.cos.model.ciModel.job.MediaAudioObject;
 import com.qcloud.cos.model.ciModel.job.MediaContainerObject;
 import com.qcloud.cos.model.ciModel.job.MediaVideoObject;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MediaVideoMontageObject {
+    public MediaVideoMontageObject(MediaTemplateRequest request) {
+        container = request.getContainer();
+        video = request.getVideo();
+        duration = request.getDuration();
+        audio = request.getAudio();
+        audioMix = request.getAudioMix();
+        scene = request.getScene();
+        audioMixArray = request.getAudioMixArray();
+    }
+
+    public MediaVideoMontageObject() {
+
+    }
 
     /**
      * 容器格式
@@ -32,11 +48,23 @@ public class MediaVideoMontageObject {
      */
     private MediaAudioMixObject audioMix;
 
+    private String scene;
+
+    private List<MediaAudioMixObject> audioMixArray;
+
     public MediaContainerObject getContainer() {
         if (container == null) {
             container = new MediaContainerObject();
         }
         return container;
+    }
+
+    public String getScene() {
+        return scene;
+    }
+
+    public void setScene(String scene) {
+        this.scene = scene;
     }
 
     public void setContainer(MediaContainerObject container) {
@@ -82,6 +110,17 @@ public class MediaVideoMontageObject {
 
     public void setAudioMix(MediaAudioMixObject audioMix) {
         this.audioMix = audioMix;
+    }
+
+    public List<MediaAudioMixObject> getAudioMixArray() {
+        if (audioMixArray == null) {
+            audioMixArray = new ArrayList<>();
+        }
+        return audioMixArray;
+    }
+
+    public void setAudioMixArray(List<MediaAudioMixObject> audioMixArray) {
+        this.audioMixArray = audioMixArray;
     }
 
     @Override
