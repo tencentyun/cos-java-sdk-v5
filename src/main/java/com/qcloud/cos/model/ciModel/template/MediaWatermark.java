@@ -42,6 +42,8 @@ public class MediaWatermark {
      */
     private MediaWaterMarkImage image;
 
+    private SlideConfig slideConfig;
+
     public String getType() {
         return type;
     }
@@ -99,7 +101,7 @@ public class MediaWatermark {
     }
 
     public MediaWaterMarkText getText() {
-        if (text==null){
+        if (text == null) {
             text = new MediaWaterMarkText();
         }
         return text;
@@ -110,7 +112,7 @@ public class MediaWatermark {
     }
 
     public MediaWaterMarkImage getImage() {
-        if (image==null){
+        if (image == null) {
             image = new MediaWaterMarkImage();
         }
         return image;
@@ -118,6 +120,17 @@ public class MediaWatermark {
 
     public void setImage(MediaWaterMarkImage image) {
         this.image = image;
+    }
+
+    public SlideConfig getSlideConfig() {
+        if (slideConfig == null) {
+            slideConfig = new SlideConfig();
+        }
+        return slideConfig;
+    }
+
+    public void setSlideConfig(SlideConfig slideConfig) {
+        this.slideConfig = slideConfig;
     }
 
     @Override
