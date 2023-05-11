@@ -49,6 +49,7 @@ import com.qcloud.cos.model.ciModel.template.MediaVideoMontageObject;
 import com.qcloud.cos.model.ciModel.template.MediaWaterMarkImage;
 import com.qcloud.cos.model.ciModel.template.MediaWaterMarkText;
 import com.qcloud.cos.model.ciModel.template.MediaWatermark;
+import com.qcloud.cos.model.ciModel.template.SlideConfig;
 import com.qcloud.cos.model.ciModel.template.SpriteSnapshotConfig;
 import com.qcloud.cos.utils.StringUtils;
 
@@ -140,6 +141,7 @@ public class CIMediaXmlFactory {
             addIfNotNull(xml, "LocMode", request.getWatermark().getLocMode());
             addIfNotNull(xml, "Pos", request.getWatermark().getPos());
             addIfNotNull(xml, "StartTime", request.getWatermark().getStartTime());
+            addSlideConfig(xml,request.getWatermark().getSlideConfig());
             if ("Text".equalsIgnoreCase(request.getWatermark().getType())) {
                 xml.start("Text");
                 MediaWaterMarkText text = request.getWatermark().getText();
@@ -747,7 +749,7 @@ public class CIMediaXmlFactory {
             addIfNotNull(xml, "LocMode", watermark.getLocMode());
             addIfNotNull(xml, "Pos", watermark.getPos());
             addIfNotNull(xml, "StartTime", watermark.getStartTime());
-
+            addSlideConfig(xml,watermark.getSlideConfig());
             if ("Text".equalsIgnoreCase(watermark.getType())) {
                 MediaWaterMarkText text = watermark.getText();
                 xml.start("Text");
@@ -765,8 +767,19 @@ public class CIMediaXmlFactory {
                 addIfNotNull(xml, "Transparency", image.getTransparency());
                 addIfNotNull(xml, "Url", image.getUrl());
                 addIfNotNull(xml, "Width", image.getWidth());
+                addIfNotNull(xml, "Background", image.getBackground());
                 xml.end();
             }
+            xml.end();
+        }
+    }
+
+    private static void addSlideConfig(XmlWriter xml, SlideConfig slideConfig) {
+        if (objIsNotValid(slideConfig)) {
+            xml.start("SlideConfig");
+            addIfNotNull(xml, "SlideMode", slideConfig.getSlideMode());
+            addIfNotNull(xml, "XSlideSpeed", slideConfig.getxSlideSpeed());
+            addIfNotNull(xml, "YSlideSpeed", slideConfig.getxSlideSpeed());
             xml.end();
         }
     }
