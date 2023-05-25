@@ -179,7 +179,7 @@ public class BucketDemo {
         CreateBucketRequest createBucketRequest = new CreateBucketRequest(bucketname);
 
         try {
-            cosclient.createBucket(createBucketRequest);
+            cosclient.createBucket(createBucketRequest, true);
         } catch (CosServiceException cse) {
             cse.printStackTrace();
         } catch (CosClientException cce) {
