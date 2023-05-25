@@ -28,7 +28,6 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
@@ -1407,7 +1406,7 @@ public class COSClient implements COS {
         return createBucket(createBucketRequest,false);
     }
 
-    public Bucket createBucket(CreateBucketRequest createBucketRequest,boolean isMAZ)
+    public Bucket createBucket(CreateBucketRequest createBucketRequest, boolean isMAZ)
             throws CosClientException, CosServiceException{
         rejectNull(createBucketRequest,
                 "The CreateBucketRequest parameter must be specified when creating a bucket");
