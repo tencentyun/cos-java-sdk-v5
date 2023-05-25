@@ -27,10 +27,10 @@ public class MediaAudioMixObject implements Serializable {
 
     /**
      * 混音淡入淡出配置
-     * true/false
-     * 默认为false
      */
-    private String effectConfig;
+    private EffectConfig effectConfig;
+
+    private String directMix;
 
     public String getAudioSource() {
         return audioSource;
@@ -56,20 +56,33 @@ public class MediaAudioMixObject implements Serializable {
         this.replace = replace;
     }
 
-    public String getEffectConfig() {
+    public EffectConfig getEffectConfig() {
+        if (effectConfig == null) {
+            effectConfig = new EffectConfig();
+        }
         return effectConfig;
     }
 
-    public void setEffectConfig(String effectConfig) {
+    public void setEffectConfig(EffectConfig effectConfig) {
         this.effectConfig = effectConfig;
+    }
+
+    public String getDirectMix() {
+        return directMix;
+    }
+
+    public void setDirectMix(String directMix) {
+        this.directMix = directMix;
     }
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("MediaAudioMixObject{");
+        final StringBuilder sb = new StringBuilder("MediaAudioMixObject{");
         sb.append("audioSource='").append(audioSource).append('\'');
         sb.append(", mixMode='").append(mixMode).append('\'');
         sb.append(", replace='").append(replace).append('\'');
+        sb.append(", effectConfig='").append(effectConfig).append('\'');
+        sb.append(", directMix='").append(directMix).append('\'');
         sb.append('}');
         return sb.toString();
     }

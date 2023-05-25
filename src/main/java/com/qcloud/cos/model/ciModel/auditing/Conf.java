@@ -41,13 +41,16 @@ public class Conf {
     /**
      * 指定是否需要高亮展示网页内的违规文本，并返回高亮展示的 html 链接。取值为 true 和 false，默认为 false。
      */
-    private CallbackVersion returnHighlightHtml;
+    private String returnHighlightHtml;
 
     /**
      * 是否进行异步处理审核 0：同步返回结果  1：异步处理。 默认值为 0
      */
     private String async;
 
+    private String callbackType;
+
+    private Freeze freeze;
 
     public String getBizType() {
         return bizType;
@@ -100,13 +103,6 @@ public class Conf {
         this.callbackVersion = callbackVersion;
     }
 
-    public CallbackVersion getReturnHighlightHtml() {
-        return returnHighlightHtml;
-    }
-
-    public void setReturnHighlightHtml(CallbackVersion returnHighlightHtml) {
-        this.returnHighlightHtml = returnHighlightHtml;
-    }
 
     public String getAsync() {
         return async;
@@ -114,6 +110,33 @@ public class Conf {
 
     public void setAsync(String async) {
         this.async = async;
+    }
+
+    public String getCallbackType() {
+        return callbackType;
+    }
+
+    public void setCallbackType(String callbackType) {
+        this.callbackType = callbackType;
+    }
+
+    public String getReturnHighlightHtml() {
+        return returnHighlightHtml;
+    }
+
+    public void setReturnHighlightHtml(String returnHighlightHtml) {
+        this.returnHighlightHtml = returnHighlightHtml;
+    }
+
+    public Freeze getFreeze() {
+        if (freeze == null) {
+            freeze = new Freeze();
+        }
+        return freeze;
+    }
+
+    public void setFreeze(Freeze freeze) {
+        this.freeze = freeze;
     }
 
     @Override
@@ -127,6 +150,7 @@ public class Conf {
         sb.append(", callbackVersion=").append(callbackVersion);
         sb.append(", returnHighlightHtml=").append(returnHighlightHtml);
         sb.append(", async='").append(async).append('\'');
+        sb.append(", callbackType='").append(callbackType).append('\'');
         sb.append('}');
         return sb.toString();
     }

@@ -49,4 +49,16 @@ public class OutputFile {
     public void setMd5Info(Md5Info md5Info) {
         this.md5Info = md5Info;
     }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("OutputFile{");
+        sb.append("region='").append(region).append('\'');
+        sb.append(", bucket='").append(bucket).append('\'');
+        sb.append(", objectPrefix='").append(objectPrefix).append('\'');
+        sb.append(", objectName='").append(objectName).append('\'');
+        sb.append(", md5Info=").append(md5Info);
+        sb.append('}');
+        return sb.toString();
+    }
 }

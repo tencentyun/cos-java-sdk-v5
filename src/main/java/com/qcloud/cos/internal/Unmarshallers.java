@@ -26,33 +26,8 @@ import java.util.List;
 
 import com.qcloud.cos.internal.XmlResponsesSaxParser.CompleteMultipartUploadHandler;
 import com.qcloud.cos.internal.XmlResponsesSaxParser.CopyObjectResultHandler;
-import com.qcloud.cos.model.AccessControlList;
-import com.qcloud.cos.model.Bucket;
-import com.qcloud.cos.model.BucketCrossOriginConfiguration;
-import com.qcloud.cos.model.BucketDomainConfiguration;
-import com.qcloud.cos.model.BucketIntelligentTierConfiguration;
-import com.qcloud.cos.model.BucketLifecycleConfiguration;
-import com.qcloud.cos.model.BucketLoggingConfiguration;
-import com.qcloud.cos.model.BucketRefererConfiguration;
-import com.qcloud.cos.model.BucketReplicationConfiguration;
-import com.qcloud.cos.model.BucketTaggingConfiguration;
-import com.qcloud.cos.model.BucketVersioningConfiguration;
-import com.qcloud.cos.model.BucketWebsiteConfiguration;
-import com.qcloud.cos.model.DecompressionResult;
-import com.qcloud.cos.model.DeleteBucketInventoryConfigurationResult;
-import com.qcloud.cos.model.DeleteObjectTaggingResult;
-import com.qcloud.cos.model.GetBucketInventoryConfigurationResult;
-import com.qcloud.cos.model.GetObjectTaggingResult;
-import com.qcloud.cos.model.InitiateMultipartUploadResult;
-import com.qcloud.cos.model.ListBucketInventoryConfigurationsResult;
-import com.qcloud.cos.model.ListJobsResult;
-import com.qcloud.cos.model.MultipartUploadListing;
-import com.qcloud.cos.model.ObjectListing;
-import com.qcloud.cos.model.ObjectMetadata;
-import com.qcloud.cos.model.PartListing;
-import com.qcloud.cos.model.SetBucketInventoryConfigurationResult;
-import com.qcloud.cos.model.SetObjectTaggingResult;
-import com.qcloud.cos.model.VersionListing;
+import com.qcloud.cos.model.*;
+import com.qcloud.cos.model.bucketcertificate.BucketGetDomainCertificate;
 import com.qcloud.cos.model.ciModel.auditing.AudioAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.BatchImageAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.DocumentAuditingResponse;
@@ -62,12 +37,15 @@ import com.qcloud.cos.model.ciModel.auditing.VideoAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.WebpageAuditingResponse;
 import com.qcloud.cos.model.ciModel.bucket.DocBucketResponse;
 import com.qcloud.cos.model.ciModel.bucket.MediaBucketResponse;
+import com.qcloud.cos.model.ciModel.image.AutoTranslationBlockResponse;
 import com.qcloud.cos.model.ciModel.image.ImageLabelResponse;
 import com.qcloud.cos.model.ciModel.image.ImageLabelV2Response;
 import com.qcloud.cos.model.ciModel.image.ImageSearchResponse;
 import com.qcloud.cos.model.ciModel.image.ImageStyleResponse;
+import com.qcloud.cos.model.ciModel.job.BatchJobResponse;
 import com.qcloud.cos.model.ciModel.job.DocJobListResponse;
 import com.qcloud.cos.model.ciModel.job.DocJobResponse;
+import com.qcloud.cos.model.ciModel.job.FileProcessJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaListJobResponse;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoResponse;
@@ -336,6 +314,17 @@ public class Unmarshallers {
         }
     }
 
+    public static final class BucketDomainCertificateUnmarshaller
+            implements Unmarshaller<BucketGetDomainCertificate, InputStream> {
+        public BucketGetDomainCertificate unmarshall(InputStream in) throws Exception {
+            if (in.available() == 0) {
+                return null;
+            }
+            return new XmlResponsesSaxParser().parseBucketDomainCertificateResponse(in)
+                    .getBucketDomainCertificate();
+        }
+    }
+
     public static final class BucketRefererConfigurationUnmarshaller
             implements Unmarshaller<BucketRefererConfiguration, InputStream> {
         public BucketRefererConfiguration unmarshall(InputStream in) throws Exception {
@@ -576,6 +565,15 @@ public class Unmarshallers {
         public MediaJobResponse unmarshall(InputStream in) throws Exception {
             return new XmlResponsesSaxParser()
                     .parseJobCreatResponse(in).getResponse();
+        }
+    }
+
+    public static final class BatchJobUnmarshaller
+            implements Unmarshaller<BatchJobResponse, InputStream> {
+
+        public BatchJobResponse unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser()
+                    .parseBatchJobResponse(in).getResponse();
         }
     }
 
@@ -853,6 +851,24 @@ public class Unmarshallers {
             return new XmlResponsesSaxParser()
                     .parseReportBadCase(in).getResponse();
         }
+    }
+
+    public static final class FileProcessUnmarshaller
+            implements Unmarshaller<FileProcessJobResponse, InputStream> {
+
+        public FileProcessJobResponse unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser()
+                    .parseFileProcessResponse(in).getResponse();
+        }
+    }
+
+    public static final class AutoTranslationBlockUnmarshaller
+                implements Unmarshaller<AutoTranslationBlockResponse, InputStream> {
+
+            public AutoTranslationBlockResponse unmarshall(InputStream in) throws Exception {
+                return new XmlResponsesSaxParser()
+                        .parseAutoTranslationBlockResponse(in).getResponse();
+            }
     }
 
 }

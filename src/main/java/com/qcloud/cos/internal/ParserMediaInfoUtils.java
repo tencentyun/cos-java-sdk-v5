@@ -3,26 +3,47 @@ package com.qcloud.cos.internal;
 import com.qcloud.cos.model.ciModel.auditing.AudioSectionInfo;
 import com.qcloud.cos.model.ciModel.auditing.AudtingCommonInfo;
 import com.qcloud.cos.model.ciModel.auditing.BatchImageJobDetail;
+import com.qcloud.cos.model.ciModel.auditing.LanguageResult;
 import com.qcloud.cos.model.ciModel.auditing.LibResult;
 import com.qcloud.cos.model.ciModel.auditing.ListResult;
+import com.qcloud.cos.model.ciModel.auditing.ObjectResults;
 import com.qcloud.cos.model.ciModel.auditing.OcrResults;
 import com.qcloud.cos.model.ciModel.auditing.PoliticsInfoObjectResults;
 import com.qcloud.cos.model.ciModel.auditing.SectionInfo;
 import com.qcloud.cos.model.ciModel.auditing.SnapshotInfo;
 import com.qcloud.cos.model.ciModel.auditing.UserInfo;
+import com.qcloud.cos.model.ciModel.common.BatchInputObject;
+import com.qcloud.cos.model.ciModel.common.MediaInputObject;
 import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
+import com.qcloud.cos.model.ciModel.job.AudioConfig;
+import com.qcloud.cos.model.ciModel.job.ColorEnhance;
+import com.qcloud.cos.model.ciModel.job.EffectConfig;
+import com.qcloud.cos.model.ciModel.job.FrameEnhance;
 import com.qcloud.cos.model.ciModel.job.Md5Info;
+import com.qcloud.cos.model.ciModel.job.MediaAudioMixObject;
 import com.qcloud.cos.model.ciModel.job.MediaAudioObject;
+import com.qcloud.cos.model.ciModel.job.MediaBodyInfo;
+import com.qcloud.cos.model.ciModel.job.MediaConcatFragmentObject;
+import com.qcloud.cos.model.ciModel.job.MediaContainerObject;
 import com.qcloud.cos.model.ciModel.job.MediaDigitalWatermark;
 import com.qcloud.cos.model.ciModel.job.MediaJobObject;
+import com.qcloud.cos.model.ciModel.job.MediaRecognition;
 import com.qcloud.cos.model.ciModel.job.MediaRemoveWaterMark;
-import com.qcloud.cos.model.ciModel.job.MediaResult;
 import com.qcloud.cos.model.ciModel.job.MediaTimeIntervalObject;
+import com.qcloud.cos.model.ciModel.job.MediaTopkRecognition;
 import com.qcloud.cos.model.ciModel.job.MediaTransConfigObject;
 import com.qcloud.cos.model.ciModel.job.MediaTranscodeVideoObject;
+import com.qcloud.cos.model.ciModel.job.MediaTtsConfig;
 import com.qcloud.cos.model.ciModel.job.MediaVideoObject;
+import com.qcloud.cos.model.ciModel.job.MsSharpen;
 import com.qcloud.cos.model.ciModel.job.OutputFile;
 import com.qcloud.cos.model.ciModel.job.ProcessResult;
+import com.qcloud.cos.model.ciModel.job.SDRtoHDR;
+import com.qcloud.cos.model.ciModel.job.Subtitle;
+import com.qcloud.cos.model.ciModel.job.Subtitles;
+import com.qcloud.cos.model.ciModel.job.SuperResolution;
+import com.qcloud.cos.model.ciModel.job.TtsTpl;
+import com.qcloud.cos.model.ciModel.job.VideoTargetRec;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaFormat;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoAudio;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoSubtitle;
@@ -669,6 +690,9 @@ public class ParserMediaInfoUtils {
             case "Count":
                 obj.setCount(value);
                 break;
+            case "SubLabel":
+                obj.setSubLabel(value);
+                break;
             default:
                 break;
         }
@@ -848,6 +872,9 @@ public class ParserMediaInfoUtils {
             case "SpriteObject":
                 output.setSpriteObject(value);
                 break;
+            case "AuObject":
+                output.setAuObject(value);
+                break;
             default:
                 break;
         }
@@ -907,6 +934,9 @@ public class ParserMediaInfoUtils {
                 break;
             case "State":
                 jobsDetail.setState(value);
+                break;
+            case "ForbidState":
+                jobsDetail.setForbidState(value);
                 break;
             default:
                 break;
@@ -1005,4 +1035,336 @@ public class ParserMediaInfoUtils {
     }
 
 
+    public static void parseLanguageResult(LanguageResult result, String name, String value) {
+        switch (name) {
+            case "EndTime":
+                result.setEndTime(value);
+                break;
+            case "Label":
+                result.setLabel(value);
+                break;
+            case "Score":
+                result.setScore(value);
+                break;
+            case "StartTime":
+                result.setStartTime(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParseConcatFragment(MediaConcatFragmentObject result, String name, String value) {
+        switch (name) {
+            case "Mode":
+                result.setMode(value);
+                break;
+            case "Url":
+                result.setUrl(value);
+                break;
+            case "StartTime":
+                result.setStartTime(value);
+                break;
+            case "EndTime":
+                result.setEndTime(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParseAudioMix(MediaAudioMixObject result, String name, String value) {
+        switch (name) {
+            case "AudioSource":
+                result.setAudioSource(value);
+                break;
+            case "MixMode":
+                result.setMixMode(value);
+                break;
+            case "Replace":
+                result.setReplace(value);
+                break;
+            case "DirectMix":
+                result.setDirectMix(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParsingVideoTargetRec(VideoTargetRec videoTargetRec, String name, String value) {
+        switch (name) {
+            case "Body":
+                videoTargetRec.setBody(value);
+                break;
+            case "Pet":
+                videoTargetRec.setPet(value);
+                break;
+            case "Car":
+                videoTargetRec.setCar(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParseMediaBodyInfo(MediaBodyInfo videoTargetRec, String name, String value) {
+        switch (name) {
+            case "Score":
+                videoTargetRec.setScore(value);
+                break;
+            case "Name":
+                videoTargetRec.setName(value);
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    public static void ParseMediaRecognition(MediaRecognition recognition, String name, String value) {
+        switch (name) {
+            case "Time":
+                recognition.setTime(value);
+                break;
+            case "Url":
+                recognition.setUrl(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParseMediaRecognition(MediaTopkRecognition recognition, String name, String value) {
+        switch (name) {
+            case "Time":
+                recognition.setTime(value);
+                break;
+            case "Url":
+                recognition.setUrl(value);
+                break;
+            case "Score":
+                recognition.setScore(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParseLocation(ObjectResults.Location location, String name, String value) {
+        switch (name) {
+            case "Height":
+                location.setHeight(value);
+                break;
+            case "Width":
+                location.setWidth(value);
+                break;
+            case "Rotate":
+                location.setRotate(value);
+                break;
+            case "X":
+                location.setX(value);
+                break;
+            case "Y":
+                location.setY(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParseAudioConfig(AudioConfig audioConfig, String name, String value) {
+        switch (name) {
+            case "Channels":
+                audioConfig.setChannels(value);
+                break;
+            case "Codec":
+                audioConfig.setCodec(value);
+                break;
+            case "Samplerate":
+                audioConfig.setSamplerate(value);
+                break;
+            case "Bitrate":
+                audioConfig.setBitrate(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParsingInput(BatchInputObject input, String name, String value) {
+        switch (name) {
+            case "Manifest":
+                input.setManifest(value);
+                break;
+            case "Prefix":
+                input.setPrefix(value);
+                break;
+            case "UrlFile":
+                input.setUrlFile(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParseTtsConfig(MediaTtsConfig ttsConfig, String name, String value) {
+        switch (name) {
+            case "Input":
+                ttsConfig.setInput(value);
+                break;
+            case "InputType":
+                ttsConfig.setInputType(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParseTtsTpl(TtsTpl ttsTpl, String name, String value) {
+        switch (name) {
+            case "Codec":
+                ttsTpl.setCodec(value);
+                break;
+            case "Mode":
+                ttsTpl.setMode(value);
+                break;
+            case "Speed":
+                ttsTpl.setSpeed(value);
+                break;
+            case "Volume":
+                ttsTpl.setVolume(value);
+                break;
+            case "VoiceType":
+                ttsTpl.setVoiceType(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParseContainer(MediaContainerObject container, String name, String value) {
+        switch (name) {
+            case "Format":
+                container.setFormat(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParsingSuperResolution(SuperResolution superResolution, String name, String value) {
+        switch (name) {
+            case "Resolution":
+                superResolution.setResolution(value);
+                break;
+            case "Version":
+                superResolution.setVersion(value);
+                break;
+            case "EnableScaleUp":
+                superResolution.setEnableScaleUp(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParsingColorEnhance(ColorEnhance colorEnhance, String name, String value) {
+        switch (name) {
+            case "Saturation":
+                colorEnhance.setSaturation(value);
+                break;
+            case "Correction":
+                colorEnhance.setCorrection(value);
+                break;
+            case "Contrast":
+                colorEnhance.setContrast(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParsingMsSharpen(MsSharpen msSharpen, String name, String value) {
+        switch (name) {
+            case "SharpenLevel":
+                msSharpen.setSharpenLevel(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParsingSDRtoHDR(SDRtoHDR sdrToHDR, String name, String value) {
+        switch (name) {
+            case "HdrMode":
+                sdrToHDR.setHdrMode(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParsingFrameEnhance(FrameEnhance frameEnhance, String name, String value) {
+        switch (name) {
+            case "FrameDoubling":
+                frameEnhance.setFrameDoubling(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParsingAudioMixArray(List<MediaAudioMixObject> audioMixArray, String name, String value) {
+        if (!audioMixArray.isEmpty()) {
+            MediaAudioMixObject mediaAudioMixObject = audioMixArray.get(audioMixArray.size() - 1);
+            ParseAudioMix(mediaAudioMixObject, name, value);
+        }
+    }
+
+    public static void ParsingEffectConfig(List<MediaAudioMixObject> audioMixArray, String name, String value) {
+        if (!audioMixArray.isEmpty()) {
+            MediaAudioMixObject mediaAudioMixObject = audioMixArray.get(audioMixArray.size() - 1);
+            ParsingEffectConfig(mediaAudioMixObject.getEffectConfig(), name, value);
+        }
+    }
+
+    public static void ParsingEffectConfig(EffectConfig effectConfig, String name, String value) {
+        switch (name) {
+            case "EnableBgmFade":
+                effectConfig.setEnableBgmFade(value);
+                break;
+            case "BgmFadeTime":
+                effectConfig.setBgmFadeTime(value);
+                break;
+            case "EnableEndFadeout":
+                effectConfig.setEnableEndFadeout(value);
+                break;
+            case "EnableStartFadein":
+                effectConfig.setEnableStartFadein(value);
+                break;
+            case "EndFadeoutTime":
+                effectConfig.setEndFadeoutTime(value);
+                break;
+            case "StartFadeinTime":
+                effectConfig.setStartFadeinTime(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParsingSubtitles(Subtitles subtitles, String name, String value) {
+        List<Subtitle> subtitle = subtitles.getSubtitle();
+        if (!subtitle.isEmpty()) {
+            Subtitle subtitle1 = subtitle.get(subtitle.size() - 1);
+            switch (name) {
+                case "Url":
+                    subtitle1.setUrl(value);
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
 }

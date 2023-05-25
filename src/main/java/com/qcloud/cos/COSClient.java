@@ -25,7 +25,6 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -103,13 +102,21 @@ import com.qcloud.cos.internal.VoidCosResponseHandler;
 import com.qcloud.cos.internal.XmlResponsesSaxParser.CompleteMultipartUploadHandler;
 import com.qcloud.cos.internal.XmlResponsesSaxParser.CopyObjectResultHandler;
 import com.qcloud.cos.model.*;
+import com.qcloud.cos.model.bucketcertificate.BucketDomainCertificateRequest;
+import com.qcloud.cos.model.bucketcertificate.BucketGetDomainCertificate;
+import com.qcloud.cos.model.bucketcertificate.BucketPutDomainCertificate;
+import com.qcloud.cos.model.bucketcertificate.SetBucketDomainCertificateRequest;
+import com.qcloud.cos.model.bucketcertificate.BucketDomainCertificateParameters;
 import com.qcloud.cos.model.ciModel.auditing.*;
 import com.qcloud.cos.model.ciModel.bucket.DocBucketRequest;
 import com.qcloud.cos.model.ciModel.bucket.DocBucketResponse;
 import com.qcloud.cos.model.ciModel.bucket.MediaBucketRequest;
 import com.qcloud.cos.model.ciModel.bucket.MediaBucketResponse;
+import com.qcloud.cos.model.ciModel.common.CImageProcessRequest;
 import com.qcloud.cos.model.ciModel.common.ImageProcessRequest;
 import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
+import com.qcloud.cos.model.ciModel.image.AutoTranslationBlockRequest;
+import com.qcloud.cos.model.ciModel.image.AutoTranslationBlockResponse;
 import com.qcloud.cos.model.ciModel.image.GenerateQrcodeRequest;
 import com.qcloud.cos.model.ciModel.image.ImageLabelRequest;
 import com.qcloud.cos.model.ciModel.image.ImageLabelResponse;
@@ -120,16 +127,19 @@ import com.qcloud.cos.model.ciModel.image.ImageSearchResponse;
 import com.qcloud.cos.model.ciModel.image.ImageStyleRequest;
 import com.qcloud.cos.model.ciModel.image.ImageStyleResponse;
 import com.qcloud.cos.model.ciModel.image.OpenImageSearchRequest;
+import com.qcloud.cos.model.ciModel.job.BatchJobRequest;
+import com.qcloud.cos.model.ciModel.job.BatchJobResponse;
 import com.qcloud.cos.model.ciModel.job.DocHtmlRequest;
 import com.qcloud.cos.model.ciModel.job.DocJobListRequest;
 import com.qcloud.cos.model.ciModel.job.DocJobListResponse;
 import com.qcloud.cos.model.ciModel.job.DocJobRequest;
 import com.qcloud.cos.model.ciModel.job.DocJobResponse;
+import com.qcloud.cos.model.ciModel.job.FileProcessJobResponse;
+import com.qcloud.cos.model.ciModel.job.FileProcessRequest;
 import com.qcloud.cos.model.ciModel.job.MediaJobObject;
 import com.qcloud.cos.model.ciModel.job.MediaJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaJobsRequest;
 import com.qcloud.cos.model.ciModel.job.MediaListJobResponse;
-import com.qcloud.cos.model.ciModel.job.PicProcessRequest;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoRequest;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoResponse;
 import com.qcloud.cos.model.ciModel.persistence.CIUploadResult;
@@ -155,6 +165,7 @@ import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowListRequest;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowListResponse;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowRequest;
 import com.qcloud.cos.model.ciModel.xml.CIAuditingXmlFactory;
+import com.qcloud.cos.model.ciModel.xml.CIFileProcessXmlFactory;
 import com.qcloud.cos.model.ciModel.xml.CIMediaXmlFactory;
 import com.qcloud.cos.model.ciModel.xml.CImageXmlFactory;
 import com.qcloud.cos.model.fetch.GetAsyncFetchTaskRequest;
@@ -175,6 +186,7 @@ import com.qcloud.cos.utils.Md5Utils;
 import com.qcloud.cos.utils.ServiceUtils;
 import com.qcloud.cos.utils.StringUtils;
 import com.qcloud.cos.utils.UrlEncoderUtils;
+import com.qcloud.cos.http.TimeOutCosHttpClient;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.http.client.methods.HttpRequestBase;
@@ -204,7 +216,11 @@ public class COSClient implements COS {
         super();
         this.credProvider = credProvider;
         this.clientConfig = clientConfig;
-        this.cosHttpClient = new DefaultCosHttpClient(clientConfig);
+        if (clientConfig.getRequestTimeOutEnable()) {
+            this.cosHttpClient = new TimeOutCosHttpClient(clientConfig);
+        } else {
+            this.cosHttpClient = new DefaultCosHttpClient(clientConfig);
+        }
     }
 
     public void shutdown() {
@@ -532,10 +548,10 @@ public class COSClient implements COS {
                     clientConfig.getEndpointResolver().resolveGetServiceApiEndpoint(endpoint);
         } else {
             bucket = formatBucket(bucket, fetchCredential().getCOSAppId());
-            if (isCIRequest) {
-                endpoint = new CIRegionEndpointBuilder(clientConfig.getRegion()).buildGeneralApiEndpoint(bucket);
-            } else if (request.getOriginalRequest() instanceof CIPicServiceRequest) {
+            if (request.getOriginalRequest() instanceof CIPicServiceRequest) {
                 endpoint = new CIPicRegionEndpointBuilder(clientConfig.getRegion()).buildGeneralApiEndpoint(bucket);
+            } else if (isCIRequest) {
+                endpoint = new CIRegionEndpointBuilder(clientConfig.getRegion()).buildGeneralApiEndpoint(bucket);
             } else {
                 endpoint = clientConfig.getEndpointBuilder().buildGeneralApiEndpoint(bucket);
             }
@@ -550,7 +566,13 @@ public class COSClient implements COS {
                     "endpointAddr is null, please check your endpoint resolver");
         }
 
-        request.addHeader(Headers.HOST, endpoint);
+        if (clientConfig.getIsDistinguishHost()) {
+            String host = String.format("%s.%s.myqcloud.com", bucket, Region.formatRegion(clientConfig.getRegion()));
+            request.addHeader(Headers.HOST,host);
+        }else{
+            request.addHeader(Headers.HOST, endpoint);
+        }
+
         if (isCIRequest && !clientConfig.getCiSpecialRequest()) {
             //万象请求只支持https
             request.setProtocol(HttpProtocol.https);
@@ -2895,6 +2917,13 @@ public class COSClient implements COS {
             }
         }
 
+        if (!signHost) {
+            Map<String, String> headers = request.getHeaders();
+            if (headers.containsKey(Headers.HOST)) {
+                headers.remove(Headers.HOST);
+            }
+        }
+
         addResponseHeaderParameters(request, req.getResponseHeaders());
 
         COSSigner cosSigner = new COSSigner();
@@ -3299,6 +3328,106 @@ public class COSClient implements COS {
     }
 
     @Override
+    public void setBucketDomainCertificate(String bucketName, BucketPutDomainCertificate domainCertificate)
+            throws CosClientException, CosServiceException{
+        setBucketDomainCertificate(new SetBucketDomainCertificateRequest(bucketName,domainCertificate));
+    }
+
+    @Override
+    public void setBucketDomainCertificate(SetBucketDomainCertificateRequest setBucketDomainCertificateRequest)
+            throws CosClientException, CosServiceException {
+        rejectNull(setBucketDomainCertificateRequest,
+                "The request object parameter setBucketDomainCertificateRequest must be specified.");
+        String bucketName = setBucketDomainCertificateRequest.getBucketName();
+        BucketPutDomainCertificate domainCertificate = setBucketDomainCertificateRequest.getBucketPutDomainCertificate();
+
+        rejectNull(bucketName,
+                "The bucket name parameter must be specified when setting a bucket's domain certificate");
+        rejectNull(domainCertificate,
+                "The bucket domain certificate parameter must be specified when setting a bucket's domain certificate");
+        rejectNull(domainCertificate.getBucketDomainCertificateInfo(),
+                "The bucket domain certificate parameter must be specified when setting a bucket's domain certificate");
+        rejectNull(domainCertificate.getDomainList(),
+                "The bucket domain lists must specify the index document suffix when setting a bucket's domain certificate");
+
+        CosHttpRequest<SetBucketDomainCertificateRequest> request = createRequest(bucketName,
+                null, setBucketDomainCertificateRequest, HttpMethodName.PUT);
+        request.addParameter(BucketDomainCertificateParameters.Parameter_Domain_Certificate, null);
+        request.addHeader("Content-Type", "application/xml");
+
+        byte[] bytes = new BucketConfigurationXmlFactory().convertToXmlByteArray(domainCertificate);
+        request.setContent(new ByteArrayInputStream(bytes));
+
+        invoke(request, voidCosResponseHandler);
+    }
+
+    @Override
+    public BucketGetDomainCertificate getBucketDomainCertificate(String bucketName, String domainName)
+            throws CosClientException, CosServiceException {
+        BucketDomainCertificateRequest getBucketDomainCertificateRequest = new BucketDomainCertificateRequest(bucketName);
+        getBucketDomainCertificateRequest.setDomainName(domainName);
+        return getBucketDomainCertificate(getBucketDomainCertificateRequest);
+    }
+
+    @Override
+    public BucketGetDomainCertificate getBucketDomainCertificate(BucketDomainCertificateRequest getBucketDomainCertificateRequest)
+            throws CosClientException, CosServiceException {
+        rejectNull(getBucketDomainCertificateRequest,
+                "The request object parameter getBucketDomainCertificateRequest must be specified.");
+        String bucketName = getBucketDomainCertificateRequest.getBucketName();
+        String domainName = getBucketDomainCertificateRequest.getDomainName();
+        rejectNull(bucketName,
+                "The bucket name must be specified when retrieving the bucket domain Certificate.");
+
+        rejectNull(domainName,
+                "The domain name must be specified when retrieving the bucket domain Certificate.");
+
+        CosHttpRequest<BucketDomainCertificateRequest> request = createRequest(bucketName,
+                null, getBucketDomainCertificateRequest, HttpMethodName.GET);
+        request.addParameter(BucketDomainCertificateParameters.Parameter_Domain_Certificate, null);
+        request.addParameter(BucketDomainCertificateParameters.Parameter_Domain_Name,domainName);
+
+
+        try {
+            return invoke(request, new Unmarshallers.BucketDomainCertificateUnmarshaller());
+        } catch (CosServiceException cse) {
+            switch (cse.getStatusCode()) {
+                case 404:
+                    return null;
+                default:
+                    throw cse;
+            }
+        }
+    }
+
+    @Override
+    public void deleteBucketDomainCertificate(String bucketName,String domainName)
+            throws CosClientException, CosServiceException{
+        BucketDomainCertificateRequest deleteBucketDomainCertificateRequest = new BucketDomainCertificateRequest(bucketName);
+        deleteBucketDomainCertificateRequest.setDomainName(domainName);
+        deleteBucketDomainCertificate(deleteBucketDomainCertificateRequest);
+    }
+
+    @Override
+    public void deleteBucketDomainCertificate(BucketDomainCertificateRequest deleteBucketDomainCertificateRequest)
+            throws CosClientException, CosServiceException{
+        rejectNull(deleteBucketDomainCertificateRequest,
+                "The request object parameter deleteBucketDomainCertificateRequest must be specified.");
+        String bucketName = deleteBucketDomainCertificateRequest.getBucketName();
+        String domainName = deleteBucketDomainCertificateRequest.getDomainName();
+        rejectNull(bucketName,
+                "The bucket name must be specified when removing the bucket domain Certificate.");
+
+        rejectNull(domainName,
+                "The domain name must be specified when removing the bucket domain Certificate.");
+        CosHttpRequest<BucketDomainCertificateRequest> request = createRequest(bucketName,
+                null, deleteBucketDomainCertificateRequest, HttpMethodName.DELETE);
+        request.addParameter(BucketDomainCertificateParameters.Parameter_Domain_Certificate, null);
+        request.addParameter(BucketDomainCertificateParameters.Parameter_Domain_Name,domainName);
+        invoke(request, voidCosResponseHandler);
+    }
+
+    @Override
     public void setBucketRefererConfiguration(String bucketName, BucketRefererConfiguration configuration)
             throws CosClientException, CosServiceException {
         setBucketRefererConfiguration(new SetBucketRefererConfigurationRequest(bucketName, configuration));
@@ -3439,10 +3568,20 @@ public class COSClient implements COS {
         request.addParameter("inventory", null);
         request.addParameter("id", id);
 
-        final byte[] bytes = new BucketConfigurationXmlFactory().convertToXmlByteArray(inventoryConfiguration);
-        request.addHeader("Content-Length", String.valueOf(bytes.length));
-        request.addHeader("Content-Type", "application/xml");
-        request.setContent(new ByteArrayInputStream(bytes));
+        if (!setBucketInventoryConfigurationRequest.IsUseInventoryText()) {
+            final byte[] bytes = new BucketConfigurationXmlFactory().convertToXmlByteArray(inventoryConfiguration);
+            request.addHeader("Content-Length", String.valueOf(bytes.length));
+            request.addHeader("Content-Type", "application/xml");
+            request.setContent(new ByteArrayInputStream(bytes));
+        } else {
+            final String contentStr = setBucketInventoryConfigurationRequest.getInventoryText();
+            if (contentStr == null || contentStr.length() <= 0) {
+                throw new IllegalArgumentException("The inventory text should be specified");
+            }
+            request.addHeader("Content-Length", String.valueOf(contentStr.length()));
+            request.addHeader("Content-Type", "application/xml");
+            request.setContent(new ByteArrayInputStream(contentStr.getBytes(StringUtils.UTF8)));
+        }
 
         return invoke(request, new Unmarshallers.SetBucketInventoryConfigurationUnmarshaller());
     }
@@ -3688,14 +3827,12 @@ public class COSClient implements COS {
     }
 
     @Override
-    public MediaJobResponse createMediaJobs(MediaJobsRequest req) throws UnsupportedEncodingException {
+    public MediaJobResponse createMediaJobs(MediaJobsRequest req)  {
         this.checkCIRequestCommon(req);
         rejectNull(req.getTag(),
                 "The tag parameter must be specified setting the object tags");
         rejectNull(req.getQueueId(),
                 "The queueId parameter must be specified setting the object tags");
-        rejectNull(req.getInput().getObject(),
-                "The input parameter must be specified setting the object tags");
         this.rejectStartWith(req.getCallBack(),"http","The CallBack parameter mush start with http or https");
         CosHttpRequest<MediaJobsRequest> request = createRequest(req.getBucketName(), "/jobs", req, HttpMethodName.POST);
         this.setContent(request, CIMediaXmlFactory.convertToXmlByteArray(req), "application/xml", false);
@@ -4011,7 +4148,7 @@ public class COSClient implements COS {
         this.checkCIRequestCommon(videoAuditingRequest);
         this.rejectStartWith(videoAuditingRequest.getConf().getCallback(), "http", "The Conf.CallBack parameter mush start with http or https");
         CosHttpRequest<VideoAuditingRequest> request = createRequest(videoAuditingRequest.getBucketName(), "/video/auditing", videoAuditingRequest, HttpMethodName.POST);
-        this.setContent(request, RequestXmlFactory.convertToXmlByteArray(videoAuditingRequest), "application/xml", false);
+        this.setContent(request, CIAuditingXmlFactory.convertToXmlByteArray(videoAuditingRequest), "application/xml", false);
         return invoke(request, new Unmarshallers.VideoAuditingUnmarshaller());
     }
 
@@ -4029,7 +4166,7 @@ public class COSClient implements COS {
         this.checkCIRequestCommon(audioAuditingRequest);
         this.rejectStartWith(audioAuditingRequest.getConf().getCallback(), "http", "The Conf.CallBack parameter mush start with http or https");
         CosHttpRequest<AudioAuditingRequest> request = createRequest(audioAuditingRequest.getBucketName(), "/audio/auditing", audioAuditingRequest, HttpMethodName.POST);
-        this.setContent(request, RequestXmlFactory.convertToXmlByteArray(audioAuditingRequest), "application/xml", false);
+        this.setContent(request, CIAuditingXmlFactory.convertToXmlByteArray(audioAuditingRequest), "application/xml", false);
         return invoke(request, new Unmarshallers.AudioAuditingUnmarshaller());
     }
 
@@ -4072,7 +4209,7 @@ public class COSClient implements COS {
         this.checkCIRequestCommon(textAuditingRequest);
         this.rejectStartWith(textAuditingRequest.getConf().getCallback(), "http", "The Conf.CallBack parameter mush start with http or https");
         CosHttpRequest<TextAuditingRequest> request = createRequest(textAuditingRequest.getBucketName(), "/text/auditing", textAuditingRequest, HttpMethodName.POST);
-        this.setContent(request, RequestXmlFactory.convertToXmlByteArray(textAuditingRequest), "application/xml", false);
+        this.setContent(request, CIAuditingXmlFactory.convertToXmlByteArray(textAuditingRequest), "application/xml", false);
         return invoke(request, new Unmarshallers.TextAuditingJobUnmarshaller());
     }
 
@@ -4090,7 +4227,7 @@ public class COSClient implements COS {
         this.checkCIRequestCommon(documentAuditingRequest);
         this.rejectStartWith(documentAuditingRequest.getConf().getCallback(), "http", "The Conf.CallBack parameter mush start with http or https");
         CosHttpRequest<DocumentAuditingRequest> request = createRequest(documentAuditingRequest.getBucketName(), "/document/auditing", documentAuditingRequest, HttpMethodName.POST);
-        this.setContent(request, RequestXmlFactory.convertToXmlByteArray(documentAuditingRequest), "application/xml", false);
+        this.setContent(request, CIAuditingXmlFactory.convertToXmlByteArray(documentAuditingRequest), "application/xml", false);
         return invoke(request, new Unmarshallers.DocumentAuditingJobUnmarshaller());
     }
 
@@ -4108,7 +4245,7 @@ public class COSClient implements COS {
         this.checkCIRequestCommon(batchImageAuditingRequest);
         this.rejectStartWith(batchImageAuditingRequest.getConf().getCallback(), "http", "The Conf.CallBack parameter mush start with http or https");
         CosHttpRequest<BatchImageAuditingRequest> request = createRequest(batchImageAuditingRequest.getBucketName(), "/image/auditing", batchImageAuditingRequest, HttpMethodName.POST);
-        this.setContent(request, RequestXmlFactory.convertToXmlByteArray(batchImageAuditingRequest), "application/xml", false);
+        this.setContent(request, CIAuditingXmlFactory.convertToXmlByteArray(batchImageAuditingRequest), "application/xml", false);
         return invoke(request, new Unmarshallers.BatchImageAuditingJobUnmarshaller());
     }
 
@@ -4137,7 +4274,7 @@ public class COSClient implements COS {
         this.checkCIRequestCommon(webpageAuditingRequest);
         this.rejectStartWith(webpageAuditingRequest.getInput().getUrl(), "http", "The Conf.CallBack parameter mush start with http or https");
         CosHttpRequest<WebpageAuditingRequest> request = createRequest(webpageAuditingRequest.getBucketName(), "/webpage/auditing", webpageAuditingRequest, HttpMethodName.POST);
-        this.setContent(request, RequestXmlFactory.convertToXmlByteArray(webpageAuditingRequest), "application/xml", false);
+        this.setContent(request, CIAuditingXmlFactory.convertToXmlByteArray(webpageAuditingRequest), "application/xml", false);
         return invoke(request, new Unmarshallers.WebpageAuditingJobUnmarshaller());
     }
 
@@ -4176,6 +4313,7 @@ public class COSClient implements COS {
         uriBuilder.addParameter("password", originalRequest.getPassword());
         uriBuilder.addParameter("comment", originalRequest.getComment());
         uriBuilder.addParameter("excelPaperDirection", originalRequest.getExcelPaperDirection());
+        uriBuilder.addParameter("excelPaperSize", originalRequest.getExcelPaperSize());
         uriBuilder.addParameter("quality", originalRequest.getQuality());
         uriBuilder.addParameter("scale", originalRequest.getScale());
         uriBuilder.addParameter("imageDpi", originalRequest.getImageDpi());
@@ -4575,6 +4713,79 @@ public class COSClient implements COS {
         addParameterIfNotNull(request, "pageNumber", req.getPageNumber());
         addParameterIfNotNull(request, "pageSize", req.getPageSize());
         return invoke(request, new Unmarshallers.ListQueueUnmarshaller());
+    }
+
+    @Override
+    public boolean processImage2(CImageProcessRequest imageProcessRequest) {
+        rejectNull(imageProcessRequest,
+                "The ImageProcessRequest parameter must be specified when requesting an object's metadata");
+        rejectNull(clientConfig.getRegion(),
+                "region is null, region in clientConfig must be specified when requesting an object's metadata");
+
+        String bucketName = imageProcessRequest.getBucketName();
+        String key = imageProcessRequest.getKey();
+
+        rejectNull(bucketName,
+                "The bucket name parameter must be specified when requesting an object's metadata");
+        rejectNull(key, "The key parameter must be specified when requesting an object's metadata");
+
+        CosHttpRequest<CImageProcessRequest> request =
+                createRequest(bucketName, key, imageProcessRequest, HttpMethodName.POST);
+        if (imageProcessRequest.getPicOperations() != null) {
+            request.addHeader(Headers.PIC_OPERATIONS, Jackson.toJsonString(imageProcessRequest.getPicOperations()));
+        }
+        invoke(request, voidCosResponseHandler);
+        return true;
+    }
+
+    @Override
+    public FileProcessJobResponse createFileProcessJob(FileProcessRequest req) {
+        this.checkCIRequestCommon(req);
+        rejectNull(req.getTag(),
+                "The tag parameter must be specified setting the object tags");
+        rejectNull(req.getQueueId(),
+                "The queueId parameter must be specified setting the object tags");
+        this.rejectStartWith(req.getCallBack(),"http","The CallBack parameter mush start with http or https");
+        CosHttpRequest<FileProcessRequest> request = createRequest(req.getBucketName(), "/file_jobs", req, HttpMethodName.POST);
+        this.setContent(request, CIFileProcessXmlFactory.convertToXmlByteArray(req), "application/xml", false);
+        return invoke(request, new Unmarshallers.FileProcessUnmarshaller());
+    }
+
+    @Override
+    public FileProcessJobResponse describeFileProcessJob(FileProcessRequest request) {
+        this.checkCIRequestCommon(request);
+        CosHttpRequest<FileProcessRequest> httpRequest = this.createRequest(request.getBucketName(), "/file_jobs/" + request.getJobId(), request, HttpMethodName.GET);
+        return this.invoke(httpRequest, new Unmarshallers.FileProcessUnmarshaller());
+    }
+
+    @Override
+    public BatchJobResponse createInventoryTriggerJob(BatchJobRequest req) {
+        CosHttpRequest<BatchJobRequest> request = createRequest(req.getBucketName(), "/inventorytriggerjob", req, HttpMethodName.POST);
+        this.setContent(request, CIMediaXmlFactory.convertToXmlByteArray(req), "application/xml", false);
+        return invoke(request, new Unmarshallers.BatchJobUnmarshaller());
+    }
+
+    @Override
+    public BatchJobResponse describeInventoryTriggerJob(BatchJobRequest request) {
+        this.checkCIRequestCommon(request);
+        CosHttpRequest<BatchJobRequest> httpRequest = this.createRequest(request.getBucketName(), "/inventorytriggerjob/" + request.getJobId(), request, HttpMethodName.GET);
+        return this.invoke(httpRequest, new Unmarshallers.BatchJobUnmarshaller());
+    }
+
+    @Override
+    public AutoTranslationBlockResponse autoTranslationBlock(AutoTranslationBlockRequest translationBlockRequest) {
+        rejectNull(translationBlockRequest,
+                "The request parameter must be specified setting the object tags");
+        rejectNull(translationBlockRequest.getBucketName(),
+                "The bucketName parameter must be specified setting the object tags");
+        CosHttpRequest<AutoTranslationBlockRequest> request = createRequest(translationBlockRequest.getBucketName(), "/", translationBlockRequest, HttpMethodName.GET);
+        request.addParameter("ci-process","AutoTranslationBlock");
+        addParameterIfNotNull(request,"InputText",translationBlockRequest.getInputText());
+        addParameterIfNotNull(request,"SourceLang",translationBlockRequest.getSourceLang());
+        addParameterIfNotNull(request,"TargetLang",translationBlockRequest.getTargetLang());
+        addParameterIfNotNull(request,"TextDomain",translationBlockRequest.getTextDomain());
+        addParameterIfNotNull(request,"TextStyle",translationBlockRequest.getTextStyle());
+        return this.invoke(request, new Unmarshallers.AutoTranslationBlockUnmarshaller());
     }
 
 }

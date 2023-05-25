@@ -34,61 +34,26 @@ import java.util.Map;
 import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.exception.MultiObjectDeleteException.DeleteError;
+import com.qcloud.cos.internal.cihandler.AutoTranslationBlockResponseHandler;
+import com.qcloud.cos.internal.cihandler.BatchJobResponseHandler;
 import com.qcloud.cos.internal.cihandler.DetectCarHandler;
+import com.qcloud.cos.internal.cihandler.FileProcessResponseHandler;
 import com.qcloud.cos.internal.cihandler.GenerateQrcodeHandler;
 import com.qcloud.cos.internal.cihandler.GetImageStyleHandler;
+import com.qcloud.cos.internal.cihandler.MediaJobResponseHandler;
 import com.qcloud.cos.internal.cihandler.ReportBadCaseHandler;
 import com.qcloud.cos.internal.cihandler.SearchImageHandler;
 import com.qcloud.cos.internal.cihandler.TriggerWorkflowListHandler;
-import com.qcloud.cos.model.AbortIncompleteMultipartUpload;
-import com.qcloud.cos.model.AccessControlList;
-import com.qcloud.cos.model.Bucket;
-import com.qcloud.cos.model.BucketCrossOriginConfiguration;
-import com.qcloud.cos.model.BucketDomainConfiguration;
-import com.qcloud.cos.model.BucketIntelligentTierConfiguration;
-import com.qcloud.cos.model.BucketLifecycleConfiguration;
+import com.qcloud.cos.model.*;
 import com.qcloud.cos.model.BucketLifecycleConfiguration.NoncurrentVersionTransition;
 import com.qcloud.cos.model.BucketLifecycleConfiguration.Rule;
 import com.qcloud.cos.model.BucketLifecycleConfiguration.Transition;
-import com.qcloud.cos.model.BucketLoggingConfiguration;
-import com.qcloud.cos.model.BucketRefererConfiguration;
-import com.qcloud.cos.model.BucketReplicationConfiguration;
-import com.qcloud.cos.model.BucketTaggingConfiguration;
-import com.qcloud.cos.model.BucketVersioningConfiguration;
-import com.qcloud.cos.model.BucketWebsiteConfiguration;
-import com.qcloud.cos.model.CORSRule;
 import com.qcloud.cos.model.CORSRule.AllowedMethods;
-import com.qcloud.cos.model.COSObjectSummary;
-import com.qcloud.cos.model.COSVersionSummary;
-import com.qcloud.cos.model.CompleteMultipartUploadResult;
-import com.qcloud.cos.model.CopyObjectResult;
-import com.qcloud.cos.model.DecompressionResult;
 import com.qcloud.cos.model.DeleteObjectsResult.DeletedObject;
-import com.qcloud.cos.model.DomainRule;
-import com.qcloud.cos.model.GetBucketInventoryConfigurationResult;
-import com.qcloud.cos.model.GetObjectTaggingResult;
-import com.qcloud.cos.model.Grantee;
-import com.qcloud.cos.model.GroupGrantee;
-import com.qcloud.cos.model.InitiateMultipartUploadResult;
-import com.qcloud.cos.model.ListBucketInventoryConfigurationsResult;
-import com.qcloud.cos.model.ListJobsResult;
-import com.qcloud.cos.model.MultipartUpload;
-import com.qcloud.cos.model.MultipartUploadListing;
-import com.qcloud.cos.model.ObjectListing;
-import com.qcloud.cos.model.Owner;
-import com.qcloud.cos.model.PartListing;
-import com.qcloud.cos.model.PartSummary;
-import com.qcloud.cos.model.Permission;
-import com.qcloud.cos.model.RedirectRule;
-import com.qcloud.cos.model.ReplicationDestinationConfig;
-import com.qcloud.cos.model.ReplicationRule;
-import com.qcloud.cos.model.RoutingRule;
-import com.qcloud.cos.model.RoutingRuleCondition;
-import com.qcloud.cos.model.TagSet;
-import com.qcloud.cos.model.UinGrantee;
-import com.qcloud.cos.model.VersionListing;
 import com.qcloud.cos.model.Tag.LifecycleTagPredicate;
 import com.qcloud.cos.model.Tag.Tag;
+import com.qcloud.cos.model.bucketcertificate.BucketDomainCertificateParameters;
+import com.qcloud.cos.model.bucketcertificate.BucketGetDomainCertificate;
 import com.qcloud.cos.model.ciModel.auditing.AudioAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.AudioSectionInfo;
 import com.qcloud.cos.model.ciModel.auditing.AuditingJobsDetail;
@@ -99,6 +64,7 @@ import com.qcloud.cos.model.ciModel.auditing.DocumentAuditingJobsDetail;
 import com.qcloud.cos.model.ciModel.auditing.DocumentAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.DocumentResultInfo;
 import com.qcloud.cos.model.ciModel.auditing.ImageAuditingResponse;
+import com.qcloud.cos.model.ciModel.auditing.LanguageResult;
 import com.qcloud.cos.model.ciModel.auditing.LibResult;
 import com.qcloud.cos.model.ciModel.auditing.ListResult;
 import com.qcloud.cos.model.ciModel.auditing.ObjectResults;
@@ -121,6 +87,7 @@ import com.qcloud.cos.model.ciModel.image.ImageLabelV2Response;
 import com.qcloud.cos.model.ciModel.image.Lobel;
 import com.qcloud.cos.model.ciModel.image.LobelV2;
 import com.qcloud.cos.model.ciModel.image.LocationLabel;
+import com.qcloud.cos.model.ciModel.job.MediaBodyInfo;
 import com.qcloud.cos.model.ciModel.job.DocJobDetail;
 import com.qcloud.cos.model.ciModel.job.DocJobListResponse;
 import com.qcloud.cos.model.ciModel.job.DocJobResponse;
@@ -139,20 +106,22 @@ import com.qcloud.cos.model.ciModel.job.MediaJobOperation;
 import com.qcloud.cos.model.ciModel.job.MediaJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaListJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaPicProcessTemplateObject;
+import com.qcloud.cos.model.ciModel.job.MediaRecognition;
 import com.qcloud.cos.model.ciModel.job.MediaRemoveWaterMark;
-import com.qcloud.cos.model.ciModel.job.MediaResult;
 import com.qcloud.cos.model.ciModel.job.MediaTimeIntervalObject;
+import com.qcloud.cos.model.ciModel.job.MediaTopkRecognition;
 import com.qcloud.cos.model.ciModel.job.MediaTransConfigObject;
 import com.qcloud.cos.model.ciModel.job.MediaTranscodeVideoObject;
 import com.qcloud.cos.model.ciModel.job.MediaVideoObject;
 import com.qcloud.cos.model.ciModel.job.OutputFile;
 import com.qcloud.cos.model.ciModel.job.ProcessResult;
+import com.qcloud.cos.model.ciModel.job.VideoTargetRec;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaFormat;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoAudio;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoResponse;
+import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoStream;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoSubtitle;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoVideo;
-import com.qcloud.cos.model.ciModel.mediaInfo.MediaStream;
 import com.qcloud.cos.model.ciModel.persistence.CIObject;
 import com.qcloud.cos.model.ciModel.persistence.CIUploadResult;
 import com.qcloud.cos.model.ciModel.persistence.ImageInfo;
@@ -518,6 +487,13 @@ public class XmlResponsesSaxParser {
         return handler;
     }
 
+    public BucketDomainCertificateHandler parseBucketDomainCertificateResponse(
+            InputStream inputStream) throws IOException {
+        BucketDomainCertificateHandler handler = new BucketDomainCertificateHandler();
+        parseXmlInputStream(handler, inputStream);
+        return handler;
+    }
+
     public BucketRefererConfigurationHandler parseBucketRefererConfigurationResponse(
             InputStream inputStream) throws IOException {
         BucketRefererConfigurationHandler handler = new BucketRefererConfigurationHandler();
@@ -751,8 +727,14 @@ public class XmlResponsesSaxParser {
         return handler;
     }
 
-    public DescribeMediaJobHandler parseMediaJobRespones(InputStream inputStream) throws IOException {
-        DescribeMediaJobHandler handler = new DescribeMediaJobHandler();
+    public MediaJobResponseHandler parseMediaJobRespones(InputStream inputStream) throws IOException {
+        MediaJobResponseHandler handler = new MediaJobResponseHandler();
+        parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
+        return handler;
+    }
+
+    public BatchJobResponseHandler parseBatchJobResponse(InputStream inputStream) throws IOException {
+        BatchJobResponseHandler handler = new BatchJobResponseHandler();
         parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
         return handler;
     }
@@ -915,6 +897,16 @@ public class XmlResponsesSaxParser {
 
     public ListJobsResultHandler parseListJobsResult(InputStream inputStream) throws IOException {
         ListJobsResultHandler handler = new ListJobsResultHandler();
+        parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
+        return handler;
+    }
+    public FileProcessResponseHandler parseFileProcessResponse(InputStream inputStream) throws IOException {
+        FileProcessResponseHandler handler = new FileProcessResponseHandler();
+        parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
+        return handler;
+    }
+    public AutoTranslationBlockResponseHandler parseAutoTranslationBlockResponse(InputStream inputStream) throws IOException {
+        AutoTranslationBlockResponseHandler handler = new AutoTranslationBlockResponseHandler();
         parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
         return handler;
     }
@@ -2962,6 +2954,28 @@ public class XmlResponsesSaxParser {
 
     }
 
+    public static class BucketDomainCertificateHandler extends AbstractHandler {
+
+        private final BucketGetDomainCertificate domainCertificate =
+                new BucketGetDomainCertificate();
+
+        public BucketGetDomainCertificate getBucketDomainCertificate(){
+            return domainCertificate;
+        }
+
+        @Override
+        protected void doStartElement(String uri, String name, String qName, Attributes attrs) {}
+
+        @Override
+        protected void doEndElement(String uri, String name, String qName) {
+            if (in(BucketDomainCertificateParameters.Element_Domain_Certificate)) {
+                if (BucketDomainCertificateParameters.Element_Status.equals(name)) {
+                    domainCertificate.setStatus(getText());
+                }
+            }
+        }
+    }
+
     public static class BucketRefererConfigurationHandler extends AbstractHandler {
 
         private final BucketRefererConfiguration configuration =
@@ -4171,18 +4185,7 @@ public class XmlResponsesSaxParser {
                 MediaTimeIntervalObject timeInterval = jobsDetail.getOperation().getTranscode().getTimeInterval();
                 ParserMediaInfoUtils.ParsingMediaTimeInterval(timeInterval, name, getText());
             } else if (in("Response", "JobsDetail", "Operation", "Output")) {
-                MediaOutputObject output = jobsDetail.getOperation().getOutput();
-                switch (name) {
-                    case "Bucket":
-                        output.setBucket(getText());
-                        break;
-                    case "Object":
-                        output.setObject(getText());
-                        break;
-                    case "Region":
-                        output.setRegion(getText());
-                        break;
-                }
+                ParserMediaInfoUtils.ParsingOutput(jobsDetail.getOperation().getOutput(), name, getText());
             }
             MediaConcatTemplateObject mediaConcatTemplate = response.getJobsDetail().getOperation().getMediaConcatTemplate();
             if (in("Response", "JobsDetail", "Operation", "ConcatTemplate", "ConcatFragment")) {
@@ -4232,202 +4235,16 @@ public class XmlResponsesSaxParser {
                 } else if ("ProcessRule".equalsIgnoreCase(name)) {
                     operation.getPicProcess().setProcessRule(getText());
                 }
-            }
-        }
-
-        public MediaJobResponse getResponse() {
-            return response;
-        }
-    }
-
-    public static class DescribeMediaJobHandler extends AbstractHandler {
-        MediaJobResponse response = new MediaJobResponse();
-        List<MediaConcatFragmentObject> concatFragmentList = response.getJobsDetail().getOperation().getMediaConcatTemplate().getConcatFragmentList();
-
-        @Override
-        protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
-            if ("ConcatFragment".equals(name)){
-                concatFragmentList.add(new MediaConcatFragmentObject());
-            }
-        }
-
-        @Override
-        protected void doEndElement(String uri, String name, String qName) {
-            MediaJobObject jobsDetail = response.getJobsDetail();
-            if (in("Response", "JobsDetail")) {
-
-                switch (name) {
-                    case "Code":
-                        jobsDetail.setCode(getText());
-                        break;
-                    case "CreationTime":
-                        jobsDetail.setCreationTime(getText());
-                        break;
-                    case "EndTime":
-                        jobsDetail.setEndTime(getText());
-                        break;
-                    case "JobId":
-                        jobsDetail.setJobId(getText());
-                        break;
-                    case "Message":
-                        jobsDetail.setMessage(getText());
-                        break;
-                    case "QueueId":
-                        jobsDetail.setQueueId(getText());
-                        break;
-                    case "State":
-                        jobsDetail.setState(getText());
-                        break;
-                    case "Tag":
-                        jobsDetail.setTag(getText());
-                        break;
-                    case "BucketName":
-                        jobsDetail.setBucketName(getText());
-                        break;
-                    default:
-                        break;
+            } else if (in("Response", "JobsDetail", "Operation", "VoiceSeparate")) {
+                if ("AudioMode".equalsIgnoreCase(name)) {
+                    jobsDetail.getOperation().getVoiceSeparate().setAudioMode(getText());
                 }
-            } else if (in("Response", "JobsDetail", "Input")) {
-                jobsDetail.getInput().setObject(getText());
-            } else if (in("Response", "JobsDetail", "Operation")) {
-                MediaJobOperation operation = jobsDetail.getOperation();
-                switch (name) {
-                    case "TemplateId":
-                        operation.setTemplateId(getText());
-                        break;
-                    case "WatermarkTemplateId":
-                        operation.getWatermarkTemplateId().add(getText());
-                        break;
-                    case "UserData":
-                        operation.setUserData(getText());
-                        break;
-                    case "JobLevel":
-                        operation.setJobLevel(getText());
-                        break;
-                    case "TemplateName":
-                        operation.setTemplateName(getText());
-                        break;
-                    default:
-                        break;
-                }
-            } else if (in("Response", "JobsDetail", "Operation", "MediaInfo", "Format")) {
-                MediaFormat format = jobsDetail.getOperation().getMediaInfo().getFormat();
-                ParserMediaInfoUtils.ParsingMediaFormat(format, name, getText());
-            } else if (in("Response", "JobsDetail", "Operation", "MediaInfo", "Stream", "Audio")) {
-                MediaInfoAudio audio = jobsDetail.getOperation().getMediaInfo().getStream().getAudio();
-                ParserMediaInfoUtils.ParsingStreamAudio(audio, name, getText());
-            } else if (in("Response", "JobsDetail", "Operation", "MediaInfo", "Stream", "Subtitle")) {
-                MediaInfoSubtitle subtitle = jobsDetail.getOperation().getMediaInfo().getStream().getSubtitle();
-                ParserMediaInfoUtils.ParsingSubtitle(subtitle, name, getText());
-            } else if (in("Response", "JobsDetail", "Operation", "MediaInfo", "Stream", "Video")) {
-                MediaInfoVideo video = jobsDetail.getOperation().getMediaInfo().getStream().getVideo();
-                ParserMediaInfoUtils.ParsingMediaVideo(video, name, getText());
-            } else if (in("Response", "JobsDetail", "Operation", "RemoveWatermark")) {
-                MediaRemoveWaterMark removeWatermark = jobsDetail.getOperation().getRemoveWatermark();
-                ParserMediaInfoUtils.ParsingRemoveWatermark(removeWatermark, name, getText());
-            }else if (in("Response", "JobsDetail", "Operation", "Transcode", "Container")) {
-                if ("Format".equalsIgnoreCase(name))
-                    jobsDetail.getOperation().getTranscode().getContainer().setFormat(getText());
-            } else if (in("Response", "JobsDetail", "Operation", "Transcode", "Video")) {
-                MediaAudioObject audio = jobsDetail.getOperation().getTranscode().getAudio();
-                ParserMediaInfoUtils.ParsingStreamAudio(audio, name, getText());
-            } else if (in("Response", "JobsDetail", "Operation", "Transcode", "Audio")) {
-                MediaTranscodeVideoObject video = jobsDetail.getOperation().getTranscode().getVideo();
-                ParserMediaInfoUtils.ParsingMediaVideo(video, name, getText());
-            } else if (in("Response", "JobsDetail", "Operation", "Transcode", "TransConfig")) {
-                MediaTransConfigObject transConfig = jobsDetail.getOperation().getTranscode().getTransConfig();
-                ParserMediaInfoUtils.ParsingTransConfig(transConfig, name, getText());
-            } else if (in("Response", "JobsDetail", "Operation", "Transcode", "TimeInterval")) {
-                MediaTimeIntervalObject timeInterval = jobsDetail.getOperation().getTranscode().getTimeInterval();
-                ParserMediaInfoUtils.ParsingMediaTimeInterval(timeInterval, name, getText());
-            } else if (in("Response", "JobsDetail", "Operation", "DigitalWatermark")) {
-                MediaDigitalWatermark digitalWatermark = response.getJobsDetail().getOperation().getDigitalWatermark();
-                ParserMediaInfoUtils.ParsingDigitalWatermark(digitalWatermark, name, getText());
-            } else if (in("Response", "JobsDetail", "Operation", "ExtractDigitalWatermark")) {
-                ExtractDigitalWatermark digitalWatermark = response.getJobsDetail().getOperation().getExtractDigitalWatermark();
-                ParserMediaInfoUtils.ParsingDigitalWatermark(digitalWatermark, name, getText());
-            } else if (in("Response", "JobsDetail", "Operation", "Snapshot")){
-                MediaSnapshotObject snapshot = response.getJobsDetail().getOperation().getSnapshot();
-                ParserMediaInfoUtils.ParsingSnapshot(snapshot, name, getText());
-            } else if (in("Response", "JobsDetail", "Operation", "Segment")){
-                MediaSegmentObject segment = response.getJobsDetail().getOperation().getSegment();
-                ParserMediaInfoUtils.ParsingSegment(segment, name, getText());
-            } else if (in("Response", "JobsDetail", "Operation", "Snapshot","SpriteSnapshotConfig")){
-                SpriteSnapshotConfig snapshotConfig = response.getJobsDetail().getOperation().getSnapshot().getSnapshotConfig();
-                ParserMediaInfoUtils.ParsingSnapshotConfig(snapshotConfig, name, getText());
-            } else if (in("Response", "JobsDetail", "Operation", "Output")) {
-                MediaOutputObject output = jobsDetail.getOperation().getOutput();
-                ParserMediaInfoUtils.ParsingOutput(output, name, getText());
-            }
-            MediaConcatTemplateObject mediaConcatTemplate = response.getJobsDetail().getOperation().getMediaConcatTemplate();
-            if (in("Response", "JobsDetail", "Operation", "ConcatTemplate", "ConcatFragment")) {
-                MediaConcatFragmentObject mediaConcatFragmentObject = concatFragmentList.get(concatFragmentList.size() - 1);
-                switch (name) {
-                    case "Mode":
-                        mediaConcatFragmentObject.setMode(getText());
-                        break;
-                    case "Url":
-                        mediaConcatFragmentObject.setUrl(getText());
-                        break;
-                    case "StartTime":
-                        mediaConcatFragmentObject.setStartTime(getText());
-                        break;
-                    case "EndTime":
-                        mediaConcatFragmentObject.setEndTime(getText());
-                        break;
-                    default:
-                        break;
-                }
-
-            } else if (in("Response", "JobsDetail", "Operation", "ConcatTemplate", "Audio")) {
-                MediaAudioObject audio = mediaConcatTemplate.getAudio();
-                ParserMediaInfoUtils.ParsingMediaAudio(audio, name, getText());
-            } else if (in("Response", "JobsDetail", "Operation", "ConcatTemplate", "Video")) {
-                MediaVideoObject video = mediaConcatTemplate.getVideo();
-                ParserMediaInfoUtils.ParsingMediaVideo(video, name, getText());
-            } else if (in("Response", "JobsDetail", "Operation", "ConcatTemplate", "Container")) {
-                MediaContainerObject container = mediaConcatTemplate.getContainer();
-                if ("Format".equals(name)) {
-                    container.setFormat(getText());
-                }
-            } else if (in("Response", "JobsDetail", "Operation", "ConcatTemplate")) {
-                if ("Index".equals(name)) {
-                    mediaConcatTemplate.setIndex(getText());
-                }
-            } else if (in("Response", "JobsDetail", "Operation", "MediaResult", "OutputFile")) {
-                OutputFile outputFile = jobsDetail.getOperation().getMediaResult().getOutputFile();
-                ParserMediaInfoUtils.ParsingMediaResult(outputFile, name, getText());
-            } else if (in("Response", "JobsDetail", "Operation", "MediaResult", "OutputFile", "Md5Info")) {
-                Md5Info md5Info = jobsDetail.getOperation().getMediaResult().getOutputFile().getMd5Info();
-                ParserMediaInfoUtils.ParsingMd5Info(md5Info, name, getText());
-            } else if (in("Response", "JobsDetail", "Operation", "PicProcess")) {
-                MediaPicProcessTemplateObject picProcess = jobsDetail.getOperation().getPicProcess();
-                if ("IsPicInfo".equalsIgnoreCase(name)) {
-                    picProcess.setIsPicInfo(getText());
-                } else if ("ProcessRule".equalsIgnoreCase(name)) {
-                    picProcess.setProcessRule(getText());
-                }
-            } else if (in("Response", "JobsDetail", "Operation", "PicProcess")) {
-                MediaPicProcessTemplateObject picProcess = jobsDetail.getOperation().getPicProcess();
-                if ("IsPicInfo".equalsIgnoreCase(name)) {
-                    picProcess.setIsPicInfo(getText());
-                } else if ("ProcessRule".equalsIgnoreCase(name)) {
-                    picProcess.setProcessRule(getText());
-                }
-            } else if (in("Response", "JobsDetail", "Operation", "PicProcessResult")) {
-                if ("ObjectName".equalsIgnoreCase(name)) {
-                    jobsDetail.getOperation().getPicProcessResult().setObjectName(getText());
-                }
-            } else if (in("Response", "JobsDetail", "Operation", "PicProcessResult", "OriginalInfo")) {
-                if ("Etag".equalsIgnoreCase(name)) {
-                    jobsDetail.getOperation().getPicProcessResult().getOriginalInfo().setEtag(getText());
-                }
-            } else if (in("Response", "JobsDetail", "Operation", "PicProcessResult", "OriginalInfo", "ImageInfo")) {
-                ImageInfo imageInfo = jobsDetail.getOperation().getPicProcessResult().getOriginalInfo().getImageInfo();
-                ParserMediaInfoUtils.ParsingImageInfo(imageInfo, name, getText());
-            } else if (in("Response", "JobsDetail", "Operation", "PicProcessResult", "ProcessResult")) {
-                ProcessResult processResult = jobsDetail.getOperation().getPicProcessResult().getProcessResult();
-                ParserMediaInfoUtils.ParsingProcessResult(processResult, name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "VoiceSeparate", "AudioConfig")) {
+                ParserMediaInfoUtils.ParseAudioConfig(jobsDetail.getOperation().getVoiceSeparate().getAudioConfig(), name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "TtsConfig")) {
+                ParserMediaInfoUtils.ParseTtsConfig(jobsDetail.getOperation().getTtsConfig(), name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "TtsTpl")) {
+                ParserMediaInfoUtils.ParseTtsTpl(jobsDetail.getOperation().getTtsTpl(), name, getText());
             }
         }
 
@@ -4638,6 +4455,35 @@ public class XmlResponsesSaxParser {
             } else if (in("Response", "JobsDetail", "Operation", "PicProcessResult", "ProcessResult")) {
                 ProcessResult processResult = jobsDetail.getOperation().getPicProcessResult().getProcessResult();
                 ParserMediaInfoUtils.ParsingProcessResult(processResult, name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "VideoTargetRec")) {
+                VideoTargetRec videoTargetRec = jobsDetail.getOperation().getVideoTargetRec();
+                ParserMediaInfoUtils.ParsingVideoTargetRec(videoTargetRec, name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "TtsConfig")) {
+                ParserMediaInfoUtils.ParseTtsConfig(jobsDetail.getOperation().getTtsConfig(), name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "TtsTpl")) {
+                ParserMediaInfoUtils.ParseTtsTpl(jobsDetail.getOperation().getTtsTpl(), name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "VideoEnhance", "Transcode", "Container")) {
+                ParserMediaInfoUtils.ParseContainer(jobsDetail.getOperation().getVideoEnhance().getTrascode().getContainer(), name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "VideoEnhance", "Transcode", "Video")) {
+                ParserMediaInfoUtils.ParsingMediaVideo(jobsDetail.getOperation().getVideoEnhance().getTrascode().getVideo(), name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "VideoEnhance", "Transcode", "Audio")) {
+                ParserMediaInfoUtils.ParsingMediaAudio(jobsDetail.getOperation().getVideoEnhance().getTrascode().getAudio(), name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "VideoEnhance", "SuperResolution")) {
+                ParserMediaInfoUtils.ParsingSuperResolution(jobsDetail.getOperation().getVideoEnhance().getSuperResolution(), name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "VideoEnhance", "ColorEnhance")) {
+                ParserMediaInfoUtils.ParsingColorEnhance(jobsDetail.getOperation().getVideoEnhance().getColorEnhance(), name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "VideoEnhance", "MsSharpen")) {
+                ParserMediaInfoUtils.ParsingMsSharpen(jobsDetail.getOperation().getVideoEnhance().getMsSharpen(), name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "VideoEnhance", "SDRtoHDR")) {
+                ParserMediaInfoUtils.ParsingSDRtoHDR(jobsDetail.getOperation().getVideoEnhance().getSdrToHDR(), name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "VideoEnhance", "FrameEnhance")) {
+                ParserMediaInfoUtils.ParsingFrameEnhance(jobsDetail.getOperation().getVideoEnhance().getFrameEnhance(), name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "Transcode", "AudioMixArray")) {
+                ParserMediaInfoUtils.ParsingAudioMixArray(jobsDetail.getOperation().getTranscode().getAudioMixArray(), name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "Transcode", "AudioMixArray", "EffectConfig")) {
+                ParserMediaInfoUtils.ParsingEffectConfig(jobsDetail.getOperation().getTranscode().getAudioMixArray(), name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "Subtitles", "Subtitle")) {
+                ParserMediaInfoUtils.ParsingSubtitles(jobsDetail.getOperation().getSubtitles(), name, getText());
             }
         }
 
@@ -4789,6 +4635,9 @@ public class XmlResponsesSaxParser {
             } else if (in("Response", "Template", "Watermark", "Image")) {
                 MediaWaterMarkImage image = response.getTemplate().getWatermark().getImage();
                 ParserMediaInfoUtils.ParsingWatermarkImage(image, name, getText());
+            } else if (in("Response", "Template", "VideoTargetRec")) {
+                VideoTargetRec videoTargetRec = response.getTemplate().getVideoTargetRec();
+                ParserMediaInfoUtils.ParsingVideoTargetRec(videoTargetRec, name, getText());
             }
         }
 
@@ -4832,6 +4681,13 @@ public class XmlResponsesSaxParser {
             if ("TemplateList".equalsIgnoreCase(name)) {
                 List<MediaTemplateObject> templateList = response.getTemplateList();
                 templateList.add(new MediaTemplateObject());
+            } else if (in("Response", "TemplateList", "ConcatTemplate") && "ConcatFragment".equalsIgnoreCase(name)) {
+                List<MediaTemplateObject> templateList = response.getTemplateList();
+                if (templateList != null && !templateList.isEmpty()) {
+                    MediaTemplateObject mediaTemplateObject = templateList.get(templateList.size() - 1);
+                    List<MediaConcatFragmentObject> concatFragmentList = mediaTemplateObject.getConcatTemplate().getConcatFragmentList();
+                    concatFragmentList.add(new MediaConcatFragmentObject());
+                }
             }
         }
 
@@ -4918,6 +4774,45 @@ public class XmlResponsesSaxParser {
             } else if (in("Response", "TemplateList", "Watermark", "Image")) {
                 MediaWaterMarkImage image = template.getWatermark().getImage();
                 ParserMediaInfoUtils.ParsingWatermarkImage(image, name, getText());
+            } else if (in("Response", "TemplateList", "ConcatTemplate", "ConcatFragment")) {
+                ParserMediaInfoUtils.ParseConcatFragment(getConcatFragment(template), name, getText());
+            } else if (in("Response", "TemplateList", "ConcatTemplate", "Audio")) {
+                ParserMediaInfoUtils.ParsingMediaAudio(template.getConcatTemplate().getAudio(), name, getText());
+            } else if (in("Response", "TemplateList", "ConcatTemplate", "Video")) {
+                ParserMediaInfoUtils.ParsingMediaVideo(template.getConcatTemplate().getVideo(), name, getText());
+            } else if (in("Response", "TemplateList", "ConcatTemplate", "Container")) {
+                if (name.equalsIgnoreCase("Format")) {
+                    template.getConcatTemplate().getContainer().setFormat(getText());
+                }
+            } else if (in("Response", "TemplateList", "ConcatTemplate", "AudioMix")) {
+                ParserMediaInfoUtils.ParseAudioMix(template.getConcatTemplate().getAudioMix(), name, getText());
+            } else if (in("Response", "TemplateList", "ConcatTemplate", "VideoTargetRec")) {
+                ParserMediaInfoUtils.ParsingVideoTargetRec(template.getVideoTargetRec(), name, getText());
+            } else if (in("Response", "TemplateList", "TtsTpl")) {
+                ParserMediaInfoUtils.ParseTtsTpl(template.getTtsTpl(), name, getText());
+            } else if (in("Response", "TemplateList", "VideoEnhance", "Transcode", "Container")) {
+                ParserMediaInfoUtils.ParseContainer(template.getVideoEnhance().getTrascode().getContainer(), name, getText());
+            } else if (in("Response", "TemplateList", "VideoEnhance", "Transcode", "Video")) {
+                ParserMediaInfoUtils.ParsingMediaVideo(template.getVideoEnhance().getTrascode().getVideo(), name, getText());
+            } else if (in("Response", "TemplateList", "VideoEnhance", "Transcode", "Audio")) {
+                ParserMediaInfoUtils.ParsingMediaAudio(template.getVideoEnhance().getTrascode().getAudio(), name, getText());
+            } else if (in("Response", "TemplateList", "VideoEnhance", "SuperResolution")) {
+                ParserMediaInfoUtils.ParsingSuperResolution(template.getVideoEnhance().getSuperResolution(), name, getText());
+            } else if (in("Response", "TemplateList", "VideoEnhance", "ColorEnhance")) {
+                ParserMediaInfoUtils.ParsingColorEnhance(template.getVideoEnhance().getColorEnhance(), name, getText());
+            } else if (in("Response", "TemplateList", "VideoEnhance", "MsSharpen")) {
+                ParserMediaInfoUtils.ParsingMsSharpen(template.getVideoEnhance().getMsSharpen(), name, getText());
+            } else if (in("Response", "TemplateList", "VideoEnhance", "SDRtoHDR")) {
+                ParserMediaInfoUtils.ParsingSDRtoHDR(template.getVideoEnhance().getSdrToHDR(), name, getText());
+            }
+        }
+
+        public MediaConcatFragmentObject getConcatFragment(MediaTemplateObject template) {
+            List<MediaConcatFragmentObject> concatFragmentList = template.getConcatTemplate().getConcatFragmentList();
+            if (concatFragmentList != null && !concatFragmentList.isEmpty()) {
+                return concatFragmentList.get(concatFragmentList.size() - 1);
+            } else {
+                return new MediaConcatFragmentObject();
             }
         }
 
@@ -4931,24 +4826,36 @@ public class XmlResponsesSaxParser {
 
         @Override
         protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
-
+            if (in("Response", "MediaInfo", "Stream") && "Video".equalsIgnoreCase(name)) {
+                List<MediaInfoVideo> mediaInfoVideoList = response.getMediaInfo().getStream().getMediaInfoVideoList();
+                mediaInfoVideoList.add(new MediaInfoVideo());
+            }if (in("Response", "MediaInfo", "Stream") && "Audio".equalsIgnoreCase(name)) {
+                List<MediaInfoAudio> mediaInfoAudioList = response.getMediaInfo().getStream().getMediaInfoAudioList();
+                mediaInfoAudioList.add(new MediaInfoAudio());
+            }
         }
 
         @Override
         protected void doEndElement(String uri, String name, String qName) {
-            MediaStream stream = response.getMediaInfo().getStream();
+            MediaInfoStream stream = response.getMediaInfo().getStream();
             if (in("Response", "MediaInfo", "Format")) {
                 MediaFormat format = response.getMediaInfo().getFormat();
                 ParserMediaInfoUtils.ParsingMediaFormat(format, name, getText());
             } else if (in("Response", "MediaInfo", "Stream", "Audio")) {
-                MediaInfoAudio audio = stream.getAudio();
-                ParserMediaInfoUtils.ParsingStreamAudio(audio, name, getText());
+                List<MediaInfoAudio> mediaInfoAudioList = stream.getMediaInfoAudioList();
+                if (!mediaInfoAudioList.isEmpty()) {
+                    MediaInfoAudio audio = stream.getMediaInfoAudioList().get(mediaInfoAudioList.size() - 1);
+                    ParserMediaInfoUtils.ParsingStreamAudio(audio, name, getText());
+                }
             } else if (in("Response", "MediaInfo", "Stream", "Subtitle")) {
                 MediaInfoSubtitle subtitle = stream.getSubtitle();
                 ParserMediaInfoUtils.ParsingSubtitle(subtitle, name, getText());
             } else if (in("Response", "MediaInfo", "Stream", "Video")) {
-                MediaInfoVideo video = stream.getVideo();
-                ParserMediaInfoUtils.ParsingMediaVideo(video, name, getText());
+                List<MediaInfoVideo> mediaInfoVideoList = stream.getMediaInfoVideoList();
+                if (!mediaInfoVideoList.isEmpty()) {
+                    MediaInfoVideo video = stream.getMediaInfoVideoList().get(mediaInfoVideoList.size() - 1);
+                    ParserMediaInfoUtils.ParsingMediaVideo(video, name, getText());
+                }
             }
         }
 
@@ -5554,6 +5461,9 @@ public class XmlResponsesSaxParser {
                     case "State":
                         response.setState(getText());
                         break;
+                    case "forbidState":
+                        response.setForbidState(getText());
+                        break;
                     default:
                         break;
                 }
@@ -5676,6 +5586,9 @@ public class XmlResponsesSaxParser {
                     case "Label":
                         jobsDetail.setLabel(getText());
                         break;
+                    case "ForbidState":
+                        jobsDetail.setForbidState(getText());
+                        break;
                     default:
                         break;
                 }
@@ -5786,8 +5699,14 @@ public class XmlResponsesSaxParser {
             List<SectionInfo> sectionList = response.getJobsDetail().getSectionList();
             if (in("Response", "JobsDetail") && "Section".equals(name)) {
                 sectionList.add(new SectionInfo());
-            }else if (in("Response", "JobsDetail", "ListInfo") && "ListResults".equals(name)) {
+            } else if (in("Response", "JobsDetail", "ListInfo") && "ListResults".equals(name)) {
                 response.getJobsDetail().getListInfo().getListResults().add(new ListResult());
+            } else if (in("Response", "JobsDetail", "Section") && "LanguageResults".equals(name)) {
+                if (!sectionList.isEmpty()) {
+                    SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
+                    List<LanguageResult> languageResult = sectionInfo.getLanguageResult();
+                    languageResult.add(new LanguageResult());
+                }
             }
         }
 
@@ -5829,6 +5748,12 @@ public class XmlResponsesSaxParser {
                     case "Label":
                         jobsDetail.setLabel(getText());
                         break;
+                    case "SubLabel":
+                        jobsDetail.setSubLabel(getText());
+                        break;
+                    case "ForbidState":
+                        jobsDetail.setForbidState(getText());
+                        break;
                     default:
                         break;
                 }
@@ -5840,6 +5765,8 @@ public class XmlResponsesSaxParser {
                 ParserMediaInfoUtils.ParsingAuditingCommonInfo(response.getJobsDetail().getTerroristInfo(), name, getText());
             } else if (in("Response", "JobsDetail", "AdsInfo")) {
                 ParserMediaInfoUtils.ParsingAuditingCommonInfo(response.getJobsDetail().getAdsInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "TeenagerInfo")) {
+                ParserMediaInfoUtils.ParsingAuditingCommonInfo(response.getJobsDetail().getTeenagerInfo(), name, getText());
             } else if (in("Response", "JobsDetail", "Section", "PornInfo")) {
                 List<SectionInfo> sectionList = response.getJobsDetail().getSectionList();
                 SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
@@ -5856,7 +5783,11 @@ public class XmlResponsesSaxParser {
                 List<SectionInfo> sectionList = response.getJobsDetail().getSectionList();
                 SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
                 ParserMediaInfoUtils.ParsingAuditingCommonInfo(sectionInfo.getAdsInfo(), name, getText());
-            }else if (in("Response", "JobsDetail", "Section")){
+            } else if (in("Response", "JobsDetail", "Section", "TeenagerInfo")) {
+                List<SectionInfo> sectionList = response.getJobsDetail().getSectionList();
+                SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
+                ParserMediaInfoUtils.ParsingAuditingCommonInfo(sectionInfo.getTeenagerInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "Section")) {
                 List<SectionInfo> sectionList = response.getJobsDetail().getSectionList();
                 SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
                 ParserMediaInfoUtils.parseSectionInfo(sectionInfo, name, getText());
@@ -5866,6 +5797,14 @@ public class XmlResponsesSaxParser {
                 List<ListResult> listResults = response.getJobsDetail().getListInfo().getListResults();
                 if (!listResults.isEmpty()) {
                     ParserMediaInfoUtils.parsingAuditingListResultInfo(listResults.get(listResults.size() - 1), name, getText());
+                }
+            } else if (in("Response", "JobsDetail", "Section", "LanguageResults")) {
+                List<SectionInfo> sectionList = response.getJobsDetail().getSectionList();
+                SectionInfo sectionInfo = sectionList.get(sectionList.size() - 1);
+                List<LanguageResult> languageResults = sectionInfo.getLanguageResult();
+                if (!languageResults.isEmpty()) {
+                    LanguageResult result = languageResults.get(languageResults.size() - 1);
+                    ParserMediaInfoUtils.parseLanguageResult(result, name, getText());
                 }
             }
         }
@@ -6247,8 +6186,14 @@ public class XmlResponsesSaxParser {
                     case "Label":
                         jobsDetail.setLabel(getText());
                         break;
+                    case "SubLabel":
+                        jobsDetail.setSubLabel(getText());
+                        break;
                     case "Content":
                         jobsDetail.setContent(getText());
+                        break;
+                    case "ForbidState":
+                        jobsDetail.setForbidState(getText());
                         break;
                     default:
                         break;
@@ -6445,6 +6390,12 @@ public class XmlResponsesSaxParser {
                     case "DataId":
                         jobsDetail.setDataId(getText());
                         break;
+                    case "ForbidState":
+                        jobsDetail.setForbidState(getText());
+                        break;
+                    case "Label":
+                        jobsDetail.setLabel(getText());
+                        break;
                     default:
                         break;
                 }
@@ -6478,29 +6429,29 @@ public class XmlResponsesSaxParser {
                 } else if ("SheetNumber".equalsIgnoreCase(name)) {
                     resultDetail.setSheetNumber(getText());
                 }
-            } else if (in("Response", "JobsDetail", "PageSegment", "Results", "PornInfo","OcrResults")) {
+            } else if (in("Response", "JobsDetail", "PageSegment", "Results", "PornInfo", "OcrResults")) {
                 parseResultInfo(resultDetail.getPornInfo().getOcrResults(), name, getText());
-            }else if (in("Response", "JobsDetail", "PageSegment", "Results", "PoliticsInfo","OcrResults")) {
+            } else if (in("Response", "JobsDetail", "PageSegment", "Results", "PoliticsInfo", "OcrResults")) {
                 parseResultInfo(resultDetail.getPoliticsInfo().getOcrResults(), name, getText());
-            }else if (in("Response", "JobsDetail", "PageSegment", "Results", "TerrorismInfo","OcrResults")) {
+            } else if (in("Response", "JobsDetail", "PageSegment", "Results", "TerrorismInfo", "OcrResults")) {
                 parseResultInfo(resultDetail.getTerroristInfo().getOcrResults(), name, getText());
-            }else if (in("Response", "JobsDetail", "PageSegment", "Results", "AdsInfo","OcrResults")) {
+            } else if (in("Response", "JobsDetail", "PageSegment", "Results", "AdsInfo", "OcrResults")) {
                 parseResultInfo(resultDetail.getAdsInfo().getOcrResults(), name, getText());
-            }else if (in("Response", "JobsDetail", "PageSegment", "Results", "PornInfo","ObjectResults")) {
+            } else if (in("Response", "JobsDetail", "PageSegment", "Results", "PornInfo", "ObjectResults")) {
                 parseResultInfo(resultDetail.getPornInfo().getObjectResults(), name, getText());
-            }else if (in("Response", "JobsDetail", "PageSegment", "Results", "PoliticsInfo","ObjectResults")) {
+            } else if (in("Response", "JobsDetail", "PageSegment", "Results", "PoliticsInfo", "ObjectResults")) {
                 parseResultInfo(resultDetail.getPoliticsInfo().getObjectResults(), name, getText());
-            }else if (in("Response", "JobsDetail", "PageSegment", "Results", "TerrorismInfo","ObjectResults")) {
+            } else if (in("Response", "JobsDetail", "PageSegment", "Results", "TerrorismInfo", "ObjectResults")) {
                 parseResultInfo(resultDetail.getTerroristInfo().getObjectResults(), name, getText());
-            }else if (in("Response", "JobsDetail", "PageSegment", "Results", "AdsInfo","ObjectResults")) {
+            } else if (in("Response", "JobsDetail", "PageSegment", "Results", "AdsInfo", "ObjectResults")) {
                 parseResultInfo(resultDetail.getAdsInfo().getObjectResults(), name, getText());
-            }else if (in("Response", "JobsDetail", "PageSegment", "Results", "PornInfo","ObjectResults","Location")) {
+            } else if (in("Response", "JobsDetail", "PageSegment", "Results", "PornInfo", "ObjectResults", "Location")) {
                 parseResultInfo(resultDetail.getPornInfo().getObjectResults(), name, getText());
-            }else if (in("Response", "JobsDetail", "PageSegment", "Results", "PoliticsInfo","ObjectResults","Location")) {
+            } else if (in("Response", "JobsDetail", "PageSegment", "Results", "PoliticsInfo", "ObjectResults", "Location")) {
                 parseResultInfo(resultDetail.getPoliticsInfo().getObjectResults(), name, getText());
-            }else if (in("Response", "JobsDetail", "PageSegment", "Results", "TerrorismInfo","ObjectResults","Location")) {
+            } else if (in("Response", "JobsDetail", "PageSegment", "Results", "TerrorismInfo", "ObjectResults", "Location")) {
                 parseResultInfo(resultDetail.getTerroristInfo().getObjectResults(), name, getText());
-            }else if (in("Response", "JobsDetail", "PageSegment", "Results", "AdsInfo","ObjectResults","Location")) {
+            } else if (in("Response", "JobsDetail", "PageSegment", "Results", "AdsInfo", "ObjectResults", "Location")) {
                 parseResultInfo(resultDetail.getAdsInfo().getObjectResults(), name, getText());
             } else if (in("Response", "JobsDetail", "UserInfo")) {
                 ParserMediaInfoUtils.ParsingAuditingUserInfo(response.getJobsDetail().getUserInfo(), name, getText());
@@ -6532,15 +6483,23 @@ public class XmlResponsesSaxParser {
                     obj.setScore(getText());
                     break;
                 case "Keywords":
-                    obj.setLabel(getText());
+                    obj.setKeywords(getText());
                     break;
                 case "Count":
                     obj.setCount(getText());
                     break;
+                case "Label":
+                    obj.setLabel(getText());
+                    break;
+                case "Category":
+                    obj.setCategory(getText());
+                    break;
+                case "SubLabel":
+                    obj.setSubLabel(getText());
+                    break;
                 default:
                     break;
             }
-
         }
 
         private void parseResultInfo(List<ObjectResults> obj, String name, String value) {
@@ -6799,6 +6758,18 @@ public class XmlResponsesSaxParser {
                     case "Label":
                         jobsDetail.setLabel(getText());
                         break;
+                    case "Code":
+                        jobsDetail.setCode(getText());
+                        break;
+                    case "Message":
+                        jobsDetail.setMessage(getText());
+                        break;
+                    case "dataId":
+                        jobsDetail.setDataId(getText());
+                        break;
+                    case "HighlightHtml":
+                        jobsDetail.setHighlightHtml(getText());
+                        break;
                     default:
                         break;
                 }
@@ -6810,12 +6781,28 @@ public class XmlResponsesSaxParser {
                     case "Url":
                         imageAuditingDetail.setUrl(getText());
                         break;
+                    case "Label":
+                        imageAuditingDetail.setLabel(getText());
+                        break;
+                    case "Suggestion":
+                        imageAuditingDetail.setSuggestion(getText());
+                        break;
                     default:
                         break;
                 }
             } else if (in("Response", "JobsDetail", "TextResults", "Results")) {
-                if ("Text".equals(name)) {
-                    textAuditingDetail.setText(getText());
+                switch (name) {
+                    case "Text":
+                        textAuditingDetail.setText(getText());
+                        break;
+                    case "Label":
+                        textAuditingDetail.setLabel(getText());
+                        break;
+                    case "Suggestion":
+                        textAuditingDetail.setSuggestion(getText());
+                        break;
+                    default:
+                        break;
                 }
             } else if (in("Response", "JobsDetail", "ImageResults", "Results","PoliticsInfo")) {
                 parseInfo(imageAuditingDetail.getPoliticsInfo(), name, getText());
@@ -6840,6 +6827,14 @@ public class XmlResponsesSaxParser {
                 if (!listResults.isEmpty()) {
                     ParserMediaInfoUtils.parsingAuditingListResultInfo(listResults.get(listResults.size() - 1), name, getText());
                 }
+            } else if (in("Response", "JobsDetail", "Labels", "PoliticsInfo")) {
+                parseInfo(response.getJobsDetail().getLabels().getPoliticsInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "Labels", "PornInfo")) {
+                parseInfo(response.getJobsDetail().getLabels().getPornInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "Labels", "TerrorismInfo")) {
+                parseInfo(response.getJobsDetail().getLabels().getTerroristInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "Labels", "AdsInfo")) {
+                parseInfo(response.getJobsDetail().getLabels().getAdsInfo(), name, getText());
             }
         }
 
@@ -6932,6 +6927,9 @@ public class XmlResponsesSaxParser {
                         break;
                     case "Category":
                         response.setCategory(getText());
+                        break;
+                    case "ForbidState":
+                        response.setForbidState(getText());
                         break;
                     default:
                         break;

@@ -150,22 +150,22 @@ public class RequestXmlFactory {
         xml.end();
     }
 
-    private static void addSelectParametersIfNotNull(XmlWriter xml, SelectParameters selectParameters) {
-        if (selectParameters == null) {
-            return;
-        }
-
-        xml.start("SelectParameters");
-
-        addInputSerializationIfNotNull(xml, selectParameters.getInputSerialization());
-
-        addIfNotNull(xml, "ExpressionType", selectParameters.getExpressionType());
-        addIfNotNull(xml, "Expression", selectParameters.getExpression());
-
-        addOutputSerializationIfNotNull(xml, selectParameters.getOutputSerialization());
-
-        xml.end();
-    }
+//    private static void addSelectParametersIfNotNull(XmlWriter xml, SelectParameters selectParameters) {
+//        if (selectParameters == null) {
+//            return;
+//        }
+//
+//        xml.start("SelectParameters");
+//
+//        addInputSerializationIfNotNull(xml, selectParameters.getInputSerialization());
+//
+//        addIfNotNull(xml, "ExpressionType", selectParameters.getExpressionType());
+//        addIfNotNull(xml, "Expression", selectParameters.getExpression());
+//
+//        addOutputSerializationIfNotNull(xml, selectParameters.getOutputSerialization());
+//
+//        xml.end();
+//    }
 
     private static void addScanRangeIfNotNull(XmlWriter xml, ScanRange scanRange) {
         if (scanRange != null) {
@@ -714,6 +714,8 @@ public class RequestXmlFactory {
             addIfNotNull(xml, "PaperDirection", docProcess.getPaperDirection());
             addIfNotNull(xml, "Quality", docProcess.getQuality());
             addIfNotNull(xml, "Zoom", docProcess.getZoom());
+            addIfNotNull(xml, "PicPagination", docProcess.getPicPagination());
+            addIfNotNull(xml, "ImageDpi", docProcess.getImageDpi());
             xml.end();
 
             xml.end();
@@ -837,6 +839,7 @@ public class RequestXmlFactory {
         addIfNotNull(xml, "Callback", conf.getCallback());
         addIfNotNull(xml, "BizType", conf.getBizType());
         addIfNotNull(xml, "CallbackVersion", conf.getCallbackVersion());
+        addIfNotNull(xml, "CallbackType", conf.getCallbackType());
         xml.end();
 
         xml.end();

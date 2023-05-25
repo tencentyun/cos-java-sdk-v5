@@ -27,6 +27,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.qcloud.cos.model.bucketcertificate.BucketDomainCertificateRequest;
+import com.qcloud.cos.model.bucketcertificate.BucketGetDomainCertificate;
+import com.qcloud.cos.model.bucketcertificate.BucketPutDomainCertificate;
+import com.qcloud.cos.model.bucketcertificate.SetBucketDomainCertificateRequest;
+import com.qcloud.cos.model.ciModel.common.CImageProcessRequest;
 import com.qcloud.cos.model.ciModel.image.*;
 import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.exception.CosServiceException;
@@ -40,11 +45,15 @@ import com.qcloud.cos.model.ciModel.bucket.DocBucketResponse;
 import com.qcloud.cos.model.ciModel.bucket.MediaBucketRequest;
 import com.qcloud.cos.model.ciModel.bucket.MediaBucketResponse;
 import com.qcloud.cos.model.ciModel.common.ImageProcessRequest;
+import com.qcloud.cos.model.ciModel.job.BatchJobRequest;
+import com.qcloud.cos.model.ciModel.job.BatchJobResponse;
 import com.qcloud.cos.model.ciModel.job.DocHtmlRequest;
 import com.qcloud.cos.model.ciModel.job.DocJobListRequest;
 import com.qcloud.cos.model.ciModel.job.DocJobListResponse;
 import com.qcloud.cos.model.ciModel.job.DocJobRequest;
 import com.qcloud.cos.model.ciModel.job.DocJobResponse;
+import com.qcloud.cos.model.ciModel.job.FileProcessJobResponse;
+import com.qcloud.cos.model.ciModel.job.FileProcessRequest;
 import com.qcloud.cos.model.ciModel.job.MediaJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaJobsRequest;
 import com.qcloud.cos.model.ciModel.job.MediaListJobResponse;
@@ -2430,7 +2439,7 @@ public interface COS extends COSDirectSpi {
      * @throws CosServiceException If any errors occurred in COS while processing the
      *                             request.
      */
-    public void deleteBucketDomainConfiguration(DeleteBucketDomainConfigurationRequest deleteBucketDomainConfigurationReqeuest)
+    public void deleteBucketDomainConfiguration(DeleteBucketDomainConfigurationRequest deleteBucketDomainConfigurationRequest)
             throws CosClientException, CosServiceException;
 
     /**
@@ -2484,6 +2493,86 @@ public interface COS extends COSDirectSpi {
      * @throws CosServiceException If any errors occurred in COS while processing the request.
      */
     public BucketDomainConfiguration getBucketDomainConfiguration(GetBucketDomainConfigurationRequest getBucketDomainConfigurationRequest)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * This operation removes the domain certificate for a bucket.
+     *
+     * @param bucketName The name of the bucket whose domain certificate is being
+     *                   deleted.
+     * @parm domainName The name of the bucket's domain whose certificate is being deleted.
+     * @throws CosClientException  If any errors are encountered on the client while making the
+     *                             request or handling the response.
+     * @throws CosServiceException If any errors occurred in COS while processing the
+     *                             request.
+     */
+    public void deleteBucketDomainCertificate(String bucketName,String domainName)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * This operation removes the domain certificate for a bucket.
+     *
+     * @param deleteBucketDomainCertificateRequest The request object specifying the name of the bucket whose
+     *                                               domain certificate is to be deleted.
+     * @throws CosClientException  If any errors are encountered on the client while making the
+     *                             request or handling the response.
+     * @throws CosServiceException If any errors occurred in COS while processing the
+     *                             request.
+     */
+    public void deleteBucketDomainCertificate(BucketDomainCertificateRequest deleteBucketDomainCertificateRequest)
+            throws CosClientException, CosServiceException;
+    /**
+     * Sets the domain certificate for the specified bucket.
+     *
+     * @param bucketName    The name of the bucket whose domain certificate is being set.
+     * @param domainCertificate The certificate describing the specified bucket custom domain
+     * @throws CosClientException  If any errors are encountered on the client while making the
+     *                             request or handling the response.
+     * @throws CosServiceException If any errors occurred in COS while processing the request.
+     */
+    public void setBucketDomainCertificate(String bucketName, BucketPutDomainCertificate domainCertificate)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * Sets the domain certificate for the specified bucket.
+     *
+     * @param setBucketDomainCertificateRequest The request object containing the name of the bucket whose
+     *                                            domain certificate is being updated, and the new domain
+     *                                            certificate values.
+     * @throws CosClientException  If any errors are encountered on the client while making the
+     *                             request or handling the response.
+     * @throws CosServiceException If any errors occurred in COS while processing the request.
+     */
+    public void setBucketDomainCertificate(SetBucketDomainCertificateRequest setBucketDomainCertificateRequest)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * Returns the domain certificate for the specified bucket.
+     *
+     * @param bucketName The name of the bucket whose domain certificate is being retrieved.
+     * @param domainName The name of the bucket's domain whose certificate is being retrieved.
+     * @return The bucket domain certificate for the specified bucket,
+     * otherwise null if there is no domain certificate set for the
+     * specified bucket.
+     * @throws CosClientException  If any errors are encountered on the client while making the
+     *                             request or handling the response.
+     * @throws CosServiceException If any errors occurred in COS while processing the request.
+     */
+    public BucketGetDomainCertificate getBucketDomainCertificate(String bucketName, String domainName)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * Returns the domain certificate for the specified bucket.
+     *
+     * @param getBucketDomainCertificateRequest The request object for retrieving the bucket domain certificate.
+     * @return The bucket domain certificate for the specified bucket,
+     * otherwise null if there is no domain certificate set for the
+     * specified bucket.
+     * @throws CosClientException  If any errors are encountered on the client while making the
+     *                             request or handling the response.
+     * @throws CosServiceException If any errors occurred in COS while processing the request.
+     */
+    public BucketGetDomainCertificate getBucketDomainCertificate(BucketDomainCertificateRequest getBucketDomainCertificateRequest)
             throws CosClientException, CosServiceException;
 
     /**
@@ -2824,7 +2913,7 @@ public interface COS extends COSDirectSpi {
      *
      * @param req
      */
-    MediaJobResponse createMediaJobs(MediaJobsRequest req) throws UnsupportedEncodingException;
+    MediaJobResponse createMediaJobs(MediaJobsRequest req) ;
 
     /**
      * CancelMediaJob 接口用于取消一个任务。  https://cloud.tencent.com/document/product/460/38939
@@ -3096,6 +3185,17 @@ public interface COS extends COSDirectSpi {
     MediaJobResponse createPicProcessJob(MediaJobsRequest req);
 
     MediaListQueueResponse describePicProcessQueues(MediaQueueRequest request);
+
+    boolean processImage2(CImageProcessRequest imageProcessRequest);
+
+    FileProcessJobResponse createFileProcessJob(FileProcessRequest request);
+    FileProcessJobResponse describeFileProcessJob(FileProcessRequest request);
+
+    BatchJobResponse createInventoryTriggerJob(BatchJobRequest request);
+
+    BatchJobResponse describeInventoryTriggerJob(BatchJobRequest request);
+
+    AutoTranslationBlockResponse autoTranslationBlock(AutoTranslationBlockRequest request);
 }
 
 

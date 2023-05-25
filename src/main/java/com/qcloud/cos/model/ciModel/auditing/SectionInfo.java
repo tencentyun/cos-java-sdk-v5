@@ -1,5 +1,8 @@
 package com.qcloud.cos.model.ciModel.auditing;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 具体文本分片的审核结果信息，只返回带有违规结果的分片
  */
@@ -11,12 +14,34 @@ public class SectionInfo {
     private AdsInfo adsInfo;
     private AbuseInfo abuseInfo;
     private IllegalInfo illegalInfo;
+    private TeenagerInfo teenagerInfo;
     private String text;
     private String url;
     private String duration;
     private String offsetTime;
     private String label;
     private String result;
+    private String subLabel;
+    private List<LanguageResult> languageResult = new ArrayList<>();
+
+    public String getSubLabel() {
+        return subLabel;
+    }
+
+    public void setSubLabel(String subLabel) {
+        this.subLabel = subLabel;
+    }
+
+    public List<LanguageResult> getLanguageResult() {
+        if (languageResult == null) {
+            languageResult = new ArrayList<>();
+        }
+        return languageResult;
+    }
+
+    public void setLanguageResult(List<LanguageResult> languageResult) {
+        this.languageResult = languageResult;
+    }
 
     public PornInfo getPornInfo() {
         if (pornInfo == null) {
@@ -138,6 +163,17 @@ public class SectionInfo {
 
     public void setResult(String result) {
         this.result = result;
+    }
+
+    public TeenagerInfo getTeenagerInfo() {
+        if (teenagerInfo == null) {
+            teenagerInfo = new TeenagerInfo();
+        }
+        return teenagerInfo;
+    }
+
+    public void setTeenagerInfo(TeenagerInfo teenagerInfo) {
+        this.teenagerInfo = teenagerInfo;
     }
 
     @Override

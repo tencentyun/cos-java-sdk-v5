@@ -28,6 +28,9 @@ import com.qcloud.cos.model.BucketLifecycleConfiguration.Transition;
 import com.qcloud.cos.model.CORSRule.AllowedMethods;
 import com.qcloud.cos.model.Tag.LifecycleTagPredicate;
 import com.qcloud.cos.model.Tag.Tag;
+import com.qcloud.cos.model.bucketcertificate.BucketDomainCertificateInfo;
+import com.qcloud.cos.model.bucketcertificate.BucketDomainCertificateParameters;
+import com.qcloud.cos.model.bucketcertificate.BucketPutDomainCertificate;
 import com.qcloud.cos.model.inventory.InventoryConfiguration;
 import com.qcloud.cos.model.inventory.InventoryCosBucketDestination;
 import com.qcloud.cos.model.inventory.InventoryDestination;
@@ -668,4 +671,27 @@ public class BucketConfigurationXmlFactory {
         return xml.getBytes();
     }
 
+    public byte[] convertToXmlByteArray(BucketPutDomainCertificate domainCertificate)
+            throws CosClientException{
+        XmlWriter xml = new XmlWriter();
+        xml.start(BucketDomainCertificateParameters.Element_Domain_Certificate);
+        BucketDomainCertificateInfo certificateInfo = domainCertificate.getBucketDomainCertificateInfo();
+        xml.start(BucketDomainCertificateParameters.Element_CertificateInfo);
+        xml.start(BucketDomainCertificateParameters.Element_CertType).value(certificateInfo.getCertType()).end();
+
+        xml.start(BucketDomainCertificateParameters.Element_CustomCert);
+        xml.start(BucketDomainCertificateParameters.Element_Cert).value(certificateInfo.getCert()).end();
+        xml.start(BucketDomainCertificateParameters.Element_PrivateKey).value(certificateInfo.getPrivateKey()).end();
+        xml.end();
+        xml.end();
+
+        xml.start(BucketDomainCertificateParameters.Element_DomainList);
+        for (String domain : domainCertificate.getDomainList()) {
+            xml.start(BucketDomainCertificateParameters.Element_DomainName).value(domain).end();
+        }
+        xml.end();
+        xml.end();
+
+        return xml.getBytes();
+    }
 }

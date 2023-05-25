@@ -7,6 +7,7 @@ package com.qcloud.cos.model.ciModel.common;
  */
 public class MediaInputObject {
     private String object;
+    private String url;
 
     public String getObject() {
         return object;
@@ -16,10 +17,20 @@ public class MediaInputObject {
         this.object = object;
     }
 
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
     @Override
     public String toString() {
-        return "MediaInputObject{" +
-                "object='" + object + '\'' +
-                '}';
+        final StringBuilder sb = new StringBuilder("MediaInputObject{");
+        sb.append("object='").append(object).append('\'');
+        sb.append(", url='").append(url).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 }

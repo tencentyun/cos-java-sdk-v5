@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.6.133]
+- update CI Media Process API
+
+## [5.6.119]
+- add CI Batch Job API
+- add File Process API
+
+## [5.6.109]
+- add Media Process ConcatTemplate API
+
+## [5.6.107]
+- update Auditing API
+
 ## [5.6.105]
 - update PicProcess API 
 

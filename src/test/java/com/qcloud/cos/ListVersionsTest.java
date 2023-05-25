@@ -3,6 +3,7 @@ package com.qcloud.cos;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URL;
 import java.util.List;
 
 import org.junit.AfterClass;
@@ -199,5 +200,99 @@ public class ListVersionsTest extends AbstractCOSClientTest {
         assertEquals(fileNum, keyIndex);
 
         delTestFile();
+    }
+
+    @Test
+    public void testListNextBatchOfVersions() throws Exception {
+        BucketVersioningConfiguration bucketVersioningEnabled =
+                new BucketVersioningConfiguration(BucketVersioningConfiguration.ENABLED);
+        cosclient.setBucketVersioningConfiguration(
+                new SetBucketVersioningConfigurationRequest(bucket, bucketVersioningEnabled));
+
+        Thread.sleep(5000L);
+
+        int countOfFiles = 4;
+        int countOfVersions = 5;
+
+        File[] localFiles = new File[countOfFiles * countOfVersions];
+        String[] keysArray = new String[countOfFiles * countOfVersions];
+
+        for (int i = 0; i < countOfFiles; ++i) {
+            for (int j = 0; j < countOfVersions; ++j) {
+                long localFileSize = (i + 1) * 1024L;
+                String key = String.format("%s/%06dk", "testVersions", i);
+                File localFile = buildTestFile(localFileSize);
+                localFiles[i * countOfVersions + j] = localFile;
+                keysArray[i * countOfVersions + j] = key;
+                PutObjectResult putObjectResult = putObjectFromLocalFile(localFile, key);
+            }
+        }
+
+        int maxKeyNum = countOfFiles * countOfVersions / 2;
+        ListVersionsRequest listVersionsRequest = new ListVersionsRequest();
+        listVersionsRequest.withBucketName(bucket).withPrefix("testVersions").withMaxResults(maxKeyNum);
+
+        VersionListing versionListing = cosclient.listVersions(listVersionsRequest);
+        int keyIndex = 0;
+
+        while (true) {
+            List<COSVersionSummary> versionSummaries = versionListing.getVersionSummaries();
+            assertTrue(versionSummaries.size() <= maxKeyNum);
+            for (COSVersionSummary versionInfo : versionSummaries) {
+                // 对相同可key的文件list出来的顺序是版本号由近到远
+                int localFileIndex = (keyIndex / countOfVersions + 1) * countOfVersions - 1
+                        - (keyIndex % countOfVersions);
+
+                File downFile =
+                        new File(localFiles[localFileIndex].getAbsolutePath() + ".down");
+                String versionId = versionInfo.getVersionId();
+                String key = versionInfo.getKey();
+                long expectedLength = versionInfo.getSize();
+                String expectedEtag = versionInfo.getETag();
+                headAndGetVersion(key, versionId, expectedEtag, expectedLength, downFile);
+                URL url = cosclient.getObjectUrl(bucket, key, versionId);
+                //delVersion(versionInfo.getKey(), versionInfo.getVersionId());
+
+                // 对于开启了多版本的 versionid不是null
+                assertFalse(versionInfo.getVersionId().equals("null"));
+                assertFalse(versionInfo.isDeleteMarker());
+                assertEquals(bucket, versionInfo.getBucketName());
+                assertEquals(keysArray[localFileIndex], versionInfo.getKey());
+                assertEquals(Md5Utils.md5Hex(localFiles[localFileIndex]),
+                        versionInfo.getETag());
+                assertEquals(localFiles[localFileIndex].length(), versionInfo.getSize());
+                ++keyIndex;
+            }
+            if (!versionListing.isTruncated()) {
+                break;
+            }
+            versionListing = cosclient.listNextBatchOfVersions(versionListing);
+        }
+
+        maxKeyNum = countOfFiles * countOfVersions;
+        listVersionsRequest = new ListVersionsRequest();
+        listVersionsRequest.withBucketName(bucket).withPrefix("testVersions").withMaxResults(maxKeyNum);
+
+        versionListing = cosclient.listVersions(listVersionsRequest);
+        keyIndex = 0;
+
+        List<COSVersionSummary> versionSummaries = versionListing.getVersionSummaries();
+        assertTrue(versionSummaries.size() <= maxKeyNum);
+        for (COSVersionSummary versionInfo : versionSummaries) {
+            delVersion(versionInfo.getKey(), versionInfo.getVersionId());
+            // 对于开启了多版本的 versionid不是null
+            assertFalse(versionInfo.getVersionId().equals("null"));
+            assertFalse(versionInfo.isDeleteMarker());
+            assertEquals(bucket, versionInfo.getBucketName());
+            ++keyIndex;
+        }
+        versionListing = cosclient.listNextBatchOfVersions(versionListing);
+
+        for (int i = 0; i < countOfFiles; ++i) {
+            for (int j = 0; j < countOfVersions; ++j) {
+                File localFile = localFiles[i * countOfVersions + j];
+                assertTrue(localFile.delete());
+            }
+        }
     }
 }

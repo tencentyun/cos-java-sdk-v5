@@ -10,6 +10,10 @@ public class MediaTimeIntervalObject {
      */
     private String start;
     /**
+     * 结束时间
+     */
+    private String end;
+    /**
      * 持续时间
      */
     private String duration;
@@ -30,11 +34,21 @@ public class MediaTimeIntervalObject {
         this.duration = duration;
     }
 
+    public String getEnd() {
+        return end;
+    }
+
+    public void setEnd(String end) {
+        this.end = end;
+    }
+
     @Override
     public String toString() {
-        return "MediaTimeIntervalObject{" +
-                "start='" + start + '\'' +
-                ", duration='" + duration + '\'' +
-                '}';
+        final StringBuilder sb = new StringBuilder("MediaTimeIntervalObject{");
+        sb.append("start='").append(start).append('\'');
+        sb.append(", end='").append(end).append('\'');
+        sb.append(", duration='").append(duration).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 }

@@ -8,4 +8,5 @@ public class ClientExceptionConstants {
     public static final String UNKNOWN_HOST = "UnknownHost";
     public static final String SOCKET_TIMEOUT = "SocketTimeout";
     public static final String CLIENT_PROTOCAL_EXCEPTION = "ClientProtocolException";
+    public static final String REQUEST_TIMEOUT = "RequestTimeout";
 }

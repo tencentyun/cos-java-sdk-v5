@@ -20,6 +20,7 @@ public class MediaJobOperation {
     private String jobLevel;
     private String UserData;
     private String templateName;
+    private String decryptKey;
     private MediaOutputObject output;
     private MediaAnimationObject mediaAnimation;
     private MediaInfoObjcet mediaInfo;
@@ -38,6 +39,21 @@ public class MediaJobOperation {
     private MediaPicProcessTemplateObject picProcess = new MediaPicProcessTemplateObject();
     private MediaResult mediaResult = new MediaResult();
     private PicProcessResult picProcessResult = new PicProcessResult();
+    private VideoTargetRec videoTargetRec = new VideoTargetRec();
+    private VoiceSeparate voiceSeparate = new VoiceSeparate();
+    private MediaTimeIntervalObject timeInterval = new MediaTimeIntervalObject();
+    private MediaTtsConfig ttsConfig = new MediaTtsConfig();
+    private VideoEnhance videoEnhance = new VideoEnhance();
+    private TtsTpl ttsTpl = new TtsTpl();
+    private Subtitles subtitles = new Subtitles();
+
+    public MediaTimeIntervalObject getTimeInterval() {
+        return timeInterval;
+    }
+
+    public void setTimeInterval(MediaTimeIntervalObject timeInterval) {
+        this.timeInterval = timeInterval;
+    }
 
     public MediaJobOperation() {
         this.output = new MediaOutputObject();
@@ -208,7 +224,7 @@ public class MediaJobOperation {
     }
 
     public MediaPicProcessTemplateObject getPicProcess() {
-        if (picProcess ==null ){
+        if (picProcess == null) {
             picProcess = new MediaPicProcessTemplateObject();
         }
         return picProcess;
@@ -250,12 +266,73 @@ public class MediaJobOperation {
         this.picProcessResult = picProcessResult;
     }
 
+    public String getDecryptKey() {
+        return decryptKey;
+    }
+
+    public void setDecryptKey(String decryptKey) {
+        this.decryptKey = decryptKey;
+    }
+
+    public VideoTargetRec getVideoTargetRec() {
+        if (videoTargetRec == null) {
+            videoTargetRec = new VideoTargetRec();
+        }
+        return videoTargetRec;
+    }
+
+    public void setVideoTargetRec(VideoTargetRec videoTargetRec) {
+        this.videoTargetRec = videoTargetRec;
+    }
+
+    public VoiceSeparate getVoiceSeparate() {
+        return voiceSeparate;
+    }
+
+    public void setVoiceSeparate(VoiceSeparate voiceSeparate) {
+        this.voiceSeparate = voiceSeparate;
+    }
+
+    public MediaTtsConfig getTtsConfig() {
+        return ttsConfig;
+    }
+
+    public void setTtsConfig(MediaTtsConfig ttsConfig) {
+        this.ttsConfig = ttsConfig;
+    }
+
+    public TtsTpl getTtsTpl() {
+        return ttsTpl;
+    }
+
+    public void setTtsTpl(TtsTpl ttsTpl) {
+        this.ttsTpl = ttsTpl;
+    }
+
+    public VideoEnhance getVideoEnhance() {
+        return videoEnhance;
+    }
+
+    public void setVideoEnhance(VideoEnhance videoEnhance) {
+        this.videoEnhance = videoEnhance;
+    }
+
+    public Subtitles getSubtitles() {
+        return subtitles;
+    }
+
+    public void setSubtitles(Subtitles subtitles) {
+        this.subtitles = subtitles;
+    }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("MediaJobOperation{");
         sb.append("templateId='").append(templateId).append('\'');
         sb.append(", jobLevel='").append(jobLevel).append('\'');
         sb.append(", UserData='").append(UserData).append('\'');
+        sb.append(", templateName='").append(templateName).append('\'');
+        sb.append(", decryptKey='").append(decryptKey).append('\'');
         sb.append(", output=").append(output);
         sb.append(", mediaAnimation=").append(mediaAnimation);
         sb.append(", mediaInfo=").append(mediaInfo);
@@ -272,6 +349,12 @@ public class MediaJobOperation {
         sb.append(", digitalWatermark=").append(digitalWatermark);
         sb.append(", extractDigitalWatermark=").append(extractDigitalWatermark);
         sb.append(", picProcess=").append(picProcess);
+        sb.append(", mediaResult=").append(mediaResult);
+        sb.append(", picProcessResult=").append(picProcessResult);
+        sb.append(", videoTargetRec=").append(videoTargetRec);
+        sb.append(", voiceSeparate=").append(voiceSeparate);
+        sb.append(", timeInterval=").append(timeInterval);
+        sb.append(", ttsConfig=").append(ttsConfig);
         sb.append('}');
         return sb.toString();
     }

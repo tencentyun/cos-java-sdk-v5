@@ -1,8 +1,5 @@
 package com.qcloud.cos;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
 import com.qcloud.cos.model.BucketReplicationConfiguration;
 import com.qcloud.cos.model.BucketVersioningConfiguration;
 import com.qcloud.cos.model.ReplicationDestinationConfig;
@@ -15,14 +12,35 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 public class BucketReplicationTest extends AbstractCOSClientTest {
+    private static String bucketQCS = null;
+
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
         AbstractCOSClientTest.initCosClient();
+        bucketQCS = System.getenv("bucketQCS") + "-" + appid;
+        deleteBucket(bucketQCS);
+        createBucket(bucketQCS);
+
+        BucketVersioningConfiguration bucketVersioningEnabled =
+                new BucketVersioningConfiguration(BucketVersioningConfiguration.ENABLED);
+        cosclient.setBucketVersioningConfiguration(
+                new SetBucketVersioningConfigurationRequest(bucketQCS, bucketVersioningEnabled));
+        try {
+            Thread.sleep(5000L);
+        } catch (InterruptedException e) {
+            fail(e.toString());
+        }
     }
 
     @AfterClass
     public static void tearDownAfterClass() throws Exception {
+        if (cosclient != null) {
+            deleteBucket(bucketQCS);
+        }
         AbstractCOSClientTest.destoryCosClient();
     }
 
@@ -48,13 +66,13 @@ public class BucketReplicationTest extends AbstractCOSClientTest {
 
         ReplicationDestinationConfig replicationDestinationConfig =
                 new ReplicationDestinationConfig();
-        String bucketQCS = "qcs:id/0:cos:ap-chengdu:appid/1251668577:chengwus3cd";
-        replicationDestinationConfig.setBucketQCS(bucketQCS);
+        String bucket_QCS = String.format("qcs::cos:ap-guangzhou::%s", bucketQCS);
+        replicationDestinationConfig.setBucketQCS(bucket_QCS);
         replicationDestinationConfig.setStorageClass(StorageClass.Standard);
         replicationRule.setDestinationConfig(replicationDestinationConfig);
         BucketReplicationConfiguration bucketReplicationConfiguration =
                 new BucketReplicationConfiguration();
-        String ruleName = "qcs::cam::uin/123456789:uin/987654543";
+        String ruleName = String.format("qcs::cam::uin/%s:uin/%s", ownerUin, ownerUin);
         bucketReplicationConfiguration.setRoleName(ruleName);
         String ruleId = "cctest1";
         replicationRule.setID(ruleId);
@@ -73,7 +91,7 @@ public class BucketReplicationTest extends AbstractCOSClientTest {
         assertEquals(ruleName, replicaConfigGet.getRoleName());
         assertEquals(1, replicaConfigGet.getRules().size());
         ReplicationRule replicationRule2 = replicaConfigGet.getRules().get(0);
-        assertEquals(bucketQCS, replicationRule2.getDestinationConfig().getBucketQCS());
+        assertEquals(bucket_QCS, replicationRule2.getDestinationConfig().getBucketQCS());
         assertEquals(StorageClass.Standard.toString(),
                 replicationRule2.getDestinationConfig().getStorageClass());
         assertEquals(ReplicationRuleStatus.Enabled.toString(), replicationRule2.getStatus());

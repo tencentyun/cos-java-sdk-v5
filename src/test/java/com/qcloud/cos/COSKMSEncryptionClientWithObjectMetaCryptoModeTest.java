@@ -13,7 +13,8 @@ public class COSKMSEncryptionClientWithObjectMetaCryptoModeTest
 
     private static void initEncryptionInfo() {
         // set cmk in prop file
-        encryptionMaterials = new KMSEncryptionMaterials("null");
+        String cmk = System.getenv("KMS_ID");
+        encryptionMaterials = new KMSEncryptionMaterials(cmk);
         cryptoConfiguration = new CryptoConfiguration(CryptoMode.AuthenticatedEncryption)
                 .withStorageMode(CryptoStorageMode.ObjectMetadata);
     }

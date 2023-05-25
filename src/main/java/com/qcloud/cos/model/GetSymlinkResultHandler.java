@@ -5,6 +5,7 @@ import com.qcloud.cos.http.CosHttpResponse;
 import com.qcloud.cos.internal.AbstractCosResponseHandler;
 import com.qcloud.cos.internal.CosServiceResponse;
 
+import java.sql.Date;
 import java.util.Map;
 
 public class GetSymlinkResultHandler extends AbstractCosResponseHandler<GetSymlinkResult> {
@@ -18,6 +19,26 @@ public class GetSymlinkResultHandler extends AbstractCosResponseHandler<GetSymli
 
             if (Headers.REQUEST_ID.compareToIgnoreCase(key) == 0) {
                 getSymlinkResult.setRequestId(value);
+                continue;
+            }
+
+            if (Headers.CONTENT_LENGTH.compareToIgnoreCase(key) == 0) {
+                getSymlinkResult.setContentLength(Long.parseLong(value));
+                continue;
+            }
+
+            if (Headers.CONTENT_TYPE.compareToIgnoreCase(key) == 0) {
+                getSymlinkResult.setContentType(value);
+                continue;
+            }
+
+            if (Headers.LAST_MODIFIED.compareToIgnoreCase(key) == 0) {
+                getSymlinkResult.setLastModified(Date.parse(value));
+                continue;
+            }
+
+            if (Headers.COS_VERSION_ID.compareToIgnoreCase(key) == 0) {
+                getSymlinkResult.setVersionId(value);
                 continue;
             }
 
