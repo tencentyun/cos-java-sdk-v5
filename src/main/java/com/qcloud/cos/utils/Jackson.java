@@ -78,23 +78,23 @@ public enum Jackson {
         }
     }
 
-    public static <T> T fromSensitiveJsonString(String json, Class<T> clazz) {
-        if (null == json) {
-            return null;
-        }
-
-        try {
-            return objectMapper.readValue(json, clazz);
-        } catch (IOException e) {
-            if (e instanceof JsonProcessingException) {
-                LOG.warn("Failed to parse the json string.", e);
-                throw new CosClientException("Unable to parse the json string. See warn logs for the exact error " +
-                        "details, which may include sensitive information.");
-            }
-
-            throw new CosClientException("Unable to parse the json string.", e);
-        }
-    }
+//    public static <T> T fromSensitiveJsonString(String json, Class<T> clazz) {
+//        if (null == json) {
+//            return null;
+//        }
+//
+//        try {
+//            return objectMapper.readValue(json, clazz);
+//        } catch (IOException e) {
+//            if (e instanceof JsonProcessingException) {
+//                LOG.warn("Failed to parse the json string.", e);
+//                throw new CosClientException("Unable to parse the json string. See warn logs for the exact error " +
+//                        "details, which may include sensitive information.");
+//            }
+//
+//            throw new CosClientException("Unable to parse the json string.", e);
+//        }
+//    }
 
     public static JsonNode jsonNodeOf(String json) {
         return fromJsonString(json, JsonNode.class);
@@ -104,26 +104,26 @@ public enum Jackson {
         return new JsonFactory().createGenerator(writer);
     }
 
-    public static <T> T loadFrom(File file, Class<T> clazz) throws IOException {
-        try {
-            return objectMapper.readValue(file, clazz);
-        } catch (IOException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
-    public static ObjectMapper getObjectMapper() {
-        return objectMapper;
-    }
-
-    public static ObjectWriter getWriter() {
-        return writer;
-    }
-
-    public static ObjectWriter getPrettywriter() {
-        return prettyWriter;
-    }
+//    public static <T> T loadFrom(File file, Class<T> clazz) throws IOException {
+//        try {
+//            return objectMapper.readValue(file, clazz);
+//        } catch (IOException e) {
+//            throw e;
+//        } catch (Exception e) {
+//            throw new IllegalStateException(e);
+//        }
+//    }
+//
+//    public static ObjectMapper getObjectMapper() {
+//        return objectMapper;
+//    }
+//
+//    public static ObjectWriter getWriter() {
+//        return writer;
+//    }
+//
+//    public static ObjectWriter getPrettywriter() {
+//        return prettyWriter;
+//    }
 }
 

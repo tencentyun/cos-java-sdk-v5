@@ -4,6 +4,8 @@ import com.qcloud.cos.internal.CIServiceRequest;
 import com.qcloud.cos.model.ciModel.job.*;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @descript 本类为模板实体类。 注释详情请参见 https://cloud.tencent.com/document/product/460/46989
@@ -57,6 +59,7 @@ public class MediaTemplateRequest extends CIServiceRequest implements Serializab
     private MediaConcatTemplateObject concat;
 
     private MediaAudioMixObject audioMix;
+    private List<MediaAudioMixObject> audioMixArray;
 
     private VideoTargetRec videoTargetRec;
 
@@ -84,6 +87,33 @@ public class MediaTemplateRequest extends CIServiceRequest implements Serializab
     private String voiceType;
     private String volume;
     private String speed;
+    /**
+     * 精彩集锦场景
+     * 取值范围：Soccer/Video，默认值为Video
+     */
+    private String scene;
+    /**
+     * 1. 默认自动分析时长
+     * 2. 单位为秒
+     * 3. 支持 float 格式，执行精度精确到毫秒
+     */
+    private String duration;
+
+    public String getScene() {
+        return scene;
+    }
+
+    public void setScene(String scene) {
+        this.scene = scene;
+    }
+
+    public String getDuration() {
+        return duration;
+    }
+
+    public void setDuration(String duration) {
+        this.duration = duration;
+    }
 
     public String getMode() {
         return mode;
@@ -292,6 +322,17 @@ public class MediaTemplateRequest extends CIServiceRequest implements Serializab
 
     public void setVideoEnhance(VideoEnhance videoEnhance) {
         this.videoEnhance = videoEnhance;
+    }
+
+    public List<MediaAudioMixObject> getAudioMixArray() {
+        if (audioMixArray == null) {
+            audioMixArray = new ArrayList<>();
+        }
+        return audioMixArray;
+    }
+
+    public void setAudioMixArray(List<MediaAudioMixObject> audioMixArray) {
+        this.audioMixArray = audioMixArray;
     }
 
     @Override

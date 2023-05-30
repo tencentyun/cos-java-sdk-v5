@@ -1,7 +1,7 @@
 package com.qcloud.cos.demo.ci;
 
 import com.qcloud.cos.COSClient;
-import com.qcloud.cos.model.ciModel.persistence.DetectCarRequest;
+import com.qcloud.cos.model.ciModel.persistence.AIRecRequest;
 import com.qcloud.cos.model.ciModel.persistence.DetectCarResponse;
 import com.qcloud.cos.utils.Jackson;
 
@@ -27,7 +27,7 @@ public class DetectCarDemo {
      */
     public static void detectCar(COSClient client) {
         //1.创建任务请求对象
-        DetectCarRequest request = new DetectCarRequest();
+        AIRecRequest request = new AIRecRequest();
         //2.添加请求参数 参数详情请见api接口文档
         //2.1设置请求bucket
         request.setBucketName("demo-1234567890");

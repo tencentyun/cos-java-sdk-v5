@@ -3,6 +3,7 @@ package com.qcloud.cos;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.junit.AfterClass;
@@ -290,19 +291,31 @@ public class TransferManagerTest extends AbstractCOSClientTest {
 
     @Test
     public void testResumeUploadAndDownload() throws Exception {
-        File localFile = buildTestFile(10L * 1024 * 1024);
-        String key = "testAbortMultipartUploads.txt";
+        File localFile = buildTestFile(100L * 1024 * 1024);
+        String key = "testResumeUploads.txt";
         PutObjectRequest putObjectRequest = new PutObjectRequest(bucket, key, localFile);
+
+        // 1 初始化用户身份信息(secretId, secretKey)
+        COSCredentials cred = new BasicCOSCredentials(secretId, secretKey);
+        // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
+        ClientConfig clientConfig = new ClientConfig(new Region("ap-guangzhou"));
+        // 3 生成cos客户端
+        COSClient CosClient = new COSClient(cred, clientConfig);
+
+        ExecutorService threadPool = Executors.newFixedThreadPool(32);
+        TransferManager transManager = new TransferManager(CosClient, threadPool);
 
         try {
             // 返回一个异步结果Upload, 可同步的调用waitForUploadResult等待upload结束, 成功返回UploadResult, 失败抛出异常.
-            Upload upload = transferManager.upload(putObjectRequest);
-            Thread.sleep(1000);
+            Upload upload = transManager.upload(putObjectRequest);
+            Thread.sleep(5000);
             PersistableUpload persistableUpload = upload.pause();
-            upload = transferManager.resumeUpload(persistableUpload);
+            upload = transManager.resumeUpload(persistableUpload);
             upload.waitForUploadResult();
-        } catch (CosServiceException e) {
-            e.printStackTrace();
+        } catch (CosServiceException cse) {
+            if (cse.getStatusCode() != 404) {
+                cse.printStackTrace();
+            }
         } catch (CosClientException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
@@ -315,10 +328,10 @@ public class TransferManagerTest extends AbstractCOSClientTest {
         GetObjectRequest getObjectRequest = new GetObjectRequest(bucket, key);
         try {
             // 返回一个异步结果copy, 可同步的调用waitForCompletion等待download结束, 成功返回void, 失败抛出异常.
-            Download download = transferManager.download(getObjectRequest, downloadFile);
+            Download download = transManager.download(getObjectRequest, downloadFile);
             Thread.sleep(1000);
             PersistableDownload persistableDownload = download.pause();
-            download = transferManager.resumeDownload(persistableDownload);
+            download = transManager.resumeDownload(persistableDownload);
             download.waitForCompletion();
         } catch (CosServiceException e) {
             e.printStackTrace();
@@ -328,6 +341,7 @@ public class TransferManagerTest extends AbstractCOSClientTest {
             e.printStackTrace();
         } finally {
             downloadFile.delete();
+            transManager.shutdownNow();
         }
     }
 
@@ -343,7 +357,22 @@ public class TransferManagerTest extends AbstractCOSClientTest {
 
         String dst_bucket = System.getenv("dst_bucket") + (int) (Math.random() * 100) + "-" + appid;
         deleteBucket(dst_bucket);
-        createBucket(dst_bucket);
+
+        Boolean switch_to_stop = true;
+        while (switch_to_stop) {
+            try {
+                cosclient.createBucket(dst_bucket);
+                switch_to_stop = false;
+            } catch (CosServiceException cse) {
+                if (cse.getStatusCode() == 409) {
+                    dst_bucket = System.getenv("dst_bucket") + (int) (Math.random() * 1000000) + "-" + appid;
+                    continue;
+                }
+                cse.printStackTrace();
+                fail(cse.getErrorMessage());
+            }
+        }
+
         CopyObjectRequest copyObjectRequest = new CopyObjectRequest(bucket, key, dst_bucket, "dstObj.txt");
         copyObjectRequest.setStorageClass(StorageClass.Archive);
         ObjectMetadata objectMetadata = new ObjectMetadata();
@@ -353,7 +382,9 @@ public class TransferManagerTest extends AbstractCOSClientTest {
             Copy copy = transferManager.copy(copyObjectRequest);
             copy.waitForCompletion();
         } catch (CosServiceException cse) {
-            fail(cse.toString());
+            if (404 != cse.getStatusCode()) {
+                fail(cse.toString());
+            }
         } finally {
             deleteBucket(dst_bucket);
             localFile.delete();

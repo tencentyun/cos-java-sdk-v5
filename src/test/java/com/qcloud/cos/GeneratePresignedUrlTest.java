@@ -14,6 +14,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 
 import com.qcloud.cos.auth.AnonymousCOSCredentials;
 import com.qcloud.cos.auth.COSCredentials;
@@ -244,5 +245,23 @@ public class GeneratePresignedUrlTest extends AbstractCOSClientTest {
             assertTrue(downLoadFile.delete()); 
             temporyCOSClient.shutdown();
         }
+    }
+
+    @Test
+    public void testGenerateUrlWithParamsAndHeaders() {
+        Date expirationTime = new Date(System.currentTimeMillis() + 30 * 60 * 1000);
+        Map<String, String> params = new HashMap<>();
+        params.put("response-content-disposition", "attachment");
+
+        Map<String, String> headers = new HashMap<>();
+        headers.put("x-cos-acl", "public-read");
+
+        URL url = cosclient.generatePresignedUrl(bucket, "test", expirationTime, HttpMethodName.PUT, headers, params, false, true);
+
+        URL get_url = cosclient.generatePresignedUrl(bucket, "test", expirationTime);
+
+        GeneratePresignedUrlRequest generatePresignedUrlRequest = new GeneratePresignedUrlRequest(bucket, "test");
+        generatePresignedUrlRequest.addRequestParameter("response-content-disposition", "attachment");
+        URL url2 = cosclient.generatePresignedUrl(generatePresignedUrlRequest, true);
     }
 }

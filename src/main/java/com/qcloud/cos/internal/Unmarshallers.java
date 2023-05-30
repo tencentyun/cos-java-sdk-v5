@@ -38,6 +38,7 @@ import com.qcloud.cos.model.ciModel.auditing.WebpageAuditingResponse;
 import com.qcloud.cos.model.ciModel.bucket.DocBucketResponse;
 import com.qcloud.cos.model.ciModel.bucket.MediaBucketResponse;
 import com.qcloud.cos.model.ciModel.image.AutoTranslationBlockResponse;
+import com.qcloud.cos.model.ciModel.image.DetectFaceResponse;
 import com.qcloud.cos.model.ciModel.image.ImageLabelResponse;
 import com.qcloud.cos.model.ciModel.image.ImageLabelV2Response;
 import com.qcloud.cos.model.ciModel.image.ImageSearchResponse;
@@ -49,6 +50,7 @@ import com.qcloud.cos.model.ciModel.job.FileProcessJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaListJobResponse;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoResponse;
+import com.qcloud.cos.model.ciModel.persistence.AIGameRecResponse;
 import com.qcloud.cos.model.ciModel.persistence.DetectCarResponse;
 import com.qcloud.cos.model.ciModel.queue.DocListQueueResponse;
 import com.qcloud.cos.model.ciModel.queue.MediaListQueueResponse;
@@ -868,6 +870,24 @@ public class Unmarshallers {
             public AutoTranslationBlockResponse unmarshall(InputStream in) throws Exception {
                 return new XmlResponsesSaxParser()
                         .parseAutoTranslationBlockResponse(in).getResponse();
+            }
+    }
+
+    public static final class DetectFaceUnmarshaller
+                implements Unmarshaller<DetectFaceResponse, InputStream> {
+
+            public DetectFaceResponse unmarshall(InputStream in) throws Exception {
+                return new XmlResponsesSaxParser()
+                        .parseDetectFaceResponse(in).getResponse();
+            }
+    }
+
+    public static final class AIGameRecUnmarshaller
+                implements Unmarshaller<AIGameRecResponse, InputStream> {
+
+            public AIGameRecResponse unmarshall(InputStream in) throws Exception {
+                return new XmlResponsesSaxParser()
+                        .parseAIGameRecResponse(in).getResponse();
             }
     }
 

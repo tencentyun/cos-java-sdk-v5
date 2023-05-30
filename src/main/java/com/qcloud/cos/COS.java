@@ -59,8 +59,9 @@ import com.qcloud.cos.model.ciModel.job.MediaJobsRequest;
 import com.qcloud.cos.model.ciModel.job.MediaListJobResponse;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoRequest;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoResponse;
+import com.qcloud.cos.model.ciModel.persistence.AIGameRecResponse;
 import com.qcloud.cos.model.ciModel.persistence.CIUploadResult;
-import com.qcloud.cos.model.ciModel.persistence.DetectCarRequest;
+import com.qcloud.cos.model.ciModel.persistence.AIRecRequest;
 import com.qcloud.cos.model.ciModel.persistence.DetectCarResponse;
 import com.qcloud.cos.model.ciModel.queue.DocListQueueResponse;
 import com.qcloud.cos.model.ciModel.queue.DocQueueRequest;
@@ -2850,16 +2851,16 @@ public interface COS extends COSDirectSpi {
     public AppendObjectResult appendObject(AppendObjectRequest appendObjectRequest)
             throws CosServiceException, CosClientException;
 
-    /**
-     * rename object, which contains both file or dir in fs
-     *
-     * @param renameRequest
-     * @return
-     * @throws CosServiceException
-     * @throws CosClientException
-     */
-    public void rename(RenameRequest renameRequest)
-            throws CosServiceException, CosClientException;
+//    /**
+//     * rename object, which contains both file or dir in fs
+//     *
+//     * @param renameRequest
+//     * @return
+//     * @throws CosServiceException
+//     * @throws CosClientException
+//     */
+//    public void rename(RenameRequest renameRequest)
+//            throws CosServiceException, CosClientException;
 
     /**
      * This operation filters the contents of an COS object based on a simple Structured Query Language (SQL) statement.
@@ -3128,7 +3129,7 @@ public interface COS extends COSDirectSpi {
 
     PrivateM3U8Response getPrivateM3U8(PrivateM3U8Request request);
 
-    DetectCarResponse detectCar(DetectCarRequest request);
+    DetectCarResponse detectCar(AIRecRequest request);
 
     boolean openImageSearch(OpenImageSearchRequest imageSearchRequest);
 
@@ -3196,6 +3197,10 @@ public interface COS extends COSDirectSpi {
     BatchJobResponse describeInventoryTriggerJob(BatchJobRequest request);
 
     AutoTranslationBlockResponse autoTranslationBlock(AutoTranslationBlockRequest request);
+
+    DetectFaceResponse detectFace(DetectFaceRequest request);
+
+    AIGameRecResponse aiGameRec(AIRecRequest request);
 }
 
 

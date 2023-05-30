@@ -2,9 +2,7 @@ package com.qcloud.cos.model.ciModel.image;
 
 import com.qcloud.cos.internal.CosServiceRequest;
 
-/**
- * 获取图片标签接口请求实体 https://cloud.tencent.com/document/product/460/39082
- */
+
 public class ImageLabelV2Request extends CosServiceRequest {
     /**
      * 对象在cos中的相对位置，例如 demo/picture.jpg

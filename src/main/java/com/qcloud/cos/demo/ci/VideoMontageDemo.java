@@ -7,9 +7,12 @@ import com.qcloud.cos.model.ciModel.job.MediaJobOperation;
 import com.qcloud.cos.model.ciModel.job.MediaJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaJobsRequest;
 import com.qcloud.cos.model.ciModel.job.MediaVideoObject;
+import com.qcloud.cos.model.ciModel.template.MediaTemplateRequest;
+import com.qcloud.cos.model.ciModel.template.MediaTemplateResponse;
 import com.qcloud.cos.model.ciModel.template.MediaVideoMontageObject;
 
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 
 /**
  * 媒体处理 VideoMontage job接口相关demo 详情见https://cloud.tencent.com/document/product/460/58325
@@ -61,4 +64,39 @@ public class VideoMontageDemo {
         System.out.println(response);
     }
 
+    /**
+     * CreateMediaTemplate 接口用于创建媒体任务模板。
+     * demo 精彩集锦模板创建
+     *
+     * @param client
+     */
+    public static void createMediaTemplate(COSClient client) throws UnsupportedEncodingException {
+        //1.创建模板请求对象
+        MediaTemplateRequest request = new MediaTemplateRequest();
+        //2.添加请求参数 参数详情请见api接口文档
+        request.setBucketName("demobucket-1234567890");
+        request.setTag("VideoMontage");
+        request.setName("VideoMontage1");
+        request.setScene("Video");
+        request.getContainer().setFormat("mp4");
+        MediaVideoObject video = request.getVideo();
+        video.setCodec("H.264");
+        video.setBitrate("1000");
+        video.setWidth("1280");
+        video.setFps("30");
+
+        List<MediaAudioMixObject> audioMixArray = request.getAudioMixArray();
+        MediaAudioMixObject mediaAudioMixObject = new MediaAudioMixObject();
+        mediaAudioMixObject.setAudioSource("https://demobucket-1234567890.cos.ap-chongqing.myqcloud.com/1.mp3");
+        mediaAudioMixObject.setReplace("true");
+        audioMixArray.add(mediaAudioMixObject);
+
+        mediaAudioMixObject = new MediaAudioMixObject();
+        mediaAudioMixObject.setAudioSource("https://demobucket-1234567890.cos.ap-chongqing.myqcloud.com/1.mp3");
+        mediaAudioMixObject.setReplace("true");
+        audioMixArray.add(mediaAudioMixObject);
+        //3.调用接口,获取模板响应对象
+        MediaTemplateResponse response = client.createMediaTemplate(request);
+        System.out.println(response);
+    }
 }

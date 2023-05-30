@@ -1,6 +1,7 @@
 package com.qcloud.cos.internal.cihandler;
 
 import com.qcloud.cos.model.ciModel.common.FileProcessInputObject;
+import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
 import com.qcloud.cos.model.ciModel.job.FileCompressConfig;
 import com.qcloud.cos.model.ciModel.job.FileHashCodeConfig;
 import com.qcloud.cos.model.ciModel.job.FileHashCodeResult;
@@ -72,6 +73,21 @@ public class FileProcessResponseHandler extends CIAbstractHandler {
         } else if (in("Response", "JobsDetail", "Operation")) {
             if ("UserData".equalsIgnoreCase(name)) {
                 response.getJobDetail().getOperation().setUserData(getText());
+            }
+        } else if (in("Response", "JobsDetail", "Operation", "Output")) {
+            MediaOutputObject output = response.getJobDetail().getOperation().getOutput();
+            switch (name) {
+                case "Bucket":
+                    output.setBucket(getText());
+                    break;
+                case "Region":
+                    output.setRegion(getText());
+                    break;
+                case "Object":
+                    output.setObject(getText());
+                    break;
+                default:
+                    break;
             }
         } else if (in("Response", "JobsDetail", "Operation", "FileCompressConfig")) {
             FileCompressConfig fileCompressConfig = response.getJobDetail().getOperation().getFileCompressConfig();

@@ -27,6 +27,7 @@ import com.qcloud.cos.model.ciModel.job.MediaConcatFragmentObject;
 import com.qcloud.cos.model.ciModel.job.MediaContainerObject;
 import com.qcloud.cos.model.ciModel.job.MediaDigitalWatermark;
 import com.qcloud.cos.model.ciModel.job.MediaJobObject;
+import com.qcloud.cos.model.ciModel.job.MediaJobOperation;
 import com.qcloud.cos.model.ciModel.job.MediaRecognition;
 import com.qcloud.cos.model.ciModel.job.MediaRemoveWaterMark;
 import com.qcloud.cos.model.ciModel.job.MediaTimeIntervalObject;
@@ -43,6 +44,7 @@ import com.qcloud.cos.model.ciModel.job.Subtitle;
 import com.qcloud.cos.model.ciModel.job.Subtitles;
 import com.qcloud.cos.model.ciModel.job.SuperResolution;
 import com.qcloud.cos.model.ciModel.job.TtsTpl;
+import com.qcloud.cos.model.ciModel.job.VideoTag;
 import com.qcloud.cos.model.ciModel.job.VideoTargetRec;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaFormat;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoAudio;
@@ -825,10 +827,14 @@ public class ParserMediaInfoUtils {
             case "BucketName":
                 jobsDetail.setBucketName(value);
                 break;
+            case "Progress":
+                jobsDetail.setProgress(value);
+                break;
             default:
                 break;
         }
     }
+
 
     public static void ParsingSnapshotConfig(SpriteSnapshotConfig snapshotConfig, String name, String value) {
         switch (name) {
@@ -1365,6 +1371,41 @@ public class ParserMediaInfoUtils {
                 default:
                     break;
             }
+        }
+    }
+
+    public static void parseMediaJobOperation(MediaJobOperation operation, String name, String value) {
+        switch (name) {
+            case "TemplateId":
+                operation.setTemplateId(value);
+                break;
+            case "TemplateName":
+                operation.setTemplateName(value);
+                break;
+            case "WatermarkTemplateId":
+                operation.getWatermarkTemplateId().add(value);
+                break;
+            case "UserData":
+                operation.setUserData(value);
+                break;
+            case "JobLevel":
+                operation.setJobLevel(value);
+                break;
+            case "DecryptKey":
+                operation.setDecryptKey(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParseVideoTag(VideoTag videoTag, String name, String value) {
+        switch (name) {
+            case "Scenario":
+                videoTag.setScenario(value);
+                break;
+            default:
+                break;
         }
     }
 }

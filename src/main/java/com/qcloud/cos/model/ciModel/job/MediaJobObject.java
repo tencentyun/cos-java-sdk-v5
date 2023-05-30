@@ -20,6 +20,7 @@ public class MediaJobObject extends CIServiceRequest implements Serializable {
     private String tag;
     private String name;
     private String type;
+    private String progress;
     private MediaInputObject input = new MediaInputObject();
     private MediaJobOperation operation = new MediaJobOperation();
 
@@ -123,6 +124,14 @@ public class MediaJobObject extends CIServiceRequest implements Serializable {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getProgress() {
+        return progress;
+    }
+
+    public void setProgress(String progress) {
+        this.progress = progress;
     }
 
     @Override

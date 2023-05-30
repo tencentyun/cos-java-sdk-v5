@@ -27,6 +27,9 @@ public class BucketWebsiteTest extends AbstractCOSClientTest {
 
     @Test
     public void testSetGetDeleteBucketWebsite() {
+        BucketWebsiteConfiguration configuration = cosclient.getBucketWebsiteConfiguration(bucket);
+        assertEquals(null, configuration);
+
         // 设置bucket website
         BucketWebsiteConfiguration bucketWebsiteConfiguration = new BucketWebsiteConfiguration();
         bucketWebsiteConfiguration.setIndexDocumentSuffix("index.html");

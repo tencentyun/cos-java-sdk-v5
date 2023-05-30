@@ -1,14 +1,13 @@
 package com.qcloud.cos;
 
+import com.qcloud.cos.exception.CosServiceException;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.qcloud.cos.model.BucketPolicy;
 
-import static org.junit.Assert.fail;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.*;
 
 public class GetSetDelPolicyTest extends AbstractCOSClientTest {
     @BeforeClass
@@ -24,9 +23,12 @@ public class GetSetDelPolicyTest extends AbstractCOSClientTest {
     @Test
     public void setGetDelPolicyTest() {
         try {
-//            String policyText = String.format(
-//                    "{\"Statement\": [  {   \"Action\": [    \"name/cos:*\"   ],   \"Condition\": {    \"ip_equal\": {     \"qcs:ip\": [      \"10.1.1.0/24\"     ]    },    \"string_equal\": {     \"qcs:sourceVpc\": [      \"vpc-123456\"     ]    }   },   \"Effect\": \"deny\",   \"Principal\": {    \"qcs\": [     \"qcs::cam::anyone:anyone\"    ]   },   \"Resource\": [    \"qcs::cos:%s:uid/%s:%s/*\"   ]  } ], \"version\": \"2.0\"}",
-//                    region, appid, bucket);
+            try {
+                BucketPolicy result = cosclient.getBucketPolicy(bucket);
+            } catch (CosServiceException cse) {
+                assertEquals(404, cse.getStatusCode());
+            }
+
             String bucketPolicyStr = String.format(
                     "{" +
                             "    \"Statement\": [" +
@@ -55,7 +57,16 @@ public class GetSetDelPolicyTest extends AbstractCOSClientTest {
             );
             cosclient.setBucketPolicy(bucket, bucketPolicyStr);
 
-            BucketPolicy bucketPolicy = cosclient.getBucketPolicy(bucket);
+            Thread.sleep(5000);
+
+            BucketPolicy bucketPolicy = new BucketPolicy();
+            try {
+                bucketPolicy = cosclient.getBucketPolicy(bucket);
+            } catch (CosServiceException cse) {
+                if (cse.getStatusCode() == 404) {
+                    bucketPolicy = cosclient.getBucketPolicy(bucket);
+                }
+            }
             assertNotNull(bucketPolicy.getPolicyText());
             assertFalse(bucketPolicy.getPolicyText().isEmpty());
 

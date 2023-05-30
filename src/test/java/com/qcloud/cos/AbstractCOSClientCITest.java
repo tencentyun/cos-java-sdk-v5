@@ -18,7 +18,8 @@ public class AbstractCOSClientCITest {
     protected static String mediaQueueId = null;
     protected static String docQueueId = null;
     protected static String auditingQueueId = null;
-    protected static String workflowId = null;
+    protected static String workflowId = "we32f75950afe4a4682463d8158ded475";
+    protected static String runId = "ibee271f4c88511ed88985254008e464b";
     protected static ClientConfig clientConfig = null;
     protected static COSClient cosclient = null;
 
@@ -41,6 +42,7 @@ public class AbstractCOSClientCITest {
                 secretKey = prop.getProperty("ciSecretKey");
                 region = prop.getProperty("ciRegion");
                 bucket = prop.getProperty("ciBucket");
+
             } finally {
                 if (fis != null) {
                     try {
