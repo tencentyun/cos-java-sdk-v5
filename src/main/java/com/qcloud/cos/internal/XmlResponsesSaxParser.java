@@ -37,6 +37,7 @@ import com.qcloud.cos.exception.MultiObjectDeleteException.DeleteError;
 import com.qcloud.cos.internal.cihandler.AIGameRecResponseHandler;
 import com.qcloud.cos.internal.cihandler.AutoTranslationBlockResponseHandler;
 import com.qcloud.cos.internal.cihandler.BatchJobResponseHandler;
+import com.qcloud.cos.internal.cihandler.CIXmlResponsesSaxParser;
 import com.qcloud.cos.internal.cihandler.DetectCarHandler;
 import com.qcloud.cos.internal.cihandler.DetectFaceResponseHandler;
 import com.qcloud.cos.internal.cihandler.FileProcessResponseHandler;
@@ -46,14 +47,56 @@ import com.qcloud.cos.internal.cihandler.MediaJobResponseHandler;
 import com.qcloud.cos.internal.cihandler.ReportBadCaseHandler;
 import com.qcloud.cos.internal.cihandler.SearchImageHandler;
 import com.qcloud.cos.internal.cihandler.TriggerWorkflowListHandler;
-import com.qcloud.cos.model.*;
+import com.qcloud.cos.internal.cihandler.WebpageAuditingDescribeJobHandler;
+import com.qcloud.cos.model.AbortIncompleteMultipartUpload;
+import com.qcloud.cos.model.AccessControlList;
+import com.qcloud.cos.model.Bucket;
+import com.qcloud.cos.model.BucketCrossOriginConfiguration;
+import com.qcloud.cos.model.BucketDomainConfiguration;
+import com.qcloud.cos.model.BucketIntelligentTierConfiguration;
+import com.qcloud.cos.model.BucketLifecycleConfiguration;
 import com.qcloud.cos.model.BucketLifecycleConfiguration.NoncurrentVersionTransition;
 import com.qcloud.cos.model.BucketLifecycleConfiguration.Rule;
 import com.qcloud.cos.model.BucketLifecycleConfiguration.Transition;
+import com.qcloud.cos.model.BucketLoggingConfiguration;
+import com.qcloud.cos.model.BucketRefererConfiguration;
+import com.qcloud.cos.model.BucketReplicationConfiguration;
+import com.qcloud.cos.model.BucketTaggingConfiguration;
+import com.qcloud.cos.model.BucketVersioningConfiguration;
+import com.qcloud.cos.model.BucketWebsiteConfiguration;
+import com.qcloud.cos.model.CORSRule;
 import com.qcloud.cos.model.CORSRule.AllowedMethods;
+import com.qcloud.cos.model.COSObjectSummary;
+import com.qcloud.cos.model.COSVersionSummary;
+import com.qcloud.cos.model.CompleteMultipartUploadResult;
+import com.qcloud.cos.model.CopyObjectResult;
+import com.qcloud.cos.model.DecompressionResult;
 import com.qcloud.cos.model.DeleteObjectsResult.DeletedObject;
+import com.qcloud.cos.model.DomainRule;
+import com.qcloud.cos.model.GetBucketInventoryConfigurationResult;
+import com.qcloud.cos.model.GetObjectTaggingResult;
+import com.qcloud.cos.model.Grantee;
+import com.qcloud.cos.model.GroupGrantee;
+import com.qcloud.cos.model.InitiateMultipartUploadResult;
+import com.qcloud.cos.model.ListBucketInventoryConfigurationsResult;
+import com.qcloud.cos.model.ListJobsResult;
+import com.qcloud.cos.model.MultipartUpload;
+import com.qcloud.cos.model.MultipartUploadListing;
+import com.qcloud.cos.model.ObjectListing;
+import com.qcloud.cos.model.Owner;
+import com.qcloud.cos.model.PartListing;
+import com.qcloud.cos.model.PartSummary;
+import com.qcloud.cos.model.Permission;
+import com.qcloud.cos.model.RedirectRule;
+import com.qcloud.cos.model.ReplicationDestinationConfig;
+import com.qcloud.cos.model.ReplicationRule;
+import com.qcloud.cos.model.RoutingRule;
+import com.qcloud.cos.model.RoutingRuleCondition;
 import com.qcloud.cos.model.Tag.LifecycleTagPredicate;
 import com.qcloud.cos.model.Tag.Tag;
+import com.qcloud.cos.model.TagSet;
+import com.qcloud.cos.model.UinGrantee;
+import com.qcloud.cos.model.VersionListing;
 import com.qcloud.cos.model.bucketcertificate.BucketDomainCertificateParameters;
 import com.qcloud.cos.model.bucketcertificate.BucketGetDomainCertificate;
 import com.qcloud.cos.model.ciModel.auditing.AudioAuditingResponse;
@@ -71,8 +114,6 @@ import com.qcloud.cos.model.ciModel.auditing.LibResult;
 import com.qcloud.cos.model.ciModel.auditing.ListResult;
 import com.qcloud.cos.model.ciModel.auditing.ObjectResults;
 import com.qcloud.cos.model.ciModel.auditing.OcrResults;
-import com.qcloud.cos.model.ciModel.auditing.ResultsImageAuditingDetail;
-import com.qcloud.cos.model.ciModel.auditing.ResultsTextAuditingDetail;
 import com.qcloud.cos.model.ciModel.auditing.SectionInfo;
 import com.qcloud.cos.model.ciModel.auditing.SnapshotInfo;
 import com.qcloud.cos.model.ciModel.auditing.TextAuditingResponse;
@@ -89,7 +130,6 @@ import com.qcloud.cos.model.ciModel.image.ImageLabelV2Response;
 import com.qcloud.cos.model.ciModel.image.Lobel;
 import com.qcloud.cos.model.ciModel.image.LobelV2;
 import com.qcloud.cos.model.ciModel.image.LocationLabel;
-import com.qcloud.cos.model.ciModel.job.MediaBodyInfo;
 import com.qcloud.cos.model.ciModel.job.DocJobDetail;
 import com.qcloud.cos.model.ciModel.job.DocJobListResponse;
 import com.qcloud.cos.model.ciModel.job.DocJobResponse;
@@ -108,10 +148,8 @@ import com.qcloud.cos.model.ciModel.job.MediaJobOperation;
 import com.qcloud.cos.model.ciModel.job.MediaJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaListJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaPicProcessTemplateObject;
-import com.qcloud.cos.model.ciModel.job.MediaRecognition;
 import com.qcloud.cos.model.ciModel.job.MediaRemoveWaterMark;
 import com.qcloud.cos.model.ciModel.job.MediaTimeIntervalObject;
-import com.qcloud.cos.model.ciModel.job.MediaTopkRecognition;
 import com.qcloud.cos.model.ciModel.job.MediaTransConfigObject;
 import com.qcloud.cos.model.ciModel.job.MediaTranscodeVideoObject;
 import com.qcloud.cos.model.ciModel.job.MediaVideoObject;
@@ -171,7 +209,6 @@ import com.qcloud.cos.model.lifecycle.LifecyclePrefixPredicate;
 import com.qcloud.cos.utils.DateUtils;
 import com.qcloud.cos.utils.StringUtils;
 import com.qcloud.cos.utils.UrlEncoderUtils;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
@@ -845,7 +882,8 @@ public class XmlResponsesSaxParser {
 
     public WebpageAuditingDescribeJobHandler parseDWebpageAuditingDescribeResponse(InputStream inputStream) throws IOException {
         WebpageAuditingDescribeJobHandler handler = new WebpageAuditingDescribeJobHandler();
-        parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
+        CIXmlResponsesSaxParser pxis = new CIXmlResponsesSaxParser();
+        pxis.parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
         return handler;
     }
 
@@ -6717,182 +6755,6 @@ public class XmlResponsesSaxParser {
             this.response = response;
         }
     }
-
-    public static class WebpageAuditingDescribeJobHandler extends AbstractHandler {
-        private WebpageAuditingResponse response = new WebpageAuditingResponse();
-
-        @Override
-        protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
-            List<ResultsImageAuditingDetail> imageResults = response.getJobsDetail().getImageResults();
-            List<ResultsTextAuditingDetail> textResults = response.getJobsDetail().getTextResults();
-            if (in("Response", "JobsDetail", "ImageResults") && "Results".equals(name)) {
-                imageResults.add(new ResultsImageAuditingDetail());
-            } else if (in("Response", "JobsDetail", "TextResults") && "Results".equals(name)) {
-                textResults.add(new ResultsTextAuditingDetail());
-            } else if (in("Response", "JobsDetail", "ListInfo") && "ListResults".equals(name)) {
-                response.getJobsDetail().getListInfo().getListResults().add(new ListResult());
-            }
-        }
-
-        @Override
-        protected void doEndElement(String uri, String name, String qName) {
-            WebpageAuditingJobsDetail jobsDetail = response.getJobsDetail();
-            List<ResultsImageAuditingDetail> imageResults = jobsDetail.getImageResults();
-            List<ResultsTextAuditingDetail> textResults = jobsDetail.getTextResults();
-            ResultsImageAuditingDetail imageAuditingDetail = null;
-            ResultsTextAuditingDetail textAuditingDetail = null;
-            if (imageResults.isEmpty()) {
-                imageAuditingDetail = new ResultsImageAuditingDetail();
-            } else {
-                imageAuditingDetail = imageResults.get(imageResults.size() - 1);
-            }
-            if (textResults.isEmpty()) {
-                textAuditingDetail = new ResultsTextAuditingDetail();
-            } else {
-                textAuditingDetail = textResults.get(textResults.size() - 1);
-            }
-            if (in("Response")) {
-                if ("RequestId".equalsIgnoreCase(name)) {
-                    response.setRequestId(getText());
-                }
-            } else if (in("Response", "JobsDetail")) {
-                switch (name) {
-                    case "JobId":
-                        jobsDetail.setJobId(getText());
-                        break;
-                    case "State":
-                        jobsDetail.setState(getText());
-                        break;
-                    case "CreationTime":
-                        jobsDetail.setCreationTime(getText());
-                        break;
-                    case "Suggestion":
-                        jobsDetail.setSuggestion(getText());
-                        break;
-                    case "PageCount":
-                        jobsDetail.setPageCount(getText());
-                        break;
-                    case "Url":
-                        jobsDetail.setUrl(getText());
-                        break;
-                    case "Label":
-                        jobsDetail.setLabel(getText());
-                        break;
-                    case "Code":
-                        jobsDetail.setCode(getText());
-                        break;
-                    case "Message":
-                        jobsDetail.setMessage(getText());
-                        break;
-                    case "dataId":
-                        jobsDetail.setDataId(getText());
-                        break;
-                    case "HighlightHtml":
-                        jobsDetail.setHighlightHtml(getText());
-                        break;
-                    default:
-                        break;
-                }
-            } else if (in("Response", "JobsDetail", "ImageResults", "Results")) {
-                switch (name) {
-                    case "Text":
-                        imageAuditingDetail.setText(getText());
-                        break;
-                    case "Url":
-                        imageAuditingDetail.setUrl(getText());
-                        break;
-                    case "Label":
-                        imageAuditingDetail.setLabel(getText());
-                        break;
-                    case "Suggestion":
-                        imageAuditingDetail.setSuggestion(getText());
-                        break;
-                    default:
-                        break;
-                }
-            } else if (in("Response", "JobsDetail", "TextResults", "Results")) {
-                switch (name) {
-                    case "Text":
-                        textAuditingDetail.setText(getText());
-                        break;
-                    case "Label":
-                        textAuditingDetail.setLabel(getText());
-                        break;
-                    case "Suggestion":
-                        textAuditingDetail.setSuggestion(getText());
-                        break;
-                    default:
-                        break;
-                }
-            } else if (in("Response", "JobsDetail", "ImageResults", "Results","PoliticsInfo")) {
-                parseInfo(imageAuditingDetail.getPoliticsInfo(), name, getText());
-            } else if (in("Response", "JobsDetail", "ImageResults", "Results", "PornInfo")) {
-                parseInfo(imageAuditingDetail.getPornInfo(), name, getText());
-            } else if (in("Response", "JobsDetail", "ImageResults", "Results", "TerrorismInfo")) {
-                parseInfo(imageAuditingDetail.getTerroristInfo(), name, getText());
-            } else if (in("Response", "JobsDetail", "ImageResults", "Results", "AdsInfo")) {
-                parseInfo(imageAuditingDetail.getAdsInfo(), name, getText());
-            } else if (in("Response", "JobsDetail", "TextResults", "Results","PoliticsInfo")) {
-                parseInfo(textAuditingDetail.getPoliticsInfo(), name, getText());
-            } else if (in("Response", "JobsDetail", "TextResults", "Results", "PornInfo")) {
-                parseInfo(textAuditingDetail.getPornInfo(), name, getText());
-            } else if (in("Response", "JobsDetail", "TextResults", "Results", "TerrorismInfo")) {
-                parseInfo(textAuditingDetail.getTerroristInfo(), name, getText());
-            } else if (in("Response", "JobsDetail", "TextResults", "Results", "AdsInfo")) {
-                parseInfo(textAuditingDetail.getAdsInfo(), name, getText());
-            } else if (in("Response", "JobsDetail", "UserInfo")) {
-                ParserMediaInfoUtils.ParsingAuditingUserInfo(response.getJobsDetail().getUserInfo(), name, getText());
-            } else if (in("Response", "JobsDetail", "ListInfo", "ListResults")) {
-                List<ListResult> listResults = response.getJobsDetail().getListInfo().getListResults();
-                if (!listResults.isEmpty()) {
-                    ParserMediaInfoUtils.parsingAuditingListResultInfo(listResults.get(listResults.size() - 1), name, getText());
-                }
-            } else if (in("Response", "JobsDetail", "Labels", "PoliticsInfo")) {
-                parseInfo(response.getJobsDetail().getLabels().getPoliticsInfo(), name, getText());
-            } else if (in("Response", "JobsDetail", "Labels", "PornInfo")) {
-                parseInfo(response.getJobsDetail().getLabels().getPornInfo(), name, getText());
-            } else if (in("Response", "JobsDetail", "Labels", "TerrorismInfo")) {
-                parseInfo(response.getJobsDetail().getLabels().getTerroristInfo(), name, getText());
-            } else if (in("Response", "JobsDetail", "Labels", "AdsInfo")) {
-                parseInfo(response.getJobsDetail().getLabels().getAdsInfo(), name, getText());
-            }
-        }
-
-        private void parseInfo(AudtingCommonInfo obj, String name, String value) {
-            switch (name) {
-                case "Code":
-                    obj.setCode(value);
-                    break;
-                case "HitFlag":
-                    obj.setHitFlag(getText());
-                    break;
-                case "Score":
-                    obj.setScore(getText());
-                    break;
-                case "Keywords":
-                    obj.setLabel(getText());
-                    break;
-                case "Count":
-                    obj.setCount(getText());
-                    break;
-                case "SubLabel":
-                    obj.setSubLabel(getText());
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        public WebpageAuditingResponse getResponse() {
-            return response;
-        }
-
-        public void setResponse(WebpageAuditingResponse response) {
-            this.response = response;
-        }
-
-    }
-
 
     public static class DescribeImageAuditingJobHandler extends AbstractHandler {
         private ImageAuditingResponse response = new ImageAuditingResponse();

@@ -1,6 +1,8 @@
 package com.qcloud.cos.model.ciModel.persistence;
 
-public class CIUploadResult {
+import com.qcloud.cos.model.CosServiceResult;
+
+public class CIUploadResult extends CosServiceResult {
     private OriginalInfo originalInfo;
     private ProcessResults processResults;
     public OriginalInfo getOriginalInfo() {

@@ -21,6 +21,11 @@ public class MediaJobOperation {
     private String UserData;
     private String templateName;
     private String decryptKey;
+    private String decryptIv;
+    private String decryptMode;
+    private String encryptKey;
+    private String encryptIv;
+    private String encryptMode;
     private MediaOutputObject output;
     private MediaAnimationObject mediaAnimation;
     private MediaInfoObjcet mediaInfo;
@@ -333,6 +338,57 @@ public class MediaJobOperation {
 
     public void setVideoTag(VideoTag videoTag) {
         this.videoTag = videoTag;
+    }
+
+    public String getDecryptIv() {
+        return decryptIv;
+    }
+
+    public void setDecryptIv(String decryptIv) {
+        this.decryptIv = decryptIv;
+    }
+
+    public String getDecryptMode() {
+        return decryptMode;
+    }
+
+    public void setDecryptMode(String decryptMode) {
+        this.decryptMode = decryptMode;
+    }
+
+    public String getEncryptKey() {
+        return encryptKey;
+    }
+
+    public void setEncryptKey(String encryptKey) {
+        this.encryptKey = encryptKey;
+    }
+
+    public String getEncryptIv() {
+        return encryptIv;
+    }
+
+    public void setEncryptIv(String encryptIv) {
+        this.encryptIv = encryptIv;
+    }
+
+    public String getEncryptMode() {
+        return encryptMode;
+    }
+
+    public void setEncryptMode(String encryptMode) {
+        this.encryptMode = encryptMode;
+    }
+
+    public VideoTagResult getVideoTagResult() {
+        if (videoTagResult == null) {
+            videoTagResult = new VideoTagResult();
+        }
+        return videoTagResult;
+    }
+
+    public void setVideoTagResult(VideoTagResult videoTagResult) {
+        this.videoTagResult = videoTagResult;
     }
 
     @Override
