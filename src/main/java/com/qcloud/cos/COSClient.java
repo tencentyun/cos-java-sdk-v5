@@ -1431,6 +1431,67 @@ public class COSClient implements COS {
         return new Bucket(bucketName);
     }
 
+    public Bucket createMAZBucket(CreateBucketRequest createBucketRequest)
+            throws CosClientException, CosServiceException {
+        rejectNull(createBucketRequest,
+                "The CreateBucketRequest parameter must be specified when creating a bucket");
+
+        String bucketName = createBucketRequest.getBucketName();
+        rejectNull(bucketName,
+                "The bucket name parameter must be specified when creating a bucket");
+        rejectNull(clientConfig.getRegion(),
+                "region is null, region in clientConfig must be specified when creating a bucket");
+
+        bucketName = bucketName.trim();
+        BucketNameUtils.validateBucketName(bucketName);
+
+        CosHttpRequest<CreateBucketRequest> request =
+                createRequest(bucketName, "/", createBucketRequest, HttpMethodName.PUT);
+
+        if (createBucketRequest.getAccessControlList() != null) {
+            addAclHeaders(request, createBucketRequest.getAccessControlList());
+        } else if (createBucketRequest.getCannedAcl() != null) {
+            request.addHeader(Headers.COS_CANNED_ACL,
+                    createBucketRequest.getCannedAcl().toString());
+        }
+
+        ObjectMetadata metadata = new ObjectMetadata();
+
+        String MAZStr = "<CreateBucketConfiguration>\n" +
+                "    <BucketAZConfig>MAZ</BucketAZConfig>\n" +
+                "</CreateBucketConfiguration>";
+
+        byte[] contentByteArray = MAZStr.getBytes(StringUtils.UTF8);
+        String contentMd5 = Md5Utils.md5AsBase64(contentByteArray);
+
+        InputStream contentInput = new ByteArrayInputStream(contentByteArray);
+
+        metadata.setContentType("application/xml");
+        metadata.setContentLength(contentByteArray.length);
+        metadata.setContentMD5(contentMd5);
+
+        MD5DigestCalculatingInputStream md5DigestStream = null;
+        md5DigestStream = new MD5DigestCalculatingInputStream(contentInput);
+
+        populateRequestMetadata(request, metadata);
+        request.setContent(md5DigestStream);
+
+        try {
+            invoke(request, voidCosResponseHandler);
+        } catch (Throwable t) {
+            throw Throwables.failure(t);
+        } finally {
+            try {
+                contentInput.close();
+                md5DigestStream.close();
+            } catch (IOException e) {
+                throw new CosClientException(e.getMessage(), e);
+            }
+        }
+
+        return new Bucket(bucketName);
+    }
+
     @Override
     public void deleteBucket(String bucketName) throws CosClientException, CosServiceException {
         deleteBucket(new DeleteBucketRequest(bucketName));

@@ -7,6 +7,8 @@ import com.qcloud.cos.COSClient;
 import com.qcloud.cos.ClientConfig;
 import com.qcloud.cos.auth.BasicCOSCredentials;
 import com.qcloud.cos.auth.COSCredentials;
+import com.qcloud.cos.exception.CosClientException;
+import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.model.Bucket;
 import com.qcloud.cos.model.BucketLoggingConfiguration;
 import com.qcloud.cos.model.BucketTaggingConfiguration;
@@ -164,6 +166,28 @@ public class BucketDemo {
         }
     }
 
+    //创多AZ桶
+    public static void CreateMAZBucketDemo() {
+        // 1 初始化用户身份信息(appid, secretId, secretKey)
+        COSCredentials cred = new BasicCOSCredentials("AKIDxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", "****************************");
+        // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
+        ClientConfig clientConfig = new ClientConfig(new Region("ap-guangzhou"));
+        // 3 生成cos客户端
+        COSClient cosclient = new COSClient(cred, clientConfig);
+
+        String bucketname = "publicreadbucket-1251668577";
+        CreateBucketRequest createBucketRequest = new CreateBucketRequest(bucketname);
+
+        try {
+            cosclient.createMAZBucket(createBucketRequest);
+        } catch (CosServiceException cse) {
+            cse.printStackTrace();
+        } catch (CosClientException cce) {
+            cce.printStackTrace();
+        } finally {
+            cosclient.shutdown();
+        }
+    }
     public static void main(String[] args) {
         ListBuckets();
     }
