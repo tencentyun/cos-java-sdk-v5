@@ -18,6 +18,7 @@
 
 package com.qcloud.cos.exception;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -101,6 +102,11 @@ public class CosServiceException extends CosClientException {
      * Additional information on the exception.
      */
     private Map<String, String> additionalDetails;
+
+    /**
+     * header information
+     */
+    private Map<String, String> headers = new HashMap<String, String>();
 
     /**
      * Returns the error XML received in the HTTP Response or null if the exception is constructed
@@ -288,6 +294,14 @@ public class CosServiceException extends CosClientException {
      */
     public void setRawResponseContent(String rawResponseContent) {
         this.rawResponseContent = rawResponseContent;
+    }
+
+    public Map<String, String> getHeaders() {
+        return headers;
+    }
+
+    public void setHeaders(Map<String, String> headers) {
+        this.headers = headers;
     }
 
 }

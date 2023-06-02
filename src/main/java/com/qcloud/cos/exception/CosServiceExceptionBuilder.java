@@ -57,6 +57,11 @@ public class CosServiceExceptionBuilder {
     private Map<String, String> additionalDetails;
 
     /**
+     * header information
+     */
+    private Map<String, String> headers = new HashMap<String, String>();
+
+    /**
      * Returns the error XML received in the HTTP Response or null if the exception is constructed
      * from the headers.
      */
@@ -185,6 +190,7 @@ public class CosServiceExceptionBuilder {
         cosException.setRequestId(requestId);
         cosException.setAdditionalDetails(additionalDetails);
         cosException.setErrorType(errorTypeOf(statusCode));
+        cosException.setHeaders(headers);
         return cosException;
     }
 
@@ -198,4 +204,13 @@ public class CosServiceExceptionBuilder {
     private ErrorType errorTypeOf(int statusCode) {
         return statusCode >= 500 ? ErrorType.Service : ErrorType.Client;
     }
+
+    public Map<String, String> getHeaders() {
+        return headers;
+    }
+
+    public void setHeaders(Map<String, String> headers) {
+        this.headers = headers;
+    }
+
 }
