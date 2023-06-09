@@ -1,6 +1,9 @@
 package com.qcloud.cos.internal;
 
 import com.qcloud.cos.model.ciModel.auditing.AudioSectionInfo;
+import com.qcloud.cos.model.ciModel.auditing.AuditingCosOutput;
+import com.qcloud.cos.model.ciModel.auditing.AuditingLiveInfo;
+import com.qcloud.cos.model.ciModel.auditing.AuditingRecordInfo;
 import com.qcloud.cos.model.ciModel.auditing.AudtingCommonInfo;
 import com.qcloud.cos.model.ciModel.auditing.BatchImageJobDetail;
 import com.qcloud.cos.model.ciModel.auditing.LanguageResult;
@@ -1403,6 +1406,51 @@ public class ParserMediaInfoUtils {
         switch (name) {
             case "Scenario":
                 videoTag.setScenario(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParsingAuditingLiveInfo(AuditingLiveInfo auditingLiveInfo, String name, String value) {
+        switch (name) {
+            case "Output":
+                auditingLiveInfo.setOutput(value);
+                break;
+            case "StartTime":
+                auditingLiveInfo.setStartTime(value);
+                break;
+            case "EndTime":
+                auditingLiveInfo.setEndTime(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParsingAuditingRecordInfo(AuditingRecordInfo recordInfo, String name, String value) {
+        switch (name) {
+            case "Code":
+                recordInfo.setCode(value);
+                break;
+            case "Message":
+                recordInfo.setMessage(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParsingAuditingOutput(AuditingCosOutput output, String name, String value) {
+        switch (name) {
+            case "Bucket":
+                output.setBucket(value);
+                break;
+            case "Region":
+                output.setRegion(value);
+                break;
+            case "Object":
+                output.setObject(value);
                 break;
             default:
                 break;

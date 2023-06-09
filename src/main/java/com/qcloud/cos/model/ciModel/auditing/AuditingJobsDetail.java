@@ -74,7 +74,7 @@ public class AuditingJobsDetail {
      * 二级标签
      */
     private String subLabel;
-  /**
+    /**
      * 二级标签
      */
     private String forbidState;
@@ -113,6 +113,7 @@ public class AuditingJobsDetail {
      * 审核结果 青少年信息
      */
     private TeenagerInfo teenagerInfo;
+    private MeaninglessInfo meaninglessInfo;
 
     private List<SnapshotInfo> snapshotList;
 
@@ -136,6 +137,29 @@ public class AuditingJobsDetail {
      * 黑白名单信息
      */
     private ListInfo listInfo = new ListInfo();
+    private String type;
+
+    private MaskInfo maskInfo;
+
+    public MeaninglessInfo getMeaninglessInfo() {
+        if (meaninglessInfo == null) {
+            meaninglessInfo = new MeaninglessInfo();
+        }
+        return meaninglessInfo;
+    }
+
+    public void setMeaninglessInfo(MeaninglessInfo meaninglessInfo) {
+        this.meaninglessInfo = meaninglessInfo;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+
+    public void setType(String type) {
+        this.type = type;
+    }
 
     public String getJobId() {
         return jobId;
@@ -346,7 +370,7 @@ public class AuditingJobsDetail {
     }
 
     public TeenagerInfo getTeenagerInfo() {
-        if (teenagerInfo == null){
+        if (teenagerInfo == null) {
             teenagerInfo = new TeenagerInfo();
         }
         return teenagerInfo;
@@ -365,7 +389,7 @@ public class AuditingJobsDetail {
     }
 
     public SectionInfo getAudioSection() {
-        if (audioSection == null){
+        if (audioSection == null) {
             audioSection = new AudioSectionInfo();
         }
         return audioSection;
@@ -397,6 +421,17 @@ public class AuditingJobsDetail {
 
     public void setForbidState(String forbidState) {
         this.forbidState = forbidState;
+    }
+
+    public MaskInfo getMaskInfo() {
+        if (maskInfo == null) {
+            maskInfo = new MaskInfo();
+        }
+        return maskInfo;
+    }
+
+    public void setMaskInfo(MaskInfo maskInfo) {
+        this.maskInfo = maskInfo;
     }
 
     @Override

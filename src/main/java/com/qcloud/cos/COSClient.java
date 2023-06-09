@@ -4808,5 +4808,18 @@ public class COSClient implements COS {
         return this.invoke(request, new Unmarshallers.AIGameRecUnmarshaller());
     }
 
+    @Override
+    public Boolean cancelLiveAuditing(VideoAuditingRequest videoAuditingRequest) {
+        rejectNull(videoAuditingRequest,
+                "The request parameter must be specified setting the object tags");
+        rejectNull(videoAuditingRequest.getBucketName(),
+                "The bucketName parameter must be specified setting the object tags");
+        rejectNull(videoAuditingRequest.getJobId(),
+                "The jobId parameter must be specified setting the object tags");
+        CosHttpRequest<VideoAuditingRequest> request = createRequest(videoAuditingRequest.getBucketName(), "/video/cancel_auditing/" + videoAuditingRequest.getJobId(), videoAuditingRequest, HttpMethodName.POST);
+        invoke(request, voidCosResponseHandler);
+        return true;
+    }
+
 }
 

@@ -561,7 +561,7 @@ public class CIMediaXmlFactory {
         }
     }
 
-    private static void addTranscode(XmlWriter xml, MediaTranscodeObject transcode) {
+    static void addTranscode(XmlWriter xml, MediaTranscodeObject transcode) {
         if (objIsNotValid(transcode)) {
             xml.start("Transcode");
             MediaTranscodeVideoObject video = transcode.getVideo();

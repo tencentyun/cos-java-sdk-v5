@@ -26,7 +26,6 @@ public class ClientUtils {
         // clientConfig 中包含了设置 region, https(默认 https), 超时, 代理等 set 方法, 使用可参见源码或者常见问题 Java SDK 部分。
         Region region = new Region(_region);
         ClientConfig clientConfig = new ClientConfig(region);
-        clientConfig.setHttpProtocol(HttpProtocol.http);
         // 3 生成 cos 客户端。
         return new COSClient(cred, clientConfig);
     }
