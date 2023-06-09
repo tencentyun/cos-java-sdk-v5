@@ -51,6 +51,7 @@ public class Conf {
     private String callbackType;
 
     private Freeze freeze;
+    private Mask mask;
 
     public String getBizType() {
         return bizType;
@@ -137,6 +138,17 @@ public class Conf {
 
     public void setFreeze(Freeze freeze) {
         this.freeze = freeze;
+    }
+
+    public Mask getMask() {
+        if (mask == null) {
+            mask = new Mask();
+        }
+        return mask;
+    }
+
+    public void setMask(Mask mask) {
+        this.mask = mask;
     }
 
     @Override

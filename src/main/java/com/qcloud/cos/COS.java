@@ -3201,6 +3201,8 @@ public interface COS extends COSDirectSpi {
     DetectFaceResponse detectFace(DetectFaceRequest request);
 
     AIGameRecResponse aiGameRec(AIRecRequest request);
+
+    Boolean cancelLiveAuditing(VideoAuditingRequest request);
 }
 
 

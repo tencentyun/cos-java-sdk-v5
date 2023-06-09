@@ -4,6 +4,7 @@ import com.qcloud.cos.COSClient;
 import com.qcloud.cos.model.ciModel.job.MediaAudioObject;
 import com.qcloud.cos.model.ciModel.job.MediaContainerObject;
 import com.qcloud.cos.model.ciModel.job.MediaJobObject;
+import com.qcloud.cos.model.ciModel.job.MediaJobOperation;
 import com.qcloud.cos.model.ciModel.job.MediaJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaJobsRequest;
 import com.qcloud.cos.model.ciModel.job.MediaListJobResponse;
@@ -66,6 +67,7 @@ public class JobDemo {
         request.getInput().setObject("1.mp4");
         //2.1添加媒体任务操作参数
         MediaTranscodeObject transcode = request.getOperation().getTranscode();
+        MediaJobOperation operation = request.getOperation();
         MediaContainerObject container = transcode.getContainer();
         container.setFormat("mp4");
         MediaTranscodeVideoObject video = transcode.getVideo();

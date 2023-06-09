@@ -2,7 +2,11 @@ package com.qcloud.cos.model.ciModel.xml;
 
 import com.qcloud.cos.internal.XmlWriter;
 import com.qcloud.cos.model.ciModel.auditing.AudioAuditingRequest;
+import com.qcloud.cos.model.ciModel.auditing.AuditingAudio;
+import com.qcloud.cos.model.ciModel.auditing.AuditingCosOutput;
+import com.qcloud.cos.model.ciModel.auditing.AuditingImage;
 import com.qcloud.cos.model.ciModel.auditing.AuditingInputObject;
+import com.qcloud.cos.model.ciModel.auditing.AuditingLiveOutput;
 import com.qcloud.cos.model.ciModel.auditing.AuditingSnapshotObject;
 import com.qcloud.cos.model.ciModel.auditing.BatchImageAuditingInputObject;
 import com.qcloud.cos.model.ciModel.auditing.BatchImageAuditingRequest;
@@ -10,7 +14,9 @@ import com.qcloud.cos.model.ciModel.auditing.Conf;
 import com.qcloud.cos.model.ciModel.auditing.DocumentAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.Encryption;
 import com.qcloud.cos.model.ciModel.auditing.Freeze;
+import com.qcloud.cos.model.ciModel.auditing.Mask;
 import com.qcloud.cos.model.ciModel.auditing.ReportBadCaseRequest;
+import com.qcloud.cos.model.ciModel.auditing.StorageConf;
 import com.qcloud.cos.model.ciModel.auditing.TextAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.UserInfo;
 import com.qcloud.cos.model.ciModel.auditing.VideoAuditingRequest;
@@ -121,11 +127,21 @@ public class CIAuditingXmlFactory {
         XmlWriter xml = new XmlWriter();
 
         xml.start("Request");
+        CIMediaXmlFactory.addIfNotNull(xml, "Type", request.getType());
         addAuditingInput(xml, request.getInput());
         addAuditingConf(xml, request.getConf());
+        addAuditingStorageConf(xml, request.getStorageConf());
         xml.end();
-
+        System.out.println(xml);
         return xml.getBytes();
+    }
+
+    private static void addAuditingStorageConf(XmlWriter xml, StorageConf storageConf) {
+        if (CIMediaXmlFactory.objIsNotValid(storageConf)) {
+            xml.start("StorageConf");
+            CIMediaXmlFactory.addIfNotNull(xml, "Path", storageConf.getPath());
+            xml.end();
+        }
     }
 
     public static byte[] convertToXmlByteArray(WebpageAuditingRequest request) {
@@ -202,7 +218,62 @@ public class CIAuditingXmlFactory {
 
             addAuditingSnapshot(xml, conf.getSnapshot());
             addFreeze(xml, conf.getFreeze());
+            addMask(xml, conf.getMask());
             xml.end();
+        }
+    }
+
+    private static void addMask(XmlWriter xml, Mask mask) {
+        if (CIMediaXmlFactory.objIsNotValid(mask)) {
+            xml.start("Mask");
+            addAuditingImage(xml, mask.getImages());
+            addAuditingAudio(xml, mask.getAudios());
+            addCosOutput(xml, mask.getCosOutput());
+            addLiveOutput(xml, mask.getLiveOutput());
+            xml.end();
+        }
+    }
+
+    private static void addLiveOutput(XmlWriter xml, AuditingLiveOutput liveOutput) {
+        if (CIMediaXmlFactory.objIsNotValid(liveOutput)) {
+            xml.start("LiveOutput");
+            CIMediaXmlFactory.addIfNotNull(xml, "Url", liveOutput.getUrl());
+            CIMediaXmlFactory.addTranscode(xml, liveOutput.getTranscode());
+            xml.end();
+        }
+    }
+
+    private static void addCosOutput(XmlWriter xml, AuditingCosOutput cosOutput) {
+        if (CIMediaXmlFactory.objIsNotValid(cosOutput)) {
+            xml.start("CosOutput");
+            CIMediaXmlFactory.addIfNotNull(xml, "Bucket", cosOutput.getBucket());
+            CIMediaXmlFactory.addIfNotNull(xml, "Region", cosOutput.getRegion());
+            CIMediaXmlFactory.addIfNotNull(xml, "Object", cosOutput.getObject());
+            CIMediaXmlFactory.addTranscode(xml, cosOutput.getTranscode());
+            xml.end();
+        }
+    }
+
+    private static void addAuditingAudio(XmlWriter xml, List<AuditingAudio> audios) {
+        if (audios != null && !audios.isEmpty()) {
+            for (AuditingAudio audio : audios) {
+                xml.start("Audios");
+                CIMediaXmlFactory.addIfNotNull(xml, "Label", audio.getLabel());
+                CIMediaXmlFactory.addIfNotNull(xml, "Type", audio.getType());
+                xml.end();
+            }
+        }
+    }
+
+    private static void addAuditingImage(XmlWriter xml, List<AuditingImage> images) {
+        if (images != null && !images.isEmpty()) {
+            for (AuditingImage image : images) {
+                xml.start("Images");
+                CIMediaXmlFactory.addIfNotNull(xml, "Label", image.getLabel());
+                CIMediaXmlFactory.addIfNotNull(xml, "Type", image.getType());
+                CIMediaXmlFactory.addIfNotNull(xml, "Url", image.getUrl());
+                xml.end();
+            }
         }
     }
 

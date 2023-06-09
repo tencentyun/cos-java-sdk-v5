@@ -32,19 +32,20 @@ public class VideoTargetRecJobDemo {
         //1.创建任务请求对象
         MediaJobsRequest request = new MediaJobsRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("demo-1234567890");
+        request.setBucketName("shanghaitest-1251704708");
         request.setTag("VideoTargetRec");
-        request.getInput().setObject("1.mp4");
+        request.getInput().setObject("test/2023Y05M19D06H25M20S00.30.ts");
         //2.1添加媒体任务操作参数
         MediaJobOperation operation = request.getOperation();
-        operation.setTemplateId("t1c842352fb4514b99a6e8ba6bf625778e");
-        operation.setJobLevel("0");
+        operation.setDecryptKey("4kkb6KFBFQmmg60dzuzOgA==");
+        operation.setDecryptIv("YWFhYWFhYWFhYWFhYWFhYQ==");
+        operation.setDecryptMode("AES128CBCNOPADDING");
 
-        operation.getOutput().setBucket("demo-1234567890");
-        operation.getOutput().setRegion("ap-shanghai");
-        operation.getOutput().setObject("1.mp4");
-        request.setQueueId("p048685dcc97145b7a3d6d20b872fa094");
-        request.setCallBack("https://cloud.tencent.com/xxx");
+        VideoTargetRec videoTargetRec = operation.getVideoTargetRec();
+        videoTargetRec.setBody("true");
+        videoTargetRec.setPet("true");
+        videoTargetRec.setCar("true");
+
         //3.调用接口,获取任务响应对象
         MediaJobResponse response = client.createMediaJobs(request);
         System.out.println(response.getJobsDetail().getJobId());
@@ -70,10 +71,6 @@ public class VideoTargetRecJobDemo {
         videoTargetRec.setPet("true");
         videoTargetRec.setCar("false");
 
-        operation.getOutput().setBucket("demo-1234567890");
-        operation.getOutput().setRegion("ap-shanghai");
-        operation.getOutput().setObject("1.mp4");
-        request.setQueueId("p048685dcc97145b7a3d6d20b872fa094");
         //3.调用接口,获取任务响应对象
         MediaJobResponse response = client.createMediaJobs(request);
         System.out.println(response);
@@ -87,8 +84,8 @@ public class VideoTargetRecJobDemo {
         //1.创建任务请求对象
         MediaJobsRequest request = new MediaJobsRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("demo-1234567890");
-        request.setJobId("abc9b178e6c8d11ed83b92b9bc98*****");
+        request.setBucketName("shanghaitest-1251704708");
+        request.setJobId("a350aba00ff8011edbf2061ef03bc37b5");
         //3.调用接口,获取任务响应对象
         MediaJobResponse response = client.describeMediaJob(request);
         System.out.println(response);

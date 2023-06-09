@@ -5643,6 +5643,9 @@ public class XmlResponsesSaxParser {
                     case "ForbidState":
                         jobsDetail.setForbidState(getText());
                         break;
+                    case "Type":
+                        jobsDetail.setType(getText());
+                        break;
                     default:
                         break;
                 }
@@ -5685,6 +5688,12 @@ public class XmlResponsesSaxParser {
                 if (!listResults.isEmpty()) {
                     ParserMediaInfoUtils.parsingAuditingListResultInfo(listResults.get(listResults.size() - 1), name, getText());
                 }
+            } else if (in("Response", "JobsDetail", "MaskInfo", "LiveInfo")) {
+                ParserMediaInfoUtils.ParsingAuditingLiveInfo(response.getJobsDetail().getMaskInfo().getAuditingLiveInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "MaskInfo", "RecordInfo")) {
+                ParserMediaInfoUtils.ParsingAuditingRecordInfo(response.getJobsDetail().getMaskInfo().getRecordInfo(), name, getText());
+            } else if (in("Response", "JobsDetail", "MaskInfo", "RecordInfo", "Output")) {
+                ParserMediaInfoUtils.ParsingAuditingOutput(response.getJobsDetail().getMaskInfo().getRecordInfo().getOutput(), name, getText());
             }
         }
 
