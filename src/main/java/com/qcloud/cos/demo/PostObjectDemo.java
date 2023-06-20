@@ -58,6 +58,7 @@ public class PostObjectDemo {
                 keyTime, policy);
         // 设置签名
         formFields.put("q-signature", signature);
+        formFields.put("Content-Type", contentType);
         // 根据以上表单参数，构造最开始的body部分
         String formBody = buildPostObjectBody(boundary, formFields,
                 filename, contentType);
