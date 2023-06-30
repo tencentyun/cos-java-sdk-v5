@@ -20,6 +20,7 @@ package com.qcloud.cos;
 
 import static com.qcloud.cos.internal.LengthCheckInputStream.EXCLUDE_SKIPPED_BYTES;
 import static com.qcloud.cos.internal.LengthCheckInputStream.INCLUDE_SKIPPED_BYTES;
+import static com.qcloud.cos.model.Policy.PolicyUtils.isMatchPrefix;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -38,6 +39,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.ArrayList;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.IntStream;
 
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -101,6 +106,17 @@ import com.qcloud.cos.internal.VoidCosResponseHandler;
 import com.qcloud.cos.internal.XmlResponsesSaxParser.CompleteMultipartUploadHandler;
 import com.qcloud.cos.internal.XmlResponsesSaxParser.CopyObjectResultHandler;
 import com.qcloud.cos.model.*;
+import com.qcloud.cos.model.Policy.PolicyContent;
+import com.qcloud.cos.model.Policy.PolicyUtils;
+import com.qcloud.cos.model.Policy.SetBucketPolicyStatementRequest;
+import com.qcloud.cos.model.Policy.PolicyStatement;
+import com.qcloud.cos.model.Policy.BucketStatementResult;
+import com.qcloud.cos.model.Policy.DelBucketPolicyStatementRequest;
+import com.qcloud.cos.model.Policy.GetBucketPolicyStatementRequest;
+import com.qcloud.cos.model.Policy.TableResult;
+import com.qcloud.cos.model.Policy.StatementPrincipal;
+import com.qcloud.cos.model.Policy.SubUinResult;
+import com.qcloud.cos.model.Policy.SchemaResult;
 import com.qcloud.cos.model.bucketcertificate.BucketDomainCertificateRequest;
 import com.qcloud.cos.model.bucketcertificate.BucketGetDomainCertificate;
 import com.qcloud.cos.model.bucketcertificate.BucketPutDomainCertificate;
@@ -3197,6 +3213,360 @@ public class COSClient implements COS {
         request.addParameter("policy", null);
 
         invoke(request, voidCosResponseHandler);
+    }
+
+    public void setBucketPolicyStatement(SetBucketPolicyStatementRequest setBucketPolicyStatementRequest) {
+        rejectNull(setBucketPolicyStatementRequest, "The request object must be specified when setting a bucket policy statement");
+        String bucketName = setBucketPolicyStatementRequest.getBucketName();
+        String subUin = setBucketPolicyStatementRequest.getSubUin();
+        String actionTemplate = setBucketPolicyStatementRequest.getActionTemplate();
+        String ownerUin = setBucketPolicyStatementRequest.getOwnerUin();
+        List<String> resourcePaths = setBucketPolicyStatementRequest.getResourcePath();
+
+        rejectEmpty(bucketName, "The bucket name must be specified when setting a bucket policy statement");
+        rejectEmpty(subUin, "The sub uin must be specified when setting a bucket policy statement");
+        rejectEmpty(actionTemplate, "The action template must be specified when setting a bucket policy statement");
+        rejectEmpty(ownerUin, "The owner uin must be specified when setting a bucket policy statement");
+
+        if (resourcePaths == null || resourcePaths.isEmpty()) {
+            throw new IllegalArgumentException("The resource paths must be specified when setting a bucket policy statement");
+        }
+
+        if (!PolicyUtils.isValidActionTemplate(actionTemplate)) {
+            throw new IllegalArgumentException("The action template must be one of {read, read_write, head_bucket}");
+        }
+
+        String sid = buildSid(subUin, actionTemplate);
+
+        BucketPolicy bucketPolicy;
+        PolicyContent policy_content = new PolicyContent();
+        try {
+           bucketPolicy = getBucketPolicy(bucketName);
+        } catch (CosServiceException cse) {
+            // 不管添加什么权限，如果桶目前不存在policy，直接添加policy
+            if (cse.getStatusCode() == 404 && Objects.equals(cse.getErrorCode(), "404 Policy Not found")) {
+                PolicyStatement statement = constructNewStatement(ownerUin, subUin, actionTemplate, resourcePaths, sid);
+                policy_content.addStatement(statement);
+                String policyText = Jackson.toJsonString(policy_content);
+                setBucketPolicy(bucketName, policyText);
+
+                return;
+            }
+            throw cse;
+        }
+
+        policy_content = Jackson.fromJsonStringCaseInsensitive(bucketPolicy.getPolicyText(), PolicyContent.class);
+        List<PolicyStatement> statements = policy_content.getStatement();
+        boolean is_sid_exist = false;
+
+        List<PolicyStatement> statements2remove = new ArrayList<>();
+
+        for (PolicyStatement statement : statements) {
+            if (Objects.equals(statement.getSid(), sid)) {
+                // sid已存在，直接更新
+                is_sid_exist = true;
+                List<String> originPaths = statement.getResource();
+                for (String resourcePath : resourcePaths) {
+                    modifyResourcePaths(resourcePath, originPaths, sid);
+                }
+            }
+
+            // 如果是添加 读写权限，需要在读权限的statement里删除对应path
+            if (Objects.equals(actionTemplate, PolicyUtils.ACTION_TEMPLATE_READ_WRITE)) {
+                if (Objects.equals(statement.getSid(), buildSid(subUin, PolicyUtils.ACTION_TEMPLATE_READ))) {
+                    List<String> originPaths = statement.getResource();
+                    for (String resourcePath : resourcePaths) {
+                        removeResourcePaths(resourcePath, originPaths);
+                    }
+                    // 如果清除对应path之后，resource为空，则删除读权限的statement，否则后面调用setBucketPolicy会报400
+                    if (originPaths.isEmpty()) {
+                        statements2remove.add(statement);
+                    }
+                }
+            }
+
+            // 如果是添加 读权限，需要判断在读写权限的statement里是否已经存在对应path或对应path的父path
+            if (Objects.equals(actionTemplate, PolicyUtils.ACTION_TEMPLATE_READ)) {
+                if (Objects.equals(statement.getSid(), buildSid(subUin, PolicyUtils.ACTION_TEMPLATE_READ_WRITE))) {
+                    List<String> originPaths = statement.getResource();
+                    for (String resourcePath : resourcePaths) {
+                        isInvalidPath(resourcePath, originPaths, buildSid(subUin, PolicyUtils.ACTION_TEMPLATE_READ_WRITE));
+                    }
+                }
+            }
+        }
+
+        statements.removeAll(statements2remove);
+
+        // sid 不存在，新增sid
+        if (!is_sid_exist) {
+            PolicyStatement statement = constructNewStatement(ownerUin, subUin, actionTemplate, resourcePaths, sid);
+            statements.add(statement);
+        }
+
+        String policyText = Jackson.toJsonString(policy_content);
+        setBucketPolicy(bucketName, policyText);
+    }
+
+    public void deleteBucketPolicyStatement(DelBucketPolicyStatementRequest delBucketPolicyStatementRequest) {
+        rejectNull(delBucketPolicyStatementRequest, "The request object must be specified when deletint a bucket policy statement");
+        String bucketName = delBucketPolicyStatementRequest.getBucketName();
+        String subUin = delBucketPolicyStatementRequest.getSubUin();
+        String actionTemplate = delBucketPolicyStatementRequest.getActionTemplate();
+        List<String> deletePaths = delBucketPolicyStatementRequest.getPath2Delete();
+
+        rejectEmpty(bucketName, "The bucket name must be specified when deleting a bucket policy statement");
+        rejectEmpty(subUin, "The sub uin must be specified when deleting a bucket policy statement");
+        rejectEmpty(actionTemplate, "The action template must be specified when deleting a bucket policy statement");
+
+        String sid = buildSid(subUin, actionTemplate);
+
+        BucketPolicy bucketPolicy = getBucketPolicy(bucketName);
+        PolicyContent policy_content = Jackson.fromJsonStringCaseInsensitive(bucketPolicy.getPolicyText(), PolicyContent.class);
+        List<PolicyStatement> statements = policy_content.getStatement();
+
+        PolicyStatement statement2remove = new PolicyStatement();
+
+        boolean find_sid = false;
+        boolean need_remove_statement = false;
+        for (PolicyStatement statement : statements) {
+            if (Objects.equals(sid, statement.getSid())) {
+                find_sid = true;
+                // 若有指定要删除的路径，删除对应的path
+                if (!deletePaths.isEmpty()) {
+                    List<String> originPaths = statement.getResource();
+                    int size_before_remove = originPaths.size();
+                    originPaths.removeAll(deletePaths);
+                    int size_after_remove = originPaths.size();
+                    if (size_after_remove == size_before_remove) {
+                        String errMsg = String.format("The specified paths do not exist in the statement %s, no need to delete", sid);
+                        throw new CosClientException(errMsg);
+                    }
+                    if (originPaths.isEmpty()) {
+                        need_remove_statement = true;
+                    }
+                } else {
+                    // 若没有指定要删除的路径，删除对应的statement
+                    need_remove_statement = true;
+                }
+                statement2remove = statement;
+                break;
+            }
+        }
+        // 若该sid不存在，则返回删除失败
+        if (!find_sid) {
+            String errMsg = String.format("The sid %s does not exist, no need to delete", sid);
+            throw new CosClientException(errMsg);
+        }
+
+        if (need_remove_statement) {
+            statements.remove(statement2remove);
+            if (statements.isEmpty()) {
+                // 若该桶的policy只有这一个statement，直接删除桶策略，传空的List<PolicyStatement>服务端会报错
+                deleteBucketPolicy(bucketName);
+                return;
+            }
+        }
+        String policyText = Jackson.toJsonString(policy_content);
+        setBucketPolicy(bucketName, policyText);
+    }
+
+    public BucketStatementResult getBucketPolicyStatement(GetBucketPolicyStatementRequest getBucketPolicyStatementRequest) {
+        String bucketName = getBucketPolicyStatementRequest.getBucketName();
+        List<String> subUins = getBucketPolicyStatementRequest.getSubUins();
+        List<String> resourcePaths = getBucketPolicyStatementRequest.getResourcePaths();
+        List<String> actionTemplates = getBucketPolicyStatementRequest.getActionTemplates();
+        List<String> effects = getBucketPolicyStatementRequest.getEffects();
+        rejectEmpty(bucketName, "The bucket name must be specified when getting a bucket policy statement");
+
+        BucketPolicy bucketPolicy = getBucketPolicy(bucketName);
+        PolicyContent policy_content = Jackson.fromJsonStringCaseInsensitive(bucketPolicy.getPolicyText(), PolicyContent.class);
+        List<PolicyStatement> statements = policy_content.getStatement();
+        Map<String,  Map<String, List<TableResult>>> tempResults = new HashMap<>();
+        Map<String, Boolean> elementsFilled = new HashMap<>();
+        for (PolicyStatement statement : statements) {
+            String sid = statement.getSid();
+            String[] sidInfo = sid.split("_", 2);
+            if (sidInfo.length != 2) {
+                continue;
+            }
+            String sub_uin = sidInfo[0];
+            String active = sidInfo[1];
+
+            // 如果当前statement的Principal不是只包含了一条qcs，也认为不是合理的statement，不展示
+            if (statement.getPrincipal().getQcs().size() != 1) {
+                continue;
+            }
+
+            // 如果当前statement的action模板，不是指定的三种模板之一，则忽略这条statement
+            if (!Objects.equals(active, PolicyUtils.ACTION_TEMPLATE_READ) && !Objects.equals(active, PolicyUtils.ACTION_TEMPLATE_READ_WRITE)
+                    && !Objects.equals(active, PolicyUtils.ACTION_TEMPLATE_HEAD_BUCKET)) {
+                continue;
+            }
+
+            // 如果查询时指定了subUin，且当前statement的subuin不包含在指定的subUin中，则忽略这条statement
+            if (!subUins.isEmpty() && !subUins.contains(sub_uin)) {
+                continue;
+            }
+
+            // 如果查询时指定了effect，且当前statement的effect不包含在指定的effect中，则忽略这条statement
+            if (!effects.isEmpty() && !effects.contains(statement.getEffect())) {
+                continue;
+            }
+
+            // 如果查询时指定了action模板，且当前statement的action模板不包含在指定的action模板中，则忽略这条statement
+            if (!actionTemplates.isEmpty() && !actionTemplates.contains(active)) {
+                continue;
+            }
+
+            if (!tempResults.containsKey(sub_uin)) {
+                Map<String, List<TableResult>> tempScheResults = new HashMap<>();
+                tempResults.put(sub_uin, tempScheResults);
+            }
+
+            List<String> originPaths = statement.getResource();
+            if (!resourcePaths.isEmpty()) {
+                for (String resourcePath : resourcePaths) {
+                    for (String originPath : originPaths) {
+                        // 如果指定路径是策略原路径的父路径，则将策略原路径加入响应中
+                        if (isMatchPrefix(resourcePath, originPath) || Objects.equals(resourcePath, originPath)) {
+                            fillTableResult(originPath, active, sub_uin, tempResults, elementsFilled);
+                        } else if (isMatchPrefix(originPath, resourcePath)) {
+                            // 如果策略原路径是指定路径的父路径，则将指定路径加入响应中
+                            fillTableResult(resourcePath, active, sub_uin, tempResults, elementsFilled);
+                        }
+                    }
+                }
+            } else {
+                for (String originPath : originPaths) {
+                    fillTableResult(originPath, active, sub_uin, tempResults, elementsFilled);
+                }
+            }
+        }
+        return constructBucketStatementResult(tempResults);
+    }
+
+    private String buildSid(String subUin, String actionTemplate) {
+        return subUin + "_" + actionTemplate;
+    }
+
+    private PolicyStatement constructNewStatement(String ownerUin, String subUin, String actionTemplate, List<String> resourcePaths, String sid) {
+        PolicyStatement statement = new PolicyStatement();
+        StatementPrincipal principal = new StatementPrincipal();
+        String qcs_str = String.format("qcs::cam::uin/%s:uin/%s", ownerUin, subUin);
+        principal.addQcs(qcs_str);
+        statement.setPrincipal(principal);
+
+        statement.setEffect(PolicyUtils.POLICY_EFFECT_ALLOW);
+        PolicyUtils.fillActions(statement, actionTemplate);
+        statement.addResources(resourcePaths);
+        statement.setSid(sid);
+
+        return statement;
+    }
+
+    private void modifyResourcePaths(String path2add, List<String> resourcePaths, String sid) {
+        rejectEmpty(path2add, "The resource path must be specified when setting a bucket policy statement");
+
+        List<String> paths2remove = new ArrayList<>();
+
+        for (String resourcePath : resourcePaths) {
+            // 如果 resourcePath 的范围小于 path2add，则忽略 resourcePath
+            if (isMatchPrefix(path2add, resourcePath)) {
+                paths2remove.add(resourcePath);
+                continue;
+            }
+            // 如果 resourcePath 的范围 大于等于 path2add，则报错，提示无效resource
+            if (isMatchPrefix(resourcePath, path2add) || Objects.equals(resourcePath, path2add)) {
+                String errMsg = String.format("The statement %s already contains the resource path %s, no need to add %s", sid, resourcePath, path2add);
+                throw new IllegalArgumentException(errMsg);
+            }
+        }
+        resourcePaths.removeAll(paths2remove);
+        resourcePaths.add(path2add);
+    }
+
+    private void removeResourcePaths(String path2remove, List<String> resourcePaths) {
+        rejectEmpty(path2remove, "The resource path must be specified when setting a bucket policy statement");
+
+        List<String> paths2remove = new ArrayList<>();
+
+        for (String resourcePath : resourcePaths) {
+            /**
+             * 如果：（1）path2remove以*结尾，且resourcePath是path2remove的子路径
+             *      （2）path2remove 等于 resourcePath
+             * 需要清除掉resourcePath
+             */
+            if (isMatchPrefix(path2remove, resourcePath) || Objects.equals(path2remove, resourcePath)) {
+                paths2remove.add(resourcePath);
+            }
+        }
+        resourcePaths.removeAll(paths2remove);
+    }
+
+    private void isInvalidPath(String targetPath, List<String> originPaths, String sid) {
+        rejectEmpty(targetPath, "The resource path must be specified when setting a bucket policy statement");
+        for (String originPath : originPaths) {
+            if (isMatchPrefix(originPath, targetPath) || Objects.equals(targetPath, originPath)) {
+                String errMsg = String.format("The statement %s already contains the resource path %s, no need to add %s to read statement", sid, originPath, targetPath);
+                throw new IllegalArgumentException(errMsg);
+            }
+        }
+    }
+
+    private BucketStatementResult constructBucketStatementResult(Map<String,  Map<String, List<TableResult>>> tempResults) {
+        Set<String> keys = tempResults.keySet();
+        BucketStatementResult result = new BucketStatementResult();
+        for (String subUin : keys) {
+            SubUinResult sub_uin_result = new SubUinResult();
+            sub_uin_result.setSubUin(subUin);
+            Map<String, List<TableResult>> tempSubUinResults = tempResults.get(subUin);
+            tempSubUinResults.forEach((schemaName, tableResults)->{
+                SchemaResult schemaResult = new SchemaResult(schemaName, tableResults);
+                sub_uin_result.addSchemaResult(schemaResult);
+            });
+            result.addFormatPolicy(sub_uin_result);
+        }
+        return result;
+    }
+
+    private void fillTableResult(String originPath, String active, String sub_uin,
+                                 Map<String,  Map<String, List<TableResult>>> tempResults, Map<String, Boolean> elementsFilled) {
+        String[] pathInfo = PolicyUtils.parseQcsResourcePath(originPath);
+        TableResult tableResult = new TableResult(pathInfo[1], active);
+        if (!tempResults.get(sub_uin).containsKey(pathInfo[0])) {
+            List<TableResult> results = new ArrayList<>();
+            results.add(tableResult);
+            tempResults.get(sub_uin).put(pathInfo[0], results);
+            elementsFilled.put(sub_uin + ":" + pathInfo[0] + ":" + pathInfo[1] + ":" + active, true);
+        } else {
+            /**
+             * 以下情况需要特殊处理：
+             * 1：tableResult的action为read，tempResults中关于目标path已存在action为read_write的结果，就不再重复添加
+             * 2：tableResult的action为read_write，tempResults中关于目标path已存在action为read的结果，删除action为read的结果，添加read_write结果
+             */
+            if (Objects.equals(active, PolicyUtils.ACTION_TEMPLATE_READ)) {
+                String elementKey = sub_uin + ":" + pathInfo[0] + ":" + pathInfo[1] + ":" + PolicyUtils.ACTION_TEMPLATE_READ_WRITE;
+                if (elementsFilled.containsKey(elementKey) && elementsFilled.get(elementKey)) {
+                    return;
+                }
+            }
+
+            List<TableResult> trs = tempResults.get(sub_uin).get(pathInfo[0]);
+
+            if (Objects.equals(active, PolicyUtils.ACTION_TEMPLATE_READ_WRITE)) {
+                String elementKey = sub_uin + ":" + pathInfo[0] + ":" + pathInfo[1] + ":" + PolicyUtils.ACTION_TEMPLATE_READ;
+                if (elementsFilled.containsKey(elementKey) && elementsFilled.get(elementKey)) {
+                    elementsFilled.remove(elementKey);
+                    // 删除action为read的结果
+                    IntStream.range(0, trs.size()).filter(i->
+                                    trs.get(i).getTableName().equals(pathInfo[1])).boxed().findFirst().
+                            map(i->trs.remove((int) i));
+                }
+            }
+            trs.add(tableResult);
+            elementsFilled.put(sub_uin + ":" + pathInfo[0] + ":" + pathInfo[1] + ":" + active, true);
+        }
     }
 
     @Override

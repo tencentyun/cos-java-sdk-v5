@@ -26,6 +26,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.qcloud.cos.exception.CosClientException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,13 +41,22 @@ public enum Jackson {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
+    private static final ObjectMapper objectMapper_case_insensitive = new ObjectMapper();
+
     static {
         objectMapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+        objectMapper_case_insensitive.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
+        objectMapper_case_insensitive.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        objectMapper_case_insensitive.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true);
     }
 
     private static final ObjectWriter writer = objectMapper.writer();
     private static final ObjectWriter prettyWriter = objectMapper.writerWithDefaultPrettyPrinter();
+
+    private static final ObjectWriter writer_case_insensitive = objectMapper_case_insensitive.writer();
+    private static final ObjectWriter prettyWriter_case_insensitive = objectMapper_case_insensitive.writerWithDefaultPrettyPrinter();
 
     public static String toJsonPrettyString(Object value) {
         try {
@@ -64,6 +74,14 @@ public enum Jackson {
         }
     }
 
+    public static String toJsonPrettyStringCaseInsensitive(Object value) {
+        try {
+            return prettyWriter_case_insensitive.writeValueAsString(value);
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
     /**
      * Returns the deserialized object from the given json string and target
      * class; or null if the given json string is null.
@@ -73,6 +91,16 @@ public enum Jackson {
             return null;
         try {
             return objectMapper.readValue(json, clazz);
+        } catch (Exception e) {
+            throw new CosClientException("Unable to parse Json String.", e);
+        }
+    }
+
+    public static <T> T fromJsonStringCaseInsensitive(String json, Class<T> clazz) {
+        if (json == null)
+            return null;
+        try {
+            return objectMapper_case_insensitive.readValue(json, clazz);
         } catch (Exception e) {
             throw new CosClientException("Unable to parse Json String.", e);
         }
