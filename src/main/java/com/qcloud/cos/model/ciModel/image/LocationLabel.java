@@ -3,7 +3,7 @@ package com.qcloud.cos.model.ciModel.image;
 /**
  * 标签信息V2
  */
-public class LocationLabel extends Lobel {
+public class LocationLabel extends Label {
 
     /**
      * 三级商品分类对应的一级分类和二级分类，两级之间用“_”（下划线）隔开，例如商品名称是“计算机键盘”，那么Parents输出为“物品_数码产品”

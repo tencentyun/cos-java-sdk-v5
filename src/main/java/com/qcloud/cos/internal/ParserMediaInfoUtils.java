@@ -16,10 +16,10 @@ import com.qcloud.cos.model.ciModel.auditing.SectionInfo;
 import com.qcloud.cos.model.ciModel.auditing.SnapshotInfo;
 import com.qcloud.cos.model.ciModel.auditing.UserInfo;
 import com.qcloud.cos.model.ciModel.common.BatchInputObject;
-import com.qcloud.cos.model.ciModel.common.MediaInputObject;
 import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
 import com.qcloud.cos.model.ciModel.job.AudioConfig;
 import com.qcloud.cos.model.ciModel.job.ColorEnhance;
+import com.qcloud.cos.model.ciModel.job.DetailedResult;
 import com.qcloud.cos.model.ciModel.job.EffectConfig;
 import com.qcloud.cos.model.ciModel.job.FrameEnhance;
 import com.qcloud.cos.model.ciModel.job.Md5Info;
@@ -42,6 +42,9 @@ import com.qcloud.cos.model.ciModel.job.MediaVideoObject;
 import com.qcloud.cos.model.ciModel.job.MsSharpen;
 import com.qcloud.cos.model.ciModel.job.OutputFile;
 import com.qcloud.cos.model.ciModel.job.ProcessResult;
+import com.qcloud.cos.model.ciModel.job.QualityEstimate;
+import com.qcloud.cos.model.ciModel.job.QualityEstimateConfig;
+import com.qcloud.cos.model.ciModel.job.QualityEstimateItem;
 import com.qcloud.cos.model.ciModel.job.SDRtoHDR;
 import com.qcloud.cos.model.ciModel.job.Subtitle;
 import com.qcloud.cos.model.ciModel.job.Subtitles;
@@ -49,6 +52,7 @@ import com.qcloud.cos.model.ciModel.job.SuperResolution;
 import com.qcloud.cos.model.ciModel.job.TtsTpl;
 import com.qcloud.cos.model.ciModel.job.VideoTag;
 import com.qcloud.cos.model.ciModel.job.VideoTargetRec;
+import com.qcloud.cos.model.ciModel.job.VqaPlusResult;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaFormat;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoAudio;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoSubtitle;
@@ -1451,6 +1455,71 @@ public class ParserMediaInfoUtils {
                 break;
             case "Object":
                 output.setObject(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParseQualityEstimateConfig(QualityEstimateConfig qualityEstimateConfig, String name, String value) {
+        switch (name) {
+            case "Mode":
+                qualityEstimateConfig.setMode(value);
+                break;
+            case "Rotate":
+                qualityEstimateConfig.setRotate(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParseVqaPlusResult(VqaPlusResult vqaPlusResult, String name, String value) {
+        switch (name) {
+            case "NoAudio":
+                vqaPlusResult.setNoAudio(value);
+                break;
+            case "NoVideo":
+                vqaPlusResult.setNoVideo(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParseDetailedResult(DetailedResult detailedResults, String name, String value) {
+        switch (name) {
+            case "Type":
+                detailedResults.setType(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParseQualityEstimateItem(QualityEstimateItem qei, String name, String value) {
+        switch (name) {
+            case "Confidence":
+                qei.setConfidence(value);
+                break;
+            case "EndTimeOffset":
+                qei.setEndTimeOffset(value);
+                break;
+            case "StartTimeOffset":
+                qei.setStartTimeOffset(value);
+                break;
+            case "AreaCoordSet":
+                qei.getAreaCoordSet().add(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParseQualityEstimate(QualityEstimate qualityEstimate, String name, String value) {
+        switch (name) {
+            case "Score":
+                qualityEstimate.setScore(value);
                 break;
             default:
                 break;

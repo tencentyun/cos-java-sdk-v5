@@ -4195,6 +4195,7 @@ public class COSClient implements COS {
         CosHttpRequest<ImageLabelRequest> request = createRequest(imageLabelRequest.getBucketName(), imageLabelRequest.getObjectKey(), imageLabelRequest, HttpMethodName.GET);
         request.addParameter("ci-process", "detect-label");
         addParameterIfNotNull(request,"detect-url", imageLabelRequest.getDetectUrl());
+        addParameterIfNotNull(request,"scenes", imageLabelRequest.getScenes());
         return invoke(request, new Unmarshallers.ImageLabelUnmarshaller());
     }
 

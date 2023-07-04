@@ -10,86 +10,86 @@ public class ImageLabelV2Response {
     /**
      * Web网络版标签结果数组。如未选择web场景，则为空。注意：此字段可能不存在，表示取不到有效值
      */
-    private List<LobelV2> webLabels;
+    private List<LabelV2> webLabels;
 
     /**
      * Camera摄像头版标签结果数组。如未选择camera场景，则为空。注意：此字段可能不存在，表示取不到有效值
      */
-    private List<LobelV2> cameraLabels;
+    private List<LabelV2> cameraLabels;
 
     /**
      * Album相册版标签结果数组。如未选择album场景，则为空。注意：此字段可能不存在，表示取不到有效值
      */
-    private List<LobelV2> albumLabels;
+    private List<LabelV2> albumLabels;
 
     /**
      * News新闻版标签结果数组。如未选择news场景，则为空。新闻版目前为测试阶段，暂不提供每个标签的一级、二级分类信息的输出。
      * 注意：此字段可能不存在，表示取不到有效值
      */
-    private List<LobelV2> newsLabels;
+    private List<LabelV2> newsLabels;
 
     /**
      * 非实拍标签注意：此字段可能不存在，表示取不到有效值
      */
-    private List<LobelV2> noneCamLabels;
+    private List<LabelV2> noneCamLabels;
 
     /**
      * 识别结果 注意：此字段可能不存在，表示取不到有效值
      */
     private List<LocationLabel> productLabels;
 
-    public List<LobelV2> getWebLabels() {
+    public List<LabelV2> getWebLabels() {
         if (webLabels == null) {
             webLabels = new ArrayList<>();
         }
         return webLabels;
     }
 
-    public void setWebLabels(List<LobelV2> webLabels) {
+    public void setWebLabels(List<LabelV2> webLabels) {
         this.webLabels = webLabels;
     }
 
-    public List<LobelV2> getCameraLabels() {
+    public List<LabelV2> getCameraLabels() {
         if (cameraLabels == null) {
             cameraLabels = new ArrayList<>();
         }
         return cameraLabels;
     }
 
-    public void setCameraLabels(List<LobelV2> cameraLabels) {
+    public void setCameraLabels(List<LabelV2> cameraLabels) {
         this.cameraLabels = cameraLabels;
     }
 
-    public List<LobelV2> getAlbumLabels() {
+    public List<LabelV2> getAlbumLabels() {
         if (albumLabels == null) {
             albumLabels = new ArrayList<>();
         }
         return albumLabels;
     }
 
-    public void setAlbumLabels(List<LobelV2> albumLabels) {
+    public void setAlbumLabels(List<LabelV2> albumLabels) {
         this.albumLabels = albumLabels;
     }
 
-    public List<LobelV2> getNewsLabels() {
+    public List<LabelV2> getNewsLabels() {
         if (newsLabels == null) {
             newsLabels = new ArrayList<>();
         }
         return newsLabels;
     }
 
-    public void setNewsLabels(List<LobelV2> newsLabels) {
+    public void setNewsLabels(List<LabelV2> newsLabels) {
         this.newsLabels = newsLabels;
     }
 
-    public List<LobelV2> getNoneCamLabels() {
+    public List<LabelV2> getNoneCamLabels() {
         if (noneCamLabels == null) {
             noneCamLabels = new ArrayList<>();
         }
         return noneCamLabels;
     }
 
-    public void setNoneCamLabels(List<LobelV2> noneCamLabels) {
+    public void setNoneCamLabels(List<LabelV2> noneCamLabels) {
         this.noneCamLabels = noneCamLabels;
     }
 

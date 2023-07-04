@@ -23,7 +23,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -127,8 +126,8 @@ import com.qcloud.cos.model.ciModel.bucket.MediaBucketResponse;
 import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
 import com.qcloud.cos.model.ciModel.image.ImageLabelResponse;
 import com.qcloud.cos.model.ciModel.image.ImageLabelV2Response;
-import com.qcloud.cos.model.ciModel.image.Lobel;
-import com.qcloud.cos.model.ciModel.image.LobelV2;
+import com.qcloud.cos.model.ciModel.image.Label;
+import com.qcloud.cos.model.ciModel.image.LabelV2;
 import com.qcloud.cos.model.ciModel.image.LocationLabel;
 import com.qcloud.cos.model.ciModel.job.DocJobDetail;
 import com.qcloud.cos.model.ciModel.job.DocJobListResponse;
@@ -4299,6 +4298,8 @@ public class XmlResponsesSaxParser {
                 ParserMediaInfoUtils.ParseTtsTpl(jobsDetail.getOperation().getTtsTpl(), name, getText());
             } else if (in("Response", "JobsDetail", "Operation", "VideoTag")) {
                 ParserMediaInfoUtils.ParseVideoTag(jobsDetail.getOperation().getVideoTag(), name, getText());
+            }else if (in("Response", "JobsDetail", "Operation", "QualityEstimateConfig")) {
+                ParserMediaInfoUtils.ParseQualityEstimateConfig(jobsDetail.getOperation().getQualityEstimateConfig(), name, getText());
             }
         }
 
@@ -5929,28 +5930,49 @@ public class XmlResponsesSaxParser {
         @Override
         protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
             if ("Labels".equalsIgnoreCase(name)) {
-                response.getRecognitionResult().add(new Lobel());
+                response.getRecognitionResult().add(new Label());
             }
         }
 
         @Override
         protected void doEndElement(String uri, String name, String qName) {
-            List<Lobel> list = response.getRecognitionResult();
-            Lobel lobel = list.get(list.size() - 1);
+            List<Label> list = response.getRecognitionResult();
+            Label label = list.get(list.size() - 1);
             if (in("RecognitionResult", "Labels")) {
-                switch (name) {
-                    case "Confidence":
-                        lobel.setConfidence(getText());
-                        break;
-                    case "Name":
-                        lobel.setName(getText());
-                        break;
-                    default:
-                        break;
-                }
+                addLabel(label, name, getText());
+            } else if (in("RecognitionResult", "AlbumLabels", "Labels")) {
+                label.setLabelName("AlbumLabels");
+                addLabel(label, name, getText());
+            }else if (in("RecognitionResult", "WebLabels", "Labels")) {
+                label.setLabelName("WebLabels");
+                addLabel(label, name, getText());
+            }else if (in("RecognitionResult", "CameraLabels", "Labels")) {
+                label.setLabelName("CameraLabels");
+                addLabel(label, name, getText());
+            }else if (in("RecognitionResult", "NewsLabels", "Labels")) {
+                label.setLabelName("NewsLabels");
+                addLabel(label, name, getText());
             }
         }
 
+        private void addLabel(Label label, String name, String value) {
+            switch (name) {
+                case "Confidence":
+                    label.setConfidence(value);
+                    break;
+                case "Name":
+                    label.setName(value);
+                    break;
+                case "FirstCategory":
+                    label.setFirstCategory(value);
+                    break;
+                case "SecondCategory":
+                    label.setSecondCategory(value);
+                    break;
+                default:
+                    break;
+            }
+        }
         public ImageLabelResponse getResponse() {
             return response;
         }
@@ -5966,15 +5988,15 @@ public class XmlResponsesSaxParser {
         @Override
         protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
             if (in("RecognitionResult", "AlbumLabels") && "Label".equalsIgnoreCase(name)) {
-                response.getAlbumLabels().add(new LobelV2());
+                response.getAlbumLabels().add(new LabelV2());
             } else if (in("RecognitionResult", "CameraLabels") && "Label".equalsIgnoreCase(name)) {
-                response.getCameraLabels().add(new LobelV2());
+                response.getCameraLabels().add(new LabelV2());
             } else if (in("RecognitionResult", "WebLabels") && "Label".equalsIgnoreCase(name)) {
-                response.getWebLabels().add(new LobelV2());
+                response.getWebLabels().add(new LabelV2());
             } else if (in("RecognitionResult", "NewsLabels") && "Label".equalsIgnoreCase(name)) {
-                response.getNewsLabels().add(new LobelV2());
+                response.getNewsLabels().add(new LabelV2());
             } else if (in("RecognitionResult", "NoneCamLabels") && "Label".equalsIgnoreCase(name)) {
-                response.getNoneCamLabels().add(new LobelV2());
+                response.getNoneCamLabels().add(new LabelV2());
             } else if (in("RecognitionResult", "ProductLabels") && "Label".equalsIgnoreCase(name)) {
                 response.getProductLabels().add(new LocationLabel());
             }
@@ -5982,25 +6004,25 @@ public class XmlResponsesSaxParser {
 
         @Override
         protected void doEndElement(String uri, String name, String qName) {
-            LobelV2 lobel = null;
+            LabelV2 lobel = null;
             if (in("RecognitionResult", "AlbumLabels","Label")) {
-                List<LobelV2> lobels = response.getAlbumLabels();
+                List<LabelV2> lobels = response.getAlbumLabels();
                 lobel = getListLast(lobels);
             } else if (in("RecognitionResult", "CameraLabels","Label")) {
-                List<LobelV2> lobels = response.getCameraLabels();
+                List<LabelV2> lobels = response.getCameraLabels();
                 lobel = getListLast(lobels);
             } else if (in("RecognitionResult", "WebLabels","Label")) {
-                List<LobelV2> lobels = response.getWebLabels();
+                List<LabelV2> lobels = response.getWebLabels();
                 lobel = getListLast(lobels);
             } else if (in("RecognitionResult", "ProductLabels","Label")) {
                 List<LocationLabel> ProductLabels = response.getProductLabels();
                 LocationLabel locationLabel = ProductLabels.get(ProductLabels.size() - 1);
                 addLocationLabel(locationLabel, name, getText());
             } else if (in("RecognitionResult", "NewsLabels","Label")) {
-                List<LobelV2> lobels = response.getNewsLabels();
+                List<LabelV2> lobels = response.getNewsLabels();
                 lobel = getListLast(lobels);
             } else if (in("RecognitionResult", "NoneCamLabels","Label")) {
-                List<LobelV2> lobels = response.getNoneCamLabels();
+                List<LabelV2> lobels = response.getNoneCamLabels();
                 lobel = getListLast(lobels);
             }
             if (lobel != null) {
@@ -6016,7 +6038,7 @@ public class XmlResponsesSaxParser {
             this.response = response;
         }
 
-        private void addLabel(LobelV2 lobel, String name, String value) {
+        private void addLabel(LabelV2 lobel, String name, String value) {
             switch (name) {
                 case "Confidence":
                     lobel.setConfidence(value);
@@ -6063,7 +6085,7 @@ public class XmlResponsesSaxParser {
             }
         }
 
-        private LobelV2 getListLast(List<LobelV2> list) {
+        private LabelV2 getListLast(List<LabelV2> list) {
             return list.get(list.size() - 1);
         }
     }
