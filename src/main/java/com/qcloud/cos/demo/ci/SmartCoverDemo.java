@@ -39,7 +39,6 @@ public class SmartCoverDemo {
         request.getOperation().getOutput().setBucket("markjrzhang-1251704708");
         request.getOperation().getOutput().setRegion("ap-chongqing");
         request.getOperation().getOutput().setObject("SmartCover-${Number}.jpg");
-        request.setQueueId("p9900025e4ec44b5e8225e70a52170834");
         //3.调用接口,获取任务响应对象
         MediaJobResponse response = client.createMediaJobs(request);
         System.out.println(response);

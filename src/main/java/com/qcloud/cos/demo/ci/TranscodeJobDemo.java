@@ -67,7 +67,6 @@ public class TranscodeJobDemo {
         request.getOperation().getOutput().setBucket("demo-1234567890");
         request.getOperation().getOutput().setRegion("ap-chongqing");
         request.getOperation().getOutput().setObject("demo1.mp4");
-        request.setQueueId("p9900025e4ec44b5e8225e70a52170834");
         request.setCallBack("https://cloud.tencent.com/xxx");
         //3.调用接口,获取任务响应对象
         MediaJobResponse response = client.createMediaJobs(request);
@@ -120,7 +119,6 @@ public class TranscodeJobDemo {
         operation.getOutput().setBucket("demo-1234567890");
         operation.getOutput().setRegion("ap-chongqing");
         operation.getOutput().setObject("demo2.mp4");
-        request.setQueueId("p9900025e4ec44b5e8225e70a52170834");
         request.setCallBack("https://cloud.tencent.com/xxx");
         //3.调用接口,获取任务响应对象
         MediaJobResponse response = client.createMediaJobs(request);
@@ -153,7 +151,6 @@ public class TranscodeJobDemo {
         MediaJobsRequest request = new MediaJobsRequest();
         //2.添加请求参数 参数详情请见api接口文档
         request.setBucketName("demo-1234567890");
-        request.setQueueId("p9900025e4ec44b5e8225e70a521*****");
         request.setTag("Transcode");
         //3.调用接口,获取任务响应对象
         MediaListJobResponse response = client.describeMediaJobs(request);

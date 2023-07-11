@@ -40,8 +40,6 @@ public class FileProcessJobDemo {
         keyList.add("mark/pic-1.jpg");
         keyList.add("mark/pic-1.pdf");
 
-        request.setQueueId("p1ff062b35a494cf0ac4b572df22a5650");
-
         MediaOutputObject output = request.getOperation().getOutput();
         output.setBucket("demo-1234567890");
         output.setRegion("ap-shanghai");
@@ -66,7 +64,6 @@ public class FileProcessJobDemo {
         FileUnCompressConfig fileUnCompressConfig = request.getOperation().getFileUnCompressConfig();
         fileUnCompressConfig.setPrefix("output/");
         fileUnCompressConfig.setPrefixReplaced("1");
-        request.setQueueId("p1ff062b35a494cf0ac4b572df22a5650");
         MediaOutputObject output = request.getOperation().getOutput();
         output.setBucket("demo-1234567890");
         output.setRegion("ap-shanghai");
@@ -89,7 +86,6 @@ public class FileProcessJobDemo {
         FileHashCodeConfig fileHashCodeConfig = request.getOperation().getFileHashCodeConfig();
         fileHashCodeConfig.setType("MD5");
         fileHashCodeConfig.setAddToHeader("true");
-        request.setQueueId("p1ff062b35a494cf0ac4b572df22a5650");
         //3.调用接口,获取任务响应对象
         FileProcessJobResponse response = client.createFileProcessJob(request);
         System.out.println(response.getJobDetail().getJobId());

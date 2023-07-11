@@ -44,7 +44,6 @@ public class DocJobDemo {
         DocJobObject docJobObject = request.getDocJobObject();
         docJobObject.setTag("DocProcess");
         docJobObject.getInput().setObject("demo.docx");
-        docJobObject.setQueueId("pc02270c617ae4b6d9b0a52cb1c*****");
         DocProcessObject docProcessObject = docJobObject.getOperation().getDocProcessObject();
         docProcessObject.setQuality("100");
         docProcessObject.setZoom("100");
@@ -87,7 +86,6 @@ public class DocJobDemo {
         DocJobListRequest request = new DocJobListRequest();
         //2.添加请求参数 参数详情请见api接口文档
         request.setBucketName("examplebucket-1250000000");
-        request.setQueueId("pc02270c617ae4b6d9b0a52cb1c*****");
         request.setTag("DocProcess");
         request.setStartCreationTime("2020-12-10T16:20:07+0800");
         //3.调用接口,获取任务响应对象
@@ -118,27 +116,11 @@ public class DocJobDemo {
      */
     public static void processDocJob(COSClient client) throws InterruptedException {
         String bucketName = "demo-123456789";
-        //1.获取队列id,需要先开启文档预览功能。
-        DocQueueRequest queueRequest = new DocQueueRequest();
-        queueRequest.setBucketName(bucketName);
-        DocListQueueResponse response = client.describeDocProcessQueues(queueRequest);
-        List<MediaQueueObject> queueList = response.getQueueList();
-        String queueId = "";
-        if (queueList.size() != 0) {
-            MediaQueueObject mediaQueueObject = queueList.get(0);
-            queueId = mediaQueueObject.getQueueId();
-        } else {
-            System.out.println("获取队列失败");
-            return;
-        }
-        //2.发送文档预览任务
-        //2.1添加请求参数 参数详情请见api接口文档
         DocJobRequest request = new DocJobRequest();
         request.setBucketName(bucketName);
         DocJobObject docJobObject = request.getDocJobObject();
         docJobObject.setTag("DocProcess");
         docJobObject.getInput().setObject("1.pdf");
-        docJobObject.setQueueId(queueId);
         DocProcessObject docProcessObject = docJobObject.getOperation().getDocProcessObject();
         docProcessObject.setQuality("100");
         docProcessObject.setZoom("100");
@@ -148,14 +130,13 @@ public class DocJobDemo {
         output.setRegion(client.getClientConfig().getRegion().getRegionName());
         output.setBucket(bucketName);
         output.setObject("demo/pic-${Number}.jpg");
-        //2.2发送预览请求
         DocJobResponse docProcessJobs = client.createDocProcessJobs(request);
 
-        //3.轮询查询任务结果（也可以配置队列的回调url,使用回调接口获取任务结果）
         DocJobRequest docJobRequest = new DocJobRequest();
         docJobRequest.setBucketName(bucketName);
         String jobId = docProcessJobs.getJobsDetail().getJobId();
         docJobRequest.setJobId(jobId);
+        //生产环境不推荐使用轮询 建议配置回调
         while (true) {
             DocJobResponse docJobResponse = client.describeDocProcessJob(docJobRequest);
             String state = docJobResponse.getJobsDetail().getState();
