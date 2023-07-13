@@ -3157,6 +3157,7 @@ public class COSClient implements COS {
                 createRequest(bucketName, null, setBucketPolicyRequest, HttpMethodName.PUT);
         request.addParameter("policy", null);
         request.setContent(new ByteArrayInputStream(policyText.getBytes(StringUtils.UTF8)));
+        request.addHeader(Headers.CONTENT_LENGTH, String.valueOf(policyText.length()));
 
         invoke(request, voidCosResponseHandler);
     }
