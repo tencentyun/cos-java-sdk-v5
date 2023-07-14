@@ -4822,5 +4822,32 @@ public class COSClient implements COS {
         return true;
     }
 
+    @Override
+    public AuditingStrategyResponse addAuditingStrategy(AuditingStrategyRequest auditingStrategyRequest) {
+        rejectNull(auditingStrategyRequest,
+                "The request parameter must be specified setting the object tags");
+        rejectNull(auditingStrategyRequest.getBucketName(),
+                "The bucketName parameter must be specified setting the object tags");
+        CosHttpRequest<AuditingStrategyRequest> request = createRequest(auditingStrategyRequest.getBucketName(), "/audit/strategy", auditingStrategyRequest, HttpMethodName.POST);
+        addParameterIfNotNull(request,"service",auditingStrategyRequest.getService());
+        invoke(request, new Unmarshallers.AddAuditingStrategyUnmarshaller());
+        return null;
+    }
+
+    @Override
+    public AuditingStrategyResponse updateAuditingStrategy(AuditingStrategyRequest request) {
+        return null;
+    }
+
+    @Override
+    public AuditingStrategyResponse describeAuditingStrategy(AuditingStrategyRequest request) {
+        return null;
+    }
+
+    @Override
+    public AuditingStrategyResponse describeAuditingStrategyList(AuditingStrategyRequest request) {
+        return null;
+    }
+
 }
 

@@ -29,6 +29,7 @@ import com.qcloud.cos.internal.XmlResponsesSaxParser.CopyObjectResultHandler;
 import com.qcloud.cos.model.*;
 import com.qcloud.cos.model.bucketcertificate.BucketGetDomainCertificate;
 import com.qcloud.cos.model.ciModel.auditing.AudioAuditingResponse;
+import com.qcloud.cos.model.ciModel.auditing.AuditingStrategyResponse;
 import com.qcloud.cos.model.ciModel.auditing.BatchImageAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.DocumentAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.ImageAuditingResponse;
@@ -888,6 +889,15 @@ public class Unmarshallers {
             public AIGameRecResponse unmarshall(InputStream in) throws Exception {
                 return new XmlResponsesSaxParser()
                         .parseAIGameRecResponse(in).getResponse();
+            }
+    }
+
+    public static final class AddAuditingStrategyUnmarshaller
+                implements Unmarshaller<AuditingStrategyResponse, InputStream> {
+
+            public AuditingStrategyResponse unmarshall(InputStream in) throws Exception {
+                return new XmlResponsesSaxParser()
+                        .parseAuditingStrategyResponse(in).getResponse();
             }
     }
 

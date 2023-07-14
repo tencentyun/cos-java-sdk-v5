@@ -3203,6 +3203,11 @@ public interface COS extends COSDirectSpi {
     AIGameRecResponse aiGameRec(AIRecRequest request);
 
     Boolean cancelLiveAuditing(VideoAuditingRequest request);
+
+    AuditingStrategyResponse addAuditingStrategy(AuditingStrategyRequest request);
+    AuditingStrategyResponse updateAuditingStrategy(AuditingStrategyRequest request);
+    AuditingStrategyResponse describeAuditingStrategy(AuditingStrategyRequest request);
+    AuditingStrategyResponse describeAuditingStrategyList(AuditingStrategyRequest request);
 }
 
 
