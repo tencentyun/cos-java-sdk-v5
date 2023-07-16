@@ -34,7 +34,6 @@ import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.exception.MultiObjectDeleteException.DeleteError;
 import com.qcloud.cos.internal.cihandler.AIGameRecResponseHandler;
-import com.qcloud.cos.internal.cihandler.AddAuditingStrategyHandler;
 import com.qcloud.cos.internal.cihandler.AutoTranslationBlockResponseHandler;
 import com.qcloud.cos.internal.cihandler.BatchJobResponseHandler;
 import com.qcloud.cos.internal.cihandler.CIXmlResponsesSaxParser;
@@ -963,11 +962,6 @@ public class XmlResponsesSaxParser {
         return handler;
     }
 
-    public AddAuditingStrategyHandler parseAuditingStrategyResponse(InputStream in) {
-        AddAuditingStrategyHandler handler = new AddAuditingStrategyHandler();
-        handler.parseXmlInputStream()
-        return handler;
-    }
 
 
     /**

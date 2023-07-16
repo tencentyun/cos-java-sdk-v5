@@ -3207,7 +3207,21 @@ public interface COS extends COSDirectSpi {
     AuditingStrategyResponse addAuditingStrategy(AuditingStrategyRequest request);
     AuditingStrategyResponse updateAuditingStrategy(AuditingStrategyRequest request);
     AuditingStrategyResponse describeAuditingStrategy(AuditingStrategyRequest request);
-    AuditingStrategyResponse describeAuditingStrategyList(AuditingStrategyRequest request);
+    AuditingStrategyListResponse describeAuditingStrategyList(AuditingStrategyRequest request);
+
+    AuditingTextLibResponse addAuditingTextLib(AuditingTextLibRequest request);
+
+    AuditingTextLibResponse describeAuditingTextLib(AuditingTextLibRequest request);
+
+    AuditingTextLibResponse updateAuditingTextLib(AuditingTextLibRequest request);
+
+    AuditingTextLibResponse deleteAuditingTextLib(AuditingTextLibRequest request);
+
+    AuditingKeywordResponse addAuditingLibKeyWord(AuditingKeywordRequest request);
+
+    AuditingKeywordResponse describeAuditingKeyWordList(AuditingKeywordRequest request);
+
+    AuditingKeywordResponse deleteAuditingKeyWord(AuditingKeywordRequest request);
 }
 
 

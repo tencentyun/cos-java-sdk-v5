@@ -1,19 +1,13 @@
 package com.qcloud.cos.demo.ci;
 
 import com.qcloud.cos.COSClient;
-import com.qcloud.cos.internal.CosServiceRequest;
-import com.qcloud.cos.internal.converter.CIConverter;
+import com.qcloud.cos.model.ciModel.auditing.AuditingStrategyListResponse;
 import com.qcloud.cos.model.ciModel.auditing.AuditingStrategyRequest;
 import com.qcloud.cos.model.ciModel.auditing.AuditingStrategyResponse;
-import com.qcloud.cos.model.ciModel.auditing.StrategyAudioLabel;
 import com.qcloud.cos.model.ciModel.auditing.StrategyImageLabel;
 import com.qcloud.cos.model.ciModel.auditing.StrategyLabels;
-import com.qcloud.cos.model.ciModel.auditing.VideoAuditingRequest;
-import com.qcloud.cos.model.ciModel.auditing.VideoAuditingResponse;
 import com.qcloud.cos.utils.Jackson;
-import com.thoughtworks.xstream.XStream;
 
-import java.lang.reflect.Field;
 import java.util.List;
 
 /**
@@ -25,77 +19,83 @@ public class AuditingStrategyDemo {
         // 1 初始化用户身份信息（secretId, secretKey）。
         COSClient client = ClientUtils.getTestClient();
         // 2 调用要使用的方法。
-        addAuditingStrategy(client);
+        describeAuditingStrategyList(client);
     }
 
-
+    /**
+     * addAuditingStrategy 创建审核策略用于创建不同文件类型审核使用的策略，可以指定需要审核的标签。
+     * 该接口属于 POST 请求。
+     */
     public static void addAuditingStrategy(COSClient client) {
         AuditingStrategyRequest request = new AuditingStrategyRequest();
-        request.setName("mark1");
-        request.setService("aaa");
+        request.setBucketName("markjrzhang-1251704708");
+        request.setName("Strategy1");
+        request.setService("Image");
 
         StrategyLabels labels = request.getLabels();
-        StrategyAudioLabel audio = labels.getAudio();
-        List<String> pron = audio.getPron();
-        pron.add("Sexy");
-        pron.add("Sexuality");
-
         StrategyImageLabel image = labels.getImage();
         List<String> politics = image.getPolitics();
         politics.add("NegativeFigure");
         politics.add("ForeignLeaders");
-
-        List<String> textLibs = request.getTextLibs();
-        textLibs.add("aaaaa");
-        textLibs.add("bbbbb");
-
-
-        // 创建XStream对象
-        XStream xstream = new XStream();
-        xstream.processAnnotations(AuditingStrategyRequest.class);
-        Field[] fields = CosServiceRequest.class.getDeclaredFields();
-        for (Field field : fields) {
-            xstream.omitField(CosServiceRequest.class, field.getName());
-        }
-        String s = xstream.toXML(request);
-
 
         AuditingStrategyResponse response = client.addAuditingStrategy(request);
         System.out.println(Jackson.toJsonString(response));
     }
 
     /**
-     * describeLiveAuditingJob 接口用于查询直播审核任务。
-     *
-     * @param client
+     * describeAuditingStrategy 查询审核策略详情用于查询指定策略的详细信息，包括开启的标签等。
+     * 该接口属于 GET 请求。
      */
-    public static void describeLiveAuditingJob(COSClient client) throws InterruptedException {
+    public static void describeAuditingStrategy(COSClient client)  {
         //1.创建任务请求对象
-        VideoAuditingRequest request = new VideoAuditingRequest();
+        AuditingStrategyRequest request = new AuditingStrategyRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("demo-1234567890");
-        request.setJobId("avf8b813aa06a411ee80f45254004*****");
+        request.setBucketName("markjrzhang-1251704708");
+        request.setService("Image");
+        request.setBizType("15fd28fd233411ee871752540032dad3");
         //3.调用接口,获取任务响应对象
-        VideoAuditingResponse response = client.describeAuditingJob(request);
+        AuditingStrategyResponse response = client.describeAuditingStrategy(request);
         System.out.println(Jackson.toJsonString(response));
-
     }
 
     /**
-     * cancelMediaJob 取消直播审核
-     *
-     * @param client
+     * updateAuditingStrategy 修改审核策略用于修改已创建的策略的标签内容。
+     * 该接口属于 PUT 请求。
      */
-    public static void cancelLiveAuditing(COSClient client) {
+    public static void updateAuditingStrategy(COSClient client){
         //1.创建任务请求对象
-        VideoAuditingRequest request = new VideoAuditingRequest();
+        AuditingStrategyRequest request = new AuditingStrategyRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("demo-1234567890");
-        request.setJobId("avf8b813aa06a411ee80f45254004*****");
+        request.setBucketName("markjrzhang-1251704708");
+        request.setService("Image");
+        request.setBizType("15fd28fd233411ee871752540032dad3");
+        StrategyLabels labels = request.getLabels();
+        StrategyImageLabel image = labels.getImage();
+        List<String> politics = image.getPolitics();
+        politics.add("NegativeFigure");
+        politics.add("ForeignLeaders");
+
+        List<String> pron = image.getPron();
+        pron.add("Sexy");
+        pron.add("OcrText");
         //3.调用接口,获取任务响应对象
-        Boolean response = client.cancelLiveAuditing(request);
-        System.out.println(response);
+        AuditingStrategyResponse response = client.updateAuditingStrategy(request);
+        System.out.println(Jackson.toJsonString(response));
     }
 
+    /**
+     * describeAuditingStrategyList 查询审核策略列表用于按条件查询符合的策略集合。该接口属于 GET 请求。
+     * 该接口属于 GET 请求。
+     */
+    public static void describeAuditingStrategyList(COSClient client)  {
+        //1.创建任务请求对象
+        AuditingStrategyRequest request = new AuditingStrategyRequest();
+        //2.添加请求参数 参数详情请见api接口文档
+        request.setBucketName("markjrzhang-1251704708");
+        request.setService("Image");
+        //3.调用接口,获取任务响应对象
+        AuditingStrategyListResponse response = client.describeAuditingStrategyList(request);
+        System.out.println(Jackson.toJsonString(response));
+    }
 
 }

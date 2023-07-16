@@ -19,12 +19,16 @@
 
 package com.qcloud.cos.internal;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamOmitField;
+
 public class CIServiceRequest extends CosServiceRequest {
     /**
      * BucketName e.g：bucketName-1234567
      */
+    @XStreamOmitField
     private String bucketName;
-
+    @XStreamAlias("RequestId")
     private String requestId;
 
     public String getBucketName() {

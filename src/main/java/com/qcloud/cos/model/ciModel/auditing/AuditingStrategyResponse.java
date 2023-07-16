@@ -5,18 +5,22 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 @XStreamAlias("Response")
 public class AuditingStrategyResponse extends CiServiceResult {
-    @XStreamAlias("RequestId")
-    private String requestId;
     @XStreamAlias("BizType")
     private String bizType;
+    @XStreamAlias("Strategy")
+    private AuditingStrategy strategy;
 
-    public String getRequestId() {
-        return requestId;
+    public AuditingStrategy getStrategy() {
+        if (strategy == null) {
+            strategy = new AuditingStrategy();
+        }
+        return strategy;
     }
 
-    public void setRequestId(String requestId) {
-        this.requestId = requestId;
+    public void setStrategy(AuditingStrategy strategy) {
+        this.strategy = strategy;
     }
+
 
     public String getBizType() {
         return bizType;

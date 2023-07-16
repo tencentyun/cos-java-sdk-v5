@@ -17,6 +17,13 @@ public class AuditingStrategyRequest extends CIServiceRequest {
     private StrategyLabels labels;
     @XStreamImplicit(itemFieldName = "TextLibs")
     private List<String> textLibs;
+    @XStreamAlias("BizType")
+    private String bizType;
+    @XStreamAlias("Offset")
+    private Integer offset;
+    @XStreamAlias("Limit")
+    private Integer limit;
+
 
     public String getName() {
         return name;
@@ -54,5 +61,29 @@ public class AuditingStrategyRequest extends CIServiceRequest {
 
     public void setService(String service) {
         this.service = service;
+    }
+
+    public String getBizType() {
+        return bizType;
+    }
+
+    public void setBizType(String bizType) {
+        this.bizType = bizType;
+    }
+
+    public Integer getOffset() {
+        return offset;
+    }
+
+    public void setOffset(Integer offset) {
+        this.offset = offset;
+    }
+
+    public Integer getLimit() {
+        return limit;
+    }
+
+    public void setLimit(Integer limit) {
+        this.limit = limit;
     }
 }
