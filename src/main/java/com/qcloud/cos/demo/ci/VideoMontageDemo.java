@@ -58,7 +58,6 @@ public class VideoMontageDemo {
         operation.getOutput().setBucket("demobucket-1234567890");
         operation.getOutput().setRegion("ap-chongqing");
         operation.getOutput().setObject("Montage.mp4");
-        request.setQueueId("p9900025e4ec44b5e8225e70a52170834");
         //3.调用接口,获取任务响应对象
         MediaJobResponse response = client.createMediaJobs(request);
         System.out.println(response);

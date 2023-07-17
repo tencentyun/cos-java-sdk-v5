@@ -75,7 +75,6 @@ public class VideoEnhanceJobDemo {
         request.getOperation().getOutput().setBucket("demo-1234567890");
         request.getOperation().getOutput().setRegion("ap-chongqing");
         request.getOperation().getOutput().setObject("VideoEnhance.mp4");
-        request.setQueueId("p9900025e4ec44b5e8225e70a52170834");
         request.setCallBack("https://cloud.tencent.com/xxx");
         //3.调用接口,获取任务响应对象
         MediaJobResponse response = client.createMediaJobs(request);

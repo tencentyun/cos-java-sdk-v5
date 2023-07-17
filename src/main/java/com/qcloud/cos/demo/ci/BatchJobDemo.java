@@ -50,7 +50,6 @@ public class BatchJobDemo {
         request.setType("Job");
         request.getInput().setPrefix("media/");
         BatchJobOperation operation = request.getOperation();
-        operation.setQueueId("p9900025e4ec44b5e8225e70a52170834");
         operation.setTag("Transcode");
         operation.getJobParam().setTemplateId("t0e2b9f4cd25184c6ab73d0c85a6ee9cb5");
         MediaOutputObject output = operation.getOutput();
@@ -74,7 +73,6 @@ public class BatchJobDemo {
         request.setType("Job");
         request.getInput().setPrefix("mark1/1");
         BatchJobOperation operation = request.getOperation();
-        operation.setQueueId("p86ede0188f844ac99d50f5fa63005237");
         operation.setTag("PicProcess");
         MediaPicProcessTemplateObject picProcess = operation.getJobParam().getPicProcess();
         picProcess.setIsPicInfo("true");

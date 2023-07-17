@@ -31,6 +31,7 @@ import com.qcloud.cos.model.ciModel.job.MediaTranscodeVideoObject;
 import com.qcloud.cos.model.ciModel.job.MediaTtsConfig;
 import com.qcloud.cos.model.ciModel.job.MediaVideoObject;
 import com.qcloud.cos.model.ciModel.job.MsSharpen;
+import com.qcloud.cos.model.ciModel.job.QualityEstimateConfig;
 import com.qcloud.cos.model.ciModel.job.SDRtoHDR;
 import com.qcloud.cos.model.ciModel.job.Subtitle;
 import com.qcloud.cos.model.ciModel.job.Subtitles;
@@ -233,7 +234,17 @@ public class CIMediaXmlFactory {
         addVideoEnhance(xml, operation.getVideoEnhance());
         addSubtitles(xml, operation.getSubtitles());
         addVideoTag(xml, operation.getVideoTag());
+        addQualityEstimateConfig(xml,operation.getQualityEstimateConfig());
         xml.end();
+    }
+
+    private static void addQualityEstimateConfig(XmlWriter xml, QualityEstimateConfig qec) {
+        if (objIsNotValid(qec)) {
+            xml.start("QualityEstimateConfig");
+            addIfNotNull(xml, "Mode", qec.getMode());
+            addIfNotNull(xml, "Rotate", qec.getRotate());
+            xml.end();
+        }
     }
 
     private static void addVideoTag(XmlWriter xml, VideoTag videoTag) {

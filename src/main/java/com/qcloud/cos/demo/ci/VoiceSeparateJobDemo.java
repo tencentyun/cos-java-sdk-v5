@@ -46,7 +46,6 @@ public class VoiceSeparateJobDemo {
         output.setRegion("ap-chongqing");
         output.setObject("demo.mp3");
         output.setAuObject("au.mp3");
-        request.setQueueId("p9900025e4ec44b5e8225e70a52170834");
         request.setCallBack("https://cloud.tencent.com/xxx");
         //3.调用接口,获取任务响应对象
         MediaJobResponse response = client.createMediaJobs(request);

@@ -41,7 +41,6 @@ public class PicProcessJobDemo {
         request.getOperation().getOutput().setObject("2.png");
         request.getOperation().getPicProcess().setProcessRule("imageMogr2/rotate/90");
         request.getOperation().getPicProcess().setIsPicInfo("true");
-        request.setQueueId("p86ede0188f844ac99d50f5fa63005237");
         request.setCallBack("https://cloud.tencent.com/xxx");
         //3.调用接口,获取任务响应对象
         MediaJobResponse response = client.createPicProcessJob(request);
@@ -74,7 +73,6 @@ public class PicProcessJobDemo {
         MediaJobsRequest request = new MediaJobsRequest();
         //2.添加请求参数 参数详情请见api接口文档
         request.setBucketName("demo-1234567890");
-        request.setQueueId("p9900025e4ec44b5e8225e70a5217****");
         request.setTag("PicProcess");
         //3.调用接口,获取任务响应对象
         MediaListJobResponse response = client.describeMediaJobs(request);

@@ -53,6 +53,8 @@ public class MediaJobOperation {
     private Subtitles subtitles = new Subtitles();
     private VideoTag videoTag = new VideoTag();
     private VideoTagResult videoTagResult = new VideoTagResult();
+    private QualityEstimateConfig qualityEstimateConfig = new QualityEstimateConfig();
+    private QualityEstimate qualityEstimate = new QualityEstimate();
 
     public MediaTimeIntervalObject getTimeInterval() {
         return timeInterval;
@@ -391,6 +393,25 @@ public class MediaJobOperation {
         this.videoTagResult = videoTagResult;
     }
 
+    public QualityEstimateConfig getQualityEstimateConfig() {
+        return qualityEstimateConfig;
+    }
+
+    public void setQualityEstimateConfig(QualityEstimateConfig qualityEstimateConfig) {
+        this.qualityEstimateConfig = qualityEstimateConfig;
+    }
+
+    public QualityEstimate getQualityEstimate() {
+        if (qualityEstimate == null) {
+            qualityEstimate = new QualityEstimate();
+        }
+        return qualityEstimate;
+    }
+
+    public void setQualityEstimate(QualityEstimate qualityEstimate) {
+        this.qualityEstimate = qualityEstimate;
+    }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("MediaJobOperation{");
@@ -399,6 +420,11 @@ public class MediaJobOperation {
         sb.append(", UserData='").append(UserData).append('\'');
         sb.append(", templateName='").append(templateName).append('\'');
         sb.append(", decryptKey='").append(decryptKey).append('\'');
+        sb.append(", decryptIv='").append(decryptIv).append('\'');
+        sb.append(", decryptMode='").append(decryptMode).append('\'');
+        sb.append(", encryptKey='").append(encryptKey).append('\'');
+        sb.append(", encryptIv='").append(encryptIv).append('\'');
+        sb.append(", encryptMode='").append(encryptMode).append('\'');
         sb.append(", output=").append(output);
         sb.append(", mediaAnimation=").append(mediaAnimation);
         sb.append(", mediaInfo=").append(mediaInfo);
@@ -421,6 +447,13 @@ public class MediaJobOperation {
         sb.append(", voiceSeparate=").append(voiceSeparate);
         sb.append(", timeInterval=").append(timeInterval);
         sb.append(", ttsConfig=").append(ttsConfig);
+        sb.append(", videoEnhance=").append(videoEnhance);
+        sb.append(", ttsTpl=").append(ttsTpl);
+        sb.append(", subtitles=").append(subtitles);
+        sb.append(", videoTag=").append(videoTag);
+        sb.append(", videoTagResult=").append(videoTagResult);
+        sb.append(", qualityEstimateConfig=").append(qualityEstimateConfig);
+        sb.append(", qualityEstimate=").append(qualityEstimate);
         sb.append('}');
         return sb.toString();
     }

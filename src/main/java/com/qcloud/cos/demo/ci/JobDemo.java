@@ -130,7 +130,6 @@ public class JobDemo {
         MediaJobsRequest request = new MediaJobsRequest();
         //2.添加请求参数 参数详情请见api接口文档
         request.setBucketName("DemoBucket-123456789");
-        request.setQueueId("p9900025e4ec44b5e8225e70a5217****");
         request.setTag("Transcode");
         //3.调用接口,获取任务响应对象
         MediaListJobResponse response = client.describeMediaJobs(request);

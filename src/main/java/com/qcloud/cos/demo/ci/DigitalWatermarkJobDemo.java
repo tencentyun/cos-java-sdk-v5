@@ -44,7 +44,6 @@ public class DigitalWatermarkJobDemo {
         operation.getOutput().setBucket("DemoBucket-1234567890");
         operation.getOutput().setRegion("ap-chongqing");
         operation.getOutput().setObject("DigitalWatermark.mp4");
-        request.setQueueId("p9900025e4ec44b5e8225e70a521*****");
         //3.调用接口,获取任务响应对象
         MediaJobResponse response = client.createMediaJobs(request);
         System.out.println(response);
@@ -76,7 +75,6 @@ public class DigitalWatermarkJobDemo {
         MediaJobsRequest request = new MediaJobsRequest();
         //2.添加请求参数 参数详情请见api接口文档
         request.setBucketName("DemoBucket-1234567890");
-        request.setQueueId("p9900025e4ec44b5e8225e70a521*****");
         request.setTag("DigitalWatermark");
         //3.调用接口,获取任务响应对象
         MediaListJobResponse response = client.describeMediaJobs(request);

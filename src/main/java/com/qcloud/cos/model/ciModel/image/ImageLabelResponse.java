@@ -13,16 +13,16 @@ public class ImageLabelResponse {
     /**
      * 对象在cos中的相对位置，例如 demo/picture.jpg
      */
-    private List<Lobel> recognitionResult;
+    private List<Label> recognitionResult;
 
-    public List<Lobel> getRecognitionResult() {
+    public List<Label> getRecognitionResult() {
         if (recognitionResult == null) {
             recognitionResult = new ArrayList<>();
         }
         return recognitionResult;
     }
 
-    public void setRecognitionResult(List<Lobel> recognitionResult) {
+    public void setRecognitionResult(List<Label> recognitionResult) {
         this.recognitionResult = recognitionResult;
     }
 

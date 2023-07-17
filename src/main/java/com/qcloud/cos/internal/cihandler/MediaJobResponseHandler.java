@@ -2,6 +2,7 @@ package com.qcloud.cos.internal.cihandler;
 
 import com.qcloud.cos.internal.ParserMediaInfoUtils;
 import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
+import com.qcloud.cos.model.ciModel.job.DetailedResult;
 import com.qcloud.cos.model.ciModel.job.ExtractDigitalWatermark;
 import com.qcloud.cos.model.ciModel.job.Md5Info;
 import com.qcloud.cos.model.ciModel.job.MediaAudioMixObject;
@@ -24,9 +25,11 @@ import com.qcloud.cos.model.ciModel.job.MediaTranscodeVideoObject;
 import com.qcloud.cos.model.ciModel.job.MediaVideoObject;
 import com.qcloud.cos.model.ciModel.job.OutputFile;
 import com.qcloud.cos.model.ciModel.job.ProcessResult;
+import com.qcloud.cos.model.ciModel.job.QualityEstimateItem;
 import com.qcloud.cos.model.ciModel.job.Subtitle;
 import com.qcloud.cos.model.ciModel.job.Subtitles;
 import com.qcloud.cos.model.ciModel.job.VideoTargetRec;
+import com.qcloud.cos.model.ciModel.job.VqaPlusResult;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaFormat;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoAudio;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoSubtitle;
@@ -78,6 +81,16 @@ public class MediaJobResponseHandler extends CIAbstractHandler {
         } else if (in("Response", "JobsDetail", "Operation", "Subtitles") && "Subtitle".equalsIgnoreCase(name)) {
             List<Subtitle> subtitle = response.getJobsDetail().getOperation().getSubtitles().getSubtitle();
             subtitle.add(new Subtitle());
+        } else if (in("Response", "JobsDetail", "Operation", "QualityEstimate", "VqaPlusResult") && "DetailedResult".equalsIgnoreCase(name)) {
+            List<DetailedResult> detailedResults = response.getJobsDetail().getOperation().getQualityEstimate().getVqaPlusResult().getDetailedResults();
+            detailedResults.add(new DetailedResult());
+        } else if (in("Response", "JobsDetail", "Operation", "QualityEstimate", "VqaPlusResult", "DetailedResult") && "Items".equalsIgnoreCase(name)) {
+            List<DetailedResult> detailedResults = response.getJobsDetail().getOperation().getQualityEstimate().getVqaPlusResult().getDetailedResults();
+            if (!detailedResults.isEmpty()) {
+                DetailedResult detailedResult = detailedResults.get(detailedResults.size() - 1);
+                List<QualityEstimateItem> items = detailedResult.getItems();
+                items.add(new QualityEstimateItem());
+            }
         }
     }
 
@@ -363,7 +376,42 @@ public class MediaJobResponseHandler extends CIAbstractHandler {
             ParserMediaInfoUtils.ParsingSubtitles(jobsDetail.getOperation().getSubtitles(), name, getText());
         } else if (in("Response", "JobsDetail", "Operation", "VideoTag")) {
             ParserMediaInfoUtils.ParseVideoTag(jobsDetail.getOperation().getVideoTag(), name, getText());
+        } else if (in("Response", "JobsDetail", "Operation", "QualityEstimateConfig")) {
+            ParserMediaInfoUtils.ParseQualityEstimateConfig(jobsDetail.getOperation().getQualityEstimateConfig(), name, getText());
+        } else if (in("Response", "JobsDetail", "Operation", "QualityEstimate")) {
+            ParserMediaInfoUtils.ParseQualityEstimate(jobsDetail.getOperation().getQualityEstimate(), name, getText());
+        } else if (in("Response", "JobsDetail", "Operation", "QualityEstimate")) {
+            if ("Score".equalsIgnoreCase(name)) jobsDetail.getOperation().getQualityEstimate().setScore(getText());
+        } else if (in("Response", "JobsDetail", "Operation", "QualityEstimate", "VqaPlusResult")) {
+            ParserMediaInfoUtils.ParseVqaPlusResult(jobsDetail.getOperation().getQualityEstimate().getVqaPlusResult(), name, getText());
+        } else if (in("Response", "JobsDetail", "Operation", "QualityEstimate", "VqaPlusResult", "DetailedResult")) {
+            DetailedResult detailedResult = getDetailedResult(jobsDetail);
+            ParserMediaInfoUtils.ParseDetailedResult(detailedResult, name, getText());
+        } else if (in("Response", "JobsDetail", "Operation", "QualityEstimate", "VqaPlusResult", "DetailedResult", "Items")) {
+            DetailedResult detailedResult = getDetailedResult(jobsDetail);
+            QualityEstimateItem qualityEstimateItem = getQualityEstimateItem(detailedResult.getItems());
+            ParserMediaInfoUtils.ParseQualityEstimateItem(qualityEstimateItem, name, getText());
+        } else if (in("Response", "JobsDetail", "Operation", "QualityEstimate", "VqaPlusResult", "DetailedResult", "Items", "AreaCoordSet")) {
+            DetailedResult detailedResult = getDetailedResult(jobsDetail);
+            QualityEstimateItem qualityEstimateItem = getQualityEstimateItem(detailedResult.getItems());
+            List<String> areaCoordSet = qualityEstimateItem.getAreaCoordSet();
+            areaCoordSet.add(getText());
         }
+    }
+
+    private DetailedResult getDetailedResult(MediaJobObject jobsDetail) {
+        List<DetailedResult> detailedResults = jobsDetail.getOperation().getQualityEstimate().getVqaPlusResult().getDetailedResults();
+        if (!detailedResults.isEmpty()) {
+            return detailedResults.get(detailedResults.size() - 1);
+        }
+        return new DetailedResult();
+    }
+
+    private QualityEstimateItem getQualityEstimateItem(List<QualityEstimateItem> items) {
+        if (!items.isEmpty()) {
+            return items.get(items.size() - 1);
+        }
+        return new QualityEstimateItem();
     }
 
     public MediaJobResponse getResponse() {
