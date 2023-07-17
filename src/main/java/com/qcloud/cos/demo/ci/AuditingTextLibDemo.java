@@ -14,7 +14,7 @@ public class AuditingTextLibDemo {
         // 1 初始化用户身份信息（secretId, secretKey）。
         COSClient client = ClientUtils.getTestClient();
         // 2 调用要使用的方法。
-        describeAuditingTextLib(client);
+        addAuditingTextLib(client);
     }
 
     /**
@@ -23,7 +23,7 @@ public class AuditingTextLibDemo {
      */
     public static void addAuditingTextLib(COSClient client) {
         AuditingTextLibRequest request = new AuditingTextLibRequest();
-        request.setBucketName("markjrzhang-1251704708");
+        request.setBucketName("chongqingtest-1259788808");
         request.setLibName("TextLib1");
         request.setMatchType("Exact");
         request.setSuggestion("Block");
@@ -41,7 +41,7 @@ public class AuditingTextLibDemo {
         //1.创建任务请求对象
         AuditingTextLibRequest request = new AuditingTextLibRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("markjrzhang-1251704708");
+        request.setBucketName("demo-123467890");
         request.setLimit(10);
         //3.调用接口,获取任务响应对象
         AuditingTextLibResponse response = client.describeAuditingTextLib(request);
@@ -56,8 +56,11 @@ public class AuditingTextLibDemo {
         //1.创建任务请求对象
         AuditingTextLibRequest request = new AuditingTextLibRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("markjrzhang-1251704708");
-        request.setLibid("");
+        request.setBucketName("demo-123467890");
+        request.setLibid("067a9359-9d10-4521-a19c-43b9a1c7*****");
+        request.setLibName("TextLib2");
+        request.setMatchType("Exact");
+        request.setSuggestion("Block");
         //3.调用接口,获取任务响应对象
         AuditingTextLibResponse response = client.updateAuditingTextLib(request);
         System.out.println(Jackson.toJsonString(response));
@@ -70,9 +73,9 @@ public class AuditingTextLibDemo {
     public static void deleteAuditingTextLib(COSClient client){
         //1.创建任务请求对象
         AuditingTextLibRequest request = new AuditingTextLibRequest();
-        request.setBucketName("markjrzhang-1251704708");
+        request.setBucketName("demo-123467890");
         //2.添加请求参数 参数详情请见api接口文档
-        request.setLibid("c3caf149-12fc-4a84-8389-e47c34b27e66");
+        request.setLibid("20a9d0e8-416e-4df8-9091-43b4a35*****");
         //3.调用接口,获取任务响应对象
         AuditingTextLibResponse response = client.deleteAuditingTextLib(request);
         System.out.println(Jackson.toJsonString(response));

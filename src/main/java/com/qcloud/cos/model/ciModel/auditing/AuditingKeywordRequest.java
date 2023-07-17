@@ -96,4 +96,5 @@ public class AuditingKeywordRequest extends CIServiceRequest {
     public void setKeywords(List<AuditingKeyword> keywords) {
         this.keywords = keywords;
     }
+
 }

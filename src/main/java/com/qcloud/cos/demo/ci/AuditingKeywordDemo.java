@@ -4,8 +4,6 @@ import com.qcloud.cos.COSClient;
 import com.qcloud.cos.model.ciModel.auditing.AuditingKeyword;
 import com.qcloud.cos.model.ciModel.auditing.AuditingKeywordRequest;
 import com.qcloud.cos.model.ciModel.auditing.AuditingKeywordResponse;
-import com.qcloud.cos.model.ciModel.auditing.AuditingTextLibRequest;
-import com.qcloud.cos.model.ciModel.auditing.AuditingTextLibResponse;
 import com.qcloud.cos.utils.Jackson;
 
 import java.util.List;
@@ -28,8 +26,8 @@ public class AuditingKeywordDemo {
      */
     public static void addAuditingLibKeyWord(COSClient client) {
         AuditingKeywordRequest request = new AuditingKeywordRequest();
-        request.setBucketName("markjrzhang-1251704708");
-        request.setLibId("d88a9e0f-6741-40db-a2c2-c2dbca4da4de");
+        request.setBucketName("demo-1234567890");
+        request.setLibId("e469c64b-0b74-4c56-a35e-c5e8c08*****");
         List<AuditingKeyword> keywords = request.getKeywords();
         AuditingKeyword keyword = new AuditingKeyword();
         keyword.setContent("demoContent1");
@@ -47,36 +45,31 @@ public class AuditingKeywordDemo {
     }
 
     /**
-     * describeAuditingKeyWordList 添加文本库关键词用于向指定的文本库中添加关键词
+     * describeAuditingKeyWordList 查询文本库关键词
      * 该接口属于 GET 请求。
      */
     public static void describeAuditingKeyWordList(COSClient client) {
         AuditingKeywordRequest request = new AuditingKeywordRequest();
-        request.setBucketName("markjrzhang-1251704708");
-        request.setLibId("d88a9e0f-6741-40db-a2c2-c2dbca4da4de");
+        request.setBucketName("demo-1234567890");
+        request.setLibId("e469c64b-0b74-4c56-a35e-c5e8c08*****");
         AuditingKeywordResponse response = client.describeAuditingKeyWordList(request);
         System.out.println(Jackson.toJsonString(response));
     }
 
     /**
-     * describeAuditingKeyWordList 添加文本库关键词用于向指定的文本库中添加关键词
-     * 该接口属于 GET 请求。
+     * deleteAuditingKeyWordList 批量删除文本库关键词
+     * 该接口属于 DELETE 请求。
      */
     public static void deleteAuditingKeyWordList(COSClient client) {
         AuditingKeywordRequest request = new AuditingKeywordRequest();
-        request.setBucketName("markjrzhang-1251704708");
-        request.setLibId("d88a9e0f-6741-40db-a2c2-c2dbca4da4de");
+        request.setBucketName("demo-1234567890");
+        request.setLibId("e469c64b-0b74-4c56-a35e-c5e8c08*****");
 
         List<String> keywordIDs = request.getKeywordIDs();
-        keywordIDs.add("数据万象");
-        keywordIDs.add("10872263");
-        keywordIDs.add("10872260");
-        keywordIDs.add("10872261");
+        keywordIDs.add("10884372");
+        keywordIDs.add("10884373");
         AuditingKeywordResponse response = client.deleteAuditingKeyWord(request);
         System.out.println(Jackson.toJsonString(response));
     }
-
-
-
 
 }

@@ -4929,7 +4929,7 @@ public class COSClient implements COS {
     @Override
     public AuditingKeywordResponse deleteAuditingKeyWord(AuditingKeywordRequest keywordRequest) {
         rejectNull(keywordRequest, "The request parameter must be specified setting the object tags");
-        CosHttpRequest<AuditingKeywordRequest> request = createRequest(keywordRequest.getBucketName(), "/audit/textlib/" + keywordRequest.getLibId() +"/keyword", keywordRequest, HttpMethodName.DELETE);
+        CosHttpRequest<AuditingKeywordRequest> request = createRequest(keywordRequest.getBucketName(), "/audit/textlib/" + keywordRequest.getLibId() +"/deletekeyword", keywordRequest, HttpMethodName.POST);
         this.setContent(request, CIAuditingXmlFactoryV2.convertToXmlByteArray(keywordRequest), "application/xml", false);
         return invoke(request, new Unmarshallers.CICommonUnmarshaller<AuditingKeywordResponse>(AuditingKeywordResponse.class));
     }

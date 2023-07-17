@@ -6,8 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BaseStrategyLabel {
-    @XStreamImplicit(itemFieldName = "Pron")
-    private List<String> pron;
+    @XStreamImplicit(itemFieldName = "Porn")
+    private List<String> porn;
     @XStreamImplicit(itemFieldName = "Politics")
     private List<String> politics;
     @XStreamImplicit(itemFieldName = "Terrorism")
@@ -19,15 +19,15 @@ public class BaseStrategyLabel {
     @XStreamImplicit(itemFieldName = "Illegal")
     private List<String> illegal;
 
-    public List<String> getPron() {
-        if (pron == null) {
-            pron = new ArrayList<>();
+    public List<String> getPorn() {
+        if (porn == null) {
+            porn = new ArrayList<>();
         }
-        return pron;
+        return porn;
     }
 
-    public void setPron(List<String> pron) {
-        this.pron = pron;
+    public void setPorn(List<String> porn) {
+        this.porn = porn;
     }
 
     public List<String> getPolitics() {

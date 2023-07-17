@@ -19,7 +19,7 @@ public class AuditingStrategyDemo {
         // 1 初始化用户身份信息（secretId, secretKey）。
         COSClient client = ClientUtils.getTestClient();
         // 2 调用要使用的方法。
-        describeAuditingStrategyList(client);
+        addAuditingStrategy(client);
     }
 
     /**
@@ -28,7 +28,7 @@ public class AuditingStrategyDemo {
      */
     public static void addAuditingStrategy(COSClient client) {
         AuditingStrategyRequest request = new AuditingStrategyRequest();
-        request.setBucketName("markjrzhang-1251704708");
+        request.setBucketName("demo-1234567890");
         request.setName("Strategy1");
         request.setService("Image");
 
@@ -50,9 +50,9 @@ public class AuditingStrategyDemo {
         //1.创建任务请求对象
         AuditingStrategyRequest request = new AuditingStrategyRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("markjrzhang-1251704708");
+        request.setBucketName("demo-1234567890");
         request.setService("Image");
-        request.setBizType("15fd28fd233411ee871752540032dad3");
+        request.setBizType("1418ef31246a11eebdef52540032dad3");
         //3.调用接口,获取任务响应对象
         AuditingStrategyResponse response = client.describeAuditingStrategy(request);
         System.out.println(Jackson.toJsonString(response));
@@ -66,16 +66,16 @@ public class AuditingStrategyDemo {
         //1.创建任务请求对象
         AuditingStrategyRequest request = new AuditingStrategyRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("markjrzhang-1251704708");
+        request.setBucketName("demo-1234567890");
         request.setService("Image");
-        request.setBizType("15fd28fd233411ee871752540032dad3");
+        request.setBizType("1418ef31246a11eebdef52540032dad3");
         StrategyLabels labels = request.getLabels();
         StrategyImageLabel image = labels.getImage();
         List<String> politics = image.getPolitics();
         politics.add("NegativeFigure");
         politics.add("ForeignLeaders");
 
-        List<String> pron = image.getPron();
+        List<String> pron = image.getPorn();
         pron.add("Sexy");
         pron.add("OcrText");
         //3.调用接口,获取任务响应对象
@@ -84,14 +84,14 @@ public class AuditingStrategyDemo {
     }
 
     /**
-     * describeAuditingStrategyList 查询审核策略列表用于按条件查询符合的策略集合。该接口属于 GET 请求。
+     * describeAuditingStrategyList 查询审核策略列表
      * 该接口属于 GET 请求。
      */
     public static void describeAuditingStrategyList(COSClient client)  {
         //1.创建任务请求对象
         AuditingStrategyRequest request = new AuditingStrategyRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("markjrzhang-1251704708");
+        request.setBucketName("demo-1234567890");
         request.setService("Image");
         //3.调用接口,获取任务响应对象
         AuditingStrategyListResponse response = client.describeAuditingStrategyList(request);

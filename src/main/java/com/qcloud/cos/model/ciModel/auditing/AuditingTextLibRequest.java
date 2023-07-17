@@ -3,6 +3,7 @@ package com.qcloud.cos.model.ciModel.auditing;
 import com.qcloud.cos.internal.CIServiceRequest;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
+import com.thoughtworks.xstream.annotations.XStreamOmitField;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +31,7 @@ public class AuditingTextLibRequest extends CIServiceRequest {
      * 自定义文本库的ID，填写则表示查询指定的文本库信息。
      * 不填写则表示查询当前账号下的文本库列表。
      */
-    @XStreamAlias("Libid")
+    @XStreamOmitField
     private String libid;
     /**
      * 查询列表的起始位置，表示从该条开始查询后续的文本库，默认为0。当未使用libid时生效。
