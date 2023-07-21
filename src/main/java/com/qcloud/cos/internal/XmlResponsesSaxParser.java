@@ -5938,19 +5938,22 @@ public class XmlResponsesSaxParser {
         @Override
         protected void doEndElement(String uri, String name, String qName) {
             List<Label> list = response.getRecognitionResult();
+            if (list.isEmpty()) {
+                return;
+            }
             Label label = list.get(list.size() - 1);
             if (in("RecognitionResult", "Labels")) {
                 addLabel(label, name, getText());
             } else if (in("RecognitionResult", "AlbumLabels", "Labels")) {
                 label.setLabelName("AlbumLabels");
                 addLabel(label, name, getText());
-            }else if (in("RecognitionResult", "WebLabels", "Labels")) {
+            } else if (in("RecognitionResult", "WebLabels", "Labels")) {
                 label.setLabelName("WebLabels");
                 addLabel(label, name, getText());
-            }else if (in("RecognitionResult", "CameraLabels", "Labels")) {
+            } else if (in("RecognitionResult", "CameraLabels", "Labels")) {
                 label.setLabelName("CameraLabels");
                 addLabel(label, name, getText());
-            }else if (in("RecognitionResult", "NewsLabels", "Labels")) {
+            } else if (in("RecognitionResult", "NewsLabels", "Labels")) {
                 label.setLabelName("NewsLabels");
                 addLabel(label, name, getText());
             }
