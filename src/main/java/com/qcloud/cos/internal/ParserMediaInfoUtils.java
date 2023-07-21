@@ -753,6 +753,9 @@ public class ParserMediaInfoUtils {
             case "Duration":
                 sectionInfo.setDuration(value);
                 break;
+           case "SubLabel":
+                sectionInfo.setSubLabel(value);
+                break;
             default:
                 break;
         }

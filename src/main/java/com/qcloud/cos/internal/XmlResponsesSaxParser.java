@@ -6196,25 +6196,7 @@ public class XmlResponsesSaxParser {
         }
 
         private void parseInfo(AudtingCommonInfo obj, String name, String value) {
-            switch (name) {
-                case "Code":
-                    obj.setCode(value);
-                    break;
-                case "HitFlag":
-                    obj.setHitFlag(getText());
-                    break;
-                case "Score":
-                    obj.setScore(getText());
-                    break;
-                case "Keywords":
-                    obj.setKeywords(getText());
-                    break;
-                case "Count":
-                    obj.setCount(getText());
-                    break;
-                default:
-                    break;
-            }
+            ParserMediaInfoUtils.ParsingAuditingCommonInfo(obj,name,value);
         }
     }
 
@@ -6336,28 +6318,7 @@ public class XmlResponsesSaxParser {
         }
 
         private void parseInfo(AudtingCommonInfo obj, String name, String value) {
-            switch (name) {
-                case "Code":
-                    obj.setCode(value);
-                    break;
-                case "HitFlag":
-                    obj.setHitFlag(getText());
-                    break;
-                case "Score":
-                    obj.setScore(getText());
-                    break;
-                case "Keywords":
-                    obj.setKeywords(getText());
-                    break;
-                case "Label":
-                    obj.setLabel(getText());
-                    break;
-                case "Count":
-                    obj.setCount(getText());
-                    break;
-                default:
-                    break;
-            }
+            ParserMediaInfoUtils.ParsingAuditingCommonInfo(obj,name,value);
         }
     }
     public static class DocumentAuditingJobHandler extends AbstractHandler {
