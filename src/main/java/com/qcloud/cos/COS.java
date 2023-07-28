@@ -3222,6 +3222,8 @@ public interface COS extends COSDirectSpi {
     AuditingKeywordResponse describeAuditingKeyWordList(AuditingKeywordRequest request);
 
     AuditingKeywordResponse deleteAuditingKeyWord(AuditingKeywordRequest request);
+
+    ImageInspectResponse getImageInspect(ImageInspectRequest request);
 }
 
 

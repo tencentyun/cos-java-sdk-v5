@@ -29,6 +29,7 @@ import com.qcloud.cos.internal.XmlResponsesSaxParser.CopyObjectResultHandler;
 import com.qcloud.cos.internal.cihandler.AuditingStrategyHandler;
 import com.qcloud.cos.internal.cihandler.AuditingTextLibHandler;
 import com.qcloud.cos.internal.cihandler.CICommonHandler;
+import com.qcloud.cos.internal.cihandler.CIJsonHandler;
 import com.qcloud.cos.model.*;
 import com.qcloud.cos.model.bucketcertificate.BucketGetDomainCertificate;
 import com.qcloud.cos.model.ciModel.auditing.AudioAuditingResponse;
@@ -45,6 +46,7 @@ import com.qcloud.cos.model.ciModel.bucket.DocBucketResponse;
 import com.qcloud.cos.model.ciModel.bucket.MediaBucketResponse;
 import com.qcloud.cos.model.ciModel.image.AutoTranslationBlockResponse;
 import com.qcloud.cos.model.ciModel.image.DetectFaceResponse;
+import com.qcloud.cos.model.ciModel.image.ImageInspectRequest;
 import com.qcloud.cos.model.ciModel.image.ImageLabelResponse;
 import com.qcloud.cos.model.ciModel.image.ImageLabelV2Response;
 import com.qcloud.cos.model.ciModel.image.ImageSearchResponse;
@@ -928,6 +930,17 @@ public class Unmarshallers {
 
         public T unmarshall(InputStream in) {
             return new CICommonHandler<T>().getResponse(in,tClass);
+        }
+    }
+
+    public static class CIJsonUnmarshaller<T> implements Unmarshaller<T, InputStream>{
+        private Class<T> tClass;
+        public CIJsonUnmarshaller(Class<T> aClass) {
+            this.tClass = aClass;
+        }
+        @Override
+        public T unmarshall(InputStream in) throws Exception {
+            return new CIJsonHandler<T>().getResponse(in,tClass);
         }
     }
 }

@@ -3,18 +3,10 @@ package com.qcloud.cos.internal.cihandler;
 import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.internal.CosServiceRequest;
 import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.thoughtworks.xstream.security.AnyTypePermission;
 
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.io.OutputStreamWriter;
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
-import java.io.Writer;
 import java.lang.reflect.Field;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 
 public abstract class XStreamXmlResponsesSaxParser<T> {
 

@@ -118,6 +118,8 @@ import com.qcloud.cos.model.ciModel.image.AutoTranslationBlockResponse;
 import com.qcloud.cos.model.ciModel.image.DetectFaceRequest;
 import com.qcloud.cos.model.ciModel.image.DetectFaceResponse;
 import com.qcloud.cos.model.ciModel.image.GenerateQrcodeRequest;
+import com.qcloud.cos.model.ciModel.image.ImageInspectRequest;
+import com.qcloud.cos.model.ciModel.image.ImageInspectResponse;
 import com.qcloud.cos.model.ciModel.image.ImageLabelRequest;
 import com.qcloud.cos.model.ciModel.image.ImageLabelResponse;
 import com.qcloud.cos.model.ciModel.image.ImageLabelV2Request;
@@ -4933,6 +4935,14 @@ public class COSClient implements COS {
         CosHttpRequest<AuditingKeywordRequest> request = createRequest(keywordRequest.getBucketName(), "/audit/textlib/" + keywordRequest.getLibId() +"/deletekeyword", keywordRequest, HttpMethodName.POST);
         this.setContent(request, CIAuditingXmlFactoryV2.convertToXmlByteArray(keywordRequest), "application/xml", false);
         return invoke(request, new Unmarshallers.CICommonUnmarshaller<AuditingKeywordResponse>(AuditingKeywordResponse.class));
+    }
+
+    @Override
+    public ImageInspectResponse getImageInspect(ImageInspectRequest inspectRequest) {
+        rejectNull(inspectRequest, "The request parameter must be specified setting the object tags");
+        CosHttpRequest<ImageInspectRequest> request = createRequest(inspectRequest.getBucketName(), inspectRequest.getObjectKey(), inspectRequest, HttpMethodName.GET);
+        request.addParameter( "ci-process", "ImageInspect");
+        return invoke(request, new Unmarshallers.CIJsonUnmarshaller<ImageInspectResponse>(ImageInspectResponse.class));
     }
 
 }
