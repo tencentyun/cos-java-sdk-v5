@@ -142,6 +142,8 @@ import com.qcloud.cos.model.ciModel.job.MediaJobObject;
 import com.qcloud.cos.model.ciModel.job.MediaJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaJobsRequest;
 import com.qcloud.cos.model.ciModel.job.MediaListJobResponse;
+import com.qcloud.cos.model.ciModel.job.v2.MediaJobResponseV2;
+import com.qcloud.cos.model.ciModel.job.v2.MediaJobsRequestV2;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoRequest;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoResponse;
 import com.qcloud.cos.model.ciModel.persistence.AIGameRecResponse;
@@ -3879,6 +3881,13 @@ public class COSClient implements COS {
     }
 
     @Override
+    public MediaJobResponseV2 createMediaJobsV2(MediaJobsRequestV2 req)  {
+        CosHttpRequest<MediaJobsRequestV2> request = createRequest(req.getBucketName(), "/jobs", req, HttpMethodName.POST);
+        this.setContent(request, CIAuditingXmlFactoryV2.convertToXmlByteArray(req), "application/xml", false);
+        return invoke(request, new Unmarshallers.CICommonUnmarshaller<MediaJobResponseV2>(MediaJobResponseV2.class));
+    }
+
+    @Override
     public Boolean cancelMediaJob(MediaJobsRequest req) {
         this.checkCIRequestCommon(req);
         rejectNull(req.getJobId(),
@@ -3895,7 +3904,6 @@ public class COSClient implements COS {
                 "The jobId parameter must be specified setting the object tags");
         CosHttpRequest<MediaJobsRequest> request = createRequest(req.getBucketName(), "/jobs/" + req.getJobId(), req, HttpMethodName.GET);
         return invoke(request, new Unmarshallers.JobUnmarshaller());
-
     }
 
     @Override
@@ -4945,5 +4953,12 @@ public class COSClient implements COS {
         return invoke(request, new Unmarshallers.CIJsonUnmarshaller<ImageInspectResponse>(ImageInspectResponse.class));
     }
 
+    @Override
+    public MediaJobResponseV2 describeMediaJobV2(MediaJobsRequestV2 req) {
+        rejectNull(req.getJobId(),
+                "The jobId parameter must be specified setting the object tags");
+        CosHttpRequest<MediaJobsRequestV2> request = createRequest(req.getBucketName(), "/jobs/" + req.getJobId(), req, HttpMethodName.GET);
+        return invoke(request,new Unmarshallers.CIJsonUnmarshaller<MediaJobResponseV2>(MediaJobResponseV2.class));
+    }
 }
 
