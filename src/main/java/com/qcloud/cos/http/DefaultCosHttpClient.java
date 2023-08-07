@@ -486,7 +486,7 @@ public class DefaultCosHttpClient implements CosHttpClient {
             } catch (CosServiceException cse) {
                 if (cse.getStatusCode() >= 500) {
                     String errorMsg = String.format("failed to execute http request, due to service exception,"
-                                    + " httpRequest: %s, retryIdx:%d, maxErrorRetry:%d", request.toString(),
+                                    + " httpRequest: %s, retryIdx:%d, maxErrorRetry:%d", request,
                             retryIndex, maxErrorRetry);
                     log.error(errorMsg, cse);
                 }

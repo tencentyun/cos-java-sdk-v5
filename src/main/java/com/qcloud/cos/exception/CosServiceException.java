@@ -290,5 +290,9 @@ public class CosServiceException extends CosClientException {
         this.rawResponseContent = rawResponseContent;
     }
 
+    public String toString() {
+        return super.toString() + ". statusCode:" + getStatusCode() + ",requestId:" + getRequestId()
+                + ",errType:" + getErrorType();
+    }
 }
 
