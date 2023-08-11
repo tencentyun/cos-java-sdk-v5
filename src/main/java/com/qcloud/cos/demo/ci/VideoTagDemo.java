@@ -1,20 +1,9 @@
 package com.qcloud.cos.demo.ci;
 
 import com.qcloud.cos.COSClient;
-import com.qcloud.cos.model.ciModel.job.MediaAudioMixObject;
-import com.qcloud.cos.model.ciModel.job.MediaAudioObject;
-import com.qcloud.cos.model.ciModel.job.MediaContainerObject;
-import com.qcloud.cos.model.ciModel.job.MediaJobObject;
-import com.qcloud.cos.model.ciModel.job.MediaJobOperation;
 import com.qcloud.cos.model.ciModel.job.MediaJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaJobsRequest;
-import com.qcloud.cos.model.ciModel.job.MediaListJobResponse;
-import com.qcloud.cos.model.ciModel.job.MediaTimeIntervalObject;
-import com.qcloud.cos.model.ciModel.job.MediaTranscodeObject;
-import com.qcloud.cos.model.ciModel.job.MediaTranscodeVideoObject;
 import com.qcloud.cos.model.ciModel.job.VideoTag;
-
-import java.util.List;
 
 /**
  * 媒体处理视频标签任务接口相关demo 详情见https://cloud.tencent.com/document/product/460/84779

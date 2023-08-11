@@ -6,43 +6,14 @@ import java.util.List;
 
 public class SoundHoundResult {
     @XStreamImplicit(itemFieldName = "SongList")
-    private List<Song> songList;
+    private List<MediaSong> songList;
 
-    public List<Song> getSongList() {
+    public List<MediaSong> getSongList() {
         return songList;
     }
 
-    public void setSongList(List<Song> songList) {
+    public void setSongList(List<MediaSong> songList) {
         this.songList = songList;
     }
 
-    private class Song {
-        private String inlier;
-        private String singerName;
-        private String songName;
-
-        public String getInlier() {
-            return inlier;
-        }
-
-        public void setInlier(String inlier) {
-            this.inlier = inlier;
-        }
-
-        public String getSingerName() {
-            return singerName;
-        }
-
-        public void setSingerName(String singerName) {
-            this.singerName = singerName;
-        }
-
-        public String getSongName() {
-            return songName;
-        }
-
-        public void setSongName(String songName) {
-            this.songName = songName;
-        }
-    }
 }

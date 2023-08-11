@@ -140,6 +140,10 @@ public class ParserMediaInfoUtils {
             case "Sar":
                 video.setSar(value);
                 break;
+            case "Bitrate":
+                video.setBitrate(value);
+            case "Language":
+                video.setLanguage(value);
             default:
                 break;
         }
@@ -216,6 +220,8 @@ public class ParserMediaInfoUtils {
             case "ScanMode":
                 video.setScanMode(value);
                 break;
+            case "Language":
+                video.setLanguage(value);
             default:
                 break;
         }

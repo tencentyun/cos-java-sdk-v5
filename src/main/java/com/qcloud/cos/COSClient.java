@@ -4958,7 +4958,7 @@ public class COSClient implements COS {
         rejectNull(req.getJobId(),
                 "The jobId parameter must be specified setting the object tags");
         CosHttpRequest<MediaJobsRequestV2> request = createRequest(req.getBucketName(), "/jobs/" + req.getJobId(), req, HttpMethodName.GET);
-        return invoke(request,new Unmarshallers.CIJsonUnmarshaller<MediaJobResponseV2>(MediaJobResponseV2.class));
+        return invoke(request,new Unmarshallers.CICommonUnmarshaller<MediaJobResponseV2>(MediaJobResponseV2.class));
     }
 }
 

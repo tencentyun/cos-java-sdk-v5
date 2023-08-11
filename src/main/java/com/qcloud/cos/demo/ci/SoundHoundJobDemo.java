@@ -1,12 +1,7 @@
 package com.qcloud.cos.demo.ci;
 
-import com.alibaba.fastjson.JSONObject;
-import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.qcloud.cos.COSClient;
-import com.qcloud.cos.model.ciModel.job.VocalScore;
 import com.qcloud.cos.model.ciModel.job.v2.MediaJobOperation;
 import com.qcloud.cos.model.ciModel.job.v2.MediaJobResponseV2;
 import com.qcloud.cos.model.ciModel.job.v2.MediaJobsRequestV2;
@@ -20,7 +15,7 @@ public class SoundHoundJobDemo {
         // 1 初始化用户身份信息（secretId, secretKey）。
         COSClient client = ClientUtils.getTestClient();
         // 2 调用要使用的方法。
-        createMediaJobs(client);
+        describeMediaJob(client);
     }
 
     /**
@@ -32,7 +27,7 @@ public class SoundHoundJobDemo {
         //1.创建任务请求对象
         MediaJobsRequestV2 request = new MediaJobsRequestV2();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("markjrzhang2-1251704708");
+        request.setBucketName("demo-1234567890");
         request.setTag("SoundHound");
         request.getInput().setObject("1.mp4");
         //2.1添加听歌识曲操作参数
@@ -41,11 +36,9 @@ public class SoundHoundJobDemo {
         operation.setJobLevel("0");
 
         request.setCallBack("https://cloud.tencent.com/xxx");
-        request.setCallBackFormat("JSON");
         //3.调用接口,获取任务响应对象
         MediaJobResponseV2 response = client.createMediaJobsV2(request);
         System.out.println(response.getJobsDetail().getJobId());
-        System.out.println(JSONObject.toJSONString(response));
     }
 
     /**
@@ -57,11 +50,11 @@ public class SoundHoundJobDemo {
         //1.创建任务请求对象
         MediaJobsRequestV2 request = new MediaJobsRequestV2();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("markjrzhang2-1251704708");
-        request.setJobId("se98173f6326c11ee88fb8950d73fcaaa");
+        request.setBucketName("demo-1234567890");
+        request.setJobId("s1f9dbaf6381e11ee97dc5f2f0af*****");
         //3.调用接口,获取任务响应对象
         MediaJobResponseV2 response = client.describeMediaJobV2(request);
-        System.out.println(response.getJobsDetail().getOperation().getTranscode());
+        System.out.println(Jackson.toJsonString(response));
     }
 
 }
