@@ -11,6 +11,8 @@ public class SetBucketPolicyStatementRequest extends CosServiceRequest {
     private List<String> resourcePath;
     private String actionTemplate;
 
+    private String accountName;
+
     public SetBucketPolicyStatementRequest(String bucketName, String subUin, List<String> resourcePath, String actionTemplate) {
         this.bucketName = bucketName;
         this.subUin = subUin;
@@ -56,5 +58,13 @@ public class SetBucketPolicyStatementRequest extends CosServiceRequest {
 
     public String getActionTemplate() {
         return actionTemplate;
+    }
+
+    public String getAccountName() {
+        return accountName;
+    }
+
+    public void setAccountName(String accountName) {
+        this.accountName = accountName;
     }
 }

@@ -29,13 +29,13 @@ public class BucketPolicyStatementDemo {
                 "exampleBucket-exampleAppid", "*");
         paths.add(path1);
 
-
         String subUin = "xxxxxxxxx";
         SetBucketPolicyStatementRequest setBucketPolicyStatementRequest = new SetBucketPolicyStatementRequest(bucketName,
                 subUin, paths, PolicyUtils.ACTION_TEMPLATE_HEAD_BUCKET);
 
-        // ownerUin一定要设置
+        // ownerUin和账号名称一定要设置
         setBucketPolicyStatementRequest.setOwnerUin("xxxxxxxxx");
+        setBucketPolicyStatementRequest.setAccountName("xxxxxxxxxxx");
 
         try {
             cosclient.setBucketPolicyStatement(setBucketPolicyStatementRequest);
@@ -62,6 +62,8 @@ public class BucketPolicyStatementDemo {
         String subUin = "xxxxxxxxxxx";
 
         DelBucketPolicyStatementRequest request = new DelBucketPolicyStatementRequest(bucketName, subUin, PolicyUtils.ACTION_TEMPLATE_READ);
+        // 账号名称一定要设置
+        request.setAccountName("xxxxxxxxx");
 
         List<String> paths = new ArrayList<>();
         String path1 = PolicyUtils.buildQcsResourcePath("ap-guangzhou", "exampleAppid",

@@ -3223,11 +3223,13 @@ public class COSClient implements COS {
         String actionTemplate = setBucketPolicyStatementRequest.getActionTemplate();
         String ownerUin = setBucketPolicyStatementRequest.getOwnerUin();
         List<String> resourcePaths = setBucketPolicyStatementRequest.getResourcePath();
+        String accountName = setBucketPolicyStatementRequest.getAccountName();
 
         rejectEmpty(bucketName, "The bucket name must be specified when setting a bucket policy statement");
         rejectEmpty(subUin, "The sub uin must be specified when setting a bucket policy statement");
         rejectEmpty(actionTemplate, "The action template must be specified when setting a bucket policy statement");
         rejectEmpty(ownerUin, "The owner uin must be specified when setting a bucket policy statement");
+        rejectEmpty(accountName, "The account name must be specified when setting a bucket policy statement");
 
         if (resourcePaths == null || resourcePaths.isEmpty()) {
             throw new IllegalArgumentException("The resource paths must be specified when setting a bucket policy statement");
@@ -3237,7 +3239,7 @@ public class COSClient implements COS {
             throw new IllegalArgumentException("The action template must be one of {read, read_write, head_bucket}");
         }
 
-        String sid = buildSid(subUin, actionTemplate);
+        String sid = buildSid(subUin, accountName, actionTemplate);
 
         BucketPolicy bucketPolicy;
         PolicyContent policy_content = new PolicyContent();
@@ -3274,7 +3276,7 @@ public class COSClient implements COS {
 
             // 如果是添加 读写权限，需要在读权限的statement里删除对应path
             if (Objects.equals(actionTemplate, PolicyUtils.ACTION_TEMPLATE_READ_WRITE)) {
-                if (Objects.equals(statement.getSid(), buildSid(subUin, PolicyUtils.ACTION_TEMPLATE_READ))) {
+                if (Objects.equals(statement.getSid(), buildSid(subUin, accountName, PolicyUtils.ACTION_TEMPLATE_READ))) {
                     List<String> originPaths = statement.getResource();
                     for (String resourcePath : resourcePaths) {
                         removeResourcePaths(resourcePath, originPaths);
@@ -3288,10 +3290,10 @@ public class COSClient implements COS {
 
             // 如果是添加 读权限，需要判断在读写权限的statement里是否已经存在对应path或对应path的父path
             if (Objects.equals(actionTemplate, PolicyUtils.ACTION_TEMPLATE_READ)) {
-                if (Objects.equals(statement.getSid(), buildSid(subUin, PolicyUtils.ACTION_TEMPLATE_READ_WRITE))) {
+                if (Objects.equals(statement.getSid(), buildSid(subUin, accountName, PolicyUtils.ACTION_TEMPLATE_READ_WRITE))) {
                     List<String> originPaths = statement.getResource();
                     for (String resourcePath : resourcePaths) {
-                        isInvalidPath(resourcePath, originPaths, buildSid(subUin, PolicyUtils.ACTION_TEMPLATE_READ_WRITE));
+                        isInvalidPath(resourcePath, originPaths, buildSid(subUin, accountName, PolicyUtils.ACTION_TEMPLATE_READ_WRITE));
                     }
                 }
             }
@@ -3315,12 +3317,14 @@ public class COSClient implements COS {
         String subUin = delBucketPolicyStatementRequest.getSubUin();
         String actionTemplate = delBucketPolicyStatementRequest.getActionTemplate();
         List<String> deletePaths = delBucketPolicyStatementRequest.getPath2Delete();
+        String accountName = delBucketPolicyStatementRequest.getAccountName();
 
         rejectEmpty(bucketName, "The bucket name must be specified when deleting a bucket policy statement");
         rejectEmpty(subUin, "The sub uin must be specified when deleting a bucket policy statement");
         rejectEmpty(actionTemplate, "The action template must be specified when deleting a bucket policy statement");
+        rejectEmpty(accountName, "The account name must be specified when deleting a bucket policy statement");
 
-        String sid = buildSid(subUin, actionTemplate);
+        String sid = buildSid(subUin, accountName, actionTemplate);
 
         BucketPolicy bucketPolicy = getBucketPolicy(bucketName);
         PolicyContent policy_content = Jackson.fromJsonStringCaseInsensitive(bucketPolicy.getPolicyText(), PolicyContent.class);
@@ -3387,12 +3391,13 @@ public class COSClient implements COS {
         Map<String, Boolean> elementsFilled = new HashMap<>();
         for (PolicyStatement statement : statements) {
             String sid = statement.getSid();
-            String[] sidInfo = sid.split("_", 2);
-            if (sidInfo.length != 2) {
+            String[] sidInfo = sid.split("-", 3);
+            if (sidInfo.length != 3) {
                 continue;
             }
             String sub_uin = sidInfo[0];
-            String active = sidInfo[1];
+            String accountName = sidInfo[1];
+            String active = sidInfo[2];
 
             // 如果当前statement的Principal不是只包含了一条qcs，也认为不是合理的statement，不展示
             if (statement.getPrincipal().getQcs().size() != 1) {
@@ -3420,9 +3425,10 @@ public class COSClient implements COS {
                 continue;
             }
 
-            if (!tempResults.containsKey(sub_uin)) {
+            String accountKey = sub_uin + ":" + accountName;
+            if (!tempResults.containsKey(accountKey)) {
                 Map<String, List<TableResult>> tempScheResults = new HashMap<>();
-                tempResults.put(sub_uin, tempScheResults);
+                tempResults.put(accountKey, tempScheResults);
             }
 
             List<String> originPaths = statement.getResource();
@@ -3431,24 +3437,24 @@ public class COSClient implements COS {
                     for (String originPath : originPaths) {
                         // 如果指定路径是策略原路径的父路径，则将策略原路径加入响应中
                         if (isMatchPrefix(resourcePath, originPath) || Objects.equals(resourcePath, originPath)) {
-                            fillTableResult(originPath, active, sub_uin, tempResults, elementsFilled);
+                            fillTableResult(originPath, active, accountKey, tempResults, elementsFilled);
                         } else if (isMatchPrefix(originPath, resourcePath)) {
                             // 如果策略原路径是指定路径的父路径，则将指定路径加入响应中
-                            fillTableResult(resourcePath, active, sub_uin, tempResults, elementsFilled);
+                            fillTableResult(resourcePath, active, accountKey, tempResults, elementsFilled);
                         }
                     }
                 }
             } else {
                 for (String originPath : originPaths) {
-                    fillTableResult(originPath, active, sub_uin, tempResults, elementsFilled);
+                    fillTableResult(originPath, active, accountKey, tempResults, elementsFilled);
                 }
             }
         }
         return constructBucketStatementResult(tempResults);
     }
 
-    private String buildSid(String subUin, String actionTemplate) {
-        return subUin + "_" + actionTemplate;
+    private String buildSid(String subUin, String accountName, String actionTemplate) {
+        return subUin + "-" + accountName + "-" + actionTemplate;
     }
 
     private PolicyStatement constructNewStatement(String ownerUin, String subUin, String actionTemplate, List<String> resourcePaths, String sid) {
@@ -3518,10 +3524,19 @@ public class COSClient implements COS {
     private BucketStatementResult constructBucketStatementResult(Map<String,  Map<String, List<TableResult>>> tempResults) {
         Set<String> keys = tempResults.keySet();
         BucketStatementResult result = new BucketStatementResult();
-        for (String subUin : keys) {
+        for (String accountKey : keys) {
+            String[] accountInfo = accountKey.split(":", 2);
+            if (accountInfo.length != 2) {
+                continue;
+            }
+            String subUin = accountInfo[0];
+            String accountName = accountInfo[1];
+
             SubUinResult sub_uin_result = new SubUinResult();
             sub_uin_result.setSubUin(subUin);
-            Map<String, List<TableResult>> tempSubUinResults = tempResults.get(subUin);
+            sub_uin_result.setAccountName(accountName);
+
+            Map<String, List<TableResult>> tempSubUinResults = tempResults.get(accountKey);
             tempSubUinResults.forEach((schemaName, tableResults)->{
                 SchemaResult schemaResult = new SchemaResult(schemaName, tableResults);
                 sub_uin_result.addSchemaResult(schemaResult);
@@ -3531,15 +3546,15 @@ public class COSClient implements COS {
         return result;
     }
 
-    private void fillTableResult(String originPath, String active, String sub_uin,
+    private void fillTableResult(String originPath, String active, String accountKey,
                                  Map<String,  Map<String, List<TableResult>>> tempResults, Map<String, Boolean> elementsFilled) {
         String[] pathInfo = PolicyUtils.parseQcsResourcePath(originPath);
         TableResult tableResult = new TableResult(pathInfo[1], active);
-        if (!tempResults.get(sub_uin).containsKey(pathInfo[0])) {
+        if (!tempResults.get(accountKey).containsKey(pathInfo[0])) {
             List<TableResult> results = new ArrayList<>();
             results.add(tableResult);
-            tempResults.get(sub_uin).put(pathInfo[0], results);
-            elementsFilled.put(sub_uin + ":" + pathInfo[0] + ":" + pathInfo[1] + ":" + active, true);
+            tempResults.get(accountKey).put(pathInfo[0], results);
+            elementsFilled.put(accountKey + ":" + pathInfo[0] + ":" + pathInfo[1] + ":" + active, true);
         } else {
             /**
              * 以下情况需要特殊处理：
@@ -3547,16 +3562,16 @@ public class COSClient implements COS {
              * 2：tableResult的action为read_write，tempResults中关于目标path已存在action为read的结果，删除action为read的结果，添加read_write结果
              */
             if (Objects.equals(active, PolicyUtils.ACTION_TEMPLATE_READ)) {
-                String elementKey = sub_uin + ":" + pathInfo[0] + ":" + pathInfo[1] + ":" + PolicyUtils.ACTION_TEMPLATE_READ_WRITE;
+                String elementKey = accountKey + ":" + pathInfo[0] + ":" + pathInfo[1] + ":" + PolicyUtils.ACTION_TEMPLATE_READ_WRITE;
                 if (elementsFilled.containsKey(elementKey) && elementsFilled.get(elementKey)) {
                     return;
                 }
             }
 
-            List<TableResult> trs = tempResults.get(sub_uin).get(pathInfo[0]);
+            List<TableResult> trs = tempResults.get(accountKey).get(pathInfo[0]);
 
             if (Objects.equals(active, PolicyUtils.ACTION_TEMPLATE_READ_WRITE)) {
-                String elementKey = sub_uin + ":" + pathInfo[0] + ":" + pathInfo[1] + ":" + PolicyUtils.ACTION_TEMPLATE_READ;
+                String elementKey = accountKey + ":" + pathInfo[0] + ":" + pathInfo[1] + ":" + PolicyUtils.ACTION_TEMPLATE_READ;
                 if (elementsFilled.containsKey(elementKey) && elementsFilled.get(elementKey)) {
                     elementsFilled.remove(elementKey);
                     // 删除action为read的结果
@@ -3566,7 +3581,7 @@ public class COSClient implements COS {
                 }
             }
             trs.add(tableResult);
-            elementsFilled.put(sub_uin + ":" + pathInfo[0] + ":" + pathInfo[1] + ":" + active, true);
+            elementsFilled.put(accountKey + ":" + pathInfo[0] + ":" + pathInfo[1] + ":" + active, true);
         }
     }
 

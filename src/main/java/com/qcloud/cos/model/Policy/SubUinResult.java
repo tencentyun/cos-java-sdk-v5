@@ -5,6 +5,9 @@ import java.util.List;
 
 public class SubUinResult {
     public String subUin;
+
+    public String accountName;
+
     public List<SchemaResult> schemaResults = new ArrayList<>();
 
     public void setSubUin(String subUin) {
@@ -25,5 +28,13 @@ public class SubUinResult {
 
     public void addSchemaResult(SchemaResult schemaResult) {
         this.schemaResults.add(schemaResult);
+    }
+
+    public String getAccountName() {
+        return accountName;
+    }
+
+    public void setAccountName(String accountName) {
+        this.accountName = accountName;
     }
 }

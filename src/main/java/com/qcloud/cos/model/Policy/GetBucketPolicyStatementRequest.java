@@ -10,6 +10,8 @@ public class GetBucketPolicyStatementRequest {
     private List<String> actionTemplates = new ArrayList<>();
     private List<String> effects = new ArrayList<>();
 
+    private String accountName;
+
     public GetBucketPolicyStatementRequest(String bucketName) {
         this.bucketName = bucketName;
     }
@@ -52,5 +54,13 @@ public class GetBucketPolicyStatementRequest {
 
     public List<String> getEffects() {
         return effects;
+    }
+
+    public void setAccountName(String accountName) {
+        this.accountName = accountName;
+    }
+
+    public String getAccountName() {
+        return accountName;
     }
 }

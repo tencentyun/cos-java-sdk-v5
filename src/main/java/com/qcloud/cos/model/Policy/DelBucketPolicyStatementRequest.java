@@ -10,6 +10,8 @@ public class DelBucketPolicyStatementRequest {
     private String actionTemplate;
     private List<String> paths2delete = new ArrayList<>();
 
+    private String accountName;
+
     public DelBucketPolicyStatementRequest(String bucketName, String subUin, String actionTemplate) {
         this.bucketName = bucketName;
         this.subUin = subUin;
@@ -58,5 +60,13 @@ public class DelBucketPolicyStatementRequest {
 
     public void addPath2Delete(String path) {
         paths2delete.add(path);
+    }
+
+    public String getAccountName() {
+        return accountName;
+    }
+
+    public void setAccountName(String accountName) {
+        this.accountName = accountName;
     }
 }
