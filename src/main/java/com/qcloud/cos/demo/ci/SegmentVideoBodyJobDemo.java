@@ -22,7 +22,7 @@ public class SegmentVideoBodyJobDemo {
     }
 
     /**
-     * createMediaJobs 接口用于创建听歌识曲任务
+     * createMediaJobs 接口用于创建视频人像分离任务
      *
      * @param client
      */
