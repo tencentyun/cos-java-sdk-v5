@@ -7,6 +7,7 @@ import com.qcloud.cos.model.ciModel.template.MediaSmartCoverObject;
 import com.qcloud.cos.model.ciModel.template.MediaSnapshotObject;
 import com.qcloud.cos.model.ciModel.template.MediaVideoMontageObject;
 import com.qcloud.cos.model.ciModel.template.MediaWatermark;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,45 +17,144 @@ import java.util.List;
  */
 
 public class MediaJobOperation {
+    @XStreamAlias("TemplateId")
     private String templateId;
+
+    @XStreamAlias("JobLevel")
     private String jobLevel;
+
+    @XStreamAlias("UserData")
     private String UserData;
+
+    @XStreamAlias("TemplateName")
     private String templateName;
+
+    @XStreamAlias("DecryptKey")
     private String decryptKey;
+
+    @XStreamAlias("DecryptIv")
     private String decryptIv;
+
+    @XStreamAlias("DecryptMode")
     private String decryptMode;
+
+    @XStreamAlias("EncryptKey")
     private String encryptKey;
+
+    @XStreamAlias("EncryptIv")
     private String encryptIv;
+
+    @XStreamAlias("EncryptMode")
     private String encryptMode;
+
+    @XStreamAlias("Output")
     private MediaOutputObject output;
+
+    @XStreamAlias("MediaAnimation")
     private MediaAnimationObject mediaAnimation;
+
+    @XStreamAlias("MediaInfo")
     private MediaInfoObjcet mediaInfo;
+
+    @XStreamAlias("MediaRemoveWaterMark")
     private MediaRemoveWaterMark removeWatermark;
+
+    @XStreamAlias("MediaWatermark")
     private MediaWatermark watermark;
+
+    @XStreamAlias("MediaTranscode")
     private MediaTranscodeObject transcode;
+
+    @XStreamAlias("WatermarkTemplateId")
     private List<String> watermarkTemplateId;
+
+    @XStreamAlias("WatermarkList")
     private List<MediaWatermark> watermarkList;
+
+    @XStreamAlias("MediaConcatTemplate")
     private MediaConcatTemplateObject mediaConcatTemplate;
+
+    @XStreamAlias("MediaSnapshot")
     private MediaSnapshotObject snapshot = new MediaSnapshotObject();
+
+    @XStreamAlias("MediaSegment")
     private MediaSegmentObject segment = new MediaSegmentObject();
+
+    @XStreamAlias("MediaSmartCover")
     private MediaSmartCoverObject smartCover = new MediaSmartCoverObject();
+
+    @XStreamAlias("MediaVideoMontage")
     private MediaVideoMontageObject videoMontage = new MediaVideoMontageObject();
+
+    @XStreamAlias("MediaDigitalWatermark")
     private MediaDigitalWatermark digitalWatermark = new MediaDigitalWatermark();
+
+    @XStreamAlias("ExtractDigitalWatermark")
     private ExtractDigitalWatermark extractDigitalWatermark = new ExtractDigitalWatermark();
+
+    @XStreamAlias("MediaPicProcessTemplate")
     private MediaPicProcessTemplateObject picProcess = new MediaPicProcessTemplateObject();
+
+    @XStreamAlias("MediaResult")
     private MediaResult mediaResult = new MediaResult();
+
+    @XStreamAlias("PicProcessResult")
     private PicProcessResult picProcessResult = new PicProcessResult();
+
+    @XStreamAlias("VideoTargetRec")
     private VideoTargetRec videoTargetRec = new VideoTargetRec();
+
+    @XStreamAlias("VoiceSeparate")
     private VoiceSeparate voiceSeparate = new VoiceSeparate();
+
+    @XStreamAlias("MediaTimeInterval")
     private MediaTimeIntervalObject timeInterval = new MediaTimeIntervalObject();
+
+    @XStreamAlias("MediaTtsConfig")
     private MediaTtsConfig ttsConfig = new MediaTtsConfig();
+
+    @XStreamAlias("VideoEnhance")
     private VideoEnhance videoEnhance = new VideoEnhance();
+
+    @XStreamAlias("TtsTpl")
     private TtsTpl ttsTpl = new TtsTpl();
+
+    @XStreamAlias("Subtitles")
     private Subtitles subtitles = new Subtitles();
+
+    @XStreamAlias("VideoTag")
     private VideoTag videoTag = new VideoTag();
+
+    @XStreamAlias("VideoTagResult")
     private VideoTagResult videoTagResult = new VideoTagResult();
+
+    @XStreamAlias("QualityEstimateConfig")
     private QualityEstimateConfig qualityEstimateConfig = new QualityEstimateConfig();
+
+    @XStreamAlias("QualityEstimate")
     private QualityEstimate qualityEstimate = new QualityEstimate();
+
+    @XStreamAlias("VocalScore")
+    private VocalScore vocalScore = new VocalScore();
+
+    @XStreamAlias("VocalScoreResult")
+    private VocalScoreResult vocalScoreResult = new VocalScoreResult();
+
+    public VocalScoreResult getVocalScoreResult() {
+        return vocalScoreResult;
+    }
+
+    public void setVocalScoreResult(VocalScoreResult vocalScoreResult) {
+        this.vocalScoreResult = vocalScoreResult;
+    }
+
+    public VocalScore getVocalScore() {
+        return vocalScore;
+    }
+
+    public void setVocalScore(VocalScore vocalScore) {
+        this.vocalScore = vocalScore;
+    }
 
     public MediaTimeIntervalObject getTimeInterval() {
         return timeInterval;
@@ -62,10 +162,6 @@ public class MediaJobOperation {
 
     public void setTimeInterval(MediaTimeIntervalObject timeInterval) {
         this.timeInterval = timeInterval;
-    }
-
-    public MediaJobOperation() {
-        this.output = new MediaOutputObject();
     }
 
     public String getTemplateId() {

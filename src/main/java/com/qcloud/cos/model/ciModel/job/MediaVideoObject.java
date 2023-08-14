@@ -87,6 +87,7 @@ public class MediaVideoObject implements Serializable {
 
     private String hlsTsTime;
 
+    private String language;
     public String getScanMode() {
         return scanMode;
     }
@@ -272,32 +273,42 @@ public class MediaVideoObject implements Serializable {
         this.hlsTsTime = hlsTsTime;
     }
 
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
+    }
+
     @Override
     public String toString() {
-        return "MediaVideoObject{" +
-                "codec='" + codec + '\'' +
-                ", width='" + width + '\'' +
-                ", height='" + height + '\'' +
-                ", fps='" + fps + '\'' +
-                ", animateOnlyKeepKeyFrame='" + animateOnlyKeepKeyFrame + '\'' +
-                ", animateTimeIntervalOfFrame='" + animateTimeIntervalOfFrame + '\'' +
-                ", animateFramesPerSecond='" + animateFramesPerSecond + '\'' +
-                ", qality='" + qality + '\'' +
-                ", remove='" + remove + '\'' +
-                ", profile='" + profile + '\'' +
-                ", bitrate='" + bitrate + '\'' +
-                ", crf='" + crf + '\'' +
-                ", gop='" + gop + '\'' +
-                ", preset='" + preset + '\'' +
-                ", bufSize='" + bufSize + '\'' +
-                ", maxrate='" + maxrate + '\'' +
-                ", scanMode='" + scanMode + '\'' +
-                ", pixFmt='" + pixFmt + '\'' +
-                ", quality='" + quality + '\'' +
-                ", longShortMode='" + longShortMode + '\'' +
-                ", pad='" + pad + '\'' +
-                ", crop='" + crop + '\'' +
-                ", hlsTsTime='" + hlsTsTime + '\'' +
-                '}';
+        final StringBuffer sb = new StringBuffer("MediaVideoObject{");
+        sb.append("codec='").append(codec).append('\'');
+        sb.append(", width='").append(width).append('\'');
+        sb.append(", height='").append(height).append('\'');
+        sb.append(", fps='").append(fps).append('\'');
+        sb.append(", animateOnlyKeepKeyFrame='").append(animateOnlyKeepKeyFrame).append('\'');
+        sb.append(", animateTimeIntervalOfFrame='").append(animateTimeIntervalOfFrame).append('\'');
+        sb.append(", animateFramesPerSecond='").append(animateFramesPerSecond).append('\'');
+        sb.append(", qality='").append(qality).append('\'');
+        sb.append(", remove='").append(remove).append('\'');
+        sb.append(", profile='").append(profile).append('\'');
+        sb.append(", bitrate='").append(bitrate).append('\'');
+        sb.append(", crf='").append(crf).append('\'');
+        sb.append(", gop='").append(gop).append('\'');
+        sb.append(", preset='").append(preset).append('\'');
+        sb.append(", bufSize='").append(bufSize).append('\'');
+        sb.append(", maxrate='").append(maxrate).append('\'');
+        sb.append(", scanMode='").append(scanMode).append('\'');
+        sb.append(", pixFmt='").append(pixFmt).append('\'');
+        sb.append(", quality='").append(quality).append('\'');
+        sb.append(", longShortMode='").append(longShortMode).append('\'');
+        sb.append(", pad='").append(pad).append('\'');
+        sb.append(", crop='").append(crop).append('\'');
+        sb.append(", hlsTsTime='").append(hlsTsTime).append('\'');
+        sb.append(", language='").append(language).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 }

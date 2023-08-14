@@ -1,6 +1,8 @@
 package com.qcloud.cos.model.ciModel.mediaInfo;
 
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  * MediaInfo video详情实体类 详情见：https://cloud.tencent.com/document/product/460/38935
  */
@@ -8,98 +10,145 @@ public class MediaInfoVideo {
     /**
      * 该流的编号
      */
+    @XStreamAlias("Index")
     private String index;
+
     /**
      * 编解码格式名称
      */
+    @XStreamAlias("CodecName")
     private String codecName;
+
     /**
      * 编解码格式的详细名称
      */
+    @XStreamAlias("CodecLongName")
     private String codecLongName;
+
     /**
      * 编码时基
      */
+    @XStreamAlias("CodecTimeBase")
     private String codecTimeBase;
+
     /**
      * 编码标签名
      */
+    @XStreamAlias("CodecTagString")
     private String codecTagString;
+
     /**
      * 编码标签
      */
+    @XStreamAlias("CodecTag")
     private String codecTag;
+
     /**
      * 视频编码档位
      */
+    @XStreamAlias("Profile")
     private String profile;
+
     /**
      * 视频高
      */
+    @XStreamAlias("Height")
     private String height;
+
     /**
      * 视频宽
      */
+    @XStreamAlias("Width")
     private String width;
+
     /**
      * 是否有B帧
      */
+    @XStreamAlias("HasBFrame")
     private String hasBFrame;
+
     /**
      * 视频编码的参考帧个数
      */
+    @XStreamAlias("RefFrames")
     private String refFrames;
+
     /**
      * 采样宽高比
      */
+    @XStreamAlias("SAR")
     private String sar;
+
     /**
      * 显示宽高比
      */
+    @XStreamAlias("DAR")
     private String dar;
+
     /**
      * 像素格式
      */
+    @XStreamAlias("PixFormat")
     private String pixFormat;
+
     /**
      * 场的顺序
      */
+    @XStreamAlias("FieldOrder")
     private String fieldOrder;
+
     /**
      * 视频编码等级
      */
+    @XStreamAlias("Level")
     private String level;
+
     /**
      * 视频帧率
      */
+    @XStreamAlias("FPS")
     private String fps;
+
     /**
      * 平均帧率
      */
+    @XStreamAlias("AvgFPS")
     private String avgFps;
+
     /**
      * 时基
      */
+    @XStreamAlias("Timebase")
     private String timebase;
+
     /**
      * 视频开始时间，单位为秒
      */
+    @XStreamAlias("StartTime")
     private String startTime;
+
     /**
      * 视频时长，单位为秒
      */
+    @XStreamAlias("Duration")
     private String duration;
+
     /**
      * 比特率，单位为 kbps
      */
+    @XStreamAlias("Bitrate")
     private String bitrate;
+
     /**
      * 总帧数
      */
+    @XStreamAlias("NumFrames")
     private String numFrames;
+
     /**
      * 语言
      */
+    @XStreamAlias("Language")
     private String language;
 
     private String rotation;

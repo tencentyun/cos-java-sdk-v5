@@ -1,8 +1,9 @@
-package com.qcloud.cos.model.ciModel.job;
+package com.qcloud.cos.model.ciModel.job.v2;
 
 import com.qcloud.cos.internal.CIServiceRequest;
 import com.qcloud.cos.model.ciModel.common.MediaInputObject;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamOmitField;
 
 import java.io.Serializable;
 
@@ -10,7 +11,10 @@ import java.io.Serializable;
  * 媒体处理 任务实体 https://cloud.tencent.com/document/product/460/48234
  */
 
-public class MediaJobObject extends CIServiceRequest implements Serializable {
+public class MediaJobObject implements Serializable {
+    @XStreamOmitField
+    private String bucketName;
+
     @XStreamAlias("Code")
     private String code;
 
@@ -52,6 +56,7 @@ public class MediaJobObject extends CIServiceRequest implements Serializable {
 
     @XStreamAlias("Operation")
     private MediaJobOperation operation = new MediaJobOperation();
+
 
     public String getCode() {
         return code;
@@ -169,6 +174,14 @@ public class MediaJobObject extends CIServiceRequest implements Serializable {
 
     public void setQueueType(String queueType) {
         this.queueType = queueType;
+    }
+
+    public String getBucketName() {
+        return bucketName;
+    }
+
+    public void setBucketName(String bucketName) {
+        this.bucketName = bucketName;
     }
 
     @Override

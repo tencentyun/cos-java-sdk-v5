@@ -1,7 +1,8 @@
-package com.qcloud.cos.model.ciModel.job;
+package com.qcloud.cos.model.ciModel.job.v2;
 
 import com.qcloud.cos.internal.CIServiceRequest;
 import com.qcloud.cos.model.ciModel.common.MediaInputObject;
+import com.qcloud.cos.model.ciModel.job.CallBackMqConfig;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
 
@@ -11,7 +12,7 @@ import java.io.Serializable;
  * 媒体处理 任务请求实体 https://cloud.tencent.com/document/product/460/48234
  */
 @XStreamAlias("Request")
-public class MediaJobsRequest extends CIServiceRequest implements Serializable {
+public class MediaJobsRequestV2 extends CIServiceRequest implements Serializable {
     /**
      * bucket名称
      */
@@ -43,7 +44,7 @@ public class MediaJobsRequest extends CIServiceRequest implements Serializable {
      * 查询数量，默认为十个
      */
     @XStreamAlias("Size")
-    private Integer size = 10;
+    private Integer size ;
 
     /**
      * 任务状态
@@ -236,8 +237,4 @@ public class MediaJobsRequest extends CIServiceRequest implements Serializable {
         this.callBackFormat = callBackFormat;
     }
 
-    @Override
-    public String toString() {
-        return "MediaJobsRequest{" + "bucketName='" + bucketName + '\'' + ", queueId='" + queueId + '\'' + ", tag='" + tag + '\'' + ", orderByTime='" + orderByTime + '\'' + ", nextToken='" + nextToken + '\'' + ", size=" + size + ", states='" + states + '\'' + ", startCreationTime='" + startCreationTime + '\'' + ", endCreationTime='" + endCreationTime + '\'' + ", jobId='" + jobId + '\'' + ", input=" + input + ", operation=" + operation + ", callBack='" + callBack + '\'' + ", callBackFormat='" + callBackFormat + '\'' + '}';
-    }
 }

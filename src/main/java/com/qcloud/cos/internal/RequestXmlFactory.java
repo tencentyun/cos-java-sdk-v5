@@ -38,7 +38,6 @@ import com.qcloud.cos.model.RequestProgress;
 import com.qcloud.cos.model.RestoreObjectRequest;
 import com.qcloud.cos.model.ScanRange;
 import com.qcloud.cos.model.SelectObjectContentRequest;
-import com.qcloud.cos.model.SelectParameters;
 import com.qcloud.cos.model.ciModel.auditing.AudioAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.BatchImageAuditingInputObject;
 import com.qcloud.cos.model.ciModel.auditing.BatchImageAuditingRequest;

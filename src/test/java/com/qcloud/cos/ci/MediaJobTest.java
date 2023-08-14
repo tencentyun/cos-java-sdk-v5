@@ -1,7 +1,6 @@
 package com.qcloud.cos.ci;
 
 import com.qcloud.cos.AbstractCOSClientCITest;
-import com.qcloud.cos.COSClient;
 import com.qcloud.cos.model.ciModel.job.MediaJobObject;
 import com.qcloud.cos.model.ciModel.job.MediaJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaJobsRequest;

@@ -14,9 +14,7 @@ public class CICheckUtils {
         PicOperations picOperations = putObjectRequest.getPicOperations();
         if (picOperations != null && picOperations.getRules() != null) {
             for (PicOperations.Rule rule : picOperations.getRules()) {
-                if (putObjectRequest.getKey() != null && rule.getFileId() != null) {
-                    return true;
-                }
+                return true;
             }
         }
         return false;

@@ -57,6 +57,8 @@ import com.qcloud.cos.model.ciModel.job.FileProcessRequest;
 import com.qcloud.cos.model.ciModel.job.MediaJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaJobsRequest;
 import com.qcloud.cos.model.ciModel.job.MediaListJobResponse;
+import com.qcloud.cos.model.ciModel.job.v2.MediaJobResponseV2;
+import com.qcloud.cos.model.ciModel.job.v2.MediaJobsRequestV2;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoRequest;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoResponse;
 import com.qcloud.cos.model.ciModel.persistence.AIGameRecResponse;
@@ -2916,6 +2918,8 @@ public interface COS extends COSDirectSpi {
      */
     MediaJobResponse createMediaJobs(MediaJobsRequest req) ;
 
+    MediaJobResponseV2 createMediaJobsV2(MediaJobsRequestV2 req);
+
     /**
      * CancelMediaJob 接口用于取消一个任务。  https://cloud.tencent.com/document/product/460/38939
      */
@@ -3224,6 +3228,8 @@ public interface COS extends COSDirectSpi {
     AuditingKeywordResponse deleteAuditingKeyWord(AuditingKeywordRequest request);
 
     ImageInspectResponse getImageInspect(ImageInspectRequest request);
+
+    MediaJobResponseV2 describeMediaJobV2(MediaJobsRequestV2 req);
 }
 
 

@@ -3,6 +3,13 @@ package com.qcloud.cos.internal.cihandler;
 import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.internal.CosServiceRequest;
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.converters.Converter;
+import com.thoughtworks.xstream.converters.MarshallingContext;
+import com.thoughtworks.xstream.converters.SingleValueConverter;
+import com.thoughtworks.xstream.converters.UnmarshallingContext;
+import com.thoughtworks.xstream.io.HierarchicalStreamReader;
+import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
+import com.thoughtworks.xstream.mapper.Mapper;
 import com.thoughtworks.xstream.security.AnyTypePermission;
 
 import java.io.InputStream;
@@ -48,5 +55,4 @@ public abstract class XStreamXmlResponsesSaxParser<T> {
             throw new CosServiceException("Response parse error");
         }
     }
-
 }
