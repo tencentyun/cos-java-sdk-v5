@@ -1,12 +1,16 @@
 package com.qcloud.cos.model.ciModel.mediaInfo;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 import java.io.Serializable;
 
 /**
  * MediaInfo 格式详情实体类 详情见：https://cloud.tencent.com/document/product/460/38935
  */
 public class MediaInfoObjcet implements Serializable {
+    @XStreamAlias("Format")
     private MediaFormat format;
+    @XStreamAlias("Stream")
     private MediaStream stream;
 
     public MediaFormat getFormat() {

@@ -1,5 +1,7 @@
 package com.qcloud.cos.model.ciModel.mediaInfo;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  * MediaInfo 格式详情实体类 详情见：https://cloud.tencent.com/document/product/460/38935
  */
@@ -7,14 +9,17 @@ public class MediaStream {
     /**
      * 视频信息
      */
+    @XStreamAlias("Video")
     private MediaInfoVideo video;
     /**
      * 音频信息
      */
+    @XStreamAlias("Audio")
     private MediaInfoAudio audio;
     /**
      * 字幕信息
      */
+    @XStreamAlias("Subtitle")
     private MediaInfoSubtitle subtitle;
 
     public MediaInfoVideo getVideo() {

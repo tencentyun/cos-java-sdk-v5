@@ -1,10 +1,17 @@
 package com.qcloud.cos.model.ciModel.job;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 public class OutputFile {
+    @XStreamAlias("Region")
     private String region;
+    @XStreamAlias("Bucket")
     private String bucket;
+    @XStreamAlias("ObjectPrefix")
     private String objectPrefix;
+    @XStreamAlias("ObjectName")
     private String objectName;
+    @XStreamAlias("Md5Info")
     private Md5Info md5Info;
 
     public String getRegion() {

@@ -165,6 +165,20 @@ public class MediaJobOperation {
     @XStreamAlias("SoundHoundResult")
     private SoundHoundResult soundHoundResult;
 
+    @XStreamAlias("SegmentVideoBody")
+    private SegmentVideoBody segmentVideoBody;
+
+    public SegmentVideoBody getSegmentVideoBody() {
+        if (segmentVideoBody == null) {
+            segmentVideoBody = new SegmentVideoBody();
+        }
+        return segmentVideoBody;
+    }
+
+    public void setSegmentVideoBody(SegmentVideoBody segmentVideoBody) {
+        this.segmentVideoBody = segmentVideoBody;
+    }
+
     public String getTemplateId() {
         return templateId;
     }

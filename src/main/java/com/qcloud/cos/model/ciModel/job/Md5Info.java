@@ -1,7 +1,11 @@
 package com.qcloud.cos.model.ciModel.job;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 public class Md5Info {
+    @XStreamAlias("Md5")
     private String md5Info;
+    @XStreamAlias("ObjectName")
     private String objectName;
 
     public String getMd5Info() {

@@ -1,6 +1,9 @@
 package com.qcloud.cos.model.ciModel.job;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 public class MediaResult {
+    @XStreamAlias("OutputFile")
     private OutputFile outputFile;
 
     public OutputFile getOutputFile() {
