@@ -845,23 +845,23 @@ public class COSClient implements COS {
         return createAppendObjectResult(returnedMetadata);
     }
 
-//    @Override
-//    public void rename(RenameRequest renameRequest)
-//            throws CosServiceException, CosClientException {
-//        rejectNull(renameRequest, "The request must not be null");
-//        rejectNull(renameRequest.getBucketName(), "The bucket name parameter must be specified when rename");
-//        rejectNull(renameRequest.getSrcObject(), "The src object parameter must be specified when rename");
-//        rejectNull(renameRequest.getDstObject(), "The dst object parameter must be specified when rename");
-//        rejectNull(clientConfig.getRegion(),
-//                "region is null, region in clientConfig must be specified when rename");
-//        rejectEmpty(renameRequest.getSrcObject(), "The length of the src key must be greater than 0");
-//        rejectEmpty(renameRequest.getDstObject(), "The length of the dst key must be greater than 0");
-//        CosHttpRequest<RenameRequest> request = createRequest(renameRequest.getBucketName(),
-//                renameRequest.getDstObject(), renameRequest, HttpMethodName.PUT);
-//        request.addParameter("rename", null);
-//        request.addHeader("x-cos-rename-source", renameRequest.getSrcObject());
-//        invoke(request, voidCosResponseHandler);
-//    }
+    @Override
+    public void rename(RenameRequest renameRequest)
+            throws CosServiceException, CosClientException {
+        rejectNull(renameRequest, "The request must not be null");
+        rejectNull(renameRequest.getBucketName(), "The bucket name parameter must be specified when rename");
+        rejectNull(renameRequest.getSrcObject(), "The src object parameter must be specified when rename");
+        rejectNull(renameRequest.getDstObject(), "The dst object parameter must be specified when rename");
+        rejectNull(clientConfig.getRegion(),
+                "region is null, region in clientConfig must be specified when rename");
+        rejectEmpty(renameRequest.getSrcObject(), "The length of the src key must be greater than 0");
+        rejectEmpty(renameRequest.getDstObject(), "The length of the dst key must be greater than 0");
+        CosHttpRequest<RenameRequest> request = createRequest(renameRequest.getBucketName(),
+                renameRequest.getDstObject(), renameRequest, HttpMethodName.PUT);
+        request.addParameter("rename", null);
+        request.addHeader("x-cos-rename-source", renameRequest.getSrcObject());
+        invoke(request, voidCosResponseHandler);
+    }
 
     protected <UploadObjectRequest extends PutObjectRequest>
         ObjectMetadata uploadObjectInternal(UploadMode uploadMode, UploadObjectRequest uploadObjectRequest)
