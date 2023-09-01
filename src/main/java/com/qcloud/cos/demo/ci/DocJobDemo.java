@@ -10,13 +10,8 @@ import com.qcloud.cos.model.ciModel.job.DocJobObject;
 import com.qcloud.cos.model.ciModel.job.DocJobRequest;
 import com.qcloud.cos.model.ciModel.job.DocJobResponse;
 import com.qcloud.cos.model.ciModel.job.DocProcessObject;
-import com.qcloud.cos.model.ciModel.queue.DocListQueueResponse;
-import com.qcloud.cos.model.ciModel.queue.DocQueueRequest;
-import com.qcloud.cos.model.ciModel.queue.MediaQueueObject;
 
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
-import java.util.List;
 
 /**
  * 文档预览任务相关demo

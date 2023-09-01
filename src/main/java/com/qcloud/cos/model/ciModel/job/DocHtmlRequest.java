@@ -73,7 +73,7 @@ public class DocHtmlRequest extends CosServiceRequest {
     private DocType dstType = DocType.html;
 
     public enum DocType {
-        html, jpg, png
+        html, jpg, png, pdf
     }
 
     public String getImageDpi() {

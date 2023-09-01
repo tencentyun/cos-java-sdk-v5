@@ -144,6 +144,8 @@ public class ParserMediaInfoUtils {
                 video.setBitrate(value);
             case "Language":
                 video.setLanguage(value);
+            case "NumFrames":
+                video.setNumFrames(value);
             default:
                 break;
         }
