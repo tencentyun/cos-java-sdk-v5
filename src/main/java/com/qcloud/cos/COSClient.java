@@ -4565,10 +4565,13 @@ public class COSClient implements COS {
                 "The request parameter must be specified setting the object tags");
         rejectNull(mediaWorkflowListRequest.getBucketName(),
                 "The bucketName parameter must be specified setting the object tags");
-        CosHttpRequest<MediaWorkflowListRequest> request = createRequest(mediaWorkflowListRequest.getBucketName(),  "triggerworkflow", mediaWorkflowListRequest, HttpMethodName.POST);
+        CosHttpRequest<MediaWorkflowListRequest> request = createRequest(mediaWorkflowListRequest.getBucketName(), "triggerworkflow", mediaWorkflowListRequest, HttpMethodName.POST);
         addParameterIfNotNull(request, "workflowId", mediaWorkflowListRequest.getWorkflowId());
         addParameterIfNotNull(request, "object", mediaWorkflowListRequest.getObject());
         addParameterIfNotNull(request, "name", mediaWorkflowListRequest.getName());
+        if (mediaWorkflowListRequest.getAttachParam() != null) {
+            this.setContent(request, CIAuditingXmlFactoryV2.convertToXmlByteArray(mediaWorkflowListRequest), "application/xml", false);
+        }
         return invoke(request, new Unmarshallers.triggerWorkflowListUnmarshaller());
     }
 

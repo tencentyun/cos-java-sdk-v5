@@ -1,30 +1,43 @@
 package com.qcloud.cos.model.ciModel.template;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  * 水印图片实体类 参数详情见: https://cloud.tencent.com/document/product/460/48176
  */
 public class MediaWaterMarkImage {
 
+    @XStreamAlias("Transparency")
+    /**
+     * 透明度 值范围：[1 100]，单位为%
+     */
+    private String transparency;
+
+    @XStreamAlias("Url")
     /**
      * 水印地址 需为桶bucket的水印图片地址
      */
     private String url;
+
+    @XStreamAlias("Mode")
     /**
      * 尺寸模式
      */
     private String mode;
+
+    @XStreamAlias("Width")
     /**
      * 宽
      */
     private String width;
+
+    @XStreamAlias("Height")
     /**
-     * 搞
+     * 高
      */
     private String height;
-    /**
-     * 透明度
-     */
-    private String transparency;
+
+    @XStreamAlias("Background")
     /**
      * 是否背景图 true、false
      */
