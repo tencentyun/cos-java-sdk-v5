@@ -11,6 +11,9 @@ public class AttachParam {
     private String watermarkTemplateId;
 
     public MediaWatermark getWatermark() {
+        if (watermark == null) {
+            watermark = new MediaWatermark();
+        }
         return watermark;
     }
 

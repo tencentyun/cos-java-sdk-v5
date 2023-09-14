@@ -124,12 +124,7 @@ public class CIMediaXmlFactory {
             xml.start("Format").value(request.getContainer().getFormat()).end();
             xml.end();
             addVideo(xml, request.getVideo());
-            if (objIsNotValid(request.getTimeInterval())) {
-                xml.start("TimeInterval");
-                xml.start("Duration").value(request.getTimeInterval().getDuration()).end();
-                xml.start("Start").value(request.getTimeInterval().getStart()).end();
-                xml.end();
-            }
+            addTimeInterval(xml, request.getTimeInterval());
         } else if ("Snapshot".equalsIgnoreCase(tag)) {
             MediaSnapshotObject snapshot = request.getSnapshot();
             addSnapshot(xml, snapshot);
@@ -194,6 +189,12 @@ public class CIMediaXmlFactory {
             addAudioMix(xml, request.getAudioMix(), "AudioMix");
             addAudioMixArray(xml, request.getAudioMixArray());
             addContainer(xml, request.getContainer());
+        } else if ("HighSpeedHd".equalsIgnoreCase(tag)) {
+            addVideo(xml, request.getVideo());
+            addAudio(xml, request.getAudio());
+            addContainer(xml, request.getContainer());
+            addTransConfig(xml, request.getTransConfig());
+            addTimeInterval(xml, request.getTimeInterval());
         }
         xml.end();
         return xml.getBytes();

@@ -21,7 +21,7 @@ public class TriggerWorkflowListHandler extends CIAbstractHandler {
     protected void doEndElement(String uri, String name, String qName) {
         AttachParam attachParam = response.getAttachParam();
         if (attachParam == null) {
-            attachParam = new AttachParam();
+           response.setAttachParam(new AttachParam());
         }
 
         if (in("Response")) {

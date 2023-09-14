@@ -4570,6 +4570,7 @@ public class COSClient implements COS {
         addParameterIfNotNull(request, "object", mediaWorkflowListRequest.getObject());
         addParameterIfNotNull(request, "name", mediaWorkflowListRequest.getName());
         if (mediaWorkflowListRequest.getAttachParam() != null) {
+            request.addParameter("attachParam", null);
             this.setContent(request, CIAuditingXmlFactoryV2.convertToXmlByteArray(mediaWorkflowListRequest), "application/xml", false);
         }
         return invoke(request, new Unmarshallers.triggerWorkflowListUnmarshaller());
