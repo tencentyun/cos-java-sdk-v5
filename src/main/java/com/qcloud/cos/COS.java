@@ -2853,16 +2853,16 @@ public interface COS extends COSDirectSpi {
     public AppendObjectResult appendObject(AppendObjectRequest appendObjectRequest)
             throws CosServiceException, CosClientException;
 
-//    /**
-//     * rename object, which contains both file or dir in fs
-//     *
-//     * @param renameRequest
-//     * @return
-//     * @throws CosServiceException
-//     * @throws CosClientException
-//     */
-//    public void rename(RenameRequest renameRequest)
-//            throws CosServiceException, CosClientException;
+    /**
+     * rename object, which contains both file or dir in fs
+     *
+     * @param renameRequest
+     * @return
+     * @throws CosServiceException
+     * @throws CosClientException
+     */
+    public void rename(RenameRequest renameRequest)
+            throws CosServiceException, CosClientException;
 
     /**
      * This operation filters the contents of an COS object based on a simple Structured Query Language (SQL) statement.
