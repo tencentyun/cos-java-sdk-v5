@@ -127,6 +127,8 @@ final class ResumableDownloadSubmitter {
 
             start = end + 1;
         }
+
+        threadPool.shutdown();
     }
 
     GetObjectRequest copyGetObjectRequest(GetObjectRequest origin) {
