@@ -51,6 +51,9 @@ public class FileProcessResponseHandler extends CIAbstractHandler {
                 case "QueueId":
                     jobDetail.setQueueId(getText());
                     break;
+                case "Progress":
+                    jobDetail.setProgress(getText());
+                    break;
                 default:
                     break;
             }

@@ -482,6 +482,7 @@ public class CIMediaXmlFactory {
                 addIfNotNull(xml, "FragmentIndex", concatFragment.getFragmentIndex());
                 addIfNotNull(xml, "StartTime", concatFragment.getStartTime());
                 addIfNotNull(xml, "EndTime", concatFragment.getEndTime());
+                addIfNotNull(xml, "Duration", concatFragment.getDuration());
                 xml.end();
             }
             addVideo(xml, mediaConcatTemplate.getVideo());
