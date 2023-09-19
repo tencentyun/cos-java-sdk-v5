@@ -40,6 +40,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.Executors;
 
 import com.qcloud.cos.COS;
 import com.qcloud.cos.COSClient;
@@ -676,7 +677,9 @@ public class TransferManager {
         DownloadImpl download = new DownloadImpl(description, transferProgress, listenerChain,
                 null, stateListener, getObjectRequest, destFile);
 
-        ResumableDownloadSubmitter submitter = new ResumableDownloadSubmitter(cos, threadPool, getObjectRequest,
+        ExecutorService partDownloadThreadPool = Executors.newFixedThreadPool(getObjectRequest.getDownloadPartsThreads());
+
+        ResumableDownloadSubmitter submitter = new ResumableDownloadSubmitter(cos, partDownloadThreadPool, getObjectRequest,
                 download, destFile, destRandomAccessFile, destFileChannel, downloadRecord, partSize, multiThreadThreshold, transferProgress, listenerChain);
 
         ResumableDownloadMonitor monitor = ResumableDownloadMonitor.create(listenerChain, submitter, download, threadPool,

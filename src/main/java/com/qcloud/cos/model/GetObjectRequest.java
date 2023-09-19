@@ -85,6 +85,8 @@ public class GetObjectRequest extends CosServiceRequest
      */
     private SSECustomerKey sseCustomerKey;
 
+    private int downloadPartsThreads = 1;
+
     public GetObjectRequest(COSObjectId cosObjectId) {
         this(cosObjectId.getBucket(), cosObjectId.getKey(), cosObjectId.getVersionId());
     }
@@ -638,5 +640,13 @@ public class GetObjectRequest extends CosServiceRequest
 
     public void setTrafficLimit(int trafficLimit) {
         this.trafficLimit = trafficLimit;
+    }
+
+    public void setDownloadPartsThreads(int downloadThreads) {
+        this.downloadPartsThreads = downloadThreads;
+    }
+
+    public int getDownloadPartsThreads() {
+        return downloadPartsThreads;
     }
 }
