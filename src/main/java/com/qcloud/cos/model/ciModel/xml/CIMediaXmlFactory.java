@@ -264,6 +264,12 @@ public class CIMediaXmlFactory {
                 if (objIsNotValid(subtitle)) {
                     xml.start("Subtitle");
                     addIfNotNull(xml, "Url", sub.getUrl());
+                    addIfNotNull(xml, "Embed", sub.getEmbed());
+                    addIfNotNull(xml, "FontType", sub.getFontType());
+                    addIfNotNull(xml, "FontSize", sub.getFontSize());
+                    addIfNotNull(xml, "FontColor", sub.getFontColor());
+                    addIfNotNull(xml, "OutlineColor", sub.getOutlineColor());
+                    addIfNotNull(xml, "VMargin", sub.getvMargin());
                     xml.end();
                 }
             }

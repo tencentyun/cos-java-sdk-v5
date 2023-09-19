@@ -1389,6 +1389,24 @@ public class ParserMediaInfoUtils {
                 case "Url":
                     subtitle1.setUrl(value);
                     break;
+                case "FontColor":
+                    subtitle1.setFontColor(value);
+                    break;
+                case "FontSize":
+                    subtitle1.setFontSize(value);
+                    break;
+                case "FontType":
+                    subtitle1.setFontType(value);
+                    break;
+                case "Embed":
+                    subtitle1.setEmbed(value);
+                    break;
+                case "VMargin":
+                    subtitle1.setvMargin(value);
+                    break;
+                case "OutlineColor":
+                    subtitle1.setOutlineColor(value);
+                    break;
                 default:
                     break;
             }
