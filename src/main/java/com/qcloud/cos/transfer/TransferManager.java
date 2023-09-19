@@ -677,9 +677,9 @@ public class TransferManager {
         DownloadImpl download = new DownloadImpl(description, transferProgress, listenerChain,
                 null, stateListener, getObjectRequest, destFile);
 
-        ExecutorService newThreadPool = Executors.newFixedThreadPool(getObjectRequest.getDownloadPartsThreads());
+        ExecutorService partDownloadThreadPool = Executors.newFixedThreadPool(getObjectRequest.getDownloadPartsThreads());
 
-        ResumableDownloadSubmitter submitter = new ResumableDownloadSubmitter(cos, newThreadPool, getObjectRequest,
+        ResumableDownloadSubmitter submitter = new ResumableDownloadSubmitter(cos, partDownloadThreadPool, getObjectRequest,
                 download, destFile, destRandomAccessFile, destFileChannel, downloadRecord, partSize, multiThreadThreshold, transferProgress, listenerChain);
 
         ResumableDownloadMonitor monitor = ResumableDownloadMonitor.create(listenerChain, submitter, download, threadPool,
