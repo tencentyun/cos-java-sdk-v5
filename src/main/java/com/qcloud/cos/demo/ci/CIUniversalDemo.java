@@ -1,7 +1,7 @@
 package com.qcloud.cos.demo.ci;
 
 import com.qcloud.cos.COSClient;
-import com.qcloud.cos.model.ciModel.auditing.ImageAuditingRequest;
+import com.qcloud.cos.model.ciModel.common.CICommonRequest;
 
 public class CIUniversalDemo {
     public static void main(String[] args) throws InterruptedException {
@@ -13,7 +13,7 @@ public class CIUniversalDemo {
 
     public static void customCIMethod(COSClient client) {
         //1.创建任务请求对象
-        ImageAuditingRequest request = new ImageAuditingRequest();
+        CICommonRequest request = new CICommonRequest();
 
     }
 }

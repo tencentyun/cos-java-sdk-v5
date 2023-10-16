@@ -12,6 +12,8 @@ import com.qcloud.cos.model.ciModel.job.MediaTimeIntervalObject;
 import com.qcloud.cos.model.ciModel.job.MediaTranscodeObject;
 import com.qcloud.cos.model.ciModel.job.MediaTtsConfig;
 import com.qcloud.cos.model.ciModel.job.PicProcessResult;
+import com.qcloud.cos.model.ciModel.job.PostSpeechRecognitionRequest;
+import com.qcloud.cos.model.ciModel.job.PostSpeechRecognitionResponse;
 import com.qcloud.cos.model.ciModel.job.QualityEstimate;
 import com.qcloud.cos.model.ciModel.job.QualityEstimateConfig;
 import com.qcloud.cos.model.ciModel.job.Subtitles;
@@ -167,6 +169,12 @@ public class MediaJobOperation {
 
     @XStreamAlias("SegmentVideoBody")
     private SegmentVideoBody segmentVideoBody;
+
+    @XStreamAlias("SpeechRecognition")
+    private PostSpeechRecognitionRequest.SpeechRecognition speechRecognition;
+
+    @XStreamAlias("SpeechRecognitionResult")
+    private SpeechRecognitionResult speechRecognitionResult;
 
     public SegmentVideoBody getSegmentVideoBody() {
         if (segmentVideoBody == null) {
@@ -618,5 +626,24 @@ public class MediaJobOperation {
 
     public void setSoundHound(SoundHoundResult soundHoundResult) {
         this.soundHoundResult = soundHoundResult;
+    }
+
+    public PostSpeechRecognitionRequest.SpeechRecognition getSpeechRecognition() {
+        if (speechRecognition == null) {
+            speechRecognition = new PostSpeechRecognitionRequest.SpeechRecognition();
+        }
+        return speechRecognition;
+    }
+
+    public void setSpeechRecognition(PostSpeechRecognitionRequest.SpeechRecognition speechRecognition) {
+        this.speechRecognition = speechRecognition;
+    }
+
+    public SpeechRecognitionResult getSpeechRecognitionResult() {
+        return speechRecognitionResult;
+    }
+
+    public void setSpeechRecognitionResult(SpeechRecognitionResult speechRecognitionResult) {
+        this.speechRecognitionResult = speechRecognitionResult;
     }
 }

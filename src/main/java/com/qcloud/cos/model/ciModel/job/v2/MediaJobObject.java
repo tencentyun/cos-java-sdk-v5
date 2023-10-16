@@ -1,6 +1,5 @@
 package com.qcloud.cos.model.ciModel.job.v2;
 
-import com.qcloud.cos.internal.CIServiceRequest;
 import com.qcloud.cos.model.ciModel.common.MediaInputObject;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
@@ -56,7 +55,6 @@ public class MediaJobObject implements Serializable {
 
     @XStreamAlias("Operation")
     private MediaJobOperation operation = new MediaJobOperation();
-
 
     public String getCode() {
         return code;
