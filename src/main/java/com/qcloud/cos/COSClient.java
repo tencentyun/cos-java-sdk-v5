@@ -4969,13 +4969,11 @@ public class COSClient implements COS {
     }
 
     @Override
-    public void aIImageColoring(AIImageColoringRequest aIImageColoringRequest) {
-
+    public InputStream aIImageColoring(AIImageColoringRequest aIImageColoringRequest) {
         CosHttpRequest<AIImageColoringRequest> request = createRequest(aIImageColoringRequest.getBucket(), "/" + aIImageColoringRequest.getObjectKey(), aIImageColoringRequest, HttpMethodName.GET);
         addParameterIfNotNull(request, "ci-process", aIImageColoringRequest.getCiProcess());
         addParameterIfNotNull(request, "detect-url", aIImageColoringRequest.getDetectUrl());
-
-        invoke(request, voidCosResponseHandler);
+        return invoke(request, new CIGetSnapshotResponseHandler());
     }
 
     @Override

@@ -10,32 +10,28 @@ public class MediaWaterMarkText {
     /**
      * 水印text节点
      * 水印类内容 长度不超过64个字符，仅支持中文、英文、数字、_、-和*
-     */
-    private String text;
+     */ private String text;
 
     @XStreamAlias("FontSize")
     /**
      * 字体大小 值范围：[5 100]，单位为px
-     */
-    private String fontSize;
+     */ private String fontSize;
 
     @XStreamAlias("FontColor")
     /**
      * 字体颜色
-     */
-    private String fontColor;
+     */ private String fontColor;
 
     @XStreamAlias("FontType")
     /**
      * 字体
-     */
-    private String fontType;
+     */ private String fontType;
 
     @XStreamAlias("Transparency")
     /**
      * 透明度 值范围：[1 100]，单位为%
-     */
-    private String transparency;
+     */ private String transparency;
+
     public String getText() {
         return text;
     }
@@ -78,11 +74,6 @@ public class MediaWaterMarkText {
 
     @Override
     public String toString() {
-        return "MediaWaterMarkText{" +
-                "text='" + text + '\'' +
-                ", fontSize='" + fontSize + '\'' +
-                ", fontColor='" + fontColor + '\'' +
-                ", transparency='" + transparency + '\'' +
-                '}';
+        return "MediaWaterMarkText{" + "text='" + text + '\'' + ", fontSize='" + fontSize + '\'' + ", fontColor='" + fontColor + '\'' + ", transparency='" + transparency + '\'' + '}';
     }
 }

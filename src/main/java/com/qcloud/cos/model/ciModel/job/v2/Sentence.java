@@ -36,7 +36,7 @@ public class Sentence {
      * 词级别的识别结果列表
      */
     @XStreamImplicit(itemFieldName = "word_list")
-    private List<PostSpeechRecognitionResponse.WordList> wordList;
+    private List<WordList> wordList;
 
     public String getText() {
         return text;
@@ -70,11 +70,11 @@ public class Sentence {
         this.speakerId = speakerId;
     }
 
-    public List<PostSpeechRecognitionResponse.WordList> getWordList() {
+    public List<WordList> getWordList() {
         return wordList;
     }
 
-    public void setWordList(List<PostSpeechRecognitionResponse.WordList> wordList) {
+    public void setWordList(List<WordList> wordList) {
         this.wordList = wordList;
     }
 }

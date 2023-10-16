@@ -26,11 +26,11 @@ public class SpeechRecognitionResult {
     @XStreamImplicit(itemFieldName = "FlashResult")
     private List<FlashResult> flashResult;
 
-//    /**
-//     * 识别结果详情，包含每个句子中的词时间偏移，一般用于生成字幕的场景。(语音识别请求中ResTextFormat=1时该字段不为空)注意：此字段可能为空，表示取不到有效值。
-//     */
-//    @XStreamImplicit(itemFieldName = "ResultDetail")
-//    private List<PostSpeechRecognitionResponse.ResultDetail> resultDetail;
+    /**
+     * 识别结果详情，包含每个句子中的词时间偏移，一般用于生成字幕的场景。(语音识别请求中ResTextFormat=1时该字段不为空)注意：此字段可能为空，表示取不到有效值。
+     */
+    @XStreamImplicit(itemFieldName = "ResultDetail")
+    private List<PostSpeechRecognitionResponse.ResultDetail> resultDetail;
 
     public String getAudioTime() {
         return audioTime;

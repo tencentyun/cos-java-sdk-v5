@@ -26,7 +26,7 @@ public class PostSpeechRecognitionDemo {
      */
     public static void postSpeechRecognition(COSClient client) {
         PostSpeechRecognitionRequest request = new PostSpeechRecognitionRequest();
-        request.setBucketName("markjrzhang-1251704708");
+        request.setBucketName("demo-1234567890");
         // 设置创建任务的 Tag：SpeechRecognition 必传
         request.setTag("SpeechRecognition");
         PostSpeechRecognitionRequest.Input input = request.getInput();
@@ -38,7 +38,7 @@ public class PostSpeechRecognitionDemo {
         // 设置存储桶的地域 必传
         operation.getOutput().setRegion("ap-chongqing");
         // 设置存储结果的存储桶 必传
-        operation.getOutput().setBucket("markjrzhang-1251704708");
+        operation.getOutput().setBucket("demo-1234567890");
         // 设置结果文件的名称 必传
         operation.getOutput().setObject("1.mp4");
         speechRecognition.setChannelNum("1");
@@ -57,10 +57,10 @@ public class PostSpeechRecognitionDemo {
         //1.创建任务请求对象
         MediaJobsRequestV2 request = new MediaJobsRequestV2();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("markjrzhang-1251704708");
-        request.setJobId("s2bda8d8a6bf911ee97ab293941e4cf59");
+        request.setBucketName("demo-1234567890");
+        request.setJobId("s2bda8d8a6bf911ee97ab293941e*****");
         //3.调用接口,获取任务响应对象
         MediaJobResponseV2 response = client.describeMediaJobV2(request);
-        System.out.println();
+        System.out.println(Jackson.toJsonString(response));
     }
 }

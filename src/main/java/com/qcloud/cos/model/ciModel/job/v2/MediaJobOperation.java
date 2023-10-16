@@ -171,7 +171,7 @@ public class MediaJobOperation {
     private SegmentVideoBody segmentVideoBody;
 
     @XStreamAlias("SpeechRecognition")
-    private PostSpeechRecognitionRequest.SpeechRecognition speechRecognition;
+    private SpeechRecognition speechRecognition;
 
     @XStreamAlias("SpeechRecognitionResult")
     private SpeechRecognitionResult speechRecognitionResult;
@@ -628,14 +628,11 @@ public class MediaJobOperation {
         this.soundHoundResult = soundHoundResult;
     }
 
-    public PostSpeechRecognitionRequest.SpeechRecognition getSpeechRecognition() {
-        if (speechRecognition == null) {
-            speechRecognition = new PostSpeechRecognitionRequest.SpeechRecognition();
-        }
+    public SpeechRecognition getSpeechRecognition() {
         return speechRecognition;
     }
 
-    public void setSpeechRecognition(PostSpeechRecognitionRequest.SpeechRecognition speechRecognition) {
+    public void setSpeechRecognition(SpeechRecognition speechRecognition) {
         this.speechRecognition = speechRecognition;
     }
 

@@ -3233,7 +3233,7 @@ public interface COS extends COSDirectSpi {
 
     MediaJobResponseV2 describeMediaJobV2(MediaJobsRequestV2 req);
 
-    void aIImageColoring(AIImageColoringRequest customRequest);
+    InputStream aIImageColoring(AIImageColoringRequest customRequest);
 
     PostSpeechRecognitionResponse postSpeechRecognition(PostSpeechRecognitionRequest postSpeechRecognitionRequest);
 }
