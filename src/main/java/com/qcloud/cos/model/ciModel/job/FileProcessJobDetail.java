@@ -12,8 +12,17 @@ public class FileProcessJobDetail {
     private String StartTime;
     private String EndTime;
     private String QueueId;
+    private String progress;
     private FileProcessInputObject input;
     private FileProcessOperation operation;
+
+    public String getProgress() {
+        return progress;
+    }
+
+    public void setProgress(String progress) {
+        this.progress = progress;
+    }
 
     public String getCode() {
         return code;

@@ -1,47 +1,66 @@
 package com.qcloud.cos.model.ciModel.template;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  * 水印模板实体类 参数详情见:https://cloud.tencent.com/document/product/460/48176
  */
 public class MediaWatermark {
+    @XStreamAlias("Type")
     /**
      * 水印类型 Text：文字水印 Image：图片水印
      */
     private String type;
+
+    @XStreamAlias("LocMode")
     /**
      * 偏移方式 Relativity：按比例 Absolute：固定位置
      */
     private String locMode;
+
+    @XStreamAlias("Dx")
     /**
      * 水平偏移
      */
     private String dx;
+
+    @XStreamAlias("Dy")
     /**
      * 垂直偏移
      */
     private String dy;
+
+    @XStreamAlias("Pos")
     /**
      * 基准位置
      */
     private String pos;
+
+    @XStreamAlias("StartTime")
     /**
      * 水印开始时间
      */
     private String startTime;
+
+    @XStreamAlias("EndTime")
     /**
      * 水印结束时间
      */
     private String endTime;
+
+    @XStreamAlias("Text")
     /**
      * 水印text节点
      */
     private MediaWaterMarkText text;
 
+    @XStreamAlias("Image")
     /**
      * 水印图片节点
      */
     private MediaWaterMarkImage image;
 
+    @XStreamAlias("SlideConfig")
     private SlideConfig slideConfig;
 
     public String getType() {

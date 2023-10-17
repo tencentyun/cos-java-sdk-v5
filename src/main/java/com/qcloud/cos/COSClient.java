@@ -113,6 +113,7 @@ import com.qcloud.cos.model.ciModel.bucket.MediaBucketRequest;
 import com.qcloud.cos.model.ciModel.bucket.MediaBucketResponse;
 import com.qcloud.cos.model.ciModel.common.CImageProcessRequest;
 import com.qcloud.cos.model.ciModel.common.ImageProcessRequest;
+import com.qcloud.cos.model.ciModel.image.AIImageColoringRequest;
 import com.qcloud.cos.model.ciModel.image.AutoTranslationBlockRequest;
 import com.qcloud.cos.model.ciModel.image.AutoTranslationBlockResponse;
 import com.qcloud.cos.model.ciModel.image.DetectFaceRequest;
@@ -142,6 +143,8 @@ import com.qcloud.cos.model.ciModel.job.MediaJobObject;
 import com.qcloud.cos.model.ciModel.job.MediaJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaJobsRequest;
 import com.qcloud.cos.model.ciModel.job.MediaListJobResponse;
+import com.qcloud.cos.model.ciModel.job.PostSpeechRecognitionRequest;
+import com.qcloud.cos.model.ciModel.job.PostSpeechRecognitionResponse;
 import com.qcloud.cos.model.ciModel.job.v2.MediaJobResponseV2;
 import com.qcloud.cos.model.ciModel.job.v2.MediaJobsRequestV2;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoRequest;
@@ -4565,10 +4568,14 @@ public class COSClient implements COS {
                 "The request parameter must be specified setting the object tags");
         rejectNull(mediaWorkflowListRequest.getBucketName(),
                 "The bucketName parameter must be specified setting the object tags");
-        CosHttpRequest<MediaWorkflowListRequest> request = createRequest(mediaWorkflowListRequest.getBucketName(),  "triggerworkflow", mediaWorkflowListRequest, HttpMethodName.POST);
+        CosHttpRequest<MediaWorkflowListRequest> request = createRequest(mediaWorkflowListRequest.getBucketName(), "triggerworkflow", mediaWorkflowListRequest, HttpMethodName.POST);
         addParameterIfNotNull(request, "workflowId", mediaWorkflowListRequest.getWorkflowId());
         addParameterIfNotNull(request, "object", mediaWorkflowListRequest.getObject());
         addParameterIfNotNull(request, "name", mediaWorkflowListRequest.getName());
+        if (mediaWorkflowListRequest.getAttachParam() != null) {
+            request.addParameter("attachParam", null);
+            this.setContent(request, CIAuditingXmlFactoryV2.convertToXmlByteArray(mediaWorkflowListRequest), "application/xml", false);
+        }
         return invoke(request, new Unmarshallers.triggerWorkflowListUnmarshaller());
     }
 
@@ -4960,5 +4967,22 @@ public class COSClient implements COS {
         CosHttpRequest<MediaJobsRequestV2> request = createRequest(req.getBucketName(), "/jobs/" + req.getJobId(), req, HttpMethodName.GET);
         return invoke(request,new Unmarshallers.CICommonUnmarshaller<MediaJobResponseV2>(MediaJobResponseV2.class));
     }
+
+    @Override
+    public InputStream aIImageColoring(AIImageColoringRequest aIImageColoringRequest) {
+        CosHttpRequest<AIImageColoringRequest> request = createRequest(aIImageColoringRequest.getBucket(), "/" + aIImageColoringRequest.getObjectKey(), aIImageColoringRequest, HttpMethodName.GET);
+        addParameterIfNotNull(request, "ci-process", aIImageColoringRequest.getCiProcess());
+        addParameterIfNotNull(request, "detect-url", aIImageColoringRequest.getDetectUrl());
+        return invoke(request, new CIGetSnapshotResponseHandler());
+    }
+
+    @Override
+    public PostSpeechRecognitionResponse postSpeechRecognition(PostSpeechRecognitionRequest postSpeechRecognitionRequest) {
+        rejectNull(postSpeechRecognitionRequest, "The request parameter must be specified setting the object tags");
+        CosHttpRequest<PostSpeechRecognitionRequest> request = createRequest(postSpeechRecognitionRequest.getBucketName(), "/jobs", postSpeechRecognitionRequest, HttpMethodName.POST);
+        this.setContent(request, CIAuditingXmlFactoryV2.convertToXmlByteArray(postSpeechRecognitionRequest), "application/xml", false);
+        return invoke(request, new Unmarshallers.CICommonUnmarshaller<PostSpeechRecognitionResponse>(PostSpeechRecognitionResponse.class));
+    }
+
 }
 

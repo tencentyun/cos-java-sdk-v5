@@ -9,10 +9,13 @@ import com.thoughtworks.xstream.converters.SingleValueConverter;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
+import com.thoughtworks.xstream.io.xml.PrettyPrintWriter;
+import com.thoughtworks.xstream.io.xml.StaxDriver;
 import com.thoughtworks.xstream.mapper.Mapper;
 import com.thoughtworks.xstream.security.AnyTypePermission;
 
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.lang.reflect.Field;
 
 public abstract class XStreamXmlResponsesSaxParser<T> {
@@ -43,8 +46,6 @@ public abstract class XStreamXmlResponsesSaxParser<T> {
         XStream xstream = initXStream(obj);
         return xstream.toXML(obj);
     }
-
-
 
     public static <T> T toBean(InputStream inputStream, Class<T> cls) {
         try {

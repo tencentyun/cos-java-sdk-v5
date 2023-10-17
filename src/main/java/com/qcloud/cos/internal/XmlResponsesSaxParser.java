@@ -4242,23 +4242,7 @@ public class XmlResponsesSaxParser {
             MediaConcatTemplateObject mediaConcatTemplate = response.getJobsDetail().getOperation().getMediaConcatTemplate();
             if (in("Response", "JobsDetail", "Operation", "ConcatTemplate", "ConcatFragment")) {
                 MediaConcatFragmentObject mediaConcatFragmentObject = concatFragmentList.get(concatFragmentList.size() - 1);
-                switch (name) {
-                    case "Mode":
-                        mediaConcatFragmentObject.setMode(getText());
-                        break;
-                    case "Url":
-                        mediaConcatFragmentObject.setUrl(getText());
-                        break;
-                    case "StartTime":
-                        mediaConcatFragmentObject.setStartTime(getText());
-                        break;
-                    case "EndTime":
-                        mediaConcatFragmentObject.setEndTime(getText());
-                        break;
-                    default:
-                        break;
-                }
-
+                ParserMediaInfoUtils.ParseConcatFragment(mediaConcatFragmentObject,name,getText());
             } else if (in("Response", "JobsDetail", "Operation", "ConcatTemplate", "Audio")) {
                 MediaAudioObject audio = mediaConcatTemplate.getAudio();
                 ParserMediaInfoUtils.ParsingMediaAudio(audio, name, getText());
@@ -4439,23 +4423,7 @@ public class XmlResponsesSaxParser {
             if (in("Response", "JobsDetail", "Operation", "ConcatTemplate", "ConcatFragment")) {
                 List<MediaConcatFragmentObject> concatFragmentList = mediaConcatTemplate.getConcatFragmentList();
                 MediaConcatFragmentObject mediaConcatFragmentObject = concatFragmentList.get(concatFragmentList.size() - 1);
-                switch (name) {
-                    case "Mode":
-                        mediaConcatFragmentObject.setMode(getText());
-                        break;
-                    case "Url":
-                        mediaConcatFragmentObject.setUrl(getText());
-                        break;
-                    case "StartTime":
-                        mediaConcatFragmentObject.setStartTime(getText());
-                        break;
-                    case "EndTime":
-                        mediaConcatFragmentObject.setEndTime(getText());
-                        break;
-                    default:
-                        break;
-                }
-
+                ParserMediaInfoUtils.ParseConcatFragment(mediaConcatFragmentObject, name, getText());
             } else if (in("Response", "JobsDetail", "Operation", "ConcatTemplate", "Audio")) {
                 MediaAudioObject audio = mediaConcatTemplate.getAudio();
                 ParserMediaInfoUtils.ParsingMediaAudio(audio, name, getText());

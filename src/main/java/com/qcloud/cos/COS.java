@@ -57,6 +57,8 @@ import com.qcloud.cos.model.ciModel.job.FileProcessRequest;
 import com.qcloud.cos.model.ciModel.job.MediaJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaJobsRequest;
 import com.qcloud.cos.model.ciModel.job.MediaListJobResponse;
+import com.qcloud.cos.model.ciModel.job.PostSpeechRecognitionRequest;
+import com.qcloud.cos.model.ciModel.job.PostSpeechRecognitionResponse;
 import com.qcloud.cos.model.ciModel.job.v2.MediaJobResponseV2;
 import com.qcloud.cos.model.ciModel.job.v2.MediaJobsRequestV2;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoRequest;
@@ -3230,6 +3232,10 @@ public interface COS extends COSDirectSpi {
     ImageInspectResponse getImageInspect(ImageInspectRequest request);
 
     MediaJobResponseV2 describeMediaJobV2(MediaJobsRequestV2 req);
+
+    InputStream aIImageColoring(AIImageColoringRequest customRequest);
+
+    PostSpeechRecognitionResponse postSpeechRecognition(PostSpeechRecognitionRequest postSpeechRecognitionRequest);
 }
 
 
