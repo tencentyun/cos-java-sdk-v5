@@ -19,7 +19,7 @@ public class PostSpeechRecognitionResponse {
     private List<JobsDetail> jobsDetail;
 
     public List<JobsDetail> getJobsDetail() {
-        if (jobsDetail != null) {
+        if (jobsDetail == null) {
             jobsDetail = new ArrayList<>();
         }
         return jobsDetail;
@@ -309,7 +309,7 @@ public class PostSpeechRecognitionResponse {
     }
 
     @XStreamAlias("Output")
-    public static   class Output {
+    public static class Output {
         /**
          * 存储桶的地域
          */

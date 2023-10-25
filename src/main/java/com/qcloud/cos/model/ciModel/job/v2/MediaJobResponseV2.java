@@ -12,7 +12,7 @@ public class MediaJobResponseV2 extends CiServiceResult {
     private MediaJobObject jobsDetail;
 
     public MediaJobObject getJobsDetail() {
-        if (jobsDetail==null){
+        if (jobsDetail == null) {
             jobsDetail = new MediaJobObject();
         }
         return jobsDetail;
