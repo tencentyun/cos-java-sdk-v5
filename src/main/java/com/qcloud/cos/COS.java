@@ -31,6 +31,13 @@ import com.qcloud.cos.model.bucketcertificate.BucketDomainCertificateRequest;
 import com.qcloud.cos.model.bucketcertificate.BucketGetDomainCertificate;
 import com.qcloud.cos.model.bucketcertificate.BucketPutDomainCertificate;
 import com.qcloud.cos.model.bucketcertificate.SetBucketDomainCertificateRequest;
+import com.qcloud.cos.model.ciModel.ai.AddPersonFaceRequest;
+import com.qcloud.cos.model.ciModel.ai.CreatePersonRequest;
+import com.qcloud.cos.model.ciModel.ai.CreatePersonResponse;
+import com.qcloud.cos.model.ciModel.ai.DeletePersonFaceRequest;
+import com.qcloud.cos.model.ciModel.ai.FaceSearchBucketRequest;
+import com.qcloud.cos.model.ciModel.ai.SearchPersonFaceRequest;
+import com.qcloud.cos.model.ciModel.ai.SearchPersonFaceResponse;
 import com.qcloud.cos.model.ciModel.common.CImageProcessRequest;
 import com.qcloud.cos.model.ciModel.image.*;
 import com.qcloud.cos.exception.CosClientException;
@@ -3236,6 +3243,16 @@ public interface COS extends COSDirectSpi {
     InputStream aIImageColoring(AIImageColoringRequest customRequest);
 
     PostSpeechRecognitionResponse postSpeechRecognition(PostSpeechRecognitionRequest postSpeechRecognitionRequest);
+
+    void faceSearchBucket(FaceSearchBucketRequest customRequest);
+
+    CreatePersonResponse createPerson(CreatePersonRequest createPersonRequest);
+
+    void addPersonFace(AddPersonFaceRequest addPersonFaceRequest);
+
+    SearchPersonFaceResponse searchPersonFace(SearchPersonFaceRequest customRequest);
+
+    void deletePersonFace(DeletePersonFaceRequest customRequest);
 }
 
 
