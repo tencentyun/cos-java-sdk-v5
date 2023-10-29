@@ -1,10 +1,13 @@
 package com.qcloud.cos.model.ciModel.ai;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamImplicit;
+
+import java.util.List;
 
 public class Results {
-    @XStreamAlias("Candidates")
-    private Candidates candidates;
+    @XStreamImplicit(itemFieldName = "Candidates")
+    private List<Candidates> candidates;
 
     @XStreamAlias("FaceRect")
     private FaceRect faceRect;
@@ -12,11 +15,11 @@ public class Results {
     @XStreamAlias("RetCode")
     private String retCode;
 
-    public Candidates getCandidates() {
+    public List<Candidates> getCandidates() {
         return candidates;
     }
 
-    public void setCandidates(Candidates candidates) {
+    public void setCandidates(List<Candidates> candidates) {
         this.candidates = candidates;
     }
 

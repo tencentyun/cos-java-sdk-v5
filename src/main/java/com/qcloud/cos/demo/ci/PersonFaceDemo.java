@@ -21,7 +21,7 @@ public class PersonFaceDemo {
     public static void main(String[] args) {
         COSClient client = ClientUtils.getTestClient();
         // 2 调用要使用的方法。
-        createPerson(client);
+        addPersonFace(client);
     }
     
     /**
@@ -32,7 +32,8 @@ public class PersonFaceDemo {
         FaceSearchBucketRequest request = new FaceSearchBucketRequest();
         request.setBucketName("xjp-1251704708");
         request.setGroupName("mark");
-        client.faceSearchBucket(request);
+        //成功时返回true  失败时抛出异常
+        boolean b = client.faceSearchBucket(request);
     }
 
     /**
@@ -68,8 +69,9 @@ public class PersonFaceDemo {
     public static void addPersonFace(COSClient client) {
         AddPersonFaceRequest request = new AddPersonFaceRequest();
         request.setBucketName("xjp-1251704708");
-        request.setPersonId("mark");
-        request.setPersonName("MarkName");
+        request.setObjectKey("huge1.jpeg");
+        request.setPersonId("huge");
+        request.setPersonName("胡歌");
         client.addPersonFace(request);
     }
 

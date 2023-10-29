@@ -32,6 +32,7 @@ import com.qcloud.cos.model.bucketcertificate.BucketGetDomainCertificate;
 import com.qcloud.cos.model.bucketcertificate.BucketPutDomainCertificate;
 import com.qcloud.cos.model.bucketcertificate.SetBucketDomainCertificateRequest;
 import com.qcloud.cos.model.ciModel.ai.AddPersonFaceRequest;
+import com.qcloud.cos.model.ciModel.ai.AddPersonFaceResponse;
 import com.qcloud.cos.model.ciModel.ai.CreatePersonRequest;
 import com.qcloud.cos.model.ciModel.ai.CreatePersonResponse;
 import com.qcloud.cos.model.ciModel.ai.DeletePersonFaceRequest;
@@ -3244,15 +3245,15 @@ public interface COS extends COSDirectSpi {
 
     PostSpeechRecognitionResponse postSpeechRecognition(PostSpeechRecognitionRequest postSpeechRecognitionRequest);
 
-    void faceSearchBucket(FaceSearchBucketRequest customRequest);
+    boolean faceSearchBucket(FaceSearchBucketRequest customRequest);
 
     CreatePersonResponse createPerson(CreatePersonRequest createPersonRequest);
 
-    void addPersonFace(AddPersonFaceRequest addPersonFaceRequest);
+    AddPersonFaceResponse addPersonFace(AddPersonFaceRequest addPersonFaceRequest);
 
     SearchPersonFaceResponse searchPersonFace(SearchPersonFaceRequest customRequest);
 
-    void deletePersonFace(DeletePersonFaceRequest customRequest);
+    boolean deletePersonFace(DeletePersonFaceRequest customRequest);
 }
 
 

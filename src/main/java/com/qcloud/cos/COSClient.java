@@ -107,6 +107,7 @@ import com.qcloud.cos.model.bucketcertificate.BucketPutDomainCertificate;
 import com.qcloud.cos.model.bucketcertificate.SetBucketDomainCertificateRequest;
 import com.qcloud.cos.model.bucketcertificate.BucketDomainCertificateParameters;
 import com.qcloud.cos.model.ciModel.ai.AddPersonFaceRequest;
+import com.qcloud.cos.model.ciModel.ai.AddPersonFaceResponse;
 import com.qcloud.cos.model.ciModel.ai.CreatePersonRequest;
 import com.qcloud.cos.model.ciModel.ai.CreatePersonResponse;
 import com.qcloud.cos.model.ciModel.ai.DeletePersonFaceRequest;
@@ -4992,11 +4993,12 @@ public class COSClient implements COS {
     }
 
     @Override
-    public void faceSearchBucket(FaceSearchBucketRequest customRequest) {
+    public boolean faceSearchBucket(FaceSearchBucketRequest customRequest) {
         rejectNull(customRequest, "The request parameter must be specified setting the object tags");
         CosHttpRequest<FaceSearchBucketRequest> request = createRequest(customRequest.getBucketName(), "/FaceSearchBucket", customRequest, HttpMethodName.POST);
         this.setContent(request, CIAuditingXmlFactoryV2.convertToXmlByteArray(customRequest), "application/xml", false);
         invoke(request, voidCosResponseHandler);
+        return true;
     }
 
     @Override
@@ -5010,15 +5012,20 @@ public class COSClient implements COS {
     }
 
     @Override
-    public void addPersonFace(AddPersonFaceRequest addPersonFaceRequest) {
+    public AddPersonFaceResponse addPersonFace(AddPersonFaceRequest addPersonFaceRequest) {
         rejectNull(addPersonFaceRequest, "The request parameter must be specified setting the object tags");
         CosHttpRequest<AddPersonFaceRequest> request = createRequest(addPersonFaceRequest.getBucketName(), "/" + addPersonFaceRequest.getObjectKey(), addPersonFaceRequest, HttpMethodName.POST);
-        invoke(request, voidCosResponseHandler);
+        request.addParameter("ci-process","FaceSearch");
+        request.addParameter("action", "AddPersonFace");
+        this.setContent(request, CIAuditingXmlFactoryV2.convertToXmlByteArray(addPersonFaceRequest), "application/xml", false);
+        return invoke(request, new Unmarshallers.CICommonUnmarshaller<AddPersonFaceResponse>(AddPersonFaceResponse.class));
     }
 
     @Override
     public SearchPersonFaceResponse searchPersonFace(SearchPersonFaceRequest customRequest) {
         CosHttpRequest<SearchPersonFaceRequest> request = createRequest(customRequest.getBucketName(), "/" + customRequest.getObjectKey(), customRequest, HttpMethodName.GET);
+        request.addParameter("ci-process","FaceSearch");
+        request.addParameter("action","SearchPersonFace");
         addParameterIfNotNull(request, "ObjectKey", customRequest.getObjectKey());
         addParameterIfNotNull(request, "FaceMatchThreshold", customRequest.getFaceMatchThreshold());
         addParameterIfNotNull(request, "NeedPersonInfo", customRequest.getNeedPersonInfo());
@@ -5028,10 +5035,13 @@ public class COSClient implements COS {
     }
 
     @Override
-    public void deletePersonFace(DeletePersonFaceRequest customRequest) {
+    public boolean deletePersonFace(DeletePersonFaceRequest customRequest) {
         rejectNull(customRequest, "The request parameter must be specified setting the object tags");
         CosHttpRequest<DeletePersonFaceRequest> request = createRequest(customRequest.getBucketName(), "/" + customRequest.getObjectKey(), customRequest, HttpMethodName.POST);
+        request.addParameter("ci-process","FaceSearch");
+        request.addParameter("action","DeletePersonFace");
         invoke(request, voidCosResponseHandler);
+        return true;
     }
 
 }
