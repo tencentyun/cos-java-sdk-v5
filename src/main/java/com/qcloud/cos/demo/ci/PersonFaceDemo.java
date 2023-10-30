@@ -16,9 +16,6 @@ import com.qcloud.cos.utils.Jackson;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * 详情见
- */
 public class PersonFaceDemo {
 
     public static void main(String[] args) {
@@ -40,7 +37,7 @@ public class PersonFaceDemo {
     }
 
     /**
-     * createPerson
+     * createPerson 该接口用于在人脸库中创建新的人员，添加人脸、姓名、性别及其他相关信息。
      * 该接口属于 POST 请求。
      */
     public static void createPerson(COSClient client) {
@@ -66,7 +63,8 @@ public class PersonFaceDemo {
     }
 
     /**
-     * addPersonFace
+     * addPersonFace 该接口用于将新的人脸图片添加到一个人员下。
+     * 一个人员最多允许包含 5 张图片。
      * 该接口属于 POST 请求。
      */
     public static void addPersonFace(COSClient client) {
@@ -81,6 +79,7 @@ public class PersonFaceDemo {
 
     /**
      * searchPersonFace
+     * 该接口用于对一张待识别的人脸图片，在一人员库中识别出最相似的人员，识别结果按照相似度从大到小排序
      * 该接口属于 GET 请求。
      */
     public static void searchPersonFace(COSClient client) {
@@ -97,6 +96,7 @@ public class PersonFaceDemo {
 
     /**
      * deletePersonFace
+     * 该接口用于删除一个人员下的人脸图片。如果该人员只有一张人脸图片，则返回错误。
      * 该接口属于 POST 请求。
      */
     public static void deletePersonFace(COSClient client) {
