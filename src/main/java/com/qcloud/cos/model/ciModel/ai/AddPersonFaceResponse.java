@@ -6,6 +6,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  * @author markjrzhang
  * @date 2023/10/27 16:14
  */
+@XStreamAlias("Response")
 public class AddPersonFaceResponse {
     /**
      * 加入成功的人脸数量示例值：1;是 否必传：否
@@ -17,8 +18,8 @@ public class AddPersonFaceResponse {
      * 加入成功的人脸ID列表
      * 示例值：["2875186538564559728"];是否必传：否
      */
-    @XStreamAlias("SucFaceIds")
-    private String sucFaceIds;
+    @XStreamAlias("SucFaceId")
+    private String sucFaceId;
 
     /**
      * 每张人脸图片添加结果，-1101 代表未检测到人脸，-1102 代表图片解码失败，
@@ -40,8 +41,8 @@ public class AddPersonFaceResponse {
     /**
      * 加入成功的人脸框位置。顺序和入参中 objectkey 的顺序一致。;是否必传：否
      */
-    @XStreamAlias("SucFaceRects")
-    private SucFaceRects sucFaceRects;
+    @XStreamAlias("SucFaceRect")
+    private SucFaceRects sucFaceRect;
 
     /**
      * 唯一请求 ID，每次请求都会返回。定位问题时需要提供该次请求的 RequestId。;是否必传：否
@@ -55,14 +56,6 @@ public class AddPersonFaceResponse {
 
     public void setSucFaceNum(Integer sucFaceNum) {
         this.sucFaceNum = sucFaceNum;
-    }
-
-    public String getSucFaceIds() {
-        return sucFaceIds;
-    }
-
-    public void setSucFaceIds(String sucFaceIds) {
-        this.sucFaceIds = sucFaceIds;
     }
 
     public Integer getRetCode() {
@@ -81,12 +74,12 @@ public class AddPersonFaceResponse {
         this.sucIndexes = sucIndexes;
     }
 
-    public SucFaceRects getSucFaceRects() {
-        return sucFaceRects;
+    public SucFaceRects getSucFaceRect() {
+        return sucFaceRect;
     }
 
-    public void setSucFaceRects(SucFaceRects sucFaceRects) {
-        this.sucFaceRects = sucFaceRects;
+    public void setSucFaceRect(SucFaceRects sucFaceRect) {
+        this.sucFaceRect = sucFaceRect;
     }
 
     public String getRequestId() {
@@ -97,5 +90,11 @@ public class AddPersonFaceResponse {
         this.requestId = requestId;
     }
 
+    public String getSucFaceId() {
+        return sucFaceId;
+    }
 
+    public void setSucFaceId(String sucFaceId) {
+        this.sucFaceId = sucFaceId;
+    }
 }

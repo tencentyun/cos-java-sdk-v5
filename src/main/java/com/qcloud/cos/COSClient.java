@@ -5040,6 +5040,7 @@ public class COSClient implements COS {
         CosHttpRequest<DeletePersonFaceRequest> request = createRequest(customRequest.getBucketName(), "/" + customRequest.getObjectKey(), customRequest, HttpMethodName.POST);
         request.addParameter("ci-process","FaceSearch");
         request.addParameter("action","DeletePersonFace");
+        this.setContent(request, CIAuditingXmlFactoryV2.convertToXmlByteArray(customRequest), "application/xml", false);
         invoke(request, voidCosResponseHandler);
         return true;
     }
