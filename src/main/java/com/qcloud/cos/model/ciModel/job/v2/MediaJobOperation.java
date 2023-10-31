@@ -32,6 +32,7 @@ import com.qcloud.cos.model.ciModel.template.MediaSnapshotObject;
 import com.qcloud.cos.model.ciModel.template.MediaVideoMontageObject;
 import com.qcloud.cos.model.ciModel.template.MediaWatermark;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -175,6 +176,20 @@ public class MediaJobOperation {
 
     @XStreamAlias("SpeechRecognitionResult")
     private SpeechRecognitionResult speechRecognitionResult;
+
+    @XStreamAlias("FillConcat")
+    private FillConcat fillConcat;
+
+    public FillConcat getFillConcat() {
+        if (fillConcat == null) {
+            fillConcat = new FillConcat();
+        }
+        return fillConcat;
+    }
+
+    public void setFillConcat(FillConcat fillConcat) {
+        this.fillConcat = fillConcat;
+    }
 
     public SegmentVideoBody getSegmentVideoBody() {
         if (segmentVideoBody == null) {
