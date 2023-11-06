@@ -13,6 +13,28 @@ public class FillConcat {
     @XStreamAlias("Format")
     private String format;
 
+    @XStreamAlias("RefMode")
+    private String refMode;
+
+    @XStreamAlias("Reflndex")
+    private String reflndex;
+
+    public String getRefMode() {
+        return refMode;
+    }
+
+    public void setRefMode(String refMode) {
+        this.refMode = refMode;
+    }
+
+    public String getReflndex() {
+        return reflndex;
+    }
+
+    public void setReflndex(String reflndex) {
+        this.reflndex = reflndex;
+    }
+
     public void setFillInput(List<FillInput> fillInput) {
         this.fillInput = fillInput;
     }
