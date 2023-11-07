@@ -13,6 +13,16 @@ public class OutputFile {
     private String objectName;
     @XStreamAlias("Md5Info")
     private Md5Info md5Info;
+    @XStreamAlias("ObjectUrl")
+    private String objectUrl;
+
+    public String getObjectUrl() {
+        return objectUrl;
+    }
+
+    public void setObjectUrl(String objectUrl) {
+        this.objectUrl = objectUrl;
+    }
 
     public String getRegion() {
         return region;

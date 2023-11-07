@@ -10,7 +10,6 @@ public class CIAuditingXmlFactoryV2 extends CIAuditingXmlFactory {
 
     public static byte[] convertToXmlByteArray(Object obj) {
         String s = XStreamXmlResponsesSaxParser.toXML(obj);
-        System.out.println(s);
         return s.getBytes();
     }
 

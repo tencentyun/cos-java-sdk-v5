@@ -1,5 +1,7 @@
 package com.qcloud.cos.model.ciModel.mediaInfo;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  * MediaInfo 格式详情实体类 详情见：https://cloud.tencent.com/document/product/460/38935
  */
@@ -7,34 +9,49 @@ public class MediaFormat {
     /**
      * 比特率，单位为 kbps
      */
+    @XStreamAlias("Bitrate")
     private String bitrate;
+
     /**
      * 时长，单位为秒
      */
+    @XStreamAlias("Duration")
     private String duration;
+
     /**
      * 容器格式的详细名称
      */
+    @XStreamAlias("FormatLongName")
     private String formatLongName;
+
     /**
      * 容器格式名称
      */
+    @XStreamAlias("FormatName")
     private String formatName;
+
     /**
      * 节目的数量
      */
+    @XStreamAlias("NumProgram")
     private String numProgram;
+
     /**
-     *	Stream（包含 Video、Audio、Subtitle）的数量
+     * Stream（包含 Video、Audio、Subtitle）的数量
      */
+    @XStreamAlias("NumStream")
     private String numStream;
+
     /**
      * 大小，单位为 Byte
      */
+    @XStreamAlias("Size")
     private String size;
+
     /**
      * 起始时间，单位为秒
      */
+    @XStreamAlias("StartTime")
     private String startTime;
 
     public String getBitrate() {

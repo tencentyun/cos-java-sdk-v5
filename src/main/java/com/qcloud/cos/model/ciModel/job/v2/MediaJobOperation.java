@@ -12,8 +12,6 @@ import com.qcloud.cos.model.ciModel.job.MediaTimeIntervalObject;
 import com.qcloud.cos.model.ciModel.job.MediaTranscodeObject;
 import com.qcloud.cos.model.ciModel.job.MediaTtsConfig;
 import com.qcloud.cos.model.ciModel.job.PicProcessResult;
-import com.qcloud.cos.model.ciModel.job.PostSpeechRecognitionRequest;
-import com.qcloud.cos.model.ciModel.job.PostSpeechRecognitionResponse;
 import com.qcloud.cos.model.ciModel.job.QualityEstimate;
 import com.qcloud.cos.model.ciModel.job.QualityEstimateConfig;
 import com.qcloud.cos.model.ciModel.job.Subtitles;
@@ -175,6 +173,45 @@ public class MediaJobOperation {
 
     @XStreamAlias("SpeechRecognitionResult")
     private SpeechRecognitionResult speechRecognitionResult;
+
+    @XStreamAlias("FillConcat")
+    private FillConcat fillConcat;
+
+    @XStreamAlias("SplitVideoParts")
+    private SplitVideoParts splitVideoParts;
+
+    @XStreamAlias("SplitVideoInfoResult")
+    private SplitVideoInfoResult splitVideoInfoResult;
+
+    public SplitVideoParts getSplitVideoParts() {
+        if (splitVideoParts == null) {
+            splitVideoParts = new SplitVideoParts();
+        }
+        return splitVideoParts;
+    }
+
+    public void setSplitVideoParts(SplitVideoParts splitVideoParts) {
+        this.splitVideoParts = splitVideoParts;
+    }
+
+    public SplitVideoInfoResult getSplitVideoInfoResult() {
+        return splitVideoInfoResult;
+    }
+
+    public void setSplitVideoInfoResult(SplitVideoInfoResult splitVideoInfoResult) {
+        this.splitVideoInfoResult = splitVideoInfoResult;
+    }
+
+    public FillConcat getFillConcat() {
+        if (fillConcat == null) {
+            fillConcat = new FillConcat();
+        }
+        return fillConcat;
+    }
+
+    public void setFillConcat(FillConcat fillConcat) {
+        this.fillConcat = fillConcat;
+    }
 
     public SegmentVideoBody getSegmentVideoBody() {
         if (segmentVideoBody == null) {
