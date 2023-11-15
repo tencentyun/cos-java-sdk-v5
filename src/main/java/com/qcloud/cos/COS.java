@@ -67,6 +67,10 @@ import com.qcloud.cos.model.ciModel.job.MediaJobsRequest;
 import com.qcloud.cos.model.ciModel.job.MediaListJobResponse;
 import com.qcloud.cos.model.ciModel.job.PostSpeechRecognitionRequest;
 import com.qcloud.cos.model.ciModel.job.PostSpeechRecognitionResponse;
+import com.qcloud.cos.model.ciModel.job.v2.DNADbConfigsRequest;
+import com.qcloud.cos.model.ciModel.job.v2.DNADbConfigsResponse;
+import com.qcloud.cos.model.ciModel.job.v2.DNADbFilesRequest;
+import com.qcloud.cos.model.ciModel.job.v2.DNADbFilesResponse;
 import com.qcloud.cos.model.ciModel.job.v2.MediaJobResponseV2;
 import com.qcloud.cos.model.ciModel.job.v2.MediaJobsRequestV2;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoRequest;
@@ -3254,6 +3258,10 @@ public interface COS extends COSDirectSpi {
     SearchPersonFaceResponse searchPersonFace(SearchPersonFaceRequest customRequest);
 
     boolean deletePersonFace(DeletePersonFaceRequest customRequest);
+
+    DNADbFilesResponse describeMediaDnaDbFiles(DNADbFilesRequest request);
+
+    DNADbConfigsResponse describeMediaDnaDbs(DNADbConfigsRequest request);
 }
 
 

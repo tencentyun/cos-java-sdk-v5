@@ -153,6 +153,10 @@ import com.qcloud.cos.model.ciModel.job.MediaJobsRequest;
 import com.qcloud.cos.model.ciModel.job.MediaListJobResponse;
 import com.qcloud.cos.model.ciModel.job.PostSpeechRecognitionRequest;
 import com.qcloud.cos.model.ciModel.job.PostSpeechRecognitionResponse;
+import com.qcloud.cos.model.ciModel.job.v2.DNADbConfigsRequest;
+import com.qcloud.cos.model.ciModel.job.v2.DNADbConfigsResponse;
+import com.qcloud.cos.model.ciModel.job.v2.DNADbFilesRequest;
+import com.qcloud.cos.model.ciModel.job.v2.DNADbFilesResponse;
 import com.qcloud.cos.model.ciModel.job.v2.MediaJobResponseV2;
 import com.qcloud.cos.model.ciModel.job.v2.MediaJobsRequestV2;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoRequest;
@@ -5043,6 +5047,27 @@ public class COSClient implements COS {
         this.setContent(request, CIAuditingXmlFactoryV2.convertToXmlByteArray(customRequest), "application/xml", false);
         invoke(request, voidCosResponseHandler);
         return true;
+    }
+
+    @Override
+    public DNADbFilesResponse describeMediaDnaDbFiles(DNADbFilesRequest dnaDbFilesRequest) {
+        rejectNull(dnaDbFilesRequest, "The request parameter must be specified setting the object tags");
+        CosHttpRequest<DNADbFilesRequest> request = createRequest(dnaDbFilesRequest.getBucket(), "/", dnaDbFilesRequest, HttpMethodName.GET);
+        addParameterIfNotNull(request, "object", dnaDbFilesRequest.getObject());
+        addParameterIfNotNull(request, "dnaDbId", dnaDbFilesRequest.getDnaDbId());
+        addParameterIfNotNull(request, "pageNumber", dnaDbFilesRequest.getPageNumber());
+        addParameterIfNotNull(request, "pageSize", dnaDbFilesRequest.getPageSize());
+        return invoke(request, new Unmarshallers.CICommonUnmarshaller<DNADbFilesResponse>(DNADbFilesResponse.class));
+    }
+
+    @Override
+    public DNADbConfigsResponse describeMediaDnaDbs(DNADbConfigsRequest dnaDbConfigsRequest) {
+        rejectNull(dnaDbConfigsRequest, "The request parameter must be specified setting the object tags");
+        CosHttpRequest<DNADbConfigsRequest> request = createRequest(dnaDbConfigsRequest.getBucketName(), "/", dnaDbConfigsRequest, HttpMethodName.GET);
+        addParameterIfNotNull(request, "ids", dnaDbConfigsRequest.getIds());
+        addParameterIfNotNull(request, "pageNumber", dnaDbConfigsRequest.getPageNumber());
+        addParameterIfNotNull(request, "pageSize", dnaDbConfigsRequest.getPageSize());
+        return invoke(request, new Unmarshallers.CICommonUnmarshaller<DNADbConfigsResponse>(DNADbConfigsResponse.class));
     }
 
 }

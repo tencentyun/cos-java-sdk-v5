@@ -1,7 +1,12 @@
 package com.qcloud.cos.model.ciModel.job;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 public class FileHashCodeConfig {
+    @XStreamAlias("Type")
     private String type;
+
+    @XStreamAlias("AddToHeader")
     private String addToHeader;
 
     public String getType() {

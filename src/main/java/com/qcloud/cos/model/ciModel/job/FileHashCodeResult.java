@@ -1,14 +1,27 @@
 package com.qcloud.cos.model.ciModel.job;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 public class FileHashCodeResult {
+    @XStreamAlias("MD5")
     private String md5;
+
+    @XStreamAlias("SHA1")
     private String sha1;
+
+    @XStreamAlias("SHA256")
     private String sha256;
+
+    @XStreamAlias("FileSize")
     private String fileSize;
+
+    @XStreamAlias("LastModified")
     private String lastModified;
+
     /**
      * HTTP1.1规定 ETag需要放在双引号内 该值内容为"xxxxxx"
      */
+    @XStreamAlias("ETag")
     private String etag;
 
     public String getMd5() {

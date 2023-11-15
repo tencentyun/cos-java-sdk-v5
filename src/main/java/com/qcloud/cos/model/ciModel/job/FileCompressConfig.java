@@ -1,14 +1,27 @@
 package com.qcloud.cos.model.ciModel.job;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamImplicit;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class FileCompressConfig {
+    @XStreamAlias("Flatten")
     private String flatten;
+
+    @XStreamAlias("Format")
     private String format;
+
+    @XStreamAlias("UrlList")
     private String urlList;
+
+    @XStreamAlias("Prefix")
     private String prefix;
+
+    @XStreamImplicit(itemFieldName = "Key")
     private List<String> key;
+
 
     public String getFlatten() {
         return flatten;

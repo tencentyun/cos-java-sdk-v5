@@ -1,7 +1,12 @@
 package com.qcloud.cos.model.ciModel.job;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 public class FileUnCompressConfig {
+    @XStreamAlias("Prefix")
     private String prefix;
+
+    @XStreamAlias("PrefixReplaced")
     private String prefixReplaced;
 
     public String getPrefix() {
