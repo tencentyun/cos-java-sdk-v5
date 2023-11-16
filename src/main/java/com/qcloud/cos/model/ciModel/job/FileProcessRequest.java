@@ -8,6 +8,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 /**
  * 文件处理请求类
  */
+@XStreamAlias("Request")
 public class FileProcessRequest extends CIServiceRequest {
     @XStreamAlias("Tag")
     private FileProcessJobType tag;
@@ -77,6 +78,9 @@ public class FileProcessRequest extends CIServiceRequest {
     }
 
     public CallBackMqConfig getCallBackMqConfig() {
+        if (callBackMqConfig == null) {
+            callBackMqConfig = new CallBackMqConfig();
+        }
         return callBackMqConfig;
     }
 

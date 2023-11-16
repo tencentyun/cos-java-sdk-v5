@@ -7,7 +7,7 @@ public class FileProcessOperation {
     @XStreamAlias("FileCompressConfig")
     private FileCompressConfig fileCompressConfig;
 
-    @XStreamAlias("FileUnCompressConfig")
+    @XStreamAlias("FileUncompressConfig")
     private FileUnCompressConfig fileUnCompressConfig;
 
     @XStreamAlias("FileHashCodeConfig")

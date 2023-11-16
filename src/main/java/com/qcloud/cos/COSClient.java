@@ -4781,7 +4781,7 @@ public class COSClient implements COS {
     public FileProcessJobResponse createFileProcessJob(FileProcessRequest req) {
         this.rejectStartWith(req.getCallBack(),"http","The CallBack parameter mush start with http or https");
         CosHttpRequest<FileProcessRequest> request = createRequest(req.getBucketName(), "/file_jobs", req, HttpMethodName.POST);
-        this.setContent(request, CIFileProcessXmlFactory.convertToXmlByteArray(req), "application/xml", false);
+        this.setContent(request, CIAuditingXmlFactoryV2.convertToXmlByteArray(req), "application/xml", false);
         return invoke(request, new Unmarshallers.FileProcessUnmarshaller());
     }
 
@@ -5052,7 +5052,7 @@ public class COSClient implements COS {
     @Override
     public DNADbFilesResponse describeMediaDnaDbFiles(DNADbFilesRequest dnaDbFilesRequest) {
         rejectNull(dnaDbFilesRequest, "The request parameter must be specified setting the object tags");
-        CosHttpRequest<DNADbFilesRequest> request = createRequest(dnaDbFilesRequest.getBucket(), "/dnadb_files", dnaDbFilesRequest, HttpMethodName.GET);
+        CosHttpRequest<DNADbFilesRequest> request = createRequest(dnaDbFilesRequest.getBucketName(), "/dnadb_files", dnaDbFilesRequest, HttpMethodName.GET);
         addParameterIfNotNull(request, "object", dnaDbFilesRequest.getObject());
         addParameterIfNotNull(request, "dnaDbId", dnaDbFilesRequest.getDnaDbId());
         addParameterIfNotNull(request, "pageNumber", dnaDbFilesRequest.getPageNumber());

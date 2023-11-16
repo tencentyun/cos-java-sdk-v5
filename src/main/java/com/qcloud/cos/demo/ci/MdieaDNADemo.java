@@ -8,10 +8,7 @@ import com.qcloud.cos.model.ciModel.job.v2.DNADbFilesResponse;
 import com.qcloud.cos.model.ciModel.job.v2.DnaConfig;
 import com.qcloud.cos.model.ciModel.job.v2.MediaJobResponseV2;
 import com.qcloud.cos.model.ciModel.job.v2.MediaJobsRequestV2;
-import com.qcloud.cos.model.ciModel.job.v2.SplitVideoInfoResult;
-import com.qcloud.cos.model.ciModel.job.v2.TimeInfo;
-
-import java.util.List;
+import com.qcloud.cos.utils.Jackson;
 
 /**
  * 视频 DNA 任务可实现视频入库、视频查重、视频出库操作。
@@ -22,7 +19,7 @@ public class MdieaDNADemo {
         // 1 初始化用户身份信息（secretId, secretKey）。
         COSClient client = ClientUtils.getTestClient();
         // 2 调用要使用的方法。
-        describeMediaDnaDbs(client);
+        createMediaJobs(client);
     }
 
     /**
@@ -35,13 +32,12 @@ public class MdieaDNADemo {
         //1.创建任务请求对象
         MediaJobsRequestV2 request = new MediaJobsRequestV2();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("markjrzhang-1251704708");
+        request.setBucketName("demo-1234567890");
         request.setTag("DNA");
-        request.getInput().setObject("media/1.mp4");
+        request.getInput().setObject("media/test.mp4");
         //2.1添加DNA 任务操作参数
         DnaConfig dnaConfig = request.getOperation().getDnaConfig();
         dnaConfig.setRuleType("GetFingerPrint");
-        dnaConfig.setDnaDbId("");
         //3.调用接口,获取任务响应对象
         MediaJobResponseV2 response = client.createMediaJobsV2(request);
         System.out.println(response.getJobsDetail().getJobId());
@@ -57,11 +53,11 @@ public class MdieaDNADemo {
         MediaJobsRequestV2 request = new MediaJobsRequestV2();
         //2.添加请求参数 参数详情请见api接口文档
         request.setBucketName("demo-1234567890");
-        request.setJobId("jb190c6d07d6d11ee97ab293941*****");
+        request.setJobId("j9cdbb46e845411ee9d800f9b074616ce");
         //3.调用接口,获取任务响应对象
         MediaJobResponseV2 response = client.describeMediaJobV2(request);
-        SplitVideoInfoResult splitVideoInfoResult = response.getJobsDetail().getOperation().getSplitVideoInfoResult();
-        List<TimeInfo> timeInfos = splitVideoInfoResult.getTimeInfos();
+        System.out.println(Jackson.toJsonString(response));
+
     }
 
     /**
@@ -70,10 +66,12 @@ public class MdieaDNADemo {
     public static void describeMediaDnaDbFiles(COSClient client) {
         //1.创建任务请求对象
         DNADbFilesRequest request = new DNADbFilesRequest();
-        request.setBucketName("markjrzhang-1251704708");
+        request.setBucketName("demo-1234567890");
+        request.setDnaDbId("Dnadeed68f8d15a45e6b867491195904695");
         //2.添加请求参数 参数详情请见api接口文档
         //3.调用接口,获取任务响应对象
-        DNADbFilesResponse dnaDbFilesResponse = client.describeMediaDnaDbFiles(request);
+        DNADbFilesResponse response = client.describeMediaDnaDbFiles(request);
+        System.out.println(Jackson.toJsonString(response));
     }
 
     /**
@@ -82,10 +80,11 @@ public class MdieaDNADemo {
     public static void describeMediaDnaDbs(COSClient client) {
         //1.创建任务请求对象
         DNADbConfigsRequest request = new DNADbConfigsRequest();
-        request.setBucketName("markjrzhang-1251704708");
+        request.setBucketName("demo-1234567890");
         //2.添加请求参数 参数详情请见api接口文档
         //3.调用接口,获取任务响应对象
         DNADbConfigsResponse response = client.describeMediaDnaDbs(request);
+        System.out.println(Jackson.toJsonString(response));
     }
 
 

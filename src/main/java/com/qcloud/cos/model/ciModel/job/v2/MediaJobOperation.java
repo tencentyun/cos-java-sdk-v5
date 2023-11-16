@@ -189,6 +189,14 @@ public class MediaJobOperation {
     @XStreamAlias("DNAResult")
     private DNAResult dnaResult;
 
+    public DNAResult getDnaResult() {
+        return dnaResult;
+    }
+
+    public void setDnaResult(DNAResult dnaResult) {
+        this.dnaResult = dnaResult;
+    }
+
     public DnaConfig getDnaConfig() {
         if (dnaConfig == null) {
             dnaConfig = new DnaConfig();

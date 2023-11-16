@@ -3,7 +3,6 @@ package com.qcloud.cos.model.ciModel.job.v2;
 import com.qcloud.cos.internal.CIServiceRequest;
 
 public class DNADbFilesRequest extends CIServiceRequest {
-    private String bucket;
 
     private String object;
 
@@ -12,14 +11,6 @@ public class DNADbFilesRequest extends CIServiceRequest {
     private Integer pageNumber;
 
     private Integer pageSize;
-
-    public String getBucket() {
-        return bucket;
-    }
-
-    public void setBucket(String bucket) {
-        this.bucket = bucket;
-    }
 
     public String getObject() {
         return object;

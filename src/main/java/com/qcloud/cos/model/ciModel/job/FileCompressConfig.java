@@ -9,19 +9,44 @@ import java.util.List;
 public class FileCompressConfig {
     @XStreamAlias("Flatten")
     private String flatten;
-
     @XStreamAlias("Format")
     private String format;
-
+    @XStreamAlias("Type")
+    private String type;
+    @XStreamAlias("CompressKey")
+    private String compressKey;
     @XStreamAlias("UrlList")
     private String urlList;
-
     @XStreamAlias("Prefix")
     private String prefix;
-
+    @XStreamAlias("IgnoreError")
+    private String ignoreError;
     @XStreamImplicit(itemFieldName = "Key")
     private List<String> key;
 
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getCompressKey() {
+        return compressKey;
+    }
+
+    public void setCompressKey(String compressKey) {
+        this.compressKey = compressKey;
+    }
+
+    public String getIgnoreError() {
+        return ignoreError;
+    }
+
+    public void setIgnoreError(String ignoreError) {
+        this.ignoreError = ignoreError;
+    }
 
     public String getFlatten() {
         return flatten;

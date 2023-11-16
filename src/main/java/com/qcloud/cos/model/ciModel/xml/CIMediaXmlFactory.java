@@ -701,6 +701,7 @@ public class CIMediaXmlFactory {
         addIfNotNull(xml, "Profile", video.getProfile());
         addIfNotNull(xml, "Remove", video.getRemove());
         addIfNotNull(xml, "ScanMode", video.getScanMode());
+        addIfNotNull(xml, "Pixfmt", video.getPixfmt());
         xml.end();
     }
 
