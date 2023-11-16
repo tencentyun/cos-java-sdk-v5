@@ -5052,7 +5052,7 @@ public class COSClient implements COS {
     @Override
     public DNADbFilesResponse describeMediaDnaDbFiles(DNADbFilesRequest dnaDbFilesRequest) {
         rejectNull(dnaDbFilesRequest, "The request parameter must be specified setting the object tags");
-        CosHttpRequest<DNADbFilesRequest> request = createRequest(dnaDbFilesRequest.getBucket(), "/", dnaDbFilesRequest, HttpMethodName.GET);
+        CosHttpRequest<DNADbFilesRequest> request = createRequest(dnaDbFilesRequest.getBucket(), "/dnadb_files", dnaDbFilesRequest, HttpMethodName.GET);
         addParameterIfNotNull(request, "object", dnaDbFilesRequest.getObject());
         addParameterIfNotNull(request, "dnaDbId", dnaDbFilesRequest.getDnaDbId());
         addParameterIfNotNull(request, "pageNumber", dnaDbFilesRequest.getPageNumber());
@@ -5063,7 +5063,7 @@ public class COSClient implements COS {
     @Override
     public DNADbConfigsResponse describeMediaDnaDbs(DNADbConfigsRequest dnaDbConfigsRequest) {
         rejectNull(dnaDbConfigsRequest, "The request parameter must be specified setting the object tags");
-        CosHttpRequest<DNADbConfigsRequest> request = createRequest(dnaDbConfigsRequest.getBucketName(), "/", dnaDbConfigsRequest, HttpMethodName.GET);
+        CosHttpRequest<DNADbConfigsRequest> request = createRequest(dnaDbConfigsRequest.getBucketName(), "/dnadb", dnaDbConfigsRequest, HttpMethodName.GET);
         addParameterIfNotNull(request, "ids", dnaDbConfigsRequest.getIds());
         addParameterIfNotNull(request, "pageNumber", dnaDbConfigsRequest.getPageNumber());
         addParameterIfNotNull(request, "pageSize", dnaDbConfigsRequest.getPageSize());

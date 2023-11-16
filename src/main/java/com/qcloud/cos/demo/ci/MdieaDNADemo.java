@@ -3,6 +3,8 @@ package com.qcloud.cos.demo.ci;
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.model.ciModel.job.v2.DNADbConfigsRequest;
 import com.qcloud.cos.model.ciModel.job.v2.DNADbConfigsResponse;
+import com.qcloud.cos.model.ciModel.job.v2.DNADbFilesRequest;
+import com.qcloud.cos.model.ciModel.job.v2.DNADbFilesResponse;
 import com.qcloud.cos.model.ciModel.job.v2.DnaConfig;
 import com.qcloud.cos.model.ciModel.job.v2.MediaJobResponseV2;
 import com.qcloud.cos.model.ciModel.job.v2.MediaJobsRequestV2;
@@ -29,7 +31,7 @@ public class MdieaDNADemo {
      *
      * @param client
      */
-    public static void createMediaJobs(COSClient client){
+    public static void createMediaJobs(COSClient client) {
         //1.创建任务请求对象
         MediaJobsRequestV2 request = new MediaJobsRequestV2();
         //2.添加请求参数 参数详情请见api接口文档
@@ -63,9 +65,19 @@ public class MdieaDNADemo {
     }
 
     /**
-     * DescribeMediaDnaDbFiles 获取 DNA 库中文件列表
-     *
-     * @param client
+     * describeMediaDnaDbFiles 获取 DNA 库中文件列表
+     */
+    public static void describeMediaDnaDbFiles(COSClient client) {
+        //1.创建任务请求对象
+        DNADbFilesRequest request = new DNADbFilesRequest();
+        request.setBucketName("markjrzhang-1251704708");
+        //2.添加请求参数 参数详情请见api接口文档
+        //3.调用接口,获取任务响应对象
+        DNADbFilesResponse dnaDbFilesResponse = client.describeMediaDnaDbFiles(request);
+    }
+
+    /**
+     * describeMediaDnaDbs 查询 DNA 库列表
      */
     public static void describeMediaDnaDbs(COSClient client) {
         //1.创建任务请求对象
@@ -75,7 +87,6 @@ public class MdieaDNADemo {
         //3.调用接口,获取任务响应对象
         DNADbConfigsResponse response = client.describeMediaDnaDbs(request);
     }
-
 
 
 }
