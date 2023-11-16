@@ -14,7 +14,7 @@ import com.qcloud.cos.utils.Jackson;
  * 视频 DNA 任务可实现视频入库、视频查重、视频出库操作。
  * 详细内容请参考API : https://cloud.tencent.com/document/product/460/96115
  */
-public class MdieaDNADemo {
+public class MediaDNADemo {
     public static void main(String[] args) throws Exception {
         // 1 初始化用户身份信息（secretId, secretKey）。
         COSClient client = ClientUtils.getTestClient();
