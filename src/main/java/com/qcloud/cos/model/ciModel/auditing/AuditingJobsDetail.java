@@ -1,5 +1,8 @@
 package com.qcloud.cos.model.ciModel.auditing;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamImplicit;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,138 +10,175 @@ public class AuditingJobsDetail {
     /**
      * 新创建任务的 ID
      */
+    @XStreamAlias("JobId")
     private String jobId;
+
     /**
      * 任务的状态，为 Submitted、Snapshoting、Success、Failed、Auditing 其中一个
      */
+    @XStreamAlias("State")
     private String state;
+
     /**
      * 任务的创建时间
      */
+    @XStreamAlias("CreationTime")
     private String creationTime;
 
     /**
      * 错误码，只有 State 为 Failed 时有意义
      */
+    @XStreamAlias("Code")
     private String code;
+
     /**
      * 错误描述，只有 State 为 Failed 时有意义
      */
+    @XStreamAlias("Message")
     private String message;
 
     /**
      * 任务对象
      */
+    @XStreamAlias("Object")
     private String object;
 
     /**
      * 任务内容
      */
+    @XStreamAlias("Content")
     private String content;
 
     /**
      * 截图数量
      */
+    @XStreamAlias("SnapshotCount")
     private String snapshotCount;
 
     /**
      * 文本分片数量
      */
+    @XStreamAlias("SectionCount")
     private String sectionCount;
 
     /**
      * 供参考的识别结果，0表示确认正常，1表示确认敏感，2表示疑似敏感
      */
+    @XStreamAlias("Result")
     private String result;
 
     /**
      * 审核文本
      */
+    @XStreamAlias("AudioText")
     private String audioText;
 
     /**
      * 内容url地址
      */
+    @XStreamAlias("Url")
     private String url;
 
     /**
      * 数据id
      */
+    @XStreamAlias("DataId")
     private String dataId;
+
     /**
      * 标签
      */
+    @XStreamAlias("Label")
     private String label;
 
     /**
      * 二级标签
      */
+    @XStreamAlias("SubLabel")
     private String subLabel;
+
     /**
      * 二级标签
      */
+    @XStreamAlias("ForbidState")
     private String forbidState;
 
     /**
      * 审核结果 鉴黄信息
      */
+    @XStreamAlias("PornInfo")
     private PornInfo pornInfo;
 
     /**
      * 审核结果 暴恐信息
      */
+    @XStreamAlias("TerroristInfo")
     private TerroristInfo terroristInfo;
 
     /**
      * 审核结果 政治敏感信息
      */
+    @XStreamAlias("PoliticsInfo")
     private PoliticsInfo politicsInfo;
 
     /**
      * 审核结果 广告信息
      */
+    @XStreamAlias("AdsInfo")
     private AdsInfo adsInfo;
 
     /**
      * 审核结果 谩骂信息
      */
+    @XStreamAlias("AbuseInfo")
     private AbuseInfo abuseInfo;
 
     /**
      * 审核结果 违法信息
      */
+    @XStreamAlias("IllegalInfo")
     private IllegalInfo illegalInfo;
 
     /**
      * 审核结果 青少年信息
      */
+    @XStreamAlias("TeenagerInfo")
     private TeenagerInfo teenagerInfo;
+
+    @XStreamAlias("MeaninglessInfo")
     private MeaninglessInfo meaninglessInfo;
 
+    @XStreamImplicit(itemFieldName = "SnapshotInfo")
     private List<SnapshotInfo> snapshotList;
 
+    @XStreamImplicit(itemFieldName = "AudioSectionInfo")
     private List<AudioSectionInfo> audioSectionList = new ArrayList<>();
 
     /**
      * 具体文本分片的审核结果信息，只返回带有违规结果的分片
      */
+    @XStreamImplicit(itemFieldName = "Section")
     private List<SectionInfo> sectionList;
 
-    /**
-     *
-     */
+    @XStreamAlias("AudioSection")
     private SectionInfo audioSection;
 
     /**
      * 用户自定义信息
      */
+    @XStreamAlias("UserInfo")
     private UserInfo userInfo = new UserInfo();
+
     /**
      * 黑白名单信息
      */
+    @XStreamAlias("ListInfo")
     private ListInfo listInfo = new ListInfo();
+
+    @XStreamAlias("Type")
     private String type;
 
+    @XStreamAlias("MaskInfo")
     private MaskInfo maskInfo;
 
     public MeaninglessInfo getMeaninglessInfo() {

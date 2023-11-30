@@ -4156,6 +4156,13 @@ public class COSClient implements COS {
                 createRequest(bucketName, key, imageProcessRequest, HttpMethodName.POST);
         request.addParameter("image_process", null);
         request.addHeader(Headers.PIC_OPERATIONS, Jackson.toJsonString(imageProcessRequest.getPicOperations()));
+        Map<String, String> customRequestHeader = imageProcessRequest.getCustomRequestHeader();
+        if (customRequestHeader != null) {
+            for (String headerKey : customRequestHeader.keySet()) {
+                request.addHeader(headerKey, customRequestHeader.get(headerKey));
+            }
+        }
+
         ObjectMetadata returnedMetadata = invoke(request, new ResponseHeaderHandlerChain<>(
                 new Unmarshallers.ImagePersistenceUnmarshaller(), new CosMetadataResponseHandler()));
         return returnedMetadata.getCiUploadResult();
@@ -4252,7 +4259,7 @@ public class COSClient implements COS {
         this.rejectStartWith(textAuditingRequest.getConf().getCallback(), "http", "The Conf.CallBack parameter mush start with http or https");
         CosHttpRequest<TextAuditingRequest> request = createRequest(textAuditingRequest.getBucketName(), "/text/auditing", textAuditingRequest, HttpMethodName.POST);
         this.setContent(request, CIAuditingXmlFactory.convertToXmlByteArray(textAuditingRequest), "application/xml", false);
-        return invoke(request, new Unmarshallers.TextAuditingJobUnmarshaller());
+        return invoke(request, new Unmarshallers.CICommonUnmarshaller<TextAuditingResponse>(TextAuditingResponse.class));
     }
 
     @Override
@@ -4261,7 +4268,7 @@ public class COSClient implements COS {
         rejectNull(textAuditingRequest.getJobId(),
                 "The jobId parameter must be specified setting the object tags");
         CosHttpRequest<TextAuditingRequest> request = createRequest(textAuditingRequest.getBucketName(), "/text/auditing/" + textAuditingRequest.getJobId(), textAuditingRequest, HttpMethodName.GET);
-        return invoke(request, new Unmarshallers.TextAuditingDescribeJobUnmarshaller());
+        return invoke(request, new Unmarshallers.CICommonUnmarshaller<TextAuditingResponse>(TextAuditingResponse.class));
     }
 
     @Override

@@ -1,5 +1,8 @@
 package com.qcloud.cos.model.ciModel.auditing;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamImplicit;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,47 +13,74 @@ public class AudtingCommonInfo {
     /**
      * 错误码，0为正确，其他数字对应相应错误。详情请参见 https://cloud.tencent.com/document/product/460/8523
      */
+    @XStreamAlias("Code")
     private String code;
+
     /**
      * 具体错误信息，如正常则为 OK
      */
+    @XStreamAlias("Msg")
     private String msg;
+
     /**
      * 是否命中该审核分类，0表示未命中，1表示命中，2表示疑似
      */
+    @XStreamAlias("HitFlag")
     private String hitFlag;
+
     /**
      * 审核分值。0 - 60分表示图片正常，60 - 90分表示图片疑似敏感，90 - 100分表示图片确定敏感
      */
+    @XStreamAlias("Score")
     private String score;
+
     /**
      * 识别出的图片标签
      */
+    @XStreamAlias("Label")
     private String label;
 
     /**
      * 在当前审核场景下命中的关键词，多关键词以,分隔。
      */
+    @XStreamAlias("Keywords")
     private String keywords;
 
     /**
      * 次数
      */
+    @XStreamAlias("Count")
     private String count;
 
     /**
      * 该字段表示审核命中的具体子标签，例如：Porn 下的 SexBehavior 子标签。
      * 注意：该字段可能返回空，表示未命中具体的子标签。
      */
+    @XStreamAlias("SubLabel")
     private String subLabel;
 
+    @XStreamAlias("OcrResults")
     private OcrResults ocrResults;
 
+    @XStreamAlias("Category")
     private String category;
 
+    @XStreamImplicit(itemFieldName = "ObjectResults")
     private List<ObjectResults> objectResults = new ArrayList<>();
 
+    @XStreamImplicit(itemFieldName = "LibResult")
     private List<LibResult> libResults;
+
+    @XStreamImplicit(itemFieldName = "HitInfos")
+    private List<HitInfo> hitInfos;
+
+    public List<HitInfo> getHitInfos() {
+        return hitInfos;
+    }
+
+    public void setHitInfos(List<HitInfo> hitInfos) {
+        this.hitInfos = hitInfos;
+    }
 
     public AudtingCommonInfo() {
     }

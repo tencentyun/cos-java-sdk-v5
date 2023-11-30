@@ -1,10 +1,14 @@
 package com.qcloud.cos.model.ciModel.auditing;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  * 截图信息，只返回违规的截图信息
  */
 public class AudioSectionInfo extends SectionInfo {
+    @XStreamAlias("OffsetTime")
     private String offsetTime;
+    @XStreamAlias("Duration")
     private String duration;
 
     public String getOffsetTime() {
@@ -22,7 +26,6 @@ public class AudioSectionInfo extends SectionInfo {
     public void setDuration(String duration) {
         this.duration = duration;
     }
-
 
     @Override
     public String toString() {

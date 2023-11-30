@@ -1,18 +1,69 @@
 package com.qcloud.cos.model.ciModel.auditing;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  * 截图信息，只返回违规的截图信息
  */
 public class SnapshotInfo {
+    /**
+     * URL地址
+     */
+    @XStreamAlias("Url")
     private String url;
+
+    /**
+     * 色情信息
+     */
+    @XStreamAlias("PornInfo")
     private PornInfo pornInfo;
+
+    /**
+     * 恐怖分子信息
+     */
+    @XStreamAlias("TerroristInfo")
     private TerroristInfo terroristInfo;
+
+    /**
+     * 政治信息
+     */
+    @XStreamAlias("PoliticsInfo")
     private PoliticsInfo politicsInfo;
+
+    /**
+     * 广告信息
+     */
+    @XStreamAlias("AdsInfo")
     private AdsInfo adsInfo;
+
+    /**
+     * 未成年人信息
+     */
+    @XStreamAlias("TeenagerInfo")
     private TeenagerInfo teenagerInfo = new TeenagerInfo();
+
+    /**
+     * 文本信息
+     */
+    @XStreamAlias("Text")
     private String text;
+
+    /**
+     * 标签信息
+     */
+    @XStreamAlias("Label")
     private String label;
+
+    /**
+     * 结果信息
+     */
+    @XStreamAlias("Result")
     private String result;
+
+    /**
+     * 快照时间
+     */
+    @XStreamAlias("SnapshotTime")
     private String snapshotTime;
 
     public String getUrl() {
