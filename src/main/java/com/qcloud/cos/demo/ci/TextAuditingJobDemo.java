@@ -29,13 +29,13 @@ public class TextAuditingJobDemo {
         //1.创建任务请求对象
         TextAuditingRequest request = new TextAuditingRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("demo-1234567898");
+        request.setBucketName("markjrzhang-1251704708");
         //2.1.1设置对象地址
-//        request.getInput().setObject("1.txt");
+        request.getInput().setObject("1.txt");
         //2.1.2或直接设置请求内容,文本内容的Base64编码
-        request.getInput().setContent("Base64Str");
+//        request.getInput().setContent("Base64Str");
         //2.2设置审核类型参数
-        request.getConf().setDetectType("all");
+//        request.getConf().setDetectType("all");
         //2.3设置审核模板（可选）
 //        request.getConf().setBizType("aa3e9d84a6a079556b0109a935c*****");
         //设置回调信息内容类型 simple精简 Detail详细

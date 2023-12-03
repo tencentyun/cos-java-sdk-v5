@@ -2,6 +2,7 @@ package com.qcloud.cos.model.ciModel.xml;
 
 import com.qcloud.cos.internal.XmlWriter;
 import com.qcloud.cos.model.ciModel.common.MediaInputObject;
+import com.qcloud.cos.model.ciModel.job.CallBackMqConfig;
 import com.qcloud.cos.model.ciModel.job.FileCompressConfig;
 import com.qcloud.cos.model.ciModel.job.FileHashCodeConfig;
 import com.qcloud.cos.model.ciModel.job.FileProcessOperation;
@@ -28,9 +29,18 @@ public class CIFileProcessXmlFactory {
         CIMediaXmlFactory.addIfNotNull(xml, "CallBack", request.getCallBack());
         CIMediaXmlFactory.addIfNotNull(xml, "CallBackFormat", request.getCallBackFormat());
         CIMediaXmlFactory.addIfNotNull(xml, "CallBackType", request.getCallBackType());
-        CIMediaXmlFactory.addIfNotNull(xml, "CallBackMqConfig", request.getCallBackMqConfig());
+        addCallBackMqConfig(xml,request.getCallBackMqConfig());
         xml.end();
         return xml.getBytes();
+    }
+    private static void addCallBackMqConfig(XmlWriter xml, CallBackMqConfig callBackMqConfig) {
+        if (CIMediaXmlFactory.objIsNotValid(callBackMqConfig)) {
+            xml.start("CallBackMqConfig");
+            xml.start("MqRegion").value(callBackMqConfig.getMqRegion()).end();
+            xml.start("MqMode").value(callBackMqConfig.getMqMode()).end();
+            xml.start("MqName").value(callBackMqConfig.getMqName()).end();
+            xml.end();
+        }
     }
 
     private static void addInput(XmlWriter xml, MediaInputObject input) {

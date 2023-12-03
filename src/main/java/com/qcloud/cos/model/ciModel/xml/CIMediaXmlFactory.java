@@ -546,6 +546,9 @@ public class CIMediaXmlFactory {
             xml.start("Segment");
             addIfNotNull(xml, "Duration", segment.getDuration());
             addIfNotNull(xml, "Format", segment.getFormat());
+            addIfNotNull(xml, "TranscodeIndex", segment.getTranscodeIndex());
+            addIfNotNull(xml, "StartTime", segment.getStartTime());
+            addIfNotNull(xml, "EndTime", segment.getEndTime());
             MediaHlsEncryptObject hlsEncrypt = segment.getHlsEncrypt();
             if (objIsNotValid(hlsEncrypt)) {
                 xml.start("HlsEncrypt");
@@ -701,6 +704,7 @@ public class CIMediaXmlFactory {
         addIfNotNull(xml, "Profile", video.getProfile());
         addIfNotNull(xml, "Remove", video.getRemove());
         addIfNotNull(xml, "ScanMode", video.getScanMode());
+        addIfNotNull(xml, "Pixfmt", video.getPixfmt());
         xml.end();
     }
 

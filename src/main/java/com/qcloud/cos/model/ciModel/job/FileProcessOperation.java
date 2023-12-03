@@ -1,13 +1,25 @@
 package com.qcloud.cos.model.ciModel.job;
 
 import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 public class FileProcessOperation {
+    @XStreamAlias("FileCompressConfig")
     private FileCompressConfig fileCompressConfig;
+
+    @XStreamAlias("FileUncompressConfig")
     private FileUnCompressConfig fileUnCompressConfig;
+
+    @XStreamAlias("FileHashCodeConfig")
     private FileHashCodeConfig fileHashCodeConfig;
+
+    @XStreamAlias("FileHashCodeResult")
     private FileHashCodeResult fileHashCodeResult;
+
+    @XStreamAlias("UserData")
     private String userData;
+
+    @XStreamAlias("Output")
     private MediaOutputObject output;
 
     public FileCompressConfig getFileCompressConfig() {

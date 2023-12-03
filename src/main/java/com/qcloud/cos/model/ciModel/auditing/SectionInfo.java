@@ -1,5 +1,8 @@
 package com.qcloud.cos.model.ciModel.auditing;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamImplicit;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,22 +10,64 @@ import java.util.List;
  * 具体文本分片的审核结果信息，只返回带有违规结果的分片
  */
 public class SectionInfo {
+    @XStreamAlias("StartByte")
     private String startByte;
+
+    @XStreamAlias("PornInfo")
     private PornInfo pornInfo;
+
+    @XStreamAlias("TerroristInfo")
     private TerroristInfo terroristInfo;
+
+    @XStreamAlias("PoliticsInfo")
     private PoliticsInfo politicsInfo;
+
+    @XStreamAlias("AdsInfo")
     private AdsInfo adsInfo;
+
+    @XStreamAlias("AbuseInfo")
     private AbuseInfo abuseInfo;
+
+    @XStreamAlias("IllegalInfo")
     private IllegalInfo illegalInfo;
+
+    @XStreamAlias("TeenagerInfo")
     private TeenagerInfo teenagerInfo;
+
+    @XStreamAlias("Text")
     private String text;
+
+    @XStreamAlias("Url")
     private String url;
+
+    @XStreamAlias("Duration")
     private String duration;
+
+    @XStreamAlias("OffsetTime")
     private String offsetTime;
+
+    @XStreamAlias("Label")
     private String label;
+
+    @XStreamAlias("Result")
     private String result;
+
+    @XStreamAlias("SubLabel")
     private String subLabel;
+
+    @XStreamAlias("SentimentAnalysis")
+    private SentimentAnalysis sentimentAnalysis;
+
+    @XStreamImplicit(itemFieldName = "LanguageResult")
     private List<LanguageResult> languageResult = new ArrayList<>();
+
+    public SentimentAnalysis getSentimentAnalysis() {
+        return sentimentAnalysis;
+    }
+
+    public void setSentimentAnalysis(SentimentAnalysis sentimentAnalysis) {
+        this.sentimentAnalysis = sentimentAnalysis;
+    }
 
     public String getSubLabel() {
         return subLabel;

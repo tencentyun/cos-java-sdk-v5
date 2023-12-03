@@ -5,6 +5,8 @@ import com.qcloud.cos.internal.CosServiceRequest;
 import com.qcloud.cos.model.DeleteObjectRequest;
 import com.qcloud.cos.model.ciModel.persistence.PicOperations;
 
+import java.util.Map;
+
 public class ImageProcessRequest extends CosServiceRequest {
     /**
      * The name of the Qcloud COS bucket containing the object to image process
@@ -20,6 +22,7 @@ public class ImageProcessRequest extends CosServiceRequest {
      */
     private PicOperations picOperations;
 
+    private Map<String,String> customRequestHeader;
     /**
      * Constructs a new {@link ImageProcessRequest}, specifying the object's bucket name and key.
      *
@@ -123,5 +126,13 @@ public class ImageProcessRequest extends CosServiceRequest {
     public ImageProcessRequest withKey(PicOperations picOperations) {
         setPicOperations(picOperations);
         return this;
+    }
+
+    public Map<String, String> getCustomRequestHeader() {
+        return customRequestHeader;
+    }
+
+    public void setCustomRequestHeader(Map<String, String> customRequestHeader) {
+        this.customRequestHeader = customRequestHeader;
     }
 }

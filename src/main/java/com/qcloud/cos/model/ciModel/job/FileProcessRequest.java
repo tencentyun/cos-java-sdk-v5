@@ -3,19 +3,38 @@ package com.qcloud.cos.model.ciModel.job;
 import com.qcloud.cos.internal.CIServiceRequest;
 import com.qcloud.cos.model.ciModel.common.MediaInputObject;
 import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  * 文件处理请求类
  */
+@XStreamAlias("Request")
 public class FileProcessRequest extends CIServiceRequest {
+    @XStreamAlias("Tag")
     private FileProcessJobType tag;
+
+    @XStreamAlias("QueueId")
     private String queueId;
+
+    @XStreamAlias("CallBackFormat")
     private String callBackFormat;
+
+    @XStreamAlias("CallBackType")
     private String callBackType;
+
+    @XStreamAlias("CallBack")
     private String callBack;
-    private String callBackMqConfig;
+
+    @XStreamAlias("CallBackMqConfig")
+    private CallBackMqConfig callBackMqConfig;
+
+    @XStreamAlias("JobId")
     private String jobId;
+
+    @XStreamAlias("Input")
     private MediaInputObject input;
+
+    @XStreamAlias("Operation")
     private FileProcessOperation operation;
 
     public FileProcessJobType getTag() {
@@ -58,11 +77,14 @@ public class FileProcessRequest extends CIServiceRequest {
         this.callBack = callBack;
     }
 
-    public String getCallBackMqConfig() {
+    public CallBackMqConfig getCallBackMqConfig() {
+        if (callBackMqConfig == null) {
+            callBackMqConfig = new CallBackMqConfig();
+        }
         return callBackMqConfig;
     }
 
-    public void setCallBackMqConfig(String callBackMqConfig) {
+    public void setCallBackMqConfig(CallBackMqConfig callBackMqConfig) {
         this.callBackMqConfig = callBackMqConfig;
     }
 

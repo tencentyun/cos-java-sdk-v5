@@ -180,8 +180,33 @@ public class MediaJobOperation {
     @XStreamAlias("SplitVideoParts")
     private SplitVideoParts splitVideoParts;
 
+    @XStreamAlias("DnaConfig")
+    private DnaConfig dnaConfig;
+
     @XStreamAlias("SplitVideoInfoResult")
     private SplitVideoInfoResult splitVideoInfoResult;
+
+    @XStreamAlias("DNAResult")
+    private DNAResult dnaResult;
+
+    public DNAResult getDnaResult() {
+        return dnaResult;
+    }
+
+    public void setDnaResult(DNAResult dnaResult) {
+        this.dnaResult = dnaResult;
+    }
+
+    public DnaConfig getDnaConfig() {
+        if (dnaConfig == null) {
+            dnaConfig = new DnaConfig();
+        }
+        return dnaConfig;
+    }
+
+    public void setDnaConfig(DnaConfig dnaConfig) {
+        this.dnaConfig = dnaConfig;
+    }
 
     public SplitVideoParts getSplitVideoParts() {
         if (splitVideoParts == null) {
