@@ -546,6 +546,9 @@ public class CIMediaXmlFactory {
             xml.start("Segment");
             addIfNotNull(xml, "Duration", segment.getDuration());
             addIfNotNull(xml, "Format", segment.getFormat());
+            addIfNotNull(xml, "TranscodeIndex", segment.getTranscodeIndex());
+            addIfNotNull(xml, "StartTime", segment.getStartTime());
+            addIfNotNull(xml, "EndTime", segment.getEndTime());
             MediaHlsEncryptObject hlsEncrypt = segment.getHlsEncrypt();
             if (objIsNotValid(hlsEncrypt)) {
                 xml.start("HlsEncrypt");
