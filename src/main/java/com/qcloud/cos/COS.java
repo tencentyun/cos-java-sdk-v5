@@ -3139,8 +3139,10 @@ public interface COS extends COSDirectSpi {
      */
     WebpageAuditingResponse describeWebpageAuditingJob(WebpageAuditingRequest request);
 
+    @Deprecated
     PutAsyncFetchTaskResult putAsyncFetchTask(PutAsyncFetchTaskRequest request);
 
+    @Deprecated
     GetAsyncFetchTaskResult getAsyncFetchTask(GetAsyncFetchTaskRequest request);
 
     ImageAuditingResponse describeAuditingImageJob(DescribeImageAuditingRequest imageAuditingRequest);

@@ -105,6 +105,10 @@ public class ClientConfig {
 
     private boolean isShortConnection = false;
 
+    private boolean isChangeEndpointRetry = true;
+
+    private boolean isPrintShutdownStackTrace = true;
+
     // 不传入region 用于后续调用List Buckets(获取所有的bucket信息)
     public ClientConfig() {
         super();
@@ -348,5 +352,21 @@ public class ClientConfig {
 
     public int getShutdownTimeout() {
         return shutdown_timeout;
+    }
+
+    public boolean isChangeEndpointRetry() {
+        return isChangeEndpointRetry;
+    }
+
+    public void setChangeEndpointRetry(boolean changeEndpointRetry) {
+        isChangeEndpointRetry = changeEndpointRetry;
+    }
+
+    public boolean isPrintShutdownStackTrace() {
+        return isPrintShutdownStackTrace;
+    }
+
+    public void setPrintShutdownStackTrace(boolean printShutdownStackTrace) {
+        isPrintShutdownStackTrace = printShutdownStackTrace;
     }
 }

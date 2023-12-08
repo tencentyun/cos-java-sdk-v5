@@ -31,9 +31,16 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.Date;
+import java.util.Objects;
 
 import com.qcloud.cos.ClientConfig;
 import com.qcloud.cos.Headers;
+import com.qcloud.cos.auth.COSCredentials;
+import com.qcloud.cos.auth.COSSigner;
+import com.qcloud.cos.region.Region;
 import com.qcloud.cos.event.ProgressInputStream;
 import com.qcloud.cos.event.ProgressListener;
 import com.qcloud.cos.exception.ClientExceptionConstants;
@@ -47,6 +54,7 @@ import com.qcloud.cos.internal.CosServiceResponse;
 import com.qcloud.cos.internal.ReleasableInputStream;
 import com.qcloud.cos.internal.ResettableInputStream;
 import com.qcloud.cos.internal.SdkBufferedInputStream;
+import com.qcloud.cos.internal.CIWorkflowServiceRequest;
 import com.qcloud.cos.retry.BackoffStrategy;
 import com.qcloud.cos.retry.RetryPolicy;
 import com.qcloud.cos.utils.CodecUtils;
@@ -132,6 +140,20 @@ public class DefaultCosHttpClient implements CosHttpClient {
 
     @Override
     public void shutdown() {
+        if (clientConfig.isPrintShutdownStackTrace()) {
+            StackTraceElement[] stackTraces = Thread.currentThread().getStackTrace();
+
+            StringBuilder trace = new StringBuilder("shutdown stackTrace:");
+            for (int i = 1; i < stackTraces.length; i++) {
+                trace.append("\n");
+                StackTraceElement element = stackTraces[i];
+                String stackTrace = "Class: " + element.getClassName() +
+                        ", Method: " + element.getMethodName() +
+                        ", Line: " + element.getLineNumber();
+                trace.append(stackTrace);
+            }
+            log.info(trace.toString());
+        }
         this.idleConnectionMonitor.shutdown();
     }
 
@@ -484,21 +506,21 @@ public class DefaultCosHttpClient implements CosHttpClient {
                 checkResponse(request, httpRequest, httpResponse);
                 break;
             } catch (CosServiceException cse) {
-                if (cse.getStatusCode() >= 500) {
-                    String errorMsg = String.format("failed to execute http request, due to service exception,"
-                                    + " httpRequest: %s, retryIdx:%d, maxErrorRetry:%d", request,
-                            retryIndex, maxErrorRetry);
-                    log.error(errorMsg, cse);
-                }
                 closeHttpResponseStream(httpResponse);
                 if (!shouldRetry(request, httpResponse, cse, retryIndex, retryPolicy)) {
+                    if (cse.getStatusCode() >= 500) {
+                        String errorMsg = String.format("failed to execute http request, due to service exception,"
+                                        + " httpRequest: %s, retryIdx:%d, maxErrorRetry:%d", request,
+                                retryIndex, maxErrorRetry);
+                        log.error(errorMsg, cse);
+                    }
                     throw cse;
                 }
+                changeEndpointForRetry(request, httpResponse);
             } catch (CosClientException cce) {
                 String errorMsg = String.format("failed to execute http request, due to client exception,"
                                 + " httpRequest: %s, retryIdx:%d, maxErrorRetry:%d",
                         request.toString(), retryIndex, maxErrorRetry);
-                log.info(errorMsg, cce);
                 closeHttpResponseStream(httpResponse);
                 if (!shouldRetry(request, httpResponse, cce, retryIndex, retryPolicy)) {
                     log.error(errorMsg, cce);
@@ -603,5 +625,50 @@ public class DefaultCosHttpClient implements CosHttpClient {
         }
 
         return httpResponse;
+    }
+
+    private <Y extends CosServiceRequest> void changeEndpointForRetry(CosHttpRequest<Y> request, HttpResponse httpResponse) {
+        if (!clientConfig.isChangeEndpointRetry()) {
+            return;
+        }
+
+        for (Header header : httpResponse.getAllHeaders()) {
+            if (Objects.equals(header.getName(), Headers.REQUEST_ID)) {
+                String value = CodecUtils.convertFromIso88591ToUtf8(header.getValue());
+                if (!value.isEmpty()) {
+                    return;
+                }
+            }
+        }
+
+        Map<String, String> req_headers = request.getHeaders();
+        if (!req_headers.isEmpty() && req_headers.containsKey(Headers.HOST)) {
+            String last_endpoint = req_headers.get(Headers.HOST);
+            String regex = ".+-\\d+\\.cos\\..+\\.myqcloud\\.com";
+            Pattern pattern = Pattern.compile(regex);
+            Matcher matcher = pattern.matcher(last_endpoint);
+            boolean isAccEndpoint = last_endpoint.endsWith("cos.accelerate.myqcloud.com");
+
+            if (matcher.matches() && !isAccEndpoint) {
+                String retry_endpoint = String.format("%s.%s.tencentcos.cn", request.getBucketName(), Region.formatRegion(clientConfig.getRegion()));
+                request.addHeader(Headers.HOST, retry_endpoint);
+                COSSigner cosSigner = clientConfig.getCosSigner();
+                COSCredentials cosCredentials = request.getCosCredentials();
+                CosServiceRequest cosServiceRequest = request.getOriginalRequest();
+                Date expiredTime = new Date(System.currentTimeMillis() + clientConfig.getSignExpired() * 1000);
+                boolean isCIWorkflowRequest = cosServiceRequest instanceof CIWorkflowServiceRequest;
+                cosSigner.setCIWorkflowRequest(isCIWorkflowRequest);
+                cosSigner.sign(request, cosCredentials, expiredTime);
+
+                String endpointAddr = clientConfig.getEndpointResolver().resolveGeneralApiEndpoint(retry_endpoint);
+
+                String fixedEndpointAddr = request.getOriginalRequest().getFixedEndpointAddr();
+                if (fixedEndpointAddr != null) {
+                    request.setEndpoint(fixedEndpointAddr);
+                } else {
+                    request.setEndpoint(endpointAddr);
+                }
+            }
+        }
     }
 }
