@@ -526,6 +526,7 @@ public class DefaultCosHttpClient implements CosHttpClient {
                     log.error(errorMsg, cce);
                     throw cce;
                 }
+                changeEndpointForRetry(request, httpResponse);
             } catch (Exception exp) {
                 String expName = exp.getClass().getName();
                 String errorMsg = String.format("httpClient execute occur an unknown exception:%s, httpRequest: %s"
@@ -632,11 +633,13 @@ public class DefaultCosHttpClient implements CosHttpClient {
             return;
         }
 
-        for (Header header : httpResponse.getAllHeaders()) {
-            if (Objects.equals(header.getName(), Headers.REQUEST_ID)) {
-                String value = CodecUtils.convertFromIso88591ToUtf8(header.getValue());
-                if (!value.isEmpty()) {
-                    return;
+        if (httpResponse != null) {
+            for (Header header : httpResponse.getAllHeaders()) {
+                if (Objects.equals(header.getName(), Headers.REQUEST_ID)) {
+                    String value = CodecUtils.convertFromIso88591ToUtf8(header.getValue());
+                    if (!value.isEmpty()) {
+                        return;
+                    }
                 }
             }
         }
