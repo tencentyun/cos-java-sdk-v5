@@ -23,6 +23,7 @@ import com.qcloud.cos.http.CosHttpRequest;
 import com.qcloud.cos.internal.CosServiceRequest;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.client.CircularRedirectException;
 
 
 public class PredefinedRetryPolicies {
@@ -62,6 +63,9 @@ public class PredefinedRetryPolicies {
 
             // Always retry on client exceptions caused by IOException
             if (exception.getCause() instanceof IOException) {
+                if (exception.getCause().getCause() != null && exception.getCause().getCause() instanceof CircularRedirectException) {
+                    return false;
+                }
                 return true;
             }
             return false;
