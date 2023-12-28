@@ -20,6 +20,9 @@ public class MediaJobOperation {
     @XStreamAlias("TemplateId")
     private String templateId;
 
+    @XStreamAlias("Version")
+    private String version;
+
     @XStreamAlias("JobLevel")
     private String jobLevel;
 
@@ -508,10 +511,19 @@ public class MediaJobOperation {
         this.qualityEstimate = qualityEstimate;
     }
 
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("MediaJobOperation{");
         sb.append("templateId='").append(templateId).append('\'');
+        sb.append(", version='").append(version).append('\'');
         sb.append(", jobLevel='").append(jobLevel).append('\'');
         sb.append(", UserData='").append(UserData).append('\'');
         sb.append(", templateName='").append(templateName).append('\'');
@@ -550,6 +562,8 @@ public class MediaJobOperation {
         sb.append(", videoTagResult=").append(videoTagResult);
         sb.append(", qualityEstimateConfig=").append(qualityEstimateConfig);
         sb.append(", qualityEstimate=").append(qualityEstimate);
+        sb.append(", vocalScore=").append(vocalScore);
+        sb.append(", vocalScoreResult=").append(vocalScoreResult);
         sb.append('}');
         return sb.toString();
     }

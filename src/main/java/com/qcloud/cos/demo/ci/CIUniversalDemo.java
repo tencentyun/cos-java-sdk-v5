@@ -1,7 +1,7 @@
 package com.qcloud.cos.demo.ci;
 
 import com.qcloud.cos.COSClient;
-import com.qcloud.cos.model.ciModel.common.CICommonRequest;
+import com.qcloud.cos.model.ciModel.common.AICommonRequest;
 
 public class CIUniversalDemo {
     public static void main(String[] args) throws InterruptedException {
@@ -13,7 +13,8 @@ public class CIUniversalDemo {
 
     public static void customCIMethod(COSClient client) {
         //1.创建任务请求对象
-        CICommonRequest request = new CICommonRequest();
-
+        AICommonRequest request = new AICommonRequest();
+        request.setBucketName("demo-1234567890");
+        request.setObjectKey("ObjectKey");
     }
 }

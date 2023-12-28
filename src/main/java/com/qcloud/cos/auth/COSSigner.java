@@ -68,6 +68,7 @@ public class COSSigner {
         needSignedHeaderSet.add("origin");
         needSignedHeaderSet.add("range");
         needSignedHeaderSet.add("transfer-encoding");
+        needSignedHeaderSet.add(Headers.PIC_OPERATIONS.toLowerCase());
     }
 
     private boolean isAnonymous(COSCredentials cred) {
