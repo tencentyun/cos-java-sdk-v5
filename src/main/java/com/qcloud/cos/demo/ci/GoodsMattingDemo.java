@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * 商品抠图 详情见https://cloud.tencent.com/document/product/460/79735
  */
-public class CreateGoodsMattingJob {
+public class GoodsMattingDemo {
 
     public static void main(String[] args) {
         // 1 初始化用户身份信息（secretId, secretKey）。
@@ -30,26 +30,26 @@ public class CreateGoodsMattingJob {
     }
 
     /**
-     * getGoodsMatting 接口检测图片中的商品信息，生成只包含商品信息的图片
-     * demo为下载时处理
+     * 接口检测图片中的商品信息，生成只包含商品信息的图片
+     * 下载时处理 demo
      */
     public static void getGoodsMatting(COSClient client) {
         //图片所在bucket名称
-        String bucketName = "markjrzhang-1251704708";
+        String bucketName = "demo-1234567890";
         //图片在bucket中的相对位置，比如根目录下file文件夹中的demo.png路径为file/demo.png
         String key = "car.jpg";
         GetObjectRequest getObj = new GetObjectRequest(bucketName, key);
         //具体参数请参考API
         getObj.putCustomQueryParameter("ci-process", "GoodsMatting");
+        getObj.putCustomQueryParameter("center-layout", "1");
         ObjectMetadata object = client.getObject(getObj, new File("demo.png"));
     }
 
     /**
-     * postGoodsMatting 接口检测图片中的商品信息，生成只包含商品信息的图片
-     * demo为云上数据处理
+     * 云上数据处理 demo
      */
     public static void postGoodsMatting(COSClient client) {
-        String bucketName = "markjrzhang-1251704708";
+        String bucketName = "demo-1234567890";
         String key = "car.jpg";
         ImageProcessRequest imageReq = new ImageProcessRequest(bucketName, key);
 
@@ -63,24 +63,16 @@ public class CreateGoodsMattingJob {
         ruleList.add(rule1);
         picOperations.setRules(ruleList);
         imageReq.setPicOperations(picOperations);
-
-        try {
-            CIUploadResult ciUploadResult = client.processImage(imageReq);
-            System.out.println(ciUploadResult.getRequestId());
-            System.out.println(Jackson.toJsonString(ciUploadResult));
-        } catch (CosServiceException e) {
-            e.printStackTrace();
-        } catch (CosClientException e) {
-            e.printStackTrace();
-        }
+        CIUploadResult ciUploadResult = client.processImage(imageReq);
+        System.out.println(Jackson.toJsonString(ciUploadResult));
     }
 
+    /**
+     * 上传时处理demo
+     */
     public static void putGoodsMatting(COSClient cosClient) {
-        // bucket名需包含appid
-        // api 请参考 https://cloud.tencent.com/document/product/436/54050
-        String bucketName = "markjrzhang-1251704708";
-
-        String key = "car2.jpg";
+        String bucketName = "demo-1234567890";
+        String key = "car3.jpg";
         File localFile = new File("car.jpg");
         PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, key, localFile);
         PicOperations picOperations = new PicOperations();
@@ -93,19 +85,10 @@ public class CreateGoodsMattingJob {
         ruleList.add(rule1);
         picOperations.setRules(ruleList);
         putObjectRequest.setPicOperations(picOperations);
-        try {
-            PutObjectResult putObjectResult = cosClient.putObject(putObjectRequest);
-            CIUploadResult ciUploadResult = putObjectResult.getCiUploadResult();
-            System.out.println(putObjectResult.getRequestId());
-            System.out.println(ciUploadResult.getOriginalInfo().getEtag());
-            for(CIObject ciObject:ciUploadResult.getProcessResults().getObjectList()) {
-                System.out.println(ciObject.getLocation());
-                System.out.println(ciObject.getEtag());
-            }
-        } catch (CosServiceException e) {
-            e.printStackTrace();
-        } catch (CosClientException e) {
-            e.printStackTrace();
-        }
+        PutObjectResult putObjectResult = cosClient.putObject(putObjectRequest);
+        CIUploadResult ciUploadResult = putObjectResult.getCiUploadResult();
+        System.out.println(putObjectResult.getRequestId());
+        System.out.println(Jackson.toJsonString(putObjectResult));
+
     }
 }
