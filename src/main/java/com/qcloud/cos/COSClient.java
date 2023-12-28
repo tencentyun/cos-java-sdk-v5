@@ -62,42 +62,7 @@ import com.qcloud.cos.http.DefaultCosHttpClient;
 import com.qcloud.cos.http.HttpMethodName;
 import com.qcloud.cos.http.HttpProtocol;
 import com.qcloud.cos.http.HttpResponseHandler;
-import com.qcloud.cos.internal.BucketNameUtils;
-import com.qcloud.cos.internal.CIGetSnapshotResponseHandler;
-import com.qcloud.cos.internal.CIPicServiceRequest;
-import com.qcloud.cos.internal.CIServiceRequest;
-import com.qcloud.cos.internal.CIWorkflowServiceRequest;
-import com.qcloud.cos.internal.COSDefaultAclHeaderHandler;
-import com.qcloud.cos.internal.COSObjectResponseHandler;
-import com.qcloud.cos.internal.COSStringResponseHandler;
-import com.qcloud.cos.internal.COSVersionHeaderHandler;
-import com.qcloud.cos.internal.COSXmlResponseHandler;
-import com.qcloud.cos.internal.Constants;
-import com.qcloud.cos.internal.CosMetadataResponseHandler;
-import com.qcloud.cos.internal.CosServiceRequest;
-import com.qcloud.cos.internal.CosServiceResponse;
-import com.qcloud.cos.internal.DeleteObjectTaggingHeaderHandler;
-import com.qcloud.cos.internal.DeleteObjectsResponse;
-import com.qcloud.cos.internal.DigestValidationInputStream;
-import com.qcloud.cos.internal.GetObjectTaggingResponseHeaderHandler;
-import com.qcloud.cos.internal.InputSubstream;
-import com.qcloud.cos.internal.LengthCheckInputStream;
-import com.qcloud.cos.internal.MD5DigestCalculatingInputStream;
-import com.qcloud.cos.internal.MultiObjectDeleteXmlFactory;
-import com.qcloud.cos.internal.ObjectExpirationHeaderHandler;
-import com.qcloud.cos.internal.ReleasableInputStream;
-import com.qcloud.cos.internal.RequestXmlFactory;
-import com.qcloud.cos.internal.ResettableInputStream;
-import com.qcloud.cos.internal.ResponseHeaderHandlerChain;
-import com.qcloud.cos.internal.SdkFilterInputStream;
-import com.qcloud.cos.internal.ServerSideEncryptionHeaderHandler;
-import com.qcloud.cos.internal.ServiceClientHolderInputStream;
-import com.qcloud.cos.internal.SetObjectTaggingResponseHeaderHandler;
-import com.qcloud.cos.internal.SkipMd5CheckStrategy;
-import com.qcloud.cos.internal.Unmarshaller;
-import com.qcloud.cos.internal.Unmarshallers;
-import com.qcloud.cos.internal.VIDResultHandler;
-import com.qcloud.cos.internal.VoidCosResponseHandler;
+import com.qcloud.cos.internal.*;
 import com.qcloud.cos.internal.XmlResponsesSaxParser.CompleteMultipartUploadHandler;
 import com.qcloud.cos.internal.XmlResponsesSaxParser.CopyObjectResultHandler;
 import com.qcloud.cos.model.*;
@@ -106,14 +71,7 @@ import com.qcloud.cos.model.bucketcertificate.BucketGetDomainCertificate;
 import com.qcloud.cos.model.bucketcertificate.BucketPutDomainCertificate;
 import com.qcloud.cos.model.bucketcertificate.SetBucketDomainCertificateRequest;
 import com.qcloud.cos.model.bucketcertificate.BucketDomainCertificateParameters;
-import com.qcloud.cos.model.ciModel.ai.AddPersonFaceRequest;
-import com.qcloud.cos.model.ciModel.ai.AddPersonFaceResponse;
-import com.qcloud.cos.model.ciModel.ai.CreatePersonRequest;
-import com.qcloud.cos.model.ciModel.ai.CreatePersonResponse;
-import com.qcloud.cos.model.ciModel.ai.DeletePersonFaceRequest;
-import com.qcloud.cos.model.ciModel.ai.FaceSearchBucketRequest;
-import com.qcloud.cos.model.ciModel.ai.SearchPersonFaceRequest;
-import com.qcloud.cos.model.ciModel.ai.SearchPersonFaceResponse;
+import com.qcloud.cos.model.ciModel.ai.*;
 import com.qcloud.cos.model.ciModel.auditing.*;
 import com.qcloud.cos.model.ciModel.bucket.DocBucketRequest;
 import com.qcloud.cos.model.ciModel.bucket.DocBucketResponse;
@@ -185,7 +143,6 @@ import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowListRequest;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowListResponse;
 import com.qcloud.cos.model.ciModel.xml.CIAuditingXmlFactory;
 import com.qcloud.cos.model.ciModel.xml.CIAuditingXmlFactoryV2;
-import com.qcloud.cos.model.ciModel.xml.CIFileProcessXmlFactory;
 import com.qcloud.cos.model.ciModel.xml.CIMediaXmlFactory;
 import com.qcloud.cos.model.ciModel.xml.CImageXmlFactory;
 import com.qcloud.cos.model.fetch.GetAsyncFetchTaskRequest;
@@ -4165,6 +4122,9 @@ public class COSClient implements COS {
 
         ObjectMetadata returnedMetadata = invoke(request, new ResponseHeaderHandlerChain<>(
                 new Unmarshallers.ImagePersistenceUnmarshaller(), new CosMetadataResponseHandler()));
+        if (returnedMetadata.getRequestId() != null) {
+            returnedMetadata.getCiUploadResult().setRequestId(returnedMetadata.getRequestId());
+        }
         return returnedMetadata.getCiUploadResult();
     }
 
@@ -4780,6 +4740,12 @@ public class COSClient implements COS {
         if (imageProcessRequest.getPicOperations() != null) {
             request.addHeader(Headers.PIC_OPERATIONS, Jackson.toJsonString(imageProcessRequest.getPicOperations()));
         }
+        Map<String, String> queryParams = imageProcessRequest.getQueryParams();
+        if (queryParams != null && !queryParams.isEmpty()) {
+            for (String qName : queryParams.keySet()) {
+                request.addParameter(qName, queryParams.get(qName));
+            }
+        }
         invoke(request, voidCosResponseHandler);
         return true;
     }
@@ -5075,6 +5041,15 @@ public class COSClient implements COS {
         addParameterIfNotNull(request, "pageNumber", dnaDbConfigsRequest.getPageNumber());
         addParameterIfNotNull(request, "pageSize", dnaDbConfigsRequest.getPageSize());
         return invoke(request, new Unmarshallers.CICommonUnmarshaller<DNADbConfigsResponse>(DNADbConfigsResponse.class));
+    }
+
+//    @Override
+    public GoodsMattingResponse goodsMatting(GoodsMattingRequest customRequest) {
+        CosHttpRequest<GoodsMattingRequest> request = createRequest(customRequest.getBucketName(), "/" + customRequest.getObjectKey(), customRequest, HttpMethodName.GET);
+        request.addParameter("ci-process","GoodsMatting");
+        addParameterIfNotNull(request, "detect-url", customRequest.getDetectUrl());
+        invoke(request, new CIGetResponseHandler());
+        return null;
     }
 
 }

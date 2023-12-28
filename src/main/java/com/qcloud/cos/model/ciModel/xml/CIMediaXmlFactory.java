@@ -649,6 +649,7 @@ public class CIMediaXmlFactory {
                 addIfNotNull(xml, "Color", snapshotConfig.getColor());
                 addIfNotNull(xml, "Columns", snapshotConfig.getColumns());
                 addIfNotNull(xml, "Lines", snapshotConfig.getLines());
+                addIfNotNull(xml, "ScaleMethod", snapshotConfig.getScaleMethod());
                 xml.end();
             }
             xml.end();
