@@ -646,13 +646,16 @@ public class DefaultCosHttpClient implements CosHttpClient {
 
         Map<String, String> req_headers = request.getHeaders();
         if (!req_headers.isEmpty() && req_headers.containsKey(Headers.HOST)) {
-            String last_endpoint = req_headers.get(Headers.HOST);
+            String last_endpoint = request.getEndpoint();
+            String last_host = req_headers.get(Headers.HOST);
             String regex = ".+-\\d+\\.cos\\..+\\.myqcloud\\.com";
             Pattern pattern = Pattern.compile(regex);
-            Matcher matcher = pattern.matcher(last_endpoint);
+            Matcher matcher_endpoint = pattern.matcher(last_endpoint);
+            Matcher matcher_host = pattern.matcher(last_host);
             boolean isAccEndpoint = last_endpoint.endsWith("cos.accelerate.myqcloud.com");
+            boolean isAccHost = last_host.endsWith("cos.accelerate.myqcloud.com");
 
-            if (matcher.matches() && !isAccEndpoint) {
+            if (matcher_endpoint.matches() && matcher_host.matches() && !isAccEndpoint && !isAccHost) {
                 String retry_endpoint = String.format("%s.%s.tencentcos.cn", request.getBucketName(), Region.formatRegion(clientConfig.getRegion()));
                 request.addHeader(Headers.HOST, retry_endpoint);
                 COSSigner cosSigner = clientConfig.getCosSigner();
