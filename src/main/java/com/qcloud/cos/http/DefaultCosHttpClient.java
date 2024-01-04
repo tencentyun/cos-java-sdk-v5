@@ -402,7 +402,11 @@ public class DefaultCosHttpClient implements CosHttpClient {
     }
 
     private <X extends CosServiceRequest> boolean isRetryableRequest(CosHttpRequest<X> request) {
-        return request.getContent() == null || request.getContent().markSupported();
+        if (request.getContent() == null || request.getContent().markSupported()) {
+            return true;
+        }
+        log.info("The content of the request is not null and not markSupported, the request is not retryable");
+        return false;
     }
 
     private <X extends CosServiceRequest> boolean shouldRetry(CosHttpRequest<X> request, HttpResponse response,
