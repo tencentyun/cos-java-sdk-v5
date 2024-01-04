@@ -20,6 +20,7 @@ package com.qcloud.cos.retry;
 import com.qcloud.cos.exception.ClientExceptionConstants;
 import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.exception.CosServiceException;
+import com.qcloud.cos.exception.ServiceExceptionConstants;
 import org.apache.http.HttpStatus;
 
 import java.util.HashSet;
@@ -29,6 +30,8 @@ public class RetryUtils {
 
     static final Set<Integer> RETRYABLE_STATUS_CODES = new HashSet<Integer>(4);
     static final Set<String> RETRYABLE_CLIENT_ERROR_CODES = new HashSet<>(1);
+
+    static final Set<String> RETRYABLE_ERROR_CODES = new HashSet<>(3);
 
     static {
         RETRYABLE_STATUS_CODES.add(HttpStatus.SC_INTERNAL_SERVER_ERROR);
@@ -41,6 +44,10 @@ public class RetryUtils {
         RETRYABLE_CLIENT_ERROR_CODES.add(ClientExceptionConstants.UNKNOWN_HOST);
         RETRYABLE_CLIENT_ERROR_CODES.add(ClientExceptionConstants.SOCKET_TIMEOUT);
         RETRYABLE_CLIENT_ERROR_CODES.add(ClientExceptionConstants.CLIENT_PROTOCAL_EXCEPTION);
+
+        RETRYABLE_ERROR_CODES.add(ServiceExceptionConstants.ERROR_CODE_INTERNAL_ERROR);
+        RETRYABLE_ERROR_CODES.add(ServiceExceptionConstants.ERROR_CODE_SLOWDOWN);
+        RETRYABLE_ERROR_CODES.add(ServiceExceptionConstants.ERROR_CODE_SERVICE_UNAVAILABLE);
     }
 
     /**
@@ -81,6 +88,10 @@ public class RetryUtils {
      */
     public static boolean isRetryableClientException(CosClientException exception) {
         return RETRYABLE_CLIENT_ERROR_CODES.contains(exception.getErrorCode());
+    }
+
+    public static boolean ShouldRetryCopyRequest(CosServiceException exception) {
+        return  RETRYABLE_ERROR_CODES.contains(exception.getErrorCode());
     }
 
 }

@@ -155,6 +155,7 @@ import com.qcloud.cos.model.fetch.PutAsyncFetchTaskSerializer;
 import com.qcloud.cos.model.inventory.InventoryConfiguration;
 import com.qcloud.cos.model.transform.ObjectTaggingXmlFactory;
 import com.qcloud.cos.region.Region;
+import com.qcloud.cos.retry.RetryUtils;
 import com.qcloud.cos.utils.Base64;
 import com.qcloud.cos.utils.BinaryUtils;
 import com.qcloud.cos.utils.DateUtils;
@@ -2095,70 +2096,82 @@ public class COSClient implements COS {
          * We can't send a non-zero length Content-Length header if the user specified it, otherwise
          * it messes up the HTTP connection when the remote server thinks there's more data to pull.
          */
-        setZeroContentLength(request);
-        CopyObjectResultHandler copyObjectResultHandler = null;
-        try {
-            @SuppressWarnings("unchecked")
-            ResponseHeaderHandlerChain<CopyObjectResultHandler> handler =
-                    new ResponseHeaderHandlerChain<CopyObjectResultHandler>(
-                            // xml payload unmarshaller
-                            new Unmarshallers.CopyObjectUnmarshaller(),
-                            // header handlers
-                            new ServerSideEncryptionHeaderHandler<CopyObjectResultHandler>(),
-                            new ObjectExpirationHeaderHandler<CopyObjectResultHandler>(),
-                            new VIDResultHandler<CopyObjectResultHandler>());
-            copyObjectResultHandler = invoke(request, handler);
-        } catch (CosServiceException cse) {
-            /*
-             * If the request failed because one of the specified constraints was not met (ex:
-             * matching ETag, modified since date, etc.), then return null, so that users don't have
-             * to wrap their code in try/catch blocks and check for this status code if they want to
-             * use constraints.
-             */
-            if (cse.getStatusCode() == Constants.FAILED_PRECONDITION_STATUS_CODE) {
-                return null;
+        int retryIndex = 0;
+        while (true) {
+            setZeroContentLength(request);
+            CopyObjectResultHandler copyObjectResultHandler = null;
+            try {
+                @SuppressWarnings("unchecked")
+                ResponseHeaderHandlerChain<CopyObjectResultHandler> handler =
+                        new ResponseHeaderHandlerChain<CopyObjectResultHandler>(
+                                // xml payload unmarshaller
+                                new Unmarshallers.CopyObjectUnmarshaller(),
+                                // header handlers
+                                new ServerSideEncryptionHeaderHandler<CopyObjectResultHandler>(),
+                                new ObjectExpirationHeaderHandler<CopyObjectResultHandler>(),
+                                new VIDResultHandler<CopyObjectResultHandler>());
+                copyObjectResultHandler = invoke(request, handler);
+            } catch (CosServiceException cse) {
+                /*
+                 * If the request failed because one of the specified constraints was not met (ex:
+                 * matching ETag, modified since date, etc.), then return null, so that users don't have
+                 * to wrap their code in try/catch blocks and check for this status code if they want to
+                 * use constraints.
+                 */
+                if (cse.getStatusCode() == Constants.FAILED_PRECONDITION_STATUS_CODE) {
+                    return null;
+                }
+
+                throw cse;
             }
 
-            throw cse;
+            /*
+             * CopyObject has two failure modes: 1 - An HTTP error code is returned and the error is
+             * processed like any other error response. 2 - An HTTP 200 OK code is returned, but the
+             * response content contains an XML error response.
+             *
+             * This makes it very difficult for the client runtime to cleanly detect this case and
+             * handle it like any other error response. We could extend the runtime to have a more
+             * flexible/customizable definition of success/error (per request), but it's probably
+             * overkill for this one special case.
+             */
+            if (copyObjectResultHandler.getErrorCode() != null) {
+                String errorCode = copyObjectResultHandler.getErrorCode();
+                String errorMessage = copyObjectResultHandler.getErrorMessage();
+                String requestId = copyObjectResultHandler.getErrorRequestId();
+
+                CosServiceException cse = new CosServiceException(errorMessage);
+                cse.setErrorCode(errorCode);
+                cse.setRequestId(requestId);
+                cse.setStatusCode(200);
+
+                String errorMsg = String.format("failed to execute http request, due to service exception: %s"
+                                + " httpRequest: %s, retryIdx:%d, maxErrorRetry:%d", cse.getMessage(), request,
+                        retryIndex, clientConfig.getMaxErrorRetryForCopyRequest());
+                log.debug(errorMsg);
+                if (retryIndex < clientConfig.getMaxErrorRetryForCopyRequest() && RetryUtils.ShouldRetryCopyRequest(cse)) {
+                    retryIndex++;
+                    continue;
+                }
+
+                throw cse;
+            }
+
+            CopyObjectResult copyObjectResult = new CopyObjectResult();
+            copyObjectResult.setETag(copyObjectResultHandler.getETag());
+            copyObjectResult.setLastModifiedDate(copyObjectResultHandler.getLastModified());
+            copyObjectResult.setVersionId(copyObjectResultHandler.getVersionId());
+            copyObjectResult.setSSEAlgorithm(copyObjectResultHandler.getSSEAlgorithm());
+            copyObjectResult.setSSECustomerAlgorithm(copyObjectResultHandler.getSSECustomerAlgorithm());
+            copyObjectResult.setSSECustomerKeyMd5(copyObjectResultHandler.getSSECustomerKeyMd5());
+            copyObjectResult.setExpirationTime(copyObjectResultHandler.getExpirationTime());
+            copyObjectResult.setExpirationTimeRuleId(copyObjectResultHandler.getExpirationTimeRuleId());
+            copyObjectResult.setDateStr(copyObjectResultHandler.getDateStr());
+            copyObjectResult.setCrc64Ecma(copyObjectResultHandler.getCrc64Ecma());
+            copyObjectResult.setRequestId(copyObjectResultHandler.getRequestId());
+
+            return copyObjectResult;
         }
-
-        /*
-         * CopyObject has two failure modes: 1 - An HTTP error code is returned and the error is
-         * processed like any other error response. 2 - An HTTP 200 OK code is returned, but the
-         * response content contains an XML error response.
-         *
-         * This makes it very difficult for the client runtime to cleanly detect this case and
-         * handle it like any other error response. We could extend the runtime to have a more
-         * flexible/customizable definition of success/error (per request), but it's probably
-         * overkill for this one special case.
-         */
-        if (copyObjectResultHandler.getErrorCode() != null) {
-            String errorCode = copyObjectResultHandler.getErrorCode();
-            String errorMessage = copyObjectResultHandler.getErrorMessage();
-            String requestId = copyObjectResultHandler.getErrorRequestId();
-
-            CosServiceException cse = new CosServiceException(errorMessage);
-            cse.setErrorCode(errorCode);
-            cse.setRequestId(requestId);
-            cse.setStatusCode(200);
-
-            throw cse;
-        }
-
-        CopyObjectResult copyObjectResult = new CopyObjectResult();
-        copyObjectResult.setETag(copyObjectResultHandler.getETag());
-        copyObjectResult.setLastModifiedDate(copyObjectResultHandler.getLastModified());
-        copyObjectResult.setVersionId(copyObjectResultHandler.getVersionId());
-        copyObjectResult.setSSEAlgorithm(copyObjectResultHandler.getSSEAlgorithm());
-        copyObjectResult.setSSECustomerAlgorithm(copyObjectResultHandler.getSSECustomerAlgorithm());
-        copyObjectResult.setSSECustomerKeyMd5(copyObjectResultHandler.getSSECustomerKeyMd5());
-        copyObjectResult.setExpirationTime(copyObjectResultHandler.getExpirationTime());
-        copyObjectResult.setExpirationTimeRuleId(copyObjectResultHandler.getExpirationTimeRuleId());
-        copyObjectResult.setDateStr(copyObjectResultHandler.getDateStr());
-        copyObjectResult.setCrc64Ecma(copyObjectResultHandler.getCrc64Ecma());
-        copyObjectResult.setRequestId(copyObjectResultHandler.getRequestId());
-
-        return copyObjectResult;
     }
 
     @Override
@@ -2197,70 +2210,82 @@ public class COSClient implements COS {
          * specified it, otherwise it messes up the HTTP connection when the
          * remote server thinks there's more data to pull.
          */
-        setZeroContentLength(request);
-        CopyObjectResultHandler copyObjectResultHandler = null;
-        try {
-            @SuppressWarnings("unchecked")
-            ResponseHeaderHandlerChain<CopyObjectResultHandler> handler =
-                    new ResponseHeaderHandlerChain<CopyObjectResultHandler>(
-                            // xml payload unmarshaller
-                            new Unmarshallers.CopyObjectUnmarshaller(),
-                            // header handlers
-                            new ServerSideEncryptionHeaderHandler<CopyObjectResultHandler>(),
-                            new COSVersionHeaderHandler());
-            copyObjectResultHandler = invoke(request, handler);
-        } catch (CosServiceException cse) {
-            /*
-             * If the request failed because one of the specified constraints
-             * was not met (ex: matching ETag, modified since date, etc.), then
-             * return null, so that users don't have to wrap their code in
-             * try/catch blocks and check for this status code if they want to
-             * use constraints.
-             */
-            if (cse.getStatusCode() == Constants.FAILED_PRECONDITION_STATUS_CODE) {
-                return null;
+        int retryIndex = 0;
+        while (true) {
+            setZeroContentLength(request);
+            CopyObjectResultHandler copyObjectResultHandler = null;
+            try {
+                @SuppressWarnings("unchecked")
+                ResponseHeaderHandlerChain<CopyObjectResultHandler> handler =
+                        new ResponseHeaderHandlerChain<CopyObjectResultHandler>(
+                                // xml payload unmarshaller
+                                new Unmarshallers.CopyObjectUnmarshaller(),
+                                // header handlers
+                                new ServerSideEncryptionHeaderHandler<CopyObjectResultHandler>(),
+                                new COSVersionHeaderHandler());
+                copyObjectResultHandler = invoke(request, handler);
+            } catch (CosServiceException cse) {
+                /*
+                 * If the request failed because one of the specified constraints
+                 * was not met (ex: matching ETag, modified since date, etc.), then
+                 * return null, so that users don't have to wrap their code in
+                 * try/catch blocks and check for this status code if they want to
+                 * use constraints.
+                 */
+                if (cse.getStatusCode() == Constants.FAILED_PRECONDITION_STATUS_CODE) {
+                    return null;
+                }
+
+                throw cse;
             }
 
-            throw cse;
+            /*
+             * CopyPart has two failure modes: 1 - An HTTP error code is returned
+             * and the error is processed like any other error response. 2 - An HTTP
+             * 200 OK code is returned, but the response content contains an XML
+             * error response.
+             *
+             * This makes it very difficult for the client runtime to cleanly detect
+             * this case and handle it like any other error response. We could
+             * extend the runtime to have a more flexible/customizable definition of
+             * success/error (per request), but it's probably overkill for this one
+             * special case.
+             */
+            if (copyObjectResultHandler.getErrorCode() != null) {
+                String errorCode = copyObjectResultHandler.getErrorCode();
+                String errorMessage = copyObjectResultHandler.getErrorMessage();
+                String requestId = copyObjectResultHandler.getErrorRequestId();
+
+                CosServiceException cse = new CosServiceException(errorMessage);
+                cse.setErrorCode(errorCode);
+                cse.setErrorType(ErrorType.Service);
+                cse.setRequestId(requestId);
+                cse.setStatusCode(200);
+
+                String errorMsg = String.format("failed to execute http request, due to service exception: %s"
+                                + " httpRequest: %s, retryIdx:%d, maxErrorRetry:%d", cse.getMessage(), request,
+                        retryIndex, clientConfig.getMaxErrorRetryForCopyRequest());
+                log.debug(errorMsg);
+                if (retryIndex < clientConfig.getMaxErrorRetryForCopyRequest() && RetryUtils.ShouldRetryCopyRequest(cse)) {
+                    retryIndex++;
+                    continue;
+                }
+
+                throw cse;
+            }
+
+            CopyPartResult copyPartResult = new CopyPartResult();
+            copyPartResult.setETag(copyObjectResultHandler.getETag());
+            copyPartResult.setPartNumber(copyPartRequest.getPartNumber());
+            copyPartResult.setLastModifiedDate(copyObjectResultHandler.getLastModified());
+            copyPartResult.setVersionId(copyObjectResultHandler.getVersionId());
+            copyPartResult.setSSEAlgorithm(copyObjectResultHandler.getSSEAlgorithm());
+            copyPartResult.setSSECustomerAlgorithm(copyObjectResultHandler.getSSECustomerAlgorithm());
+            copyPartResult.setSSECustomerKeyMd5(copyObjectResultHandler.getSSECustomerKeyMd5());
+            copyPartResult.setCrc64Ecma(copyObjectResultHandler.getCrc64Ecma());
+
+            return copyPartResult;
         }
-
-        /*
-         * CopyPart has two failure modes: 1 - An HTTP error code is returned
-         * and the error is processed like any other error response. 2 - An HTTP
-         * 200 OK code is returned, but the response content contains an XML
-         * error response.
-         *
-         * This makes it very difficult for the client runtime to cleanly detect
-         * this case and handle it like any other error response. We could
-         * extend the runtime to have a more flexible/customizable definition of
-         * success/error (per request), but it's probably overkill for this one
-         * special case.
-         */
-        if (copyObjectResultHandler.getErrorCode() != null) {
-            String errorCode = copyObjectResultHandler.getErrorCode();
-            String errorMessage = copyObjectResultHandler.getErrorMessage();
-            String requestId = copyObjectResultHandler.getErrorRequestId();
-
-            CosServiceException cse = new CosServiceException(errorMessage);
-            cse.setErrorCode(errorCode);
-            cse.setErrorType(ErrorType.Service);
-            cse.setRequestId(requestId);
-            cse.setStatusCode(200);
-
-            throw cse;
-        }
-
-        CopyPartResult copyPartResult = new CopyPartResult();
-        copyPartResult.setETag(copyObjectResultHandler.getETag());
-        copyPartResult.setPartNumber(copyPartRequest.getPartNumber());
-        copyPartResult.setLastModifiedDate(copyObjectResultHandler.getLastModified());
-        copyPartResult.setVersionId(copyObjectResultHandler.getVersionId());
-        copyPartResult.setSSEAlgorithm(copyObjectResultHandler.getSSEAlgorithm());
-        copyPartResult.setSSECustomerAlgorithm(copyObjectResultHandler.getSSECustomerAlgorithm());
-        copyPartResult.setSSECustomerKeyMd5(copyObjectResultHandler.getSSECustomerKeyMd5());
-        copyPartResult.setCrc64Ecma(copyObjectResultHandler.getCrc64Ecma());
-
-        return copyPartResult;
     }
 
     @Override
