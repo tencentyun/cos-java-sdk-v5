@@ -112,7 +112,7 @@ public class AuditingJobsDetail {
     /**
      * 审核结果 暴恐信息
      */
-    @XStreamAlias("TerroristInfo")
+    @XStreamAlias("TerrorismInfo")
     private TerroristInfo terroristInfo;
 
     /**

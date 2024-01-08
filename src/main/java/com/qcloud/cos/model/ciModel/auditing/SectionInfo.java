@@ -16,7 +16,7 @@ public class SectionInfo {
     @XStreamAlias("PornInfo")
     private PornInfo pornInfo;
 
-    @XStreamAlias("TerroristInfo")
+    @XStreamAlias("TerrorismInfo")
     private TerroristInfo terroristInfo;
 
     @XStreamAlias("PoliticsInfo")
