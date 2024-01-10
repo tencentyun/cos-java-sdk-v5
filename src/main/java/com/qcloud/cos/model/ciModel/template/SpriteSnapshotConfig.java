@@ -35,6 +35,14 @@ public class SpriteSnapshotConfig {
      * 单位：px
      */
     private String Lines;
+    /**
+     * 雪碧图缩放模式
+     * DirectScale: 指定宽高缩放
+     * MaxWHScaleAndPad: 指定最大宽高缩放填充
+     * MaxWHScale: 指定最大宽高缩放
+     * 主动设置 CellWidth 和CellHeight 时生效
+     */
+    private String scaleMethod;
 
     public String getCellWidth() {
         return cellWidth;
@@ -90,6 +98,14 @@ public class SpriteSnapshotConfig {
 
     public void setLines(String lines) {
         Lines = lines;
+    }
+
+    public String getScaleMethod() {
+        return scaleMethod;
+    }
+
+    public void setScaleMethod(String scaleMethod) {
+        this.scaleMethod = scaleMethod;
     }
 
     @Override

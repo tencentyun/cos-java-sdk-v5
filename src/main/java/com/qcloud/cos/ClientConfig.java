@@ -61,6 +61,8 @@ public class ClientConfig {
      * The max retry times if retryable exception occured
      **/
     private int maxErrorRetry = DEFAULT_RETRY_TIMES;
+
+    private int maxErrorRetryForCopyRequest = DEFAULT_RETRY_TIMES;
     /**
      * The retry policy if exception occured
      **/
@@ -276,6 +278,14 @@ public class ClientConfig {
 
     public void setMaxErrorRetry(int maxErrorRetry) {
         this.maxErrorRetry = maxErrorRetry;
+    }
+
+    public int getMaxErrorRetryForCopyRequest() {
+        return maxErrorRetryForCopyRequest;
+    }
+
+    public void setMaxErrorRetryForCopyRequest(int maxErrorRetry) {
+        this.maxErrorRetryForCopyRequest = maxErrorRetry;
     }
 
     public RetryPolicy getRetryPolicy() {

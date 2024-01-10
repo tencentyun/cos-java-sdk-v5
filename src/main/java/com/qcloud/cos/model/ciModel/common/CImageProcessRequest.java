@@ -18,17 +18,17 @@ public class CImageProcessRequest extends CIPicServiceRequest {
      */
     private String key;
     /**
-     *  pic operations
+     * pic operations
      */
     private PicOperations picOperations;
 
-    private Map<String,String> queryParams;
+    private Map<String, String> queryParams;
 
     /**
      * Constructs a new {@link CImageProcessRequest}, specifying the object's bucket name and key.
      *
      * @param bucketName The name of the Qcloud COS bucket containing the object to image process
-     * @param key The key of the object to image process
+     * @param key        The key of the object to image process
      */
     public CImageProcessRequest(String bucketName, String key) {
         setBucketName(bucketName);
@@ -40,7 +40,6 @@ public class CImageProcessRequest extends CIPicServiceRequest {
      * Gets the name of the Qcloud COS bucket containing the object to image process.
      *
      * @return The name of the Qcloud COS bucket containing the object to image process.
-     *
      * @see DeleteObjectRequest#setBucketName(String)
      */
     public String getBucketName() {
@@ -62,9 +61,8 @@ public class CImageProcessRequest extends CIPicServiceRequest {
      * object, enabling additional method calls to be chained together.
      *
      * @param bucketName The name of the Qcloud COS bucket containing the object to image process
-     *
      * @return The updated {@link DeleteObjectRequest} object, enabling additional method calls to
-     *         be chained together.
+     * be chained together.
      */
     public CImageProcessRequest withBucketName(String bucketName) {
         setBucketName(bucketName);
@@ -75,7 +73,6 @@ public class CImageProcessRequest extends CIPicServiceRequest {
      * Gets the key of the object to image process.
      *
      * @return The key of the object to image process.
-     *
      * @see CImageProcessRequest#setKey(String)
      */
     public String getKey() {
@@ -86,7 +83,6 @@ public class CImageProcessRequest extends CIPicServiceRequest {
      * Sets the key of the object to image process.
      *
      * @param key The key of the object to image process.
-     *
      * @see CImageProcessRequest#getKey()
      */
     public void setKey(String key) {
@@ -98,9 +94,8 @@ public class CImageProcessRequest extends CIPicServiceRequest {
      * calls to be chained together.
      *
      * @param key The key of the object to image process.
-     *
      * @return The updated {@link CImageProcessRequest} object, enabling additional method calls to
-     *         chained together.
+     * chained together.
      */
     public CImageProcessRequest withKey(String key) {
         setKey(key);
@@ -108,6 +103,9 @@ public class CImageProcessRequest extends CIPicServiceRequest {
     }
 
     public PicOperations getPicOperations() {
+        if (picOperations == null) {
+            picOperations = new PicOperations();
+        }
         return picOperations;
     }
 
@@ -120,9 +118,8 @@ public class CImageProcessRequest extends CIPicServiceRequest {
      * calls to be chained together.
      *
      * @param picOperations The pic operations of the object to image process.
-     *
      * @return The updated {@link CImageProcessRequest} object, enabling additional method calls to
-     *         chained together.
+     * chained together.
      */
     public CImageProcessRequest withKey(PicOperations picOperations) {
         setPicOperations(picOperations);
