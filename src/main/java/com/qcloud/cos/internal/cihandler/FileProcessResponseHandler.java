@@ -137,30 +137,6 @@ public class FileProcessResponseHandler extends CIAbstractHandler {
                 default:
                     break;
             }
-        } else if (in("Response", "JobsDetail", "Operation", "FileHashCodeResult")) {
-            FileHashCodeResult fileHashCodeResult = response.getJobDetail().getOperation().getFileHashCodeResult();
-            switch (name) {
-                case "MD5":
-                    fileHashCodeResult.setMd5(getText());
-                    break;
-                case "FileSize":
-                    fileHashCodeResult.setFileSize(getText());
-                    break;
-                case "LastModified":
-                    fileHashCodeResult.setLastModified(getText());
-                    break;
-                case "Etag":
-                    fileHashCodeResult.setEtag(getText());
-                    break;
-                case "SHA1":
-                    fileHashCodeResult.setSha1(getText());
-                    break;
-                case "SHA256":
-                    fileHashCodeResult.setSha256(getText());
-                    break;
-                default:
-                    break;
-            }
         }
     }
 

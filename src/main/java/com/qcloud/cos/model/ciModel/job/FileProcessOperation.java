@@ -16,6 +16,9 @@ public class FileProcessOperation {
     @XStreamAlias("FileHashCodeResult")
     private FileHashCodeResult fileHashCodeResult;
 
+    @XStreamAlias("FileCompressResult")
+    private FileCompressResult fileCompressResult;
+
     @XStreamAlias("UserData")
     private String userData;
 
@@ -83,6 +86,17 @@ public class FileProcessOperation {
 
     public void setFileHashCodeResult(FileHashCodeResult fileHashCodeResult) {
         this.fileHashCodeResult = fileHashCodeResult;
+    }
+
+    public FileCompressResult getFileCompressResult() {
+        if (fileCompressResult == null) {
+            fileCompressResult = new FileCompressResult();
+        }
+        return fileCompressResult;
+    }
+
+    public void setFileCompressResult(FileCompressResult fileCompressResult) {
+        this.fileCompressResult = fileCompressResult;
     }
 
     @Override
