@@ -21,7 +21,7 @@ public class SnapshotInfo {
     /**
      * 恐怖分子信息
      */
-    @XStreamAlias("TerroristInfo")
+    @XStreamAlias("TerrorismInfo")
     private TerroristInfo terroristInfo;
 
     /**

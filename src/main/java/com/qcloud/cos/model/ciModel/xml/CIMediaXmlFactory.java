@@ -33,6 +33,7 @@ import com.qcloud.cos.model.ciModel.job.MediaVideoObject;
 import com.qcloud.cos.model.ciModel.job.MsSharpen;
 import com.qcloud.cos.model.ciModel.job.QualityEstimateConfig;
 import com.qcloud.cos.model.ciModel.job.SDRtoHDR;
+import com.qcloud.cos.model.ciModel.job.SceneChangeInfo;
 import com.qcloud.cos.model.ciModel.job.Subtitle;
 import com.qcloud.cos.model.ciModel.job.Subtitles;
 import com.qcloud.cos.model.ciModel.job.SuperResolution;
@@ -497,6 +498,17 @@ public class CIMediaXmlFactory {
             addIfNotNull(xml, "DirectConcat", mediaConcatTemplate.getDirectConcat());
             addContainer(xml, mediaConcatTemplate.getContainer());
             addAudioMix(xml, mediaConcatTemplate.getAudioMix(), "AudioMix");
+            addAudioMixArray(xml,mediaConcatTemplate.getAudioMixArray());
+            addSceneChangeInfo(xml,mediaConcatTemplate.getSceneChangeInfo());
+            xml.end();
+        }
+    }
+
+    private static void addSceneChangeInfo(XmlWriter xml, SceneChangeInfo sceneChangeInfo) {
+        if (objIsNotValid(sceneChangeInfo)) {
+            xml.start("SceneChangeInfo");
+            addIfNotNull(xml, "Time", sceneChangeInfo.getTime());
+            addIfNotNull(xml, "Mode", sceneChangeInfo.getMode());
             xml.end();
         }
     }
@@ -681,6 +693,7 @@ public class CIMediaXmlFactory {
         addIfNotNull(xml, "Remove", video.getRemove());
         addIfNotNull(xml, "ScanMode", video.getScanMode());
         addIfNotNull(xml, "HlsTsTime", video.getHlsTsTime());
+        addIfNotNull(xml, "Rotate", video.getRotate());
         addIfNotNull(xml, "AnimateFramesPerSecond", video.getAnimateFramesPerSecond());
         addIfNotNull(xml, "AnimateTimeIntervalOfFrame", video.getAnimateTimeIntervalOfFrame());
         addIfNotNull(xml, "AnimateOnlyKeepKeyFrame", video.getAnimateOnlyKeepKeyFrame());

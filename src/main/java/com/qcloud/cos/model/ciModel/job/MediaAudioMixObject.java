@@ -1,5 +1,7 @@
 package com.qcloud.cos.model.ciModel.job;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 import java.io.Serializable;
 
 /**
@@ -7,29 +9,35 @@ import java.io.Serializable;
  */
 
 public class MediaAudioMixObject implements Serializable {
-
     /**
      * 混音文件地址
      * 需与 Input 媒体文件存储于同一 bucket
      */
+    @XStreamAlias("AudioSource")
     private String audioSource;
+
     /**
      * 混音模式
      * 1. Repeat：背景音循环 默认值
      * 2. Once：背景音一次播放
      */
+    @XStreamAlias("MixMode")
     private String mixMode;
+
     /**
      * 是否用混音音轨媒体替换 Input 媒体文件的原音频
      * true/false
      */
+    @XStreamAlias("Replace")
     private String replace;
 
     /**
      * 混音淡入淡出配置
      */
+    @XStreamAlias("EffectConfig")
     private EffectConfig effectConfig;
 
+    @XStreamAlias("DirectMix")
     private String directMix;
 
     public String getAudioSource() {

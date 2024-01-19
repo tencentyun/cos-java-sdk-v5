@@ -1,19 +1,43 @@
 package com.qcloud.cos.model.ciModel.job;
 
 import com.qcloud.cos.model.ciModel.common.FileProcessInputObject;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 public class FileProcessJobDetail {
+    @XStreamAlias("Code")
     private String code;
+
+    @XStreamAlias("Message")
     private String Message;
+
+    @XStreamAlias("JobId")
     private String JobId;
+
+    @XStreamAlias("Tag")
     private String Tag;
+
+    @XStreamAlias("State")
     private String State;
+
+    @XStreamAlias("CreationTime")
     private String CreationTime;
+
+    @XStreamAlias("StartTime")
     private String StartTime;
+
+    @XStreamAlias("EndTime")
     private String EndTime;
+
+    @XStreamAlias("QueueId")
     private String QueueId;
+
+    @XStreamAlias("Progress")
     private String progress;
+
+    @XStreamAlias("Input")
     private FileProcessInputObject input;
+
+    @XStreamAlias("Operation")
     private FileProcessOperation operation;
 
     public String getProgress() {

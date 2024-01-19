@@ -224,6 +224,8 @@ public class ParserMediaInfoUtils {
                 break;
             case "Language":
                 video.setLanguage(value);
+            case "Rotate":
+                video.setRotate(value);
             default:
                 break;
         }

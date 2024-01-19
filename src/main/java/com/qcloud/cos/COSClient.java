@@ -96,21 +96,7 @@ import com.qcloud.cos.model.ciModel.image.ImageSearchResponse;
 import com.qcloud.cos.model.ciModel.image.ImageStyleRequest;
 import com.qcloud.cos.model.ciModel.image.ImageStyleResponse;
 import com.qcloud.cos.model.ciModel.image.OpenImageSearchRequest;
-import com.qcloud.cos.model.ciModel.job.BatchJobRequest;
-import com.qcloud.cos.model.ciModel.job.BatchJobResponse;
-import com.qcloud.cos.model.ciModel.job.DocHtmlRequest;
-import com.qcloud.cos.model.ciModel.job.DocJobListRequest;
-import com.qcloud.cos.model.ciModel.job.DocJobListResponse;
-import com.qcloud.cos.model.ciModel.job.DocJobRequest;
-import com.qcloud.cos.model.ciModel.job.DocJobResponse;
-import com.qcloud.cos.model.ciModel.job.FileProcessJobResponse;
-import com.qcloud.cos.model.ciModel.job.FileProcessRequest;
-import com.qcloud.cos.model.ciModel.job.MediaJobObject;
-import com.qcloud.cos.model.ciModel.job.MediaJobResponse;
-import com.qcloud.cos.model.ciModel.job.MediaJobsRequest;
-import com.qcloud.cos.model.ciModel.job.MediaListJobResponse;
-import com.qcloud.cos.model.ciModel.job.PostSpeechRecognitionRequest;
-import com.qcloud.cos.model.ciModel.job.PostSpeechRecognitionResponse;
+import com.qcloud.cos.model.ciModel.job.*;
 import com.qcloud.cos.model.ciModel.job.v2.DNADbConfigsRequest;
 import com.qcloud.cos.model.ciModel.job.v2.DNADbConfigsResponse;
 import com.qcloud.cos.model.ciModel.job.v2.DNADbFilesRequest;
@@ -4787,7 +4773,7 @@ public class COSClient implements COS {
     public FileProcessJobResponse describeFileProcessJob(FileProcessRequest request) {
         this.checkCIRequestCommon(request);
         CosHttpRequest<FileProcessRequest> httpRequest = this.createRequest(request.getBucketName(), "/file_jobs/" + request.getJobId(), request, HttpMethodName.GET);
-        return this.invoke(httpRequest, new Unmarshallers.FileProcessUnmarshaller());
+        return this.invoke(httpRequest, new Unmarshallers.CICommonUnmarshaller<FileProcessJobResponse>(FileProcessJobResponse.class));
     }
 
     @Override
@@ -5068,7 +5054,16 @@ public class COSClient implements COS {
         return invoke(request, new Unmarshallers.CICommonUnmarshaller<DNADbConfigsResponse>(DNADbConfigsResponse.class));
     }
 
-//    @Override
+    @Override
+    public ZipPreviewResponse zipPreview(ZipPreviewRequest zipPreviewRequest) {
+        rejectNull(zipPreviewRequest, "The request parameter must be specified setting the object tags");
+        CosHttpRequest<ZipPreviewRequest> request = createRequest(zipPreviewRequest.getBucketName(), zipPreviewRequest.getObjectKey(), zipPreviewRequest, HttpMethodName.GET);
+        request.addParameter("ci-process","zippreview");
+        addParameterIfNotNull(request, "uncompress-key", zipPreviewRequest.getUncompressKey());
+        return invoke(request, new Unmarshallers.CICommonUnmarshaller<ZipPreviewResponse>(ZipPreviewResponse.class));
+    }
+
+    //    @Override
     public GoodsMattingResponse goodsMatting(GoodsMattingRequest customRequest) {
         CosHttpRequest<GoodsMattingRequest> request = createRequest(customRequest.getBucketName(), "/" + customRequest.getObjectKey(), customRequest, HttpMethodName.GET);
         request.addParameter("ci-process","GoodsMatting");
