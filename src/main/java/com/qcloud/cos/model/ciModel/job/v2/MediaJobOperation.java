@@ -30,6 +30,7 @@ import com.qcloud.cos.model.ciModel.template.MediaSnapshotObject;
 import com.qcloud.cos.model.ciModel.template.MediaVideoMontageObject;
 import com.qcloud.cos.model.ciModel.template.MediaWatermark;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,52 +73,52 @@ public class MediaJobOperation {
     @XStreamAlias("Output")
     private MediaOutputObject output;
 
-    @XStreamAlias("MediaAnimation")
+    @XStreamAlias("Animation")
     private MediaAnimationObject mediaAnimation;
 
-    @XStreamAlias("MediaInfo")
+    @XStreamAlias("Info")
     private MediaInfoObjcet mediaInfo;
 
-    @XStreamAlias("MediaRemoveWaterMark")
+    @XStreamAlias("RemoveWaterMark")
     private MediaRemoveWaterMark removeWatermark;
 
-    @XStreamAlias("MediaWatermark")
+    @XStreamAlias("Watermark")
     private MediaWatermark watermark;
 
-    @XStreamAlias("MediaTranscode")
+    @XStreamAlias("Transcode")
     private MediaTranscodeObject transcode;
 
-    @XStreamAlias("WatermarkTemplateId")
+    @XStreamImplicit(itemFieldName = "WatermarkTemplateId")
     private List<String> watermarkTemplateId;
 
-    @XStreamAlias("WatermarkList")
+    @XStreamImplicit(itemFieldName = "WatermarkList")
     private List<MediaWatermark> watermarkList;
 
-    @XStreamAlias("MediaConcatTemplate")
+    @XStreamAlias("ConcatTemplate")
     private MediaConcatTemplateObject mediaConcatTemplate;
 
-    @XStreamAlias("MediaSnapshot")
+    @XStreamAlias("Snapshot")
     private MediaSnapshotObject snapshot;
 
-    @XStreamAlias("MediaSegment")
+    @XStreamAlias("Segment")
     private MediaSegmentObject segment;
 
-    @XStreamAlias("MediaSmartCover")
+    @XStreamAlias("SmartCover")
     private MediaSmartCoverObject smartCover;
 
-    @XStreamAlias("MediaVideoMontage")
+    @XStreamAlias("VideoMontage")
     private MediaVideoMontageObject videoMontage;
 
-    @XStreamAlias("MediaDigitalWatermark")
+    @XStreamAlias("DigitalWatermark")
     private MediaDigitalWatermark digitalWatermark;
 
     @XStreamAlias("ExtractDigitalWatermark")
     private ExtractDigitalWatermark extractDigitalWatermark;
 
-    @XStreamAlias("MediaPicProcessTemplate")
+    @XStreamAlias("PicProcessTemplate")
     private MediaPicProcessTemplateObject picProcess;
 
-    @XStreamAlias("MediaResult")
+    @XStreamAlias("Result")
     private MediaResult mediaResult;
 
     @XStreamAlias("PicProcessResult")
@@ -129,10 +130,10 @@ public class MediaJobOperation {
     @XStreamAlias("VoiceSeparate")
     private VoiceSeparate voiceSeparate;
 
-    @XStreamAlias("MediaTimeInterval")
+    @XStreamAlias("TimeInterval")
     private MediaTimeIntervalObject timeInterval;
 
-    @XStreamAlias("MediaTtsConfig")
+    @XStreamAlias("TtsConfig")
     private MediaTtsConfig ttsConfig;
 
     @XStreamAlias("VideoEnhance")

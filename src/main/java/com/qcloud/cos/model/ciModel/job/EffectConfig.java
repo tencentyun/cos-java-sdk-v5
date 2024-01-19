@@ -1,11 +1,24 @@
 package com.qcloud.cos.model.ciModel.job;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 public class EffectConfig {
+    @XStreamAlias("EnableStartFadein")
     private String enableStartFadein;
+
+    @XStreamAlias("StartFadeinTime")
     private String startFadeinTime;
+
+    @XStreamAlias("EnableEndFadeout")
     private String enableEndFadeout;
+
+    @XStreamAlias("EndFadeoutTime")
     private String endFadeoutTime;
+
+    @XStreamAlias("EnableBgmFade")
     private String enableBgmFade;
+
+    @XStreamAlias("BgmFadeTime")
     private String bgmFadeTime;
 
     public String getEnableStartFadein() {
