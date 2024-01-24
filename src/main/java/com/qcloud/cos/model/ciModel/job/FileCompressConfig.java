@@ -23,27 +23,21 @@ public class FileCompressConfig {
     private String ignoreError;
     @XStreamImplicit(itemFieldName = "Key")
     private List<String> key;
-    @XStreamAlias("PrefixConfig")
-    private PrefixConfig prefixConfig;
 
     @XStreamImplicit(itemFieldName = "KeyConfig")
-    private List<KeyConfig> KeyConfigList;
+    private List<KeyConfig> keyConfigList;
 
     public List<KeyConfig> getKeyConfigList() {
-        return KeyConfigList;
+        if (keyConfigList == null) {
+            keyConfigList = new ArrayList<>();
+        }
+        return keyConfigList;
     }
 
     public void setKeyConfigList(List<KeyConfig> keyConfigList) {
-        KeyConfigList = keyConfigList;
+        this.keyConfigList = keyConfigList;
     }
 
-    public PrefixConfig getPrefixConfig() {
-        return prefixConfig;
-    }
-
-    public void setPrefixConfig(PrefixConfig prefixConfig) {
-        this.prefixConfig = prefixConfig;
-    }
     public String getType() {
         return type;
     }
