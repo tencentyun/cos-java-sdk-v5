@@ -28,6 +28,8 @@ import com.qcloud.cos.transfer.Download;
 import com.qcloud.cos.transfer.TransferManager;
 import com.qcloud.cos.transfer.TransferManagerConfiguration;
 import com.qcloud.cos.transfer.Upload;
+import com.tencentcloudapi.common.profile.ClientProfile;
+import com.tencentcloudapi.common.profile.HttpProfile;
 
 public class KMSEncryptionClientDemo {
 	static String cmk = "kms-xxxxxxx";
@@ -67,6 +69,22 @@ public class KMSEncryptionClientDemo {
 
         // 生成加密客户端EncryptionClient, COSEncryptionClient是COSClient的子类, 所有COSClient支持的接口他都支持。
         // EncryptionClient覆盖了COSClient上传下载逻辑，操作内部会执行加密操作，其他操作执行逻辑和COSClient一致
+
+        // in case you want to use different kms server:
+        //{
+        //String kmsEndPoint = "";
+        ///HttpProfile httpProfile = new HttpProfile();
+        //httpProfile.setEndpoint(kmsEndPoint);
+        //httpProfile.setProtocol(HttpProfile.REQ_HTTP);
+        //ClientProfile clientProfile = new ClientProfile();
+        //clientProfile.setHttpProfile(httpProfile);
+
+        //COSEncryptionClient cosEncryptionClient =
+        //        new COSEncryptionClient(new COSStaticCredentialsProvider(cred),
+        //                new KMSEncryptionMaterialsProvider(encryptionMaterials), clientConfig,
+        //                cryptoConf,clientProfile);
+        //}
+        
         COSEncryptionClient cosEncryptionClient =
                 new COSEncryptionClient(new COSStaticCredentialsProvider(cred),
                         new KMSEncryptionMaterialsProvider(encryptionMaterials), clientConfig,
