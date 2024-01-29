@@ -1,7 +1,11 @@
 package com.qcloud.cos.model.ciModel.common;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 public class FileProcessInputObject extends MediaInputObject {
+    @XStreamAlias("BucketId")
     private String bucketId;
+    @XStreamAlias("Region")
     private String region;
 
     public String getBucketId() {

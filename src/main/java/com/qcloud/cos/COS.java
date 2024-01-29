@@ -53,20 +53,7 @@ import com.qcloud.cos.model.ciModel.bucket.DocBucketResponse;
 import com.qcloud.cos.model.ciModel.bucket.MediaBucketRequest;
 import com.qcloud.cos.model.ciModel.bucket.MediaBucketResponse;
 import com.qcloud.cos.model.ciModel.common.ImageProcessRequest;
-import com.qcloud.cos.model.ciModel.job.BatchJobRequest;
-import com.qcloud.cos.model.ciModel.job.BatchJobResponse;
-import com.qcloud.cos.model.ciModel.job.DocHtmlRequest;
-import com.qcloud.cos.model.ciModel.job.DocJobListRequest;
-import com.qcloud.cos.model.ciModel.job.DocJobListResponse;
-import com.qcloud.cos.model.ciModel.job.DocJobRequest;
-import com.qcloud.cos.model.ciModel.job.DocJobResponse;
-import com.qcloud.cos.model.ciModel.job.FileProcessJobResponse;
-import com.qcloud.cos.model.ciModel.job.FileProcessRequest;
-import com.qcloud.cos.model.ciModel.job.MediaJobResponse;
-import com.qcloud.cos.model.ciModel.job.MediaJobsRequest;
-import com.qcloud.cos.model.ciModel.job.MediaListJobResponse;
-import com.qcloud.cos.model.ciModel.job.PostSpeechRecognitionRequest;
-import com.qcloud.cos.model.ciModel.job.PostSpeechRecognitionResponse;
+import com.qcloud.cos.model.ciModel.job.*;
 import com.qcloud.cos.model.ciModel.job.v2.DNADbConfigsRequest;
 import com.qcloud.cos.model.ciModel.job.v2.DNADbConfigsResponse;
 import com.qcloud.cos.model.ciModel.job.v2.DNADbFilesRequest;
@@ -3264,6 +3251,8 @@ public interface COS extends COSDirectSpi {
     DNADbFilesResponse describeMediaDnaDbFiles(DNADbFilesRequest request);
 
     DNADbConfigsResponse describeMediaDnaDbs(DNADbConfigsRequest request);
+
+    ZipPreviewResponse zipPreview(ZipPreviewRequest request);
 }
 
 

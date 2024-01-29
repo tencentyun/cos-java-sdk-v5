@@ -1,5 +1,7 @@
 package com.qcloud.cos.model.ciModel.job;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 import java.io.Serializable;
 
 /**
@@ -7,87 +9,134 @@ import java.io.Serializable;
  */
 public class MediaVideoObject implements Serializable {
 
-    /**
-     * 编解码格式 仅限 gif，webp
-     */
+    @XStreamAlias("Codec")
     private String codec;
+
     /**
      * 宽
      */
+    @XStreamAlias("Width")
     private String width;
+
     /**
      * 高
      */
+    @XStreamAlias("Height")
     private String height;
+
     /**
      * 帧率
      */
+    @XStreamAlias("Fps")
     private String fps;
 
     /**
      * 动图只保留关键帧
      */
+    @XStreamAlias("AnimateOnlyKeepKeyFrame")
     private String animateOnlyKeepKeyFrame;
+
     /**
      * 动图抽帧间隔时间
      */
+    @XStreamAlias("AnimateTimeIntervalOfFrame")
     private String animateTimeIntervalOfFrame;
+
     /**
      * Animation 每秒抽帧帧数
      */
+    @XStreamAlias("AnimateFramesPerSecond")
     private String animateFramesPerSecond;
+
     /**
      * 设置相对质量
      */
+    @XStreamAlias("Qality")
     private String qality;
+
     /**
      * 是否删除视频流
      */
+    @XStreamAlias("Remove")
     private String remove;
+
     /**
      * 编码级别
      */
+    @XStreamAlias("Profile")
     private String profile;
+
     /**
      * 视频输出文件的码率
      */
+    @XStreamAlias("Bitrate")
     private String bitrate;
+
     /**
      * 码率-质量控制因子
      */
+    @XStreamAlias("Crf")
     private String crf;
+
     /**
      * 关键帧间最大帧数
      */
+    @XStreamAlias("Gop")
     private String gop;
+
     /**
      * 视频算法器预置
      */
+    @XStreamAlias("Preset")
     private String preset;
+
     /**
      * 缓冲区大小
      */
+    @XStreamAlias("BufSize")
     private String bufSize;
+
     /**
      * 视频码率峰值
      */
+    @XStreamAlias("Maxrate")
     private String maxrate;
 
+    @XStreamAlias("ScanMode")
     private String scanMode;
 
+    @XStreamAlias("PixFmt")
     private String pixFmt;
 
+    @XStreamAlias("Quality")
     private String quality;
 
+    @XStreamAlias("LongShortMode")
     private String longShortMode;
 
+    @XStreamAlias("Pad")
     private String pad;
 
+    @XStreamAlias("Crop")
     private String crop;
 
+    @XStreamAlias("HlsTsTime")
     private String hlsTsTime;
 
+    @XStreamAlias("Language")
     private String language;
+
+    @XStreamAlias("Rotate")
+    private String rotate;
+
+    public String getRotate() {
+        return rotate;
+    }
+
+    public void setRotate(String rotate) {
+        this.rotate = rotate;
+    }
+
     public String getScanMode() {
         return scanMode;
     }

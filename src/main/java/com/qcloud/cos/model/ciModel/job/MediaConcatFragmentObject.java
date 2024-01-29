@@ -1,5 +1,7 @@
 package com.qcloud.cos.model.ciModel.job;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  * 媒体处理拼接节点
  */
@@ -7,29 +9,39 @@ public class MediaConcatFragmentObject {
     /**
      * 拼接cos资源完整url
      */
+    @XStreamAlias("Url")
     private String url;
+
     /**
      * Start：开头
      * End：结尾
      */
+    @XStreamAlias("Mode")
     private String mode;
+
     /**
      * 开始时间
      */
+    @XStreamAlias("StartTime")
     private String startTime;
 
     /**
      * 结束时间
      */
+    @XStreamAlias("EndTime")
     private String endTime;
+
     /**
      * 拼接对象的索引位置
      * 大于等于0的整数
      * 默认值 0
      */
+    @XStreamAlias("FragmentIndex")
     private String fragmentIndex;
 
+    @XStreamAlias("Duration")
     private String duration;
+
 
     public String getDuration() {
         return duration;
