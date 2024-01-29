@@ -23,6 +23,9 @@ import com.qcloud.cos.http.CosHttpRequest;
 import com.qcloud.cos.internal.CosServiceRequest;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.client.CircularRedirectException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class PredefinedRetryPolicies {
@@ -50,7 +53,7 @@ public class PredefinedRetryPolicies {
     }
 
     public static class SdkDefaultRetryPolicy extends RetryPolicy {
-
+        private static final Logger log = LoggerFactory.getLogger(SdkDefaultRetryPolicy.class);
         @Override
         public <X extends CosServiceRequest> boolean shouldRetry(CosHttpRequest<X> request,
                 HttpResponse response,
@@ -62,6 +65,10 @@ public class PredefinedRetryPolicies {
 
             // Always retry on client exceptions caused by IOException
             if (exception.getCause() instanceof IOException) {
+                if (exception.getCause().getCause() != null && exception.getCause().getCause() instanceof CircularRedirectException) {
+                    log.error("CircularRedirectException will not retry");
+                    return false;
+                }
                 return true;
             }
             return false;

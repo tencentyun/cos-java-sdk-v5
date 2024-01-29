@@ -280,6 +280,7 @@ public class COSClient implements COS {
             buildUrlAndHost(httpRequest, bucketName, key, false);
         }
         httpRequest.setProgressListener(originalRequest.getGeneralProgressListener());
+        httpRequest.setBucketName(bucketName);
         return httpRequest;
     }
 
@@ -582,8 +583,10 @@ public class COSClient implements COS {
         CosServiceRequest cosServiceRequest = request.getOriginalRequest();
         if(cosServiceRequest != null && cosServiceRequest.getCosCredentials() != null) {
             cosCredentials = cosServiceRequest.getCosCredentials();
+            request.setCosCredentials(cosCredentials);
         } else {
             cosCredentials = fetchCredential();
+            request.setCosCredentials(cosCredentials);
         }
         Date expiredTime = new Date(System.currentTimeMillis() + clientConfig.getSignExpired() * 1000);
         boolean isCIWorkflowRequest = cosServiceRequest instanceof  CIWorkflowServiceRequest;
@@ -4449,6 +4452,7 @@ public class COSClient implements COS {
         }
     }
 
+    @Deprecated
     public PutAsyncFetchTaskResult putAsyncFetchTask(PutAsyncFetchTaskRequest putAsyncFetchTaskRequest) {
         CosHttpRequest<PutAsyncFetchTaskRequest> request = createRequest(putAsyncFetchTaskRequest.getBucketName(),
                 String.format("/%s/", putAsyncFetchTaskRequest.getBucketName()), putAsyncFetchTaskRequest, HttpMethodName.POST);
@@ -4471,6 +4475,7 @@ public class COSClient implements COS {
         return invoke(request, new PutAsyncFetchTaskResultHandler());
     }
 
+    @Deprecated
     public GetAsyncFetchTaskResult getAsyncFetchTask(GetAsyncFetchTaskRequest getAsyncFetchTaskRequest) {
         CosHttpRequest<GetAsyncFetchTaskRequest> request = createRequest(getAsyncFetchTaskRequest.getBucketName(),
                 String.format("/%s/%s", getAsyncFetchTaskRequest.getBucketName(), getAsyncFetchTaskRequest.getTaskId()),
