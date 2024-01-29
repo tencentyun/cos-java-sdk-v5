@@ -1,5 +1,7 @@
 package com.qcloud.cos.model.ciModel.job;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 import java.io.Serializable;
 
 /**
@@ -11,7 +13,9 @@ public class MediaAudioObject implements Serializable {
     /**
      * 编解码格式
      */
+    @XStreamAlias("Codec")
     private String codec;
+
     /**
      * 采样率
      * 单位：Hz
@@ -20,32 +24,44 @@ public class MediaAudioObject implements Serializable {
      * 当 Codec 设置为 amr 时，只支持8000
      * 当 Codec 设置为 opus 时，仅支持8000，16000，24000，48000
      */
+    @XStreamAlias("Samplerate")
     private String samplerate;
+
     /**
      * 原始音频码率
      */
+    @XStreamAlias("Bitrate")
     private String bitrate;
+
     /**
      * 声道数
      */
+    @XStreamAlias("Channels")
     private String channels;
+
     /**
      * 是否删除音频流
      */
+    @XStreamAlias("Remove")
     private String remove;
 
+    @XStreamAlias("Profile")
     private String profile;
 
     /**
      * 保持双音轨
      * 取值 true、false。 当 Video.Codec 为H.265时，此参数无效。
      */
+    @XStreamAlias("KeepTwoTracks")
     private String keepTwoTracks;
+
     /**
      * 转换轨道
      * 取值 true、false。 当 Video.Codec 为H.265时，此参数无效。
      */
+    @XStreamAlias("SwitchTrack")
     private String switchTrack;
+
     /**
      * 采样位宽
      * 当 Codec 设置为 aac, 支持 fltp
@@ -54,6 +70,7 @@ public class MediaAudioObject implements Serializable {
      * 当 Codec 设置为 amr, 支持s16
      * 当 Video.Codec 为H.265时，此参数无效
      */
+    @XStreamAlias("SampleFormat")
     private String sampleFormat;
 
     public String getProfile() {

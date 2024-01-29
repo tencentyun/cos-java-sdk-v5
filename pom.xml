@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.qcloud</groupId>
     <artifactId>cos_api</artifactId>
-    <version>5.6.197</version>
+    <version>5.6.199</version>
     <packaging>jar</packaging>
     <name>cos-java-sdk</name>
     <description>java sdk for qcloud cos</description>
@@ -120,10 +120,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.tencent.cloud</groupId>
-            <artifactId>cos-sts-java</artifactId>
-            <version>3.0.8</version>
-            <scope>test</scope>
+            <groupId>com.qcloud</groupId>
+            <artifactId>cos-sts_api</artifactId>
+            <version>3.1.1</version>
         </dependency>
         <dependency>
             <groupId>org.powermock</groupId>
