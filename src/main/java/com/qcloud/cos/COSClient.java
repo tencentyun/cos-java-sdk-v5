@@ -821,7 +821,7 @@ public class COSClient implements COS {
         CosHttpRequest<RenameRequest> request = createRequest(renameRequest.getBucketName(),
                 renameRequest.getDstObject(), renameRequest, HttpMethodName.PUT);
         request.addParameter("rename", null);
-        request.addHeader("x-cos-rename-source", renameRequest.getSrcObject());
+        request.addHeader("x-cos-rename-source", UrlEncoderUtils.encodeEscapeDelimiter(renameRequest.getSrcObject()));
         invoke(request, voidCosResponseHandler);
     }
 
