@@ -77,7 +77,7 @@ public class UrlEncoderUtils {
                 if('/' == urlPath.charAt(end - 1)) {
                     pathBuilder.append(ENCODE_DELIMITER);
                 } else {
-                    pathBuilder.append(encode(urlPath.substring(start, end))).append(PATH_DELIMITER);
+                    pathBuilder.append(encode(urlPath.substring(start, end))).append(ENCODE_DELIMITER);
                 }
                 start = end + 1;
             }
