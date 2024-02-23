@@ -77,7 +77,7 @@ public class UrlEncoderUtils {
                 if('/' == urlPath.charAt(end - 1)) {
                     pathBuilder.append(ENCODE_DELIMITER);
                 } else {
-                    pathBuilder.append(encode(urlPath.substring(start, end))).append(ENCODE_DELIMITER);
+                    pathBuilder.append(encode(urlPath.substring(start, end))).append(PATH_DELIMITER);
                 }
                 start = end + 1;
             }
@@ -86,7 +86,7 @@ public class UrlEncoderUtils {
         if(start < end) {
             pathBuilder.append(encode(urlPath.substring(start, end)));
         }
-        return pathBuilder.toString();
+        return pathBuilder.toString().replace("./", ".%2F");
     }
     
     /**
