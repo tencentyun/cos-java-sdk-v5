@@ -24,6 +24,20 @@ public class FileCompressConfig {
     @XStreamImplicit(itemFieldName = "Key")
     private List<String> key;
 
+    @XStreamImplicit(itemFieldName = "KeyConfig")
+    private List<KeyConfig> keyConfigList;
+
+    public List<KeyConfig> getKeyConfigList() {
+        if (keyConfigList == null) {
+            keyConfigList = new ArrayList<>();
+        }
+        return keyConfigList;
+    }
+
+    public void setKeyConfigList(List<KeyConfig> keyConfigList) {
+        this.keyConfigList = keyConfigList;
+    }
+
     public String getType() {
         return type;
     }
