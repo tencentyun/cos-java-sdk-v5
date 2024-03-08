@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.qcloud.cos.auth.COSCredentials;
 import com.qcloud.cos.event.ProgressListener;
 import com.qcloud.cos.internal.CosServiceRequest;
 
@@ -51,6 +52,10 @@ public class CosHttpRequest<T extends CosServiceRequest> {
     private ProgressListener progressListener;
 
     private String ciSpecialEndParameter;
+
+    private String bucketName;
+
+    private COSCredentials cosCredentials;
 
     public CosHttpRequest(T originRequest) {
         this.originRequest = originRequest;
@@ -146,6 +151,22 @@ public class CosHttpRequest<T extends CosServiceRequest> {
 
     public void setCiSpecialEndParameter(String ciSpecialEndParameter) {
         this.ciSpecialEndParameter = ciSpecialEndParameter;
+    }
+
+    public String getBucketName() {
+        return bucketName;
+    }
+
+    public void setBucketName(String bucketName) {
+        this.bucketName = bucketName;
+    }
+
+    public COSCredentials getCosCredentials() {
+        return cosCredentials;
+    }
+
+    public void setCosCredentials(COSCredentials cosCredentials) {
+        this.cosCredentials = cosCredentials;
     }
 
     @Override
