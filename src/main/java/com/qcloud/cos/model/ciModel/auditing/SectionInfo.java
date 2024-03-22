@@ -58,6 +58,9 @@ public class SectionInfo {
     @XStreamAlias("SentimentAnalysis")
     private SentimentAnalysis sentimentAnalysis;
 
+    @XStreamAlias("ValueInfo")
+    private ValueInfo valueInfo;
+
     @XStreamImplicit(itemFieldName = "LanguageResult")
     private List<LanguageResult> languageResult = new ArrayList<>();
 
@@ -82,6 +85,14 @@ public class SectionInfo {
             languageResult = new ArrayList<>();
         }
         return languageResult;
+    }
+
+    public ValueInfo getValueInfo() {
+        return valueInfo;
+    }
+
+    public void setValueInfo(ValueInfo valueInfo) {
+        this.valueInfo = valueInfo;
     }
 
     public void setLanguageResult(List<LanguageResult> languageResult) {

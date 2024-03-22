@@ -35,9 +35,16 @@ public class FileProcessJobDemo {
         fileCompressConfig.setFormat("zip");
         fileCompressConfig.setFlatten("0");
         fileCompressConfig.setIgnoreError("true");
-        List<String> keyList = fileCompressConfig.getKey();
-        keyList.add("mark/pic-1.jpg");
-        keyList.add("mark/pic-1.pdf");
+        List<KeyConfig> keyConfigList = fileCompressConfig.getKeyConfigList();
+        KeyConfig keyConfig = new KeyConfig();
+        keyConfig.setKey("1.jpg");
+        keyConfig.setRename("rename-1.jpg");
+        keyConfigList.add(keyConfig);
+
+        keyConfig = new KeyConfig();
+        keyConfig.setKey("2.jpg");
+        keyConfig.setRename("rename-2.jpg");
+        keyConfigList.add(keyConfig);
 
         MediaOutputObject output = request.getOperation().getOutput();
         output.setBucket("demo-1234567890");
@@ -102,7 +109,7 @@ public class FileProcessJobDemo {
         FileProcessRequest request = new FileProcessRequest();
         //2.添加请求参数 参数详情请见api接口文档
         request.setBucketName("demo-1234567890");
-        request.setJobId("f37c257b8b6a411ee9916fbc75b6071c4");
+        request.setJobId("ff96f4bacba8511ee949b8116795*****");
         //3.调用接口,获取任务响应对象
         FileProcessJobResponse response = client.describeFileProcessJob(request);
         FileProcessJobDetail jobDetail = response.getJobDetail();
