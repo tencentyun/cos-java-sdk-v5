@@ -186,12 +186,6 @@ public class COSSigner {
 
             if(needSignedHeader(key)) {
                 String value = headerEntry.getValue();
-                if (key.equals("content-length")) {
-                    long contentLength = Long.parseLong(value);
-                    if (contentLength < 0) {
-                        throw new CosClientException("The specified header content-length should be greater than or equal to 0");
-                    }
-                }
                 signHeaders.put(key, value);
             }
         }
