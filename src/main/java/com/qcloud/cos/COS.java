@@ -40,6 +40,7 @@ import com.qcloud.cos.model.ciModel.ai.FaceSearchBucketRequest;
 import com.qcloud.cos.model.ciModel.ai.SearchPersonFaceRequest;
 import com.qcloud.cos.model.ciModel.ai.SearchPersonFaceResponse;
 import com.qcloud.cos.model.ciModel.common.CImageProcessRequest;
+import com.qcloud.cos.model.ciModel.hls.*;
 import com.qcloud.cos.model.ciModel.image.*;
 import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.exception.CosServiceException;
@@ -3253,6 +3254,12 @@ public interface COS extends COSDirectSpi {
     DNADbConfigsResponse describeMediaDnaDbs(DNADbConfigsRequest request);
 
     ZipPreviewResponse zipPreview(ZipPreviewRequest request);
+
+    CreateHLSPlayKeyResponse createHLSPlayKey(CreateHLSPlayKeyRequest customRequest);
+
+    GetHLSPlayKeyResponse getHLSPlayKey(GetHLSPlayKeyRequest customRequest);
+
+    UpdataHLSPlayKeyResponse updataHLSPlayKey(UpdataHLSPlayKeyRequest customRequest);
 }
 
 
