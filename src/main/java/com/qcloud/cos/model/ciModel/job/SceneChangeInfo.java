@@ -9,6 +9,9 @@ public class SceneChangeInfo {
     @XStreamAlias("Time")
     private String time;
 
+    @XStreamAlias("TransitionType")
+    private String transitionType;
+
     public String getMode() {
         return mode;
     }
@@ -23,5 +26,13 @@ public class SceneChangeInfo {
 
     public void setTime(String time) {
         this.time = time;
+    }
+
+    public String getTransitionType() {
+        return transitionType;
+    }
+
+    public void setTransitionType(String transitionType) {
+        this.transitionType = transitionType;
     }
 }

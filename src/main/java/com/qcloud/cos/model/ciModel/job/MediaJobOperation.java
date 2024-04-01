@@ -89,7 +89,7 @@ public class MediaJobOperation {
     @XStreamAlias("MediaVideoMontage")
     private MediaVideoMontageObject videoMontage = new MediaVideoMontageObject();
 
-    @XStreamAlias("MediaDigitalWatermark")
+    @XStreamAlias("DigitalWatermark")
     private MediaDigitalWatermark digitalWatermark = new MediaDigitalWatermark();
 
     @XStreamAlias("ExtractDigitalWatermark")

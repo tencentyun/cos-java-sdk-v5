@@ -114,6 +114,9 @@ public class CIMediaXmlFactory {
      * 模板任务xml转换
      */
     public static byte[] convertToXmlByteArray(MediaTemplateRequest request) {
+        if ("Concat".equalsIgnoreCase(request.getTag())){
+            return CIAuditingXmlFactoryV2.convertToXmlByteArray(request);
+        }
         XmlWriter xml = new XmlWriter();
         String tag = request.getTag();
         xml.start("Request");
