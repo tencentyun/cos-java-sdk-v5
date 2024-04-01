@@ -6,37 +6,53 @@ import com.qcloud.cos.model.ciModel.job.MediaTransConfigObject;
 import com.qcloud.cos.model.ciModel.job.TtsTpl;
 import com.qcloud.cos.model.ciModel.job.VideoEnhance;
 import com.qcloud.cos.model.ciModel.job.VideoTargetRec;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  * @descript 媒体模板响应实体类。 注释详情请参见 https://cloud.tencent.com/document/product/460/46989
  */
 public class MediaTemplateObject extends MediaCommonResponse {
 
+    @XStreamAlias("TemplateId")
     private String templateId;
 
+    @XStreamAlias("Name")
     private String name;
 
+    @XStreamAlias("Tag")
     private String tag;
 
+    @XStreamAlias("State")
     private String state;
 
+    @XStreamAlias("BucketId")
     private String bucketId;
+
+    @XStreamAlias("Category")
     private String category;
 
+    @XStreamAlias("TransTpl")
     private MediaTemplateTransTplObject transTpl;
 
+    @XStreamAlias("Snapshot")
     private MediaSnapshotObject snapshot;
 
+    @XStreamAlias("Watermark")
     private MediaWatermark watermark;
 
+    @XStreamAlias("TransConfig")
     private MediaTransConfigObject transConfig;
 
+    @XStreamAlias("ConcatTemplate")
     private MediaConcatTemplateObject concatTemplate;
 
+    @XStreamAlias("VideoTargetRec")
     private VideoTargetRec videoTargetRec;
 
+    @XStreamAlias("TtsTpl")
     private TtsTpl ttsTpl;
 
+    @XStreamAlias("VideoEnhance")
     private VideoEnhance videoEnhance;
 
     public String getTemplateId() {

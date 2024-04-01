@@ -3112,6 +3112,8 @@ public interface COS extends COSDirectSpi {
      */
     Boolean createDocProcessBucket(DocBucketRequest request);
 
+    Boolean createMediaProcessBucket(MediaBucketRequest mediaBucketRequest);
+
     /**
      * GenerateDocPreviewHtmlUrl  查询账号下已开通文档预览功能的bucket
      */
@@ -3260,6 +3262,8 @@ public interface COS extends COSDirectSpi {
     GetHLSPlayKeyResponse getHLSPlayKey(GetHLSPlayKeyRequest customRequest);
 
     UpdataHLSPlayKeyResponse updataHLSPlayKey(UpdataHLSPlayKeyRequest customRequest);
+
+    MediaListTemplateResponse describeMediaTemplatesV2(MediaTemplateRequest request);
 }
 
 
