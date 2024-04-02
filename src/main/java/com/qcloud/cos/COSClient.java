@@ -79,6 +79,7 @@ import com.qcloud.cos.model.ciModel.bucket.MediaBucketRequest;
 import com.qcloud.cos.model.ciModel.bucket.MediaBucketResponse;
 import com.qcloud.cos.model.ciModel.common.CImageProcessRequest;
 import com.qcloud.cos.model.ciModel.common.ImageProcessRequest;
+import com.qcloud.cos.model.ciModel.hls.*;
 import com.qcloud.cos.model.ciModel.image.AIImageColoringRequest;
 import com.qcloud.cos.model.ciModel.image.AutoTranslationBlockRequest;
 import com.qcloud.cos.model.ciModel.image.AutoTranslationBlockResponse;
@@ -4282,6 +4283,14 @@ public class COSClient implements COS {
     }
 
     @Override
+    public Boolean createMediaProcessBucket(MediaBucketRequest mediaBucketRequest) {
+        this.checkCIRequestCommon(mediaBucketRequest);
+        CosHttpRequest<MediaBucketRequest> request = createRequest(mediaBucketRequest.getBucketName(), "/mediabucket", mediaBucketRequest, HttpMethodName.POST);
+        this.invoke(request, voidCosResponseHandler);
+        return true;
+    }
+
+    @Override
     public String GenerateDocPreviewUrl(DocHtmlRequest docJobRequest) throws URISyntaxException {
         rejectNull(docJobRequest,
                 "The request parameter must be specified setting the object tags");
@@ -5077,6 +5086,48 @@ public class COSClient implements COS {
         invoke(request, new CIGetResponseHandler());
         return null;
     }
+
+    @Override
+    public CreateHLSPlayKeyResponse createHLSPlayKey(CreateHLSPlayKeyRequest customRequest) {
+
+        CosHttpRequest<CreateHLSPlayKeyRequest> request = createRequest(customRequest.getBucketName(), "/playKey", customRequest , HttpMethodName.POST);
+
+        return invoke(request, new Unmarshallers.CICommonUnmarshaller<CreateHLSPlayKeyResponse>(CreateHLSPlayKeyResponse.class));
+    }
+
+    @Override
+    public GetHLSPlayKeyResponse getHLSPlayKey(GetHLSPlayKeyRequest customRequest) {
+
+        CosHttpRequest<GetHLSPlayKeyRequest> request = createRequest(customRequest.getBucketName(), "/playKey", customRequest , HttpMethodName.GET);
+
+
+        return invoke(request, new Unmarshallers.CICommonUnmarshaller<GetHLSPlayKeyResponse>(GetHLSPlayKeyResponse.class));
+    }
+
+    @Override
+    public UpdataHLSPlayKeyResponse updataHLSPlayKey(UpdataHLSPlayKeyRequest customRequest) {
+        rejectNull(customRequest, "The request parameter must be specified setting the object tags");
+
+        CosHttpRequest<UpdataHLSPlayKeyRequest> request = createRequest(customRequest.getBucketName(), "/playKey", customRequest , HttpMethodName.PUT);
+        addParameterIfNotNull(request, "masterPlayKey", customRequest.getMasterPlayKey());
+
+        this.setContent(request, CIAuditingXmlFactoryV2.convertToXmlByteArray(request), "application/xml", false);
+        return invoke(request, new Unmarshallers.CICommonUnmarshaller<UpdataHLSPlayKeyResponse>(UpdataHLSPlayKeyResponse.class));
+    }
+
+    @Override
+    public MediaListTemplateResponse describeMediaTemplatesV2(MediaTemplateRequest request) {
+        this.checkCIRequestCommon(request);
+        CosHttpRequest<MediaTemplateRequest> httpRequest = this.createRequest(request.getBucketName(), "/template", request, HttpMethodName.GET);
+        addParameterIfNotNull(httpRequest, "tag", request.getTag());
+        addParameterIfNotNull(httpRequest, "category", request.getCategory());
+        addParameterIfNotNull(httpRequest, "ids", request.getIds());
+        addParameterIfNotNull(httpRequest, "name", request.getName());
+        addParameterIfNotNull(httpRequest, "pageNumber", request.getPageNumber());
+        addParameterIfNotNull(httpRequest, "pageSize", request.getPageSize());
+        return this.invoke(httpRequest, new Unmarshallers.CICommonUnmarshaller<MediaListTemplateResponse>(MediaListTemplateResponse.class));
+    }
+
 
 }
 

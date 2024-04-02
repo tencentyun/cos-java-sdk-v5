@@ -34,17 +34,13 @@ public class ConcatDemo {
         request.getInput().setObject("demo.mp4");
         MediaConcatTemplateObject mediaConcatTemplate = request.getOperation().getMediaConcatTemplate();
         SceneChangeInfo sceneChangeInfo = mediaConcatTemplate.getSceneChangeInfo();
-        sceneChangeInfo.setMode("FADE");
+        sceneChangeInfo.setMode("XFADE");
         sceneChangeInfo.setTime("5");
+        sceneChangeInfo.setTransitionType("fade");
         List<MediaConcatFragmentObject> concatFragmentList = mediaConcatTemplate.getConcatFragmentList();
         MediaConcatFragmentObject mediaConcatFragmentObject = new MediaConcatFragmentObject();
         mediaConcatFragmentObject.setMode("Start");
         mediaConcatFragmentObject.setUrl("https://demo-1234567890.cos.ap-chongqing.myqcloud.com/media/1.mp4");
-        concatFragmentList.add(mediaConcatFragmentObject);
-
-        mediaConcatFragmentObject = new MediaConcatFragmentObject();
-        mediaConcatFragmentObject.setMode("End");
-        mediaConcatFragmentObject.setUrl("https://demo-1234567890.cos.ap-chongqing.myqcloud.com/media/test.mp4");
         concatFragmentList.add(mediaConcatFragmentObject);
 
         MediaAudioObject audio = mediaConcatTemplate.getAudio();
@@ -59,17 +55,6 @@ public class ConcatDemo {
         container.setFormat("mp4");
 
         mediaConcatTemplate.setIndex("1");
-
-        List<MediaAudioMixObject> audioMixArray = mediaConcatTemplate.getAudioMixArray();
-
-        MediaAudioMixObject mediaAudioMixObject = new MediaAudioMixObject();
-        mediaAudioMixObject.setAudioSource("https://demo-1234567890.cos.ap-chongqing.myqcloud.com/1.mp3");
-        mediaAudioMixObject.setMixMode("Once");
-        EffectConfig effectConfig = mediaAudioMixObject.getEffectConfig();
-        effectConfig.setEnableStartFadein("true");
-        audioMixArray.add(mediaAudioMixObject);
-
-
         request.getOperation().getOutput().setBucket("demo-1234567890");
         request.getOperation().getOutput().setRegion("ap-chongqing");
         request.getOperation().getOutput().setObject("concat.mp4");
@@ -87,29 +72,10 @@ public class ConcatDemo {
         MediaJobsRequestV2 request = new MediaJobsRequestV2();
         //2.添加请求参数 参数详情请见api接口文档
         request.setBucketName("demo-1234567890");
-        request.setJobId("j5b16d618b6c611ee8240393a70*");
+        request.setJobId("j0d9e19eef00211ee9b72713e624*****");
         //3.调用接口,获取任务响应对象
         MediaJobResponseV2 response = client.describeMediaJobV2(request);
         System.out.println(Jackson.toJsonString(response));
-    }
-
-    /**
-     * describeMediaJobs 查询任务列表
-     * @param client
-     */
-    public static void describeMediaJobs(COSClient client)  {
-        //1.创建任务请求对象
-        MediaJobsRequest request = new MediaJobsRequest();
-        //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("demo-1234567890");
-        request.setTag("Concat");
-        request.setSize(100);
-        //3.调用接口,获取任务响应对象
-        MediaListJobResponse response = client.describeMediaJobs(request);
-        List<MediaJobObject> jobsDetail = response.getJobsDetailList();
-        for (MediaJobObject mediaJobObject : jobsDetail) {
-            System.out.println(mediaJobObject);
-        }
     }
 
     /**

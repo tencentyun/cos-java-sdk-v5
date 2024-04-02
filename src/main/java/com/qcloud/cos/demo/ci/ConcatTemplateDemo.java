@@ -1,10 +1,7 @@
 package com.qcloud.cos.demo.ci;
 
 import com.qcloud.cos.COSClient;
-import com.qcloud.cos.model.ciModel.job.MediaAudioObject;
-import com.qcloud.cos.model.ciModel.job.MediaConcatFragmentObject;
-import com.qcloud.cos.model.ciModel.job.MediaConcatTemplateObject;
-import com.qcloud.cos.model.ciModel.job.MediaVideoObject;
+import com.qcloud.cos.model.ciModel.job.*;
 import com.qcloud.cos.model.ciModel.template.MediaListTemplateResponse;
 import com.qcloud.cos.model.ciModel.template.MediaTemplateObject;
 import com.qcloud.cos.model.ciModel.template.MediaTemplateRequest;
@@ -22,7 +19,7 @@ public class ConcatTemplateDemo {
         // 1 初始化用户身份信息（secretId, secretKey）。
         COSClient client = ClientUtils.getTestClient();
         // 2 调用要使用的方法。
-        describeMediaTemplates(client);
+        createMediaTemplate(client);
     }
 
     /**
@@ -35,7 +32,7 @@ public class ConcatTemplateDemo {
         //2.添加请求参数 参数详情请见api接口文档
         request.setBucketName("demo-1234567890");
         request.setTag("Concat");
-        request.setName("ConcatTemplate");
+        request.setName("ConcatTemplate42");
         MediaConcatTemplateObject concatTemplate = request.getConcat();
         concatTemplate.getContainer().setFormat("mp4");
         List<MediaConcatFragmentObject> concatList = concatTemplate.getConcatFragmentList();
@@ -44,18 +41,10 @@ public class ConcatTemplateDemo {
         fragment.setUrl("http://demo-1234567890.cos.ap-chongqing.myqcloud.com/demo1.mp4");
         concatList.add(fragment);
 
-        fragment = new MediaConcatFragmentObject();
-        fragment.setMode("End");
-        fragment.setUrl("http://demo-1234567890.cos.ap-chongqing.myqcloud.com/demo2.mp4");
-        concatList.add(fragment);
-
-        MediaAudioObject audio = concatTemplate.getAudio();
-        audio.setCodec("mp3");
-        MediaVideoObject video = concatTemplate.getVideo();
-        video.setCodec("H.264");
-        video.setBitrate("1000");
-        video.setWidth("1280");
-        video.setFps("30");
+        SceneChangeInfo sceneChangeInfo = concatTemplate.getSceneChangeInfo();
+        sceneChangeInfo.setMode("XFADE");
+        sceneChangeInfo.setTime("5");
+        sceneChangeInfo.setTransitionType("fade");
 
         MediaTemplateResponse response = client.createMediaTemplate(request);
         System.out.println(response);
@@ -66,13 +55,13 @@ public class ConcatTemplateDemo {
      *
      * @param client
      */
-    public static void describeMediaTemplates(COSClient client) {
+    public static void describeMediaTemplatesV2(COSClient client) {
         //1.创建模板请求对象
         MediaTemplateRequest request = new MediaTemplateRequest();
         //2.添加请求参数 参数详情请见api接口文档
         request.setBucketName("demo-1234567890");
         request.setTag("Concat");
-        MediaListTemplateResponse response = client.describeMediaTemplates(request);
+        MediaListTemplateResponse response = client.describeMediaTemplatesV2(request);
         List<MediaTemplateObject> templateList = response.getTemplateList();
         for (MediaTemplateObject mediaTemplateObject : templateList) {
             System.out.println(Jackson.toJsonString(mediaTemplateObject));

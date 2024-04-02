@@ -2,6 +2,7 @@ package com.qcloud.cos.model.ciModel.template;
 
 import com.qcloud.cos.internal.CIServiceRequest;
 import com.qcloud.cos.model.ciModel.job.*;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -10,95 +11,140 @@ import java.util.List;
 /**
  * @descript 本类为模板实体类。 注释详情请参见 https://cloud.tencent.com/document/product/460/46989
  */
+@XStreamAlias("Request")
 public class MediaTemplateRequest extends CIServiceRequest implements Serializable {
     /**
      * 模板id
      */
+    @XStreamAlias("TemplateId")
     private String templateId;
+
     /**
      * 动图模板 : Animation 截图模板Snapshot
      * 水印模板 : Watermark 截图模板Transcode
      */
+    @XStreamAlias("Tag")
     private String tag;
+
     /**
      * 模板名称 仅支持中文、英文、数字、_、-和*
      */
+    @XStreamAlias("Name")
     private String name;
+
     /**
      * 容器格式
      */
+    @XStreamAlias("Container")
     private MediaContainerObject container;
+
     /**
      * 视频信息
      */
+    @XStreamAlias("Video")
     private MediaVideoObject video;
+
     /**
      * 音频信息
      */
+    @XStreamAlias("Audio")
     private MediaAudioObject audio;
+
     /**
      * 视频信息
      */
+    @XStreamAlias("TransConfig")
     private MediaTransConfigObject transConfig;
+
     /**
      * 时间区间
      */
+    @XStreamAlias("TimeInterval")
     private MediaTimeIntervalObject timeInterval;
+
     /**
      * 截图
      */
+    @XStreamAlias("Snapshot")
     private MediaSnapshotObject snapshot;
+
     /**
      * 水印
      */
+    @XStreamAlias("Watermark")
     private MediaWatermark watermark;
 
     /**
      * 拼接参数
      */
+    @XStreamAlias("ConcatTemplate")
     private MediaConcatTemplateObject concat;
 
+    @XStreamAlias("AudioMix")
     private MediaAudioMixObject audioMix;
+
+    @XStreamAlias("AudioMixArray")
     private List<MediaAudioMixObject> audioMixArray;
 
+    @XStreamAlias("VideoTargetRec")
     private VideoTargetRec videoTargetRec;
 
+    @XStreamAlias("VideoEnhance")
     private VideoEnhance videoEnhance;
 
     /**
      * 第几页
      */
+    @XStreamAlias("PageNumber")
     private String pageNumber;
+
     /**
      * 每页个数
      */
+    @XStreamAlias("PageSize")
     private String pageSize;
+
     /**
      * Official，Custom，默认值：Custom
      */
+    @XStreamAlias("Category")
     private String category;
+
     /**
      * 模板 ID，以,符号分割字符串
      */
+    @XStreamAlias("Ids")
     private String ids;
 
+    @XStreamAlias("Mode")
     private String mode;
+
+    @XStreamAlias("Codec")
     private String codec;
+
+    @XStreamAlias("VoiceType")
     private String voiceType;
+
+    @XStreamAlias("Volume")
     private String volume;
+
+    @XStreamAlias("Speed")
     private String speed;
+
     /**
      * 精彩集锦场景
      * 取值范围：Soccer/Video，默认值为Video
      */
+    @XStreamAlias("Scene")
     private String scene;
+
     /**
      * 1. 默认自动分析时长
      * 2. 单位为秒
      * 3. 支持 float 格式，执行精度精确到毫秒
      */
+    @XStreamAlias("Duration")
     private String duration;
-
     public String getScene() {
         return scene;
     }
