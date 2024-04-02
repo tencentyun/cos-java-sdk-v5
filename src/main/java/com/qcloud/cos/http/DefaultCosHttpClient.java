@@ -512,9 +512,12 @@ public class DefaultCosHttpClient implements CosHttpClient {
                 break;
             } catch (CosServiceException cse) {
                 closeHttpResponseStream(httpResponse);
-                request.addLogDetails(new ExceptionLogDetail(cse, "service", System.currentTimeMillis(), retryIndex));
+                String errorMsg = String.format("failed to execute http request due to service exception, request timeStamp %d,"
+                                + " httpRequest: %s, retryIdx:%d, maxErrorRetry:%d", System.currentTimeMillis(), request,
+                        retryIndex, maxErrorRetry);
+                request.addLogDetails(new ExceptionLogDetail(cse, errorMsg));
                 if (!shouldRetry(request, httpResponse, cse, retryIndex, retryPolicy)) {
-                    if (cse.getStatusCode() >= 500) {
+                    if (cse.getStatusCode() >= 400) {
                         handleLog(request);
                     }
                     throw cse;
@@ -522,7 +525,10 @@ public class DefaultCosHttpClient implements CosHttpClient {
                 changeEndpointForRetry(request, httpResponse, retryIndex);
             } catch (CosClientException cce) {
                 closeHttpResponseStream(httpResponse);
-                request.addLogDetails(new ExceptionLogDetail(cce, "client", System.currentTimeMillis(), retryIndex));
+                String errorMsg = String.format("failed to execute http request due to client exception, request timeStamp %d,"
+                                + " httpRequest: %s, retryIdx:%d, maxErrorRetry:%d", System.currentTimeMillis(), request,
+                        retryIndex, maxErrorRetry);
+                request.addLogDetails(new ExceptionLogDetail(cce, errorMsg));
                 if (!shouldRetry(request, httpResponse, cce, retryIndex, retryPolicy)) {
                     handleLog(request);
                     throw cce;
@@ -631,10 +637,7 @@ public class DefaultCosHttpClient implements CosHttpClient {
 
     private <Y extends CosServiceRequest> void handleLog(CosHttpRequest<Y> request) {
         for (ExceptionLogDetail logDetail : request.getExceptionsLogDetails()) {
-            String errorMsg = String.format("failed to execute http request due to %s exception, request timeStamp %d,"
-                            + " httpRequest: %s, retryIdx:%d, maxErrorRetry:%d", logDetail.getExceptionLevel(), logDetail.getTimeStamp(), request,
-                    logDetail.getExecuteIndex(), maxErrorRetry);
-            log.error(errorMsg, logDetail.getException());
+            log.error(logDetail.getErrMsg(), logDetail.getException());
         }
     }
 
