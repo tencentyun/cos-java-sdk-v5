@@ -48,6 +48,7 @@ import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.exception.CosServiceException.ErrorType;
 import com.qcloud.cos.exception.ResponseNotCompleteException;
+import com.qcloud.cos.exception.ExceptionLogDetail;
 import com.qcloud.cos.internal.CosErrorResponseHandler;
 import com.qcloud.cos.internal.CosServiceRequest;
 import com.qcloud.cos.internal.CosServiceResponse;
@@ -511,26 +512,22 @@ public class DefaultCosHttpClient implements CosHttpClient {
                 break;
             } catch (CosServiceException cse) {
                 closeHttpResponseStream(httpResponse);
+                request.addLogDetails(new ExceptionLogDetail(cse, "service", System.currentTimeMillis(), retryIndex));
                 if (!shouldRetry(request, httpResponse, cse, retryIndex, retryPolicy)) {
                     if (cse.getStatusCode() >= 500) {
-                        String errorMsg = String.format("failed to execute http request, due to service exception,"
-                                        + " httpRequest: %s, retryIdx:%d, maxErrorRetry:%d", request,
-                                retryIndex, maxErrorRetry);
-                        log.error(errorMsg, cse);
+                        handleLog(request);
                     }
                     throw cse;
                 }
-                changeEndpointForRetry(request, httpResponse);
+                changeEndpointForRetry(request, httpResponse, retryIndex);
             } catch (CosClientException cce) {
-                String errorMsg = String.format("failed to execute http request, due to client exception,"
-                                + " httpRequest: %s, retryIdx:%d, maxErrorRetry:%d",
-                        request.toString(), retryIndex, maxErrorRetry);
                 closeHttpResponseStream(httpResponse);
+                request.addLogDetails(new ExceptionLogDetail(cce, "client", System.currentTimeMillis(), retryIndex));
                 if (!shouldRetry(request, httpResponse, cce, retryIndex, retryPolicy)) {
-                    log.error(errorMsg, cce);
+                    handleLog(request);
                     throw cce;
                 }
-                changeEndpointForRetry(request, httpResponse);
+                changeEndpointForRetry(request, httpResponse, retryIndex);
             } catch (Exception exp) {
                 String expName = exp.getClass().getName();
                 String errorMsg = String.format("httpClient execute occur an unknown exception:%s, httpRequest: %s"
@@ -632,8 +629,17 @@ public class DefaultCosHttpClient implements CosHttpClient {
         return httpResponse;
     }
 
-    private <Y extends CosServiceRequest> void changeEndpointForRetry(CosHttpRequest<Y> request, HttpResponse httpResponse) {
-        if (!clientConfig.isChangeEndpointRetry()) {
+    private <Y extends CosServiceRequest> void handleLog(CosHttpRequest<Y> request) {
+        for (ExceptionLogDetail logDetail : request.getExceptionsLogDetails()) {
+            String errorMsg = String.format("failed to execute http request due to %s exception, request timeStamp %d,"
+                            + " httpRequest: %s, retryIdx:%d, maxErrorRetry:%d", logDetail.getExceptionLevel(), logDetail.getTimeStamp(), request,
+                    logDetail.getExecuteIndex(), maxErrorRetry);
+            log.error(errorMsg, logDetail.getException());
+        }
+    }
+
+    private <Y extends CosServiceRequest> void changeEndpointForRetry(CosHttpRequest<Y> request, HttpResponse httpResponse, int retryIndex) {
+        if (!clientConfig.isChangeEndpointRetry() || retryIndex != (maxErrorRetry - 1)) {
             return;
         }
 

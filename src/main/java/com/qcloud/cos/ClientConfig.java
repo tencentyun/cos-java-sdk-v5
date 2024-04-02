@@ -107,7 +107,7 @@ public class ClientConfig {
 
     private boolean isShortConnection = false;
 
-    private boolean isChangeEndpointRetry = true;
+    private boolean isChangeEndpointRetry = false;
 
     private boolean isPrintShutdownStackTrace = true;
 
