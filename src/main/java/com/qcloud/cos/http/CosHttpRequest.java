@@ -19,11 +19,14 @@
 package com.qcloud.cos.http;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.qcloud.cos.auth.COSCredentials;
 import com.qcloud.cos.event.ProgressListener;
+import com.qcloud.cos.exception.ExceptionLogDetail;
 import com.qcloud.cos.internal.CosServiceRequest;
 
 public class CosHttpRequest<T extends CosServiceRequest> {
@@ -56,6 +59,8 @@ public class CosHttpRequest<T extends CosServiceRequest> {
     private String bucketName;
 
     private COSCredentials cosCredentials;
+
+    private List<ExceptionLogDetail> logDetails = new ArrayList<ExceptionLogDetail>();
 
     public CosHttpRequest(T originRequest) {
         this.originRequest = originRequest;
@@ -167,6 +172,14 @@ public class CosHttpRequest<T extends CosServiceRequest> {
 
     public void setCosCredentials(COSCredentials cosCredentials) {
         this.cosCredentials = cosCredentials;
+    }
+
+    public void addLogDetails(ExceptionLogDetail logDetail) {
+        logDetails.add(logDetail);
+    }
+
+    public List<ExceptionLogDetail> getExceptionsLogDetails() {
+        return logDetails;
     }
 
     @Override
