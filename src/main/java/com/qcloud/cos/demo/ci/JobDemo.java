@@ -17,7 +17,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 /**
- * 媒体处理 job接口相关demo 详情见https://cloud.tencent.com/document/product/460/48216
+ * 媒体处理 job接口相关demo 详情见https://cloud.tencent.com/document/product/460/84790
  */
 public class JobDemo {
 

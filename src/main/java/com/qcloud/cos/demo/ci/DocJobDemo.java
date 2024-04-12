@@ -14,7 +14,7 @@ import com.qcloud.cos.model.ciModel.job.DocProcessObject;
 import java.net.URISyntaxException;
 
 /**
- * 文档预览任务相关demo
+ * 文档预览任务相关demo 详情参考API文档 https://cloud.tencent.com/document/product/460/46942
  */
 public class DocJobDemo {
     public static void main(String[] args)  {

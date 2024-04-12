@@ -3,10 +3,8 @@ package com.qcloud.cos.demo.ci;
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
 import com.qcloud.cos.model.ciModel.job.*;
-import com.qcloud.cos.utils.Base64;
 import com.qcloud.cos.utils.Jackson;
 
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**

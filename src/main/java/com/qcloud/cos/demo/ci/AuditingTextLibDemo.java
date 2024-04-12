@@ -6,7 +6,7 @@ import com.qcloud.cos.model.ciModel.auditing.AuditingTextLibResponse;
 import com.qcloud.cos.utils.Jackson;
 
 /**
- * 内容审核 自定义文本库相关demo 详情见https://cloud.tencent.com/document/product/460/76261
+ * 内容审核 自定义文本库相关demo
  */
 public class AuditingTextLibDemo {
 

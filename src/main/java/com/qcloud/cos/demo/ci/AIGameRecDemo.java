@@ -6,7 +6,7 @@ import com.qcloud.cos.model.ciModel.persistence.AIRecRequest;
 import com.qcloud.cos.utils.Jackson;
 
 /**
- * 游戏图场景识别demo
+ * 游戏图场景识别demo  相关API 请参考 https://cloud.tencent.com/document/product/460/93153
  */
 public class AIGameRecDemo {
     public static void main(String[] args) throws InterruptedException {
