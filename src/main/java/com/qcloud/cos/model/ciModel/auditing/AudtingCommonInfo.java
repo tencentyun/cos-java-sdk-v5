@@ -59,8 +59,8 @@ public class AudtingCommonInfo {
     @XStreamAlias("SubLabel")
     private String subLabel;
 
-    @XStreamAlias("OcrResults")
-    private OcrResults ocrResults;
+    @XStreamImplicit(itemFieldName = "OcrResults")
+    private List<OcrResults> ocrResults;
 
     @XStreamAlias("Category")
     private String category;
@@ -142,14 +142,11 @@ public class AudtingCommonInfo {
         this.count = count;
     }
 
-    public OcrResults getOcrResults() {
-        if (ocrResults == null) {
-            ocrResults = new OcrResults();
-        }
+    public List<OcrResults> getOcrResults() {
         return ocrResults;
     }
 
-    public void setOcrResults(OcrResults ocrResults) {
+    public void setOcrResults(List<OcrResults> ocrResults) {
         this.ocrResults = ocrResults;
     }
 

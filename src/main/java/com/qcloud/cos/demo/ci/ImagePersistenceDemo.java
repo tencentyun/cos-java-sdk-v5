@@ -26,7 +26,9 @@ import com.qcloud.cos.model.ciModel.persistence.PicOperations;
 import com.qcloud.cos.transfer.TransferManager;
 import com.qcloud.cos.transfer.Upload;
 
-
+/**
+ * 基础图片处理相关demo  相关API https://cloud.tencent.com/document/product/460/36540
+ */
 public class ImagePersistenceDemo {
     public static void persistenceImage(COSClient cosClient) {
         // bucket名需包含appid

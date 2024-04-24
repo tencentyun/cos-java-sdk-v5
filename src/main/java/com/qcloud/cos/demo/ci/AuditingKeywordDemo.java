@@ -9,7 +9,7 @@ import com.qcloud.cos.utils.Jackson;
 import java.util.List;
 
 /**
- * 内容审核 自定义文本库关键词相关demo 详情见https://cloud.tencent.com/document/product/460/76261
+ * 内容审核 自定义文本库关键词相关demo
  */
 public class AuditingKeywordDemo {
 

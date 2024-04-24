@@ -7,7 +7,10 @@ import com.qcloud.cos.auth.COSCredentials;
 import com.qcloud.cos.region.Region;
 
 /**
- * Generate request client tool class
+ * 仅为demo演示所用 在demo中每次执行都会创建client对象
+ * COSClient 是线程安全的类，允许多线程访问同一实例。
+ * 因为实例内部维持了一个连接池，创建多个实例可能导致程序资源耗尽，请确保程序生命周期内实例只有一个
+ * 在不再需要使用时，调用 shutdown 方法将其关闭。如果需要新建实例，请先将之前的实例关闭。
  */
 public class ClientUtils {
 

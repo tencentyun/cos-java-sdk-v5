@@ -11,7 +11,7 @@ import com.qcloud.cos.utils.Jackson;
 import java.util.List;
 
 /**
- * 内容审核 审核策略相关demo 详情见https://cloud.tencent.com/document/product/460/76261
+ * 内容审核 审核策略相关demo
  */
 public class AuditingStrategyDemo {
 

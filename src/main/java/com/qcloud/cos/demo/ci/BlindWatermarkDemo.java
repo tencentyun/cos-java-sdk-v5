@@ -26,7 +26,9 @@ import java.io.FileNotFoundException;
 import java.util.LinkedList;
 import java.util.List;
 
-
+/**
+ * 盲水印相关demo API 接口说明：https://cloud.tencent.com/document/product/460/19017
+ */
 public class BlindWatermarkDemo {
     public static void addBlindWatermark(COSClient cosClient) {
         // bucket名需包含appid
