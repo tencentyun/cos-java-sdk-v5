@@ -1,9 +1,14 @@
 package com.qcloud.cos.model.ciModel.auditing;
 
-public class OcrResults {
-    private String text;
-    private String keywords;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 
+public class OcrResults {
+    @XStreamAlias("Text")
+    private String text;
+    @XStreamAlias("Keywords")
+    private String keywords;
+    @XStreamAlias("Location")
+    private Location location;
     public String getText() {
         return text;
     }
@@ -18,6 +23,14 @@ public class OcrResults {
 
     public void setKeywords(String keywords) {
         this.keywords = keywords;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
     }
 
     @Override

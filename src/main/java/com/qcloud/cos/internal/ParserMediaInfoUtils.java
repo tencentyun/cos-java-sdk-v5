@@ -717,16 +717,19 @@ public class ParserMediaInfoUtils {
         }
     }
 
-    public static void parseOrcInfo(OcrResults obj, String name, String value) {
-        switch (name) {
-            case "Text":
-                obj.setText(value);
-                break;
-            case "Keywords":
-                obj.setKeywords(value);
-                break;
-            default:
-                break;
+    public static void parseOrcInfo(List<OcrResults> obj, String name, String value) {
+        if (obj != null && !obj.isEmpty()) {
+            OcrResults ocrResults = obj.get(obj.size() - 1);
+            switch (name) {
+                case "Text":
+                    ocrResults.setText(value);
+                    break;
+                case "Keywords":
+                    ocrResults.setKeywords(value);
+                    break;
+                default:
+                    break;
+            }
         }
     }
 

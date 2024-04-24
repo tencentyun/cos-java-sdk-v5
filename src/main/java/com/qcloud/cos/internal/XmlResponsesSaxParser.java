@@ -6448,13 +6448,13 @@ public class XmlResponsesSaxParser {
                     resultDetail.setSheetNumber(getText());
                 }
             } else if (in("Response", "JobsDetail", "PageSegment", "Results", "PornInfo", "OcrResults")) {
-                parseResultInfo(resultDetail.getPornInfo().getOcrResults(), name, getText());
+                ParserMediaInfoUtils.parseOrcInfo(resultDetail.getPornInfo().getOcrResults(), name, getText());
             } else if (in("Response", "JobsDetail", "PageSegment", "Results", "PoliticsInfo", "OcrResults")) {
-                parseResultInfo(resultDetail.getPoliticsInfo().getOcrResults(), name, getText());
+                ParserMediaInfoUtils.parseOrcInfo(resultDetail.getPoliticsInfo().getOcrResults(), name, getText());
             } else if (in("Response", "JobsDetail", "PageSegment", "Results", "TerrorismInfo", "OcrResults")) {
-                parseResultInfo(resultDetail.getTerroristInfo().getOcrResults(), name, getText());
+                ParserMediaInfoUtils.parseOrcInfo(resultDetail.getTerroristInfo().getOcrResults(), name, getText());
             } else if (in("Response", "JobsDetail", "PageSegment", "Results", "AdsInfo", "OcrResults")) {
-                parseResultInfo(resultDetail.getAdsInfo().getOcrResults(), name, getText());
+                ParserMediaInfoUtils.parseOrcInfo(resultDetail.getAdsInfo().getOcrResults(), name, getText());
             } else if (in("Response", "JobsDetail", "PageSegment", "Results", "PornInfo", "ObjectResults")) {
                 parseResultInfo(resultDetail.getPornInfo().getObjectResults(), name, getText());
             } else if (in("Response", "JobsDetail", "PageSegment", "Results", "PoliticsInfo", "ObjectResults")) {
@@ -6546,19 +6546,6 @@ public class XmlResponsesSaxParser {
                     default:
                         break;
                 }
-            }
-        }
-
-        private void parseResultInfo(OcrResults obj, String name, String value) {
-            switch (name) {
-                case "Text":
-                    obj.setText(value);
-                    break;
-                case "Keywords":
-                    obj.setKeywords(getText());
-                    break;
-                default:
-                    break;
             }
         }
     }

@@ -68,6 +68,8 @@ public class TranscodeJobDemo {
         request.getOperation().getOutput().setRegion("ap-chongqing");
         request.getOperation().getOutput().setObject("demo1.mp4");
         request.setCallBack("https://cloud.tencent.com/xxx");
+        //任务所在的队列类型，限制为 SpeedTranscoding, 表示为开启倍速转码
+//        request.setQueueType("SpeedTranscoding");
         //3.调用接口,获取任务响应对象
         MediaJobResponse response = client.createMediaJobs(request);
         System.out.println(response.getJobsDetail().getJobId());

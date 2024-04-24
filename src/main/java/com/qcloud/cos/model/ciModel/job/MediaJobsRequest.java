@@ -99,6 +99,17 @@ public class MediaJobsRequest extends CIServiceRequest implements Serializable {
     @XStreamAlias("CallBackMqConfig")
     private CallBackMqConfig callBackMqConfig;
 
+    @XStreamAlias("QueueType")
+    private String queueType;
+
+    public String getQueueType() {
+        return queueType;
+    }
+
+    public void setQueueType(String queueType) {
+        this.queueType = queueType;
+    }
+
     public String getCallBackType() {
         return callBackType;
     }

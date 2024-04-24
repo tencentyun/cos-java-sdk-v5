@@ -44,7 +44,7 @@ public class MediaJobsRequestV2 extends CIServiceRequest implements Serializable
      * 查询数量，默认为十个
      */
     @XStreamAlias("Size")
-    private Integer size ;
+    private Integer size;
 
     /**
      * 任务状态
@@ -99,6 +99,16 @@ public class MediaJobsRequestV2 extends CIServiceRequest implements Serializable
     private String callBackType;
     @XStreamAlias("CallBackMqConfig")
     private CallBackMqConfig callBackMqConfig;
+    @XStreamAlias("QueueType")
+    private String queueType;
+
+    public String getQueueType() {
+        return queueType;
+    }
+
+    public void setQueueType(String queueType) {
+        this.queueType = queueType;
+    }
 
     public String getCallBackType() {
         return callBackType;

@@ -595,6 +595,7 @@ public class CIMediaXmlFactory {
             addIfNotNull(xml, "CallBack", request.getCallBack());
             addIfNotNull(xml, "CallBackFormat", request.getCallBackFormat());
             addIfNotNull(xml, "CallBackType", request.getCallBackType());
+            addIfNotNull(xml, "QueueType", request.getQueueType());
         }
     }
 
