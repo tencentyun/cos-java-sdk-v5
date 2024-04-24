@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.qcloud.cos.Headers;
+import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.internal.ObjectExpirationResult;
 import com.qcloud.cos.internal.ObjectRestoreResult;
 import com.qcloud.cos.internal.ServerSideEncryptionResult;
@@ -163,6 +164,13 @@ public class ObjectMetadata extends CosServiceResult implements ServerSideEncryp
      * @param value The value for the header.
      */
     public void setHeader(String key, Object value) {
+        String key_lower = key.toLowerCase();
+        if (key_lower.equals("content-length")) {
+            long contentLength = Long.parseLong(value.toString());
+            if (contentLength < 0) {
+                throw new CosClientException("The specified header content-length should be greater than or equal to 0");
+            }
+        }
         metadata.put(key, value);
     }
 
@@ -301,7 +309,7 @@ public class ObjectMetadata extends CosServiceResult implements ServerSideEncryp
      * @see ObjectMetadata#getContentLength()
      */
     public void setContentLength(long contentLength) {
-        metadata.put(Headers.CONTENT_LENGTH, contentLength);
+        setHeader(Headers.CONTENT_LENGTH, contentLength);
     }
 
     /**

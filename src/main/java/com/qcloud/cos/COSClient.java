@@ -2920,6 +2920,7 @@ public class COSClient implements COS {
 
         final String bucketName = req.getBucketName();
         final String key = req.getKey();
+        rejectEmpty(key, "The filepath must be specified when generating a pre-signed URL");
 
         if (req.getExpiration() == null) {
             req.setExpiration(new Date(

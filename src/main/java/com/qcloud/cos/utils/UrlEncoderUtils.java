@@ -86,7 +86,7 @@ public class UrlEncoderUtils {
         if(start < end) {
             pathBuilder.append(encode(urlPath.substring(start, end)));
         }
-        return pathBuilder.toString();
+        return pathBuilder.toString().replace("./", ".%2F");
     }
     
     /**
