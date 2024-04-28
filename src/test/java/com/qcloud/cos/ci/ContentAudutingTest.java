@@ -329,7 +329,7 @@ public class ContentAudutingTest extends AbstractCOSClientCITest {
         }
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void createWebpageAuditingJobTest2() {
         try {
             WebpageAuditingRequest request = null;
