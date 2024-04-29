@@ -3,7 +3,7 @@ package com.qcloud.cos.exception;
 public class ExceptionLogDetail {
     public ExceptionLogDetail(Throwable t, String msg) {
         this.t = t;
-        this.err_msg = msg;
+        this.errMsg = msg;
     }
 
     public Throwable getException() {
@@ -11,10 +11,10 @@ public class ExceptionLogDetail {
     }
 
     public String getErrMsg() {
-        return err_msg;
+        return errMsg;
     }
 
     private Throwable t;
 
-    private String err_msg;
+    private String errMsg;
 }

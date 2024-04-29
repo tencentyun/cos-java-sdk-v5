@@ -2139,7 +2139,7 @@ public class COSClient implements COS {
                                 + " httpRequest: %s, retryIdx:%d, maxErrorRetry:%d", cse.getMessage(), request,
                         retryIndex, clientConfig.getMaxErrorRetryForCopyRequest());
                 log.debug(errorMsg);
-                if (retryIndex < clientConfig.getMaxErrorRetryForCopyRequest() && RetryUtils.ShouldRetryCopyRequest(cse)) {
+                if (retryIndex < clientConfig.getMaxErrorRetryForCopyRequest() && RetryUtils.shouldRetryCopyRequest(cse)) {
                     retryIndex++;
                     continue;
                 }
@@ -2256,7 +2256,7 @@ public class COSClient implements COS {
                                 + " httpRequest: %s, retryIdx:%d, maxErrorRetry:%d", cse.getMessage(), request,
                         retryIndex, clientConfig.getMaxErrorRetryForCopyRequest());
                 log.debug(errorMsg);
-                if (retryIndex < clientConfig.getMaxErrorRetryForCopyRequest() && RetryUtils.ShouldRetryCopyRequest(cse)) {
+                if (retryIndex < clientConfig.getMaxErrorRetryForCopyRequest() && RetryUtils.shouldRetryCopyRequest(cse)) {
                     retryIndex++;
                     continue;
                 }

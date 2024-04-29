@@ -439,7 +439,7 @@ public class CosClientWithMockTest {
         COSCredentials cred = new BasicCOSCredentials(secretId_, secretKey_);
         COSClient cosClient = new COSClient(cred, clientConfig);
 
-        VersionListing result = cosClient.listVersions(bucket_, "test_prefix", null, null, null, null);
+        VersionListing result = cosClient.listVersions(bucket_, "test_prefix", "test_key_marker", "test_version_marker", "/", 1000);
         assertEquals(bucket_, result.getBucketName());
         cosClient.shutdown();
     }
