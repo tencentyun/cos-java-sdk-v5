@@ -339,8 +339,7 @@ public class TransferManagerTest extends AbstractCOSClientTest {
         Upload upload = transferManager.upload(putObjectRequest);
         upload.waitForCompletion();
 
-        String dst_bucket = System.getenv("dst_bucket") + (int) (Math.random() * 100) + "-" + appid;
-        deleteBucket(dst_bucket);
+        String dst_bucket = System.getenv("dst_bucket") + "-" + (int) (System.currentTimeMillis()) + "-" + appid;
 
         Boolean switch_to_stop = true;
         while (switch_to_stop) {
