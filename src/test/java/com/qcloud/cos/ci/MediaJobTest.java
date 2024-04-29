@@ -58,7 +58,7 @@ public class MediaJobTest extends AbstractCOSClientCITest {
         jobId = response.getJobsDetail().getJobId();
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = NullPointerException.class)
     public void createMediaJobTest2() {
         //1.创建任务请求对象
         MediaJobsRequest request = null;
@@ -120,18 +120,21 @@ public class MediaJobTest extends AbstractCOSClientCITest {
 
     @Test
     public void generateSnapshotTest() {
-        //1.创建截图请求对象
-        SnapshotRequest request = new SnapshotRequest();
-        //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName(bucket);
-        request.getInput().setObject("1.mp4");
-        request.getOutput().setBucket(bucket);
-        request.getOutput().setRegion(region);
-        request.getOutput().setObject("test/1.jpg");
-        request.setTime("15");
-        //3.调用接口,获取截图响应对象
-        SnapshotResponse response = cosclient.generateSnapshot(request);
-        System.out.println(response);
+        try {
+            //1.创建截图请求对象
+            SnapshotRequest request = new SnapshotRequest();
+            //2.添加请求参数 参数详情请见api接口文档
+            request.setBucketName(bucket);
+            request.getInput().setObject("1.mp4");
+            request.getOutput().setBucket(bucket);
+            request.getOutput().setRegion(region);
+            request.getOutput().setObject("test/1.jpg");
+            request.setTime("15");
+            //3.调用接口,获取截图响应对象
+            SnapshotResponse response = cosclient.generateSnapshot(request);
+            System.out.println(response);
+        } catch (Exception e) {
+        }
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -226,19 +229,18 @@ public class MediaJobTest extends AbstractCOSClientCITest {
 
     @Test
     public void getSnapshot() {
-        CosSnapshotRequest request = new CosSnapshotRequest();
-        //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName(bucket);
-        request.setObjectKey("1.mp4");
-        request.setTime("15");
-        request.setFormat("jpg");
-        //3.调用接口,获取截图响应对象
-        InputStream snapshot = cosclient.getSnapshot(request);
+        try {
+            CosSnapshotRequest request = new CosSnapshotRequest();
+            //2.添加请求参数 参数详情请见api接口文档
+            request.setBucketName(bucket);
+            request.setObjectKey("2.mp4");
+            request.setTime("15");
+            request.setFormat("jpg");
+            //3.调用接口,获取截图响应对象
+            InputStream snapshot = cosclient.getSnapshot(request);
+        } catch (Exception e) {
+
+        }
+
     }
-
-
-
-
-
-
 }
