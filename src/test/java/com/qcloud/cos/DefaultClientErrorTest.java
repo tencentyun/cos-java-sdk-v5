@@ -144,6 +144,87 @@ public class DefaultClientErrorTest {
         }
     }
 
+    @Test
+    public void testExecuteRequestWithIOException() throws Exception {
+        COSSigner signer = PowerMockito.mock(COSSigner.class);
+        PowerMockito.whenNew(COSSigner.class).withNoArguments().thenReturn(signer);
+        PowerMockito.when(signer, "sign", any(), any(), any()).thenAnswer((m)->{return null;});
+        ClientConfig clientConfig = new ClientConfig(new Region(region_));
+        clientConfig.setUseBasicAuth(true);
+
+        PoolingHttpClientConnectionManager manager = PowerMockito.mock(PoolingHttpClientConnectionManager.class);
+        PowerMockito.whenNew(PoolingHttpClientConnectionManager.class).withNoArguments().thenReturn(manager);
+
+        CosErrorResponseHandler cosErrorResponseHandler = PowerMockito.mock(CosErrorResponseHandler.class);
+        PowerMockito.whenNew(CosErrorResponseHandler.class).withNoArguments().thenReturn(cosErrorResponseHandler);
+        PowerMockito.when(cosErrorResponseHandler.handle(any())).thenAnswer((m)->{
+            XMLStreamException xmlStreamException = new XMLStreamException("test error");
+            throw  xmlStreamException;
+        });
+
+        HttpClientBuilder httpClientBuilder = PowerMockito.mock(HttpClientBuilder.class);
+        CloseableHttpClient httpClient = PowerMockito.mock(CloseableHttpClient.class);
+        PowerMockito.mockStatic(HttpClients.class);
+        PowerMockito.when(HttpClients.custom()).thenReturn(httpClientBuilder);
+        PowerMockito.when(httpClientBuilder.build()).thenReturn(httpClient);
+
+
+        PowerMockito.when(httpClient.execute((HttpUriRequest) any(), (HttpContext) any())).thenAnswer((m)->{
+            IOException e = new IOException("test IO error");
+            throw e;
+        });
+        COSCredentials cred = new BasicCOSCredentials(secretId_, secretKey_);
+        COSClient cosClient = new COSClient(cred, clientConfig);
+
+        try {
+            cosClient.getObject(bucket_, "test_obj");
+        } catch (CosClientException cce) {
+            assertEquals(ClientExceptionConstants.UNKNOWN, cce.getErrorCode());
+        } finally {
+            cosClient.shutdown();
+        }
+    }
+
+    @Test
+    public void testExecuteRequestWithInterruptedException() throws Exception {
+        COSSigner signer = PowerMockito.mock(COSSigner.class);
+        PowerMockito.whenNew(COSSigner.class).withNoArguments().thenReturn(signer);
+        PowerMockito.when(signer, "sign", any(), any(), any()).thenAnswer((m)->{return null;});
+        ClientConfig clientConfig = new ClientConfig(new Region(region_));
+        clientConfig.setUseBasicAuth(true);
+
+        PoolingHttpClientConnectionManager manager = PowerMockito.mock(PoolingHttpClientConnectionManager.class);
+        PowerMockito.whenNew(PoolingHttpClientConnectionManager.class).withNoArguments().thenReturn(manager);
+
+        CosErrorResponseHandler cosErrorResponseHandler = PowerMockito.mock(CosErrorResponseHandler.class);
+        PowerMockito.whenNew(CosErrorResponseHandler.class).withNoArguments().thenReturn(cosErrorResponseHandler);
+        PowerMockito.when(cosErrorResponseHandler.handle(any())).thenAnswer((m)->{
+            XMLStreamException xmlStreamException = new XMLStreamException("test error");
+            throw  xmlStreamException;
+        });
+
+        HttpClientBuilder httpClientBuilder = PowerMockito.mock(HttpClientBuilder.class);
+        CloseableHttpClient httpClient = PowerMockito.mock(CloseableHttpClient.class);
+        PowerMockito.mockStatic(HttpClients.class);
+        PowerMockito.when(HttpClients.custom()).thenReturn(httpClientBuilder);
+        PowerMockito.when(httpClientBuilder.build()).thenReturn(httpClient);
+
+
+        PowerMockito.when(httpClient.execute((HttpUriRequest) any(), (HttpContext) any())).thenAnswer((m)->{
+            InterruptedException e = new InterruptedException("test InterruptedException");
+            throw e;
+        });
+        COSCredentials cred = new BasicCOSCredentials(secretId_, secretKey_);
+        COSClient cosClient = new COSClient(cred, clientConfig);
+
+        try {
+            cosClient.getObject(bucket_, "test_obj");
+        } catch (CosClientException cce) {
+            assertEquals(ClientExceptionConstants.UNKNOWN, cce.getErrorCode());
+        } finally {
+            cosClient.shutdown();
+        }
+    }
 
     private class MockBasicHttpResponse extends AbstractHttpMessage implements CloseableHttpResponse {
 

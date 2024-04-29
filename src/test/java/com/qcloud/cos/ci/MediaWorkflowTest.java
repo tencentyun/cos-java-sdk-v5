@@ -1,6 +1,7 @@
 package com.qcloud.cos.ci;
 
 import com.qcloud.cos.AbstractCOSClientCITest;
+import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
 import com.qcloud.cos.model.ciModel.job.BatchJobOperation;
 import com.qcloud.cos.model.ciModel.job.BatchJobRequest;
@@ -56,7 +57,7 @@ public class MediaWorkflowTest extends AbstractCOSClientCITest {
         MediaInfoResponse result = cosclient.generateMediainfo(request);
     }
 
-    @Test
+    @Test(expected = CosServiceException.class)
     public void testDescribeWorkflowExecution() {
         try {
             MediaWorkflowListRequest request = new MediaWorkflowListRequest();

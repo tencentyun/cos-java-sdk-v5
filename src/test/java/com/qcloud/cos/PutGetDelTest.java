@@ -638,7 +638,7 @@ public class PutGetDelTest extends AbstractCOSClientTest {
         owner.setId(ownerId);
         acl.setOwner(owner);
 
-        String granteeUin = String.format("qcs::cam::uin/%s:uin/734505014", ownerUin);
+        String granteeUin = String.format("qcs::cam::uin/%s:uin/2832742109", ownerUin);
         UinGrantee uinGrantee = new UinGrantee(granteeUin);
         uinGrantee.setIdentifier(granteeUin);
         acl.grantPermission(uinGrantee, Permission.FullControl);
@@ -671,7 +671,7 @@ public class PutGetDelTest extends AbstractCOSClientTest {
         owner.setId(ownerId);
         acl.setOwner(owner);
 
-        String granteeUin = String.format("qcs::cam::uin/%s:uin/734505014", ownerUin);
+        String granteeUin = String.format("qcs::cam::uin/%s:uin/2832742109", ownerUin);
         UinGrantee uinGrantee = new UinGrantee(granteeUin);
         uinGrantee.setIdentifier(granteeUin);
         acl.grantPermission(uinGrantee, Permission.FullControl);

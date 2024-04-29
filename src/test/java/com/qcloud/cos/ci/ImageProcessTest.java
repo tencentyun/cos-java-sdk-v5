@@ -271,7 +271,6 @@ public class ImageProcessTest extends AbstractCOSClientCITest {
         }catch (Exception e){
 
         }
-
     }
 
     @Test
