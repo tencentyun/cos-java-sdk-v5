@@ -489,13 +489,17 @@ public class DefaultCosHttpClient implements CosHttpClient {
         while (true) {
             try {
                 checkInterrupted();
-                if (originalContent instanceof BufferedInputStream
-                        && originalContent.markSupported()) {
-                    // Mark everytime for BufferedInputStream, since the marker could have been
-                    // invalidated
-                    final int readLimit = clientConfig.getReadLimit();
-                    originalContent.mark(readLimit);
-                }
+                /**
+                 * 目前sdk所有的上传请求都会把流包装成ReleasableInputStream
+                 * 所以这里不再需要判断BufferedInputStream的子类了
+                 * */
+//                if (originalContent instanceof BufferedInputStream
+//                        && originalContent.markSupported()) {
+//                    // Mark everytime for BufferedInputStream, since the marker could have been
+//                    // invalidated
+//                    final int readLimit = clientConfig.getReadLimit();
+//                    originalContent.mark(readLimit);
+//                }
                 // 如果是重试的则恢复流
                 if (retryIndex != 0 && originalContent != null) {
                     originalContent.reset();
@@ -535,8 +539,7 @@ public class DefaultCosHttpClient implements CosHttpClient {
                 }
                 changeEndpointForRetry(request, httpResponse, retryIndex);
             } catch (Exception exp) {
-                String expName = exp.getClass().getName();
-                String errorMsg = String.format("httpClient execute occur an unknown exception:%s, httpRequest: %s", expName, request);
+                String errorMsg = String.format("httpClient execute occur an unknown exception:%s, httpRequest: %s", exp.getClass().getName(), request);
                 closeHttpResponseStream(httpResponse);
                 log.error(errorMsg, exp);
                 throw new CosClientException(errorMsg, exp);
@@ -613,7 +616,17 @@ public class DefaultCosHttpClient implements CosHttpClient {
         HttpResponse httpResponse = null;
         try {
             httpResponse = executeOneRequest(context, httpRequest);
-        } catch (Exception e) {
+        } catch (IOException e) {
+            httpRequest.abort();
+            throw ExceptionUtils.createClientException(e);
+        } catch (InterruptedException e) {
+            httpRequest.abort();
+            throw new CosClientException(e.getMessage(), e);
+        } catch (TimeoutException e) {
+            httpRequest.abort();
+            String errorMsg = "ExecutorService: time out after waiting  " + this.clientConfig.getRequestTimeout()/1000 + " seconds";
+            throw new CosClientException(errorMsg, ClientExceptionConstants.REQUEST_TIMEOUT, e);
+        } catch (ExecutionException e) {
             httpRequest.abort();
             if (e.getCause() instanceof IOException) {
                 throw ExceptionUtils.createClientException((IOException)e.getCause());

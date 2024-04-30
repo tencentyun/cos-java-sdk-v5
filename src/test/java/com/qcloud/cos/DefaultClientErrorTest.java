@@ -8,7 +8,10 @@ import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.http.DefaultCosHttpClient;
 import com.qcloud.cos.internal.CosErrorResponseHandler;
+import com.qcloud.cos.internal.InputSubstream;
 import com.qcloud.cos.model.GetObjectRequest;
+import com.qcloud.cos.model.ObjectMetadata;
+import com.qcloud.cos.model.PutObjectResult;
 import com.qcloud.cos.region.Region;
 import org.apache.http.*;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -30,10 +33,14 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import javax.xml.stream.XMLStreamException;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Locale;
+import java.util.concurrent.ExecutionException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -85,6 +92,7 @@ public class DefaultClientErrorTest {
         PowerMockito.whenNew(COSSigner.class).withNoArguments().thenReturn(signer);
         PowerMockito.when(signer, "sign", any(), any(), any()).thenAnswer((m)->{return null;});
         ClientConfig clientConfig = new ClientConfig(new Region(region_));
+        clientConfig.setChangeEndpointRetry(true);
 
         PoolingHttpClientConnectionManager manager = PowerMockito.mock(PoolingHttpClientConnectionManager.class);
         PowerMockito.whenNew(PoolingHttpClientConnectionManager.class).withNoArguments().thenReturn(manager);
@@ -115,18 +123,19 @@ public class DefaultClientErrorTest {
             try {
                 cosClient.getObject(getObjectRequest);
             } catch (CosServiceException cse) {
-                //assertEquals(413, cse.getStatusCode());
+                assertEquals(413, cse.getStatusCode());
                 System.out.println(cse.getErrorMessage());
             }
 
             StatusLine statusLine2 = new BasicStatusLine(protocolVersion, 503, "Service Unavailable");
             HttpResponse response2 = new MockBasicHttpResponse(statusLine2);
+            response2.addHeader(Headers.REQUEST_ID, "NQIDXXXXXXXXXXXXXXX");
             PowerMockito.when(httpClient.execute((HttpUriRequest) any(), (HttpContext) any())).thenReturn((CloseableHttpResponse) response2);
 
             try {
                 cosClient.getObject(getObjectRequest);
             } catch (CosServiceException cse) {
-                //assertEquals(503, cse.getStatusCode());
+                assertEquals(503, cse.getStatusCode());
                 System.out.println(cse.getErrorMessage());
             }
 
@@ -137,8 +146,7 @@ public class DefaultClientErrorTest {
             try {
                 cosClient.getObject(getObjectRequest);
             } catch (CosClientException cce) {
-                //assertEquals(ClientExceptionConstants.UNKNOWN, cce.getErrorCode());
-                System.out.println(cce.getMessage());
+                assertEquals(ClientExceptionConstants.UNKNOWN, cce.getErrorCode());
             }
         } finally {
             if (cosClient != null) {
@@ -181,10 +189,12 @@ public class DefaultClientErrorTest {
         COSClient cosClient = new COSClient(cred, clientConfig);
 
         try {
-            cosClient.getObject(bucket_, "test_obj");
+            String content = "hello cos!";
+            ByteArrayInputStream in = new ByteArrayInputStream(content.getBytes());
+            BufferedInputStream inputStream = new BufferedInputStream(in);
+            PutObjectResult result = cosClient.putObject(bucket_, "test", inputStream, new ObjectMetadata());
         } catch (CosClientException cce) {
-//            assertEquals(ClientExceptionConstants.UNKNOWN, cce.getErrorCode());
-            System.out.println(cce.getMessage());
+            assertEquals(ClientExceptionConstants.UNKNOWN, cce.getErrorCode());
         } finally {
             cosClient.shutdown();
         }
@@ -225,8 +235,93 @@ public class DefaultClientErrorTest {
         try {
             cosClient.getObject(bucket_, "test_obj");
         } catch (CosClientException cce) {
-//            assertEquals(ClientExceptionConstants.UNKNOWN, cce.getErrorCode());
-            System.out.println(cce.getMessage());
+            assertEquals(ClientExceptionConstants.UNKNOWN, cce.getErrorCode());
+        } finally {
+            cosClient.shutdown();
+        }
+    }
+
+    @Test
+    public void testExecuteRequestWithExecutionException() throws Exception {
+        COSSigner signer = PowerMockito.mock(COSSigner.class);
+        PowerMockito.whenNew(COSSigner.class).withNoArguments().thenReturn(signer);
+        PowerMockito.when(signer, "sign", any(), any(), any()).thenAnswer((m)->{return null;});
+        ClientConfig clientConfig = new ClientConfig(new Region(region_));
+        clientConfig.setChangeEndpointRetry(true);
+        clientConfig.setUseBasicAuth(true);
+
+        PoolingHttpClientConnectionManager manager = PowerMockito.mock(PoolingHttpClientConnectionManager.class);
+        PowerMockito.whenNew(PoolingHttpClientConnectionManager.class).withNoArguments().thenReturn(manager);
+
+        CosErrorResponseHandler cosErrorResponseHandler = PowerMockito.mock(CosErrorResponseHandler.class);
+        PowerMockito.whenNew(CosErrorResponseHandler.class).withNoArguments().thenReturn(cosErrorResponseHandler);
+        PowerMockito.when(cosErrorResponseHandler.handle(any())).thenAnswer((m)->{
+            XMLStreamException xmlStreamException = new XMLStreamException("test error");
+            throw  xmlStreamException;
+        });
+
+        HttpClientBuilder httpClientBuilder = PowerMockito.mock(HttpClientBuilder.class);
+        CloseableHttpClient httpClient = PowerMockito.mock(CloseableHttpClient.class);
+        PowerMockito.mockStatic(HttpClients.class);
+        PowerMockito.when(HttpClients.custom()).thenReturn(httpClientBuilder);
+        PowerMockito.when(httpClientBuilder.build()).thenReturn(httpClient);
+
+
+        PowerMockito.when(httpClient.execute((HttpUriRequest) any(), (HttpContext) any())).thenAnswer((m)->{
+            IOException ie = new IOException("test IO error");
+            ExecutionException e = new ExecutionException(ie);
+            throw e;
+        });
+        COSCredentials cred = new BasicCOSCredentials(secretId_, secretKey_);
+        COSClient cosClient = new COSClient(cred, clientConfig);
+
+        try {
+            cosClient.getObject(bucket_, "test_obj");
+        } catch (CosClientException cce) {
+            assertEquals(ClientExceptionConstants.UNKNOWN, cce.getErrorCode());
+        } finally {
+            cosClient.shutdown();
+        }
+    }
+
+    @Test
+    public void testExecuteRequestWithExecutionException2() throws Exception {
+        COSSigner signer = PowerMockito.mock(COSSigner.class);
+        PowerMockito.whenNew(COSSigner.class).withNoArguments().thenReturn(signer);
+        PowerMockito.when(signer, "sign", any(), any(), any()).thenAnswer((m)->{return null;});
+        ClientConfig clientConfig = new ClientConfig(new Region(region_));
+        clientConfig.setChangeEndpointRetry(true);
+        clientConfig.setUseBasicAuth(true);
+
+        PoolingHttpClientConnectionManager manager = PowerMockito.mock(PoolingHttpClientConnectionManager.class);
+        PowerMockito.whenNew(PoolingHttpClientConnectionManager.class).withNoArguments().thenReturn(manager);
+
+        CosErrorResponseHandler cosErrorResponseHandler = PowerMockito.mock(CosErrorResponseHandler.class);
+        PowerMockito.whenNew(CosErrorResponseHandler.class).withNoArguments().thenReturn(cosErrorResponseHandler);
+        PowerMockito.when(cosErrorResponseHandler.handle(any())).thenAnswer((m)->{
+            XMLStreamException xmlStreamException = new XMLStreamException("test error");
+            throw  xmlStreamException;
+        });
+
+        HttpClientBuilder httpClientBuilder = PowerMockito.mock(HttpClientBuilder.class);
+        CloseableHttpClient httpClient = PowerMockito.mock(CloseableHttpClient.class);
+        PowerMockito.mockStatic(HttpClients.class);
+        PowerMockito.when(HttpClients.custom()).thenReturn(httpClientBuilder);
+        PowerMockito.when(httpClientBuilder.build()).thenReturn(httpClient);
+
+
+        PowerMockito.when(httpClient.execute((HttpUriRequest) any(), (HttpContext) any())).thenAnswer((m)->{
+            Exception e = new Exception("test exception");
+            ExecutionException ee = new ExecutionException(e);
+            throw ee;
+        });
+        COSCredentials cred = new BasicCOSCredentials(secretId_, secretKey_);
+        COSClient cosClient = new COSClient(cred, clientConfig);
+
+        try {
+            cosClient.getObject(bucket_, "test_obj");
+        } catch (CosServiceException cse) {
+            assertEquals("java.lang.Exception: test exception", cse.getErrorMessage());
         } finally {
             cosClient.shutdown();
         }
