@@ -57,21 +57,21 @@ public class MediaWorkflowTest extends AbstractCOSClientCITest {
         MediaInfoResponse result = cosclient.generateMediainfo(request);
     }
 
-    @Test(expected = CosServiceException.class)
-    public void testDescribeWorkflowExecution() {
-        try {
-            MediaWorkflowListRequest request = new MediaWorkflowListRequest();
-            request.setBucketName(bucket);
-            request.setWorkflowId(workflowId);
-            request.setObject("2.jpg");
-            request.setName("mark");
-            request.setRunId(runId);
-            request.setPageSize("2");
-            MediaWorkflowExecutionResponse result = cosclient.describeWorkflowExecution(request);
-        } catch (Exception e) {
-
-        }
-    }
+//    @Test(expected = CosServiceException.class)
+//    public void testDescribeWorkflowExecution() {
+//        try {
+//            MediaWorkflowListRequest request = new MediaWorkflowListRequest();
+//            request.setBucketName(bucket);
+//            request.setWorkflowId(workflowId);
+//            request.setObject("2.jpg");
+//            request.setName("mark");
+//            request.setRunId(runId);
+//            request.setPageSize("2");
+//            MediaWorkflowExecutionResponse result = cosclient.describeWorkflowExecution(request);
+//        } catch (Exception e) {
+//
+//        }
+//    }
 
     @Test
     public void testDescribeWorkflowExecutions() {

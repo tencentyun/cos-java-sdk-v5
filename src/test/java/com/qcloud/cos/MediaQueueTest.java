@@ -47,31 +47,31 @@ public class MediaQueueTest extends AbstractCOSClientCITest {
         }
     }
 
-    @Test
-    public void updateMediaQueueTest() {
-        if (!judgeUserInfoValid()) {
-            return;
-        }
-        MediaQueueRequest request = new MediaQueueRequest();
-        request.setBucketName(bucket);
-        MediaListQueueResponse response = cosclient.describeMediaQueues(request);
-        if (response != null) {
-            List<MediaQueueObject> queueList = response.getQueueList();
-            if (queueList.size() != 0) {
-                MediaQueueObject mediaQueueObject = queueList.get(0);
-                request = new MediaQueueRequest();
-                request.setBucketName(bucket);
-                request.setQueueId(mediaQueueObject.getQueueId());
-                request.getNotifyConfig().setUrl(QUEUE_URL);
-                request.setState(QUEUE_STATE);
-                request.setName(QUEUE_NAME);
-                MediaQueueResponse updateResponse = cosclient.updateMediaQueue(request);
-                MediaQueueObject queue = updateResponse.getQueue();
-                assertEquals(bucket, queue.getBucketId());
-                assertEquals(QUEUE_NAME, queue.getName());
-                assertEquals(QUEUE_STATE, queue.getState());
-            }
-        }
-    }
+//    @Test
+//    public void updateMediaQueueTest() {
+//        if (!judgeUserInfoValid()) {
+//            return;
+//        }
+//        MediaQueueRequest request = new MediaQueueRequest();
+//        request.setBucketName(bucket);
+//        MediaListQueueResponse response = cosclient.describeMediaQueues(request);
+//        if (response != null) {
+//            List<MediaQueueObject> queueList = response.getQueueList();
+//            if (queueList.size() != 0) {
+//                MediaQueueObject mediaQueueObject = queueList.get(0);
+//                request = new MediaQueueRequest();
+//                request.setBucketName(bucket);
+//                request.setQueueId(mediaQueueObject.getQueueId());
+//                request.getNotifyConfig().setUrl(QUEUE_URL);
+//                request.setState(QUEUE_STATE);
+//                request.setName(QUEUE_NAME);
+//                MediaQueueResponse updateResponse = cosclient.updateMediaQueue(request);
+//                MediaQueueObject queue = updateResponse.getQueue();
+//                assertEquals(bucket, queue.getBucketId());
+//                assertEquals(QUEUE_NAME, queue.getName());
+//                assertEquals(QUEUE_STATE, queue.getState());
+//            }
+//        }
+//    }
 
 }

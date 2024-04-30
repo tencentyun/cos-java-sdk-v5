@@ -116,7 +116,7 @@ public class DefaultClientErrorTest {
                 cosClient.getObject(getObjectRequest);
             } catch (CosServiceException cse) {
                 //assertEquals(413, cse.getStatusCode());
-                cse.printStackTrace();
+                System.out.println(cse.getErrorMessage());
             }
 
             StatusLine statusLine2 = new BasicStatusLine(protocolVersion, 503, "Service Unavailable");
@@ -127,7 +127,7 @@ public class DefaultClientErrorTest {
                 cosClient.getObject(getObjectRequest);
             } catch (CosServiceException cse) {
                 //assertEquals(503, cse.getStatusCode());
-                cse.printStackTrace();
+                System.out.println(cse.getErrorMessage());
             }
 
             StatusLine statusLine3 = new BasicStatusLine(protocolVersion, 503, "test mock error");
@@ -138,7 +138,7 @@ public class DefaultClientErrorTest {
                 cosClient.getObject(getObjectRequest);
             } catch (CosClientException cce) {
                 //assertEquals(ClientExceptionConstants.UNKNOWN, cce.getErrorCode());
-                cce.printStackTrace();
+                System.out.println(cce.getMessage());
             }
         } finally {
             if (cosClient != null) {
@@ -184,7 +184,7 @@ public class DefaultClientErrorTest {
             cosClient.getObject(bucket_, "test_obj");
         } catch (CosClientException cce) {
 //            assertEquals(ClientExceptionConstants.UNKNOWN, cce.getErrorCode());
-            cce.printStackTrace();
+            System.out.println(cce.getMessage());
         } finally {
             cosClient.shutdown();
         }
@@ -226,7 +226,7 @@ public class DefaultClientErrorTest {
             cosClient.getObject(bucket_, "test_obj");
         } catch (CosClientException cce) {
 //            assertEquals(ClientExceptionConstants.UNKNOWN, cce.getErrorCode());
-            cce.printStackTrace();
+            System.out.println(cce.getMessage());
         } finally {
             cosClient.shutdown();
         }
