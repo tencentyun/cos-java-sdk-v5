@@ -114,6 +114,7 @@ public class ListVersionsTest extends AbstractCOSClientTest {
         final int maxKeyNum = 20;
         ListVersionsRequest listVersionsRequest = new ListVersionsRequest();
         listVersionsRequest.withBucketName(bucket).withPrefix(keyPrefix).withMaxResults(maxKeyNum);
+        listVersionsRequest.setEncodingType("url");
 
         VersionListing versionListing = cosclient.listVersions(listVersionsRequest);
         int keyIndex = 0;

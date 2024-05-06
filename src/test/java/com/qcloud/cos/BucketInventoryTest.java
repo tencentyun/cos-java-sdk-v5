@@ -89,4 +89,64 @@ public class BucketInventoryTest extends AbstractCOSClientTest {
         ListBucketInventoryConfigurationsResult listBucketInventoryConfigurationsResult1 = cosclient.listBucketInventoryConfigurations(listBucketInventoryConfigurationsRequest);
         assertEquals(1, listBucketInventoryConfigurationsResult1.getInventoryConfigurationList().size());
     }
+
+    @Test
+    public void testSetBucketInventoryWithText() throws InterruptedException {
+        if (accountId == null) {
+            return;
+        }
+        SetBucketInventoryConfigurationRequest request = new SetBucketInventoryConfigurationRequest();
+        request.setBucketName(bucket);
+        // 打开开关，选择直接传入清单文本内容的模式发起请求
+        request.useInventoryText();
+
+        InventoryConfiguration inventoryConfiguration = new InventoryConfiguration();
+        // 注意这里的 Id 要与下方 inventoryText 里的 Id 保持一致
+        inventoryConfiguration.setId("test12");
+        request.setInventoryConfiguration(inventoryConfiguration);
+
+        String emptyStr = "";
+        request.setInventoryText(emptyStr);
+
+        try {
+            cosclient.setBucketInventoryConfiguration(request);
+        } catch (IllegalArgumentException ie) {
+            assertEquals(ie.getMessage(), "The inventory text should be specified");
+        }
+
+        StringBuilder inventoryText = new StringBuilder("<InventoryConfiguration>\n" +
+                "    <Id>test12</Id>\n" +
+                "    <IsEnabled>true</IsEnabled>\n" +
+                "    <Destination>\n" +
+                "        <COSBucketDestination>\n" +
+                "            <Format>CSV</Format>");
+        String accountIdItem = "<AccountId>" + accountId + "</AccountId>";
+        inventoryText.append(accountIdItem);
+
+        String bucketItem = "<Bucket>qcs::cos:ap-guangzhou::" + bucket + "</Bucket>";
+        inventoryText.append(bucketItem);
+
+        inventoryText.append("<Prefix>cos_bucket_inventory</Prefix>\n" +
+                "        </COSBucketDestination>\n" +
+                "    </Destination>\n" +
+                "    <Schedule>\n" +
+                "        <Frequency>Daily</Frequency>\n" +
+                "    </Schedule>\n" +
+                "    <Filter>\n" +
+                "       <And>\n" +
+                "            <Prefix>test</Prefix>\n" +
+                "        </And>\n" +
+                "    </Filter>\n" +
+                "    <IncludedObjectVersions>All</IncludedObjectVersions>\n" +
+                "    <OptionalFields>\n" +
+                "        <Field>Size</Field>\n" +
+                "        <Field>LastModifiedDate</Field>\n" +
+                "    </OptionalFields>\n" +
+                "</InventoryConfiguration>");
+        request.setInventoryText(inventoryText.toString());
+        cosclient.setBucketInventoryConfiguration(request);
+
+        Thread.sleep(1000);
+        cosclient.deleteBucketInventoryConfiguration(bucket, "test12");
+    }
 }
