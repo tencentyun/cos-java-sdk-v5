@@ -1,6 +1,7 @@
 package com.qcloud.cos.ci;
 
 import com.qcloud.cos.AbstractCOSClientCITest;
+import com.qcloud.cos.model.ciModel.bucket.MediaBucketRequest;
 import com.qcloud.cos.model.ciModel.job.MediaJobObject;
 import com.qcloud.cos.model.ciModel.job.MediaJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaJobsRequest;
@@ -18,6 +19,8 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.io.InputStream;
 import java.util.List;
@@ -25,6 +28,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+@RunWith(PowerMockRunner.class)
 public class MediaJobTest extends AbstractCOSClientCITest {
 
     private String jobId;
@@ -81,6 +85,17 @@ public class MediaJobTest extends AbstractCOSClientCITest {
         request.setJobId(jobId);
         //3.调用接口,获取任务响应对象
         Boolean response = cosclient.cancelMediaJob(request);
+        assertTrue(response);
+    }
+
+    @Test
+    public void createMediaBucketTest() {
+        //1.创建任务请求对象
+        MediaBucketRequest request = new MediaBucketRequest();
+        //2.添加请求参数 参数详情请见api接口文档
+        request.setBucketName(bucket);
+        //3.调用接口,获取任务响应对象
+        Boolean response = cosclient.createMediaProcessBucket(request);
         assertTrue(response);
     }
 
@@ -241,6 +256,7 @@ public class MediaJobTest extends AbstractCOSClientCITest {
         } catch (Exception e) {
 
         }
-
     }
+
+
 }
