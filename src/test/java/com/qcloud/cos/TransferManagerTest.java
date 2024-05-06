@@ -396,6 +396,7 @@ public class TransferManagerTest extends AbstractCOSClientTest {
         objectMetadata.setContentLength(inputStreamLength);
         PutObjectRequest putObjectRequest = new PutObjectRequest(bucket, "testDownloadWithRange", inputStream, objectMetadata);
         File dstFile = new File("dstFile");
+        File dstFile2 = new File("dstFile2");
         try {
             Upload upload = transferManager.upload(putObjectRequest);
             upload.waitForCompletion();
@@ -405,12 +406,16 @@ public class TransferManagerTest extends AbstractCOSClientTest {
 
             Download download = transferManager.download(getObjectRequest, dstFile);
             download.waitForCompletion();
+
+            download = transferManager.download(bucket, "testDownloadWithRange", dstFile2);
+            download.abort();
         } catch (InterruptedException e) {
             System.out.println(e.getMessage());
         } catch (CosClientException cce) {
             System.out.println(cce.getMessage());
         } finally {
             dstFile.delete();
+            dstFile2.delete();
             inputStream.close();
         }
     }

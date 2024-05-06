@@ -101,8 +101,7 @@ public class COSSigner {
                                         COSCredentials cred,
                                         Date expiredTime) {
         Date startTime = new Date();
-        return buildAuthorizationStr(methodName, resouce_path, new HashMap<>(), new HashMap<>(),
-                cred, startTime, expiredTime, true);
+        return buildAuthorizationStr(methodName, resouce_path, new HashMap<>(), new HashMap<>(), cred, startTime, expiredTime, true);
     }
 
     public String buildAuthorizationStr(HttpMethodName methodName, String resouce_path,
