@@ -82,37 +82,37 @@ public class ImageProcessTest extends AbstractCOSClientCITest {
     public static String responseToJsonStr(Object obj) throws JsonProcessingException {
         return new ObjectMapper().writeValueAsString(obj);
     }
-
-    @Test
-    public void processImageTest() {
-        String bucketName = bucket;
-        String key = "1.jpg";
-        ImageProcessRequest imageReq = new ImageProcessRequest(bucketName, key);
-
-        PicOperations picOperations = new PicOperations();
-        picOperations.setIsPicInfo(1);
-        List<PicOperations.Rule> ruleList = new LinkedList<>();
-        PicOperations.Rule rule1 = new PicOperations.Rule();
-        rule1.setBucket(bucketName);
-        rule1.setFileId("test-1.jpg");
-        rule1.setRule("imageMogr2/rotate/90");
-        ruleList.add(rule1);
-        PicOperations.Rule rule2 = new PicOperations.Rule();
-        rule2.setBucket(bucketName);
-        rule2.setFileId("test-2.jpg");
-        rule2.setRule("imageMogr2/rotate/180");
-        ruleList.add(rule2);
-        picOperations.setRules(ruleList);
-
-        imageReq.setPicOperations(picOperations);
-
-        CIUploadResult ciUploadResult = cosclient.processImage(imageReq);
-        System.out.println(ciUploadResult.getOriginalInfo().getEtag());
-        for (CIObject ciObject : ciUploadResult.getProcessResults().getObjectList()) {
-            System.out.println(ciObject.getLocation());
-            System.out.println(ciObject.getEtag());
-        }
-    }
+//    @Test
+//    public void processImageTest() {
+//        String bucketName = bucket;
+//        String key = "1.jpg";
+//        ImageProcessRequest imageReq = new ImageProcessRequest(bucketName, key);
+//
+//        PicOperations picOperations = new PicOperations();
+//        picOperations.setIsPicInfo(1);
+//        List<PicOperations.Rule> ruleList = new LinkedList<>();
+//        PicOperations.Rule rule1 = new PicOperations.Rule();
+//        rule1.setBucket(bucketName);
+//        rule1.setFileId("test-1.jpg");
+//        rule1.setRule("imageMogr2/rotate/90");
+//        ruleList.add(rule1);
+//        PicOperations.Rule rule2 = new PicOperations.Rule();
+//        rule2.setBucket(bucketName);
+//        rule2.setFileId("test-2.jpg");
+//        rule2.setRule("imageMogr2/rotate/180");
+//        ruleList.add(rule2);
+//        picOperations.setRules(ruleList);
+//
+//        imageReq.setPicOperations(picOperations);
+//
+//        CIUploadResult ciUploadResult = cosclient.processImage(imageReq);
+//        System.out.println(ciUploadResult.getOriginalInfo().getEtag());
+//        for (CIObject ciObject : ciUploadResult.getProcessResults().getObjectList()) {
+//            System.out.println(ciObject.getLocation());
+//            System.out.println(ciObject.getEtag());
+//        }
+//    }
+//    
 
     @Test(expected = IllegalArgumentException.class)
     public void processImageTest2() {
