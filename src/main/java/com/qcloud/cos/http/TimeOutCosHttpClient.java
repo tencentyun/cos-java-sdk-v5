@@ -34,9 +34,9 @@ public class TimeOutCosHttpClient  extends DefaultCosHttpClient{
         threadPool.shutdown();
 
         try {
-            int shutdown_timeout = clientConfig.getShutdownTimeout();
-            if (!threadPool.awaitTermination(shutdown_timeout, TimeUnit.MILLISECONDS)) {
-                log.warn("The threadPool has not shutdown successfully during the last " + shutdown_timeout/1000 + " seconds");
+            int shutdownTimeout = clientConfig.getShutdownTimeout();
+            if (!threadPool.awaitTermination(shutdownTimeout, TimeUnit.MILLISECONDS)) {
+                log.warn("The threadPool has not shutdown successfully during the last " + shutdownTimeout/1000 + " seconds");
                 threadPool.shutdownNow();
             }
         } catch (InterruptedException e) {
