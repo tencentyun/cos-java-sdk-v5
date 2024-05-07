@@ -60,6 +60,7 @@ public class MultipartUploadDemo {
             InitiateMultipartUploadResult initResult = cosClient.initiateMultipartUpload(request);
             // 获取uploadid
             String uploadId = initResult.getUploadId();
+            System.out.println("succeed to init multipart upload, uploadid:" + uploadId);
             return uploadId;
         } catch (CosServiceException e) {
             throw e;
@@ -84,6 +85,7 @@ public class MultipartUploadDemo {
             }
             for (PartSummary partSummary : partListing.getParts()) {
                 partETags.add(new PartETag(partSummary.getPartNumber(), partSummary.getETag()));
+                System.out.println("list multipart upload parts, partNum:" + partSummary.getPartNumber() + ", etag:" + partSummary.getETag());
             }
             listPartsRequest.setPartNumberMarker(partListing.getNextPartNumberMarker());
         } while (partListing.isTruncated());
@@ -117,7 +119,7 @@ public class MultipartUploadDemo {
                 UploadPartResult uploadPartResult = cosClient.uploadPart(uploadPartRequest);
                 PartETag partETag = uploadPartResult.getPartETag();
                 partETags.add(partETag);
-                String crc64 = uploadPartResult.getCrc64Ecma();
+                System.out.println("succeed to upload part, partNum:" + uploadPartRequest.getPartNumber());
             } catch (CosServiceException e) {
                 throw e;
             } catch (CosClientException e) {
@@ -137,8 +139,7 @@ public class MultipartUploadDemo {
         try {
             CompleteMultipartUploadResult completeResult =
                     cosClient.completeMultipartUpload(completeMultipartUploadRequest);
-            String etag = completeResult.getETag();
-            String crc64 = completeResult.getCrc64Ecma();
+            System.out.println("succeed to complete multipart upload");
         } catch (CosServiceException e) {
             throw e;
         } catch (CosClientException e) {
@@ -152,6 +153,7 @@ public class MultipartUploadDemo {
         AbortMultipartUploadRequest abortMultipartUploadRequest = new AbortMultipartUploadRequest(bucketName, key, uploadId);
         try {
             cosClient.abortMultipartUpload(abortMultipartUploadRequest);
+            System.out.println("succeed to abort multipart upload, uploadid:" + uploadId);
         } catch (CosServiceException e) {
             e.printStackTrace();
         } catch (CosClientException e) {
@@ -181,6 +183,7 @@ public class MultipartUploadDemo {
         try {
             CopyPartResult copyPartResult = cosClient.copyPart(copyPartRequest);
             PartETag partETag = copyPartResult.getPartETag();
+            System.out.println("succeed to copy part, partNum:" + copyPartRequest.getPartNumber());
         } catch (CosServiceException e) {
             e.printStackTrace();
         } catch (CosClientException e) {
