@@ -9,12 +9,14 @@ import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.http.DefaultCosHttpClient;
 import com.qcloud.cos.internal.COSObjectResponseHandler;
 import com.qcloud.cos.internal.CosErrorResponseHandler;
-import com.qcloud.cos.internal.InputSubstream;
+import com.qcloud.cos.model.COSObject;
 import com.qcloud.cos.model.GetObjectRequest;
 import com.qcloud.cos.model.ObjectMetadata;
 import com.qcloud.cos.model.PutObjectResult;
 import com.qcloud.cos.region.Region;
 import org.apache.http.*;
+import org.apache.http.client.CircularRedirectException;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.protocol.HttpClientContext;
@@ -520,6 +522,49 @@ public class DefaultClientErrorTest {
             if (cosClient != null) {
                 cosClient.shutdown();
             }
+        }
+    }
+
+    @Test
+    public void testExecuteRequestWithCircularRedirectException() throws Exception {
+        COSSigner signer = PowerMockito.mock(COSSigner.class);
+        PowerMockito.whenNew(COSSigner.class).withNoArguments().thenReturn(signer);
+        PowerMockito.when(signer, "sign", any(), any(), any()).thenAnswer((m)->{return null;});
+        ClientConfig clientConfig = new ClientConfig(new Region(region_));
+        clientConfig.setChangeEndpointRetry(true);
+        clientConfig.setUseBasicAuth(true);
+
+        PoolingHttpClientConnectionManager manager = PowerMockito.mock(PoolingHttpClientConnectionManager.class);
+        PowerMockito.whenNew(PoolingHttpClientConnectionManager.class).withNoArguments().thenReturn(manager);
+
+        CosErrorResponseHandler cosErrorResponseHandler = PowerMockito.mock(CosErrorResponseHandler.class);
+        PowerMockito.whenNew(CosErrorResponseHandler.class).withNoArguments().thenReturn(cosErrorResponseHandler);
+        PowerMockito.when(cosErrorResponseHandler.handle(any())).thenAnswer((m)->{
+            XMLStreamException xmlStreamException = new XMLStreamException("test error");
+            throw  xmlStreamException;
+        });
+
+        HttpClientBuilder httpClientBuilder = PowerMockito.mock(HttpClientBuilder.class);
+        CloseableHttpClient httpClient = PowerMockito.mock(CloseableHttpClient.class);
+        PowerMockito.mockStatic(HttpClients.class);
+        PowerMockito.when(HttpClients.custom()).thenReturn(httpClientBuilder);
+        PowerMockito.when(httpClientBuilder.build()).thenReturn(httpClient);
+
+
+        PowerMockito.when(httpClient.execute((HttpUriRequest) any(), (HttpContext) any())).thenAnswer((m)->{
+            CircularRedirectException circularRedirectException = new CircularRedirectException("Circular redirect to xxxxxxxx");
+            ClientProtocolException ce = new ClientProtocolException(circularRedirectException);
+            throw ce;
+        });
+        COSCredentials cred = new BasicCOSCredentials(secretId_, secretKey_);
+        COSClient cosClient = new COSClient(cred, clientConfig);
+
+        try {
+            COSObject cosObject = cosClient.getObject(bucket_, "test");
+        } catch (CosClientException cce) {
+            assertEquals(ClientExceptionConstants.CLIENT_PROTOCAL_EXCEPTION, cce.getErrorCode());
+        } finally {
+            cosClient.shutdown();
         }
     }
 

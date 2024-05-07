@@ -71,6 +71,7 @@ public class SelectObjectTest extends AbstractCOSClientTest{
             stringBuffer.append(line).append("\n");
         }
         assertEquals(stringBuffer.toString(), "SiChuan,ChengDu\nGuiZhou,GuiYang\n");
+         ((SelectRecordsInputStream) resultInputStream).abort();
         cosclient.deleteObject(bucket, key);
     }
 //
