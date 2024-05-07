@@ -24,7 +24,7 @@ public class BucketTaggingDemo {
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名需包含appid
-        String bucketName = "mybucket-1251668577";
+        String bucketName = "mybucket-12500000000";
         List<TagSet> tagSetList = new LinkedList<TagSet>();
         TagSet tagSet = new TagSet();
         tagSet.setTag("age", "18");
@@ -47,7 +47,7 @@ public class BucketTaggingDemo {
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名需包含appid
-        String bucketName = "mybucket-1251668577";
+        String bucketName = "mybucket-12500000000";
         String key = "testTag";
 
         InputStream is = new ByteArrayInputStream(new byte[]{'d', 'a', 't', 'a'});

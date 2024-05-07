@@ -35,7 +35,7 @@ public class MultipartUploadDemo {
     private static String secretId = "AKIDXXXXXXXX";
     private static String secretKey = "1A2Z3YYYYYYYYYY";
     private static String region = "ap-guangzhou";
-    private static String bucketName = "mybucket-1251668577";
+    private static String bucketName = "mybucket-12500000000";
     private static String key = "aaa/bbb.txt";
 
     private static COSClient cosClient = createCli(region);

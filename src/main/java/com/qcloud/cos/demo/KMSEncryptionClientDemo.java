@@ -32,7 +32,7 @@ import com.qcloud.cos.transfer.Upload;
 public class KMSEncryptionClientDemo {
 	static String cmk = "kms-xxxxxxx";
 
-	static String bucketName = "mybucket-1251668577";
+	static String bucketName = "mybucket-12500000000";
 	static String key = "testKMS/len1m.txt";
 	static File localFile = new File("len1m.txt");
     static File bigLocalFile = new File("len10m.txt");

@@ -10,7 +10,7 @@ import com.qcloud.cos.region.Region;
 public class BucketRefererDemo {
     public static COSClient cosClient = null;
     // bucket名需包含appid
-    public static String bucketName = "examplebucket-1251668577";
+    public static String bucketName = "examplebucket-12500000000";
 
     public static void createCosClient() {
         // 1 初始化用户身份信息(secretId, secretKey)

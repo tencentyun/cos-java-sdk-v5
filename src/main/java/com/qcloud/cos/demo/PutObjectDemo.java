@@ -32,7 +32,7 @@ public class PutObjectDemo {
     }
 
     static void putObjectDemo() {
-        String bucketName = "examplebucket-1251668577";
+        String bucketName = "examplebucket-12500000000";
         String key = "abc/abc.txt";
 
         String localPath = "abc.txt";

@@ -32,7 +32,7 @@ public class DelFileDemo {
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名需包含appid
-        String bucketName = "mybucket-1251668577";
+        String bucketName = "mybucket-12500000000";
         try {
             String key = ""; // 空key值
             cosclient.deleteObject(bucketName, key);
@@ -66,7 +66,7 @@ public class DelFileDemo {
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名需包含appid
-        String bucketName = "mybucket-1251668577";
+        String bucketName = "mybucket-12500000000";
 
         DeleteObjectsRequest deleteObjectsRequest = new DeleteObjectsRequest(bucketName);
         // 设置要删除的key列表, 最多一次删除1000个
@@ -103,7 +103,7 @@ public class DelFileDemo {
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名需包含appid
-        String bucketName = "mybucket-1251668577";
+        String bucketName = "mybucket-12500000000";
 
         DeleteObjectsRequest deleteObjectsRequest = new DeleteObjectsRequest(bucketName);
         // 设置要删除的key列表, 最多一次删除1000个

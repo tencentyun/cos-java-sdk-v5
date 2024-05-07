@@ -17,7 +17,7 @@ public class BucketDomainDemo {
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名需包含appid
-        String bucketName = "mybucket-1251668577";
+        String bucketName = "mybucket-12500000000";
         BucketDomainConfiguration bucketDomainConfiguration = new BucketDomainConfiguration();
         DomainRule domainRule = new DomainRule();
         domainRule.setStatus(DomainRule.ENABLED);

@@ -24,7 +24,7 @@ public class GetObjectURLDemo {
         COSClient cosclient = new COSClient(cred, clientConfig);
 
         String key = "test/my_test中文.json";
-        String bucketName = "mybucket-1251668577";
+        String bucketName = "mybucket-12500000000";
 
         System.out.println(cosclient.getObjectUrl(bucketName, key));
     }
@@ -40,7 +40,7 @@ public class GetObjectURLDemo {
         COSClient cosclient = new COSClient(cred, clientConfig);
 
         String key = "test/my_test中文.json";
-        String bucketName = "mybucket-1251668577";
+        String bucketName = "mybucket-12500000000";
         String versionId = "xxxyyyzzz111222333";
 
         System.out.println(cosclient.getObjectUrl(bucketName, key, versionId));
@@ -60,7 +60,7 @@ public class GetObjectURLDemo {
         COSClient cosclient = new COSClient(cred, clientConfig);
 
         String key = "test/my_test中文.json";
-        String bucketName = "mybucket-1251668577";
+        String bucketName = "mybucket-12500000000";
         String versionId = "xxxyyyzzz111222333";
 
         System.out.println(cosclient.getObjectUrl(bucketName, key, versionId));

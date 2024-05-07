@@ -33,11 +33,11 @@ public class CopyFileDemo {
         // 要拷贝的bucket region, 支持跨园区拷贝
         Region srcBucketRegion = new Region("ap-shanghai");
         // 源bucket, bucket名需包含appid
-        String srcBucketName = "srcBucket-1251668577";
+        String srcBucketName = "srcBucket-12500000000";
         // 要拷贝的源文件
         String srcKey = "aaa/bbb.txt";
         // 目的bucket, bucket名需包含appid
-        String destBucketName = "destBucket-1251668577";
+        String destBucketName = "destBucket-12500000000";
         // 要拷贝的目的文件
         String destKey = "ccc/ddd.txt";
 
@@ -72,11 +72,11 @@ public class CopyFileDemo {
         // 要拷贝的bucket region, 支持跨园区拷贝
         Region srcBucketRegion = new Region("ap-shanghai");
         // 源bucket, bucket名需包含appid
-        String srcBucketName = "srcBucket-1251668577";
+        String srcBucketName = "srcBucket-12500000000";
         // 要拷贝的源文件
         String srcKey = "aaa/bbb.txt";
         // 目的bucket, bucket名需包含appid
-        String destBucketName = "destBucket-1251668577";
+        String destBucketName = "destBucket-12500000000";
         // 要拷贝的目的文件
         String destKey = "ccc/ddd.txt";
 
@@ -116,11 +116,11 @@ public class CopyFileDemo {
         // 要拷贝的bucket region, 支持跨园区拷贝
         Region srcBucketRegion = new Region("ap-shanghai");
         // 源bucket, bucket名需包含appid
-        String srcBucketName = "srcBucket-1251668577";
+        String srcBucketName = "srcBucket-12500000000";
         // 要拷贝的源文件
         String srcKey = "aaa/bbb.txt";
         // 目的bucket, bucket名需包含appid
-        String destBucketName = "destBucket-1251668577";
+        String destBucketName = "destBucket-12500000000";
         // 要拷贝的目的文件
         String destKey = "ccc/ddd.txt";
 

@@ -35,7 +35,7 @@ public class BucketDemo {
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名称, 需包含appid
-        String bucketName = "publicreadbucket-1251668577";
+        String bucketName = "publicreadbucket-12500000000";
         
         CreateBucketRequest createBucketRequest = new CreateBucketRequest(bucketName);
         // 设置bucket的权限为PublicRead(公有读私有写), 其他可选有私有读写, 公有读私有写
@@ -55,7 +55,7 @@ public class BucketDemo {
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名称, 需包含appid
-        String bucketName = "examplebucket-1251668577";
+        String bucketName = "examplebucket-12500000000";
 
         // 开启版本控制
         BucketVersioningConfiguration bucketVersioningConfiguration = new BucketVersioningConfiguration(BucketVersioningConfiguration.ENABLED);
@@ -76,7 +76,7 @@ public class BucketDemo {
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名称, 需包含appid
-        String bucketName = "examplebucket-1251668577";
+        String bucketName = "examplebucket-12500000000";
 
         BucketLoggingConfiguration bucketLoggingConfiguration = new BucketLoggingConfiguration();
         // 设置日志存储的 bucket
@@ -97,7 +97,7 @@ public class BucketDemo {
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名需包含appid
-        String bucketName = "mybucket-1251668577";
+        String bucketName = "mybucket-12500000000";
         List<TagSet> tagSetList = new LinkedList<TagSet>();
         TagSet tagSet = new TagSet();
         tagSet.setTag("age", "18");
@@ -122,7 +122,7 @@ public class BucketDemo {
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名称, 需包含appid        
-        String bucketName = "publicreadbucket-1251668577";
+        String bucketName = "publicreadbucket-12500000000";
         // 删除bucket
         cosclient.deleteBucket(bucketName);
         
@@ -139,7 +139,7 @@ public class BucketDemo {
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         
-        String bucketName = "publicreadbucket-1251668577";
+        String bucketName = "publicreadbucket-12500000000";
         // 判断bucket是否存在
         cosclient.doesBucketExist(bucketName);
         
@@ -175,7 +175,7 @@ public class BucketDemo {
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
 
-        String bucketname = "publicreadbucket-1251668577";
+        String bucketname = "publicreadbucket-12500000000";
         CreateBucketRequest createBucketRequest = new CreateBucketRequest(bucketname);
 
         try {

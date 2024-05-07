@@ -43,7 +43,7 @@ public class KmsUploadDemo {
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名需包含appid
-        String bucketName = "mybucket-1251668577";
+        String bucketName = "mybucket-12500000000";
 
         String key = "aaa/bbb.txt";
         File localFile = new File("/test.log");
@@ -79,7 +79,7 @@ public class KmsUploadDemo {
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名需包含appid
-        String bucketName = "mybucket-1251668577";
+        String bucketName = "mybucket-12500000000";
 
         String key = "aaa/bbb.txt";
         String kmsKeyId = "your-kms-key-id";
@@ -139,11 +139,11 @@ public class KmsUploadDemo {
         // 要拷贝的bucket region, 支持跨园区拷贝
         Region srcBucketRegion = new Region("ap-guangzhou");
         // 源bucket, bucket名需包含appid
-        String srcBucketName = "mybucket-1251668577";
+        String srcBucketName = "mybucket-12500000000";
         // 要拷贝的源文件
         String srcKey = "aaa/bbb.txt";
         // 目的bucket, bucket名需包含appid
-        String destBucketName = "mybucket-1251668577";
+        String destBucketName = "mybucket-12500000000";
         // 要拷贝的目的文件
         String destKey = "ccc/ddd.txt";
 

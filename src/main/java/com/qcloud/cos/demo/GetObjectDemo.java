@@ -23,7 +23,7 @@ public class GetObjectDemo {
         // 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         String key = "test/my_test.json";
-        String bucketName = "mybucket-1251668577";
+        String bucketName = "mybucket-12500000000";
         boolean useTrafficLimit = false;
         GetObjectRequest getObjectRequest = new GetObjectRequest(bucketName, key);
         if(useTrafficLimit) {

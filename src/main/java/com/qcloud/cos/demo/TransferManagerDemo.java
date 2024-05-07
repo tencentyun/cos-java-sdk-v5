@@ -63,7 +63,7 @@ public class TransferManagerDemo {
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名需包含appid
-        String bucketName = "mybucket-1251668577";
+        String bucketName = "mybucket-12500000000";
 
         ExecutorService threadPool = Executors.newFixedThreadPool(32);
         // 传入一个threadpool, 若不传入线程池, 默认TransferManager中会生成一个单线程的线程池。
@@ -104,7 +104,7 @@ public class TransferManagerDemo {
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名需包含appid
-        String bucketName = "mybucket-1251668577";
+        String bucketName = "mybucket-12500000000";
 
         ExecutorService threadPool = Executors.newFixedThreadPool(4);
         // 传入一个threadpool, 若不传入线程池, 默认TransferManager中会生成一个单线程的线程池。
@@ -142,7 +142,7 @@ public class TransferManagerDemo {
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名需包含appid
-        String bucketName = "mybucket-1251668577";
+        String bucketName = "mybucket-12500000000";
 
         ExecutorService threadPool = Executors.newFixedThreadPool(2);
         // 传入一个threadpool, 若不传入线程池, 默认TransferManager中会生成一个单线程的线程池。
@@ -189,7 +189,7 @@ public class TransferManagerDemo {
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名需包含appid
-        String bucketName = "mybucket-1251668577";
+        String bucketName = "mybucket-12500000000";
 
         ExecutorService threadPool = Executors.newFixedThreadPool(4);
         // 传入一个threadpool, 若不传入线程池, 默认TransferManager中会生成一个单线程的线程池。
@@ -234,7 +234,7 @@ public class TransferManagerDemo {
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名需包含appid
-        String bucketName = "mybucket-1251668577";
+        String bucketName = "mybucket-12500000000";
 
         ExecutorService threadPool = Executors.newFixedThreadPool(4);
         // 传入一个threadpool, 若不传入线程池, 默认TransferManager中会生成一个单线程的线程池。
@@ -277,7 +277,7 @@ public class TransferManagerDemo {
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名需包含appid
-        String bucketName = "mybucket-1251668577";
+        String bucketName = "mybucket-12500000000";
 
         ExecutorService threadPool = Executors.newFixedThreadPool(32);
         // 传入一个threadpool, 若不传入线程池, 默认TransferManager中会生成一个单线程的线程池。
@@ -311,7 +311,7 @@ public class TransferManagerDemo {
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名需包含appid
-        String bucketName = "mybucket-1251668577";
+        String bucketName = "mybucket-12500000000";
 
         ExecutorService threadPool = Executors.newFixedThreadPool(32);
         // 传入一个threadpool, 若不传入线程池, 默认TransferManager中会生成一个单线程的线程池。
@@ -360,11 +360,11 @@ public class TransferManagerDemo {
         // 要拷贝的bucket region, 支持跨园区拷贝
         Region srcBucketRegion = new Region("ap-shanghai");
         // 源bucket, bucket名需包含appid
-        String srcBucketName = "srcBucket-1251668577";
+        String srcBucketName = "srcBucket-12500000000";
         // 要拷贝的源文件
         String srcKey = "aaa/bbb.txt";
         // 目的bucket, bucket名需包含appid
-        String destBucketName = "destBucket-1251668577";
+        String destBucketName = "destBucket-12500000000";
         // 要拷贝的目的文件
         String destKey = "ccc/ddd.txt";
 
@@ -409,11 +409,11 @@ public class TransferManagerDemo {
         // 要拷贝的bucket region, 支持跨园区拷贝
         Region srcBucketRegion = new Region("ap-beijing-1");
         // 源bucket, bucket名需包含appid
-        String srcBucketName = "srcBucket-1251668577";
+        String srcBucketName = "srcBucket-12500000000";
         // 要拷贝的源文件
         String srcKey = "aaa/bbb.txt";
         // 目的bucket, bucket名需包含appid
-        String destBucketName = "destBucket-1251668577";
+        String destBucketName = "destBucket-12500000000";
         // 要拷贝的目的文件
         String destKey = "ccc/ddd.txt";
 

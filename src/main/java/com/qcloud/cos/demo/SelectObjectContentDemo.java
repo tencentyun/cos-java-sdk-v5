@@ -26,7 +26,7 @@ public class SelectObjectContentDemo {
         // 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         String key = "test/my_test.csv";
-        String bucketName = "mybucket-1251668577";
+        String bucketName = "mybucket-12500000000";
         String csvContent = "HuNan,ChangSha\nSiChuan,ChengDu\nGuiZhou,GuiYang\n";
         cosclient.putObject(bucketName, key, csvContent);
         String query = "select s._1 from COSObject s";
@@ -89,7 +89,7 @@ public class SelectObjectContentDemo {
         // 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         String key = "test/my_test.json";
-        String bucketName = "mybucket-1251668577";
+        String bucketName = "mybucket-12500000000";
         String csvContent = "{\"name\":\"xiaoming\",\"mathScore\":89,\"musicScore\":92}\n" +
                 "{\"name\":\"xiaowang\",\"mathScore\":93,\"musicScore\":85}\n" +
                 "{\"name\":\"xiaoli\",\"mathScore\":82,\"musicScore\":95}\n";

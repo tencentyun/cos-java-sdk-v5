@@ -21,13 +21,13 @@ public class BucketInventoryDemo {
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名需包含appid
-        String bucketName = "mybucket-1251668577";
+        String bucketName = "mybucket-12500000000";
 
         InventoryConfiguration inventoryConfiguration = new InventoryConfiguration();
         InventoryCosBucketDestination inventoryCosBucketDestination = new InventoryCosBucketDestination();
         // 设置清单的输出目标存储桶的格式和前缀等
         inventoryCosBucketDestination.setAccountId("2779643970");
-        inventoryCosBucketDestination.setBucketArn("qcs::cos:ap-guangzhou::mybucket-1251668577");
+        inventoryCosBucketDestination.setBucketArn("qcs::cos:ap-guangzhou::mybucket-12500000000");
         inventoryCosBucketDestination.setEncryption(new ServerSideEncryptionCOS());
         inventoryCosBucketDestination.setFormat(InventoryFormat.CSV);
         inventoryCosBucketDestination.setPrefix("inventory-output");
@@ -81,7 +81,7 @@ public class BucketInventoryDemo {
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名需包含appid
-        String bucketName = "mybucket-1251668577";
+        String bucketName = "mybucket-12500000000";
 
         SetBucketInventoryConfigurationRequest request = new SetBucketInventoryConfigurationRequest();
         request.setBucketName(bucketName);
@@ -100,7 +100,7 @@ public class BucketInventoryDemo {
                                     "<Destination>\n" +
                                         "<COSBucketDestination>\n" +
                                             "<AccountId>2779643970</AccountId>\n" +
-                                            "<Bucket>qcs::cos:ap-guangzhou::mybucket-1251668577</Bucket>\n" +
+                                            "<Bucket>qcs::cos:ap-guangzhou::mybucket-12500000000</Bucket>\n" +
                                             "<Prefix>inventory-output</Prefix>\n" +
                                             "<Format>CSV</Format>\n" +
                                             "<Encryption><SSECOS></SSECOS></Encryption>\n" +

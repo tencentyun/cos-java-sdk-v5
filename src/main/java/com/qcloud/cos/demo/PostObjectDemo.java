@@ -22,7 +22,7 @@ public class PostObjectDemo {
     }
 
     private static void postObjectUploadDemo() throws Exception {
-        String bucketName = "mybucket-1251668577";
+        String bucketName = "mybucket-12500000000";
         String endpoint = "cos.ap-guangzhou.myqcloud.com";
         String key = "images/test.jpg";
         String filename = "test.jpg";

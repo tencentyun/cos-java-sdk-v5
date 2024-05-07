@@ -12,7 +12,7 @@ import com.qcloud.cos.region.Region;
 
 public class BucketReplicationDemo {
     static COSClient cosClient = null;
-    static String bucketName = "examplebucket-1251668577";
+    static String bucketName = "examplebucket-12500000000";
 
     public static void createCOSClient() {
         COSCredentials cred = new BasicCOSCredentials("AKID********************************", "********************************");
@@ -31,7 +31,7 @@ public class BucketReplicationDemo {
         replicationRule.setStatus(ReplicationRuleStatus.Disabled);
         replicationRule.setPrefix("testReplication");
         ReplicationDestinationConfig replicationDestinationConfig = new ReplicationDestinationConfig();
-        replicationDestinationConfig.setBucketQCS("qcs::cos:ap-shanghai::examplebucket-cp-1251668577");
+        replicationDestinationConfig.setBucketQCS("qcs::cos:ap-shanghai::examplebucket-cp-12500000000");
         replicationRule.setDestinationConfig(replicationDestinationConfig);
 
         bucketReplicationConfiguration.addRule(replicationRule);
@@ -41,7 +41,7 @@ public class BucketReplicationDemo {
         replicationRule2.setStatus(ReplicationRuleStatus.Disabled);
         replicationRule2.setPrefix("test2Replication");
         ReplicationDestinationConfig replicationDestinationConfig2 = new ReplicationDestinationConfig();
-        replicationDestinationConfig2.setBucketQCS("qcs::cos:ap-shanghai::examplebucket-cp-1251668577");
+        replicationDestinationConfig2.setBucketQCS("qcs::cos:ap-shanghai::examplebucket-cp-12500000000");
         replicationRule2.setDestinationConfig(replicationDestinationConfig2);
 
         bucketReplicationConfiguration.addRule(replicationRule2);
@@ -51,7 +51,7 @@ public class BucketReplicationDemo {
         replicationRule3.setStatus(ReplicationRuleStatus.Disabled);
         replicationRule3.setPrefix("test3Replication");
         ReplicationDestinationConfig replicationDestinationConfig3 = new ReplicationDestinationConfig();
-        replicationDestinationConfig3.setBucketQCS("qcs::cos:ap-shanghai::examplebucket-cp-1251668577");
+        replicationDestinationConfig3.setBucketQCS("qcs::cos:ap-shanghai::examplebucket-cp-12500000000");
         replicationRule2.setDestinationConfig(replicationDestinationConfig3);
 
         bucketReplicationConfiguration.addRule(replicationRule3);

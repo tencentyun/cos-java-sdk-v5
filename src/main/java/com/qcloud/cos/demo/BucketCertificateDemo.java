@@ -27,7 +27,7 @@ public class BucketCertificateDemo {
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
         ClientConfig clientConfig = new ClientConfig(new Region("ap-beijing"));
         // bucket名需包含appid
-        String bucketName = "mybucket-1251668577";
+        String bucketName = "mybucket-12500000000";
 
         BucketPutDomainCertificate bucketPutDomainCertificate = new BucketPutDomainCertificate();
         BucketDomainCertificateInfo bucketDomainCertificateInfo = new BucketDomainCertificateInfo();
