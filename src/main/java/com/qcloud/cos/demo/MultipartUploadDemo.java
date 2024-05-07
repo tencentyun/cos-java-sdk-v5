@@ -32,22 +32,32 @@ import com.qcloud.cos.region.Region;
  * 分块上传的完成逻辑较复杂，需要经历多个步骤, 建议用户使用TransferManager中封装好的上传接口来进行文件的上传
  */
 public class MultipartUploadDemo {
-    public static String InitMultipartUploadDemo() {
-        // 1 初始化用户身份信息(secretId, secretKey)
-        COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
-        // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
-        ClientConfig clientConfig = new ClientConfig(new Region("ap-guangzhou"));
-        // 3 生成cos客户端
-        COSClient cosclient = new COSClient(cred, clientConfig);
-        // bucket名需包含appid
-        String bucketName = "mybucket-1251668577";
+    private static String secretId = "AKIDXXXXXXXX";
+    private static String secretKey = "1A2Z3YYYYYYYYYY";
+    private static String region = "ap-guangzhou";
+    private static String bucketName = "mybucket-1251668577";
+    private static String key = "aaa/bbb.txt";
 
-        String key = "aaa/bbb.txt";
+    private static COSClient cosClient = createCli(region);
+
+    public static COSClient createCli(String region) {
+        // 1 初始化用户身份信息(secretId, secretKey)
+        COSCredentials cred = new BasicCOSCredentials(secretId, secretKey);
+
+        // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
+        ClientConfig clientConfig = new ClientConfig(new Region(region));
+
+        // 生成cos客户端
+        return new COSClient(cred, clientConfig);
+    }
+
+
+    public static String initMultipartUploadDemo() {
         InitiateMultipartUploadRequest request = new InitiateMultipartUploadRequest(bucketName, key);
         // 设置存储类型, 默认是标准(Standard), 低频(Standard_IA), 归档(Archive)
         request.setStorageClass(StorageClass.Standard);
         try {
-            InitiateMultipartUploadResult initResult = cosclient.initiateMultipartUpload(request);
+            InitiateMultipartUploadResult initResult = cosClient.initiateMultipartUpload(request);
             // 获取uploadid
             String uploadId = initResult.getUploadId();
             return uploadId;
@@ -55,31 +65,18 @@ public class MultipartUploadDemo {
             throw e;
         } catch (CosClientException e) {
             throw e;
-        } finally {
-            cosclient.shutdown();
         }
     }
 
     // list part用于获取已上传的分片, 如果已上传的分片数量较多, 需要循环多次调用list part获取已上传的所有的分片
     public static List<PartETag> listPartDemo(String uploadId) {
-        // 1 初始化用户身份信息(secretId, secretKey)
-        COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
-        // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
-        ClientConfig clientConfig = new ClientConfig(new Region("ap-guangzhou"));
-        // 3 生成cos客户端
-        COSClient cosclient = new COSClient(cred, clientConfig);
-
-        // bucket名需包含appid
-        String bucketName = "mybucket-1251668577";
-        String key = "aaa/bbb.txt";
         // uploadid(通过initiateMultipartUpload或者ListMultipartUploads获取)
-
         List<PartETag> partETags = new LinkedList<>();      // 用于保存已上传的分片信息
         PartListing partListing = null;
         ListPartsRequest listPartsRequest = new ListPartsRequest(bucketName, key, uploadId);
         do {
             try {
-                partListing = cosclient.listParts(listPartsRequest);
+                partListing = cosClient.listParts(listPartsRequest);
             } catch (CosServiceException e) {
                 throw e;
             } catch (CosClientException e) {
@@ -91,23 +88,12 @@ public class MultipartUploadDemo {
             listPartsRequest.setPartNumberMarker(partListing.getNextPartNumberMarker());
         } while (partListing.isTruncated());
 
-        cosclient.shutdown();
         return partETags;
     }
 
     // 分块上传(上传某一个分片的数据)
-    public static List<PartETag> UploadPartDemo(String uploadId) {
-        // 1 初始化用户身份信息(secretId, secretKey)
-        COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
-        // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
-        ClientConfig clientConfig = new ClientConfig(new Region("ap-guangzhou"));
-        // 3 生成cos客户端
-        COSClient cosclient = new COSClient(cred, clientConfig);
-        // bucket名需包含appid
-        String bucketName = "mybucket-1251668577";
-        String key = "aaa/bbb.txt";
+    public static List<PartETag> uploadPartDemo(String uploadId) {
         // uploadid(通过initiateMultipartUpload或者ListMultipartUploads获取)
-
         boolean userTrafficLimit = false;
         List<PartETag> partETags = new LinkedList<>();
 
@@ -128,7 +114,7 @@ public class MultipartUploadDemo {
             }
 
             try {
-                UploadPartResult uploadPartResult = cosclient.uploadPart(uploadPartRequest);
+                UploadPartResult uploadPartResult = cosClient.uploadPart(uploadPartRequest);
                 PartETag partETag = uploadPartResult.getPartETag();
                 partETags.add(partETag);
                 String crc64 = uploadPartResult.getCrc64Ecma();
@@ -138,30 +124,19 @@ public class MultipartUploadDemo {
                 throw e;
             }
         }
-        cosclient.shutdown();
+
         return partETags;
     }
 
     // complete完成分片上传
     public static void completePartDemo(String uploadId, List<PartETag> partETags) {
-        // 1 初始化用户身份信息(secretId, secretKey)
-        COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
-        // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
-        ClientConfig clientConfig = new ClientConfig(new Region("ap-guangzhou"));
-        // 3 生成cos客户端
-        COSClient cosclient = new COSClient(cred, clientConfig);
-        // bucket名需包含appid
-        String bucketName = "mybucket-1251668577";
-        String key = "aaa/bbb.txt";
         // uploadid(通过initiateMultipartUpload或者ListMultipartUploads获取)
-
-
         // 分片上传结束后，调用complete完成分片上传
         CompleteMultipartUploadRequest completeMultipartUploadRequest =
                 new CompleteMultipartUploadRequest(bucketName, key, uploadId, partETags);
         try {
             CompleteMultipartUploadResult completeResult =
-                    cosclient.completeMultipartUpload(completeMultipartUploadRequest);
+                    cosClient.completeMultipartUpload(completeMultipartUploadRequest);
             String etag = completeResult.getETag();
             String crc64 = completeResult.getCrc64Ecma();
         } catch (CosServiceException e) {
@@ -169,52 +144,26 @@ public class MultipartUploadDemo {
         } catch (CosClientException e) {
             throw e;
         }
-
-        cosclient.shutdown();
     }
 
     // 终止分块上传
     public static void abortPartUploadDemo(String uploadId) {
-        // 1 初始化用户身份信息(secretId, secretKey)
-        COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
-        // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
-        ClientConfig clientConfig = new ClientConfig(new Region("ap-guangzhou"));
-        // 3 生成cos客户端
-        COSClient cosclient = new COSClient(cred, clientConfig);
-
-        // bucket名需包含appid
-        String bucketName = "mybucket-1251668577";
-        String key = "aaa/bbb.txt";
         // uploadid(通过initiateMultipartUpload或者ListMultipartUploads获取)
-
         AbortMultipartUploadRequest abortMultipartUploadRequest = new AbortMultipartUploadRequest(bucketName, key, uploadId);
         try {
-            cosclient.abortMultipartUpload(abortMultipartUploadRequest);
+            cosClient.abortMultipartUpload(abortMultipartUploadRequest);
         } catch (CosServiceException e) {
             e.printStackTrace();
         } catch (CosClientException e) {
             e.printStackTrace();
         }
-
-        cosclient.shutdown();
     }
 
     // 分块copy, 表示该块的数据来自另外一个文件的某一范围, 支持跨园区, 跨bucket copy
     public static void copyPartUploadDemo(String uploadId) {
-        // 1 初始化用户身份信息(secretId, secretKey)
-        COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
-        // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
-        ClientConfig clientConfig = new ClientConfig(new Region("ap-guangzhou"));
-        // 3 生成cos客户端
-        COSClient cosclient = new COSClient(cred, clientConfig);
-        // bucket名需包含appid
-        String bucketName = "mybucket-1251668577";
-
-        String key = "aaa/bbb.txt";
-
         CopyPartRequest copyPartRequest = new CopyPartRequest();
         // 要拷贝的源文件所在的region
-        copyPartRequest.setSourceBucketRegion(new Region("ap-guangzhou"));
+        copyPartRequest.setSourceBucketRegion(new Region(region));
         // 要拷贝的源文件的bucket名称
         copyPartRequest.setSourceBucketName(bucketName);
         // 要拷贝的源文件的路径
@@ -230,20 +179,36 @@ public class MultipartUploadDemo {
         // uploadId
         copyPartRequest.setUploadId(uploadId);
         try {
-            CopyPartResult copyPartResult = cosclient.copyPart(copyPartRequest);
+            CopyPartResult copyPartResult = cosClient.copyPart(copyPartRequest);
             PartETag partETag = copyPartResult.getPartETag();
         } catch (CosServiceException e) {
             e.printStackTrace();
         } catch (CosClientException e) {
             e.printStackTrace();
         }
+    }
 
-        cosclient.shutdown();
+    public static void multipartUploadDemo() {
+        try {
+            String uploadId = initMultipartUploadDemo();
+            List<PartETag> partETags = uploadPartDemo(uploadId);
+            completePartDemo(uploadId, partETags);
+        } catch (CosServiceException cse) {
+            throw cse;
+        } catch (CosClientException cce) {
+            throw cce;
+        }
     }
 
     public static void main(String[] args) {
-        String uploadId = InitMultipartUploadDemo();
-        List<PartETag> partETags = UploadPartDemo(uploadId);
-        completePartDemo(uploadId, partETags);
+        try {
+            multipartUploadDemo();
+        } catch (CosServiceException cse) {
+            cse.printStackTrace();
+        } catch (CosClientException cce) {
+            cce.printStackTrace();
+        } finally {
+            cosClient.shutdown();
+        }
     }
 }

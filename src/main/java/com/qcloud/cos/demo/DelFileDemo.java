@@ -24,7 +24,7 @@ import com.qcloud.cos.region.Region;
 public class DelFileDemo {
 
     // 删除单个文件(不带版本号, 即bucket未开启多版本)
-    public static void DelSingleFile() {
+    public static void delSingleFile() {
         // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -58,7 +58,7 @@ public class DelFileDemo {
     }
 
     // 批量删除文件(不带版本号, 即bucket未开启多版本)
-    public static void BatchDelFile() {
+    public static void batchDelFile() {
         // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -95,7 +95,7 @@ public class DelFileDemo {
     }
 
     // 批量删除带有版本号的文件(即bucket开启了多版本)
-    public static void BatchDelFileWithVersion() {
+    public static void batchDelFileWithVersion() {
         // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -132,6 +132,6 @@ public class DelFileDemo {
     }
 
     public static void main(String[] args) {
-        DelSingleFile();
+        delSingleFile();
     }
 }

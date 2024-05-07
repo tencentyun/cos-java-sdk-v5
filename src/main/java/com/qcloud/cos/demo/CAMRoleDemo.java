@@ -13,7 +13,7 @@ import java.io.File;
 
 public class CAMRoleDemo {
 
-    public static void SimpleUploadFileFromLocal() {
+    public static void simpleUploadFileFromLocal() {
         InstanceMetadataCredentialsEndpointProvider endpointProvider =
                 new InstanceMetadataCredentialsEndpointProvider(InstanceMetadataCredentialsEndpointProvider.Instance.CVM);
 
@@ -30,7 +30,7 @@ public class CAMRoleDemo {
         cosClient.shutdown();
     }
 
-    public static void SimpleUploadFileFromEMR() {
+    public static void simpleUploadFileFromEMR() {
         InstanceMetadataCredentialsEndpointProvider endpointProvider =
                 new InstanceMetadataCredentialsEndpointProvider(InstanceMetadataCredentialsEndpointProvider.Instance.EMR);
 
@@ -69,6 +69,6 @@ public class CAMRoleDemo {
     }
 
     public static void main(String[] args) {
-        SimpleUploadFileFromEMR();
+        simpleUploadFileFromEMR();
     }
 }

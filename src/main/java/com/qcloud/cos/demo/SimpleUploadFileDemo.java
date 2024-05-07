@@ -21,10 +21,10 @@ import com.qcloud.cos.region.Region;
  */
 public class SimpleUploadFileDemo {
     public static void main(String[] args) {
-        SimpleUploadFileFromLocal(false);
+        simpleUploadFileFromLocal(false);
     }
     // 将本地文件上传到COS
-    public static void SimpleUploadFileFromLocal(boolean useTrafficLimit) {
+    public static void simpleUploadFileFromLocal(boolean useTrafficLimit) {
         // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -59,7 +59,7 @@ public class SimpleUploadFileDemo {
     }
     
     // 从输入流进行读取并上传到COS
-    public static void SimpleUploadFileFromStream() {
+    public static void simpleUploadFileFromStream() {
         // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224

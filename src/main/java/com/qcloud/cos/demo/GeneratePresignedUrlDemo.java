@@ -27,7 +27,7 @@ import com.qcloud.cos.utils.DateUtils;
  */
 public class GeneratePresignedUrlDemo {
     // 获取下载的预签名连接
-    public static void GenerateSimplePresignedDownloadUrl() {
+    public static void generateSimplePresignedDownloadUrl() {
         // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -60,7 +60,7 @@ public class GeneratePresignedUrlDemo {
     }
 
     // 获取预签名的下载链接, 并设置返回的content-type, cache-control等http头
-    public static void GeneratePresignedDownloadUrlWithOverrideResponseHeader() {
+    public static void generatePresignedDownloadUrlWithOverrideResponseHeader() {
         // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -106,7 +106,7 @@ public class GeneratePresignedUrlDemo {
     }
 
     // 获取预签名的下载链接， 用于匿名bucket, 匿名bucket生成的预下载链接不包含签名
-    public static void GeneratePresignedDownloadUrlAnonymous() {
+    public static void generatePresignedDownloadUrlAnonymous() {
         // 1 初始化用户身份信息, 匿名身份不用传入ak sk
         COSCredentials cred = new AnonymousCOSCredentials();
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -127,7 +127,7 @@ public class GeneratePresignedUrlDemo {
     }
 
     // 生成预签名的上传连接
-    public static void GeneratePresignedUploadUrl() {
+    public static void generatePresignedUploadUrl() {
         // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", "********************************");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -166,6 +166,6 @@ public class GeneratePresignedUrlDemo {
     
 
     public static void main(String[] args) {
-        GeneratePresignedUploadUrl();
+        generatePresignedUploadUrl();
     }
 }

@@ -24,7 +24,7 @@ public class TemporyTokenDemo {
 	}
 
 	// 使用临时秘钥进行上传和下载
-	public static void UseTemporyTokenUploadAndDownload() {
+	public static void useTemporyTokenUploadAndDownload() {
 		// 使用云api秘钥，可以获取一个临时secret id，secret key和session token,
 		BasicSessionCredentials cred = getSessionCredential();
 		// 设置区域, 这里设置为北京一区
@@ -52,7 +52,7 @@ public class TemporyTokenDemo {
 	}
 	
 	public static void main(String[] args) throws Exception {
-	    UseTemporyTokenUploadAndDownload();
+	    useTemporyTokenUploadAndDownload();
 	}
 
 }
