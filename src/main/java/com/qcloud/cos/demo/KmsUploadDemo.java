@@ -30,11 +30,11 @@ import java.util.List;
 public class KmsUploadDemo {
 
     public static void main(String[] args) {
-        SimpleUploadWithKmsMeta();
-        CopyObjectWithKmsMeta();
+        simpleUploadWithKmsMeta();
+        copyObjectWithKmsMeta();
     }
 
-    public static void SimpleUploadWithKmsMeta() {
+    public static void simpleUploadWithKmsMeta() {
         COSCredentials cred = new BasicCOSCredentials("SECRET_ID", "SECRET_KEY");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
         ClientConfig clientConfig = new ClientConfig(new Region("ap-guangzhou"));
@@ -43,7 +43,7 @@ public class KmsUploadDemo {
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名需包含appid
-        String bucketName = "mybucket-1251668577";
+        String bucketName = "mybucket-12500000000";
 
         String key = "aaa/bbb.txt";
         File localFile = new File("/test.log");
@@ -70,7 +70,7 @@ public class KmsUploadDemo {
         cosclient.shutdown();
     }
 
-    public static void MultipartUploadWithKmsMeta() {
+    public static void multipartUploadWithKmsMeta() {
         COSCredentials cred = new BasicCOSCredentials("SECRET_ID", "SECRET_KEY");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
         ClientConfig clientConfig = new ClientConfig(new Region("ap-guangzhou"));
@@ -79,7 +79,7 @@ public class KmsUploadDemo {
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名需包含appid
-        String bucketName = "mybucket-1251668577";
+        String bucketName = "mybucket-12500000000";
 
         String key = "aaa/bbb.txt";
         String kmsKeyId = "your-kms-key-id";
@@ -123,7 +123,7 @@ public class KmsUploadDemo {
         cosclient.shutdown();
     }
 
-    public static void CopyObjectWithKmsMeta() {
+    public static void copyObjectWithKmsMeta() {
         COSCredentials cred = new BasicCOSCredentials("SECRET_ID", "SECRET_KEY");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
         ClientConfig clientConfig = new ClientConfig(new Region("ap-guangzhou"));
@@ -139,11 +139,11 @@ public class KmsUploadDemo {
         // 要拷贝的bucket region, 支持跨园区拷贝
         Region srcBucketRegion = new Region("ap-guangzhou");
         // 源bucket, bucket名需包含appid
-        String srcBucketName = "mybucket-1251668577";
+        String srcBucketName = "mybucket-12500000000";
         // 要拷贝的源文件
         String srcKey = "aaa/bbb.txt";
         // 目的bucket, bucket名需包含appid
-        String destBucketName = "mybucket-1251668577";
+        String destBucketName = "mybucket-12500000000";
         // 要拷贝的目的文件
         String destKey = "ccc/ddd.txt";
 

@@ -12,10 +12,10 @@ import com.qcloud.cos.region.Region;
 
 public class GetObjectDemo {
     public static void main(String[] args) {
-        GetObjectToFileDemo();
+        getObjectToFileDemo();
     }
 
-    public static void GetObjectToFileDemo() {
+    public static void getObjectToFileDemo() {
         // 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX","1A2Z3YYYYYYYYYY");
         // 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -23,7 +23,7 @@ public class GetObjectDemo {
         // 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         String key = "test/my_test.json";
-        String bucketName = "mybucket-1251668577";
+        String bucketName = "mybucket-12500000000";
         boolean useTrafficLimit = false;
         GetObjectRequest getObjectRequest = new GetObjectRequest(bucketName, key);
         if(useTrafficLimit) {

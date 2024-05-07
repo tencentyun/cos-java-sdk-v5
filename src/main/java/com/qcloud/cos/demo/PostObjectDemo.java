@@ -4,7 +4,11 @@ import com.qcloud.cos.auth.COSSigner;
 import com.qcloud.cos.utils.VersionInfoUtils;
 import org.apache.commons.codec.binary.Base64;
 
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
@@ -14,11 +18,11 @@ import java.util.Map;
 
 public class PostObjectDemo {
     public static void main(String[] args) throws Exception {
-        PostObjectUploadDemo();
+        postObjectUploadDemo();
     }
 
-    private static void PostObjectUploadDemo() throws Exception {
-        String bucketName = "mybucket-1251668577";
+    private static void postObjectUploadDemo() throws Exception {
+        String bucketName = "mybucket-12500000000";
         String endpoint = "cos.ap-guangzhou.myqcloud.com";
         String key = "images/test.jpg";
         String filename = "test.jpg";

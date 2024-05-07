@@ -41,7 +41,7 @@ public class AsymmetricKeyEncryptionClientDemo {
     private static final String priKeyPath = "pri.key";
     private static final SecureRandom srand = new SecureRandom();
 
-	static String bucketName = "mybucket-1251668577";
+	static String bucketName = "mybucket-12500000000";
     static  String key = "testKMS/asy.txt";
 	static File localFile = new File("len1m.txt");
 

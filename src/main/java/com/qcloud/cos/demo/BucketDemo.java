@@ -27,7 +27,7 @@ import com.qcloud.cos.region.Region;
  */
 public class BucketDemo {
     // 创建bucket
-    public static void CreateBucketDemo() {
+    public static void createBucketDemo() {
         // 1 初始化用户身份信息(appid, secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -35,7 +35,7 @@ public class BucketDemo {
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名称, 需包含appid
-        String bucketName = "publicreadbucket-1251668577";
+        String bucketName = "publicreadbucket-12500000000";
         
         CreateBucketRequest createBucketRequest = new CreateBucketRequest(bucketName);
         // 设置bucket的权限为PublicRead(公有读私有写), 其他可选有私有读写, 公有读私有写
@@ -47,7 +47,7 @@ public class BucketDemo {
     }
 
     // 开启 bucket 版本控制
-    public static void SetBucketVersioning() {
+    public static void setBucketVersioning() {
         // 1 初始化用户身份信息(appid, secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -55,7 +55,7 @@ public class BucketDemo {
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名称, 需包含appid
-        String bucketName = "examplebucket-1251668577";
+        String bucketName = "examplebucket-12500000000";
 
         // 开启版本控制
         BucketVersioningConfiguration bucketVersioningConfiguration = new BucketVersioningConfiguration(BucketVersioningConfiguration.ENABLED);
@@ -68,7 +68,7 @@ public class BucketDemo {
     }
 
     // 开启日志存储
-    public static void SetBucketLogging() {
+    public static void setBucketLogging() {
         // 1 初始化用户身份信息(appid, secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -76,7 +76,7 @@ public class BucketDemo {
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名称, 需包含appid
-        String bucketName = "examplebucket-1251668577";
+        String bucketName = "examplebucket-12500000000";
 
         BucketLoggingConfiguration bucketLoggingConfiguration = new BucketLoggingConfiguration();
         // 设置日志存储的 bucket
@@ -89,7 +89,7 @@ public class BucketDemo {
     }
 
     // 使用 bucket tag
-    public static void SetGetDeleteBucketTagging() {
+    public static void setGetDeleteBucketTagging() {
         // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -97,7 +97,7 @@ public class BucketDemo {
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名需包含appid
-        String bucketName = "mybucket-1251668577";
+        String bucketName = "mybucket-12500000000";
         List<TagSet> tagSetList = new LinkedList<TagSet>();
         TagSet tagSet = new TagSet();
         tagSet.setTag("age", "18");
@@ -114,7 +114,7 @@ public class BucketDemo {
     }
     
     // 删除bucket, 只用于空bucket, 含有数据的bucket需要在删除前清空删除。
-    public static void DeleteBucketDemo() {
+    public static void deleteBucketDemo() {
         // 1 初始化用户身份信息(appid, secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -122,7 +122,7 @@ public class BucketDemo {
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名称, 需包含appid        
-        String bucketName = "publicreadbucket-1251668577";
+        String bucketName = "publicreadbucket-12500000000";
         // 删除bucket
         cosclient.deleteBucket(bucketName);
         
@@ -131,7 +131,7 @@ public class BucketDemo {
     }
     
     // 查询bucket是否存在
-    public static void JudgeBucketExistDemo() {
+    public static void judgeBucketExistDemo() {
         // 1 初始化用户身份信息(appid, secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -139,7 +139,7 @@ public class BucketDemo {
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         
-        String bucketName = "publicreadbucket-1251668577";
+        String bucketName = "publicreadbucket-12500000000";
         // 判断bucket是否存在
         cosclient.doesBucketExist(bucketName);
         
@@ -147,7 +147,7 @@ public class BucketDemo {
         cosclient.shutdown();
     }    
 
-    public static void ListBuckets() {
+    public static void listBuckets() {
         // 1 初始化用户身份信息(appid, secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", "****************************");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -167,7 +167,7 @@ public class BucketDemo {
     }
 
     //创多AZ桶
-    public static void CreateMAZBucketDemo() {
+    public static void createMAZBucketDemo() {
         // 1 初始化用户身份信息(appid, secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", "****************************");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -175,7 +175,7 @@ public class BucketDemo {
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
 
-        String bucketname = "publicreadbucket-1251668577";
+        String bucketname = "publicreadbucket-12500000000";
         CreateBucketRequest createBucketRequest = new CreateBucketRequest(bucketname);
 
         try {
@@ -189,6 +189,6 @@ public class BucketDemo {
         }
     }
     public static void main(String[] args) {
-        ListBuckets();
+        listBuckets();
     }
 }

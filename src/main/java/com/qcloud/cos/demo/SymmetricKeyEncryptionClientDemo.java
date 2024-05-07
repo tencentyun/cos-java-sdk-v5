@@ -37,7 +37,7 @@ import com.qcloud.cos.region.Region;
 public class SymmetricKeyEncryptionClientDemo {
     private static final String keyFilePath = "secret.key";
 
-	static String bucketName = "mybucket-1251668577";
+	static String bucketName = "mybucket-12500000000";
     static  String key = "testKMS/sym.txt";
 	static File localFile = new File("len1m.txt");
 

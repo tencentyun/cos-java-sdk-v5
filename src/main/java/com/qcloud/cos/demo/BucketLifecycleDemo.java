@@ -17,7 +17,7 @@ import com.qcloud.cos.region.Region;
 
 	
 public class BucketLifecycleDemo {
-    public  String bucketName = "example-1251668577";
+    public  String bucketName = "example-12500000000";
     public COSClient cosClient = COSBuilder();
 
     public COSClient COSBuilder() {

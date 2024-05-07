@@ -16,7 +16,7 @@ public class RestoreObjectDemo {
         // 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         String key = "test/my_data.txt";
-        String bucketName = "mybucket-1251668577";
+        String bucketName = "mybucket-12500000000";
 
         // 上传一个类型为归档的文件
         File localFile = new File("test/my_data.txt");
