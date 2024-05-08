@@ -40,7 +40,19 @@ public class MultipartUploadDemo {
 
     private static COSClient cosClient = createCli(region);
 
-    public static COSClient createCli(String region) {
+    public static void main(String[] args) {
+        try {
+            multipartUploadDemo();
+        } catch (CosServiceException cse) {
+            cse.printStackTrace();
+        } catch (CosClientException cce) {
+            cce.printStackTrace();
+        } finally {
+            cosClient.shutdown();
+        }
+    }
+
+    private static COSClient createCli(String region) {
         // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials(secretId, secretKey);
 
@@ -52,7 +64,7 @@ public class MultipartUploadDemo {
     }
 
 
-    public static String initMultipartUploadDemo() {
+    private static String initMultipartUploadDemo() {
         InitiateMultipartUploadRequest request = new InitiateMultipartUploadRequest(bucketName, key);
         // 设置存储类型, 默认是标准(Standard), 低频(Standard_IA), 归档(Archive)
         request.setStorageClass(StorageClass.Standard);
@@ -70,7 +82,7 @@ public class MultipartUploadDemo {
     }
 
     // list part用于获取已上传的分片, 如果已上传的分片数量较多, 需要循环多次调用list part获取已上传的所有的分片
-    public static List<PartETag> listPartDemo(String uploadId) {
+    private static List<PartETag> listPartDemo(String uploadId) {
         // uploadid(通过initiateMultipartUpload或者ListMultipartUploads获取)
         List<PartETag> partETags = new LinkedList<>();      // 用于保存已上传的分片信息
         PartListing partListing = null;
@@ -94,7 +106,7 @@ public class MultipartUploadDemo {
     }
 
     // 分块上传(上传某一个分片的数据)
-    public static List<PartETag> uploadPartDemo(String uploadId) {
+    private static List<PartETag> uploadPartDemo(String uploadId) {
         // uploadid(通过initiateMultipartUpload或者ListMultipartUploads获取)
         boolean userTrafficLimit = false;
         List<PartETag> partETags = new LinkedList<>();
@@ -131,7 +143,7 @@ public class MultipartUploadDemo {
     }
 
     // complete完成分片上传
-    public static void completePartDemo(String uploadId, List<PartETag> partETags) {
+    private static void completePartDemo(String uploadId, List<PartETag> partETags) {
         // uploadid(通过initiateMultipartUpload或者ListMultipartUploads获取)
         // 分片上传结束后，调用complete完成分片上传
         CompleteMultipartUploadRequest completeMultipartUploadRequest =
@@ -148,7 +160,7 @@ public class MultipartUploadDemo {
     }
 
     // 终止分块上传
-    public static void abortPartUploadDemo(String uploadId) {
+    private static void abortPartUploadDemo(String uploadId) {
         // uploadid(通过initiateMultipartUpload或者ListMultipartUploads获取)
         AbortMultipartUploadRequest abortMultipartUploadRequest = new AbortMultipartUploadRequest(bucketName, key, uploadId);
         try {
@@ -162,7 +174,7 @@ public class MultipartUploadDemo {
     }
 
     // 分块copy, 表示该块的数据来自另外一个文件的某一范围, 支持跨园区, 跨bucket copy
-    public static void copyPartUploadDemo(String uploadId) {
+    private static void copyPartUploadDemo(String uploadId) {
         CopyPartRequest copyPartRequest = new CopyPartRequest();
         // 要拷贝的源文件所在的region
         copyPartRequest.setSourceBucketRegion(new Region(region));
@@ -191,7 +203,7 @@ public class MultipartUploadDemo {
         }
     }
 
-    public static void multipartUploadDemo() {
+    private static void multipartUploadDemo() {
         try {
             String uploadId = initMultipartUploadDemo();
             List<PartETag> partETags = uploadPartDemo(uploadId);
@@ -200,18 +212,6 @@ public class MultipartUploadDemo {
             throw cse;
         } catch (CosClientException cce) {
             throw cce;
-        }
-    }
-
-    public static void main(String[] args) {
-        try {
-            multipartUploadDemo();
-        } catch (CosServiceException cse) {
-            cse.printStackTrace();
-        } catch (CosClientException cce) {
-            cce.printStackTrace();
-        } finally {
-            cosClient.shutdown();
         }
     }
 }
