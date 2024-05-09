@@ -693,4 +693,21 @@ public class PutGetDelTest extends AbstractCOSClientTest {
             cse.printStackTrace();
         }
     }
+
+    @Test
+    public void testGetObjWithInvalidKey() {
+        ClientConfig clientConfig = new ClientConfig(new Region(region));
+        clientConfig.setCheckRequestPath(true);
+        COSCredentials cred = new BasicCOSCredentials(secretId, secretKey);
+        COSClient cosClient = new COSClient(cred, clientConfig);
+
+        String key = "test/../";
+        try {
+            COSObject cosObject = cosClient.getObject(bucket, key);
+        } catch (IllegalArgumentException ie) {
+            assertEquals(ie.getMessage(), "The key you specified is invalid");
+        } finally {
+            cosClient.shutdown();
+        }
+    }
 }

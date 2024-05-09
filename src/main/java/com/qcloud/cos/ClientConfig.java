@@ -111,6 +111,8 @@ public class ClientConfig {
 
     private boolean isPrintShutdownStackTrace = true;
 
+    private boolean isCheckRequestPath = true;
+
     // 不传入region 用于后续调用List Buckets(获取所有的bucket信息)
     public ClientConfig() {
         super();
@@ -378,5 +380,13 @@ public class ClientConfig {
 
     public void setPrintShutdownStackTrace(boolean printShutdownStackTrace) {
         isPrintShutdownStackTrace = printShutdownStackTrace;
+    }
+
+    public void setCheckRequestPath(boolean isCheck) {
+        isCheckRequestPath = isCheck;
+    }
+
+    public boolean isCheckRequestPath() {
+        return isCheckRequestPath;
     }
 }
