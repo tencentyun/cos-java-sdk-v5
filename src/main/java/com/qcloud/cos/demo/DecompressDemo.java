@@ -17,7 +17,13 @@ public class DecompressDemo {
     private static final String bucket = "";
     private static final String region = "";
 
-    public static DecompressionResult postObjectDecompression() {
+    public static void main(String[] args) {
+        System.out.println(postObjectDecompression());
+        System.out.println(getObjectDecompressionStatus("a.tar.gz"));
+        listObjectDecompressionJobs();
+    }
+
+    private static DecompressionResult postObjectDecompression() {
         COSCredentials cosCredentials = new BasicCOSCredentials(secretId, secretKey);
         ClientConfig clientConfig = new ClientConfig(new Region(region));
         COSClient cosClient = new COSClient(cosCredentials, clientConfig);
@@ -37,7 +43,7 @@ public class DecompressDemo {
 
     }
 
-    public static DecompressionResult getObjectDecompressionStatus(String objectKey) {
+    private static DecompressionResult getObjectDecompressionStatus(String objectKey) {
         COSCredentials cosCredentials = new BasicCOSCredentials(secretId, secretKey);
         ClientConfig clientConfig = new ClientConfig(new Region(region));
         clientConfig.setHttpProtocol(HttpProtocol.http);
@@ -50,7 +56,7 @@ public class DecompressDemo {
     }
 
 
-    public static void listObjectDecompressionJobs() {
+    private static void listObjectDecompressionJobs() {
         COSCredentials cosCredentials = new BasicCOSCredentials(secretId, secretKey);
         ClientConfig clientConfig = new ClientConfig(new Region(region));
         clientConfig.setHttpProtocol(HttpProtocol.http);
@@ -64,19 +70,12 @@ public class DecompressDemo {
         }
     }
 
-    public static String getPrefix(String objectKey) {
+    private static String getPrefix(String objectKey) {
         int index = objectKey.lastIndexOf('/');
         String parent = "";
         if (index != -1) {
             parent = objectKey.substring(0, index + 1);
         }
         return parent;
-    }
-
-
-    public static void main(String[] args) {
-        System.out.println(postObjectDecompression());
-        System.out.println(getObjectDecompressionStatus("a.tar.gz"));
-        listObjectDecompressionJobs();
     }
 }

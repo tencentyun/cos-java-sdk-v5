@@ -37,17 +37,24 @@ import com.qcloud.cos.region.Region;
 public class SymmetricKeyEncryptionClientDemo {
     private static final String keyFilePath = "secret.key";
 
-	static String bucketName = "mybucket-12500000000";
-    static  String key = "testKMS/sym.txt";
-	static File localFile = new File("len1m.txt");
+    private static String bucketName = "mybucket-12500000000";
+    private static  String key = "testKMS/sym.txt";
+    private static File localFile = new File("len1m.txt");
 
-	static COSClient cosClient = createCosClient();
+    private static COSClient cosClient = createCosClient();
 
-	static COSClient createCosClient() {
+    public static void main(String[] args) throws Exception {
+        putObjectDemo();
+        getObjectDemo();
+        // 关闭
+        cosClient.shutdown();
+    }
+
+    private static COSClient createCosClient() {
 		return createCosClient("ap-guangzhou");
 	}
 
-	static COSClient createCosClient(String region) {
+    private static COSClient createCosClient(String region) {
         // 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
                 "yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy");
@@ -88,7 +95,7 @@ public class SymmetricKeyEncryptionClientDemo {
 		return cosEncryptionClient;
 	}
     // 这里给出了一个产生和保存秘钥信息的示例, 推荐使用256位秘钥.
-    public static void buildAndSaveSymmetricKey() throws IOException, NoSuchAlgorithmException {
+    private static void buildAndSaveSymmetricKey() throws IOException, NoSuchAlgorithmException {
         // Generate symmetric 256 bit AES key.
         KeyGenerator symKeyGenerator = KeyGenerator.getInstance("AES");
         // JDK默认不支持256位长度的AES秘钥, SDK内部默认使用AES256加密数据
@@ -104,7 +111,7 @@ public class SymmetricKeyEncryptionClientDemo {
     }
 
     // 这里给出了一个加载秘钥的示例
-    public static SecretKey loadSymmetricAESKey() throws IOException, NoSuchAlgorithmException,
+    private static SecretKey loadSymmetricAESKey() throws IOException, NoSuchAlgorithmException,
             InvalidKeySpecException, InvalidKeyException {
         // Read private key from file.
         File keyFile = new File(keyFilePath);
@@ -117,7 +124,7 @@ public class SymmetricKeyEncryptionClientDemo {
         return new SecretKeySpec(encodedPrivateKey, "AES");
     }
 
-    static void getObjectDemo() {
+    private static void getObjectDemo() {
         // 下载文件
         GetObjectRequest getObjectRequest = new GetObjectRequest(bucketName, key);
         File downloadFile = new File("downSym.txt");
@@ -125,7 +132,7 @@ public class SymmetricKeyEncryptionClientDemo {
 		System.out.println(objectMetadata.getRequestId());
     }
 
-	static void putObjectDemo() {
+    private static void putObjectDemo() {
         // 上传文件
         // 这里给出putObject的示例, 对于高级API上传，只用在生成TransferManager时传入COSEncryptionClient对象即可
 		PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, key, localFile);
@@ -133,15 +140,8 @@ public class SymmetricKeyEncryptionClientDemo {
 		System.out.println(putObjectResult.getRequestId());
 	}
 
-	static void deleteObjectDemo() {
+    private static void deleteObjectDemo() {
         // 删除文件
 		cosClient.deleteObject(bucketName, key);
 	}
-
-    public static void main(String[] args) throws Exception {
-        putObjectDemo();
-        getObjectDemo();
-        // 关闭
-        cosClient.shutdown();
-    }
 }

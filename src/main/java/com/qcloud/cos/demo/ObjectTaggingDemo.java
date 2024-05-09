@@ -4,7 +4,11 @@ import com.qcloud.cos.COSClient;
 import com.qcloud.cos.ClientConfig;
 import com.qcloud.cos.auth.BasicCOSCredentials;
 import com.qcloud.cos.auth.COSCredentials;
-import com.qcloud.cos.model.*;
+import com.qcloud.cos.model.DeleteObjectTaggingRequest;
+import com.qcloud.cos.model.GetObjectTaggingRequest;
+import com.qcloud.cos.model.GetObjectTaggingResult;
+import com.qcloud.cos.model.ObjectTagging;
+import com.qcloud.cos.model.SetObjectTaggingRequest;
 import com.qcloud.cos.model.Tag.Tag;
 import com.qcloud.cos.region.Region;
 
@@ -12,7 +16,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class ObjectTaggingDemo {
-    public static void setGetDelObjectTaggingDemo() {
+    private static void setGetDelObjectTaggingDemo() {
         // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("COS_SECRET_ID", "COS_SECRET_KEY");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224

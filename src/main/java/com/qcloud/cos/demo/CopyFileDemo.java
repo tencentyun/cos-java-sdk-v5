@@ -22,8 +22,12 @@ import com.qcloud.cos.utils.Md5Utils;
 
 
 public class CopyFileDemo {
+    public static void main(String[] args) {
+        copyWithNewMetaDataDemo();
+    }
+
     // copyObject最大支持5G文件的copy, 5G以上的文件copy请参照TransferManagerDemo中的copy示例
-    public static void copySmallFileDemo() {
+    private static void copySmallFileDemo() {
         // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -56,7 +60,7 @@ public class CopyFileDemo {
 
     // 对于5G以上的文件，需要通过分块上传中的copypart来实现，步骤较多,实现较复杂。
     // 因此在TransferManager中封装了一个copy接口，能根据文件大小自动的选择接口，既支持5G以下的文件copy, 也支持5G以上的文件copy。推荐使用该接口进行文件的copy。
-    public static void copyBigFileDemo() {
+    private static void copyBigFileDemo() {
         // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -101,7 +105,7 @@ public class CopyFileDemo {
         cosclient.shutdown();
     }
 
-    public static void copyWithNewMetaDataDemo() {
+    private static void copyWithNewMetaDataDemo() {
         // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -155,9 +159,5 @@ public class CopyFileDemo {
             e.printStackTrace();
         }
         cosclient.shutdown();
-    }
-
-    public static void main(String[] args) {
-        copyWithNewMetaDataDemo();
     }
 }

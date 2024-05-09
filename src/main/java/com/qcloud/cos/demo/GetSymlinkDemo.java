@@ -14,7 +14,7 @@ public class GetSymlinkDemo {
     private static final String bucket = "";
     private static final String region = "";
 
-    public static String getSymlink(String symlink) {
+    private static String getSymlink(String symlink) {
         COSCredentials cosCredentials = new BasicCOSCredentials(secretId, secretKey);
         ClientConfig clientConfig = new ClientConfig(new Region(region));
         COSClient cosClient = new COSClient(cosCredentials, clientConfig);

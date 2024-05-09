@@ -26,8 +26,11 @@ import com.qcloud.cos.region.Region;
  *
  */
 public class BucketDemo {
+    public static void main(String[] args) {
+        listBuckets();
+    }
     // 创建bucket
-    public static void createBucketDemo() {
+    private static void createBucketDemo() {
         // 1 初始化用户身份信息(appid, secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -47,7 +50,7 @@ public class BucketDemo {
     }
 
     // 开启 bucket 版本控制
-    public static void setBucketVersioning() {
+    private static void setBucketVersioning() {
         // 1 初始化用户身份信息(appid, secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -68,7 +71,7 @@ public class BucketDemo {
     }
 
     // 开启日志存储
-    public static void setBucketLogging() {
+    private static void setBucketLogging() {
         // 1 初始化用户身份信息(appid, secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -89,7 +92,7 @@ public class BucketDemo {
     }
 
     // 使用 bucket tag
-    public static void setGetDeleteBucketTagging() {
+    private static void setGetDeleteBucketTagging() {
         // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -114,7 +117,7 @@ public class BucketDemo {
     }
     
     // 删除bucket, 只用于空bucket, 含有数据的bucket需要在删除前清空删除。
-    public static void deleteBucketDemo() {
+    private static void deleteBucketDemo() {
         // 1 初始化用户身份信息(appid, secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -131,7 +134,7 @@ public class BucketDemo {
     }
     
     // 查询bucket是否存在
-    public static void judgeBucketExistDemo() {
+    private static void judgeBucketExistDemo() {
         // 1 初始化用户身份信息(appid, secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -145,9 +148,9 @@ public class BucketDemo {
         
         // 关闭客户端
         cosclient.shutdown();
-    }    
+    }
 
-    public static void listBuckets() {
+    private static void listBuckets() {
         // 1 初始化用户身份信息(appid, secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", "****************************");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -167,7 +170,7 @@ public class BucketDemo {
     }
 
     //创多AZ桶
-    public static void createMAZBucketDemo() {
+    private static void createMAZBucketDemo() {
         // 1 初始化用户身份信息(appid, secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", "****************************");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -187,8 +190,5 @@ public class BucketDemo {
         } finally {
             cosclient.shutdown();
         }
-    }
-    public static void main(String[] args) {
-        listBuckets();
     }
 }

@@ -114,7 +114,7 @@ public class PostObjectDemo {
         }
     }
 
-    public static String buildPostObjectBody(String boundary, Map<String, String> formFields,
+    private static String buildPostObjectBody(String boundary, Map<String, String> formFields,
                                              String filename, String contentType) {
         StringBuffer stringBuffer = new StringBuffer();
         for(Map.Entry entry: formFields.entrySet()) {

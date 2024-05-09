@@ -11,10 +11,16 @@ import com.qcloud.cos.model.ReplicationRuleStatus;
 import com.qcloud.cos.region.Region;
 
 public class BucketReplicationDemo {
-    static COSClient cosClient = null;
-    static String bucketName = "examplebucket-12500000000";
+    private static COSClient cosClient = null;
+    private static String bucketName = "examplebucket-12500000000";
 
-    public static void createCOSClient() {
+    public static void main(String[] argv) {
+        createCOSClient();
+        putBucketReplication();
+        getBucketReplication();
+    }
+
+    private static void createCOSClient() {
         COSCredentials cred = new BasicCOSCredentials("AKID********************************", "********************************");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
         ClientConfig clientConfig = new ClientConfig(new Region("ap-shanghai"));
@@ -22,7 +28,7 @@ public class BucketReplicationDemo {
         cosClient = new COSClient(cred, clientConfig);
     }
 
-    public static void putBucketReplication() {
+    private static void putBucketReplication() {
         BucketReplicationConfiguration bucketReplicationConfiguration = new BucketReplicationConfiguration();
         bucketReplicationConfiguration.setRoleName("qcs::cam::uin/1000000001:uin/1000000001");
 
@@ -61,14 +67,8 @@ public class BucketReplicationDemo {
         cosClient.setBucketReplicationConfiguration(bucketName, bucketReplicationConfiguration);
     }
 
-    public static void getBucketReplication() {
+    private static void getBucketReplication() {
         BucketReplicationConfiguration configuration = cosClient.getBucketReplicationConfiguration(bucketName);
         System.out.println(configuration.toString());
-    }
-
-    public static void main(String[] argv) {
-        createCOSClient();
-        putBucketReplication();
-        getBucketReplication();
     }
 }

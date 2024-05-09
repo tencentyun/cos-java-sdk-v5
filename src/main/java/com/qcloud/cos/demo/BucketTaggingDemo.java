@@ -16,7 +16,11 @@ import com.qcloud.cos.model.TagSet;
 import com.qcloud.cos.region.Region;
 
 public class BucketTaggingDemo {
-    public static void setGetDeleteBucketTagging() {
+    public static void main(String[] args) {
+        setTagWhilePutObject();
+    }
+
+    private static void setGetDeleteBucketTagging() {
         // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -39,7 +43,7 @@ public class BucketTaggingDemo {
         cosclient.deleteBucketTaggingConfiguration(bucketName);
     }
 
-    public static void setTagWhilePutObject() {
+    private static void setTagWhilePutObject() {
         // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -56,9 +60,5 @@ public class BucketTaggingDemo {
         objectMetadata.setHeader("x-cos-tagging", "level=info");
 
         cosclient.putObject(bucketName, key, is, objectMetadata);
-    }
-
-    public static void main(String[] args) {
-        setTagWhilePutObject();
     }
 }
