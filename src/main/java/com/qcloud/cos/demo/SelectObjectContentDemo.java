@@ -4,7 +4,19 @@ import com.qcloud.cos.COSClient;
 import com.qcloud.cos.ClientConfig;
 import com.qcloud.cos.auth.BasicCOSCredentials;
 import com.qcloud.cos.auth.COSCredentials;
-import com.qcloud.cos.model.*;
+import com.qcloud.cos.model.CompressionType;
+import com.qcloud.cos.model.CSVInput;
+import com.qcloud.cos.model.CSVOutput;
+import com.qcloud.cos.model.ExpressionType;
+import com.qcloud.cos.model.InputSerialization;
+import com.qcloud.cos.model.OutputSerialization;
+import com.qcloud.cos.model.SelectObjectContentRequest;
+import com.qcloud.cos.model.SelectObjectContentResult;
+import com.qcloud.cos.model.SelectObjectContentEventVisitor;
+import com.qcloud.cos.model.SelectObjectContentEvent;
+import com.qcloud.cos.model.JSONInput;
+import com.qcloud.cos.model.JSONOutput;
+import com.qcloud.cos.model.JSONType;
 import com.qcloud.cos.region.Region;
 
 import java.io.BufferedReader;
@@ -18,7 +30,7 @@ public class SelectObjectContentDemo {
         selectJsonContentDemo();
     }
 
-    public static void selectCsvContentDemo() throws Exception {
+    private static void selectCsvContentDemo() throws Exception {
         // 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
         // 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -81,7 +93,7 @@ public class SelectObjectContentDemo {
         }
     }
 
-    public static void selectJsonContentDemo() throws Exception {
+    private static void selectJsonContentDemo() throws Exception {
         // 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
         // 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224

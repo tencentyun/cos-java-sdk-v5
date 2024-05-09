@@ -35,6 +35,10 @@ import com.qcloud.cos.transfer.Upload;
 // TransferManager提供异步的上传文件, 下载文件，copy文件的高级API接口
 // 可以根据文件大小自动的选择上传接口或者copy接口,方便用户使用, 无需自行封装较复杂的分块上传或者分块copy
 public class TransferManagerDemo {
+    public static void main(String[] args) {
+        //multipartUploadWithMetaData();
+        resumableDownloadFile();
+    }
     // Prints progress while waiting for the transfer to finish.
     private static void showTransferProgress(Transfer transfer) {
         System.out.println(transfer.getDescription());
@@ -54,7 +58,7 @@ public class TransferManagerDemo {
     }
 
     // 上传文件, 根据文件大小自动选择简单上传或者分块上传。
-    public static void uploadFile() {
+    private static void uploadFile() {
         // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -96,7 +100,7 @@ public class TransferManagerDemo {
     }
 
     // 上传文件（上传过程中暂停, 并继续上传)
-    public static void pauseUploadFileAndResume() {
+    private static void pauseUploadFileAndResume() {
         // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -134,7 +138,7 @@ public class TransferManagerDemo {
         cosclient.shutdown();
     }
 
-    public static void multipartUploadWithMetaData() {
+    private static void multipartUploadWithMetaData() {
         // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -181,7 +185,7 @@ public class TransferManagerDemo {
     }
 
     // 批量上传
-    public static void uploadDirectory() {
+    private static void uploadDirectory() {
         // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -226,7 +230,7 @@ public class TransferManagerDemo {
     }
 
     // 批量下载
-    public static void downloadDirectory() {
+    private static void downloadDirectory() {
         // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -269,7 +273,7 @@ public class TransferManagerDemo {
     }
 
     // 将文件下载到本地
-    public static void downLoadFile() {
+    private static void downLoadFile() {
         // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -303,7 +307,7 @@ public class TransferManagerDemo {
     }
 
     // 将文件下载到本地(中途暂停并继续开始)
-    public static void pauseDownloadFileAndResume() {
+    private static void pauseDownloadFileAndResume() {
         // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -344,7 +348,7 @@ public class TransferManagerDemo {
 
     // copy接口支持根据文件大小自动选择copy或者分块copy
     // 以下代码展示跨园区拷贝, 即将一个园区的文件拷贝到另一个园区
-    public static void copyFileForDiffRegion() {
+    private static void copyFileForDiffRegion() {
         // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -390,7 +394,7 @@ public class TransferManagerDemo {
 
     // copy接口支持根据文件大小自动选择copy或者分块copy
     // 以下代码展示同园区拷贝, 即将同园区的文件拷贝到另一个园区
-    public static void copyFileForSameRegion() {
+    private static void copyFileForSameRegion() {
         // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -436,7 +440,7 @@ public class TransferManagerDemo {
         cosclient.shutdown();
     }
 
-    public static void copyFileSetMetadata() {
+    private static void copyFileSetMetadata() {
         // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -492,7 +496,7 @@ public class TransferManagerDemo {
         cosclient.shutdown();
     }
 
-    public static void resumableDownloadFile() {
+    private static void resumableDownloadFile() {
         // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -521,10 +525,5 @@ public class TransferManagerDemo {
 
         transferManager.shutdownNow();
         cosclient.shutdown();
-    }
-
-    public static void main(String[] args) {
-        //multipartUploadWithMetaData();
-        resumableDownloadFile();
     }
 }

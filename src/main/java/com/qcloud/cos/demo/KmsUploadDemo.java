@@ -34,7 +34,7 @@ public class KmsUploadDemo {
         copyObjectWithKmsMeta();
     }
 
-    public static void simpleUploadWithKmsMeta() {
+    private static void simpleUploadWithKmsMeta() {
         COSCredentials cred = new BasicCOSCredentials("SECRET_ID", "SECRET_KEY");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
         ClientConfig clientConfig = new ClientConfig(new Region("ap-guangzhou"));
@@ -70,7 +70,7 @@ public class KmsUploadDemo {
         cosclient.shutdown();
     }
 
-    public static void multipartUploadWithKmsMeta() {
+    private static void multipartUploadWithKmsMeta() {
         COSCredentials cred = new BasicCOSCredentials("SECRET_ID", "SECRET_KEY");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
         ClientConfig clientConfig = new ClientConfig(new Region("ap-guangzhou"));
@@ -123,7 +123,7 @@ public class KmsUploadDemo {
         cosclient.shutdown();
     }
 
-    public static void copyObjectWithKmsMeta() {
+    private static void copyObjectWithKmsMeta() {
         COSCredentials cred = new BasicCOSCredentials("SECRET_ID", "SECRET_KEY");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
         ClientConfig clientConfig = new ClientConfig(new Region("ap-guangzhou"));

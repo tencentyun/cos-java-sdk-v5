@@ -26,8 +26,12 @@ import com.qcloud.cos.utils.DateUtils;
  * 用于可将生成的连接分发给移动端或者他人, 即可实现在签名有效期内上传或者下载文件.
  */
 public class GeneratePresignedUrlDemo {
+    public static void main(String[] args) {
+        generatePresignedUploadUrl();
+    }
+
     // 获取下载的预签名连接
-    public static void generateSimplePresignedDownloadUrl() {
+    private static void generateSimplePresignedDownloadUrl() {
         // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -60,7 +64,7 @@ public class GeneratePresignedUrlDemo {
     }
 
     // 获取预签名的下载链接, 并设置返回的content-type, cache-control等http头
-    public static void generatePresignedDownloadUrlWithOverrideResponseHeader() {
+    private static void generatePresignedDownloadUrlWithOverrideResponseHeader() {
         // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -106,7 +110,7 @@ public class GeneratePresignedUrlDemo {
     }
 
     // 获取预签名的下载链接， 用于匿名bucket, 匿名bucket生成的预下载链接不包含签名
-    public static void generatePresignedDownloadUrlAnonymous() {
+    private static void generatePresignedDownloadUrlAnonymous() {
         // 1 初始化用户身份信息, 匿名身份不用传入ak sk
         COSCredentials cred = new AnonymousCOSCredentials();
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -127,7 +131,7 @@ public class GeneratePresignedUrlDemo {
     }
 
     // 生成预签名的上传连接
-    public static void generatePresignedUploadUrl() {
+    private static void generatePresignedUploadUrl() {
         // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", "********************************");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -162,10 +166,5 @@ public class GeneratePresignedUrlDemo {
         }
         
         cosclient.shutdown();
-    }
-    
-
-    public static void main(String[] args) {
-        generatePresignedUploadUrl();
     }
 }

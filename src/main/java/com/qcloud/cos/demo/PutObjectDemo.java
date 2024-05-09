@@ -16,13 +16,13 @@ import com.qcloud.cos.region.Region;
 
 public class PutObjectDemo {
 
-    static COSClient cosClient = createCli();;
+    private static COSClient cosClient = createCli();;
 
-    static COSClient createCli() {
+    private static COSClient createCli() {
         return createCli("ap-shanghai");
     }
 
-    static COSClient createCli(String region) {
+    private static COSClient createCli(String region) {
         // 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX","1A2Z3YYYYYYYYYY");
         // 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -31,7 +31,7 @@ public class PutObjectDemo {
         return new COSClient(cred, clientConfig);
     }
 
-    static void putObjectDemo() {
+    private static void putObjectDemo() {
         String bucketName = "examplebucket-12500000000";
         String key = "abc/abc.txt";
 

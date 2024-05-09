@@ -13,7 +13,7 @@ public class GetObjectURLDemo {
         getObjectUrlWithEndpoint();
     }
 
-    public static void getObjectUrl() {
+    private static void getObjectUrl() {
         // getObjectUrl 不需要验证身份信息
         COSCredentials cred = new AnonymousCOSCredentials();
         // 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -29,7 +29,7 @@ public class GetObjectURLDemo {
         System.out.println(cosclient.getObjectUrl(bucketName, key));
     }
 
-    public static void getObjectUrlWithVersionId() {
+    private static void getObjectUrlWithVersionId() {
         // getObjectUrl 不需要验证身份信息
         COSCredentials cred = new AnonymousCOSCredentials();
         // 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -46,7 +46,7 @@ public class GetObjectURLDemo {
         System.out.println(cosclient.getObjectUrl(bucketName, key, versionId));
     }
 
-    public static void getObjectUrlWithEndpoint() {
+    private static void getObjectUrlWithEndpoint() {
         // getObjectUrl 不需要验证身份信息
         COSCredentials cred = new AnonymousCOSCredentials();
         // 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224

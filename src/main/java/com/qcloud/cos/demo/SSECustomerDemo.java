@@ -7,7 +7,15 @@ import com.qcloud.cos.auth.COSCredentials;
 import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.http.HttpProtocol;
-import com.qcloud.cos.model.*;
+import com.qcloud.cos.model.COSObject;
+import com.qcloud.cos.model.COSObjectInputStream;
+import com.qcloud.cos.model.GetObjectMetadataRequest;
+import com.qcloud.cos.model.GetObjectRequest;
+import com.qcloud.cos.model.ObjectMetadata;
+import com.qcloud.cos.model.PutObjectRequest;
+import com.qcloud.cos.model.PutObjectResult;
+import com.qcloud.cos.model.SSECustomerKey;
+import com.qcloud.cos.model.StorageClass;
 import com.qcloud.cos.region.Region;
 
 import java.io.BufferedReader;
@@ -16,7 +24,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 public class SSECustomerDemo {
-    public static void SSECustomerUpload() {
+    public static void main(String[] args) {
+        SSECustomerUpload();
+        SSECustomerDownload();
+        SSECustomerHead();
+    }
+    private static void SSECustomerUpload() {
         // 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("COS_SECRETID", "COS_SECRETKEY");
         // 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -48,7 +61,7 @@ public class SSECustomerDemo {
         cosclient.shutdown();
 
     }
-    public static void SSECustomerDownload() {
+    private static void SSECustomerDownload() {
         // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("COS_SECRETID", "COS_SECRETKEY");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -79,7 +92,7 @@ public class SSECustomerDemo {
         cosclient.shutdown();
     }
 
-    static void SSECustomerHead() {
+    private static void SSECustomerHead() {
         // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("COS_SECRETID", "COS_SECRETKEY");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -104,12 +117,6 @@ public class SSECustomerDemo {
         }
         // 关闭客户端
         cosclient.shutdown();
-    }
-
-    public static void main(String[] args) {
-        SSECustomerUpload();
-        SSECustomerDownload();
-        SSECustomerHead();
     }
 }
 
