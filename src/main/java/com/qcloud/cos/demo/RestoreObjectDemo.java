@@ -8,7 +8,7 @@ import com.qcloud.cos.model.*;
 import com.qcloud.cos.region.Region;
 
 public class RestoreObjectDemo {
-    public static void restoreObjectDemo() {
+    private static void restoreObjectDemo() {
         // 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
         // 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -16,7 +16,7 @@ public class RestoreObjectDemo {
         // 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         String key = "test/my_data.txt";
-        String bucketName = "mybucket-1251668577";
+        String bucketName = "mybucket-12500000000";
 
         // 上传一个类型为归档的文件
         File localFile = new File("test/my_data.txt");

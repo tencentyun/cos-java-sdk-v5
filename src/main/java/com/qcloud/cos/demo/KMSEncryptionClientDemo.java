@@ -30,20 +30,28 @@ import com.qcloud.cos.transfer.TransferManagerConfiguration;
 import com.qcloud.cos.transfer.Upload;
 
 public class KMSEncryptionClientDemo {
-	static String cmk = "kms-xxxxxxx";
+	private static String cmk = "kms-xxxxxxx";
 
-	static String bucketName = "mybucket-1251668577";
-	static String key = "testKMS/len1m.txt";
-	static File localFile = new File("len1m.txt");
-    static File bigLocalFile = new File("len10m.txt");
+    private static String bucketName = "mybucket-12500000000";
+    private static String key = "testKMS/len1m.txt";
+    private static File localFile = new File("len1m.txt");
+    private static File bigLocalFile = new File("len10m.txt");
 
-	static COSClient cosClient = createCosClient();
+    private static COSClient cosClient = createCosClient();
 
-	static COSClient createCosClient() {
+    public static void main(String[] args) throws Exception {
+        putObjectDemo();
+        getObjectDemo();
+        transferManagerDemo();
+        // 关闭
+        cosClient.shutdown();
+    }
+
+    private static COSClient createCosClient() {
 		return createCosClient("ap-guangzhou");
 	}
 
-	static COSClient createCosClient(String region) {
+    private static COSClient createCosClient(String region) {
         // 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
                 "yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy");
@@ -75,7 +83,7 @@ public class KMSEncryptionClientDemo {
 		return cosEncryptionClient;
 	}
 
-    static void getObjectDemo() {
+    private static void getObjectDemo() {
         // 下载文件
         GetObjectRequest getObjectRequest = new GetObjectRequest(bucketName, key);
         File downloadFile = new File("downlen1m.txt");
@@ -83,7 +91,7 @@ public class KMSEncryptionClientDemo {
 		System.out.println(objectMetadata.getRequestId());
     }
 
-	static void putObjectDemo() {
+    private static void putObjectDemo() {
         // 上传文件
         // 这里给出putObject的示例, 对于高级API上传，只用在生成TransferManager时传入COSEncryptionClient对象即可
 		PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, key, localFile);
@@ -91,12 +99,12 @@ public class KMSEncryptionClientDemo {
 		System.out.println(putObjectResult.getRequestId());
 	}
 
-	static void deleteObjectDemo() {
+    private static void deleteObjectDemo() {
         // 删除文件
 		cosClient.deleteObject(bucketName, key);
 	}
 
-    static void transferManagerDemo() {
+    private static void transferManagerDemo() {
         ExecutorService threadPool = Executors.newFixedThreadPool(32);
         // 传入一个threadpool, 若不传入线程池, 默认TransferManager中会生成一个单线程的线程池。
         TransferManager transferManager = new TransferManager(cosClient, threadPool);
@@ -132,13 +140,5 @@ public class KMSEncryptionClientDemo {
         }
 
         transferManager.shutdownNow();
-    }
-
-    public static void main(String[] args) throws Exception {
-		putObjectDemo();
-		getObjectDemo();
-        transferManagerDemo();
-        // 关闭
-        cosClient.shutdown();
     }
 }

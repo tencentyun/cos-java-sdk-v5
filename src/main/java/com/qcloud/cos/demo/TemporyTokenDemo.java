@@ -15,7 +15,7 @@ public class TemporyTokenDemo {
 	// 该例子介绍使用临时秘钥来访问COS上的资源
 	// 临时秘钥通过云API向腾讯云权限管理系统CAM申请，java云api可以在此获取：https://github.com/QcloudApi/qcloudapi-sdk-java
 
-	public static BasicSessionCredentials getSessionCredential() {
+	private static BasicSessionCredentials getSessionCredential() {
 		// 实际应用中，这里通过云api请求得到临时秘钥后，构造BasicSessionCredential
 		BasicSessionCredentials cred =
 				new BasicSessionCredentials("111111111111122222",
@@ -24,7 +24,7 @@ public class TemporyTokenDemo {
 	}
 
 	// 使用临时秘钥进行上传和下载
-	public static void UseTemporyTokenUploadAndDownload() {
+	private static void useTemporyTokenUploadAndDownload() {
 		// 使用云api秘钥，可以获取一个临时secret id，secret key和session token,
 		BasicSessionCredentials cred = getSessionCredential();
 		// 设置区域, 这里设置为北京一区
@@ -52,7 +52,7 @@ public class TemporyTokenDemo {
 	}
 	
 	public static void main(String[] args) throws Exception {
-	    UseTemporyTokenUploadAndDownload();
+	    useTemporyTokenUploadAndDownload();
 	}
 
 }

@@ -6,15 +6,14 @@ import com.qcloud.cos.auth.BasicCOSCredentials;
 import com.qcloud.cos.auth.COSCredentials;
 import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.exception.CosServiceException;
-import com.qcloud.cos.model.*;
+import com.qcloud.cos.model.AppendObjectRequest;
+import com.qcloud.cos.model.AppendObjectResult;
 import com.qcloud.cos.region.Region;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.InputStream;
 
 public class AppendObjectDemo {
-    public static void AppendObjectFromLocal() {
+    private static void appendObjectFromLocal() {
         // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -22,7 +21,7 @@ public class AppendObjectDemo {
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名需包含appid
-        String bucketName = "mybucket-1251668577";
+        String bucketName = "mybucket-12500000000";
         String key = "aaa/bbb.txt";
         try {
             File localFile = new File("1M.txt");
@@ -48,6 +47,6 @@ public class AppendObjectDemo {
     }
 
     public static void main(String[] args) {
-        AppendObjectFromLocal();
+        appendObjectFromLocal();
     }
 }

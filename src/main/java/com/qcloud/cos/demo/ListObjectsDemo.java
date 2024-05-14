@@ -20,8 +20,11 @@ import com.qcloud.cos.region.Region;
  * ListObjectsDemo展示了如何列出object
  */
 public class ListObjectsDemo {
+    public static void main(String[] args) {
+        listObjectsVersions();
+    }
 
-    public static void listObjectsDemo() {
+    private static void listObjectsDemo() {
         // 1 初始化用户身份信息(appid, secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -29,7 +32,7 @@ public class ListObjectsDemo {
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名称, 需包含appid
-        String bucketName = "mybucket-1251668577";
+        String bucketName = "mybucket-12500000000";
 
         ListObjectsRequest listObjectsRequest = new ListObjectsRequest();
         // 设置bucket名称
@@ -70,7 +73,7 @@ public class ListObjectsDemo {
 
     // 如果要获取超过maxkey数量的object或者获取所有的object, 则需要循环调用listobject, 用上一次返回的next marker作为下一次调用的marker,
     // 直到返回的truncated为false
-    public static void listAllObjects() {
+    private static void listAllObjects() {
         // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -78,7 +81,7 @@ public class ListObjectsDemo {
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名需包含appid
-        String bucketName = "mybucket-1251668577";
+        String bucketName = "mybucket-12500000000";
 
         ListObjectsRequest listObjectsRequest = new ListObjectsRequest();
         // 设置bucket名称
@@ -124,7 +127,7 @@ public class ListObjectsDemo {
         cosclient.shutdown();
     }
 
-    public static void listObjectsVersions() {
+    private static void listObjectsVersions() {
         // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -132,7 +135,7 @@ public class ListObjectsDemo {
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名需包含appid
-        String bucketName = "mybucket-1251668577";
+        String bucketName = "mybucket-12500000000";
 
         ListVersionsRequest listVersionsRequest = new ListVersionsRequest();
         listVersionsRequest.setBucketName(bucketName);
@@ -166,9 +169,4 @@ public class ListObjectsDemo {
 
         cosclient.shutdown();
     }
-
-    public static void main(String[] args) {
-        listObjectsVersions();
-    }
-
 }

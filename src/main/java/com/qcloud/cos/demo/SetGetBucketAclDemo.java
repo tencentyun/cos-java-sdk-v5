@@ -14,7 +14,7 @@ import com.qcloud.cos.model.UinGrantee;
 import com.qcloud.cos.region.Region;
 
 public class SetGetBucketAclDemo {
-    public static void setGetBucketAclDemo() {
+    private static void setGetBucketAclDemo() {
         // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -22,7 +22,7 @@ public class SetGetBucketAclDemo {
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名需包含appid
-        String bucketName = "mybucket-1251668577";
+        String bucketName = "mybucket-12500000000";
         AccessControlList aclGet = cosclient.getBucketAcl(bucketName);
         System.out.println("bucket acl:" + aclGet.getOwner());
         System.out.println("bucket acl:" + aclGet.getCannedAccessControl());

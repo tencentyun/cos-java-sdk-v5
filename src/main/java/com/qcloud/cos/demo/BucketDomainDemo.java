@@ -9,7 +9,7 @@ import com.qcloud.cos.model.DomainRule;
 import com.qcloud.cos.region.Region;
 
 public class BucketDomainDemo {
-    public static void SetGetDeleteBucketDomainDemo() {
+    private static void setGetDeleteBucketDomainDemo() {
         // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDxxxxxxxxxxxxxxxxxxxxxxxxxxxx", "yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy");
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -17,7 +17,7 @@ public class BucketDomainDemo {
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
         // bucket名需包含appid
-        String bucketName = "mybucket-1251668577";
+        String bucketName = "mybucket-12500000000";
         BucketDomainConfiguration bucketDomainConfiguration = new BucketDomainConfiguration();
         DomainRule domainRule = new DomainRule();
         domainRule.setStatus(DomainRule.ENABLED);
@@ -42,6 +42,6 @@ public class BucketDomainDemo {
     }
 
     public static void main(String[] args) {
-        SetGetDeleteBucketDomainDemo();
+        setGetDeleteBucketDomainDemo();
     }
 }

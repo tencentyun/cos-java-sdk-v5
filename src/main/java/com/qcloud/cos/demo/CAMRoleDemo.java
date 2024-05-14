@@ -2,7 +2,11 @@ package com.qcloud.cos.demo;
 
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.ClientConfig;
-import com.qcloud.cos.auth.*;
+import com.qcloud.cos.auth.COSCredentials;
+import com.qcloud.cos.auth.COSCredentialsProvider;
+import com.qcloud.cos.auth.InstanceCredentialsFetcher;
+import com.qcloud.cos.auth.InstanceCredentialsProvider;
+import com.qcloud.cos.auth.InstanceMetadataCredentialsEndpointProvider;
 import com.qcloud.cos.model.ObjectMetadata;
 import com.qcloud.cos.model.PutObjectRequest;
 import com.qcloud.cos.model.PutObjectResult;
@@ -12,8 +16,11 @@ import com.qcloud.cos.region.Region;
 import java.io.File;
 
 public class CAMRoleDemo {
+    public static void main(String[] args) {
+        simpleUploadFileFromEMR();
+    }
 
-    public static void SimpleUploadFileFromLocal() {
+    private static void simpleUploadFileFromLocal() {
         InstanceMetadataCredentialsEndpointProvider endpointProvider =
                 new InstanceMetadataCredentialsEndpointProvider(InstanceMetadataCredentialsEndpointProvider.Instance.CVM);
 
@@ -30,7 +37,7 @@ public class CAMRoleDemo {
         cosClient.shutdown();
     }
 
-    public static void SimpleUploadFileFromEMR() {
+    private static void simpleUploadFileFromEMR() {
         InstanceMetadataCredentialsEndpointProvider endpointProvider =
                 new InstanceMetadataCredentialsEndpointProvider(InstanceMetadataCredentialsEndpointProvider.Instance.EMR);
 
@@ -66,9 +73,5 @@ public class CAMRoleDemo {
         }
 
         cosClient.shutdown();
-    }
-
-    public static void main(String[] args) {
-        SimpleUploadFileFromEMR();
     }
 }

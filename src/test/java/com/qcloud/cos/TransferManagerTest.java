@@ -460,7 +460,7 @@ public class TransferManagerTest extends AbstractCOSClientTest {
         String srcRegion = "ap-guangzhou";
         ClientConfig srcClientConfig = new ClientConfig(new Region(srcRegion));
         COSClient srcCOSClient = new COSClient(srcCred, srcClientConfig);
-        String srcBucketName = "chengwus3gz-1251668577";
+        String srcBucketName = "chengwus3gz-12500000000";
         String srcKey = "ut_copy/len10G_1.txt";
         String destKey = "ut_copy_dest/len10G_1.txt";
         CopyObjectRequest copyObjectRequest = new CopyObjectRequest(new Region(srcRegion),
@@ -481,7 +481,7 @@ public class TransferManagerTest extends AbstractCOSClientTest {
         String srcRegion = "ap-guangzhou";
         ClientConfig srcClientConfig = new ClientConfig(new Region(srcRegion));
         COSClient srcCOSClient = new COSClient(srcCred, srcClientConfig);
-        String srcBucketName = "chengwus3gz-1251668577";
+        String srcBucketName = "chengwus3gz-12500000000";
         String srcKey = "ut_copy/len1G.txt";
         String destKey = "ut_copy_dest/len1G.txt";
         CopyObjectRequest copyObjectRequest = new CopyObjectRequest(new Region(srcRegion),

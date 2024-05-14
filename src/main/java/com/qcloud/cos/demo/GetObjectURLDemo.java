@@ -13,7 +13,7 @@ public class GetObjectURLDemo {
         getObjectUrlWithEndpoint();
     }
 
-    public static void getObjectUrl() {
+    private static void getObjectUrl() {
         // getObjectUrl 不需要验证身份信息
         COSCredentials cred = new AnonymousCOSCredentials();
         // 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -24,12 +24,12 @@ public class GetObjectURLDemo {
         COSClient cosclient = new COSClient(cred, clientConfig);
 
         String key = "test/my_test中文.json";
-        String bucketName = "mybucket-1251668577";
+        String bucketName = "mybucket-12500000000";
 
         System.out.println(cosclient.getObjectUrl(bucketName, key));
     }
 
-    public static void getObjectUrlWithVersionId() {
+    private static void getObjectUrlWithVersionId() {
         // getObjectUrl 不需要验证身份信息
         COSCredentials cred = new AnonymousCOSCredentials();
         // 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -40,13 +40,13 @@ public class GetObjectURLDemo {
         COSClient cosclient = new COSClient(cred, clientConfig);
 
         String key = "test/my_test中文.json";
-        String bucketName = "mybucket-1251668577";
+        String bucketName = "mybucket-12500000000";
         String versionId = "xxxyyyzzz111222333";
 
         System.out.println(cosclient.getObjectUrl(bucketName, key, versionId));
     }
 
-    public static void getObjectUrlWithEndpoint() {
+    private static void getObjectUrlWithEndpoint() {
         // getObjectUrl 不需要验证身份信息
         COSCredentials cred = new AnonymousCOSCredentials();
         // 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -60,7 +60,7 @@ public class GetObjectURLDemo {
         COSClient cosclient = new COSClient(cred, clientConfig);
 
         String key = "test/my_test中文.json";
-        String bucketName = "mybucket-1251668577";
+        String bucketName = "mybucket-12500000000";
         String versionId = "xxxyyyzzz111222333";
 
         System.out.println(cosclient.getObjectUrl(bucketName, key, versionId));
