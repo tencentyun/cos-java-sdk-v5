@@ -42,7 +42,6 @@ public class AbstractCOSClientCITest {
                 secretKey = prop.getProperty("ciSecretKey");
                 region = prop.getProperty("ciRegion");
                 bucket = prop.getProperty("ciBucket");
-
             } finally {
                 if (fis != null) {
                     try {
