@@ -89,16 +89,16 @@ public class LiveAuditingJobDemo {
      *
      * @param client
      */
-    public static void cancelLiveAuditing(COSClient client) {
-        //1.创建任务请求对象
-        VideoAuditingRequest request = new VideoAuditingRequest();
-        //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("demo-1234567890");
-        request.setJobId("avf8b813aa06a411ee80f45254004*****");
-        //3.调用接口,获取任务响应对象
-        Boolean response = client.cancelLiveAuditing(request);
-        System.out.println(response);
-    }
+//    public static void cancelLiveAuditing(COSClient client) {
+//        //1.创建任务请求对象
+//        VideoAuditingRequest request = new VideoAuditingRequest();
+//        //2.添加请求参数 参数详情请见api接口文档
+//        request.setBucketName("demo-1234567890");
+//        request.setJobId("avf8b813aa06a411ee80f45254004*****");
+//        //3.调用接口,获取任务响应对象
+//        Boolean response = client.cancelLiveAuditing(request);
+//        System.out.println(response);
+//    }
 
 
 }
