@@ -46,7 +46,15 @@ public class CosErrorResponseHandler implements HttpResponseHandler<CosServiceEx
     private static final Logger log = LoggerFactory.getLogger(CosErrorResponseHandler.class);
 
     /** Shared factory for creating XML event readers */
-    private static final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+    private static final XMLInputFactory xmlInputFactory = createXMLInputFactory();
+
+    private static XMLInputFactory createXMLInputFactory() {
+        XMLInputFactory inputFactory = XMLInputFactory.newInstance();
+        inputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+        inputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+
+        return inputFactory;
+    }
 
     private static enum COSErrorTags {
         Error, Code, Message, Resource, RequestId, TraceId;
