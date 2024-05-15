@@ -18,6 +18,7 @@ import com.qcloud.cos.utils.IOUtils;
 
 public class GetObjectDemo {
     private static COSClient cosClient = createClient();
+
     public static void main(String[] args) {
         getObjectToFileDemo();
     }
