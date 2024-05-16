@@ -7,10 +7,13 @@ import com.qcloud.cos.auth.COSCredentials;
 import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.internal.SkipMd5CheckStrategy;
+import com.qcloud.cos.model.COSObject;
+import com.qcloud.cos.model.COSObjectInputStream;
 import com.qcloud.cos.model.CompleteMultipartUploadRequest;
 import com.qcloud.cos.model.CompleteMultipartUploadResult;
 import com.qcloud.cos.model.CopyObjectRequest;
 import com.qcloud.cos.model.CopyObjectResult;
+import com.qcloud.cos.model.GetObjectRequest;
 import com.qcloud.cos.model.InitiateMultipartUploadRequest;
 import com.qcloud.cos.model.InitiateMultipartUploadResult;
 import com.qcloud.cos.model.PartETag;
@@ -21,8 +24,11 @@ import com.qcloud.cos.model.UploadPartRequest;
 import com.qcloud.cos.model.UploadPartResult;
 import com.qcloud.cos.region.Region;
 import com.qcloud.cos.utils.Base64;
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -38,8 +44,14 @@ public class KmsUploadDemo {
     private static String encryptionContext = Base64.encodeAsString("{\"Ssekmstest\":\"Ssekmstest\"}".getBytes());
 
     public static void main(String[] args) {
-        simpleUploadWithKmsMeta();
-        copyObjectWithKmsMeta();
+        try {
+            simpleUploadWithKmsMeta();
+            simpledownloadWithKmsMeta();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            cosClient.shutdown();
+        }
     }
 
     private static COSClient createCOSClient() {
@@ -69,6 +81,27 @@ public class KmsUploadDemo {
             e.printStackTrace();
         } catch (CosClientException e) {
             e.printStackTrace();
+        }
+    }
+
+    private static void simpledownloadWithKmsMeta() throws IOException {
+        GetObjectRequest getObjectRequest = new GetObjectRequest(bucketName, key);
+        COSObject cosObject = null;
+        try {
+            cosObject = cosClient.getObject(getObjectRequest);
+            COSObjectInputStream cosObjectInputStream = cosObject.getObjectContent();
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(cosObjectInputStream));
+            System.out.println(bufferedReader.readLine());
+        } catch (CosServiceException e) {
+            e.printStackTrace();
+        } catch (CosClientException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (cosObject != null) {
+                cosObject.close();
+            }
         }
     }
 
