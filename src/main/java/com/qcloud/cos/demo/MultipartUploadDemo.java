@@ -52,6 +52,30 @@ public class MultipartUploadDemo {
         }
     }
 
+    private static void multipartUploadDemo() {
+        try {
+            String uploadId = initMultipartUploadDemo();
+            List<PartETag> partETags = uploadPartDemo(uploadId);
+            completePartDemo(uploadId, partETags);
+        } catch (CosServiceException cse) {
+            throw cse;
+        } catch (CosClientException cce) {
+            throw cce;
+        }
+    }
+
+    private static void multipartUploadCopyDemo() {
+        try {
+            String uploadId = initMultipartUploadDemo();
+            List<PartETag> partETags = copyPartUploadDemo(uploadId);
+            completePartDemo(uploadId, partETags);
+        } catch (CosServiceException cse) {
+            throw cse;
+        } catch (CosClientException cce) {
+            throw cce;
+        }
+    }
+
     private static COSClient createCli(String region) {
         // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials(secretId, secretKey);
@@ -174,7 +198,7 @@ public class MultipartUploadDemo {
     }
 
     // 分块copy, 表示该块的数据来自另外一个文件的某一范围, 支持跨园区, 跨bucket copy
-    private static void copyPartUploadDemo(String uploadId) {
+    private static List<PartETag> copyPartUploadDemo(String uploadId) {
         CopyPartRequest copyPartRequest = new CopyPartRequest();
         // 要拷贝的源文件所在的region
         copyPartRequest.setSourceBucketRegion(new Region(region));
@@ -192,26 +216,18 @@ public class MultipartUploadDemo {
         copyPartRequest.setPartNumber(1);
         // uploadId
         copyPartRequest.setUploadId(uploadId);
+        List<PartETag> partETags = new LinkedList<>();
         try {
             CopyPartResult copyPartResult = cosClient.copyPart(copyPartRequest);
             PartETag partETag = copyPartResult.getPartETag();
+            partETags.add(partETag);
             System.out.println("succeed to copy part, partNum:" + copyPartRequest.getPartNumber());
         } catch (CosServiceException e) {
             e.printStackTrace();
         } catch (CosClientException e) {
             e.printStackTrace();
         }
-    }
 
-    private static void multipartUploadDemo() {
-        try {
-            String uploadId = initMultipartUploadDemo();
-            List<PartETag> partETags = uploadPartDemo(uploadId);
-            completePartDemo(uploadId, partETags);
-        } catch (CosServiceException cse) {
-            throw cse;
-        } catch (CosClientException cce) {
-            throw cce;
-        }
+        return partETags;
     }
 }
