@@ -47,6 +47,13 @@ public class AsymmetricKeyEncryptionClientDemo {
 
 	private static COSClient cosClient = createCosClient();
 
+    public static void main(String[] args) throws Exception {
+        putObjectDemo();
+        getObjectDemo();
+        // 关闭
+        cosClient.shutdown();
+    }
+
 	private static COSClient createCosClient() {
 		return createCosClient("ap-guangzhou");
 	}
@@ -75,12 +82,6 @@ public class AsymmetricKeyEncryptionClientDemo {
         // 使用AES/GCM模式，并将加密信息存储在文件元信息中.
         CryptoConfiguration cryptoConf = new CryptoConfiguration(CryptoMode.AesCtrEncryption)
                 .withStorageMode(CryptoStorageMode.ObjectMetadata);
-
-        //// 如果 kms 服务的 region 与 cos 的 region 不一致，则在加密信息里指定 kms 服务的 region
-        //cryptoConf.setKmsRegion(kmsRegion);
-
-        //// 如果需要可以为 KMS 服务的 cmk 设置对应的描述信息。
-        //encryptionMaterials.addDescription("kms-region", "guangzhou");
 
         // 生成加密客户端EncryptionClient, COSEncryptionClient是COSClient的子类, 所有COSClient支持的接口他都支持。
         // EncryptionClient覆盖了COSClient上传下载逻辑，操作内部会执行加密操作，其他操作执行逻辑和COSClient一致
@@ -157,11 +158,4 @@ public class AsymmetricKeyEncryptionClientDemo {
         // 删除文件
 		cosClient.deleteObject(bucketName, key);
 	}
-
-    public static void main(String[] args) throws Exception {
-        putObjectDemo();
-        getObjectDemo();
-        // 关闭
-        cosClient.shutdown();
-    }
 }
