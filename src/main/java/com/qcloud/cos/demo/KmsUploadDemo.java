@@ -6,7 +6,6 @@ import com.qcloud.cos.auth.BasicCOSCredentials;
 import com.qcloud.cos.auth.COSCredentials;
 import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.exception.CosServiceException;
-import com.qcloud.cos.http.HttpProtocol;
 import com.qcloud.cos.internal.SkipMd5CheckStrategy;
 import com.qcloud.cos.model.CompleteMultipartUploadRequest;
 import com.qcloud.cos.model.CompleteMultipartUploadResult;
@@ -28,62 +27,52 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class KmsUploadDemo {
+    private static COSClient cosClient = createCOSClient();
+
+    private static String bucketName = "mybucket-12500000000";
+
+    private static String key = "aaa/bbb.txt";
+
+    private static String kmsKeyId = "your-kms-key-id";
+
+    private static String encryptionContext = Base64.encodeAsString("{\"Ssekmstest\":\"Ssekmstest\"}".getBytes());
 
     public static void main(String[] args) {
         simpleUploadWithKmsMeta();
         copyObjectWithKmsMeta();
     }
 
-    private static void simpleUploadWithKmsMeta() {
-        COSCredentials cred = new BasicCOSCredentials("SECRET_ID", "SECRET_KEY");
-        // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
+    private static COSClient createCOSClient() {
+        // 初始化用户身份信息(secretId, secretKey)
+        COSCredentials cred = new BasicCOSCredentials("COS_SECRETID", "COS_SECRETKEY");
+        // 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
         ClientConfig clientConfig = new ClientConfig(new Region("ap-guangzhou"));
-        // 设置使用https请求
-        clientConfig.setHttpProtocol(HttpProtocol.https);
-        // 3 生成cos客户端
+        // 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
-        // bucket名需包含appid
-        String bucketName = "mybucket-12500000000";
 
-        String key = "aaa/bbb.txt";
+        return cosclient;
+    }
+
+    private static void simpleUploadWithKmsMeta() {
         File localFile = new File("/test.log");
         PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, key, localFile);
-        String kmsKeyId = "your-kms-key-id";
-        String encryptionContext = Base64.encodeAsString("{\"Ssekmstest\":\"Ssekmstest\"}".getBytes());
         SSECOSKeyManagementParams ssecosKeyManagementParams = new SSECOSKeyManagementParams(kmsKeyId, encryptionContext);
         putObjectRequest.setSSECOSKeyManagementParams(ssecosKeyManagementParams);
         // 服务端加密场景下，返回的etag不再代表文件的md5，所以需要去掉客户端的md5校验
         // 如有需要，可获取crc64，自行校验
         System.setProperty(SkipMd5CheckStrategy.DISABLE_PUT_OBJECT_MD5_VALIDATION_PROPERTY, "true");
         try {
-            PutObjectResult putObjectResult = cosclient.putObject(putObjectRequest);
-            // putobjectResult会返回文件的etag
-            String etag = putObjectResult.getETag();
+            PutObjectResult putObjectResult = cosClient.putObject(putObjectRequest);
             String crc64 = putObjectResult.getCrc64Ecma();
+            System.out.println("finish upload, crc64:" + crc64);
         } catch (CosServiceException e) {
             e.printStackTrace();
         } catch (CosClientException e) {
             e.printStackTrace();
         }
-
-        // 关闭客户端
-        cosclient.shutdown();
     }
 
     private static void multipartUploadWithKmsMeta() {
-        COSCredentials cred = new BasicCOSCredentials("SECRET_ID", "SECRET_KEY");
-        // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
-        ClientConfig clientConfig = new ClientConfig(new Region("ap-guangzhou"));
-        // 设置使用https请求
-        clientConfig.setHttpProtocol(HttpProtocol.https);
-        // 3 生成cos客户端
-        COSClient cosclient = new COSClient(cred, clientConfig);
-        // bucket名需包含appid
-        String bucketName = "mybucket-12500000000";
-
-        String key = "aaa/bbb.txt";
-        String kmsKeyId = "your-kms-key-id";
-        String encryptionContext = Base64.encodeAsString("{\"Ssekmstest\":\"Ssekmstest\"}".getBytes());
         InitiateMultipartUploadRequest initiateMultipartUploadRequest = new InitiateMultipartUploadRequest(bucketName, key);
         SSECOSKeyManagementParams ssecosKeyManagementParams = new SSECOSKeyManagementParams(kmsKeyId, encryptionContext);
         // 服务端加密场景下，返回的etag不再代表文件的md5，所以需要去掉客户端的md5校验
@@ -91,7 +80,7 @@ public class KmsUploadDemo {
         System.setProperty(SkipMd5CheckStrategy.DISABLE_PUT_OBJECT_MD5_VALIDATION_PROPERTY, "true");
         initiateMultipartUploadRequest.setSSECOSKeyManagementParams(ssecosKeyManagementParams);
         try {
-            InitiateMultipartUploadResult initiateMultipartUploadResult = cosclient.initiateMultipartUpload(initiateMultipartUploadRequest);
+            InitiateMultipartUploadResult initiateMultipartUploadResult = cosClient.initiateMultipartUpload(initiateMultipartUploadRequest);
             List<PartETag> partETags = new LinkedList<>();
             for (int i = 0; i < 2; i++) {
                 byte data[] = new byte[1024 * 1024];
@@ -105,37 +94,23 @@ public class KmsUploadDemo {
                 uploadPartRequest.setPartSize(data.length); // 设置数据长度
                 uploadPartRequest.setPartNumber(i + 1);     // 假设要上传的part编号是10
 
-                UploadPartResult uploadPartResult = cosclient.uploadPart(uploadPartRequest);
+                UploadPartResult uploadPartResult = cosClient.uploadPart(uploadPartRequest);
                 PartETag partETag = uploadPartResult.getPartETag();
                 partETags.add(partETag);
             }
             CompleteMultipartUploadRequest completeMultipartUploadRequest =
                     new CompleteMultipartUploadRequest(bucketName, key, initiateMultipartUploadResult.getUploadId(), partETags);
             CompleteMultipartUploadResult completeResult =
-                    cosclient.completeMultipartUpload(completeMultipartUploadRequest);
+                    cosClient.completeMultipartUpload(completeMultipartUploadRequest);
+            System.out.println("finsh multipart upload, reqId:" + completeResult.getRequestId());
         } catch (CosServiceException e) {
             e.printStackTrace();
         } catch (CosClientException e) {
             e.printStackTrace();
         }
-
-        // 关闭客户端
-        cosclient.shutdown();
     }
 
     private static void copyObjectWithKmsMeta() {
-        COSCredentials cred = new BasicCOSCredentials("SECRET_ID", "SECRET_KEY");
-        // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
-        ClientConfig clientConfig = new ClientConfig(new Region("ap-guangzhou"));
-        // 设置使用https请求
-        clientConfig.setHttpProtocol(HttpProtocol.https);
-        // 3 生成cos客户端
-        COSClient cosclient = new COSClient(cred, clientConfig);
-        // bucket名需包含appid
-
-        String kmsKeyId = "your-kms-key-id";
-        String encryptionContext = Base64.encodeAsString("{\"Ssekmstest\":\"Ssekmstest\"}".getBytes());
-
         // 要拷贝的bucket region, 支持跨园区拷贝
         Region srcBucketRegion = new Region("ap-guangzhou");
         // 源bucket, bucket名需包含appid
@@ -151,15 +126,13 @@ public class KmsUploadDemo {
                 srcKey, destBucketName, destKey);
         copyObjectRequest.setSSECOSKeyManagementParams(new SSECOSKeyManagementParams(kmsKeyId, encryptionContext));
         try {
-            CopyObjectResult copyObjectResult = cosclient.copyObject(copyObjectRequest);
+            CopyObjectResult copyObjectResult = cosClient.copyObject(copyObjectRequest);
             String crc64 = copyObjectResult.getCrc64Ecma();
+            System.out.println("finish copy object, crc64:" + crc64);
         } catch (CosServiceException e) {
             e.printStackTrace();
         } catch (CosClientException e) {
             e.printStackTrace();
         }
-
-        // 关闭客户端
-        cosclient.shutdown();
     }
 }

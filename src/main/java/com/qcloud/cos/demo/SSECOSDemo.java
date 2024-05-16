@@ -13,7 +13,7 @@ import com.qcloud.cos.model.GetObjectRequest;
 import com.qcloud.cos.model.ObjectMetadata;
 import com.qcloud.cos.model.PutObjectRequest;
 import com.qcloud.cos.model.PutObjectResult;
-import com.qcloud.cos.model.SSECustomerKey;
+import com.qcloud.cos.model.SSEAlgorithm;
 import com.qcloud.cos.region.Region;
 
 import java.io.BufferedReader;
@@ -21,20 +21,18 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-public class SSECustomerDemo {
+public class SSECOSDemo {
     private static COSClient cosClient = createCOSClient();
 
     private static String bucketName = "examplebucket-1250000000";
 
     private static String key = "aaa/bbb.txt";
 
-    private static String base64EncodedKey = "MDEyMzQ1Njc4OUFCQ0RFRjAxMjM0NTY3ODlBQkNERUY=";
-
     public static void main(String[] args) {
         try {
-            SSECustomerUpload();
-            SSECustomerDownload();
-            SSECustomerHead();
+            SSECOSUpload();
+            SSECOSDownload();
+            SSECOSHead();
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -53,27 +51,26 @@ public class SSECustomerDemo {
         return cosclient;
     }
 
-    private static void SSECustomerUpload() {
+    private static void SSECOSUpload() {
         File localFile = new File("test.txt");
         PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, key, localFile);
-        SSECustomerKey sseCustomerKey = new SSECustomerKey(base64EncodedKey);
-        putObjectRequest.setSSECustomerKey(sseCustomerKey);
+        ObjectMetadata objectMetadata = new ObjectMetadata();
+        // 设置加密算法为AES256
+        objectMetadata.setServerSideEncryption(SSEAlgorithm.AES256.getAlgorithm());
+        putObjectRequest.setMetadata(objectMetadata);
 
         try {
-            PutObjectResult putObjectResult = cosClient.putObject(putObjectRequest);
-            // putobjectResult会返回文件的etag, 该md5值根据s3语义不是对象的md5，只是唯一性标志
-            String etag = putObjectResult.getETag();
-            System.out.println("finish upload, etag:" + etag);
-        } catch (CosServiceException e) {
-            e.printStackTrace();
-        } catch (CosClientException e) {
-            e.printStackTrace();
+            PutObjectResult result = cosClient.putObject(putObjectRequest);
+            System.out.println("finish upload, reqid:" + result.getRequestId());
+        } catch (CosServiceException cse) {
+            cse.printStackTrace();
+        } catch (CosClientException cce) {
+            cce.printStackTrace();
         }
     }
-    private static void SSECustomerDownload() throws IOException {
+
+    private static void SSECOSDownload() throws IOException {
         GetObjectRequest getObjectRequest = new GetObjectRequest(bucketName, key);
-        SSECustomerKey sseCustomerKey = new SSECustomerKey(base64EncodedKey);
-        getObjectRequest.setSSECustomerKey(sseCustomerKey);
         COSObject cosObject = null;
         try {
             cosObject = cosClient.getObject(getObjectRequest);
@@ -93,11 +90,9 @@ public class SSECustomerDemo {
         }
     }
 
-    private static void SSECustomerHead() {
+    private static void SSECOSHead() {
         try {
             GetObjectMetadataRequest getObjectMetadataRequest = new GetObjectMetadataRequest(bucketName, key);
-            SSECustomerKey sseCustomerKey = new SSECustomerKey(base64EncodedKey);
-            getObjectMetadataRequest.setSSECustomerKey(sseCustomerKey);
             ObjectMetadata objectMetadata = cosClient.getObjectMetadata(getObjectMetadataRequest);
             System.out.println(objectMetadata);
         } catch (CosServiceException e) {
@@ -107,4 +102,3 @@ public class SSECustomerDemo {
         }
     }
 }
-
