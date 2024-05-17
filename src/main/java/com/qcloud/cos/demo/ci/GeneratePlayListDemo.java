@@ -29,7 +29,7 @@ public class GeneratePlayListDemo {
     public static void generatePlayList(COSClient client)  {
         //1.创建任务请求对象
         MediaJobsRequestV2 request = new MediaJobsRequestV2();
-        request.setBucketName("beijingtest-1251704708");
+        request.setBucketName("demo-1234567890");
         //2.添加请求参数 参数详情请见api接口文档
         request.setTag("GeneratePlayList");
         MediaVod vod = request.getInput().getVod();
@@ -47,7 +47,7 @@ public class GeneratePlayListDemo {
         video.setHeight("960");
 
 
-        request.getOperation().getOutput().setBucket("beijingtest-1251704708");
+        request.getOperation().getOutput().setBucket("demo-1234567890");
         request.getOperation().getOutput().setRegion("ap-beijing");
         request.getOperation().getOutput().setObject("output/media/test.m3u8");
         //3.调用接口,获取任务响应对象
@@ -63,8 +63,8 @@ public class GeneratePlayListDemo {
         //1.创建任务请求对象
         MediaJobsRequestV2 request = new MediaJobsRequestV2();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("beijingtest-1251704708");
-        request.setJobId("j8b360cd0142511efac6425779c0071f0");
+        request.setBucketName("demo-1234567890");
+        request.setJobId("j8b360cd0142511efac6425779c0*****");
         //3.调用接口,获取任务响应对象
         MediaJobResponseV2 response = client.describeMediaJobV2(request);
         System.out.println(Jackson.toJsonString(response));
@@ -75,7 +75,7 @@ public class GeneratePlayListDemo {
      */
     public static void getPlayList(COSClient client)  {
         GetPlayListRequest request = new GetPlayListRequest();
-        request.setBucketName("beijingtest-1251704708");
+        request.setBucketName("demo-1234567890");
         request.setObject("output/media/test.m3u8");
         request.setExpires("3600");
         InputStream response = client.getPlayList(request);
