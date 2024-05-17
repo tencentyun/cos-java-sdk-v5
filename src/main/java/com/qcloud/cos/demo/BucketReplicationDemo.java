@@ -18,6 +18,7 @@ public class BucketReplicationDemo {
         createCOSClient();
         putBucketReplication();
         getBucketReplication();
+        deleteBucketReplication();
     }
 
     private static void createCOSClient() {
@@ -70,5 +71,10 @@ public class BucketReplicationDemo {
     private static void getBucketReplication() {
         BucketReplicationConfiguration configuration = cosClient.getBucketReplicationConfiguration(bucketName);
         System.out.println(configuration.toString());
+    }
+
+    private static void deleteBucketReplication() {
+        cosClient.deleteBucketReplicationConfiguration(bucketName);
+        System.out.println("finish delete bucket replication");
     }
 }
