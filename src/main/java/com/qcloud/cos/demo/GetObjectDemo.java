@@ -20,7 +20,13 @@ public class GetObjectDemo {
     private static COSClient cosClient = createClient();
 
     public static void main(String[] args) {
-        getObjectToFileDemo();
+        try {
+            getObjectToFileDemo();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            cosClient.shutdown();
+        }
     }
 
     private static COSClient createClient() {
@@ -37,14 +43,19 @@ public class GetObjectDemo {
     private static void getObjectToFileDemo() {
         String key = "test/my_test.json";
         String bucketName = "mybucket-12500000000";
-        boolean useTrafficLimit = false;
         GetObjectRequest getObjectRequest = new GetObjectRequest(bucketName, key);
-        if(useTrafficLimit) {
-            getObjectRequest.setTrafficLimit(8*1024*1024);
+        // 设置下载的单链接限速（如有需要），不需要可忽略
+        getObjectRequest.setTrafficLimit(8*1024*1024);
+
+        try {
+            File localFile = new File("my_test.json");
+            ObjectMetadata objectMetadata = cosClient.getObject(getObjectRequest, localFile);
+            System.out.println(objectMetadata.getContentLength());
+        } catch (CosServiceException cse) {
+            cse.printStackTrace();
+        } catch (CosClientException cce) {
+            cce.printStackTrace();
         }
-        File localFile = new File("my_test.json");
-        ObjectMetadata objectMetadata = cosClient.getObject(getObjectRequest, localFile);
-        System.out.println(objectMetadata.getContentLength());
     }
 
     private static void getObjectDemo() throws IOException {
