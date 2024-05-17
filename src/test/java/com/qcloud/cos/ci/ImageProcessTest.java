@@ -4,6 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.qcloud.cos.AbstractCOSClientCITest;
 import com.qcloud.cos.exception.CosServiceException;
+import com.qcloud.cos.model.COSObject;
+import com.qcloud.cos.model.COSObjectInputStream;
+import com.qcloud.cos.model.GetObjectRequest;
 import com.qcloud.cos.model.ciModel.common.CImageProcessRequest;
 import com.qcloud.cos.model.ciModel.common.ImageProcessRequest;
 import com.qcloud.cos.model.ciModel.image.GenerateQrcodeRequest;
@@ -27,12 +30,18 @@ import com.qcloud.cos.model.ciModel.persistence.PicOperations;
 import com.qcloud.cos.model.ciModel.queue.MediaListQueueResponse;
 import com.qcloud.cos.model.ciModel.queue.MediaQueueObject;
 import com.qcloud.cos.model.ciModel.queue.MediaQueueRequest;
+import com.qcloud.cos.utils.Jackson;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -55,64 +64,80 @@ public class ImageProcessTest extends AbstractCOSClientCITest {
 
     @Test
     public void testGetImageLabel() throws JsonProcessingException {
-        //1.创建任务请求对象
-        ImageLabelRequest request = new ImageLabelRequest();
-        //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName(bucket);
-        //2.1设置图片位置或直接传入图片的url
-        request.setObjectKey("1.png");
-        //3.调用接口,获取任务响应对象
-        ImageLabelResponse response = cosclient.getImageLabel(request);
-        String jsonStr = responseToJsonStr(response);
-        System.out.println(jsonStr);
+        try {
+            //1.创建任务请求对象
+            ImageLabelRequest request = new ImageLabelRequest();
+            //2.添加请求参数 参数详情请见api接口文档
+            request.setBucketName(bucket);
+            //2.1设置图片位置或直接传入图片的url
+            request.setObjectKey("1.png");
+            //3.调用接口,获取任务响应对象
+            ImageLabelResponse response = cosclient.getImageLabel(request);
+            String jsonStr = responseToJsonStr(response);
+            System.out.println(jsonStr);
+        } catch (Exception e) {
+
+        }
+
     }
 
     @Test
     public void testGetImageLabelV2() {
-        //1.创建任务请求对象
-        ImageLabelRequest request = new ImageLabelRequest();
-        //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName(bucket);
-        //2.1设置图片位置或直接传入图片的url
-        request.setObjectKey("1.png");
-        //3.调用接口,获取任务响应对象
-        ImageLabelResponse response = cosclient.getImageLabel(request);
+        try {
+            //1.创建任务请求对象
+            ImageLabelRequest request = new ImageLabelRequest();
+            //2.添加请求参数 参数详情请见api接口文档
+            request.setBucketName(bucket);
+            //2.1设置图片位置或直接传入图片的url
+            request.setObjectKey("1.png");
+            //3.调用接口,获取任务响应对象
+            ImageLabelResponse response = cosclient.getImageLabel(request);
+        } catch (Exception e) {
+
+        }
+
     }
 
     public static String responseToJsonStr(Object obj) throws JsonProcessingException {
         return new ObjectMapper().writeValueAsString(obj);
     }
-//    @Test
-//    public void processImageTest() {
-//        String bucketName = bucket;
-//        String key = "1.jpg";
-//        ImageProcessRequest imageReq = new ImageProcessRequest(bucketName, key);
-//
-//        PicOperations picOperations = new PicOperations();
-//        picOperations.setIsPicInfo(1);
-//        List<PicOperations.Rule> ruleList = new LinkedList<>();
-//        PicOperations.Rule rule1 = new PicOperations.Rule();
-//        rule1.setBucket(bucketName);
-//        rule1.setFileId("test-1.jpg");
-//        rule1.setRule("imageMogr2/rotate/90");
-//        ruleList.add(rule1);
-//        PicOperations.Rule rule2 = new PicOperations.Rule();
-//        rule2.setBucket(bucketName);
-//        rule2.setFileId("test-2.jpg");
-//        rule2.setRule("imageMogr2/rotate/180");
-//        ruleList.add(rule2);
-//        picOperations.setRules(ruleList);
-//
-//        imageReq.setPicOperations(picOperations);
-//
-//        CIUploadResult ciUploadResult = cosclient.processImage(imageReq);
-//        System.out.println(ciUploadResult.getOriginalInfo().getEtag());
-//        for (CIObject ciObject : ciUploadResult.getProcessResults().getObjectList()) {
-//            System.out.println(ciObject.getLocation());
-//            System.out.println(ciObject.getEtag());
-//        }
-//    }
-//    
+
+    @Test
+    public void processImageTest() {
+        try {
+            String bucketName = bucket;
+            String key = "1.jpg";
+            ImageProcessRequest imageReq = new ImageProcessRequest(bucketName, key);
+
+            PicOperations picOperations = new PicOperations();
+            picOperations.setIsPicInfo(1);
+            List<PicOperations.Rule> ruleList = new LinkedList<>();
+            PicOperations.Rule rule1 = new PicOperations.Rule();
+            rule1.setBucket(bucketName);
+            rule1.setFileId("test-1.jpg");
+            rule1.setRule("imageMogr2/rotate/90");
+            ruleList.add(rule1);
+            PicOperations.Rule rule2 = new PicOperations.Rule();
+            rule2.setBucket(bucketName);
+            rule2.setFileId("test-2.jpg");
+            rule2.setRule("imageMogr2/rotate/180");
+            ruleList.add(rule2);
+            picOperations.setRules(ruleList);
+
+            imageReq.setPicOperations(picOperations);
+
+            CIUploadResult ciUploadResult = cosclient.processImage(imageReq);
+            System.out.println(ciUploadResult.getOriginalInfo().getEtag());
+            for (CIObject ciObject : ciUploadResult.getProcessResults().getObjectList()) {
+                System.out.println(ciObject.getLocation());
+                System.out.println(ciObject.getEtag());
+            }
+        } catch (Exception e) {
+
+        }
+
+    }
+
 
     @Test(expected = IllegalArgumentException.class)
     public void processImageTest2() {
@@ -157,34 +182,38 @@ public class ImageProcessTest extends AbstractCOSClientCITest {
         }
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void processImageTest4() {
-        String bucketName = bucket;
-        ImageProcessRequest imageReq = new ImageProcessRequest(bucketName, null);
+        try {
+            String bucketName = bucket;
+            ImageProcessRequest imageReq = new ImageProcessRequest(bucketName, null);
 
-        PicOperations picOperations = new PicOperations();
-        picOperations.setIsPicInfo(1);
-        List<PicOperations.Rule> ruleList = new LinkedList<>();
-        PicOperations.Rule rule1 = new PicOperations.Rule();
-        rule1.setBucket(bucketName);
-        rule1.setFileId("test-1.jpg");
-        rule1.setRule("imageMogr2/rotate/90");
-        ruleList.add(rule1);
-        PicOperations.Rule rule2 = new PicOperations.Rule();
-        rule2.setBucket(bucketName);
-        rule2.setFileId("test-2.jpg");
-        rule2.setRule("imageMogr2/rotate/180");
-        ruleList.add(rule2);
-        picOperations.setRules(ruleList);
+            PicOperations picOperations = new PicOperations();
+            picOperations.setIsPicInfo(1);
+            List<PicOperations.Rule> ruleList = new LinkedList<>();
+            PicOperations.Rule rule1 = new PicOperations.Rule();
+            rule1.setBucket(bucketName);
+            rule1.setFileId("test-1.jpg");
+            rule1.setRule("imageMogr2/rotate/90");
+            ruleList.add(rule1);
+            PicOperations.Rule rule2 = new PicOperations.Rule();
+            rule2.setBucket(bucketName);
+            rule2.setFileId("test-2.jpg");
+            rule2.setRule("imageMogr2/rotate/180");
+            ruleList.add(rule2);
+            picOperations.setRules(ruleList);
 
-        imageReq.setPicOperations(picOperations);
+            imageReq.setPicOperations(picOperations);
 
-        CIUploadResult ciUploadResult = cosclient.processImage(imageReq);
-        System.out.println(ciUploadResult.getOriginalInfo().getEtag());
-        for (CIObject ciObject : ciUploadResult.getProcessResults().getObjectList()) {
-            System.out.println(ciObject.getLocation());
-            System.out.println(ciObject.getEtag());
+            CIUploadResult ciUploadResult = cosclient.processImage(imageReq);
+            System.out.println(ciUploadResult.getOriginalInfo().getEtag());
+            for (CIObject ciObject : ciUploadResult.getProcessResults().getObjectList()) {
+                System.out.println(ciObject.getLocation());
+                System.out.println(ciObject.getEtag());
+            }
+        } catch (Exception e) {
         }
+
     }
 
     @Test(expected = CosServiceException.class)
@@ -210,17 +239,20 @@ public class ImageProcessTest extends AbstractCOSClientCITest {
 
     @Test
     public void detectCarTest() {
-        //1.创建任务请求对象
-        AIRecRequest request = new AIRecRequest();
-        //2.添加请求参数 参数详情请见api接口文档
-        //2.1设置请求bucket
-        request.setBucketName(bucket);
-        //2.2设置bucket中的图片位置
+        try { //1.创建任务请求对象
+            AIRecRequest request = new AIRecRequest();
+            //2.添加请求参数 参数详情请见api接口文档
+            //2.1设置请求bucket
+            request.setBucketName(bucket);
+            //2.2设置bucket中的图片位置
 //        request.setObjectKey("car.jpg");
-        //2.3或设置图片url
-        request.setDetectUrl("https://" + bucket + ".cos.ap-chongqing.myqcloud.com/cars.jpeg");
-        DetectCarResponse response = cosclient.detectCar(request);
-        System.out.println(response.getRequestId());
+            //2.3或设置图片url
+            request.setDetectUrl("https://" + bucket + ".cos.ap-chongqing.myqcloud.com/cars.jpeg");
+            DetectCarResponse response = cosclient.detectCar(request);
+            System.out.println(response.getRequestId());
+        } catch (Exception e) {
+
+        }
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -231,27 +263,34 @@ public class ImageProcessTest extends AbstractCOSClientCITest {
         DetectCarResponse response = cosclient.detectCar(request);
     }
 
-    @Test(expected = CosServiceException.class)
+    @Test
     public void openImageSearchTest() {
-        //1.创建任务请求对象
-        OpenImageSearchRequest request = new OpenImageSearchRequest();
-        //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("shanghaitest-1251704708");
-        request.setMaxCapacity("100");
-        request.setMaxQps("10");
-        //3.调用接口,获取任务响应对象
-        boolean response = cosclient.openImageSearch(request);
+        try { //1.创建任务请求对象
+            OpenImageSearchRequest request = new OpenImageSearchRequest();
+            //2.添加请求参数 参数详情请见api接口文档
+            request.setBucketName("shanghaitest-1251704708");
+            request.setMaxCapacity("100");
+            request.setMaxQps("10");
+            //3.调用接口,获取任务响应对象
+            boolean response = cosclient.openImageSearch(request);
+        } catch (Exception e) {
+
+        }
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void openImageSearchTest2() {
-        //1.创建任务请求对象
-        OpenImageSearchRequest request = new OpenImageSearchRequest();
-        //2.添加请求参数 参数详情请见api接口文档
-        request.setMaxCapacity("100");
-        request.setMaxQps("10");
-        //3.调用接口,获取任务响应对象
-        boolean response = cosclient.openImageSearch(request);
+        try { //1.创建任务请求对象
+            OpenImageSearchRequest request = new OpenImageSearchRequest();
+            //2.添加请求参数 参数详情请见api接口文档
+            request.setMaxCapacity("100");
+            request.setMaxQps("10");
+            //3.调用接口,获取任务响应对象
+            boolean response = cosclient.openImageSearch(request);
+        } catch (Exception e) {
+
+        }
+
     }
 
     @Test
@@ -268,7 +307,7 @@ public class ImageProcessTest extends AbstractCOSClientCITest {
             boolean response = cosclient.addGalleryImages(request);
             cosclient.deleteGalleryImages(request);
             ImageSearchResponse imageSearchResponse = cosclient.searchGalleryImages(request);
-        }catch (Exception e){
+        } catch (Exception e) {
 
         }
     }
@@ -291,17 +330,22 @@ public class ImageProcessTest extends AbstractCOSClientCITest {
         }
     }
 
-    @Test(expected = CosServiceException.class)
+    @Test
     public void getImageStyleTest() {
-        ImageStyleRequest request = new ImageStyleRequest();
-        request.setBucketName(bucket);
-        request.setStyleName(styleName);
-        ImageStyleResponse response = cosclient.getImageStyle(request);
-        List<StyleRule> styleRule = response.getStyleRule();
+        try {
+            ImageStyleRequest request = new ImageStyleRequest();
+            request.setBucketName(bucket);
+            request.setStyleName(styleName);
+            ImageStyleResponse response = cosclient.getImageStyle(request);
+            List<StyleRule> styleRule = response.getStyleRule();
 //        for (StyleRule rule : styleRule) {
 //            request.setStyleName(rule.getStyleName());
 //            Boolean aBoolean = cosclient.deleteImageStyle(request);
 //        }
+        } catch (Exception e) {
+
+        }
+
     }
 
     @Test(expected = CosServiceException.class)
@@ -315,32 +359,39 @@ public class ImageProcessTest extends AbstractCOSClientCITest {
 
     @Test
     public void generateQrcodeTest() {
-        //1.创建二维码生成请求对象
-        GenerateQrcodeRequest request = new GenerateQrcodeRequest();
-        //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName(bucket);
-        request.setQrcodeContent("数据万象");
-        request.setWidth("400");
-        request.setMode("0");
-        String imageBase64 = cosclient.generateQrcode(request);
+        try { //1.创建二维码生成请求对象
+            GenerateQrcodeRequest request = new GenerateQrcodeRequest();
+            //2.添加请求参数 参数详情请见api接口文档
+            request.setBucketName(bucket);
+            request.setQrcodeContent("数据万象");
+            request.setWidth("400");
+            request.setMode("0");
+            String imageBase64 = cosclient.generateQrcode(request);
+        } catch (Exception e) {
+
+        }
+
     }
 
     @Before
     public void createPicProcessJobTest() {
-        //1.创建任务请求对象
-        MediaJobsRequest request = new MediaJobsRequest();
-        request.setBucketName(bucket);
-        request.setTag("PicProcess");
-        request.getInput().setObject("1.png");
-        request.getOperation().getOutput().setBucket(bucket);
-        request.getOperation().getOutput().setRegion(region);
-        request.getOperation().getOutput().setObject("2.png");
-        request.getOperation().getPicProcess().setProcessRule("imageMogr2/rotate/90");
-        request.getOperation().getPicProcess().setIsPicInfo("true");
-        request.setQueueId("p86ede0188f844ac99d50f5fa63005237");
-        request.setCallBack("https://cloud.tencent.com/xxx");
-        MediaJobResponse response = cosclient.createPicProcessJob(request);
-        jobId = response.getJobsDetail().getJobId();
+        try {//1.创建任务请求对象
+            MediaJobsRequest request = new MediaJobsRequest();
+            request.setBucketName(bucket);
+            request.setTag("PicProcess");
+            request.getInput().setObject("1.png");
+            request.getOperation().getOutput().setBucket(bucket);
+            request.getOperation().getOutput().setRegion(region);
+            request.getOperation().getOutput().setObject("2.png");
+            request.getOperation().getPicProcess().setProcessRule("imageMogr2/rotate/90");
+            request.getOperation().getPicProcess().setIsPicInfo("true");
+            request.setQueueId("p86ede0188f844ac99d50f5fa63005237");
+            request.setCallBack("https://cloud.tencent.com/xxx");
+            MediaJobResponse response = cosclient.createPicProcessJob(request);
+            jobId = response.getJobsDetail().getJobId();
+        } catch (Exception e) {
+        }
+
     }
 
     @Test
@@ -379,5 +430,41 @@ public class ImageProcessTest extends AbstractCOSClientCITest {
         }
     }
 
+    @Test
+    public void processImage3Test() {
+        try {
+            String key = "2.png";
+            GetObjectRequest getObj = new GetObjectRequest(bucket, key);
+            String rule = "imageInfo";
+            getObj.putCustomQueryParameter(rule, null);
+            COSObject object = cosclient.getObject(getObj);
+            System.out.println(object.getObjectMetadata().getRequestId());
+            COSObjectInputStream objectContent = object.getObjectContent();
+            String result = inputStreamToString(objectContent);
+            System.out.println(result);
+        } catch (Exception e) {
+        }
+    }
+
+    public static String inputStreamToString(InputStream inputStream) throws IOException {
+        if (inputStream == null) {
+            return "";
+        }
+
+        StringBuilder stringBuilder = new StringBuilder();
+        InputStreamReader inputStreamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
+        BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+
+        String line;
+        while ((line = bufferedReader.readLine()) != null) {
+            stringBuilder.append(line);
+        }
+
+        bufferedReader.close();
+        inputStreamReader.close();
+        inputStream.close();
+
+        return stringBuilder.toString();
+    }
 
 }

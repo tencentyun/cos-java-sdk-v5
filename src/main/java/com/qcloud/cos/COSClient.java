@@ -98,12 +98,8 @@ import com.qcloud.cos.model.ciModel.image.ImageStyleRequest;
 import com.qcloud.cos.model.ciModel.image.ImageStyleResponse;
 import com.qcloud.cos.model.ciModel.image.OpenImageSearchRequest;
 import com.qcloud.cos.model.ciModel.job.*;
-import com.qcloud.cos.model.ciModel.job.v2.DNADbConfigsRequest;
-import com.qcloud.cos.model.ciModel.job.v2.DNADbConfigsResponse;
-import com.qcloud.cos.model.ciModel.job.v2.DNADbFilesRequest;
-import com.qcloud.cos.model.ciModel.job.v2.DNADbFilesResponse;
-import com.qcloud.cos.model.ciModel.job.v2.MediaJobResponseV2;
-import com.qcloud.cos.model.ciModel.job.v2.MediaJobsRequestV2;
+import com.qcloud.cos.model.ciModel.job.MediaJobObject;
+import com.qcloud.cos.model.ciModel.job.v2.*;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoRequest;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoResponse;
 import com.qcloud.cos.model.ciModel.persistence.AIGameRecResponse;
@@ -5133,6 +5129,13 @@ public class COSClient implements COS {
         return this.invoke(httpRequest, new Unmarshallers.CICommonUnmarshaller<MediaListTemplateResponse>(MediaListTemplateResponse.class));
     }
 
+    @Override
+    public InputStream getPlayList(GetPlayListRequest getPlayListRequest) {
+        CosHttpRequest<GetPlayListRequest> request = createRequest(getPlayListRequest.getBucketName(), "/getplaylist", getPlayListRequest, HttpMethodName.GET);
+        addParameterIfNotNull(request, "object", getPlayListRequest.getObject());
+        addParameterIfNotNull(request, "expires", getPlayListRequest.getExpires());
+        return invoke(request, new CIGetSnapshotResponseHandler());
+    }
 
 }
 

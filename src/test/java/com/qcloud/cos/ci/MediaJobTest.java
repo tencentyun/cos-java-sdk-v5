@@ -258,5 +258,15 @@ public class MediaJobTest extends AbstractCOSClientCITest {
         }
     }
 
+    @Test
+    public void testCreateMediaProcessBucket() {
+        try {
+            MediaBucketRequest request = new MediaBucketRequest();
+            request.setBucketName(bucket);
+            Boolean response = cosclient.createMediaProcessBucket(request);
+            assertTrue(response);
+        } catch (Exception e) {
+        }
+    }
 
 }

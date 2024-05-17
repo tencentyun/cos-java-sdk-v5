@@ -1,5 +1,8 @@
 package com.qcloud.cos.model.ciModel.job;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamImplicit;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,31 +13,36 @@ public class MediaTranscodeObject extends MediaVideoCommon {
     /**
      * 容器格式	例:mp4
      */
+    @XStreamAlias("Container")
     private MediaContainerObject container;
     /**
      * 视频信息	不传 Video，相当于删除视频信息
      */
+    @XStreamAlias("Video")
     private MediaTranscodeVideoObject video;
     /**
      * 音频信息
      */
+    @XStreamAlias("Audio")
     private MediaAudioObject audio;
     /**
      * 转码配置
      */
+    @XStreamAlias("TransConfig")
     private MediaTransConfigObject transConfig;
     /**
      * 时间区间
      */
+    @XStreamAlias("TimeInterval")
     private MediaTimeIntervalObject timeInterval;
 
     /**
-     * 混音
-     *
-     * @return
+     * 混音配置
      */
+    @XStreamAlias("AudioMix")
     private MediaAudioMixObject audioMix;
 
+    @XStreamImplicit(itemFieldName = "AudioMix")
     private List<MediaAudioMixObject> audioMixArray;
 
     public MediaContainerObject getContainer() {

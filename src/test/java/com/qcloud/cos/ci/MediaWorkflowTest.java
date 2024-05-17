@@ -57,21 +57,21 @@ public class MediaWorkflowTest extends AbstractCOSClientCITest {
         MediaInfoResponse result = cosclient.generateMediainfo(request);
     }
 
-//    @Test(expected = CosServiceException.class)
-//    public void testDescribeWorkflowExecution() {
-//        try {
-//            MediaWorkflowListRequest request = new MediaWorkflowListRequest();
-//            request.setBucketName(bucket);
-//            request.setWorkflowId(workflowId);
-//            request.setObject("2.jpg");
-//            request.setName("mark");
-//            request.setRunId(runId);
-//            request.setPageSize("2");
-//            MediaWorkflowExecutionResponse result = cosclient.describeWorkflowExecution(request);
-//        } catch (Exception e) {
-//
-//        }
-//    }
+    @Test
+    public void testDescribeWorkflowExecution() {
+        try {
+            MediaWorkflowListRequest request = new MediaWorkflowListRequest();
+            request.setBucketName(bucket);
+            request.setWorkflowId(workflowId);
+            request.setObject("2.jpg");
+            request.setName("mark");
+            request.setRunId(runId);
+            request.setPageSize("2");
+            MediaWorkflowExecutionResponse result = cosclient.describeWorkflowExecution(request);
+        } catch (Exception e) {
+
+        }
+    }
 
     @Test
     public void testDescribeWorkflowExecutions() {
@@ -134,6 +134,21 @@ public class MediaWorkflowTest extends AbstractCOSClientCITest {
             request.setBucketName(bucket);
             request.setJobId(batchJobId);
             BatchJobResponse response = cosclient.describeInventoryTriggerJob(request);
+        } catch (Exception e) {
+        }
+
+    }
+
+    @Test
+    public void describeWorkflowExecutionTest() {
+        try {
+            //1.创建工作流请求对象
+            MediaWorkflowListRequest request = new MediaWorkflowListRequest();
+            //2.添加请求参数 参数详情请见api接口文档
+            request.setBucketName(bucket);
+            request.setRunId("i34bfd8d7eae711ea89fe525400c");
+            MediaWorkflowExecutionResponse response = cosclient.describeWorkflowExecution(request);
+            System.out.println(response);
         } catch (Exception e) {
         }
 

@@ -55,12 +55,7 @@ import com.qcloud.cos.model.ciModel.bucket.MediaBucketRequest;
 import com.qcloud.cos.model.ciModel.bucket.MediaBucketResponse;
 import com.qcloud.cos.model.ciModel.common.ImageProcessRequest;
 import com.qcloud.cos.model.ciModel.job.*;
-import com.qcloud.cos.model.ciModel.job.v2.DNADbConfigsRequest;
-import com.qcloud.cos.model.ciModel.job.v2.DNADbConfigsResponse;
-import com.qcloud.cos.model.ciModel.job.v2.DNADbFilesRequest;
-import com.qcloud.cos.model.ciModel.job.v2.DNADbFilesResponse;
-import com.qcloud.cos.model.ciModel.job.v2.MediaJobResponseV2;
-import com.qcloud.cos.model.ciModel.job.v2.MediaJobsRequestV2;
+import com.qcloud.cos.model.ciModel.job.v2.*;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoRequest;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoResponse;
 import com.qcloud.cos.model.ciModel.persistence.AIGameRecResponse;
@@ -3264,6 +3259,8 @@ public interface COS extends COSDirectSpi {
     UpdataHLSPlayKeyResponse updataHLSPlayKey(UpdataHLSPlayKeyRequest customRequest);
 
     MediaListTemplateResponse describeMediaTemplatesV2(MediaTemplateRequest request);
+
+    InputStream getPlayList(GetPlayListRequest request);
 }
 
 
