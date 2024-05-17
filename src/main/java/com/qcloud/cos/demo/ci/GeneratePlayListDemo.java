@@ -46,7 +46,6 @@ public class GeneratePlayListDemo {
         video.setWidth("1280");
         video.setHeight("960");
 
-
         request.getOperation().getOutput().setBucket("demo-1234567890");
         request.getOperation().getOutput().setRegion("ap-beijing");
         request.getOperation().getOutput().setObject("output/media/test.m3u8");
@@ -57,7 +56,6 @@ public class GeneratePlayListDemo {
 
     /**
      * describeMediaJob 根据jobId查询任务信息
-     * @param client
      */
     public static void describeMediaJob(COSClient client)  {
         //1.创建任务请求对象
@@ -78,8 +76,8 @@ public class GeneratePlayListDemo {
         request.setBucketName("demo-1234567890");
         request.setObject("output/media/test.m3u8");
         request.setExpires("3600");
-        InputStream response = client.getPlayList(request);
         try {
+            InputStream response = client.getPlayList(request);
             System.out.println(inputStreamToString(response));
         } catch (IOException e) {
             e.printStackTrace();
