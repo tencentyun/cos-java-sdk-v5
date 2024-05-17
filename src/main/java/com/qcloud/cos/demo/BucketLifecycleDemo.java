@@ -17,10 +17,18 @@ import com.qcloud.cos.region.Region;
 
 	
 public class BucketLifecycleDemo {
-    private String bucketName = "example-12500000000";
-    private COSClient cosClient = COSBuilder();
+    private static String bucketName = "example-12500000000";
+    private static COSClient cosClient = COSBuilder();
 
-    private COSClient COSBuilder() {
+    public static void main(String[] args) throws InterruptedException {
+        deletedAllLifeCycle();
+        addLifeCycle("warehouse-ods-apx","warehouse/ods/apx/");
+        addLifeCycle("warehouse-ods-apx2","warehouse/ods/apx2/");
+        queryPath();
+        cosClient.shutdown();
+    }
+
+    private static COSClient COSBuilder() {
         // 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
         // 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
@@ -29,7 +37,7 @@ public class BucketLifecycleDemo {
         return new COSClient(cred, clientConfig);
     }
 
-    private void addLifeCycle(String id,String path) {
+    private static void addLifeCycle(String id, String path) {
         List<BucketLifecycleConfiguration.Rule> rules = new ArrayList<BucketLifecycleConfiguration.Rule>();
         // 规则1  30天后删除路径以 hongkong_movie/ 为开始的文件
         BucketLifecycleConfiguration.Rule deletePrefixRule = new BucketLifecycleConfiguration.Rule();
@@ -64,7 +72,7 @@ public class BucketLifecycleDemo {
         // 设置生命周期
         cosClient.setBucketLifecycleConfiguration(setBucketLifecycleConfigurationRequest);
     }
-    private void queryPath() {
+    private static void queryPath() {
         // 存储桶的命名格式为 BucketName-APPID ，此处填写的存储桶名称必须为此格式
         BucketLifecycleConfiguration queryLifeCycleRet =
                 cosClient.getBucketLifecycleConfiguration(bucketName);
@@ -79,17 +87,8 @@ public class BucketLifecycleDemo {
         }
     }
 
-    private Boolean deletedAllLifeCycle() {
-        COSClient cosClient = COSBuilder();
+    private static void deletedAllLifeCycle() {
         cosClient.deleteBucketLifecycleConfiguration(bucketName);
-        return  true;
-    }
-
-    public static void main(String[] args) throws InterruptedException {
-        BucketLifecycleDemo manage = new BucketLifecycleDemo();
-        manage.deletedAllLifeCycle();
-        manage.addLifeCycle("warehouse-ods-apx","warehouse/ods/apx/");
-        manage.addLifeCycle("warehouse-ods-apx2","warehouse/ods/apx2/");
-        manage.queryPath();
+        System.out.println("finish delete all LifeCycle");
     }
 }
