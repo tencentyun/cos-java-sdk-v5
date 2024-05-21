@@ -4822,155 +4822,155 @@ public class COSClient implements COS {
         return this.invoke(request, new Unmarshallers.AutoTranslationBlockUnmarshaller());
     }
 
-//    @Override
-//    public DetectFaceResponse detectFace(DetectFaceRequest detectFaceRequest) {
-//        rejectNull(detectFaceRequest,
-//                "The request parameter must be specified setting the object tags");
-//        rejectNull(detectFaceRequest.getBucketName(),
-//                "The bucketName parameter must be specified setting the object tags");
-//        CosHttpRequest<DetectFaceRequest> request = createRequest(detectFaceRequest.getBucketName(), detectFaceRequest.getObjectKey(), detectFaceRequest, HttpMethodName.GET);
-//        request.addParameter("ci-process","DetectFace");
-//        addParameterIfNotNull(request,"max-face-num",detectFaceRequest.getMaxFaceNum());
-//        addParameterIfNotNull(request,"detect-url",detectFaceRequest.getDetectUrl());
-//        return this.invoke(request, new Unmarshallers.DetectFaceUnmarshaller());
-//    }
+    @Override
+    public DetectFaceResponse detectFace(DetectFaceRequest detectFaceRequest) {
+        rejectNull(detectFaceRequest,
+                "The request parameter must be specified setting the object tags");
+        rejectNull(detectFaceRequest.getBucketName(),
+                "The bucketName parameter must be specified setting the object tags");
+        CosHttpRequest<DetectFaceRequest> request = createRequest(detectFaceRequest.getBucketName(), detectFaceRequest.getObjectKey(), detectFaceRequest, HttpMethodName.GET);
+        request.addParameter("ci-process","DetectFace");
+        addParameterIfNotNull(request,"max-face-num",detectFaceRequest.getMaxFaceNum());
+        addParameterIfNotNull(request,"detect-url",detectFaceRequest.getDetectUrl());
+        return this.invoke(request, new Unmarshallers.DetectFaceUnmarshaller());
+    }
 
-//    @Override
-//    public AIGameRecResponse aiGameRec(AIRecRequest aiRecRequest) {
-//        rejectNull(aiRecRequest,
-//                "The request parameter must be specified setting the object tags");
-//        rejectNull(aiRecRequest.getBucketName(),
-//                "The bucketName parameter must be specified setting the object tags");
-//        CosHttpRequest<AIRecRequest> request = createRequest(aiRecRequest.getBucketName(), aiRecRequest.getObjectKey(), aiRecRequest, HttpMethodName.GET);
-//        request.addParameter("ci-process","AIGameRec");
-//        addParameterIfNotNull(request,"detect-url",aiRecRequest.getDetectUrl());
-//        return this.invoke(request, new Unmarshallers.AIGameRecUnmarshaller());
-//    }
+    @Override
+    public AIGameRecResponse aiGameRec(AIRecRequest aiRecRequest) {
+        rejectNull(aiRecRequest,
+                "The request parameter must be specified setting the object tags");
+        rejectNull(aiRecRequest.getBucketName(),
+                "The bucketName parameter must be specified setting the object tags");
+        CosHttpRequest<AIRecRequest> request = createRequest(aiRecRequest.getBucketName(), aiRecRequest.getObjectKey(), aiRecRequest, HttpMethodName.GET);
+        request.addParameter("ci-process","AIGameRec");
+        addParameterIfNotNull(request,"detect-url",aiRecRequest.getDetectUrl());
+        return this.invoke(request, new Unmarshallers.AIGameRecUnmarshaller());
+    }
 
-//    @Override
-//    public Boolean cancelLiveAuditing(VideoAuditingRequest videoAuditingRequest) {
-//        rejectNull(videoAuditingRequest,
-//                "The request parameter must be specified setting the object tags");
-//        rejectNull(videoAuditingRequest.getBucketName(),
-//                "The bucketName parameter must be specified setting the object tags");
-//        rejectNull(videoAuditingRequest.getJobId(),
-//                "The jobId parameter must be specified setting the object tags");
-//        CosHttpRequest<VideoAuditingRequest> request = createRequest(videoAuditingRequest.getBucketName(), "/video/cancel_auditing/" + videoAuditingRequest.getJobId(), videoAuditingRequest, HttpMethodName.POST);
-//        invoke(request, voidCosResponseHandler);
-//        return true;
-//    }
+    @Override
+    public Boolean cancelLiveAuditing(VideoAuditingRequest videoAuditingRequest) {
+        rejectNull(videoAuditingRequest,
+                "The request parameter must be specified setting the object tags");
+        rejectNull(videoAuditingRequest.getBucketName(),
+                "The bucketName parameter must be specified setting the object tags");
+        rejectNull(videoAuditingRequest.getJobId(),
+                "The jobId parameter must be specified setting the object tags");
+        CosHttpRequest<VideoAuditingRequest> request = createRequest(videoAuditingRequest.getBucketName(), "/video/cancel_auditing/" + videoAuditingRequest.getJobId(), videoAuditingRequest, HttpMethodName.POST);
+        invoke(request, voidCosResponseHandler);
+        return true;
+    }
 
-//    @Override
-//    public AuditingStrategyResponse addAuditingStrategy(AuditingStrategyRequest auditingStrategyRequest) {
-//        rejectNull(auditingStrategyRequest, "The request parameter must be specified setting the object tags");
-//        rejectNull(auditingStrategyRequest.getBucketName(), "The bucketName parameter must be specified setting the object tags");
-//        CosHttpRequest<AuditingStrategyRequest> request = createRequest(auditingStrategyRequest.getBucketName(), "/audit/strategy", auditingStrategyRequest, HttpMethodName.POST);
-//        this.setContent(request, CIAuditingXmlFactoryV2.convertToXmlByteArray(auditingStrategyRequest), "application/xml", false);
-//        addParameterIfNotNull(request, "service", auditingStrategyRequest.getService());
-//        return invoke(request, new Unmarshallers.AuditingStrategyUnmarshaller());
-//    }
+    @Override
+    public AuditingStrategyResponse addAuditingStrategy(AuditingStrategyRequest auditingStrategyRequest) {
+        rejectNull(auditingStrategyRequest, "The request parameter must be specified setting the object tags");
+        rejectNull(auditingStrategyRequest.getBucketName(), "The bucketName parameter must be specified setting the object tags");
+        CosHttpRequest<AuditingStrategyRequest> request = createRequest(auditingStrategyRequest.getBucketName(), "/audit/strategy", auditingStrategyRequest, HttpMethodName.POST);
+        this.setContent(request, CIAuditingXmlFactoryV2.convertToXmlByteArray(auditingStrategyRequest), "application/xml", false);
+        addParameterIfNotNull(request, "service", auditingStrategyRequest.getService());
+        return invoke(request, new Unmarshallers.AuditingStrategyUnmarshaller());
+    }
 
-//    @Override
-//    public AuditingStrategyResponse updateAuditingStrategy(AuditingStrategyRequest auditingStrategyRequest) {
-//        rejectNull(auditingStrategyRequest, "The request parameter must be specified setting the object tags");
-//        rejectNull(auditingStrategyRequest.getBucketName(), "The bucketName parameter must be specified setting the object tags");
-//        CosHttpRequest<AuditingStrategyRequest> request = createRequest(auditingStrategyRequest.getBucketName(), "/audit/strategy/"+auditingStrategyRequest.getBizType(), auditingStrategyRequest, HttpMethodName.PUT);
-//        this.setContent(request, CIAuditingXmlFactoryV2.convertToXmlByteArray(auditingStrategyRequest), "application/xml", false);
-//        addParameterIfNotNull(request, "service", auditingStrategyRequest.getService());
-//        return invoke(request, new Unmarshallers.AuditingStrategyUnmarshaller());
-//    }
+    @Override
+    public AuditingStrategyResponse updateAuditingStrategy(AuditingStrategyRequest auditingStrategyRequest) {
+        rejectNull(auditingStrategyRequest, "The request parameter must be specified setting the object tags");
+        rejectNull(auditingStrategyRequest.getBucketName(), "The bucketName parameter must be specified setting the object tags");
+        CosHttpRequest<AuditingStrategyRequest> request = createRequest(auditingStrategyRequest.getBucketName(), "/audit/strategy/"+auditingStrategyRequest.getBizType(), auditingStrategyRequest, HttpMethodName.PUT);
+        this.setContent(request, CIAuditingXmlFactoryV2.convertToXmlByteArray(auditingStrategyRequest), "application/xml", false);
+        addParameterIfNotNull(request, "service", auditingStrategyRequest.getService());
+        return invoke(request, new Unmarshallers.AuditingStrategyUnmarshaller());
+    }
 
-//    @Override
-//    public AuditingStrategyResponse describeAuditingStrategy(AuditingStrategyRequest auditingStrategyRequest) {
-//        rejectNull(auditingStrategyRequest, "The request parameter must be specified setting the object tags");
-//        rejectNull(auditingStrategyRequest.getBucketName(), "The bucketName parameter must be specified setting the object tags");
-//        CosHttpRequest<AuditingStrategyRequest> request = createRequest(auditingStrategyRequest.getBucketName(), "/audit/strategy/"+auditingStrategyRequest.getBizType(), auditingStrategyRequest, HttpMethodName.GET);
-//        addParameterIfNotNull(request, "service", auditingStrategyRequest.getService());
-//        return invoke(request, new Unmarshallers.AuditingStrategyUnmarshaller());
-//    }
+    @Override
+    public AuditingStrategyResponse describeAuditingStrategy(AuditingStrategyRequest auditingStrategyRequest) {
+        rejectNull(auditingStrategyRequest, "The request parameter must be specified setting the object tags");
+        rejectNull(auditingStrategyRequest.getBucketName(), "The bucketName parameter must be specified setting the object tags");
+        CosHttpRequest<AuditingStrategyRequest> request = createRequest(auditingStrategyRequest.getBucketName(), "/audit/strategy/"+auditingStrategyRequest.getBizType(), auditingStrategyRequest, HttpMethodName.GET);
+        addParameterIfNotNull(request, "service", auditingStrategyRequest.getService());
+        return invoke(request, new Unmarshallers.AuditingStrategyUnmarshaller());
+    }
 
-//    @Override
-//    public AuditingStrategyListResponse describeAuditingStrategyList(AuditingStrategyRequest auditingStrategyRequest) {
-//        rejectNull(auditingStrategyRequest, "The request parameter must be specified setting the object tags");
-//        rejectNull(auditingStrategyRequest.getBucketName(), "The bucketName parameter must be specified setting the object tags");
-//        CosHttpRequest<AuditingStrategyRequest> request = createRequest(auditingStrategyRequest.getBucketName(), "/audit/strategy", auditingStrategyRequest, HttpMethodName.GET);
-//        addParameterIfNotNull(request, "service", auditingStrategyRequest.getService());
-//        addParameterIfNotNull(request, "offset", auditingStrategyRequest.getOffset());
-//        addParameterIfNotNull(request, "limit", auditingStrategyRequest.getLimit());
-//        return invoke(request, new Unmarshallers.AuditingStrategyListUnmarshaller());
-//    }
+    @Override
+    public AuditingStrategyListResponse describeAuditingStrategyList(AuditingStrategyRequest auditingStrategyRequest) {
+        rejectNull(auditingStrategyRequest, "The request parameter must be specified setting the object tags");
+        rejectNull(auditingStrategyRequest.getBucketName(), "The bucketName parameter must be specified setting the object tags");
+        CosHttpRequest<AuditingStrategyRequest> request = createRequest(auditingStrategyRequest.getBucketName(), "/audit/strategy", auditingStrategyRequest, HttpMethodName.GET);
+        addParameterIfNotNull(request, "service", auditingStrategyRequest.getService());
+        addParameterIfNotNull(request, "offset", auditingStrategyRequest.getOffset());
+        addParameterIfNotNull(request, "limit", auditingStrategyRequest.getLimit());
+        return invoke(request, new Unmarshallers.AuditingStrategyListUnmarshaller());
+    }
 
-//    @Override
-//    public AuditingTextLibResponse addAuditingTextLib(AuditingTextLibRequest libRequest) {
-//        rejectNull(libRequest, "The request parameter must be specified setting the object tags");
-//        rejectNull(libRequest.getBucketName(), "The bucketName parameter must be specified setting the object tags");
-//        CosHttpRequest<AuditingTextLibRequest> request = createRequest(libRequest.getBucketName(), "/audit/textlib", libRequest, HttpMethodName.POST);
-//        this.setContent(request, CIAuditingXmlFactoryV2.convertToXmlByteArray(libRequest), "application/xml", false);
-//        return invoke(request, new Unmarshallers.AuditingTextLibUnmarshaller());
-//    }
+    @Override
+    public AuditingTextLibResponse addAuditingTextLib(AuditingTextLibRequest libRequest) {
+        rejectNull(libRequest, "The request parameter must be specified setting the object tags");
+        rejectNull(libRequest.getBucketName(), "The bucketName parameter must be specified setting the object tags");
+        CosHttpRequest<AuditingTextLibRequest> request = createRequest(libRequest.getBucketName(), "/audit/textlib", libRequest, HttpMethodName.POST);
+        this.setContent(request, CIAuditingXmlFactoryV2.convertToXmlByteArray(libRequest), "application/xml", false);
+        return invoke(request, new Unmarshallers.AuditingTextLibUnmarshaller());
+    }
 
-//    @Override
-//    public AuditingTextLibResponse describeAuditingTextLib(AuditingTextLibRequest libRequest) {
-//        rejectNull(libRequest, "The request parameter must be specified setting the object tags");
-//        rejectNull(libRequest.getBucketName(), "The bucketName parameter must be specified setting the object tags");
-//        CosHttpRequest<AuditingTextLibRequest> request = createRequest(libRequest.getBucketName(), "/audit/textlib", libRequest, HttpMethodName.GET);
-//        addParameterIfNotNull(request, "libid", libRequest.getLibid());
-//        addParameterIfNotNull(request, "offset", libRequest.getOffset());
-//        addParameterIfNotNull(request, "limit", libRequest.getLimit());
-//        return invoke(request, new Unmarshallers.AuditingTextLibUnmarshaller());
-//    }
+    @Override
+    public AuditingTextLibResponse describeAuditingTextLib(AuditingTextLibRequest libRequest) {
+        rejectNull(libRequest, "The request parameter must be specified setting the object tags");
+        rejectNull(libRequest.getBucketName(), "The bucketName parameter must be specified setting the object tags");
+        CosHttpRequest<AuditingTextLibRequest> request = createRequest(libRequest.getBucketName(), "/audit/textlib", libRequest, HttpMethodName.GET);
+        addParameterIfNotNull(request, "libid", libRequest.getLibid());
+        addParameterIfNotNull(request, "offset", libRequest.getOffset());
+        addParameterIfNotNull(request, "limit", libRequest.getLimit());
+        return invoke(request, new Unmarshallers.AuditingTextLibUnmarshaller());
+    }
 
-//    @Override
-//    public AuditingTextLibResponse updateAuditingTextLib(AuditingTextLibRequest libRequest) {
-//        rejectNull(libRequest, "The request parameter must be specified setting the object tags");
-//        rejectNull(libRequest.getBucketName(), "The bucketName parameter must be specified setting the object tags");
-//        CosHttpRequest<AuditingTextLibRequest> request = createRequest(libRequest.getBucketName(), "/audit/textlib/" + libRequest.getLibid(), libRequest, HttpMethodName.PUT);
-//        this.setContent(request, CIAuditingXmlFactoryV2.convertToXmlByteArray(libRequest), "application/xml", false);
-//        return invoke(request, new Unmarshallers.AuditingTextLibUnmarshaller());
-//    }
+    @Override
+    public AuditingTextLibResponse updateAuditingTextLib(AuditingTextLibRequest libRequest) {
+        rejectNull(libRequest, "The request parameter must be specified setting the object tags");
+        rejectNull(libRequest.getBucketName(), "The bucketName parameter must be specified setting the object tags");
+        CosHttpRequest<AuditingTextLibRequest> request = createRequest(libRequest.getBucketName(), "/audit/textlib/" + libRequest.getLibid(), libRequest, HttpMethodName.PUT);
+        this.setContent(request, CIAuditingXmlFactoryV2.convertToXmlByteArray(libRequest), "application/xml", false);
+        return invoke(request, new Unmarshallers.AuditingTextLibUnmarshaller());
+    }
 
-//    @Override
-//    public AuditingTextLibResponse deleteAuditingTextLib(AuditingTextLibRequest libRequest) {
-//        rejectNull(libRequest, "The request parameter must be specified setting the object tags");
-//        CosHttpRequest<AuditingTextLibRequest> request = createRequest(libRequest.getBucketName(), "/audit/textlib/" + libRequest.getLibid(), libRequest, HttpMethodName.DELETE);
-//        return invoke(request, new Unmarshallers.AuditingTextLibUnmarshaller());
-//    }
+    @Override
+    public AuditingTextLibResponse deleteAuditingTextLib(AuditingTextLibRequest libRequest) {
+        rejectNull(libRequest, "The request parameter must be specified setting the object tags");
+        CosHttpRequest<AuditingTextLibRequest> request = createRequest(libRequest.getBucketName(), "/audit/textlib/" + libRequest.getLibid(), libRequest, HttpMethodName.DELETE);
+        return invoke(request, new Unmarshallers.AuditingTextLibUnmarshaller());
+    }
 
-//    @Override
-//    public AuditingKeywordResponse addAuditingLibKeyWord(AuditingKeywordRequest keywordRequest) {
-//        rejectNull(keywordRequest, "The request parameter must be specified setting the object tags");
-//        CosHttpRequest<AuditingKeywordRequest> request = createRequest(keywordRequest.getBucketName(), "/audit/textlib/" + keywordRequest.getLibId() + "/keyword", keywordRequest, HttpMethodName.POST);
-//        this.setContent(request, CIAuditingXmlFactoryV2.convertToXmlByteArray(keywordRequest), "application/xml", false);
-//        return invoke(request, new Unmarshallers.CICommonUnmarshaller<AuditingKeywordResponse>(AuditingKeywordResponse.class));
-//    }
+    @Override
+    public AuditingKeywordResponse addAuditingLibKeyWord(AuditingKeywordRequest keywordRequest) {
+        rejectNull(keywordRequest, "The request parameter must be specified setting the object tags");
+        CosHttpRequest<AuditingKeywordRequest> request = createRequest(keywordRequest.getBucketName(), "/audit/textlib/" + keywordRequest.getLibId() + "/keyword", keywordRequest, HttpMethodName.POST);
+        this.setContent(request, CIAuditingXmlFactoryV2.convertToXmlByteArray(keywordRequest), "application/xml", false);
+        return invoke(request, new Unmarshallers.CICommonUnmarshaller<AuditingKeywordResponse>(AuditingKeywordResponse.class));
+    }
 
-//    @Override
-//    public AuditingKeywordResponse describeAuditingKeyWordList(AuditingKeywordRequest keywordRequest) {
-//        rejectNull(keywordRequest, "The request parameter must be specified setting the object tags");
-//        CosHttpRequest<AuditingKeywordRequest> request = createRequest(keywordRequest.getBucketName(), "/audit/textlib/" + keywordRequest.getLibId() + "/keyword", keywordRequest, HttpMethodName.GET);
-//        addParameterIfNotNull(request, "content", keywordRequest.getContent());
-//        addParameterIfNotNull(request, "label", keywordRequest.getLabel());
-//        addParameterIfNotNull(request, "offset", keywordRequest.getOffset());
-//        addParameterIfNotNull(request, "limit", keywordRequest.getLimit());
-//        return invoke(request, new Unmarshallers.CICommonUnmarshaller<AuditingKeywordResponse>(AuditingKeywordResponse.class));
-//
-//    }
+    @Override
+    public AuditingKeywordResponse describeAuditingKeyWordList(AuditingKeywordRequest keywordRequest) {
+        rejectNull(keywordRequest, "The request parameter must be specified setting the object tags");
+        CosHttpRequest<AuditingKeywordRequest> request = createRequest(keywordRequest.getBucketName(), "/audit/textlib/" + keywordRequest.getLibId() + "/keyword", keywordRequest, HttpMethodName.GET);
+        addParameterIfNotNull(request, "content", keywordRequest.getContent());
+        addParameterIfNotNull(request, "label", keywordRequest.getLabel());
+        addParameterIfNotNull(request, "offset", keywordRequest.getOffset());
+        addParameterIfNotNull(request, "limit", keywordRequest.getLimit());
+        return invoke(request, new Unmarshallers.CICommonUnmarshaller<AuditingKeywordResponse>(AuditingKeywordResponse.class));
 
-//    @Override
-//    public AuditingKeywordResponse deleteAuditingKeyWord(AuditingKeywordRequest keywordRequest) {
-//        rejectNull(keywordRequest, "The request parameter must be specified setting the object tags");
-//        CosHttpRequest<AuditingKeywordRequest> request = createRequest(keywordRequest.getBucketName(), "/audit/textlib/" + keywordRequest.getLibId() +"/deletekeyword", keywordRequest, HttpMethodName.POST);
-//        this.setContent(request, CIAuditingXmlFactoryV2.convertToXmlByteArray(keywordRequest), "application/xml", false);
-//        return invoke(request, new Unmarshallers.CICommonUnmarshaller<AuditingKeywordResponse>(AuditingKeywordResponse.class));
-//    }
+    }
 
-//    @Override
-//    public ImageInspectResponse getImageInspect(ImageInspectRequest inspectRequest) {
-//        rejectNull(inspectRequest, "The request parameter must be specified setting the object tags");
-//        CosHttpRequest<ImageInspectRequest> request = createRequest(inspectRequest.getBucketName(), inspectRequest.getObjectKey(), inspectRequest, HttpMethodName.GET);
-//        request.addParameter( "ci-process", "ImageInspect");
-//        return invoke(request, new Unmarshallers.CIJsonUnmarshaller<ImageInspectResponse>(ImageInspectResponse.class));
-//    }
+    @Override
+    public AuditingKeywordResponse deleteAuditingKeyWord(AuditingKeywordRequest keywordRequest) {
+        rejectNull(keywordRequest, "The request parameter must be specified setting the object tags");
+        CosHttpRequest<AuditingKeywordRequest> request = createRequest(keywordRequest.getBucketName(), "/audit/textlib/" + keywordRequest.getLibId() +"/deletekeyword", keywordRequest, HttpMethodName.POST);
+        this.setContent(request, CIAuditingXmlFactoryV2.convertToXmlByteArray(keywordRequest), "application/xml", false);
+        return invoke(request, new Unmarshallers.CICommonUnmarshaller<AuditingKeywordResponse>(AuditingKeywordResponse.class));
+    }
+
+    @Override
+    public ImageInspectResponse getImageInspect(ImageInspectRequest inspectRequest) {
+        rejectNull(inspectRequest, "The request parameter must be specified setting the object tags");
+        CosHttpRequest<ImageInspectRequest> request = createRequest(inspectRequest.getBucketName(), inspectRequest.getObjectKey(), inspectRequest, HttpMethodName.GET);
+        request.addParameter( "ci-process", "ImageInspect");
+        return invoke(request, new Unmarshallers.CIJsonUnmarshaller<ImageInspectResponse>(ImageInspectResponse.class));
+    }
 
     @Override
     public MediaJobResponseV2 describeMediaJobV2(MediaJobsRequestV2 req) {
@@ -4980,21 +4980,21 @@ public class COSClient implements COS {
         return invoke(request,new Unmarshallers.CICommonUnmarshaller<MediaJobResponseV2>(MediaJobResponseV2.class));
     }
 
-//    @Override
-//    public InputStream aIImageColoring(AIImageColoringRequest aIImageColoringRequest) {
-//        CosHttpRequest<AIImageColoringRequest> request = createRequest(aIImageColoringRequest.getBucket(), "/" + aIImageColoringRequest.getObjectKey(), aIImageColoringRequest, HttpMethodName.GET);
-//        addParameterIfNotNull(request, "ci-process", aIImageColoringRequest.getCiProcess());
-//        addParameterIfNotNull(request, "detect-url", aIImageColoringRequest.getDetectUrl());
-//        return invoke(request, new CIGetSnapshotResponseHandler());
-//    }
+    @Override
+    public InputStream aIImageColoring(AIImageColoringRequest aIImageColoringRequest) {
+        CosHttpRequest<AIImageColoringRequest> request = createRequest(aIImageColoringRequest.getBucket(), "/" + aIImageColoringRequest.getObjectKey(), aIImageColoringRequest, HttpMethodName.GET);
+        addParameterIfNotNull(request, "ci-process", aIImageColoringRequest.getCiProcess());
+        addParameterIfNotNull(request, "detect-url", aIImageColoringRequest.getDetectUrl());
+        return invoke(request, new CIGetSnapshotResponseHandler());
+    }
 
-//    @Override
-//    public PostSpeechRecognitionResponse postSpeechRecognition(PostSpeechRecognitionRequest postSpeechRecognitionRequest) {
-//        rejectNull(postSpeechRecognitionRequest, "The request parameter must be specified setting the object tags");
-//        CosHttpRequest<PostSpeechRecognitionRequest> request = createRequest(postSpeechRecognitionRequest.getBucketName(), "/jobs", postSpeechRecognitionRequest, HttpMethodName.POST);
-//        this.setContent(request, CIAuditingXmlFactoryV2.convertToXmlByteArray(postSpeechRecognitionRequest), "application/xml", false);
-//        return invoke(request, new Unmarshallers.CICommonUnmarshaller<PostSpeechRecognitionResponse>(PostSpeechRecognitionResponse.class));
-//    }
+    @Override
+    public PostSpeechRecognitionResponse postSpeechRecognition(PostSpeechRecognitionRequest postSpeechRecognitionRequest) {
+        rejectNull(postSpeechRecognitionRequest, "The request parameter must be specified setting the object tags");
+        CosHttpRequest<PostSpeechRecognitionRequest> request = createRequest(postSpeechRecognitionRequest.getBucketName(), "/jobs", postSpeechRecognitionRequest, HttpMethodName.POST);
+        this.setContent(request, CIAuditingXmlFactoryV2.convertToXmlByteArray(postSpeechRecognitionRequest), "application/xml", false);
+        return invoke(request, new Unmarshallers.CICommonUnmarshaller<PostSpeechRecognitionResponse>(PostSpeechRecognitionResponse.class));
+    }
 
     @Override
     public boolean faceSearchBucket(FaceSearchBucketRequest customRequest) {
