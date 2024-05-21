@@ -9,7 +9,11 @@ import com.qcloud.cos.model.COSObjectInputStream;
 import com.qcloud.cos.model.GetObjectRequest;
 import com.qcloud.cos.model.ciModel.common.CImageProcessRequest;
 import com.qcloud.cos.model.ciModel.common.ImageProcessRequest;
+import com.qcloud.cos.model.ciModel.image.DetectFaceRequest;
+import com.qcloud.cos.model.ciModel.image.DetectFaceResponse;
 import com.qcloud.cos.model.ciModel.image.GenerateQrcodeRequest;
+import com.qcloud.cos.model.ciModel.image.ImageInspectRequest;
+import com.qcloud.cos.model.ciModel.image.ImageInspectResponse;
 import com.qcloud.cos.model.ciModel.image.ImageLabelRequest;
 import com.qcloud.cos.model.ciModel.image.ImageLabelResponse;
 import com.qcloud.cos.model.ciModel.image.ImageLabelV2Request;
@@ -444,6 +448,38 @@ public class ImageProcessTest extends AbstractCOSClientCITest {
             System.out.println(result);
         } catch (Exception e) {
         }
+    }
+
+    @Test
+    public void getImageInspectTest() {
+        try {
+            //1.创建任务请求对象
+            ImageInspectRequest request = new ImageInspectRequest();
+            //2.添加请求参数 参数详情请见api接口文档
+            request.setBucketName(bucket);
+            //2.1图片位置
+            request.setObjectKey("test/1.jpg");
+            //3.调用接口,获取任务响应对象
+            ImageInspectResponse response = cosclient.getImageInspect(request);
+            System.out.println(Jackson.toJsonString(response));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void detectFaceTest() {
+        try {
+            DetectFaceRequest request = new DetectFaceRequest();
+            //2.添加请求参数 参数详情请见api接口文档
+            request.setBucketName(bucket);
+            request.setObjectKey("1.jpg");
+            DetectFaceResponse response = cosclient.detectFace(request);
+            System.out.println(Jackson.toJsonString(response));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     public static String inputStreamToString(InputStream inputStream) throws IOException {
