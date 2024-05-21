@@ -24,29 +24,29 @@ public class PostSpeechRecognitionDemo {
      * postSpeechRecognition 提交一个语音识别任务
      * 该接口属于 POST 请求。
      */
-    public static void postSpeechRecognition(COSClient client) {
-        PostSpeechRecognitionRequest request = new PostSpeechRecognitionRequest();
-        request.setBucketName("demo-1234567890");
-        // 设置创建任务的 Tag：SpeechRecognition 必传
-        request.setTag("SpeechRecognition");
-        PostSpeechRecognitionRequest.Input input = request.getInput();
-        input.setObject("1.mp4");
-        // 设置引擎模型类型，分为电话场景和非电话场景 必传
-        PostSpeechRecognitionRequest.Operation operation = request.getOperation();
-        PostSpeechRecognitionRequest.SpeechRecognition speechRecognition = operation.getSpeechRecognition();
-        speechRecognition.setEngineModelType("8k_zh");
-        // 设置存储桶的地域 必传
-        operation.getOutput().setRegion("ap-chongqing");
-        // 设置存储结果的存储桶 必传
-        operation.getOutput().setBucket("demo-1234567890");
-        // 设置结果文件的名称 必传
-        operation.getOutput().setObject("1.mp4");
-        speechRecognition.setChannelNum("1");
-        speechRecognition.setFilterDirty("1");
-        speechRecognition.setFilterModal("1");
-        PostSpeechRecognitionResponse response = client.postSpeechRecognition(request);
-        System.out.println(Jackson.toJsonString(response));
-    }
+//    public static void postSpeechRecognition(COSClient client) {
+//        PostSpeechRecognitionRequest request = new PostSpeechRecognitionRequest();
+//        request.setBucketName("demo-1234567890");
+//        // 设置创建任务的 Tag：SpeechRecognition 必传
+//        request.setTag("SpeechRecognition");
+//        PostSpeechRecognitionRequest.Input input = request.getInput();
+//        input.setObject("1.mp4");
+//        // 设置引擎模型类型，分为电话场景和非电话场景 必传
+//        PostSpeechRecognitionRequest.Operation operation = request.getOperation();
+//        PostSpeechRecognitionRequest.SpeechRecognition speechRecognition = operation.getSpeechRecognition();
+//        speechRecognition.setEngineModelType("8k_zh");
+//        // 设置存储桶的地域 必传
+//        operation.getOutput().setRegion("ap-chongqing");
+//        // 设置存储结果的存储桶 必传
+//        operation.getOutput().setBucket("demo-1234567890");
+//        // 设置结果文件的名称 必传
+//        operation.getOutput().setObject("1.mp4");
+//        speechRecognition.setChannelNum("1");
+//        speechRecognition.setFilterDirty("1");
+//        speechRecognition.setFilterModal("1");
+//        PostSpeechRecognitionResponse response = client.postSpeechRecognition(request);
+//        System.out.println(Jackson.toJsonString(response));
+//    }
 
     /**
      * describeMediaJob 根据jobId查询任务信息

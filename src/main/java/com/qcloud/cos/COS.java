@@ -3203,38 +3203,38 @@ public interface COS extends COSDirectSpi {
 
     AutoTranslationBlockResponse autoTranslationBlock(AutoTranslationBlockRequest request);
 
-    DetectFaceResponse detectFace(DetectFaceRequest request);
+//    DetectFaceResponse detectFace(DetectFaceRequest request);
 
-    AIGameRecResponse aiGameRec(AIRecRequest request);
+//    AIGameRecResponse aiGameRec(AIRecRequest request);
 
-    Boolean cancelLiveAuditing(VideoAuditingRequest request);
+//    Boolean cancelLiveAuditing(VideoAuditingRequest request);
 
-    AuditingStrategyResponse addAuditingStrategy(AuditingStrategyRequest request);
-    AuditingStrategyResponse updateAuditingStrategy(AuditingStrategyRequest request);
-    AuditingStrategyResponse describeAuditingStrategy(AuditingStrategyRequest request);
-    AuditingStrategyListResponse describeAuditingStrategyList(AuditingStrategyRequest request);
+//    AuditingStrategyResponse addAuditingStrategy(AuditingStrategyRequest request);
+//    AuditingStrategyResponse updateAuditingStrategy(AuditingStrategyRequest request);
+//    AuditingStrategyResponse describeAuditingStrategy(AuditingStrategyRequest request);
+//    AuditingStrategyListResponse describeAuditingStrategyList(AuditingStrategyRequest request);
 
-    AuditingTextLibResponse addAuditingTextLib(AuditingTextLibRequest request);
+//    AuditingTextLibResponse addAuditingTextLib(AuditingTextLibRequest request);
 
-    AuditingTextLibResponse describeAuditingTextLib(AuditingTextLibRequest request);
+//    AuditingTextLibResponse describeAuditingTextLib(AuditingTextLibRequest request);
 
-    AuditingTextLibResponse updateAuditingTextLib(AuditingTextLibRequest request);
+//    AuditingTextLibResponse updateAuditingTextLib(AuditingTextLibRequest request);
 
-    AuditingTextLibResponse deleteAuditingTextLib(AuditingTextLibRequest request);
+//    AuditingTextLibResponse deleteAuditingTextLib(AuditingTextLibRequest request);
 
-    AuditingKeywordResponse addAuditingLibKeyWord(AuditingKeywordRequest request);
+//    AuditingKeywordResponse addAuditingLibKeyWord(AuditingKeywordRequest request);
 
-    AuditingKeywordResponse describeAuditingKeyWordList(AuditingKeywordRequest request);
+//    AuditingKeywordResponse describeAuditingKeyWordList(AuditingKeywordRequest request);
 
-    AuditingKeywordResponse deleteAuditingKeyWord(AuditingKeywordRequest request);
+//    AuditingKeywordResponse deleteAuditingKeyWord(AuditingKeywordRequest request);
 
-    ImageInspectResponse getImageInspect(ImageInspectRequest request);
+//    ImageInspectResponse getImageInspect(ImageInspectRequest request);
 
     MediaJobResponseV2 describeMediaJobV2(MediaJobsRequestV2 req);
 
-    InputStream aIImageColoring(AIImageColoringRequest customRequest);
+//    InputStream aIImageColoring(AIImageColoringRequest customRequest);
 
-    PostSpeechRecognitionResponse postSpeechRecognition(PostSpeechRecognitionRequest postSpeechRecognitionRequest);
+//    PostSpeechRecognitionResponse postSpeechRecognition(PostSpeechRecognitionRequest postSpeechRecognitionRequest);
 
     boolean faceSearchBucket(FaceSearchBucketRequest customRequest);
 
