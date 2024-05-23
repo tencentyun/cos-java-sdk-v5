@@ -35,7 +35,7 @@ public class ImageSearchDemoTest extends AbstractCOSClientCITest{
             //1.创建任务请求对象
             OpenImageSearchRequest request = new OpenImageSearchRequest();
             //2.添加请求参数 参数详情请见api接口文档
-            request.setBucketName("demobucket-123456789");
+            request.setBucketName(bucket);
             request.setMaxCapacity("100");
             request.setMaxQps("10");
             //3.调用接口,获取任务响应对象
@@ -45,16 +45,4 @@ public class ImageSearchDemoTest extends AbstractCOSClientCITest{
         }
     }
 
-
-    @Test
-    public void addGalleryImages() {
-    }
-
-    @Test
-    public void deleteGalleryImages() {
-    }
-
-    @Test
-    public void searchGalleryImages() {
-    }
 }
