@@ -12,10 +12,10 @@ import com.qcloud.cos.region.Region;
 
 public class DecompressDemo {
 
-    private static final String secretId = "";
-    private static final String secretKey = "";
-    private static final String bucket = "";
-    private static final String region = "";
+    private static final String secretId = "AKIDXXXXXXXX";
+    private static final String secretKey = "1A2Z3YYYYYYYYYY";
+    private static final String bucketName = "examplebucket-12500000000";
+    private static final String region = "ap-guangzhou";
 
     public static void main(String[] args) {
         System.out.println(postObjectDecompression());
@@ -31,8 +31,8 @@ public class DecompressDemo {
             DecompressionRequest decompressionRequest =
                     new DecompressionRequest()
                             .setObjectKey("a.tar.gz")
-                            .setSourceBucketName(bucket)
-                            .setTargetBucketName(bucket)
+                            .setSourceBucketName(bucketName)
+                            .setTargetBucketName(bucketName)
                             .setPrefixReplaced(true)
                             .setResourcesPrefix("")
                             .setTargetKeyPrefix("test_out/");
@@ -49,7 +49,7 @@ public class DecompressDemo {
         clientConfig.setHttpProtocol(HttpProtocol.http);
         COSClient cosClient = new COSClient(cosCredentials, clientConfig);
         try {
-            return cosClient.getObjectDecompressionStatus(bucket, objectKey, null);
+            return cosClient.getObjectDecompressionStatus(bucketName, objectKey, null);
         } finally {
             cosClient.shutdown();
         }
@@ -63,7 +63,7 @@ public class DecompressDemo {
         COSClient cosClient = new COSClient(cosCredentials, clientConfig);
         try {
             ListJobsResult result =
-                    cosClient.listObjectDecompressionJobs(bucket, "Success", "asc", "1000", null);
+                    cosClient.listObjectDecompressionJobs(bucketName, "Success", "asc", "1000", null);
             System.out.println(result);
         } finally {
             cosClient.shutdown();

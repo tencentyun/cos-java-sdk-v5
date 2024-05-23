@@ -11,11 +11,9 @@ import java.util.Map;
 
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.ClientConfig;
-import com.qcloud.cos.auth.AnonymousCOSCredentials;
 import com.qcloud.cos.auth.BasicCOSCredentials;
 import com.qcloud.cos.auth.COSCredentials;
 import com.qcloud.cos.http.HttpMethodName;
-import com.qcloud.cos.http.HttpProtocol;
 import com.qcloud.cos.model.GeneratePresignedUrlRequest;
 import com.qcloud.cos.model.ResponseHeaderOverrides;
 import com.qcloud.cos.region.Region;
@@ -26,23 +24,32 @@ import com.qcloud.cos.utils.DateUtils;
  * 用于可将生成的连接分发给移动端或者他人, 即可实现在签名有效期内上传或者下载文件.
  */
 public class GeneratePresignedUrlDemo {
+    private static String secretId = "AKIDXXXXXXXX";
+    private static String secretKey = "1A2Z3YYYYYYYYYY";
+    private static String bucketName = "examplebucket-12500000000";
+    private static String region = "ap-guangzhou";
+    private static COSClient cosClient = createCli();
     public static void main(String[] args) {
-        generatePresignedUploadUrl();
+        try {
+            generatePresignedUploadUrl();
+        } catch (Exception e) {
+            cosClient.shutdown();
+        }
+    }
+
+    private static COSClient createCli() {
+        // 1 初始化用户身份信息(secretId, secretKey)
+        COSCredentials cred = new BasicCOSCredentials(secretId, secretKey);
+        // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
+        ClientConfig clientConfig = new ClientConfig(new Region(region));
+        // 3 生成cos客户端
+        COSClient cosclient = new COSClient(cred, clientConfig);
+
+        return cosclient;
     }
 
     // 获取下载的预签名连接
     private static void generateSimplePresignedDownloadUrl() {
-        // 1 初始化用户身份信息(secretId, secretKey)
-        COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
-        // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
-        ClientConfig clientConfig = new ClientConfig(new Region("ap-beijing-1"));
-        // 如果要获取 https 的 url 则在此设置，否则默认获取的是 http url
-        clientConfig.setHttpProtocol(HttpProtocol.https);
-        // 3 生成cos客户端
-        COSClient cosclient = new COSClient(cred, clientConfig);
-        // bucket名需包含appid
-        String bucketName = "mybucket-12500000000";
-        
         String key = "aaa.txt";
         GeneratePresignedUrlRequest req =
                 new GeneratePresignedUrlRequest(bucketName, key, HttpMethodName.GET);
@@ -57,23 +64,12 @@ public class GeneratePresignedUrlDemo {
         // 填写本次请求的头部。Host 头部会自动补全，不需要填写
         req.putCustomRequestHeader("header1", "value1");
 
-        URL url = cosclient.generatePresignedUrl(req);
+        URL url = cosClient.generatePresignedUrl(req);
         System.out.println(url.toString());
-        
-        cosclient.shutdown();
     }
 
     // 获取预签名的下载链接, 并设置返回的content-type, cache-control等http头
     private static void generatePresignedDownloadUrlWithOverrideResponseHeader() {
-        // 1 初始化用户身份信息(secretId, secretKey)
-        COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
-        // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
-        ClientConfig clientConfig = new ClientConfig(new Region("ap-beijing-1"));
-        // 3 生成cos客户端
-        COSClient cosclient = new COSClient(cred, clientConfig);
-        // bucket名需包含appid
-        String bucketName = "mybucket-12500000000";
-        
         String key = "aaa.txt";
         GeneratePresignedUrlRequest req =
                 new GeneratePresignedUrlRequest(bucketName, key, HttpMethodName.GET);
@@ -102,45 +98,12 @@ public class GeneratePresignedUrlDemo {
         // 填写本次请求的头部。Host 头部会自动补全，不需要填写
         req.putCustomRequestHeader("header1", "value1");
 
-        URL url = cosclient.generatePresignedUrl(req);
-
+        URL url = cosClient.generatePresignedUrl(req);
         System.out.println(url.toString());
-        
-        cosclient.shutdown();
-    }
-
-    // 获取预签名的下载链接， 用于匿名bucket, 匿名bucket生成的预下载链接不包含签名
-    private static void generatePresignedDownloadUrlAnonymous() {
-        // 1 初始化用户身份信息, 匿名身份不用传入ak sk
-        COSCredentials cred = new AnonymousCOSCredentials();
-        // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
-        ClientConfig clientConfig = new ClientConfig(new Region("ap-beijing-1"));
-        // 3 生成cos客户端
-        COSClient cosclient = new COSClient(cred, clientConfig);
-        // bucket名需包含appid
-        String bucketName = "mybucket-12500000000";
-        
-        String key = "aaa.txt";
-        GeneratePresignedUrlRequest req =
-                new GeneratePresignedUrlRequest(bucketName, key, HttpMethodName.GET);
-        URL url = cosclient.generatePresignedUrl(req);
-
-        System.out.println(url.toString());
-        
-        cosclient.shutdown();
     }
 
     // 生成预签名的上传连接
     private static void generatePresignedUploadUrl() {
-        // 1 初始化用户身份信息(secretId, secretKey)
-        COSCredentials cred = new BasicCOSCredentials("AKIDxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", "********************************");
-        // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
-        ClientConfig clientConfig = new ClientConfig(new Region("ap-shanghai"));
-        // 3 生成cos客户端
-        COSClient cosclient = new COSClient(cred, clientConfig);
-        // bucket名需包含appid
-        String bucketName = "mybucket-12500000000";
-        
         String key = "aaa.txt";
         Date expirationTime = new Date(System.currentTimeMillis() + 30 * 60 * 1000);
         // 填写本次请求的 header。Host 头部会自动补全，只需填入其他头部
@@ -148,7 +111,8 @@ public class GeneratePresignedUrlDemo {
         // 填写本次请求的 params。
         Map<String, String> params = new HashMap<String,String>();
 
-        URL url = cosclient.generatePresignedUrl(bucketName, key, expirationTime, HttpMethodName.PUT, headers, params);
+        URL url = cosClient.generatePresignedUrl(bucketName, key, expirationTime, HttpMethodName.PUT, headers, params);
+        System.out.println(url.toString());
         try {
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setDoOutput(true);
@@ -164,7 +128,5 @@ public class GeneratePresignedUrlDemo {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        
-        cosclient.shutdown();
     }
 }
