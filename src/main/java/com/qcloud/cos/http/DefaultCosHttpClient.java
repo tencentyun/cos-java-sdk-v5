@@ -517,7 +517,11 @@ public class DefaultCosHttpClient implements CosHttpClient {
                         retryIndex, maxErrorRetry);
                 request.addLogDetails(new ExceptionLogDetail(cse, errorMsg));
                 if (!shouldRetry(request, httpResponse, cse, retryIndex, retryPolicy)) {
-                    if (cse.getStatusCode() >= 400) {
+                    int status_code_thresh = clientConfig.getErrorLogStatusCodeThresh();
+                    if (status_code_thresh < 0) {
+                        status_code_thresh = 500;
+                    }
+                    if (cse.getStatusCode() >= status_code_thresh) {
                         handleLog(request);
                     }
                     throw cse;

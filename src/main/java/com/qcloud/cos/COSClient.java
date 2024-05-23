@@ -1070,6 +1070,11 @@ public class COSClient implements COS {
         rejectNull(clientConfig.getRegion(),
                 "region is null, region in clientConfig must be specified when requesting an object");
 
+        if (clientConfig.isCheckRequestPath()) {
+            if (StringUtils.isRequestPathInvalid(getObjectRequest.getKey())) {
+                throw new IllegalArgumentException("The key you specified is invalid");
+            }
+        }
 
         CosHttpRequest<GetObjectRequest> request = createRequest(getObjectRequest.getBucketName(),
                 getObjectRequest.getKey(), getObjectRequest, HttpMethodName.GET);

@@ -19,7 +19,11 @@ public class TimeOutCosHttpClient  extends DefaultCosHttpClient{
 
     public TimeOutCosHttpClient(ClientConfig clientConfig) {
         super(clientConfig);
-        threadPool =  Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 5);
+        int pool_size = clientConfig.getTimeoutClientThreadSize();
+        if (pool_size <= 0) {
+            pool_size = Runtime.getRuntime().availableProcessors() * 5;
+        }
+        threadPool =  Executors.newFixedThreadPool(pool_size);
     }
 
     @Override
