@@ -17,6 +17,9 @@ import com.qcloud.cos.region.Region;
 
 	
 public class BucketLifecycleDemo {
+    private static String secretId = "AKIDXXXXXXXX";
+    private static String secretKey = "1A2Z3YYYYYYYYYY";
+    private static String cosRegion = "ap-guangzhou";
     private static String bucketName = "example-12500000000";
     private static COSClient cosClient = COSBuilder();
 
@@ -30,9 +33,9 @@ public class BucketLifecycleDemo {
 
     private static COSClient COSBuilder() {
         // 初始化用户身份信息(secretId, secretKey)
-        COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
+        COSCredentials cred = new BasicCOSCredentials(secretId, secretKey);
         // 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
-        ClientConfig clientConfig = new ClientConfig(new Region("ap-shanghai"));
+        ClientConfig clientConfig = new ClientConfig(new Region(cosRegion));
         // 生成cos客户端
         return new COSClient(cred, clientConfig);
     }

@@ -26,6 +26,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class BucketInventoryDemo {
+    public static void main(String[] args) {
+        setGetDeleteBucketInventoryDemo();
+        setBucketInventoryDemo();
+    }
+
     private static void setGetDeleteBucketInventoryDemo() {
         // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
@@ -138,10 +143,5 @@ public class BucketInventoryDemo {
 
         cosclient.setBucketInventoryConfiguration(request);
         cosclient.shutdown();
-    }
-
-    public static void main(String[] args) {
-        setGetDeleteBucketInventoryDemo();
-        setBucketInventoryDemo();
     }
 }

@@ -17,11 +17,16 @@ import com.qcloud.cos.region.Region;
 import com.qcloud.cos.utils.IOUtils;
 
 public class GetObjectDemo {
+    private static String secretId = "AKIDXXXXXXXX";
+    private static String secretKey = "1A2Z3YYYYYYYYYY";
+    private static String bucketName = "examplebucket-12500000000";
+    private static String region = "ap-guangzhou";
     private static COSClient cosClient = createClient();
 
     public static void main(String[] args) {
         try {
             getObjectToFileDemo();
+            //getObjectInputStreamDemo();
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -31,9 +36,9 @@ public class GetObjectDemo {
 
     private static COSClient createClient() {
         // 初始化用户身份信息(secretId, secretKey)
-        COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX","1A2Z3YYYYYYYYYY");
+        COSCredentials cred = new BasicCOSCredentials(secretId,secretKey);
         // 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
-        ClientConfig clientConfig = new ClientConfig(new Region("ap-guangzhou"));
+        ClientConfig clientConfig = new ClientConfig(new Region(region));
         // 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
 
@@ -42,7 +47,6 @@ public class GetObjectDemo {
 
     private static void getObjectToFileDemo() {
         String key = "test/my_test.json";
-        String bucketName = "mybucket-12500000000";
         GetObjectRequest getObjectRequest = new GetObjectRequest(bucketName, key);
         // 设置下载的单链接限速（如有需要），不需要可忽略
         getObjectRequest.setTrafficLimit(8*1024*1024);
@@ -58,9 +62,8 @@ public class GetObjectDemo {
         }
     }
 
-    private static void getObjectDemo() throws IOException {
+    private static void getObjectInputStreamDemo() throws IOException {
         String key = "test/my_test.json";
-        String bucketName = "mybucket-12500000000";
         GetObjectRequest getObjectRequest = new GetObjectRequest(bucketName, key);
         InputStream cosObjectInput = null;
 
