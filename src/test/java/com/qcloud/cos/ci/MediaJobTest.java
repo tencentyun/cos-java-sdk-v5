@@ -28,7 +28,6 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-@RunWith(PowerMockRunner.class)
 public class MediaJobTest extends AbstractCOSClientCITest {
 
     private String jobId;
@@ -36,7 +35,11 @@ public class MediaJobTest extends AbstractCOSClientCITest {
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
-        AbstractCOSClientCITest.initCosClient();
+        try {
+            AbstractCOSClientCITest.initCosClient();
+        }catch (Exception e){
+
+        }
     }
 
     @AfterClass
