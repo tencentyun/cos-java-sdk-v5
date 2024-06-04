@@ -7,6 +7,16 @@ public class KeyConfig {
     private String key;
     @XStreamAlias("Rename")
     private String rename;
+    @XStreamAlias("ImageParams")
+    private String imageParams;
+
+    public String getImageParams() {
+        return imageParams;
+    }
+
+    public void setImageParams(String imageParams) {
+        this.imageParams = imageParams;
+    }
 
     public String getKey() {
         return key;

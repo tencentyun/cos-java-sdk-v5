@@ -31,14 +31,7 @@ import com.qcloud.cos.model.bucketcertificate.BucketDomainCertificateRequest;
 import com.qcloud.cos.model.bucketcertificate.BucketGetDomainCertificate;
 import com.qcloud.cos.model.bucketcertificate.BucketPutDomainCertificate;
 import com.qcloud.cos.model.bucketcertificate.SetBucketDomainCertificateRequest;
-import com.qcloud.cos.model.ciModel.ai.AddPersonFaceRequest;
-import com.qcloud.cos.model.ciModel.ai.AddPersonFaceResponse;
-import com.qcloud.cos.model.ciModel.ai.CreatePersonRequest;
-import com.qcloud.cos.model.ciModel.ai.CreatePersonResponse;
-import com.qcloud.cos.model.ciModel.ai.DeletePersonFaceRequest;
-import com.qcloud.cos.model.ciModel.ai.FaceSearchBucketRequest;
-import com.qcloud.cos.model.ciModel.ai.SearchPersonFaceRequest;
-import com.qcloud.cos.model.ciModel.ai.SearchPersonFaceResponse;
+import com.qcloud.cos.model.ciModel.ai.*;
 import com.qcloud.cos.model.ciModel.common.CImageProcessRequest;
 import com.qcloud.cos.model.ciModel.hls.*;
 import com.qcloud.cos.model.ciModel.image.*;
@@ -3261,6 +3254,8 @@ public interface COS extends COSDirectSpi {
     MediaListTemplateResponse describeMediaTemplatesV2(MediaTemplateRequest request);
 
     InputStream getPlayList(GetPlayListRequest request);
+
+    RecognizeLogoResponse recognizeLogo(RecognizeLogoRequest customRequest);
 }
 
 

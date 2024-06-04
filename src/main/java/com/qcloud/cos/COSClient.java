@@ -151,7 +151,6 @@ import com.qcloud.cos.http.TimeOutCosHttpClient;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -4329,29 +4328,31 @@ public class COSClient implements COS {
         return invoke(request, new Unmarshallers.ReportBadCaseUnmarshaller());
     }
 
-
     private String buildDocPreview(CosHttpRequest<DocHtmlRequest> request) throws URISyntaxException {
-        String urlStr = request.getProtocol().toString() + "://" + request.getEndpoint() + request.getResourcePath();
-        URIBuilder uriBuilder = new URIBuilder(urlStr);
-        COSSigner cosSigner = clientConfig.getCosSigner();
         Date expiredTime = new Date(System.currentTimeMillis() + clientConfig.getSignExpired() * 1000);
-        String authoriationStr = cosSigner.buildAuthorizationStr(request.getHttpMethod(), request.getResourcePath(),
-                request.getHeaders(), request.getParameters(), fetchCredential(), expiredTime, true);
+        HashMap<String, String> params = new HashMap<>();
+        params.put("ci-process", "doc-preview");
         DocHtmlRequest originalRequest = request.getOriginalRequest();
-        uriBuilder.addParameter("ci-process", "doc-preview");
-        uriBuilder.addParameter("dstType", originalRequest.getDstType().toString());
-        uriBuilder.addParameter("srcType", originalRequest.getSrcType());
-        uriBuilder.addParameter("page", originalRequest.getPage());
-        uriBuilder.addParameter("ImageParams", originalRequest.getImageParams());
-        uriBuilder.addParameter("sheet", originalRequest.getSheet());
-        uriBuilder.addParameter("password", originalRequest.getPassword());
-        uriBuilder.addParameter("comment", originalRequest.getComment());
-        uriBuilder.addParameter("excelPaperDirection", originalRequest.getExcelPaperDirection());
-        uriBuilder.addParameter("excelPaperSize", originalRequest.getExcelPaperSize());
-        uriBuilder.addParameter("quality", originalRequest.getQuality());
-        uriBuilder.addParameter("scale", originalRequest.getScale());
-        uriBuilder.addParameter("imageDpi", originalRequest.getImageDpi());
-        return uriBuilder.build().toString() + "&" + authoriationStr;
+        putIfNotNull(params, "dstType", originalRequest.getDstType().toString());
+        putIfNotNull(params, "srcType", originalRequest.getSrcType());
+        putIfNotNull(params, "page", originalRequest.getPage());
+        putIfNotNull(params, "ImageParams", originalRequest.getImageParams());
+        putIfNotNull(params, "sheet", originalRequest.getSheet());
+        putIfNotNull(params, "password", originalRequest.getPassword());
+        putIfNotNull(params, "comment", originalRequest.getComment());
+        putIfNotNull(params, "excelPaperDirection", originalRequest.getExcelPaperDirection());
+        putIfNotNull(params, "excelPaperSize", originalRequest.getExcelPaperSize());
+        putIfNotNull(params, "quality", originalRequest.getQuality());
+        putIfNotNull(params, "scale", originalRequest.getScale());
+        putIfNotNull(params, "imageDpi", originalRequest.getImageDpi());
+        URL url = generatePresignedUrl(request.getBucketName(), request.getResourcePath(), expiredTime, HttpMethodName.GET, new HashMap<String, String>(), params, false, false);
+        return url.toString();
+    }
+
+    private void putIfNotNull(HashMap<String, String> map, String key, String value) {
+        if (value != null) {
+            map.put(key, value);
+        }
     }
 
 //    private void checkAuditingRequest(ImageAuditingRequest request) {
@@ -5136,6 +5137,18 @@ public class COSClient implements COS {
         addParameterIfNotNull(request, "expires", getPlayListRequest.getExpires());
         return invoke(request, new CIGetSnapshotResponseHandler());
     }
+
+    @Override
+    public RecognizeLogoResponse recognizeLogo(RecognizeLogoRequest customRequest) {
+
+        CosHttpRequest<RecognizeLogoRequest> request = createRequest(customRequest.getBucketName(), "/", customRequest , HttpMethodName.GET);
+        addParameterIfNotNull(request, "ci-process", customRequest.getCiProcess());
+        addParameterIfNotNull(request, "detect-url", customRequest.getDetectUrl());
+
+        return invoke(request, new Unmarshallers.CICommonUnmarshaller<RecognizeLogoResponse>(RecognizeLogoResponse.class));
+    }
+
+
 
 }
 
