@@ -106,7 +106,7 @@ public class SelectObjectContentDemo {
                 "{\"name\":\"xiaowang\",\"mathScore\":93,\"musicScore\":85}\n" +
                 "{\"name\":\"xiaoli\",\"mathScore\":82,\"musicScore\":95}\n";
         cosclient.putObject(bucketName, key, csvContent);
-        String query = "select * from COSObject s where mathScore > 85'";
+        String query = "select * from COSObject s where mathScore > '85'";
 
         SelectObjectContentRequest request = new SelectObjectContentRequest();
         request.setBucketName(bucketName);

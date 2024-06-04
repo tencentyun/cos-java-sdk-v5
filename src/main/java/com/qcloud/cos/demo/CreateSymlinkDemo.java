@@ -10,10 +10,14 @@ import com.qcloud.cos.region.Region;
 
 public class CreateSymlinkDemo {
 
-    private static final String secretId = "";
-    private static final String secretKey = "";
-    private static final String bucket = "";
-    private static final String region = "";
+    private static final String secretId = "AKIDXXXXXXXX";
+    private static final String secretKey = "1A2Z3YYYYYYYYYY";
+    private static final String bucketName = "examplebucket-12500000000";
+    private static final String region = "ap-guangzhou";
+
+    public static void main(String[] args) {
+        createSymlink("test-symlink", "word_count.txt");
+    }
 
     private static void createSymlink(String symlink, String target)  {
         COSCredentials cosCredentials = new BasicCOSCredentials(secretId, secretKey);
@@ -21,7 +25,7 @@ public class CreateSymlinkDemo {
 
         COSClient cosClient = new COSClient(cosCredentials, clientConfig);
 
-        PutSymlinkRequest putSymlinkRequest = new PutSymlinkRequest(bucket, symlink, target);
+        PutSymlinkRequest putSymlinkRequest = new PutSymlinkRequest(bucketName, symlink, target);
 
         try {
             PutSymlinkResult putSymlinkResult = cosClient.putSymlink(putSymlinkRequest);
@@ -30,9 +34,5 @@ public class CreateSymlinkDemo {
             cosClient.shutdown();
         }
 
-    }
-
-    public static void main(String[] args) {
-        createSymlink("test-symlink", "word_count.txt");
     }
 }

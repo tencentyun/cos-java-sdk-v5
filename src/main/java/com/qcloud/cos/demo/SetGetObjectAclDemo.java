@@ -34,15 +34,15 @@ public class SetGetObjectAclDemo {
         // 设置对象的acl
         AccessControlList acl = new AccessControlList();
         Owner owner = new Owner();
-        owner.setId("qcs::cam::uin/2779643970:uin/2779643970");
+        owner.setId("qcs::cam::uin/100000000001:uin/100000000001");
         acl.setOwner(owner);
-        // 设置子账号734505014具有WriteAcp权限
-        String id = "qcs::cam::uin/2779643970:uin/734505014";
+        // 设置子账号100000000002具有WriteAcp权限
+        String id = "qcs::cam::uin/100000000001:uin/100000000002";
         UinGrantee uinGrantee = new UinGrantee(id);
         uinGrantee.setIdentifier(id);
-        // 设置子账号909619400具有Read权限
+        // 设置子账号100000000003具有Read权限
         acl.grantPermission(uinGrantee, Permission.WriteAcp);
-        String id1 = "qcs::cam::uin/2779643970:uin/909619400";
+        String id1 = "qcs::cam::uin/100000000001:uin/100000000003";
         UinGrantee uinGrantee1 = new UinGrantee(id1);
         uinGrantee.setIdentifier(id1);
         acl.grantPermission(uinGrantee1, Permission.Read);

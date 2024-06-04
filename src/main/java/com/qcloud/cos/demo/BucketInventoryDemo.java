@@ -26,6 +26,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class BucketInventoryDemo {
+    public static void main(String[] args) {
+        setGetDeleteBucketInventoryDemo();
+        setBucketInventoryDemo();
+    }
+
     private static void setGetDeleteBucketInventoryDemo() {
         // 1 初始化用户身份信息(secretId, secretKey)
         COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
@@ -39,7 +44,7 @@ public class BucketInventoryDemo {
         InventoryConfiguration inventoryConfiguration = new InventoryConfiguration();
         InventoryCosBucketDestination inventoryCosBucketDestination = new InventoryCosBucketDestination();
         // 设置清单的输出目标存储桶的格式和前缀等
-        inventoryCosBucketDestination.setAccountId("2779643970");
+        inventoryCosBucketDestination.setAccountId("100000000001");
         inventoryCosBucketDestination.setBucketArn("qcs::cos:ap-guangzhou::mybucket-12500000000");
         inventoryCosBucketDestination.setEncryption(new ServerSideEncryptionCOS());
         inventoryCosBucketDestination.setFormat(InventoryFormat.CSV);
@@ -112,7 +117,7 @@ public class BucketInventoryDemo {
                                     "<IncludedObjectVersions>All</IncludedObjectVersions>\n" +
                                     "<Destination>\n" +
                                         "<COSBucketDestination>\n" +
-                                            "<AccountId>2779643970</AccountId>\n" +
+                                            "<AccountId>100000000001</AccountId>\n" +
                                             "<Bucket>qcs::cos:ap-guangzhou::mybucket-12500000000</Bucket>\n" +
                                             "<Prefix>inventory-output</Prefix>\n" +
                                             "<Format>CSV</Format>\n" +
@@ -138,10 +143,5 @@ public class BucketInventoryDemo {
 
         cosclient.setBucketInventoryConfiguration(request);
         cosclient.shutdown();
-    }
-
-    public static void main(String[] args) {
-        setGetDeleteBucketInventoryDemo();
-        setBucketInventoryDemo();
     }
 }
