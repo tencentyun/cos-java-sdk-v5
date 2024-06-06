@@ -51,6 +51,8 @@ import com.qcloud.cos.model.ciModel.job.*;
 import com.qcloud.cos.model.ciModel.job.v2.*;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoRequest;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoResponse;
+import com.qcloud.cos.model.ciModel.metaInsight.CreateDatasetRequest;
+import com.qcloud.cos.model.ciModel.metaInsight.CreateDatasetResponse;
 import com.qcloud.cos.model.ciModel.persistence.AIGameRecResponse;
 import com.qcloud.cos.model.ciModel.persistence.CIUploadResult;
 import com.qcloud.cos.model.ciModel.persistence.AIRecRequest;
@@ -3256,6 +3258,8 @@ public interface COS extends COSDirectSpi {
     InputStream getPlayList(GetPlayListRequest request);
 
     RecognizeLogoResponse recognizeLogo(RecognizeLogoRequest customRequest);
+
+    CreateDatasetResponse createDataset(CreateDatasetRequest customRequest);
 }
 
 

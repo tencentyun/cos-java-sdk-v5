@@ -102,6 +102,8 @@ import com.qcloud.cos.model.ciModel.job.MediaJobObject;
 import com.qcloud.cos.model.ciModel.job.v2.*;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoRequest;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoResponse;
+import com.qcloud.cos.model.ciModel.metaInsight.CreateDatasetRequest;
+import com.qcloud.cos.model.ciModel.metaInsight.CreateDatasetResponse;
 import com.qcloud.cos.model.ciModel.persistence.AIGameRecResponse;
 import com.qcloud.cos.model.ciModel.persistence.CIUploadResult;
 import com.qcloud.cos.model.ciModel.persistence.AIRecRequest;
@@ -139,14 +141,7 @@ import com.qcloud.cos.model.inventory.InventoryConfiguration;
 import com.qcloud.cos.model.transform.ObjectTaggingXmlFactory;
 import com.qcloud.cos.region.Region;
 import com.qcloud.cos.retry.RetryUtils;
-import com.qcloud.cos.utils.Base64;
-import com.qcloud.cos.utils.BinaryUtils;
-import com.qcloud.cos.utils.DateUtils;
-import com.qcloud.cos.utils.Jackson;
-import com.qcloud.cos.utils.Md5Utils;
-import com.qcloud.cos.utils.ServiceUtils;
-import com.qcloud.cos.utils.StringUtils;
-import com.qcloud.cos.utils.UrlEncoderUtils;
+import com.qcloud.cos.utils.*;
 import com.qcloud.cos.http.TimeOutCosHttpClient;
 
 import org.apache.commons.codec.DecoderException;
@@ -5102,7 +5097,6 @@ public class COSClient implements COS {
 
         CosHttpRequest<GetHLSPlayKeyRequest> request = createRequest(customRequest.getBucketName(), "/playKey", customRequest , HttpMethodName.GET);
 
-
         return invoke(request, new Unmarshallers.CICommonUnmarshaller<GetHLSPlayKeyResponse>(GetHLSPlayKeyResponse.class));
     }
 
@@ -5132,11 +5126,25 @@ public class COSClient implements COS {
 
     @Override
     public InputStream getPlayList(GetPlayListRequest getPlayListRequest) {
-        CosHttpRequest<GetPlayListRequest> request = createRequest(getPlayListRequest.getBucketName(), "/getplaylist", getPlayListRequest, HttpMethodName.GET);
+        CosHttpRequest<GetPlayListRequest> request = createRequest(getPlayListRequest.getBucketName(), getPlayListRequest.getObject(), getPlayListRequest, HttpMethodName.GET);
+        request.addParameter("ci-process","pm3u8");
         addParameterIfNotNull(request, "object", getPlayListRequest.getObject());
         addParameterIfNotNull(request, "expires", getPlayListRequest.getExpires());
+        addParameterIfNotNull(request, "tokenType", getPlayListRequest.getTokenType());
+        addParameterIfNotNull(request, "token", getPlayListRequest.getToken());
+
         return invoke(request, new CIGetSnapshotResponseHandler());
     }
+//@Override
+//    public InputStream getPlayList(GetPlayListRequest getPlayListRequest) {
+//        CosHttpRequest<GetPlayListRequest> request = createRequest(getPlayListRequest.getBucketName(), "/getplaylist", getPlayListRequest, HttpMethodName.GET);
+//        addParameterIfNotNull(request, "object", getPlayListRequest.getObject());
+//        addParameterIfNotNull(request, "expires", getPlayListRequest.getExpires());
+//        addParameterIfNotNull(request, "tokenType", getPlayListRequest.getTokenType());
+//        addParameterIfNotNull(request, "token", getPlayListRequest.getToken());
+//
+//        return invoke(request, new CIGetSnapshotResponseHandler());
+//    }
 
     @Override
     public RecognizeLogoResponse recognizeLogo(RecognizeLogoRequest customRequest) {
@@ -5148,7 +5156,39 @@ public class COSClient implements COS {
         return invoke(request, new Unmarshallers.CICommonUnmarshaller<RecognizeLogoResponse>(RecognizeLogoResponse.class));
     }
 
+    @Override
+    public CreateDatasetResponse createDataset(CreateDatasetRequest customRequest) {
+        rejectNull(customRequest, "The request parameter must be specified setting the object tags");
+
+        CosHttpRequest<CreateDatasetRequest> request = createRequest(customRequest.getAppId(), "/dataset", customRequest , HttpMethodName.POST);
+        request.addHeader("Accept", "application/json");
+        this.setContent(request, CIJackson.toJsonString(request).getBytes(), "application/json", false);
+        return invoke(request, new Unmarshallers.CICommonUnmarshaller<CreateDatasetResponse>(CreateDatasetResponse.class));
+    }
 
 
+    public String generateCosDomainPrivateM3U8Url(PrivateM3U8Request privateM3U8Request) {
+        CosHttpRequest<PrivateM3U8Request> request = createRequest(privateM3U8Request.getBucketName(), privateM3U8Request.getObject(), privateM3U8Request, HttpMethodName.GET);
+        request.addParameter("ci-process","pm3u8");
+        addParameterIfNotNull(request, "object", privateM3U8Request.getObject());
+        addParameterIfNotNull(request, "expires", privateM3U8Request.getExpires());
+        addParameterIfNotNull(request, "tokenType", privateM3U8Request.getTokenType());
+        addParameterIfNotNull(request, "token", privateM3U8Request.getToken());
+
+        return buildPrivateM3U8Url(request,clientConfig);
+    }
+
+    private String buildPrivateM3U8Url(CosHttpRequest<PrivateM3U8Request> request, ClientConfig clientConfig) {
+        Date expiredTime = new Date(System.currentTimeMillis() + clientConfig.getSignExpired() * 1000);
+        HashMap<String, String> params = new HashMap<>();
+        params.put("ci-process", "pm3u8");
+        PrivateM3U8Request originalRequest = request.getOriginalRequest();
+        putIfNotNull(params, "object", originalRequest.getObject());
+        putIfNotNull(params, "expires", originalRequest.getExpires());
+        putIfNotNull(params, "tokenType", originalRequest.getTokenType());
+        putIfNotNull(params, "token", originalRequest.getToken());
+        URL url = generatePresignedUrl(request.getBucketName(), request.getResourcePath(), expiredTime, HttpMethodName.GET, new HashMap<String, String>(), params, false, false);
+        return url.toString();
+    }
 }
 
