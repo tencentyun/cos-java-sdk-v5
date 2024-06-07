@@ -15,9 +15,9 @@ import java.util.Date;
 public class LiveTranscodeDemo {
     private static String appId = "1251704708";
     private static String bucket = "markjrzhang-1251704708";
-    private static String objectKey = "output/media/test.m3u8";
+    private static String objectKey = "test.m3u8";
     private static String expires = "3600";
-    private static byte[] secret = "ui0KZSbUbhApT2OjF1BNiU04FvqloQEL".getBytes();
+    private static byte[] secret = "YourSecret".getBytes();
 
 
     public static void main(String[] args) {
@@ -31,8 +31,9 @@ public class LiveTranscodeDemo {
         request.setBucketName(bucket);
         request.setObject(objectKey);
         request.setExpires(expires);
+        request.setTokenType("JwtToken");
         String token =generateToken(appId, bucket, objectKey, secret,expires);
-        request.setTokenType(token);
+        request.setToken(token);
         return client.generateCosDomainPrivateM3U8Url(request);
     }
 
