@@ -31,14 +31,7 @@ import com.qcloud.cos.model.bucketcertificate.BucketDomainCertificateRequest;
 import com.qcloud.cos.model.bucketcertificate.BucketGetDomainCertificate;
 import com.qcloud.cos.model.bucketcertificate.BucketPutDomainCertificate;
 import com.qcloud.cos.model.bucketcertificate.SetBucketDomainCertificateRequest;
-import com.qcloud.cos.model.ciModel.ai.AddPersonFaceRequest;
-import com.qcloud.cos.model.ciModel.ai.AddPersonFaceResponse;
-import com.qcloud.cos.model.ciModel.ai.CreatePersonRequest;
-import com.qcloud.cos.model.ciModel.ai.CreatePersonResponse;
-import com.qcloud.cos.model.ciModel.ai.DeletePersonFaceRequest;
-import com.qcloud.cos.model.ciModel.ai.FaceSearchBucketRequest;
-import com.qcloud.cos.model.ciModel.ai.SearchPersonFaceRequest;
-import com.qcloud.cos.model.ciModel.ai.SearchPersonFaceResponse;
+import com.qcloud.cos.model.ciModel.ai.*;
 import com.qcloud.cos.model.ciModel.common.CImageProcessRequest;
 import com.qcloud.cos.model.ciModel.hls.*;
 import com.qcloud.cos.model.ciModel.image.*;
@@ -55,14 +48,11 @@ import com.qcloud.cos.model.ciModel.bucket.MediaBucketRequest;
 import com.qcloud.cos.model.ciModel.bucket.MediaBucketResponse;
 import com.qcloud.cos.model.ciModel.common.ImageProcessRequest;
 import com.qcloud.cos.model.ciModel.job.*;
-import com.qcloud.cos.model.ciModel.job.v2.DNADbConfigsRequest;
-import com.qcloud.cos.model.ciModel.job.v2.DNADbConfigsResponse;
-import com.qcloud.cos.model.ciModel.job.v2.DNADbFilesRequest;
-import com.qcloud.cos.model.ciModel.job.v2.DNADbFilesResponse;
-import com.qcloud.cos.model.ciModel.job.v2.MediaJobResponseV2;
-import com.qcloud.cos.model.ciModel.job.v2.MediaJobsRequestV2;
+import com.qcloud.cos.model.ciModel.job.v2.*;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoRequest;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoResponse;
+import com.qcloud.cos.model.ciModel.metaInsight.CreateDatasetRequest;
+import com.qcloud.cos.model.ciModel.metaInsight.CreateDatasetResponse;
 import com.qcloud.cos.model.ciModel.persistence.AIGameRecResponse;
 import com.qcloud.cos.model.ciModel.persistence.CIUploadResult;
 import com.qcloud.cos.model.ciModel.persistence.AIRecRequest;
@@ -3264,6 +3254,12 @@ public interface COS extends COSDirectSpi {
     UpdataHLSPlayKeyResponse updataHLSPlayKey(UpdataHLSPlayKeyRequest customRequest);
 
     MediaListTemplateResponse describeMediaTemplatesV2(MediaTemplateRequest request);
+
+    InputStream getPlayList(GetPlayListRequest request);
+
+    RecognizeLogoResponse recognizeLogo(RecognizeLogoRequest customRequest);
+
+    CreateDatasetResponse createDataset(CreateDatasetRequest customRequest);
 }
 
 

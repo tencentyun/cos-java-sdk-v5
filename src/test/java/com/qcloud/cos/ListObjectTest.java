@@ -98,6 +98,7 @@ public class ListObjectTest extends AbstractCOSClientTest {
         }
         ListObjectsRequest listObjectsRequest =
                 new ListObjectsRequest().withBucketName(bucket).withDelimiter("/");
+        listObjectsRequest.setEncodingType("url");
         ObjectListing objectListing = cosclient.listObjects(listObjectsRequest);
         assertEquals(1L, objectListing.getCommonPrefixes().size());
         assertEquals(0L, objectListing.getObjectSummaries().size());

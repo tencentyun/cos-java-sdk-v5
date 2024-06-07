@@ -147,7 +147,23 @@ public class CosClientWithMockTest {
             }
         } finally {
             inputStream.close();
+            client.shutdown();
         }
+    }
+
+    @Test
+    public void testPutWithDecoderException() throws Exception {
+        COSSigner signer = PowerMockito.mock(COSSigner.class);
+        PowerMockito.whenNew(COSSigner.class).withNoArguments().thenReturn(signer);
+        PowerMockito.when(signer, "sign", any(), any(), any()).thenAnswer((m)->{return null;});
+        ClientConfig clientConfig = new ClientConfig(new Region(region_));
+
+        DefaultCosHttpClient cosHttpClient = PowerMockito.mock(DefaultCosHttpClient.class);
+        PowerMockito.whenNew(DefaultCosHttpClient.class).withArguments(clientConfig).thenReturn(cosHttpClient);
+
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setETag("b6d81b360a5672d80c27430f39153e2c");
+        PowerMockito.when(cosHttpClient,"exeute", any(), any()).thenReturn(metadata);
 
         PowerMockito.mockStatic(BinaryUtils.class);
         PowerMockito.when(BinaryUtils.fromHex(anyString())).thenAnswer((m)->{
@@ -155,12 +171,15 @@ public class CosClientWithMockTest {
             throw de;
         });
 
-        data = new byte[inputStreamLength];
-        InputStream inputStream2 = new ByteArrayInputStream(data);
-        key = "testDecoderException";
-        objectMetadata = new ObjectMetadata();
+        COSCredentials cred = new BasicCOSCredentials(secretId_, secretKey_);
+        COSClient client = new COSClient(cred, clientConfig);
 
-        putObjectRequest = new PutObjectRequest(bucket_, key, inputStream2, objectMetadata);
+        byte[] data = new byte[1024 * 1024];
+        InputStream inputStream2 = new ByteArrayInputStream(data);
+        String key = "testDecoderException";
+        ObjectMetadata objectMetadata = new ObjectMetadata();
+
+        PutObjectRequest putObjectRequest = new PutObjectRequest(bucket_, key, inputStream2, objectMetadata);
 
         try {
             client.putObject(putObjectRequest);
@@ -287,6 +306,12 @@ public class CosClientWithMockTest {
         request.setSourceVersionId("1111111");
         request.setCannedAccessControlList(CannedAccessControlList.PublicRead);
 
+        CopyObjectRequest request_with_params = new CopyObjectRequest(bucket_, "testSrc", bucket_, "testDst");
+        AccessControlList acl = new AccessControlList();
+        request_with_params.setAccessControlList(acl);
+        request_with_params.setRedirectLocation("test_redirectLocation");
+        request_with_params.setMetadataDirective("metadata_directive");
+
         CopyPartRequest copyPartRequest = new CopyPartRequest();
         // 要拷贝的源文件所在的region
         UserSpecifiedEndpointBuilder endpointBuilder = new UserSpecifiedEndpointBuilder("testApiEndpoint", "getServiceApiEndpoint");
@@ -316,6 +341,12 @@ public class CosClientWithMockTest {
 
         try {
             cosClient.copyPart(copyPartRequest);
+        } catch (CosServiceException cse) {
+            assertEquals("Unknown", cse.getErrorCode());
+        }
+
+        try {
+            cosClient.copyObject(request_with_params);
         } catch (CosServiceException cse) {
             assertEquals("Unknown", cse.getErrorCode());
         }
@@ -408,7 +439,7 @@ public class CosClientWithMockTest {
         COSCredentials cred = new BasicCOSCredentials(secretId_, secretKey_);
         COSClient cosClient = new COSClient(cred, clientConfig);
 
-        VersionListing result = cosClient.listVersions(bucket_, "test_prefix", null, null, null, null);
+        VersionListing result = cosClient.listVersions(bucket_, "test_prefix", "test_key_marker", "test_version_marker", "/", 1000);
         assertEquals(bucket_, result.getBucketName());
         cosClient.shutdown();
     }
@@ -729,6 +760,76 @@ public class CosClientWithMockTest {
             System.out.println(imageAuditing.getResponse());
         }
         transferManager.shutdownNow();
+        cosClient.shutdown();
+    }
+
+    @Test
+    public void testSetBucketACL() throws Exception {
+        COSSigner signer = PowerMockito.mock(COSSigner.class);
+        PowerMockito.whenNew(COSSigner.class).withNoArguments().thenReturn(signer);
+        PowerMockito.when(signer, "sign", any(), any(), any()).thenAnswer((m)->{return null;});
+        ClientConfig clientConfig = new ClientConfig(new Region(region_));
+
+        DefaultCosHttpClient cosHttpClient = PowerMockito.mock(DefaultCosHttpClient.class);
+        PowerMockito.whenNew(DefaultCosHttpClient.class).withArguments(clientConfig).thenReturn(cosHttpClient);
+
+        PowerMockito.when(cosHttpClient,"exeute", any(), any()).thenAnswer((m)->{
+            return null;
+        });
+
+        COSCredentials cred = new BasicCOSCredentials(secretId_, secretKey_);
+        COSClient cosClient = new COSClient(cred, clientConfig);
+
+        String ownerUin = System.getenv("owner_uin");
+        String ownerId = String.format("qcs::cam::uin/%s:uin/%s", ownerUin, ownerUin);
+        AccessControlList acl = new AccessControlList();
+        Owner owner = new Owner();
+        owner.setId(ownerId);
+        acl.setOwner(owner);
+
+        String granteeUin = "qcs::cam::uin/734505014:uin/734505014";
+        UinGrantee uinGrantee = new UinGrantee(granteeUin);
+        uinGrantee.setIdentifier(granteeUin);
+        acl.grantPermission(uinGrantee, Permission.FullControl);
+        cosClient.setBucketAcl(bucket_, acl);
+        cosClient.setObjectAcl(bucket_, "testSetObjACL", acl);
+
+        cosClient.shutdown();
+    }
+
+    @Test
+    public void testGetBucketACL() throws Exception {
+        COSSigner signer = PowerMockito.mock(COSSigner.class);
+        PowerMockito.whenNew(COSSigner.class).withNoArguments().thenReturn(signer);
+        PowerMockito.when(signer, "sign", any(), any(), any()).thenAnswer((m)->{return null;});
+        ClientConfig clientConfig = new ClientConfig(new Region(region_));
+
+        DefaultCosHttpClient cosHttpClient = PowerMockito.mock(DefaultCosHttpClient.class);
+        PowerMockito.whenNew(DefaultCosHttpClient.class).withArguments(clientConfig).thenReturn(cosHttpClient);
+
+        PowerMockito.when(cosHttpClient,"exeute", any(), any()).thenAnswer((m)->{
+            AccessControlList acl = new AccessControlList();
+            Owner owner = new Owner();
+            String ownerId = "qcs::cam::uin/100000000001:uin/100000000001";
+            owner.setId(ownerId);
+            acl.setOwner(owner);
+            String granteeUin = "qcs::cam::uin/100000000002:uin/100000000002";
+            UinGrantee uinGrantee = new UinGrantee(granteeUin);
+            acl.grantPermission(uinGrantee, Permission.FullControl);
+            return acl;
+        });
+
+        COSCredentials cred = new BasicCOSCredentials(secretId_, secretKey_);
+        COSClient cosClient = new COSClient(cred, clientConfig);
+
+        AccessControlList acl = cosClient.getBucketAcl(bucket_);
+        List<Grant> grants = acl.getGrantsAsList();
+        assertEquals(1L, grants.size());
+
+        acl = cosClient.getObjectAcl(bucket_, "testGetObjACL");
+        grants = acl.getGrantsAsList();
+        assertEquals(1L, grants.size());
+
         cosClient.shutdown();
     }
 }

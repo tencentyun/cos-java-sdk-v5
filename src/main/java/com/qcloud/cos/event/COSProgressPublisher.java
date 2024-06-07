@@ -81,8 +81,7 @@ public class COSProgressPublisher extends SDKProgressPublisher {
         } catch(Throwable t) {
             // That's right, we need to suppress all errors so as to be on par
             // with the async mode where all failures will be ignored.
-            LoggerFactory.getLogger(COSProgressPublisher.class)
-                .debug("Failure from the event listener", t);
+            LoggerFactory.getLogger(COSProgressPublisher.class).debug("Failure from the event listener", t);
         }
         return null;
     }

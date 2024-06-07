@@ -69,5 +69,11 @@ public class StringUtilsTest {
         BigDecimal bigDecimal = StringUtils.toBigDecimal("1024");
         String str_from_bigDecimal = StringUtils.fromBigDecimal(bigDecimal);
         assertEquals("1024", str_from_bigDecimal);
+
+        String key = "/.../a/../b/c/../d/./";
+        assertEquals(false, StringUtils.isRequestPathInvalid(key));
+
+        key = "../";
+        assertEquals(true, StringUtils.isRequestPathInvalid(key));
     }
 }

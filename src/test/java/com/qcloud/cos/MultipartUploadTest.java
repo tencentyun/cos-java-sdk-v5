@@ -60,20 +60,29 @@ public class MultipartUploadTest extends AbstractCOSClientTest {
         if (!judgeUserInfoValid()) {
             return;
         }
-        String key = "ut/testListMultipart.txt";
-        InitiateMultipartUploadRequest initiateMultipartUploadRequest = new InitiateMultipartUploadRequest(bucket, key);
-        String uploadId = testInitMultipart(initiateMultipartUploadRequest);
+        String key1 = "ut/testListMultipart1.txt";
+        InitiateMultipartUploadRequest initiateMultipartUploadRequest1 = new InitiateMultipartUploadRequest(bucket, key1);
+        String uploadId = testInitMultipart(initiateMultipartUploadRequest1);
+
+        String key2 = "ut/testListMultipart2.txt";
+        InitiateMultipartUploadRequest initiateMultipartUploadRequest2 = new InitiateMultipartUploadRequest(bucket, key2);
+        String uploadId2 = testInitMultipart(initiateMultipartUploadRequest2);
+
         ListMultipartUploadsRequest listMultipartUploadsRequest =
                 new ListMultipartUploadsRequest(bucket);
         listMultipartUploadsRequest.setMaxUploads(100);
         listMultipartUploadsRequest.setPrefix("ut/");
+        listMultipartUploadsRequest.setKeyMarker("ut/testListMultipart1.txt");
+        listMultipartUploadsRequest.setDelimiter("/");
+        listMultipartUploadsRequest.setEncodingType("url");
+        listMultipartUploadsRequest.setUploadIdMarker(uploadId);
         while (true) {
             MultipartUploadListing multipartUploadListing =
                     cosclient.listMultipartUploads(listMultipartUploadsRequest);
             List<MultipartUpload> multipartUploads = multipartUploadListing.getMultipartUploads();
             for (MultipartUpload mUpload : multipartUploads) {
-                if (mUpload.getUploadId().equals(uploadId)) {
-                    assertEquals(key, mUpload.getKey());
+                if (mUpload.getUploadId().equals(uploadId2)) {
+                    assertEquals(key2, mUpload.getKey());
                     return;
                 }
             }

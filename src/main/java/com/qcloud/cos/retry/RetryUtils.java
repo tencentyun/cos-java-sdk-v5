@@ -90,7 +90,7 @@ public class RetryUtils {
         return RETRYABLE_CLIENT_ERROR_CODES.contains(exception.getErrorCode());
     }
 
-    public static boolean ShouldRetryCopyRequest(CosServiceException exception) {
+    public static boolean shouldRetryCopyRequest(CosServiceException exception) {
         return  RETRYABLE_ERROR_CODES.contains(exception.getErrorCode());
     }
 

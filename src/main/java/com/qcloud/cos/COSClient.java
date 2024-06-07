@@ -98,14 +98,12 @@ import com.qcloud.cos.model.ciModel.image.ImageStyleRequest;
 import com.qcloud.cos.model.ciModel.image.ImageStyleResponse;
 import com.qcloud.cos.model.ciModel.image.OpenImageSearchRequest;
 import com.qcloud.cos.model.ciModel.job.*;
-import com.qcloud.cos.model.ciModel.job.v2.DNADbConfigsRequest;
-import com.qcloud.cos.model.ciModel.job.v2.DNADbConfigsResponse;
-import com.qcloud.cos.model.ciModel.job.v2.DNADbFilesRequest;
-import com.qcloud.cos.model.ciModel.job.v2.DNADbFilesResponse;
-import com.qcloud.cos.model.ciModel.job.v2.MediaJobResponseV2;
-import com.qcloud.cos.model.ciModel.job.v2.MediaJobsRequestV2;
+import com.qcloud.cos.model.ciModel.job.MediaJobObject;
+import com.qcloud.cos.model.ciModel.job.v2.*;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoRequest;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoResponse;
+import com.qcloud.cos.model.ciModel.metaInsight.CreateDatasetRequest;
+import com.qcloud.cos.model.ciModel.metaInsight.CreateDatasetResponse;
 import com.qcloud.cos.model.ciModel.persistence.AIGameRecResponse;
 import com.qcloud.cos.model.ciModel.persistence.CIUploadResult;
 import com.qcloud.cos.model.ciModel.persistence.AIRecRequest;
@@ -155,7 +153,6 @@ import com.qcloud.cos.http.TimeOutCosHttpClient;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -2144,7 +2141,7 @@ public class COSClient implements COS {
                                 + " httpRequest: %s, retryIdx:%d, maxErrorRetry:%d", cse.getMessage(), request,
                         retryIndex, clientConfig.getMaxErrorRetryForCopyRequest());
                 log.debug(errorMsg);
-                if (retryIndex < clientConfig.getMaxErrorRetryForCopyRequest() && RetryUtils.ShouldRetryCopyRequest(cse)) {
+                if (retryIndex < clientConfig.getMaxErrorRetryForCopyRequest() && RetryUtils.shouldRetryCopyRequest(cse)) {
                     retryIndex++;
                     continue;
                 }
@@ -2261,7 +2258,7 @@ public class COSClient implements COS {
                                 + " httpRequest: %s, retryIdx:%d, maxErrorRetry:%d", cse.getMessage(), request,
                         retryIndex, clientConfig.getMaxErrorRetryForCopyRequest());
                 log.debug(errorMsg);
-                if (retryIndex < clientConfig.getMaxErrorRetryForCopyRequest() && RetryUtils.ShouldRetryCopyRequest(cse)) {
+                if (retryIndex < clientConfig.getMaxErrorRetryForCopyRequest() && RetryUtils.shouldRetryCopyRequest(cse)) {
                     retryIndex++;
                     continue;
                 }
@@ -4333,46 +4330,32 @@ public class COSClient implements COS {
         return invoke(request, new Unmarshallers.ReportBadCaseUnmarshaller());
     }
 
-
     private String buildDocPreview(CosHttpRequest<DocHtmlRequest> request) throws URISyntaxException {
-        String urlStr = request.getProtocol().toString() + "://" + request.getEndpoint() + request.getResourcePath();
-        URIBuilder uriBuilder = new URIBuilder(urlStr);
-        COSSigner cosSigner = clientConfig.getCosSigner();
         Date expiredTime = new Date(System.currentTimeMillis() + clientConfig.getSignExpired() * 1000);
-        String authoriationStr = cosSigner.buildAuthorizationStr(request.getHttpMethod(), request.getResourcePath(),
-                request.getHeaders(), request.getParameters(), fetchCredential(), expiredTime, true);
+        HashMap<String, String> params = new HashMap<>();
+        params.put("ci-process", "doc-preview");
         DocHtmlRequest originalRequest = request.getOriginalRequest();
-        uriBuilder.addParameter("ci-process", "doc-preview");
-        uriBuilder.addParameter("dstType", originalRequest.getDstType().toString());
-        uriBuilder.addParameter("srcType", originalRequest.getSrcType());
-        uriBuilder.addParameter("page", originalRequest.getPage());
-        uriBuilder.addParameter("ImageParams", originalRequest.getImageParams());
-        uriBuilder.addParameter("sheet", originalRequest.getSheet());
-        uriBuilder.addParameter("password", originalRequest.getPassword());
-        uriBuilder.addParameter("comment", originalRequest.getComment());
-        uriBuilder.addParameter("excelPaperDirection", originalRequest.getExcelPaperDirection());
-        uriBuilder.addParameter("excelPaperSize", originalRequest.getExcelPaperSize());
-        uriBuilder.addParameter("quality", originalRequest.getQuality());
-        uriBuilder.addParameter("scale", originalRequest.getScale());
-        uriBuilder.addParameter("imageDpi", originalRequest.getImageDpi());
-        return uriBuilder.build().toString() + "&" + authoriationStr;
+        putIfNotNull(params, "dstType", originalRequest.getDstType().toString());
+        putIfNotNull(params, "srcType", originalRequest.getSrcType());
+        putIfNotNull(params, "page", originalRequest.getPage());
+        putIfNotNull(params, "ImageParams", originalRequest.getImageParams());
+        putIfNotNull(params, "sheet", originalRequest.getSheet());
+        putIfNotNull(params, "password", originalRequest.getPassword());
+        putIfNotNull(params, "comment", originalRequest.getComment());
+        putIfNotNull(params, "excelPaperDirection", originalRequest.getExcelPaperDirection());
+        putIfNotNull(params, "excelPaperSize", originalRequest.getExcelPaperSize());
+        putIfNotNull(params, "quality", originalRequest.getQuality());
+        putIfNotNull(params, "scale", originalRequest.getScale());
+        putIfNotNull(params, "imageDpi", originalRequest.getImageDpi());
+        URL url = generatePresignedUrl(request.getBucketName(), request.getResourcePath(), expiredTime, HttpMethodName.GET, new HashMap<String, String>(), params, false, false);
+        return url.toString();
     }
 
-//    private void checkAuditingRequest(ImageAuditingRequest request) {
-//        rejectNull(request.getDetectType(), "The detectType parameter must be specified setting the object tags");
-//        rejectNull(request.getObjectKey(), "The objectKey parameter must be specified setting the object tags");
-//    }
-//
-//    private void checkWorkflowParameter(MediaWorkflowRequest request) {
-//        rejectNull(request.getName(),
-//                "The name parameter must be specified setting the object tags");
-//        rejectNull(request.getTopology(),
-//                "The topology parameter must be specified setting the object tags");
-//        rejectEmpty(request.getTopology().getMediaWorkflowNodes(),
-//                "The Nodes parameter must be specified setting the object tags");
-//        rejectEmpty(request.getTopology().getMediaWorkflowDependency(),
-//                "The Dependency parameter must be specified setting the object tags");
-//    }
+    private void putIfNotNull(HashMap<String, String> map, String key, String value) {
+        if (value != null) {
+            map.put(key, value);
+        }
+    }
 
     private void checkCIRequestCommon(CIServiceRequest request) {
         rejectNull(request,
@@ -4380,16 +4363,6 @@ public class COSClient implements COS {
         rejectNull(request.getBucketName(),
                 "The bucketName parameter must be specified setting the object tags");
     }
-
-//    private void checkRequestOutput(MediaOutputObject output) {
-//        rejectNull(output.getBucket(),
-//                "The output.bucket parameter must be specified setting the object tags");
-//        rejectNull(output.getRegion(),
-//                "The output.region parameter must be specified setting the object tags");
-//        rejectNull(output.getObject(),
-//                "The output.object parameter must be specified setting the object tags");
-//    }
-
 
     private void checkMediaListJobResponse(MediaListJobResponse response) {
         List<MediaJobObject> jobsDetailList = response.getJobsDetailList();
@@ -5133,6 +5106,50 @@ public class COSClient implements COS {
         return this.invoke(httpRequest, new Unmarshallers.CICommonUnmarshaller<MediaListTemplateResponse>(MediaListTemplateResponse.class));
     }
 
+    @Override
+    public InputStream getPlayList(GetPlayListRequest getPlayListRequest) {
+        CosHttpRequest<GetPlayListRequest> request = createRequest(getPlayListRequest.getBucketName(), "/getplaylist", getPlayListRequest, HttpMethodName.GET);
+        addParameterIfNotNull(request, "object", getPlayListRequest.getObject());
+        addParameterIfNotNull(request, "expires", getPlayListRequest.getExpires());
 
+        return invoke(request, new CIGetSnapshotResponseHandler());
+    }
+
+    @Override
+    public RecognizeLogoResponse recognizeLogo(RecognizeLogoRequest customRequest) {
+
+        CosHttpRequest<RecognizeLogoRequest> request = createRequest(customRequest.getBucketName(), "/", customRequest , HttpMethodName.GET);
+        addParameterIfNotNull(request, "ci-process", customRequest.getCiProcess());
+        addParameterIfNotNull(request, "detect-url", customRequest.getDetectUrl());
+
+        return invoke(request, new Unmarshallers.CICommonUnmarshaller<RecognizeLogoResponse>(RecognizeLogoResponse.class));
+    }
+
+    @Override
+    public CreateDatasetResponse createDataset(CreateDatasetRequest customRequest) {
+        return null;
+    }
+
+
+    public String generateCosDomainPrivateM3U8Url(PrivateM3U8Request privateM3U8Request) {
+        CosHttpRequest<PrivateM3U8Request> request = createRequest(privateM3U8Request.getBucketName(), privateM3U8Request.getObject(), privateM3U8Request, HttpMethodName.GET);
+        request.addParameter("ci-process","pm3u8");
+        addParameterIfNotNull(request,"expires",privateM3U8Request.getExpires());
+        addParameterIfNotNull(request,"tokenType",privateM3U8Request.getTokenType());
+        addParameterIfNotNull(request,"token",privateM3U8Request.getToken());
+        return buildPrivateM3U8Url(request);
+    }
+
+    private String buildPrivateM3U8Url(CosHttpRequest<PrivateM3U8Request> request)  {
+        Date expiredTime = new Date(System.currentTimeMillis() + clientConfig.getSignExpired() * 1000);
+        HashMap<String, String> params = new HashMap<>();
+        params.put("ci-process", "pm3u8");
+        PrivateM3U8Request originalRequest = request.getOriginalRequest();
+        putIfNotNull(params, "expires", originalRequest.getExpires());
+        putIfNotNull(params, "tokenType", originalRequest.getTokenType());
+        putIfNotNull(params, "token", originalRequest.getToken());
+        URL url = generatePresignedUrl(request.getBucketName(), request.getResourcePath(), expiredTime, HttpMethodName.GET, new HashMap<String, String>(), params, false, false);
+        return url.toString();
+    }
 }
 

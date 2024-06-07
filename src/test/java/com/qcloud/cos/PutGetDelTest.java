@@ -638,7 +638,7 @@ public class PutGetDelTest extends AbstractCOSClientTest {
         owner.setId(ownerId);
         acl.setOwner(owner);
 
-        String granteeUin = String.format("qcs::cam::uin/%s:uin/734505014", ownerUin);
+        String granteeUin = String.format("qcs::cam::uin/%s:uin/2832742109", ownerUin);
         UinGrantee uinGrantee = new UinGrantee(granteeUin);
         uinGrantee.setIdentifier(granteeUin);
         acl.grantPermission(uinGrantee, Permission.FullControl);
@@ -671,7 +671,7 @@ public class PutGetDelTest extends AbstractCOSClientTest {
         owner.setId(ownerId);
         acl.setOwner(owner);
 
-        String granteeUin = String.format("qcs::cam::uin/%s:uin/734505014", ownerUin);
+        String granteeUin = String.format("qcs::cam::uin/%s:uin/2832742109", ownerUin);
         UinGrantee uinGrantee = new UinGrantee(granteeUin);
         uinGrantee.setIdentifier(granteeUin);
         acl.grantPermission(uinGrantee, Permission.FullControl);
@@ -691,6 +691,23 @@ public class PutGetDelTest extends AbstractCOSClientTest {
             cosclient.initiateMultipartUpload(initiateMultipartUploadRequest);
         } catch (CosServiceException cse) {
             cse.printStackTrace();
+        }
+    }
+
+    @Test
+    public void testGetObjWithInvalidKey() {
+        ClientConfig clientConfig = new ClientConfig(new Region(region));
+        clientConfig.setCheckRequestPath(true);
+        COSCredentials cred = new BasicCOSCredentials(secretId, secretKey);
+        COSClient cosClient = new COSClient(cred, clientConfig);
+
+        String key = "test/../";
+        try {
+            COSObject cosObject = cosClient.getObject(bucket, key);
+        } catch (IllegalArgumentException ie) {
+            assertEquals(ie.getMessage(), "The key you specified is invalid");
+        } finally {
+            cosClient.shutdown();
         }
     }
 }

@@ -1,11 +1,17 @@
 package com.qcloud.cos;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import com.qcloud.cos.event.COSProgressListenerChain;
+import com.qcloud.cos.event.TransferProgressUpdatingListener;
+import com.qcloud.cos.model.*;
+import com.qcloud.cos.transfer.*;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -15,23 +21,7 @@ import com.qcloud.cos.auth.BasicCOSCredentials;
 import com.qcloud.cos.auth.COSCredentials;
 import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.exception.CosServiceException;
-import com.qcloud.cos.model.CopyObjectRequest;
-import com.qcloud.cos.model.CopyResult;
-import com.qcloud.cos.model.GetObjectRequest;
-import com.qcloud.cos.model.ObjectMetadata;
-import com.qcloud.cos.model.PutObjectRequest;
-import com.qcloud.cos.model.UploadResult;
-import com.qcloud.cos.model.StorageClass;
 import com.qcloud.cos.region.Region;
-import com.qcloud.cos.transfer.Copy;
-import com.qcloud.cos.transfer.Download;
-import com.qcloud.cos.transfer.MultipleFileDownload;
-import com.qcloud.cos.transfer.MultipleFileUpload;
-import com.qcloud.cos.transfer.TransferManager;
-import com.qcloud.cos.transfer.Upload;
-import com.qcloud.cos.transfer.PersistableUpload;
-import com.qcloud.cos.transfer.PersistableDownload;
-import com.qcloud.cos.transfer.TransferManagerConfiguration;
 import com.qcloud.cos.utils.Md5Utils;
 
 import static org.junit.Assert.*;
@@ -269,23 +259,17 @@ public class TransferManagerTest extends AbstractCOSClientTest {
 
     @Test
     public void testAbortMultipartUploads() throws Exception {
-        File localFile = buildTestFile(10L * 1024 * 1024);
         String key = "testAbortMultipartUploads.txt";
-        PutObjectRequest putObjectRequest = new PutObjectRequest(bucket, key, localFile);
         try {
-            // 返回一个异步结果Upload, 可同步的调用waitForUploadResult等待upload结束, 成功返回UploadResult, 失败抛出异常.
-            Upload upload = transferManager.upload(putObjectRequest);
-            Thread.sleep(1000);
-            PersistableUpload persistableUpload = upload.pause();
+            InitiateMultipartUploadRequest initiateMultipartUploadRequest = new InitiateMultipartUploadRequest(bucket, key);
+            cosclient.initiateMultipartUpload(initiateMultipartUploadRequest);
             transferManager.abortMultipartUploads(bucket, new Date(System.currentTimeMillis()));
         } catch (CosServiceException e) {
+            System.out.println(e.getErrorMessage());
             e.printStackTrace();
         } catch (CosClientException e) {
+            System.out.println(e.getMessage());
             e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }finally {
-            localFile.delete();
         }
     }
 
@@ -355,8 +339,7 @@ public class TransferManagerTest extends AbstractCOSClientTest {
         Upload upload = transferManager.upload(putObjectRequest);
         upload.waitForCompletion();
 
-        String dst_bucket = System.getenv("dst_bucket") + (int) (Math.random() * 100) + "-" + appid;
-        deleteBucket(dst_bucket);
+        String dst_bucket = System.getenv("dst_bucket") + "-" + (int) (System.currentTimeMillis()) + "-" + appid;
 
         Boolean switch_to_stop = true;
         while (switch_to_stop) {
@@ -389,6 +372,81 @@ public class TransferManagerTest extends AbstractCOSClientTest {
             deleteBucket(dst_bucket);
             localFile.delete();
         }
+    }
+
+    @Test
+    public void testCreateTransfWithError() {
+        ClientConfig config = new ClientConfig();
+        COSCredentials cred = new BasicCOSCredentials(secretId, secretKey);
+        COSClient cos_Client = new COSClient(cred, config);
+        try {
+            TransferManager transfer_manager = new TransferManager(cos_Client);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            assertEquals("region in clientConfig of cosClient must be specified!", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testDownloadWithRange() throws IOException {
+        int inputStreamLength = 10 * 1024 * 1024;
+        byte[] data = new byte[inputStreamLength];
+        InputStream inputStream = new ByteArrayInputStream(data);
+        ObjectMetadata objectMetadata = new ObjectMetadata();
+        objectMetadata.setContentLength(inputStreamLength);
+        PutObjectRequest putObjectRequest = new PutObjectRequest(bucket, "testDownloadWithRange", inputStream, objectMetadata);
+        File dstFile = new File("dstFile");
+        File dstFile2 = new File("dstFile2");
+        try {
+            Upload upload = transferManager.upload(putObjectRequest);
+            upload.waitForCompletion();
+
+            GetObjectRequest getObjectRequest = new GetObjectRequest(bucket, "testDownloadWithRange");
+            getObjectRequest.setRange(512, 1024);
+
+            Download download = transferManager.download(getObjectRequest, dstFile);
+            download.waitForCompletion();
+
+            download = transferManager.download(bucket, "testDownloadWithRange", dstFile2);
+            download.abort();
+        } catch (InterruptedException e) {
+            System.out.println(e.getMessage());
+        } catch (CosClientException cce) {
+            System.out.println(cce.getMessage());
+        } finally {
+            dstFile.delete();
+            dstFile2.delete();
+            inputStream.close();
+        }
+    }
+
+    @Test
+    public void testDownloadImpl() {
+        GetObjectRequest getObjectRequest = new GetObjectRequest(bucket, "testDownloadImpl");
+        COSObject cosObject = new COSObject();
+        ObjectMetadata metadata = new ObjectMetadata();
+        cosObject.setObjectMetadata(metadata);
+        cosObject.setBucketName(bucket);
+        cosObject.setKey("testDownloadImpl");
+
+        File dstFile = new File("dstFile");
+        TransferProgress transferProgress = new TransferProgress();
+        String description = "test downloading from " + getObjectRequest.getBucketName() + "/"
+                + getObjectRequest.getKey();
+        COSProgressListenerChain listenerChain = new COSProgressListenerChain(
+                // The listener for updating transfer progress
+                new TransferProgressUpdatingListener(transferProgress),
+                getObjectRequest.getGeneralProgressListener(), null);
+
+        DownloadImpl download = new DownloadImpl(description, transferProgress, listenerChain,
+                null, null, getObjectRequest, dstFile);
+
+        download.setCosObject(cosObject);
+
+        ObjectMetadata objectMetadata = download.getObjectMetadata();
+        String bucketname = download.getBucketName();
+        String key = download.getKey();
+        dstFile.delete();
     }
 
     // transfer manager对不同园区5G以上文件进行分块拷贝

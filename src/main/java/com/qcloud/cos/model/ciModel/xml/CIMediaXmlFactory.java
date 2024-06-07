@@ -114,7 +114,7 @@ public class CIMediaXmlFactory {
      * 模板任务xml转换
      */
     public static byte[] convertToXmlByteArray(MediaTemplateRequest request) {
-        if ("Concat".equalsIgnoreCase(request.getTag())){
+        if ("Concat".equalsIgnoreCase(request.getTag())) {
             return CIAuditingXmlFactoryV2.convertToXmlByteArray(request);
         }
         XmlWriter xml = new XmlWriter();
@@ -141,7 +141,7 @@ public class CIMediaXmlFactory {
             addIfNotNull(xml, "LocMode", request.getWatermark().getLocMode());
             addIfNotNull(xml, "Pos", request.getWatermark().getPos());
             addIfNotNull(xml, "StartTime", request.getWatermark().getStartTime());
-            addSlideConfig(xml,request.getWatermark().getSlideConfig());
+            addSlideConfig(xml, request.getWatermark().getSlideConfig());
             if ("Text".equalsIgnoreCase(request.getWatermark().getType())) {
                 xml.start("Text");
                 MediaWaterMarkText text = request.getWatermark().getText();
@@ -239,7 +239,7 @@ public class CIMediaXmlFactory {
         addVideoEnhance(xml, operation.getVideoEnhance());
         addSubtitles(xml, operation.getSubtitles());
         addVideoTag(xml, operation.getVideoTag());
-        addQualityEstimateConfig(xml,operation.getQualityEstimateConfig());
+        addQualityEstimateConfig(xml, operation.getQualityEstimateConfig());
         xml.end();
     }
 
@@ -501,8 +501,8 @@ public class CIMediaXmlFactory {
             addIfNotNull(xml, "DirectConcat", mediaConcatTemplate.getDirectConcat());
             addContainer(xml, mediaConcatTemplate.getContainer());
             addAudioMix(xml, mediaConcatTemplate.getAudioMix(), "AudioMix");
-            addAudioMixArray(xml,mediaConcatTemplate.getAudioMixArray());
-            addSceneChangeInfo(xml,mediaConcatTemplate.getSceneChangeInfo());
+            addAudioMixArray(xml, mediaConcatTemplate.getAudioMixArray());
+            addSceneChangeInfo(xml, mediaConcatTemplate.getSceneChangeInfo());
             xml.end();
         }
     }
@@ -795,7 +795,7 @@ public class CIMediaXmlFactory {
             addIfNotNull(xml, "LocMode", watermark.getLocMode());
             addIfNotNull(xml, "Pos", watermark.getPos());
             addIfNotNull(xml, "StartTime", watermark.getStartTime());
-            addSlideConfig(xml,watermark.getSlideConfig());
+            addSlideConfig(xml, watermark.getSlideConfig());
             if ("Text".equalsIgnoreCase(watermark.getType())) {
                 MediaWaterMarkText text = watermark.getText();
                 xml.start("Text");
@@ -864,6 +864,9 @@ public class CIMediaXmlFactory {
 
 
     public static Boolean objIsNotValid(Object obj) {
+        if (obj == null) {
+            return false;
+        }
         //查询出对象所有的属性
         Field[] fields = obj.getClass().getDeclaredFields();
         //用于判断所有属性是否为空,如果参数为空则不查询

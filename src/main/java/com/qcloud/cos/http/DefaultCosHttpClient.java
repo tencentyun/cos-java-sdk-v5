@@ -148,9 +148,9 @@ public class DefaultCosHttpClient implements CosHttpClient {
             for (int i = 1; i < stackTraces.length; i++) {
                 trace.append("\n");
                 StackTraceElement element = stackTraces[i];
-                String stackTrace = "Class: " + element.getClassName() +
-                        ", Method: " + element.getMethodName() +
-                        ", Line: " + element.getLineNumber();
+                String stackTrace = "Class: " + element.getClassName()
+                        + ", Method: " + element.getMethodName()
+                        + ", Line: " + element.getLineNumber();
                 trace.append(stackTrace);
             }
             log.info(trace.toString());
@@ -489,13 +489,17 @@ public class DefaultCosHttpClient implements CosHttpClient {
         while (true) {
             try {
                 checkInterrupted();
-                if (originalContent instanceof BufferedInputStream
-                        && originalContent.markSupported()) {
-                    // Mark everytime for BufferedInputStream, since the marker could have been
-                    // invalidated
-                    final int readLimit = clientConfig.getReadLimit();
-                    originalContent.mark(readLimit);
-                }
+                /**
+                 * 目前sdk所有的上传请求都会把流包装成ReleasableInputStream
+                 * 所以这里不再需要判断BufferedInputStream的子类了
+                 * */
+//                if (originalContent instanceof BufferedInputStream
+//                        && originalContent.markSupported()) {
+//                    // Mark everytime for BufferedInputStream, since the marker could have been
+//                    // invalidated
+//                    final int readLimit = clientConfig.getReadLimit();
+//                    originalContent.mark(readLimit);
+//                }
                 // 如果是重试的则恢复流
                 if (retryIndex != 0 && originalContent != null) {
                     originalContent.reset();
@@ -540,8 +544,7 @@ public class DefaultCosHttpClient implements CosHttpClient {
                 changeEndpointForRetry(request, httpResponse, retryIndex);
             } catch (Exception exp) {
                 String expName = exp.getClass().getName();
-                String errorMsg = String.format("httpClient execute occur an unknown exception:%s, httpRequest: %s"
-                        , expName, request);
+                String errorMsg = String.format("httpClient execute occur an unknown exception:%s, httpRequest: %s", expName, request);
                 closeHttpResponseStream(httpResponse);
                 log.error(errorMsg, exp);
                 throw new CosClientException(errorMsg, exp);
@@ -614,7 +617,7 @@ public class DefaultCosHttpClient implements CosHttpClient {
         }
     }
 
-    private HttpResponse executeRequest(HttpContext context, HttpRequestBase httpRequest) throws Exception{
+    private HttpResponse executeRequest(HttpContext context, HttpRequestBase httpRequest) throws Exception {
         HttpResponse httpResponse = null;
         try {
             httpResponse = executeOneRequest(context, httpRequest);
@@ -627,7 +630,7 @@ public class DefaultCosHttpClient implements CosHttpClient {
         } catch (TimeoutException e) {
             httpRequest.abort();
             String errorMsg = "ExecutorService: time out after waiting  " + this.clientConfig.getRequestTimeout()/1000 + " seconds";
-            throw new CosClientException(errorMsg, ClientExceptionConstants.REQUEST_TIMEOUT,e);
+            throw new CosClientException(errorMsg, ClientExceptionConstants.REQUEST_TIMEOUT, e);
         } catch (ExecutionException e) {
             httpRequest.abort();
             if (e.getCause() instanceof IOException) {
@@ -661,20 +664,20 @@ public class DefaultCosHttpClient implements CosHttpClient {
             }
         }
 
-        Map<String, String> req_headers = request.getHeaders();
-        if (!req_headers.isEmpty() && req_headers.containsKey(Headers.HOST)) {
-            String last_endpoint = request.getEndpoint();
-            String last_host = req_headers.get(Headers.HOST);
+        Map<String, String> reqHeaders = request.getHeaders();
+        if (!reqHeaders.isEmpty() && reqHeaders.containsKey(Headers.HOST)) {
+            String lastEndpoint = request.getEndpoint();
+            String lastHost = reqHeaders.get(Headers.HOST);
             String regex = ".+-\\d+\\.cos\\..+\\.myqcloud\\.com";
             Pattern pattern = Pattern.compile(regex);
-            Matcher matcher_endpoint = pattern.matcher(last_endpoint);
-            Matcher matcher_host = pattern.matcher(last_host);
-            boolean isAccEndpoint = last_endpoint.endsWith("cos.accelerate.myqcloud.com");
-            boolean isAccHost = last_host.endsWith("cos.accelerate.myqcloud.com");
+            Matcher matcherEndpoint = pattern.matcher(lastEndpoint);
+            Matcher matcherHost = pattern.matcher(lastHost);
+            boolean isAccEndpoint = lastEndpoint.endsWith("cos.accelerate.myqcloud.com");
+            boolean isAccHost = lastHost.endsWith("cos.accelerate.myqcloud.com");
 
-            if (matcher_endpoint.matches() && matcher_host.matches() && !isAccEndpoint && !isAccHost) {
-                String retry_endpoint = String.format("%s.%s.tencentcos.cn", request.getBucketName(), Region.formatRegion(clientConfig.getRegion()));
-                request.addHeader(Headers.HOST, retry_endpoint);
+            if (matcherEndpoint.matches() && matcherHost.matches() && !isAccEndpoint && !isAccHost) {
+                String retryEndpoint = String.format("%s.%s.tencentcos.cn", request.getBucketName(), Region.formatRegion(clientConfig.getRegion()));
+                request.addHeader(Headers.HOST, retryEndpoint);
                 COSSigner cosSigner = clientConfig.getCosSigner();
                 COSCredentials cosCredentials = request.getCosCredentials();
                 CosServiceRequest cosServiceRequest = request.getOriginalRequest();
@@ -683,7 +686,7 @@ public class DefaultCosHttpClient implements CosHttpClient {
                 cosSigner.setCIWorkflowRequest(isCIWorkflowRequest);
                 cosSigner.sign(request, cosCredentials, expiredTime);
 
-                String endpointAddr = clientConfig.getEndpointResolver().resolveGeneralApiEndpoint(retry_endpoint);
+                String endpointAddr = clientConfig.getEndpointResolver().resolveGeneralApiEndpoint(retryEndpoint);
 
                 String fixedEndpointAddr = request.getOriginalRequest().getFixedEndpointAddr();
                 if (fixedEndpointAddr != null) {
