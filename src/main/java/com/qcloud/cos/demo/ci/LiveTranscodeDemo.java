@@ -13,8 +13,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 public class LiveTranscodeDemo {
-    private static String appId = "1251704708";
-    private static String bucket = "markjrzhang-1251704708";
+    private static String appId = "123456789";
+    private static String bucket = "demo-123456789";
     private static String objectKey = "test.m3u8";
     private static String expires = "3600";
     private static byte[] secret = "YourSecret".getBytes();
