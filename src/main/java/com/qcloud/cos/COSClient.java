@@ -5127,7 +5127,11 @@ public class COSClient implements COS {
 
     @Override
     public CreateDatasetResponse createDataset(CreateDatasetRequest customRequest) {
-        return null;
+        rejectNull(customRequest, "The request parameter must be specified setting the object tags");
+        CosHttpRequest<CreateDatasetRequest> request = createRequest(customRequest.getAppId(), "/dataset", customRequest , HttpMethodName.POST);
+        request.addHeader("Accept", "application/json");
+        this.setContent(request, CIJackson.toJsonBytes(customRequest), "application/json", false);
+        return invoke(request, new Unmarshallers.CICommonUnmarshaller<CreateDatasetResponse>(CreateDatasetResponse.class));
     }
 
 

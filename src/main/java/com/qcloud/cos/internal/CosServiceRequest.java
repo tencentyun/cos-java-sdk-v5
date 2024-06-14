@@ -24,9 +24,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
 import com.qcloud.cos.auth.COSCredentials;
 import com.qcloud.cos.event.ProgressListener;
 
+@JsonFilter("CosServiceFilter")
 public class CosServiceRequest implements Cloneable, ReadLimitInfo  {
     /**
      * Request related key information
