@@ -258,6 +258,8 @@ public class UploadCallable implements Callable<UploadResult> {
                 partListing = cos.listParts(listPartsRequest);
             } catch (CosServiceException cse) {
                 if (cse.getStatusCode() == 404 && Objects.equals(cse.getErrorCode(), "NoSuchUpload")) {
+                    String warnMsg = String.format("will not do resumable upload, because the uploadId[%s] is not exist, request id is %s", multipartUploadId, cse.getRequestId());
+                    log.warn(warnMsg);
                     return false;
                 }
                 throw cse;
