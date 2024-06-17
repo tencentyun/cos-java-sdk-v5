@@ -20,11 +20,15 @@ package com.qcloud.cos.transfer;
 
 import static com.qcloud.cos.event.SDKProgressPublisher.publishProgress;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutorService;
@@ -35,6 +39,10 @@ import com.qcloud.cos.COSEncryptionClient;
 import com.qcloud.cos.event.COSProgressPublisher;
 import com.qcloud.cos.event.ProgressEventType;
 import com.qcloud.cos.event.ProgressListenerChain;
+import com.qcloud.cos.exception.CosClientException;
+import com.qcloud.cos.exception.CosServiceException;
+import com.qcloud.cos.internal.InputSubstream;
+import com.qcloud.cos.internal.ResettableInputStream;
 import com.qcloud.cos.internal.UploadPartRequestFactory;
 import com.qcloud.cos.model.AbortMultipartUploadRequest;
 import com.qcloud.cos.model.CompleteMultipartUploadRequest;
@@ -51,8 +59,14 @@ import com.qcloud.cos.model.PutObjectRequest;
 import com.qcloud.cos.model.PutObjectResult;
 import com.qcloud.cos.model.UploadPartRequest;
 import com.qcloud.cos.model.UploadResult;
+import com.qcloud.cos.model.ListMultipartUploadsRequest;
+import com.qcloud.cos.model.MultipartUploadListing;
+import com.qcloud.cos.model.MultipartUpload;
 import com.qcloud.cos.transfer.Transfer.TransferState;
+import com.qcloud.cos.utils.BinaryUtils;
+import com.qcloud.cos.utils.Md5Utils;
 
+import org.apache.commons.codec.DecoderException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,7 +90,11 @@ public class UploadCallable implements Callable<UploadResult> {
      */
     private final List<PartETag> eTagsToSkip = new ArrayList<PartETag>();
 
+    private Map<Integer, PartSummary> skipParts = new HashMap<Integer, PartSummary>();
+
     private PersistableUpload persistableUpload;
+
+    private boolean isResumableUpload = false;
 
     public UploadCallable(TransferManager transferManager, ExecutorService threadPool,
             UploadImpl upload, PutObjectRequest origReq,
@@ -179,7 +197,10 @@ public class UploadCallable implements Callable<UploadResult> {
         long optimalPartSize = getOptimalPartSize(isUsingEncryption);
         try {
             if (multipartUploadId == null) {
-                multipartUploadId = initiateMultipartUpload(origReq, isUsingEncryption, optimalPartSize);
+                isResumableUpload = getResumableUploadId(isUsingEncryption);
+                if (!isResumableUpload) {
+                    multipartUploadId = initiateMultipartUpload(origReq, isUsingEncryption, optimalPartSize);
+                }
             }
 
             UploadPartRequestFactory requestFactory =
@@ -194,7 +215,6 @@ public class UploadCallable implements Callable<UploadResult> {
             }
         } catch (Exception e) {
             publishProgress(listener, ProgressEventType.TRANSFER_FAILED_EVENT);
-            performAbortMultipartUpload();
             throw e;
         } finally {
             if (origReq.getInputStream() != null) {
@@ -205,6 +225,114 @@ public class UploadCallable implements Callable<UploadResult> {
                 }
             }
         }
+    }
+
+    private boolean getResumableUploadId(boolean isUsingEncryption) throws CosServiceException, CosClientException  {
+        if (isUsingEncryption || origReq.getFile() == null || !origReq.isEnableResumableUpload()) {
+            return false;
+        }
+        ListMultipartUploadsRequest listMultipartUploadsRequest = new ListMultipartUploadsRequest(origReq.getBucketName());
+        listMultipartUploadsRequest.setPrefix(origReq.getKey());
+        MultipartUploadListing uploadListing = cos.listMultipartUploads(listMultipartUploadsRequest);
+        List<MultipartUpload> uploads = uploadListing.getMultipartUploads();
+        for (int index = uploads.size() - 1; index >= 0; index--) {
+            if (Objects.equals(uploads.get(index).getKey(), origReq.getKey())) {
+                multipartUploadId = uploads.get(index).getUploadId();
+                break;
+            }
+        }
+
+        if (multipartUploadId != null) {
+            return checkResumableUpload();
+        }
+
+        return false;
+    }
+
+    private boolean checkResumableUpload() {
+        ListPartsRequest listPartsRequest = new ListPartsRequest(origReq.getBucketName(), origReq.getKey(), multipartUploadId);
+        PartListing partListing = null;
+        List<PartSummary> partSummaries = new ArrayList<>();
+        do {
+            try {
+                partListing = cos.listParts(listPartsRequest);
+            } catch (CosServiceException cse) {
+                if (cse.getStatusCode() == 404 && Objects.equals(cse.getErrorCode(), "NoSuchUpload")) {
+                    String warnMsg = String.format("will not do resumable upload, because the uploadId[%s] is not exist, request id is %s", multipartUploadId, cse.getRequestId());
+                    log.warn(warnMsg);
+                    return false;
+                }
+                throw cse;
+            } catch (CosClientException cce) {
+                throw cce;
+            }
+            partSummaries.addAll(partListing.getParts());
+            listPartsRequest.setPartNumberMarker(partListing.getNextPartNumberMarker());
+        } while (partListing.isTruncated());
+
+        long optimalPartSize = getOptimalPartSize(false);
+        long contentLength = TransferManagerUtils.getContentLength(origReq);
+        long lastPartSize = contentLength % optimalPartSize;
+        long partsNum = (contentLength / optimalPartSize);
+        if (lastPartSize == 0) {
+            lastPartSize = optimalPartSize;
+        } else {
+            partsNum = partsNum + 1;
+        }
+
+        for (PartSummary partSummary : partSummaries) {
+            int partNum = partSummary.getPartNumber();
+            if (partNum > partsNum) {
+                return false;
+            }
+            long offset = (partNum - 1) * optimalPartSize;
+            long localPartSize = optimalPartSize;
+            boolean isLastPart = false;
+            if (partNum == partsNum) {
+                localPartSize = lastPartSize;
+                isLastPart = true;
+            }
+            if (!checkSingleUploadPart(offset, localPartSize, partSummary, isLastPart)) {
+                return false;
+            }
+            skipParts.put(partNum, partSummary);
+        }
+
+        return true;
+    }
+
+    private boolean checkSingleUploadPart(long offset, long loaclPartSize, PartSummary partSummary, boolean isLastPart) {
+        long remoteSize = partSummary.getSize();
+        if (loaclPartSize != remoteSize) {
+            String warnMsg = String.format("The remote part size[%d] is not equal to the local part size[%d], will not do resumable upload,"
+                            + " uploadId[%s], partNum[%d]", remoteSize, loaclPartSize, multipartUploadId, partSummary.getPartNumber());
+            log.warn(warnMsg);
+            return false;
+        }
+
+        File fileOrig = origReq.getFile();
+        InputStream isCurr = null;
+        try {
+            isCurr = new ResettableInputStream(fileOrig);
+        } catch (IOException ie) {
+            log.warn("Can not check single upload part due to the IO exception: ", ie);
+            return false;
+        }
+        isCurr = new InputSubstream(isCurr, offset, loaclPartSize, isLastPart);
+        try {
+            byte[] clientSideHash = Md5Utils.computeMD5Hash(isCurr);
+            byte[] serverSideHash = BinaryUtils.fromHex(partSummary.getETag());
+            if (!Arrays.equals(clientSideHash, serverSideHash)) {
+                return false;
+            }
+        } catch (DecoderException de) {
+            log.warn("Can not check single upload part due to the decode exception: ", de);
+            return false;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return true;
     }
 
     /**
@@ -305,7 +433,7 @@ public class UploadCallable implements Callable<UploadResult> {
      */
     private void uploadPartsInParallel(UploadPartRequestFactory requestFactory, String uploadId) {
 
-        Map<Integer, PartSummary> partNumbers = identifyExistingPartsForResume(uploadId);
+        Map<Integer, PartSummary> partNumbers = isResumableUpload ? skipParts : identifyExistingPartsForResume(uploadId);
 
         while (requestFactory.hasMoreRequests()) {
             if (threadPool.isShutdown())
