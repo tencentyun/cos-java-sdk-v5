@@ -141,14 +141,7 @@ import com.qcloud.cos.model.inventory.InventoryConfiguration;
 import com.qcloud.cos.model.transform.ObjectTaggingXmlFactory;
 import com.qcloud.cos.region.Region;
 import com.qcloud.cos.retry.RetryUtils;
-import com.qcloud.cos.utils.Base64;
-import com.qcloud.cos.utils.BinaryUtils;
-import com.qcloud.cos.utils.DateUtils;
-import com.qcloud.cos.utils.Jackson;
-import com.qcloud.cos.utils.Md5Utils;
-import com.qcloud.cos.utils.ServiceUtils;
-import com.qcloud.cos.utils.StringUtils;
-import com.qcloud.cos.utils.UrlEncoderUtils;
+import com.qcloud.cos.utils.*;
 import com.qcloud.cos.http.TimeOutCosHttpClient;
 
 import org.apache.commons.codec.DecoderException;
