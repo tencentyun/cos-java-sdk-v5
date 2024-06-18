@@ -102,8 +102,7 @@ import com.qcloud.cos.model.ciModel.job.MediaJobObject;
 import com.qcloud.cos.model.ciModel.job.v2.*;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoRequest;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoResponse;
-import com.qcloud.cos.model.ciModel.metaInsight.CreateDatasetRequest;
-import com.qcloud.cos.model.ciModel.metaInsight.CreateDatasetResponse;
+import com.qcloud.cos.model.ciModel.metaInsight.*;
 import com.qcloud.cos.model.ciModel.persistence.AIGameRecResponse;
 import com.qcloud.cos.model.ciModel.persistence.CIUploadResult;
 import com.qcloud.cos.model.ciModel.persistence.AIRecRequest;
@@ -5124,9 +5123,174 @@ public class COSClient implements COS {
         CosHttpRequest<CreateDatasetRequest> request = createRequest(customRequest.getAppId(), "/dataset", customRequest , HttpMethodName.POST);
         request.addHeader("Accept", "application/json");
         this.setContent(request, CIJackson.toJsonBytes(customRequest), "application/json", false);
-        return invoke(request, new Unmarshallers.CICommonUnmarshaller<CreateDatasetResponse>(CreateDatasetResponse.class));
+        return invoke(request, new Unmarshallers.CICommonJsonUnmarshaller<CreateDatasetResponse>(CreateDatasetResponse.class));
     }
 
+    @Override
+    public CreateDatasetBindingResponse createDatasetBinding(CreateDatasetBindingRequest customRequest) {
+        rejectNull(customRequest, "The request parameter must be specified setting the object tags");
+
+        CosHttpRequest<CreateDatasetBindingRequest> request = createRequest(customRequest.getAppId(), "/datasetbinding", customRequest , HttpMethodName.POST);
+        request.addHeader("Accept", "application/json");
+
+        this.setContent(request, CIJackson.toJsonBytes(customRequest), "application/json", false);
+        return invoke(request, new Unmarshallers.CICommonJsonUnmarshaller<CreateDatasetBindingResponse>(CreateDatasetBindingResponse.class));
+    }
+
+    @Override
+    public CreateFileMetaIndexResponse createFileMetaIndex(CreateFileMetaIndexRequest customRequest) {
+        rejectNull(customRequest, "The request parameter must be specified setting the object tags");
+
+        CosHttpRequest<CreateFileMetaIndexRequest> request = createRequest(customRequest.getAppId(), "/filemeta", customRequest , HttpMethodName.POST);
+        request.addHeader("Accept", "application/json");
+
+        this.setContent(request, CIJackson.toJsonBytes(customRequest), "application/json", false);
+        return invoke(request, new Unmarshallers.CICommonJsonUnmarshaller<CreateFileMetaIndexResponse>(CreateFileMetaIndexResponse.class));
+    }
+
+    @Override
+    public DatasetFaceSearchResponse datasetFaceSearch(DatasetFaceSearchRequest customRequest) {
+        rejectNull(customRequest, "The request parameter must be specified setting the object tags");
+
+        CosHttpRequest<DatasetFaceSearchRequest> request = createRequest(customRequest.getAppId(), "/datasetquery" + "/facesearch", customRequest , HttpMethodName.POST);
+        request.addHeader("Accept", "application/json");
+
+        this.setContent(request, CIJackson.toJsonBytes(customRequest), "application/json", false);
+        return invoke(request, new Unmarshallers.CICommonJsonUnmarshaller<DatasetFaceSearchResponse>(DatasetFaceSearchResponse.class));
+    }
+
+    @Override
+    public DatasetSimpleQueryResponse datasetSimpleQuery(DatasetSimpleQueryRequest customRequest) {
+        rejectNull(customRequest, "The request parameter must be specified setting the object tags");
+
+        CosHttpRequest<DatasetSimpleQueryRequest> request = createRequest(customRequest.getAppId(), "/datasetquery" + "/simple", customRequest , HttpMethodName.POST);
+        request.addHeader("Accept", "application/json");
+
+        this.setContent(request, CIJackson.toJsonBytes(customRequest), "application/json", false);
+        return invoke(request, new Unmarshallers.CICommonJsonUnmarshaller<DatasetSimpleQueryResponse>(DatasetSimpleQueryResponse.class));
+    }
+
+    @Override
+    public DeleteDatasetResponse deleteDataset(DeleteDatasetRequest customRequest) {
+        rejectNull(customRequest, "The request parameter must be specified setting the object tags");
+
+        CosHttpRequest<DeleteDatasetRequest> request = createRequest(customRequest.getAppId(), "/dataset", customRequest , HttpMethodName.DELETE);
+        request.addHeader("Accept", "application/json");
+
+        this.setContent(request, CIJackson.toJsonBytes(customRequest), "application/json", false);
+        return invoke(request, new Unmarshallers.CICommonJsonUnmarshaller<DeleteDatasetResponse>(DeleteDatasetResponse.class));
+    }
+
+    @Override
+    public DeleteDatasetBindingResponse deleteDatasetBinding(DeleteDatasetBindingRequest customRequest) {
+        rejectNull(customRequest, "The request parameter must be specified setting the object tags");
+
+        CosHttpRequest<DeleteDatasetBindingRequest> request = createRequest(customRequest.getAppId(), "/datasetbinding", customRequest , HttpMethodName.DELETE);
+        request.addHeader("Accept", "application/json");
+
+        this.setContent(request, CIJackson.toJsonBytes(customRequest), "application/json", false);
+        return invoke(request, new Unmarshallers.CICommonJsonUnmarshaller<DeleteDatasetBindingResponse>(DeleteDatasetBindingResponse.class));
+    }
+
+    @Override
+    public DeleteFileMetaIndexResponse deleteFileMetaIndex(DeleteFileMetaIndexRequest customRequest) {
+        rejectNull(customRequest, "The request parameter must be specified setting the object tags");
+
+        CosHttpRequest<DeleteFileMetaIndexRequest> request = createRequest(customRequest.getAppId(), "/filemeta", customRequest , HttpMethodName.DELETE);
+
+        this.setContent(request, CIJackson.toJsonBytes(customRequest), "application/json", false);
+        return invoke(request, new Unmarshallers.CICommonJsonUnmarshaller<DeleteFileMetaIndexResponse>(DeleteFileMetaIndexResponse.class));
+    }
+
+    @Override
+    public DescribeDatasetResponse describeDataset(DescribeDatasetRequest customRequest) {
+
+        CosHttpRequest<DescribeDatasetRequest> request = createRequest(customRequest.getAppId(), "/dataset", customRequest , HttpMethodName.GET);
+        addParameterIfNotNull(request, "datasetname", customRequest.getDatasetname());
+        addParameterIfNotNull(request, "statistics", String.valueOf(customRequest.getStatistics()));
+        request.addHeader("Accept", "application/json");
+
+        return invoke(request, new Unmarshallers.CICommonJsonUnmarshaller<DescribeDatasetResponse>(DescribeDatasetResponse.class));
+    }
+
+    @Override
+    public DescribeDatasetBindingResponse describeDatasetBinding(DescribeDatasetBindingRequest customRequest) {
+
+        CosHttpRequest<DescribeDatasetBindingRequest> request = createRequest(customRequest.getAppId(), "/datasetbinding", customRequest , HttpMethodName.GET);
+        addParameterIfNotNull(request, "datasetname", customRequest.getDatasetname());
+        addParameterIfNotNull(request, "uri", customRequest.getUri());
+        request.addHeader("Accept", "application/json");
+
+
+        return invoke(request, new Unmarshallers.CICommonJsonUnmarshaller<DescribeDatasetBindingResponse>(DescribeDatasetBindingResponse.class));
+    }
+
+    @Override
+    public DescribeDatasetBindingsResponse describeDatasetBindings(DescribeDatasetBindingsRequest customRequest) {
+
+        CosHttpRequest<DescribeDatasetBindingsRequest> request = createRequest(customRequest.getAppId(), "/datasetbindings", customRequest , HttpMethodName.GET);
+        addParameterIfNotNull(request, "datasetname", customRequest.getDatasetname());
+        addParameterIfNotNull(request, "maxresults", customRequest.getMaxresults());
+        addParameterIfNotNull(request, "nexttoken", customRequest.getNexttoken());
+        request.addHeader("Accept", "application/json");
+        return invoke(request, new Unmarshallers.CICommonJsonUnmarshaller<DescribeDatasetBindingsResponse>(DescribeDatasetBindingsResponse.class));
+    }
+
+    @Override
+    public DescribeDatasetsResponse describeDatasets(DescribeDatasetsRequest customRequest) {
+
+        CosHttpRequest<DescribeDatasetsRequest> request = createRequest(customRequest.getAppId(), "/datasets", customRequest , HttpMethodName.GET);
+        addParameterIfNotNull(request, "maxresults", customRequest.getMaxresults());
+        addParameterIfNotNull(request, "nexttoken", customRequest.getNexttoken());
+        addParameterIfNotNull(request, "prefix", customRequest.getPrefix());
+        request.addHeader("Accept", "application/json");
+
+
+        return invoke(request, new Unmarshallers.CICommonJsonUnmarshaller<DescribeDatasetsResponse>(DescribeDatasetsResponse.class));
+    }
+
+    @Override
+    public DescribeFileMetaIndexResponse describeFileMetaIndex(DescribeFileMetaIndexRequest customRequest) {
+
+        CosHttpRequest<DescribeFileMetaIndexRequest> request = createRequest(customRequest.getAppId(), "/filemeta", customRequest , HttpMethodName.GET);
+        addParameterIfNotNull(request, "datasetname", customRequest.getDatasetname());
+        addParameterIfNotNull(request, "uri", customRequest.getUri());
+        request.addHeader("Accept", "application/json");
+        return invoke(request, new Unmarshallers.CICommonJsonUnmarshaller<DescribeFileMetaIndexResponse>(DescribeFileMetaIndexResponse.class));
+    }
+
+    @Override
+    public SearchImageResponse searchImage(SearchImageRequest customRequest) {
+        rejectNull(customRequest, "The request parameter must be specified setting the object tags");
+
+        CosHttpRequest<SearchImageRequest> request = createRequest(customRequest.getAppId(), "/datasetquery" + "/imagesearch", customRequest , HttpMethodName.POST);
+        request.addHeader("Accept", "application/json");
+
+        this.setContent(request, CIJackson.toJsonBytes(customRequest), "application/json", false);
+        return invoke(request, new Unmarshallers.CICommonJsonUnmarshaller<SearchImageResponse>(SearchImageResponse.class));
+    }
+
+    @Override
+    public UpdateDatasetResponse updateDataset(UpdateDatasetRequest customRequest) {
+        rejectNull(customRequest, "The request parameter must be specified setting the object tags");
+
+        CosHttpRequest<UpdateDatasetRequest> request = createRequest(customRequest.getAppId(), "/dataset", customRequest , HttpMethodName.PUT);
+        request.addHeader("Accept", "application/json");
+
+        this.setContent(request, CIJackson.toJsonBytes(customRequest), "application/json", false);
+        return invoke(request, new Unmarshallers.CICommonJsonUnmarshaller<UpdateDatasetResponse>(UpdateDatasetResponse.class));
+    }
+
+    @Override
+    public UpdateFileMetaIndexResponse updateFileMetaIndex(UpdateFileMetaIndexRequest customRequest) {
+        rejectNull(customRequest, "The request parameter must be specified setting the object tags");
+
+        CosHttpRequest<UpdateFileMetaIndexRequest> request = createRequest(customRequest.getAppId(), "/filemeta", customRequest , HttpMethodName.PUT);
+        request.addHeader("Accept", "application/json");
+
+        this.setContent(request, CIJackson.toJsonBytes(customRequest), "application/json", false);
+        return invoke(request, new Unmarshallers.CICommonJsonUnmarshaller<UpdateFileMetaIndexResponse>(UpdateFileMetaIndexResponse.class));
+    }
 
     public String generateCosDomainPrivateM3U8Url(PrivateM3U8Request privateM3U8Request) {
         CosHttpRequest<PrivateM3U8Request> request = createRequest(privateM3U8Request.getBucketName(), privateM3U8Request.getObject(), privateM3U8Request, HttpMethodName.GET);

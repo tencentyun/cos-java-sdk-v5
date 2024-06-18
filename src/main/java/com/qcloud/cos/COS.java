@@ -51,8 +51,7 @@ import com.qcloud.cos.model.ciModel.job.*;
 import com.qcloud.cos.model.ciModel.job.v2.*;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoRequest;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoResponse;
-import com.qcloud.cos.model.ciModel.metaInsight.CreateDatasetRequest;
-import com.qcloud.cos.model.ciModel.metaInsight.CreateDatasetResponse;
+import com.qcloud.cos.model.ciModel.metaInsight.*;
 import com.qcloud.cos.model.ciModel.persistence.AIGameRecResponse;
 import com.qcloud.cos.model.ciModel.persistence.CIUploadResult;
 import com.qcloud.cos.model.ciModel.persistence.AIRecRequest;
@@ -3260,6 +3259,36 @@ public interface COS extends COSDirectSpi {
     RecognizeLogoResponse recognizeLogo(RecognizeLogoRequest customRequest);
 
     CreateDatasetResponse createDataset(CreateDatasetRequest customRequest);
+
+    CreateDatasetBindingResponse createDatasetBinding(CreateDatasetBindingRequest customRequest);
+
+    CreateFileMetaIndexResponse createFileMetaIndex(CreateFileMetaIndexRequest customRequest);
+
+    DatasetFaceSearchResponse datasetFaceSearch(DatasetFaceSearchRequest customRequest);
+
+    DatasetSimpleQueryResponse datasetSimpleQuery(DatasetSimpleQueryRequest customRequest);
+
+    DeleteDatasetResponse deleteDataset(DeleteDatasetRequest customRequest);
+
+    DeleteDatasetBindingResponse deleteDatasetBinding(DeleteDatasetBindingRequest customRequest);
+
+    DeleteFileMetaIndexResponse deleteFileMetaIndex(DeleteFileMetaIndexRequest customRequest);
+
+    DescribeDatasetResponse describeDataset(DescribeDatasetRequest customRequest);
+
+    DescribeDatasetBindingResponse describeDatasetBinding(DescribeDatasetBindingRequest customRequest);
+
+    DescribeDatasetBindingsResponse describeDatasetBindings(DescribeDatasetBindingsRequest customRequest);
+
+    DescribeDatasetsResponse describeDatasets(DescribeDatasetsRequest customRequest);
+
+    DescribeFileMetaIndexResponse describeFileMetaIndex(DescribeFileMetaIndexRequest customRequest);
+
+    SearchImageResponse searchImage(SearchImageRequest customRequest);
+
+    UpdateDatasetResponse updateDataset(UpdateDatasetRequest customRequest);
+
+    UpdateFileMetaIndexResponse updateFileMetaIndex(UpdateFileMetaIndexRequest customRequest);
 }
 
 

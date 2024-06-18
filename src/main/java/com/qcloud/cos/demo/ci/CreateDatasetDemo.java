@@ -3,10 +3,7 @@ package com.qcloud.cos.demo.ci;
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.model.ciModel.metaInsight.CreateDatasetRequest;
 import com.qcloud.cos.model.ciModel.metaInsight.CreateDatasetResponse;
-import com.qcloud.cos.utils.CIJackson;
 import com.qcloud.cos.utils.Jackson;
-
-import java.util.Arrays;
 
 /**
  * 创建数据集 详情见https://cloud.tencent.com/document/product/460/106020
@@ -38,7 +35,6 @@ public class CreateDatasetDemo {
         //               Official:FaceSearch：人脸检索模板，包含人脸检索、COS 文件基础元信息算子。
         //               Official:ImageSearch：图像检索模板，包含图像检索、COS 文件基础元信息算子。
         request.setTemplateId("Official:COSBasicMeta");
-        System.out.println(CIJackson.toJsonString(request));
         CreateDatasetResponse response = client.createDataset(request);
         System.out.println(Jackson.toJsonString(response));
     }
