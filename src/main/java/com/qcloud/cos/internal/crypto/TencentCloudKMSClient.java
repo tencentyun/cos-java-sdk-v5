@@ -29,6 +29,7 @@ import com.tencentcloudapi.kms.v20190118.models.EncryptRequest;
 import com.tencentcloudapi.kms.v20190118.models.EncryptResponse;
 import com.tencentcloudapi.kms.v20190118.models.GenerateDataKeyRequest;
 import com.tencentcloudapi.kms.v20190118.models.GenerateDataKeyResponse;
+import com.tencentcloudapi.common.profile.ClientProfile;
 
 /**
  * Client for accessing TencentCloud KMS.
@@ -45,6 +46,14 @@ public class TencentCloudKMSClient implements QCLOUDKMS {
         this.kmsClient = new KmsClient(credential, region);
     } 
 
+    public TencentCloudKMSClient(COSCredentialsProvider cosCredentialsProvider, String region, ClientProfile clientProfile) {
+        COSCredentials cosCredentials = cosCredentialsProvider.getCredentials();
+        String secretId = cosCredentials.getCOSAccessKeyId();
+        String secretKey = cosCredentials.getCOSSecretKey();
+
+        Credential credential = new Credential(secretId, secretKey);
+        this.kmsClient = new KmsClient(credential, region, clientProfile);
+    }
     /**
      * Generates a unique symmetric data key for client-side encryption. This operation returns a plaintext copy of the
      * data key and a copy that is encrypted under a customer master key (CMK) that you specify. You can use the
