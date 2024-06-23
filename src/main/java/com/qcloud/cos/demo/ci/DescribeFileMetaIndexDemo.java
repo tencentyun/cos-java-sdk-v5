@@ -25,8 +25,9 @@ public class DescribeFileMetaIndexDemo {
      */
     public static void describeFileMetaIndex(COSClient client) {
         DescribeFileMetaIndexRequest request = new DescribeFileMetaIndexRequest();
-        request.setBucketName("demo-1234567890");
-
+        request.setAppId("1234567890");
+        request.setUri("cos://<BucketName>/<ObjectKey>");
+        request.setDatasetname("test");
         DescribeFileMetaIndexResponse response = client.describeFileMetaIndex(request);
         System.out.println(Jackson.toJsonString(response));
     }

@@ -23,7 +23,7 @@ public class DeleteDatasetBindingDemo {
      */
     public static void deleteDatasetBinding(COSClient client) {
         DeleteDatasetBindingRequest request = new DeleteDatasetBindingRequest();
-        request.setBucketName("demo-1234567890");
+        request.setAppId("demo-1234567890");
         // 设置数据集名称，同一个账户下唯一。;是否必传：是
         request.setDatasetName("test");
         // 设置资源标识字段，表示需要与数据集绑定的资源，当前仅支持COS存储桶，字段规则：cos://<BucketName>，其中BucketName表示COS存储桶名称，例如：cos://examplebucket-1250000000;是否必传：是

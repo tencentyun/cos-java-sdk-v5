@@ -1,8 +1,6 @@
 package com.qcloud.cos.model.ciModel.metaInsight;
 
 import com.qcloud.cos.model.CiServiceResult;
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
 import java.util.List;
 

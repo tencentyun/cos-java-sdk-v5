@@ -25,10 +25,10 @@ public class DescribeDatasetsDemo {
      */
     public static void describeDatasets(COSClient client) {
         DescribeDatasetsRequest request = new DescribeDatasetsRequest();
-        request.setBucketName("demo-1234567890");
+        request.setAppId("1251704708");
         request.setMaxresults(100);// 设置本次返回数据集的最大个数，取值范围为0~200。不设置此参数或者设置为0时，则默认值为100。
-        request.setNexttoken("下一页");// 设置翻页标记。当文件总数大于设置的MaxResults时，用于翻页的Token。从NextToken开始按字典序返回文件信息列表。填写上次查询返回的值，首次使用时填写为空。
-        request.setPrefix("数据集前缀");// 设置数据集名称前缀。
+//        request.setNexttoken("下一页");// 设置翻页标记。当文件总数大于设置的MaxResults时，用于翻页的Token。从NextToken开始按字典序返回文件信息列表。填写上次查询返回的值，首次使用时填写为空。
+//        request.setPrefix("数据集前缀");// 设置数据集名称前缀。
 
         DescribeDatasetsResponse response = client.describeDatasets(request);
         System.out.println(Jackson.toJsonString(response));

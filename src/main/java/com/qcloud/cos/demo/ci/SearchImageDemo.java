@@ -25,7 +25,7 @@ public class SearchImageDemo {
      */
     public static void searchImage(COSClient client) {
         SearchImageRequest request = new SearchImageRequest();
-        request.setBucketName("demo-1234567890");
+        request.setAppId("1234567890");
         // 设置数据集名称，同一个账户下唯一。;是否必传：是
         request.setDatasetName("ImageSearch001");
         // 设置指定检索方式为图片或文本，pic 为图片检索，text 为文本检索，默认为 pic。;是否必传：否

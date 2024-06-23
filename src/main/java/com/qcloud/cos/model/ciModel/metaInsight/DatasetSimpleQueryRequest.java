@@ -1,5 +1,6 @@
 package com.qcloud.cos.model.ciModel.metaInsight;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.qcloud.cos.internal.CIServiceRequest;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
@@ -8,7 +9,7 @@ import com.thoughtworks.xstream.annotations.XStreamOmitField;
 import java.util.ArrayList;
 import java.util.List;
 
-
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 public class DatasetSimpleQueryRequest extends CIServiceRequest {
 
     /**
@@ -55,10 +56,7 @@ public class DatasetSimpleQueryRequest extends CIServiceRequest {
 
     public void setDatasetName(String datasetName) { this.datasetName = datasetName; }
 
-    public Query getQuery() { 
-        if(query == null){
-            query = new Query(); 
-        }
+    public Query getQuery() {
         return query;
     }
 
@@ -80,10 +78,7 @@ public class DatasetSimpleQueryRequest extends CIServiceRequest {
 
     public void setOrder(String order) { this.order = order; }
 
-    public Aggregations getAggregations() { 
-        if(aggregations == null){
-            aggregations = new Aggregations(); 
-        }
+    public Aggregations getAggregations() {
         return aggregations;
     }
 

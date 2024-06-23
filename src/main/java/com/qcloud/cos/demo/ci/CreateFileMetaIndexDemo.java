@@ -3,6 +3,7 @@ package com.qcloud.cos.demo.ci;
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.model.ciModel.metaInsight.CreateFileMetaIndexRequest;
 import com.qcloud.cos.model.ciModel.metaInsight.CreateFileMetaIndexResponse;
+import com.qcloud.cos.model.ciModel.metaInsight.File;
 import com.qcloud.cos.utils.Jackson;
 
 
@@ -24,10 +25,12 @@ public class CreateFileMetaIndexDemo {
      */
     public static void createFileMetaIndex(COSClient client) {
         CreateFileMetaIndexRequest request = new CreateFileMetaIndexRequest();
-        request.setBucketName("demo-1234567890");
+        request.setAppId("1234567890");
         // 设置数据集名称，同一个账户下唯一。;是否必传：是
         request.setDatasetName("test001");
-
+        File file = new File();
+        file.setURI("cos://<BucketName>/<ObjectKey>");
+        request.setFile(file);
         CreateFileMetaIndexResponse response = client.createFileMetaIndex(request);
         System.out.println(Jackson.toJsonString(response));
     }

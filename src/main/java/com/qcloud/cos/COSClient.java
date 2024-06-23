@@ -5152,7 +5152,7 @@ public class COSClient implements COS {
     public DatasetFaceSearchResponse datasetFaceSearch(DatasetFaceSearchRequest customRequest) {
         rejectNull(customRequest, "The request parameter must be specified setting the object tags");
 
-        CosHttpRequest<DatasetFaceSearchRequest> request = createRequest(customRequest.getAppId(), "/datasetquery" + "/facesearch", customRequest , HttpMethodName.POST);
+        CosHttpRequest<DatasetFaceSearchRequest> request = createRequest(customRequest.getAppId(), "/datasetquery/facesearch", customRequest , HttpMethodName.POST);
         request.addHeader("Accept", "application/json");
 
         this.setContent(request, CIJackson.toJsonBytes(customRequest), "application/json", false);
@@ -5163,7 +5163,7 @@ public class COSClient implements COS {
     public DatasetSimpleQueryResponse datasetSimpleQuery(DatasetSimpleQueryRequest customRequest) {
         rejectNull(customRequest, "The request parameter must be specified setting the object tags");
 
-        CosHttpRequest<DatasetSimpleQueryRequest> request = createRequest(customRequest.getAppId(), "/datasetquery" + "/simple", customRequest , HttpMethodName.POST);
+        CosHttpRequest<DatasetSimpleQueryRequest> request = createRequest(customRequest.getAppId(), "/datasetquery/simple", customRequest , HttpMethodName.POST);
         request.addHeader("Accept", "application/json");
 
         this.setContent(request, CIJackson.toJsonBytes(customRequest), "application/json", false);
@@ -5263,7 +5263,7 @@ public class COSClient implements COS {
     public SearchImageResponse searchImage(SearchImageRequest customRequest) {
         rejectNull(customRequest, "The request parameter must be specified setting the object tags");
 
-        CosHttpRequest<SearchImageRequest> request = createRequest(customRequest.getAppId(), "/datasetquery" + "/imagesearch", customRequest , HttpMethodName.POST);
+        CosHttpRequest<SearchImageRequest> request = createRequest(customRequest.getAppId(), "/datasetquery/imagesearch", customRequest , HttpMethodName.POST);
         request.addHeader("Accept", "application/json");
 
         this.setContent(request, CIJackson.toJsonBytes(customRequest), "application/json", false);

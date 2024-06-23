@@ -3,6 +3,7 @@ package com.qcloud.cos.demo.ci;
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.model.ciModel.metaInsight.DatasetFaceSearchRequest;
 import com.qcloud.cos.model.ciModel.metaInsight.DatasetFaceSearchResponse;
+import com.qcloud.cos.utils.CIJackson;
 import com.qcloud.cos.utils.Jackson;
 
 
@@ -24,18 +25,17 @@ public class DatasetFaceSearchDemo {
      */
     public static void datasetFaceSearch(COSClient client) {
         DatasetFaceSearchRequest request = new DatasetFaceSearchRequest();
-        request.setBucketName("demo-1234567890");
+        request.setAppId("1251704708");
         // 设置数据集名称，同一个账户下唯一。;是否必传：是
         request.setDatasetName("test");
         // 设置资源标识字段，表示需要建立索引的文件地址。;是否必传：是
-        request.setURI("cos://examplebucket-1250000000/test.jpg");
+        request.setURI("cos://<BucketName>/<ObjectKey>");
         // 设置输入图片中检索的人脸数量，默认值为1(传0或不传采用默认值)，最大值为10。;是否必传：否
         request.setMaxFaceNum(1);
         // 设置检索的每张人脸返回相关人脸数量，默认值为10，最大值为100。;是否必传：否
         request.setLimit(10);
         // 设置出参 Score 中，只有超过 MatchThreshold 值的结果才会返回。范围：1-100，默认值为0，推荐值为80。;是否必传：否
         request.setMatchThreshold(10);
-
         DatasetFaceSearchResponse response = client.datasetFaceSearch(request);
         System.out.println(Jackson.toJsonString(response));
     }

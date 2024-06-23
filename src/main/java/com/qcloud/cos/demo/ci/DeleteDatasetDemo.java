@@ -25,7 +25,7 @@ public class DeleteDatasetDemo {
      */
     public static void deleteDataset(COSClient client) {
         DeleteDatasetRequest request = new DeleteDatasetRequest();
-        request.setBucketName("demo-1234567890");
+        request.setAppId("demo-1234567890");
         // 设置数据集名称，同一个账户下唯一。;是否必传：是
         request.setDatasetName("test");
 

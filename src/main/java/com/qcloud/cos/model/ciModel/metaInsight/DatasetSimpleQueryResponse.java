@@ -14,7 +14,7 @@ public class DatasetSimpleQueryResponse extends CiServiceResult {
     /**
      *文件信息列表。仅在请求的Aggregations为空时返回。
      */
-    private List<File> files;
+    private List<FilesDetail> files;
 
     /**
      *聚合字段信息列表。仅在请求的Aggregations不为空时返回。
@@ -30,9 +30,9 @@ public class DatasetSimpleQueryResponse extends CiServiceResult {
 
     public void setRequestId(String requestId) { this.requestId = requestId; }
 
-    public List<File> getFiles() { return files; }
+    public List<FilesDetail> getFiles() { return files; }
 
-    public void setFiles(List<File> files) { this.files = files; }
+    public void setFiles(List<FilesDetail> files) { this.files = files; }
 
     public List<Aggregations> getAggregations() { return aggregations; }
 
