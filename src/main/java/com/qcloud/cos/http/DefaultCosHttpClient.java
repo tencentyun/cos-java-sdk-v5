@@ -40,6 +40,7 @@ import com.qcloud.cos.ClientConfig;
 import com.qcloud.cos.Headers;
 import com.qcloud.cos.auth.COSCredentials;
 import com.qcloud.cos.auth.COSSigner;
+import com.qcloud.cos.internal.cihandler.HttpEntityEnclosingDelete;
 import com.qcloud.cos.region.Region;
 import com.qcloud.cos.event.ProgressInputStream;
 import com.qcloud.cos.event.ProgressListener;
@@ -232,7 +233,7 @@ public class DefaultCosHttpClient implements CosHttpClient {
         } else if (httpMethodName.equals(HttpMethodName.GET)) {
             httpRequestBase = new HttpGet();
         } else if (httpMethodName.equals(HttpMethodName.DELETE)) {
-            httpRequestBase = new HttpDelete();
+            httpRequestBase = new HttpEntityEnclosingDelete();
         } else if (httpMethodName.equals(HttpMethodName.POST)) {
             httpRequestBase = new HttpPost();
         } else if (httpMethodName.equals(HttpMethodName.HEAD)) {
@@ -289,6 +290,12 @@ public class DefaultCosHttpClient implements CosHttpClient {
                     || httpMethodName.equals(HttpMethodName.POST)) {
                 HttpEntityEnclosingRequestBase entityRequestBase =
                         (HttpEntityEnclosingRequestBase) httpRequestBase;
+                entityRequestBase.setEntity(reqEntity);
+            }
+
+            if ( httpMethodName.equals(HttpMethodName.DELETE)){
+                HttpEntityEnclosingRequestBase entityRequestBase =
+                        (HttpEntityEnclosingDelete) httpRequestBase;
                 entityRequestBase.setEntity(reqEntity);
             }
         }

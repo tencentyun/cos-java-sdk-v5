@@ -45,13 +45,23 @@ public class Dataset {
      * 数据集中当前文件总大小，单位为字节                           
      */
     @XStreamAlias("TotalFileSize")
-    private Integer totalFileSize;
+    private String totalFileSize;
 
     /**
      *数据集名称
      */
     @XStreamAlias("DatasetName")
     private String datasetName;
+
+    private String region;
+
+    public String getRegion() {
+        return region;
+    }
+
+    public void setRegion(String region) {
+        this.region = region;
+    }
 
     public String getTemplateId() { return templateId; }
 
@@ -77,9 +87,9 @@ public class Dataset {
 
     public void setFileCount(Integer fileCount) { this.fileCount = fileCount; }
 
-    public Integer getTotalFileSize() { return totalFileSize; }
+    public String getTotalFileSize() { return totalFileSize; }
 
-    public void setTotalFileSize(Integer totalFileSize) { this.totalFileSize = totalFileSize; }
+    public void setTotalFileSize(String totalFileSize) { this.totalFileSize = totalFileSize; }
 
     public String getDatasetName() { return datasetName; }
 

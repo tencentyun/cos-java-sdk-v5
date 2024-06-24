@@ -26,10 +26,7 @@ import java.util.List;
 
 import com.qcloud.cos.internal.XmlResponsesSaxParser.CompleteMultipartUploadHandler;
 import com.qcloud.cos.internal.XmlResponsesSaxParser.CopyObjectResultHandler;
-import com.qcloud.cos.internal.cihandler.AuditingStrategyHandler;
-import com.qcloud.cos.internal.cihandler.AuditingTextLibHandler;
-import com.qcloud.cos.internal.cihandler.CICommonHandler;
-import com.qcloud.cos.internal.cihandler.CIJsonHandler;
+import com.qcloud.cos.internal.cihandler.*;
 import com.qcloud.cos.model.*;
 import com.qcloud.cos.model.bucketcertificate.BucketGetDomainCertificate;
 import com.qcloud.cos.model.ciModel.auditing.AudioAuditingResponse;
@@ -930,6 +927,18 @@ public class Unmarshallers {
 
         public T unmarshall(InputStream in) {
             return new CICommonHandler<T>().getResponse(in,tClass);
+        }
+    }
+
+    public static final class CICommonJsonUnmarshaller<T> implements Unmarshaller<T, InputStream> {
+        private Class<T> tClass;
+
+        public CICommonJsonUnmarshaller(Class<T> cls) {
+            this.tClass = cls;
+        }
+
+        public T unmarshall(InputStream in) throws IOException {
+            return new CICommonJsonResponseHandler<T>().getResponse(in,tClass);
         }
     }
 

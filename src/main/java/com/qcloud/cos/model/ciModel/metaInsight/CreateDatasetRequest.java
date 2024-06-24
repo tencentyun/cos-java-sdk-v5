@@ -16,7 +16,12 @@ public class CreateDatasetRequest extends CIServiceRequest {
     private String description;
 
     /**
-     *指模板，在建立元数据索引时，后端将根据模板来决定收集哪些元数据。每个模板都包含一个或多个算子，不同的算子表示不同的元数据。目前支持的模板： Official:DefaultEmptyId：默认为空的模板，表示不进行元数据的采集。 Official:COSBasicMeta：基础信息模板，包含 COS 文件基础元信息算子，表示采集 COS 文件的名称、类型、ACL等基础元信息数据。 Official:FaceSearch：人脸检索模板，包含人脸检索、COS 文件基础元信息算子。Official:ImageSearch：图像检索模板，包含图像检索、COS 文件基础元信息算子。;是否必传：否
+     *指模板，在建立元数据索引时，后端将根据模板来决定收集哪些元数据。每个模板都包含一个或多个算子，不同的算子表示不同的元数据。
+     * 目前支持的模板： Official:DefaultEmptyId：默认为空的模板，表示不进行元数据的采集。
+     * Official:COSBasicMeta：基础信息模板，包含 COS 文件基础元信息算子，表示采集 COS 文件的名称、类型、ACL等基础元信息数据。
+     * Official:FaceSearch：人脸检索模板，包含人脸检索、COS 文件基础元信息算子。
+     * Official:ImageSearch：图像检索模板，包含图像检索、COS 文件基础元信息算子。;
+     * 是否必传：否
      */
     private String templateId;
 

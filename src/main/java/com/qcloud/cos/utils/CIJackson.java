@@ -18,6 +18,7 @@
 
 package com.qcloud.cos.utils;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
@@ -25,12 +26,19 @@ import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.qcloud.cos.exception.CosClientException;
+import com.qcloud.cos.internal.CosServiceRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.Writer;
+import java.lang.reflect.Field;
+import java.nio.charset.StandardCharsets;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public enum CIJackson {
     ;
@@ -43,20 +51,28 @@ public enum CIJackson {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
         objectMapper.setPropertyNamingStrategy(PropertyNamingStrategy.PASCAL_CASE_TO_CAMEL_CASE);
-        SimpleBeanPropertyFilter filter = SimpleBeanPropertyFilter.serializeAllExcept();
+        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        SimpleBeanPropertyFilter filter = SimpleBeanPropertyFilter.serializeAllExcept(getFieldsToFilter(CosServiceRequest.class));
         FilterProvider filters = new SimpleFilterProvider().addFilter("CosServiceFilter", filter);
         objectMapper.setFilterProvider(filters);
     }
-
     private static final ObjectWriter writer = objectMapper.writer();
-    private static final ObjectWriter prettyWriter = objectMapper.writerWithDefaultPrettyPrinter();
 
-    public static String toJsonPrettyString(Object value) {
-        try {
-            return prettyWriter.writeValueAsString(value);
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
+    private static Set<String> getFieldsToFilter(Class cosServiceRequestClass) {
+        Set<String> fieldNames = new HashSet<>();
+        Field[] declaredFields = cosServiceRequestClass.getDeclaredFields();
+        for (Field declaredField : declaredFields) {
+            String name = declaredField.getName();
+            String fieldNameCapitalized = capitalizeFirstLetter(name);
+            fieldNames.add(fieldNameCapitalized);
         }
+        fieldNames.add("ReadLimit");
+        fieldNames.add("CloneRoot");
+        fieldNames.add("GeneralProgressListener");
+        fieldNames.add("RequestId");
+        fieldNames.add("BucketName");
+//        fieldNames.add("AppId");
+        return fieldNames;
     }
 
     public static String toJsonString(Object value) {
@@ -67,23 +83,19 @@ public enum CIJackson {
         }
     }
 
-    public static <T> T fromJsonString(String json, Class<T> clazz) {
-        if (json == null)
-            return null;
+    public static byte[] toJsonBytes(Object value) {
         try {
-            return objectMapper.readValue(json, clazz);
+            return writer.writeValueAsString(value).getBytes(StandardCharsets.UTF_8);
         } catch (Exception e) {
-            throw new CosClientException("Unable to parse Json String.", e);
+            throw new IllegalStateException(e);
         }
     }
 
-    public static JsonNode jsonNodeOf(String json) {
-        return fromJsonString(json, JsonNode.class);
+    private static String capitalizeFirstLetter(String str) {
+        if (str == null || str.isEmpty()) {
+            return str;
+        }
+        return Character.toUpperCase(str.charAt(0)) + str.substring(1);
     }
-
-    public static JsonGenerator jsonGeneratorOf(Writer writer) throws IOException {
-        return new JsonFactory().createGenerator(writer);
-    }
-
 }
 

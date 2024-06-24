@@ -11,7 +11,7 @@
  * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
  * express or implied. See the License for the specific language governing
  * permissions and limitations under the License.
- 
+
  * According to cos feature, we modify some class，comment, field name, etc.
  */
 
@@ -30,6 +30,8 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,7 +63,7 @@ public class CosErrorResponseHandler implements HttpResponseHandler<CosServiceEx
     };
 
     private CosServiceException createExceptionFromHeaders(CosHttpResponse errorResponse,
-            String errorResponseXml) {
+                                                           String errorResponseXml) {
         final Map<String, String> headers = errorResponse.getHeaders();
         final int statusCode = errorResponse.getStatusCode();
         final CosServiceExceptionBuilder exceptionBuilder = new CosServiceExceptionBuilder();
@@ -69,14 +71,27 @@ public class CosErrorResponseHandler implements HttpResponseHandler<CosServiceEx
         exceptionBuilder.setErrorResponseXml(errorResponseXml);
         exceptionBuilder.setStatusCode(statusCode);
         exceptionBuilder.setTraceId(headers.get(Headers.TRACE_ID));
-        exceptionBuilder.setRequestId(headers.get(Headers.REQUEST_ID));
+        String requestId = headers.get(Headers.REQUEST_ID);
         exceptionBuilder.setErrorCode(statusCode + " " + errorResponse.getStatusText());
+        if (requestId == null || requestId.isEmpty()) {
+            requestId = headers.get(Headers.CI_REQUEST_ID);
+        }
+        exceptionBuilder.setRequestId(requestId);
         return exceptionBuilder.build();
     }
 
     @Override
-    public CosServiceException handle(CosHttpResponse httpResponse) throws XMLStreamException {
+    public CosServiceException handle(CosHttpResponse httpResponse) throws XMLStreamException, IOException {
         final InputStream is = httpResponse.getContent();
+        Map<String, String> headers = httpResponse.getHeaders();
+        if ("application/json".equalsIgnoreCase(headers.get(Headers.CONTENT_TYPE))) {
+            return handleJsonErrorResponse(httpResponse, is);
+        } else {
+            return handleXmlErrorResponse(httpResponse, is);
+        }
+    }
+
+    private CosServiceException handleXmlErrorResponse(CosHttpResponse httpResponse, InputStream is) throws XMLStreamException {
         String xmlContent = null;
         /*
          * We don't always get an error response body back from COS. When we send a HEAD request, we
@@ -161,6 +176,15 @@ public class CosErrorResponseHandler implements HttpResponseHandler<CosServiceEx
             log.debug("Failed in parsing the error response : " + content, e);
         }
         return createExceptionFromHeaders(httpResponse, content);
+    }
+
+    private CosServiceException handleJsonErrorResponse(CosHttpResponse httpResponse, InputStream is) throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode jsonNode = objectMapper.readTree(is);
+        if(jsonNode.has("Message")){
+            httpResponse.setStatusText(jsonNode.get("Message").asText());
+        }
+        return createExceptionFromHeaders(httpResponse,null);
     }
 
     @Override
