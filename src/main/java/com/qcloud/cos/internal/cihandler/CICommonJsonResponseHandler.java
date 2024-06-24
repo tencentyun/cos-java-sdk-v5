@@ -18,7 +18,7 @@ public class CICommonJsonResponseHandler<T> {
 
     public T getResponse(InputStream in, Class<T> tClass) throws IOException {
         String response = inputStreamToStringUsingBufferedReader(in);
-//        System.out.println(response);
+        System.out.println(response);
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.setPropertyNamingStrategy(PropertyNamingStrategy.UPPER_CAMEL_CASE);
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);

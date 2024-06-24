@@ -5,8 +5,6 @@ import com.qcloud.cos.model.ciModel.metaInsight.DeleteDatasetRequest;
 import com.qcloud.cos.model.ciModel.metaInsight.DeleteDatasetResponse;
 import com.qcloud.cos.utils.Jackson;
 
-import java.util.List;
-
 /**
  * 删除数据集 详情见https://cloud.tencent.com/document/product/460/106157
  */
@@ -25,7 +23,7 @@ public class DeleteDatasetDemo {
      */
     public static void deleteDataset(COSClient client) {
         DeleteDatasetRequest request = new DeleteDatasetRequest();
-        request.setAppId("demo-1234567890");
+        request.setAppId("1234567890");
         // 设置数据集名称，同一个账户下唯一。;是否必传：是
         request.setDatasetName("test");
 

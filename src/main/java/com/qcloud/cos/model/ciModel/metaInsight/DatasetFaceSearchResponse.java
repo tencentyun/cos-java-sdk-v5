@@ -1,5 +1,6 @@
 package com.qcloud.cos.model.ciModel.metaInsight;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.qcloud.cos.model.CiServiceResult;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
@@ -12,6 +13,7 @@ public class DatasetFaceSearchResponse extends CiServiceResult {
     /**
      *人脸检索识别结果信息列表。
      */
+    @JsonProperty(value = "FaceResult")
     private List<FaceResult> faceResult;
 
     /**
@@ -28,28 +30,30 @@ public class DatasetFaceSearchResponse extends CiServiceResult {
     public void setRequestId(String requestId) { this.requestId = requestId; }
 
     
-    public class FaceResult {
+    public static class FaceResult {
         /**
          *相关人脸信息列表。
          */
+        @JsonProperty("FaceInfos")
         private List<FaceInfos> faceInfos;
 
         /**
          *输入图片的人脸框位置。
          */
-        private InputFaceBoundary inputFaceBoundary;
+        @JsonProperty("InputFaceBoundary")
+        private FaceBoundary inputFaceBoundary;
 
         public List<FaceInfos> getFaceInfos() { return faceInfos; }
 
         public void setFaceInfos(List<FaceInfos> faceInfos) { this.faceInfos = faceInfos; }
 
-        public InputFaceBoundary getInputFaceBoundary() { return inputFaceBoundary; }
+        public FaceBoundary getInputFaceBoundary() { return inputFaceBoundary; }
 
-        public void setInputFaceBoundary(InputFaceBoundary inputFaceBoundary) { this.inputFaceBoundary = inputFaceBoundary; }
+        public void setInputFaceBoundary(FaceBoundary inputFaceBoundary) { this.inputFaceBoundary = inputFaceBoundary; }
 
     }
 
-    public class FaceBoundary {
+    public static class FaceBoundary {
         /**
          *人脸高度。
          */
@@ -88,7 +92,7 @@ public class DatasetFaceSearchResponse extends CiServiceResult {
 
     }
 
-    public class FaceInfos {
+    public static class FaceInfos {
         /**
          *自定义人物ID。
          */
@@ -112,6 +116,7 @@ public class DatasetFaceSearchResponse extends CiServiceResult {
         /**
          *资源标识字段，表示需要建立索引的文件地址。
          */
+        @JsonProperty("URI")
         private String uRI;
 
         public String getPersonId() { return personId; }

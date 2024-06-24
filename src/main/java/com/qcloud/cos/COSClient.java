@@ -5048,7 +5048,7 @@ public class COSClient implements COS {
         return invoke(request, new Unmarshallers.CICommonUnmarshaller<ZipPreviewResponse>(ZipPreviewResponse.class));
     }
 
-    //    @Override
+//    @Override
     public GoodsMattingResponse goodsMatting(GoodsMattingRequest customRequest) {
         CosHttpRequest<GoodsMattingRequest> request = createRequest(customRequest.getBucketName(), "/" + customRequest.getObjectKey(), customRequest, HttpMethodName.GET);
         request.addParameter("ci-process","GoodsMatting");

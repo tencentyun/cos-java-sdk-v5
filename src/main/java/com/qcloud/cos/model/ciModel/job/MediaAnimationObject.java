@@ -1,11 +1,16 @@
 package com.qcloud.cos.model.ciModel.job;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  * 媒体处理 动图任务实体 https://cloud.tencent.com/document/product/460/48217
  */
 public class MediaAnimationObject {
+    @XStreamAlias("Container")
     private MediaContainerObject container;
+    @XStreamAlias("Video")
     private MediaVideoObject video;
+    @XStreamAlias("TimeInterval")
     private MediaTimeIntervalObject timeInterval;
 
     public MediaContainerObject getContainer() {

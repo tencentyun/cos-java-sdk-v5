@@ -25,7 +25,7 @@ public class DescribeDatasetDemo {
      */
     public static void describeDataset(COSClient client) {
         DescribeDatasetRequest request = new DescribeDatasetRequest();
-        request.setAppId("demo-1234567890");
+        request.setAppId("1234567890");
         request.setDatasetname("数据集名称");// 设置数据集名称，同一个账户下唯一。
 
         DescribeDatasetResponse response = client.describeDataset(request);

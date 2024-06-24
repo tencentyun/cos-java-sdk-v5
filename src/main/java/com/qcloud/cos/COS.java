@@ -3246,6 +3246,8 @@ public interface COS extends COSDirectSpi {
 
     ZipPreviewResponse zipPreview(ZipPreviewRequest request);
 
+    GoodsMattingResponse goodsMatting(GoodsMattingRequest customRequest);
+
     CreateHLSPlayKeyResponse createHLSPlayKey(CreateHLSPlayKeyRequest customRequest);
 
     GetHLSPlayKeyResponse getHLSPlayKey(GetHLSPlayKeyRequest customRequest);

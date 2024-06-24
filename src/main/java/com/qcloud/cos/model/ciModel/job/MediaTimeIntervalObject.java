@@ -1,6 +1,8 @@
 package com.qcloud.cos.model.ciModel.job;
 
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  * 媒体处理 任务时间参数实体 https://cloud.tencent.com/document/product/460/48234
  */
@@ -8,14 +10,17 @@ public class MediaTimeIntervalObject {
     /**
      * 开始时间
      */
+    @XStreamAlias("Start")
     private String start;
     /**
      * 结束时间
      */
+    @XStreamAlias("End")
     private String end;
     /**
      * 持续时间
      */
+    @XStreamAlias("Duration")
     private String duration;
 
     public String getStart() {
