@@ -32,9 +32,7 @@ public class GeneratePlayListDemo {
         request.setBucketName("demo-1234567890");
         //2.添加请求参数 参数详情请见api接口文档
         request.setTag("GeneratePlayList");
-        MediaVod vod = request.getInput().getVod();
-        vod.setFileId("1397757888244478755");
-        vod.setSubAppId("1251704708");
+        request.getInput().setObject("1.mp4");
         MediaContainerObject container = request.getOperation().getTranscode().getContainer();
         container.setFormat("hls");
         container.getClipConfig().setDuration("5");
