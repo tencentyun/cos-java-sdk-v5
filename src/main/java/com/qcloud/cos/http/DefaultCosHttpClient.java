@@ -496,17 +496,13 @@ public class DefaultCosHttpClient implements CosHttpClient {
         while (true) {
             try {
                 checkInterrupted();
-                /**
-                 * 目前sdk所有的上传请求都会把流包装成ReleasableInputStream
-                 * 所以这里不再需要判断BufferedInputStream的子类了
-                 * */
-//                if (originalContent instanceof BufferedInputStream
-//                        && originalContent.markSupported()) {
-//                    // Mark everytime for BufferedInputStream, since the marker could have been
-//                    // invalidated
-//                    final int readLimit = clientConfig.getReadLimit();
-//                    originalContent.mark(readLimit);
-//                }
+                if (originalContent instanceof BufferedInputStream
+                        && originalContent.markSupported()) {
+                    // Mark everytime for BufferedInputStream, since the marker could have been
+                    // invalidated
+                    final int readLimit = clientConfig.getReadLimit();
+                    originalContent.mark(readLimit);
+                }
                 // 如果是重试的则恢复流
                 if (retryIndex != 0 && originalContent != null) {
                     originalContent.reset();
