@@ -721,7 +721,7 @@ public class TransferManager {
         long lastByte;
 
         long[] range = getObjectRequest.getRange();
-        if (range != null && range.length == 2) {
+        if (range != null && range.length == 2 && range[0] != -1 && range[1] != -1) {
             startingByte = range[0];
             lastByte = range[1];
         } else {
@@ -734,6 +734,13 @@ public class TransferManager {
             final ObjectMetadata objectMetadata = cos.getObjectMetadata(getObjectMetadataRequest);
 
             lastByte = objectMetadata.getContentLength() - 1;
+            if (range != null && range.length == 2) {
+                if (range[0] == -1) {
+                    startingByte = lastByte - range[1] + 1;
+                } else {
+                    startingByte = range[0];
+                }
+            }
         }
         final long origStartingByte = startingByte;
         // We still pass the unfiltered listener chain into DownloadImpl
