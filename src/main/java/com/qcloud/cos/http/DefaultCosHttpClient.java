@@ -509,6 +509,7 @@ public class DefaultCosHttpClient implements CosHttpClient {
                 }
                 if (retryIndex != 0) {
                     long delay = backoffStrategy.computeDelayBeforeNextRetry(retryIndex);
+                    request.addHeader("x-cos-sdk-retry", "true");
                     Thread.sleep(delay);
                 }
                 HttpContext context = HttpClientContext.create();
