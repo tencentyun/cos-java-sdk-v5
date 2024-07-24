@@ -39,7 +39,6 @@ public class RecoverObjectsDemo {
         ClientConfig clientConfig = new ClientConfig(new Region(bucketRegion));
 
         clientConfig.setHttpProtocol(HttpProtocol.https);
-        clientConfig.setPrintShutdownStackTrace(false);
         // 生成cos客户端
         return new COSClient(cred, clientConfig);
     }
