@@ -296,9 +296,7 @@ public class DefaultCosHttpClient implements CosHttpClient {
                 HttpEntityEnclosingRequestBase entityRequestBase =
                         (HttpEntityEnclosingRequestBase) httpRequestBase;
                 entityRequestBase.setEntity(reqEntity);
-            }
-
-            if (httpMethodName.equals(HttpMethodName.DELETE) &&
+            } else if (httpMethodName.equals(HttpMethodName.DELETE) &&
                     request.getOriginalRequest() instanceof CIServiceRequest) {
                 HttpEntityEnclosingRequestBase entityRequestBase =
                         (HttpEntityEnclosingDelete) httpRequestBase;
