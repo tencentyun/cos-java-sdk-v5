@@ -47,7 +47,7 @@ public class RecoverObjectsDemo {
         ListVersionsRequest listVersionsRequest = new ListVersionsRequest();
         listVersionsRequest.setBucketName(bucketName);
         listVersionsRequest.setPrefix("");
-        listVersionsRequest.setMaxResults(2);
+        listVersionsRequest.setMaxResults(1000);
 
         VersionListing versionListing = null;
 
