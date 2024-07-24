@@ -329,6 +329,20 @@ public class GetObjectRequest extends CosServiceRequest
         range = new long[] {start, end};
     }
 
+    public void setRangeStart(long start) {
+        if (start < 0) {
+            throw new IllegalArgumentException("The range start should be greater than or equal to 0");
+        }
+        range = new long[] {start, -1L};
+    }
+
+    public void setRangeEnd(long end) {
+        if (end < 0) {
+            throw new IllegalArgumentException("The range end should be greater than or equal to 0");
+        }
+        range = new long[] {-1L, end};
+    }
+
     /**
      * <p>
      * Sets the optional inclusive byte range within the desired object that will be downloaded by

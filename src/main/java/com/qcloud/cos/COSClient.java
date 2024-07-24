@@ -38,6 +38,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -143,6 +144,7 @@ import com.qcloud.cos.retry.RetryUtils;
 import com.qcloud.cos.utils.*;
 import com.qcloud.cos.http.TimeOutCosHttpClient;
 
+import com.qcloud.cos.utils.Base64;
 import org.apache.commons.codec.DecoderException;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.ContentType;
@@ -1072,8 +1074,16 @@ public class COSClient implements COS {
         // Range
         long[] range = getObjectRequest.getRange();
         if (range != null) {
-            request.addHeader(Headers.RANGE,
-                    "bytes=" + Long.toString(range[0]) + "-" + Long.toString(range[1]));
+            if (range[0] == -1) {
+                request.addHeader(Headers.RANGE,
+                        "bytes=" + "-" + Long.toString(range[1]));
+            } else if (range[1] == -1) {
+                request.addHeader(Headers.RANGE,
+                        "bytes=" + Long.toString(range[0]) + "-");
+            } else {
+                request.addHeader(Headers.RANGE,
+                        "bytes=" + Long.toString(range[0]) + "-" + Long.toString(range[1]));
+            }
         }
         addResponseHeaderParameters(request, getObjectRequest.getResponseHeaders());
 
@@ -1274,6 +1284,11 @@ public class COSClient implements COS {
 
         rejectEmpty(deleteObjectRequest.getKey(),
                                 "The length of the key must be greater than 0");
+
+        if (Objects.equals(deleteObjectRequest.getKey(), "/")) {
+            throw new IllegalArgumentException("The specified key should not be /");
+        }
+
         CosHttpRequest<DeleteObjectRequest> request =
                 createRequest(deleteObjectRequest.getBucketName(), deleteObjectRequest.getKey(),
                         deleteObjectRequest, HttpMethodName.DELETE);
