@@ -6774,6 +6774,12 @@ public class XmlResponsesSaxParser {
                     case "Score":
                         response.setScore(getText());
                         break;
+                    case "CompressionResult":
+                        response.setCompressionResult(getText());
+                        break;
+                     case "SubLabel":
+                        response.setSubLabel(getText());
+                        break;
                     default:
                         break;
                 }
@@ -6781,7 +6787,7 @@ public class XmlResponsesSaxParser {
                 ParserMediaInfoUtils.ParsingAuditingCommonInfo(response.getPornInfo(), name, getText());
             } else if (in("Response", "JobsDetail", "PoliticsInfo")) {
                 ParserMediaInfoUtils.ParsingAuditingCommonInfo(response.getPoliticsInfo(), name, getText());
-            } else if (in("Response", "JobsDetail", "TerroristInfo")) {
+            } else if (in("Response", "JobsDetail", "TerroristInfo") || in("Response", "JobsDetail", "TerrorismInfo")) {
                 ParserMediaInfoUtils.ParsingAuditingCommonInfo(response.getTerroristInfo(), name, getText());
             } else if (in("Response", "JobsDetail", "AdsInfo")) {
                 ParserMediaInfoUtils.ParsingAuditingCommonInfo(response.getAdsInfo(), name, getText());

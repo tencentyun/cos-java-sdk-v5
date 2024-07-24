@@ -1,5 +1,6 @@
 package com.qcloud.cos.model.ciModel.metaInsight;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.qcloud.cos.internal.CIServiceRequest;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
@@ -19,6 +20,7 @@ public class DeleteFileMetaIndexRequest extends CIServiceRequest {
     /**
      *资源标识字段，表示需要建立索引的文件地址。;是否必传：是
      */
+    @JsonProperty("URI")
     private String uRI;
 
     public String getDatasetName() { return datasetName; }
