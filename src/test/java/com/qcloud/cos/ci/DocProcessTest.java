@@ -141,7 +141,7 @@ public class DocProcessTest extends AbstractCOSClientCITest {
         docJobRequest.setBucketName(bucket);
         docJobRequest.setDstType(DocHtmlRequest.DocType.html);
         docJobRequest.setExcelPaperSize("excelPaperSize");
-        String result = cosclient.GenerateDocPreviewUrl(docJobRequest);
+        String result = cosclient.generateDocPreviewUrl(docJobRequest);
     }
 
     @Test
@@ -163,7 +163,7 @@ public class DocProcessTest extends AbstractCOSClientCITest {
         docJobRequest.setExcelPaperSize("excelPaperSize");
         String s = null;
         try {
-             cosclient.GenerateDocPreviewUrl(docJobRequest);
+             cosclient.generateDocPreviewUrl(docJobRequest);
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }

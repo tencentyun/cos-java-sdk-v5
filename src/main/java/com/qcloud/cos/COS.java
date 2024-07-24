@@ -3106,7 +3106,7 @@ public interface COS extends COSDirectSpi {
     /**
      * GenerateDocPreviewHtmlUrl  查询账号下已开通文档预览功能的bucket
      */
-    String GenerateDocPreviewUrl(DocHtmlRequest docJobRequest) throws URISyntaxException;
+    String generateDocPreviewUrl(DocHtmlRequest docJobRequest) throws URISyntaxException;
 
     /**
      * createWebpageAuditingJob  提交网页审核任务 https://cloud.tencent.com/document/product/460/63968

@@ -102,7 +102,7 @@ public class DocJobDemo {
         request.setDstType(DocHtmlRequest.DocType.html);
         request.setObjectKey("1.pptx");
         //3.调用接口,获取任务响应对象
-        String previewUrl = client.GenerateDocPreviewUrl(request);
+        String previewUrl = client.generateDocPreviewUrl(request);
         System.out.println(previewUrl);
     }
 

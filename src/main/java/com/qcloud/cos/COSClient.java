@@ -4299,8 +4299,12 @@ public class COSClient implements COS {
         return true;
     }
 
-    @Override
     public String GenerateDocPreviewUrl(DocHtmlRequest docJobRequest) throws URISyntaxException {
+        return generateDocPreviewUrl(docJobRequest);
+    }
+
+    @Override
+    public String generateDocPreviewUrl(DocHtmlRequest docJobRequest) throws URISyntaxException {
         rejectNull(docJobRequest,
                 "The request parameter must be specified setting the object tags");
         rejectNull(docJobRequest.getBucketName(),
@@ -5212,7 +5216,7 @@ public class COSClient implements COS {
         rejectNull(customRequest, "The request parameter must be specified setting the object tags");
 
         CosHttpRequest<DeleteFileMetaIndexRequest> request = createRequest(customRequest.getAppId(), "/filemeta", customRequest , HttpMethodName.DELETE);
-
+        request.addHeader("Accept", "application/json");
         this.setContent(request, CIJackson.toJsonBytes(customRequest), "application/json", false);
         return invoke(request, new Unmarshallers.CICommonJsonUnmarshaller<DeleteFileMetaIndexResponse>(DeleteFileMetaIndexResponse.class));
     }
