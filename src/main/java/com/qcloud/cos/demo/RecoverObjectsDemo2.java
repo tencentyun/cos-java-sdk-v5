@@ -41,7 +41,7 @@ public class RecoverObjectsDemo2 {
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
         ClientConfig clientConfig = new ClientConfig(new Region(region));
 
-        clientConfig.setHttpProtocol(HttpProtocol.http);
+        clientConfig.setHttpProtocol(HttpProtocol.https);
         // 生成cos客户端
         return new COSClient(cred, clientConfig);
     }
