@@ -25,6 +25,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.NoSuchAlgorithmException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.util.Date;
+import java.util.Objects;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,8 +38,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.Date;
-import java.util.Objects;
 
 import com.qcloud.cos.ClientConfig;
 import com.qcloud.cos.Headers;
@@ -80,6 +83,13 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.config.Registry;
+import org.apache.http.config.RegistryBuilder;
+import org.apache.http.conn.socket.ConnectionSocketFactory;
+import org.apache.http.conn.socket.PlainConnectionSocketFactory;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.ssl.SSLContextBuilder;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
@@ -88,6 +98,7 @@ import org.apache.http.protocol.HttpContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.net.ssl.SSLContext;
 
 public class DefaultCosHttpClient implements CosHttpClient {
 
@@ -107,7 +118,29 @@ public class DefaultCosHttpClient implements CosHttpClient {
         super();
         this.errorResponseHandler = new CosErrorResponseHandler();
         this.clientConfig = clientConfig;
-        this.connectionManager = new PoolingHttpClientConnectionManager();
+
+        if (clientConfig.isCheckSSLCertificate()) {
+            this.connectionManager = new PoolingHttpClientConnectionManager();
+        } else {
+            try {
+                SSLContext sslContext = SSLContextBuilder.create().loadTrustMaterial((chain, authType) -> true).build();
+
+                SSLConnectionSocketFactory sslSocketFactory = new SSLConnectionSocketFactory(sslContext, NoopHostnameVerifier.INSTANCE);
+                Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder.<ConnectionSocketFactory> create()
+                        .register("http", PlainConnectionSocketFactory.getSocketFactory())
+                        .register("https", sslSocketFactory).build();
+                this.connectionManager = new PoolingHttpClientConnectionManager(socketFactoryRegistry);
+            } catch (NoSuchAlgorithmException e) {
+                log.error("fail to init http client: ", e);
+                throw new RuntimeException(e);
+            } catch (KeyStoreException e) {
+                log.error("fail to init http client: ", e);
+                throw new RuntimeException(e);
+            } catch (KeyManagementException e) {
+                log.error("fail to init http client: ", e);
+                throw new RuntimeException(e);
+            }
+        }
         this.maxErrorRetry = clientConfig.getMaxErrorRetry();
         this.retryPolicy = ValidationUtils.assertNotNull(clientConfig.getRetryPolicy(), "retry policy");
         this.backoffStrategy = ValidationUtils.assertNotNull(clientConfig.getBackoffStrategy(), "backoff strategy");

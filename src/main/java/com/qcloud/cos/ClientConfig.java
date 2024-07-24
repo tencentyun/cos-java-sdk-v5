@@ -117,6 +117,8 @@ public class ClientConfig {
 
     private int error_log_status_code_thresh = 500;
 
+    private boolean checkSSLCertificate = true;
+
     // 不传入region 用于后续调用List Buckets(获取所有的bucket信息)
     public ClientConfig() {
         super();
@@ -408,5 +410,13 @@ public class ClientConfig {
 
     public int getErrorLogStatusCodeThresh() {
         return error_log_status_code_thresh;
+    }
+
+    public void setCheckSSLCertificate(boolean isCheckSSLCertificate) {
+        checkSSLCertificate = isCheckSSLCertificate;
+    }
+
+    public boolean isCheckSSLCertificate() {
+        return checkSSLCertificate;
     }
 }
