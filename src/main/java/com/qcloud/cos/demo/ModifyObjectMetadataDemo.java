@@ -12,17 +12,19 @@ import com.qcloud.cos.model.ObjectMetadata;
 import com.qcloud.cos.region.Region;
 
 public class ModifyObjectMetadataDemo {
+    private static String secretId = System.getenv("SECRETID");
+    private static String secretKey = System.getenv("SECRETKEY");
+    private static String bucketName = System.getenv("BUCKET_NAME");
+    private static String region = System.getenv("REGION");
     public static void main(String[] args) {
         // 1 初始化用户身份信息(secretId, secretKey)
-        COSCredentials cred = new BasicCOSCredentials("AKIDXXXXXXXX", "1A2Z3YYYYYYYYYY");
+        COSCredentials cred = new BasicCOSCredentials(secretId, secretKey);
         // 2 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
-        Region region = new Region("ap-beijing");
-        ClientConfig clientConfig = new ClientConfig(region);
+        Region cosRegion = new Region(region);
+        ClientConfig clientConfig = new ClientConfig(cosRegion);
         // 3 生成cos客户端
         COSClient cosclient = new COSClient(cred, clientConfig);
 
-        // 存储桶的命名格式为 BucketName-APPID，此处填写的存储桶名称必须为此格式
-        String bucketName = "examplebucket-1250000000";
         String key = "exampleobject";
 
         ObjectMetadata objectMetadata = cosclient.getObjectMetadata(bucketName, key);
@@ -33,7 +35,7 @@ public class ModifyObjectMetadataDemo {
         objectMetadata.setHeader("x-cos-storage-class", "STANDARD_IA");
         objectMetadata.setContentType("text/plain");
 
-        CopyObjectRequest copyObjectRequest = new CopyObjectRequest(region, bucketName, key, bucketName, key);
+        CopyObjectRequest copyObjectRequest = new CopyObjectRequest(cosRegion, bucketName, key, bucketName, key);
         copyObjectRequest.setNewObjectMetadata(objectMetadata);
 
         try {
