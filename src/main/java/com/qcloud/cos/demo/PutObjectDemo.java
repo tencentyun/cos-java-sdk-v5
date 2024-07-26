@@ -16,11 +16,11 @@ import com.qcloud.cos.model.PutObjectResult;
 import com.qcloud.cos.region.Region;
 
 public class PutObjectDemo {
-    private static String secretId = "AKIDXXXXXXXX";
-    private static String secretKey = "1A2Z3YYYYYYYYYY";
-    private static String bucketName = "examplebucket-12500000000";
-    private static String region = "ap-guangzhou";
-    private static COSClient cosClient = createCli();;
+    private static String secretId = System.getenv("SECRETID");
+    private static String secretKey = System.getenv("SECRETKEY");
+    private static String bucketName = System.getenv("BUCKET_NAME");
+    private static String region = System.getenv("REGION");
+    private static COSClient cosClient = createCli();
 
     public static void main(String[] args) {
         try {

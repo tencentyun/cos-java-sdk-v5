@@ -21,10 +21,10 @@ import com.qcloud.cos.region.Region;
  * DelFileDemo展示了删除单个文件的DelObject, 删除多个文件的DelObjects的使用示例.
  */
 public class DelFileDemo {
-    private static String secretId = "AKIDXXXXXXXX";
-    private static String secretKey = "1A2Z3YYYYYYYYYY";
-    private static String bucketName = "examplebucket-12500000000";
-    private static String region = "ap-guangzhou";
+    private static String secretId = System.getenv("SECRETID");
+    private static String secretKey = System.getenv("SECRETKEY");
+    private static String bucketName = System.getenv("BUCKET_NAME");
+    private static String region = System.getenv("REGION");
     private static COSClient cosClient = createCli();
     public static void main(String[] args) {
         delSingleFile();

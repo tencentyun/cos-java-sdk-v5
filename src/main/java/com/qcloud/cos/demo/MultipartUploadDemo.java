@@ -32,10 +32,10 @@ import com.qcloud.cos.region.Region;
  * 分块上传的完成逻辑较复杂，需要经历多个步骤, 建议用户使用TransferManager中封装好的上传接口来进行文件的上传
  */
 public class MultipartUploadDemo {
-    private static String secretId = "AKIDXXXXXXXX";
-    private static String secretKey = "1A2Z3YYYYYYYYYY";
-    private static String region = "ap-guangzhou";
-    private static String bucketName = "mybucket-12500000000";
+    private static String secretId = System.getenv("SECRETID");
+    private static String secretKey = System.getenv("SECRETKEY");
+    private static String region = System.getenv("REGION");
+    private static String bucketName = System.getenv("BUCKET_NAME");
     private static String key = "aaa/bbb.txt";
 
     private static COSClient cosClient = createCli(region);
