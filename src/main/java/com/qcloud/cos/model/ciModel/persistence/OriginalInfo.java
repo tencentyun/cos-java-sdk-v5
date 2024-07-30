@@ -1,10 +1,19 @@
 package com.qcloud.cos.model.ciModel.persistence;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 public class OriginalInfo {
+    @XStreamAlias("Key")
     private String key;
+
+    @XStreamAlias("Location")
     private String location;
-    private ImageInfo imageInfo;
+
+    @XStreamAlias("ETag")
     private String etag;
+
+    @XStreamAlias("ImageInfo")
+    private ImageInfo imageInfo;
 
     public String getKey() {
         return key;

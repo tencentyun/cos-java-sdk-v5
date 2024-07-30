@@ -1,12 +1,29 @@
 package com.qcloud.cos.model.ciModel.persistence;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 public class ImageInfo {
+    @XStreamAlias("Format")
     private String format;
-    private Integer width;
-    private Integer height;
-    private Integer quality;
+
+    @XStreamAlias("Width")
+    private int width;
+
+    @XStreamAlias("Height")
+    private int height;
+
+    @XStreamAlias("Quality")
+    private int quality;
+
+    @XStreamAlias("Ave")
     private String ave;
-    private Integer orientation;
+
+    @XStreamAlias("Orientation")
+    private int orientation;
+
+    @XStreamAlias("FrameCount")
+    private int frameCount;
+
     public String getFormat() {
         return format;
     }
@@ -15,27 +32,27 @@ public class ImageInfo {
         this.format = format;
     }
 
-    public Integer getWidth() {
+    public int getWidth() {
         return width;
     }
 
-    public void setWidth(Integer width) {
+    public void setWidth(int width) {
         this.width = width;
     }
 
-    public Integer getHeight() {
+    public int getHeight() {
         return height;
     }
 
-    public void setHeight(Integer height) {
+    public void setHeight(int height) {
         this.height = height;
     }
 
-    public Integer getQuality() {
+    public int getQuality() {
         return quality;
     }
 
-    public void setQuality(Integer quality) {
+    public void setQuality(int quality) {
         this.quality = quality;
     }
 
@@ -47,11 +64,19 @@ public class ImageInfo {
         this.ave = ave;
     }
 
-    public Integer getOrientation() {
+    public int getOrientation() {
         return orientation;
     }
 
-    public void setOrientation(Integer orientation) {
+    public void setOrientation(int orientation) {
         this.orientation = orientation;
+    }
+
+    public int getFrameCount() {
+        return frameCount;
+    }
+
+    public void setFrameCount(int frameCount) {
+        this.frameCount = frameCount;
     }
 }
