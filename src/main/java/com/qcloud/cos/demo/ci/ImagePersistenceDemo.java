@@ -57,7 +57,6 @@ public class ImagePersistenceDemo {
             PutObjectResult putObjectResult = cosClient.putObject(putObjectRequest);
             CIUploadResult ciUploadResult = putObjectResult.getCiUploadResult();
             System.out.println(putObjectResult.getRequestId());
-            System.out.println(ciUploadResult.getOriginalInfo().getEtag());
             for(CIObject ciObject:ciUploadResult.getProcessResults().getObjectList()) {
                 System.out.println(ciObject.getLocation());
                 System.out.println(ciObject.getEtag());

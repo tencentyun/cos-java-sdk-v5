@@ -2,6 +2,7 @@ package com.qcloud.cos.model.ciModel.metaInsight;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 public class ImageResult {
+
     /**
      *资源标识字段，表示需要建立索引的文件地址。
      */

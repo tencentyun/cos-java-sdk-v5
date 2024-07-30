@@ -1,7 +1,11 @@
 package com.qcloud.cos.model.ciModel.recognition;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 public class QRcodeInfo {
+    @XStreamAlias("codeUrl")
     private String codeUrl;
+    @XStreamAlias("CodeLocation")
     private CodeLocation codeLocation;
 
     public String getCodeUrl() {
