@@ -35,10 +35,10 @@ import com.qcloud.cos.transfer.Upload;
 // TransferManager提供异步的上传文件, 下载文件，copy文件的高级API接口
 // 可以根据文件大小自动的选择上传接口或者copy接口,方便用户使用, 无需自行封装较复杂的分块上传或者分块copy
 public class TransferManagerDemo {
-    private static String secretId = "AKIDXXXXXXXX";
-    private static String secretKey = "1A2Z3YYYYYYYYYY";
-    private static String cosRegion = "ap-guangzhou";
-    private static String bucketName = "examplebucket-12500000000";
+    private static String secretId = System.getenv("SECRETID");
+    private static String secretKey = System.getenv("SECRETKEY");
+    private static String cosRegion = System.getenv("REGION");
+    private static String bucketName = System.getenv("BUCKET_NAME");
     public static void main(String[] args) {
         //multipartUploadWithMetaData();
         resumableDownloadFile();
