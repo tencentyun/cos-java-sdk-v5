@@ -1,14 +1,18 @@
 package com.qcloud.cos.demo.ci;
 
 import com.qcloud.cos.COSClient;
-import com.qcloud.cos.model.ciModel.job.MediaJobOperation;
-import com.qcloud.cos.model.ciModel.job.MediaJobResponse;
-import com.qcloud.cos.model.ciModel.job.MediaJobsRequest;
+import com.qcloud.cos.model.ciModel.job.MediaContainerObject;
+import com.qcloud.cos.model.ciModel.job.MediaVideoObject;
+import com.qcloud.cos.model.ciModel.job.TransTpl;
 import com.qcloud.cos.model.ciModel.job.VideoTargetRec;
+import com.qcloud.cos.model.ciModel.job.v2.*;
+import com.qcloud.cos.model.ciModel.template.MediaListTemplateResponse;
+import com.qcloud.cos.model.ciModel.template.MediaTemplateObject;
 import com.qcloud.cos.model.ciModel.template.MediaTemplateRequest;
-import com.qcloud.cos.model.ciModel.template.MediaTemplateResponse;
+import com.qcloud.cos.utils.CIJackson;
 
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 
 /**
  * 媒体处理 目标检测任务 job接口相关demo
@@ -19,7 +23,7 @@ public class VideoTargetRecJobDemo {
         // 1 初始化用户身份信息（secretId, secretKey）。
         COSClient client = ClientUtils.getTestClient();
         // 2 调用要使用的方法。
-        describeMediaJob(client);
+        describeMediaTemplates(client);
     }
 
     /**
@@ -30,50 +34,23 @@ public class VideoTargetRecJobDemo {
      */
     public static void createMediaJobs(COSClient client) {
         //1.创建任务请求对象
-        MediaJobsRequest request = new MediaJobsRequest();
-        //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("shanghaitest-1251704708");
-        request.setTag("VideoTargetRec");
-        request.getInput().setObject("test/2023Y05M19D06H25M20S00.30.ts");
-        //2.1添加媒体任务操作参数
-        MediaJobOperation operation = request.getOperation();
-        operation.setDecryptKey("4kkb6KFBFQmmg60dzuzOgA==");
-        operation.setDecryptIv("YWFhYWFhYWFhYWFhYWFhYQ==");
-        operation.setDecryptMode("AES128CBCNOPADDING");
-
-        VideoTargetRec videoTargetRec = operation.getVideoTargetRec();
-        videoTargetRec.setBody("true");
-        videoTargetRec.setPet("true");
-        videoTargetRec.setCar("true");
-
-        //3.调用接口,获取任务响应对象
-        MediaJobResponse response = client.createMediaJobs(request);
-        System.out.println(response.getJobsDetail().getJobId());
-    }
-
-    /**
-     * createMediaJobs 接口用于创建媒体任务
-     * 使用目标检测参数创建任务
-     */
-    public static void createMediaJobs2(COSClient client) {
-        //1.创建任务请求对象
-        MediaJobsRequest request = new MediaJobsRequest();
+        MediaJobsRequestV2 request = new MediaJobsRequestV2();
         //2.添加请求参数 参数详情请见api接口文档
         request.setBucketName("demo-1234567890");
         request.setTag("VideoTargetRec");
         request.getInput().setObject("1.mp4");
         //2.1添加媒体任务操作参数
         MediaJobOperation operation = request.getOperation();
-        operation.setJobLevel("0");
 
         VideoTargetRec videoTargetRec = operation.getVideoTargetRec();
-        videoTargetRec.setBody("false");
+        videoTargetRec.setBody("true");
         videoTargetRec.setPet("true");
-        videoTargetRec.setCar("false");
+        videoTargetRec.setCar("true");
+        videoTargetRec.setFace("true");
 
         //3.调用接口,获取任务响应对象
-        MediaJobResponse response = client.createMediaJobs(request);
-        System.out.println(response);
+        MediaJobResponseV2 response = client.createMediaJobsV2(request);
+        System.out.println(response.getJobsDetail().getJobId());
     }
 
     /**
@@ -82,13 +59,13 @@ public class VideoTargetRecJobDemo {
      */
     public static void describeMediaJob(COSClient client) {
         //1.创建任务请求对象
-        MediaJobsRequest request = new MediaJobsRequest();
+        MediaJobsRequestV2 request = new MediaJobsRequestV2();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("shanghaitest-1251704708");
-        request.setJobId("a350aba00ff8011edbf2061ef03bc37b5");
+        request.setBucketName("demo-1234567890");
+        request.setJobId("a794b193e4fad11ef8a36bfd795e*****");
         //3.调用接口,获取任务响应对象
-        MediaJobResponse response = client.describeMediaJob(request);
-        System.out.println(response);
+        MediaJobResponseV2 response = client.describeMediaJobV2(request);
+        System.out.println(CIJackson.toJsonString(response));
     }
 
     /**
@@ -98,18 +75,45 @@ public class VideoTargetRecJobDemo {
      */
     public static void createMediaTemplate(COSClient client) throws UnsupportedEncodingException {
         //1.创建模板请求对象
+        MediaTemplateRequestV2 request = new MediaTemplateRequestV2();
+        //2.添加请求参数 参数详情请见api接口文档
+        request.setBucketName("demo-1234567890");
+        request.setTag("VideoTargetRec");
+        request.setName("mark-VideoTargetRec-175");
+        VideoTargetRec videoTargetRec = new VideoTargetRec();
+        videoTargetRec.setCar("false");
+        videoTargetRec.setBody("false");
+        videoTargetRec.setPet("false");
+        videoTargetRec.setFace("true");
+        videoTargetRec.setProcessType("Mosaic");
+
+        TransTpl transTpl = new TransTpl();
+        MediaContainerObject container = new MediaContainerObject();
+        container.setFormat("mp4");
+        transTpl.setContainer(container);
+
+        MediaVideoObject video = new MediaVideoObject();
+        video.setCodec("H.264");
+        video.setCrf("23");
+        transTpl.setVideo(video);
+        videoTargetRec.setTransTpl(transTpl);
+        request.setVideoTargetRec(videoTargetRec);
+        MediaTemplateResponseV2 response = client.createMediaTemplateV2(request);
+
+        System.out.println(CIJackson.toJsonString(response));
+    }
+
+    public static void describeMediaTemplates(COSClient client) {
+        //1.创建模板请求对象
         MediaTemplateRequest request = new MediaTemplateRequest();
         //2.添加请求参数 参数详情请见api接口文档
         request.setBucketName("demo-1234567890");
         request.setTag("VideoTargetRec");
-        request.setName("mark-VideoTargetRec");
-        VideoTargetRec videoTargetRec = request.getVideoTargetRec();
-        videoTargetRec.setCar("true");
-        videoTargetRec.setBody("true");
-        videoTargetRec.setPet("false");
-
-        MediaTemplateResponse response = client.createMediaTemplate(request);
-        System.out.println(response);
+        //3.调用接口,获取模板响应对象
+        MediaListTemplateResponse response = client.describeMediaTemplatesV2(request);
+        List<MediaTemplateObject> templateList = response.getTemplateList();
+        for (MediaTemplateObject mediaTemplateObject : templateList) {
+            System.out.println(CIJackson.toJsonString(mediaTemplateObject));
+        }
     }
-
 }

@@ -190,8 +190,19 @@ public class MediaJobOperation {
     @XStreamAlias("DNAResult")
     private DNAResult dnaResult;
 
+    @XStreamAlias("VideoTargetRecResult")
+    private VideoTargetRecResult videoTargetRecResult;
+
     public DNAResult getDnaResult() {
         return dnaResult;
+    }
+
+    public VideoTargetRecResult getVideoTargetRecResult() {
+        return videoTargetRecResult;
+    }
+
+    public void setVideoTargetRecResult(VideoTargetRecResult videoTargetRecResult) {
+        this.videoTargetRecResult = videoTargetRecResult;
     }
 
     public void setDnaResult(DNAResult dnaResult) {

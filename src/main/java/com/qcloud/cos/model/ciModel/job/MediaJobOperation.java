@@ -49,6 +49,8 @@ public class MediaJobOperation {
 
     @XStreamAlias("EncryptMode")
     private String encryptMode;
+    @XStreamAlias("SnapshotPrefix")
+    private String snapshotPrefix;
 
     @XStreamAlias("Output")
     private MediaOutputObject output;
@@ -517,6 +519,14 @@ public class MediaJobOperation {
 
     public void setVersion(String version) {
         this.version = version;
+    }
+
+    public String getSnapshotPrefix() {
+        return snapshotPrefix;
+    }
+
+    public void setSnapshotPrefix(String snapshotPrefix) {
+        this.snapshotPrefix = snapshotPrefix;
     }
 
     @Override

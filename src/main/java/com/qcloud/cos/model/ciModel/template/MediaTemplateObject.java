@@ -30,7 +30,6 @@ public class MediaTemplateObject extends MediaCommonResponse {
 
     @XStreamAlias("Category")
     private String category;
-
     @XStreamAlias("TransTpl")
     private MediaTemplateTransTplObject transTpl;
 

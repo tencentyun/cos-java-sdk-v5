@@ -1,29 +1,74 @@
 package com.qcloud.cos.model.ciModel.job;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class VideoTargetRec {
+
+    @XStreamAlias("ProcessType")
+    private String processType;
+
     /**
      * 是否开启人体检测
      */
+    @XStreamAlias("Body")
     private String body;
     /**
      * 是否开启宠物检测
      */
+    @XStreamAlias("Pet")
     private String pet;
     /**
      * 是否开启车辆检测
      */
+    @XStreamAlias("Car")
     private String car;
-
+    @XStreamAlias("Face")
+    private String face;
+    @XStreamAlias("Version")
+    private String version;
+    @XStreamAlias("SnapshotFreq")
+    private String snapshotFreq;
+    @XStreamAlias("BodyRecognition")
     private MediaRecognition bodyRecognition;
-
+    @XStreamAlias("CarRecognition")
     private MediaRecognition carRecognition;
-
+    @XStreamAlias("PetRecognition")
     private MediaRecognition petRecognition;
-
+    @XStreamAlias("FaceRecognition")
+    private MediaRecognition faceRecognition;
+    @XStreamAlias("TopKRecognition")
     private List<MediaTopkRecognition> topKRecognition;
+
+    @XStreamAlias("TransTpl")
+    private TransTpl transTpl;
+
+    public TransTpl getTransTpl() {
+        return transTpl;
+    }
+
+    public void setTransTpl(TransTpl transTpl) {
+        this.transTpl = transTpl;
+    }
+
+    public String getProcessType() {
+        return processType;
+    }
+
+    public void setProcessType(String processType) {
+        this.processType = processType;
+    }
+
+
+    public String getFace() {
+        return face;
+    }
+
+    public void setFace(String face) {
+        this.face = face;
+    }
 
     public String getBody() {
         return body;
@@ -93,6 +138,31 @@ public class VideoTargetRec {
     public void setTopKRecognition(List<MediaTopkRecognition> topKRecognition) {
         this.topKRecognition = topKRecognition;
     }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    public String getSnapshotFreq() {
+        return snapshotFreq;
+    }
+
+    public void setSnapshotFreq(String snapshotFreq) {
+        this.snapshotFreq = snapshotFreq;
+    }
+
+    public MediaRecognition getFaceRecognition() {
+        return faceRecognition;
+    }
+
+    public void setFaceRecognition(MediaRecognition faceRecognition) {
+        this.faceRecognition = faceRecognition;
+    }
+
 
     @Override
     public String toString() {
