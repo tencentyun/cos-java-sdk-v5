@@ -7,23 +7,28 @@ import org.apache.http.protocol.HttpContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.Callable;
 
 public class TimeOutCosHttpClient  extends DefaultCosHttpClient{
-    private ExecutorService threadPool;
+    private ThreadPoolExecutor threadPool;
     private static final Logger log = LoggerFactory.getLogger(TimeOutCosHttpClient.class);
 
     public TimeOutCosHttpClient(ClientConfig clientConfig) {
         super(clientConfig);
-        int pool_size = clientConfig.getTimeoutClientThreadSize();
-        if (pool_size <= 0) {
-            pool_size = Runtime.getRuntime().availableProcessors() * 5;
+        int poolSize = clientConfig.getTimeoutClientThreadSize();
+        if (poolSize <= 0) {
+            poolSize = Runtime.getRuntime().availableProcessors() * 5;
         }
-        threadPool =  Executors.newFixedThreadPool(pool_size);
+
+        threadPool = new ThreadPoolExecutor(poolSize, poolSize * 2, 60L, TimeUnit.SECONDS,
+                new ArrayBlockingQueue<Runnable>(poolSize * 20), Executors.defaultThreadFactory(),
+                new ThreadPoolExecutor.CallerRunsPolicy());
+        threadPool.allowCoreThreadTimeOut(true);
     }
 
     @Override

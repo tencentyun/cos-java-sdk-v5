@@ -23,11 +23,16 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.InetAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.UnknownHostException;
 import java.security.NoSuchAlgorithmException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
+import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Objects;
 import java.util.HashMap;
@@ -85,6 +90,7 @@ import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
+import org.apache.http.conn.DnsResolver;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
@@ -118,9 +124,27 @@ public class DefaultCosHttpClient implements CosHttpClient {
         super();
         this.errorResponseHandler = new CosErrorResponseHandler();
         this.clientConfig = clientConfig;
+        DnsResolver dnsResolver = new DnsResolver() {
+            @Override
+            public InetAddress[] resolve(String host) throws UnknownHostException {
+                InetAddress[] addresses = InetAddress.getAllByName(host);
+                List<InetAddress> addressList = new ArrayList<>(Arrays.asList(addresses));
+                Collections.shuffle(addressList);
+
+                InetAddress[] newAddresses = addressList.toArray(new InetAddress[0]);
+                return newAddresses;
+            }
+        };
 
         if (clientConfig.isCheckSSLCertificate()) {
-            this.connectionManager = new PoolingHttpClientConnectionManager();
+            if (clientConfig.isUseDefaultDnsResolver()) {
+                this.connectionManager = new PoolingHttpClientConnectionManager();
+            } else {
+                Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder.<ConnectionSocketFactory> create()
+                        .register("http", PlainConnectionSocketFactory.getSocketFactory())
+                        .register("https", SSLConnectionSocketFactory.getSocketFactory()).build();
+                this.connectionManager = new PoolingHttpClientConnectionManager(socketFactoryRegistry, dnsResolver);
+            }
         } else {
             try {
                 SSLContext sslContext = SSLContextBuilder.create().loadTrustMaterial((chain, authType) -> true).build();
@@ -129,7 +153,11 @@ public class DefaultCosHttpClient implements CosHttpClient {
                 Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder.<ConnectionSocketFactory> create()
                         .register("http", PlainConnectionSocketFactory.getSocketFactory())
                         .register("https", sslSocketFactory).build();
-                this.connectionManager = new PoolingHttpClientConnectionManager(socketFactoryRegistry);
+                if (clientConfig.isUseDefaultDnsResolver()) {
+                    this.connectionManager = new PoolingHttpClientConnectionManager(socketFactoryRegistry);
+                } else {
+                    this.connectionManager = new PoolingHttpClientConnectionManager(socketFactoryRegistry, dnsResolver);
+                }
             } catch (NoSuchAlgorithmException e) {
                 log.error("fail to init http client: ", e);
                 throw new RuntimeException(e);

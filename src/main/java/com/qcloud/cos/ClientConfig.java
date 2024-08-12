@@ -95,8 +95,8 @@ public class ClientConfig {
     private int readLimit = DEFAULT_READ_LIMIT;
     private COSSigner cosSigner = new COSSigner();
 
-    private int request_timeout = DEFAULT_REQUEST_TIMEOUT;
-    private int shutdown_timeout = DEFAULT_SHUTDOWN_TIMEOUT;
+    private int requestTimeout = DEFAULT_REQUEST_TIMEOUT;
+    private int shutdownTimeout = DEFAULT_SHUTDOWN_TIMEOUT;
     private boolean isRequestTimeOutEnable = false;
 
     // 数据万象特殊请求配置
@@ -113,11 +113,13 @@ public class ClientConfig {
 
     private boolean isCheckRequestPath = true;
 
-    private int timeout_client_thread_size = 0;
+    private int timeoutClientThreadSize = 0;
 
-    private int error_log_status_code_thresh = 500;
+    private int errorLogStatusCodeThresh = 500;
 
     private boolean checkSSLCertificate = true;
+
+    private boolean useDefaultDnsResolver = true;
 
     // 不传入region 用于后续调用List Buckets(获取所有的bucket信息)
     public ClientConfig() {
@@ -349,11 +351,11 @@ public class ClientConfig {
     }
 
     public int getRequestTimeout () {
-        return request_timeout;
+        return requestTimeout;
     }
 
     public void setRequestTimeout (int requestTimeout) {
-        this.request_timeout = requestTimeout;
+        this.requestTimeout = requestTimeout;
     }
 
     public void setRequestTimeOutEnable(boolean requestTimeOutEnable) {
@@ -365,11 +367,11 @@ public class ClientConfig {
     }
 
     public void setShutdownTimeout(int shutdownTimeout) {
-        this.shutdown_timeout = shutdownTimeout;
+        this.shutdownTimeout = shutdownTimeout;
     }
 
     public int getShutdownTimeout() {
-        return shutdown_timeout;
+        return shutdownTimeout;
     }
 
     public boolean isChangeEndpointRetry() {
@@ -397,19 +399,19 @@ public class ClientConfig {
     }
 
     public int getTimeoutClientThreadSize() {
-        return timeout_client_thread_size;
+        return timeoutClientThreadSize;
     }
 
-    public void setTimeoutClientThreadSize(int pool_size) {
-        timeout_client_thread_size = pool_size;
+    public void setTimeoutClientThreadSize(int poolSize) {
+        timeoutClientThreadSize = poolSize;
     }
 
-    public void setErrorLogStatusCodeThresh(int status_code) {
-        error_log_status_code_thresh = status_code;
+    public void setErrorLogStatusCodeThresh(int statusCode) {
+        errorLogStatusCodeThresh = statusCode;
     }
 
     public int getErrorLogStatusCodeThresh() {
-        return error_log_status_code_thresh;
+        return errorLogStatusCodeThresh;
     }
 
     public void setCheckSSLCertificate(boolean isCheckSSLCertificate) {
@@ -418,5 +420,13 @@ public class ClientConfig {
 
     public boolean isCheckSSLCertificate() {
         return checkSSLCertificate;
+    }
+
+    public void setUseDefaultDnsResolver(boolean useDefaultDnsResolver) {
+        this.useDefaultDnsResolver = useDefaultDnsResolver;
+    }
+
+    public boolean isUseDefaultDnsResolver() {
+        return useDefaultDnsResolver;
     }
 }
