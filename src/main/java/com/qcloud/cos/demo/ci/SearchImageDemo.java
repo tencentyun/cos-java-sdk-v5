@@ -5,7 +5,6 @@ import com.qcloud.cos.model.ciModel.metaInsight.SearchImageRequest;
 import com.qcloud.cos.model.ciModel.metaInsight.SearchImageResponse;
 import com.qcloud.cos.utils.Jackson;
 
-import java.util.List;
 
 /**
  * 图像检索 详情见https://cloud.tencent.com/document/product/460/106376

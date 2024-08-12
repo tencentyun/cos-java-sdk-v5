@@ -17,8 +17,8 @@ import com.qcloud.cos.transfer.Copy;
 import com.qcloud.cos.transfer.TransferManager;
 
 public class CopyFileDemo {
-    private static String secretId = "AKIDXXXXXXXX";
-    private static String secretKey = "1A2Z3YYYYYYYYYY";
+    private static String secretId = System.getenv("SECRETID");
+    private static String secretKey = System.getenv("SECRETKEY");
     private static String srcBucketName = "srcBucket-12500000000";
     private static String srcKey = "aaa/bbb.txt";
     private static String destBucketName = "destBucket-12500000000";

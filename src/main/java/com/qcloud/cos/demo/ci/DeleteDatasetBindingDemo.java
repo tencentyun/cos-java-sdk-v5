@@ -27,8 +27,7 @@ public class DeleteDatasetBindingDemo {
         // 设置数据集名称，同一个账户下唯一。;是否必传：是
         request.setDatasetName("test");
         // 设置资源标识字段，表示需要与数据集绑定的资源，当前仅支持COS存储桶，字段规则：cos://<BucketName>，其中BucketName表示COS存储桶名称，例如：cos://examplebucket-1250000000;是否必传：是
-        request.setURI("cos://examplebucket-1250000000");
-
+        request.setURI("cos://examplebucket-1250000000/object");
         DeleteDatasetBindingResponse response = client.deleteDatasetBinding(request);
         System.out.println(Jackson.toJsonString(response));
     }

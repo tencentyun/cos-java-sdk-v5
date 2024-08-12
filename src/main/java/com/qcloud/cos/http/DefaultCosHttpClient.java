@@ -65,6 +65,7 @@ import com.qcloud.cos.internal.ReleasableInputStream;
 import com.qcloud.cos.internal.ResettableInputStream;
 import com.qcloud.cos.internal.SdkBufferedInputStream;
 import com.qcloud.cos.internal.CIWorkflowServiceRequest;
+import com.qcloud.cos.internal.CIServiceRequest;
 import com.qcloud.cos.retry.BackoffStrategy;
 import com.qcloud.cos.retry.RetryPolicy;
 import com.qcloud.cos.utils.CodecUtils;
@@ -294,7 +295,11 @@ public class DefaultCosHttpClient implements CosHttpClient {
         } else if (httpMethodName.equals(HttpMethodName.GET)) {
             httpRequestBase = new HttpGet();
         } else if (httpMethodName.equals(HttpMethodName.DELETE)) {
-            httpRequestBase = new HttpEntityEnclosingDelete();
+            if (request.getOriginalRequest() instanceof CIServiceRequest) {
+                httpRequestBase = new HttpEntityEnclosingDelete();
+            } else {
+                httpRequestBase = new HttpDelete();
+            }
         } else if (httpMethodName.equals(HttpMethodName.POST)) {
             httpRequestBase = new HttpPost();
         } else if (httpMethodName.equals(HttpMethodName.HEAD)) {
@@ -352,9 +357,8 @@ public class DefaultCosHttpClient implements CosHttpClient {
                 HttpEntityEnclosingRequestBase entityRequestBase =
                         (HttpEntityEnclosingRequestBase) httpRequestBase;
                 entityRequestBase.setEntity(reqEntity);
-            }
-
-            if ( httpMethodName.equals(HttpMethodName.DELETE)){
+            } else if (httpMethodName.equals(HttpMethodName.DELETE) &&
+                    request.getOriginalRequest() instanceof CIServiceRequest) {
                 HttpEntityEnclosingRequestBase entityRequestBase =
                         (HttpEntityEnclosingDelete) httpRequestBase;
                 entityRequestBase.setEntity(reqEntity);

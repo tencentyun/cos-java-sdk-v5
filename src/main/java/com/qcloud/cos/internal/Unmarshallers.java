@@ -30,6 +30,7 @@ import com.qcloud.cos.internal.cihandler.*;
 import com.qcloud.cos.model.*;
 import com.qcloud.cos.model.bucketcertificate.BucketGetDomainCertificate;
 import com.qcloud.cos.model.ciModel.auditing.AudioAuditingResponse;
+import com.qcloud.cos.model.ciModel.auditing.AuditingKeywordResponse;
 import com.qcloud.cos.model.ciModel.auditing.AuditingStrategyListResponse;
 import com.qcloud.cos.model.ciModel.auditing.AuditingStrategyResponse;
 import com.qcloud.cos.model.ciModel.auditing.AuditingTextLibResponse;
@@ -56,6 +57,7 @@ import com.qcloud.cos.model.ciModel.job.MediaJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaListJobResponse;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoResponse;
 import com.qcloud.cos.model.ciModel.persistence.AIGameRecResponse;
+import com.qcloud.cos.model.ciModel.persistence.CIUploadResult;
 import com.qcloud.cos.model.ciModel.persistence.DetectCarResponse;
 import com.qcloud.cos.model.ciModel.queue.DocListQueueResponse;
 import com.qcloud.cos.model.ciModel.queue.MediaListQueueResponse;
@@ -146,8 +148,8 @@ public class Unmarshallers {
             implements Unmarshaller<ObjectMetadata, InputStream> {
         public ObjectMetadata unmarshall(InputStream in) throws Exception {
             ObjectMetadata objectMetadata = new ObjectMetadata();
-            objectMetadata.setCiUploadResult(new XmlResponsesSaxParser().parseImagePersistenceResponse(in)
-                    .getCiUploadResult());
+            CICommonUnmarshaller<CIUploadResult> unmarshaller = new CICommonUnmarshaller<>(CIUploadResult.class);
+            objectMetadata.setCiUploadResult(unmarshaller.unmarshall(in));
             return objectMetadata;
         }
     }

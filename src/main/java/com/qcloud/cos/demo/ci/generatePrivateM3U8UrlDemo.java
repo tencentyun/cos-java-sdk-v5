@@ -12,42 +12,29 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
-public class LiveTranscodeDemo {
+public class generatePrivateM3U8UrlDemo {
     private static String appId = "123456789";
     private static String bucket = "demo-123456789";
     private static String objectKey = "test.m3u8";
     private static String expires = "3600";
     private static byte[] secret = "YourSecret".getBytes();
 
-
-    public static void main(String[] args) {
-        COSClient client = ClientUtils.getTestClient();
-        String url = generateCosDomainPrivateM3U8Url(client);
-        System.out.println("Generated url: " + url);
-    }
-
-    public static String  generateCosDomainPrivateM3U8Url(COSClient client) {
+    public static String  generateCosDomainPrivateM3U8Url(COSClient client) throws UnsupportedEncodingException {
         PrivateM3U8Request request = new PrivateM3U8Request();
         request.setBucketName(bucket);
         request.setObject(objectKey);
         request.setExpires(expires);
         request.setTokenType("JwtToken");
-        String token =generateToken(appId, bucket, objectKey, secret,expires);
+        String token = generateToken(appId, bucket, objectKey, secret,expires);
         request.setToken(token);
         return client.generateCosDomainPrivateM3U8Url(request);
     }
 
-    public static String generateToken(String appId, String bucketId, String objectKey, byte[] secret, String expires) {
-
+    public static String generateToken(String appId, String bucketId, String objectKey, byte[] secret, String expires) throws UnsupportedEncodingException {
         Instant now = Instant.now();
-        Instant expire = now.plus(6, ChronoUnit.DAYS);
-
+        Instant expire = now.plus(Long.parseLong(expires), ChronoUnit.SECONDS);
         String encodedObjectKey;
-        try {
-            encodedObjectKey = URLEncoder.encode(objectKey, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException("Error encoding object key", e);
-        }
+        encodedObjectKey = URLEncoder.encode(objectKey, "UTF-8");
 
         Algorithm algorithm = Algorithm.HMAC256(secret);
         JWTCreator.Builder builder = JWT.create().withIssuer("client")

@@ -250,6 +250,9 @@ public class COSClient implements COS {
         CosHttpRequest<X> httpRequest = new CosHttpRequest<X>(originalRequest);
         httpRequest.setHttpMethod(httpMethod);
         httpRequest.addHeader(Headers.USER_AGENT, clientConfig.getUserAgent());
+        if (originalRequest.getCustomRequestHeaders() != null && originalRequest.getCustomRequestHeaders().containsKey("Pic-Operations")) {
+            httpRequest.addHeader("Pic-Operations", originalRequest.getCustomRequestHeaders().get("Pic-Operations"));
+        }
         if (originalRequest instanceof ListBucketsRequest) {
             buildUrlAndHost(httpRequest, bucketName, key, true);
         } else {
@@ -959,8 +962,10 @@ public class COSClient implements COS {
             populateRequestMetadata(request, metadata);
             request.setContent(input);
             try {
-                if(uploadObjectRequest.getPicOperations() != null) {
-                    request.addHeader(Headers.PIC_OPERATIONS, Jackson.toJsonString(uploadObjectRequest.getPicOperations()));
+                if(uploadObjectRequest.getPicOperations() != null || (uploadObjectRequest.getCustomRequestHeaders() != null && uploadObjectRequest.getCustomRequestHeaders().containsKey(Headers.PIC_OPERATIONS)) ) {
+                    if (uploadObjectRequest.getCustomRequestHeaders() == null || !uploadObjectRequest.getCustomRequestHeaders().containsKey(Headers.PIC_OPERATIONS)){
+                        request.addHeader(Headers.PIC_OPERATIONS, Jackson.toJsonString(uploadObjectRequest.getPicOperations()));
+                    }
                     returnedMetadata = invoke(request, new ResponseHeaderHandlerChain<ObjectMetadata>(
                             new Unmarshallers.ImagePersistenceUnmarshaller(), new CosMetadataResponseHandler()));
                 } else {
@@ -4299,8 +4304,12 @@ public class COSClient implements COS {
         return true;
     }
 
-    @Override
     public String GenerateDocPreviewUrl(DocHtmlRequest docJobRequest) throws URISyntaxException {
+        return generateDocPreviewUrl(docJobRequest);
+    }
+
+    @Override
+    public String generateDocPreviewUrl(DocHtmlRequest docJobRequest) throws URISyntaxException {
         rejectNull(docJobRequest,
                 "The request parameter must be specified setting the object tags");
         rejectNull(docJobRequest.getBucketName(),
@@ -5212,7 +5221,7 @@ public class COSClient implements COS {
         rejectNull(customRequest, "The request parameter must be specified setting the object tags");
 
         CosHttpRequest<DeleteFileMetaIndexRequest> request = createRequest(customRequest.getAppId(), "/filemeta", customRequest , HttpMethodName.DELETE);
-
+        request.addHeader("Accept", "application/json");
         this.setContent(request, CIJackson.toJsonBytes(customRequest), "application/json", false);
         return invoke(request, new Unmarshallers.CICommonJsonUnmarshaller<DeleteFileMetaIndexResponse>(DeleteFileMetaIndexResponse.class));
     }
