@@ -24,6 +24,8 @@ import com.qcloud.cos.endpoint.EndpointBuilder;
 import com.qcloud.cos.endpoint.EndpointResolver;
 import com.qcloud.cos.endpoint.RegionEndpointBuilder;
 import com.qcloud.cos.endpoint.SuffixEndpointBuilder;
+import com.qcloud.cos.http.DefaultHandlerAfterProcess;
+import com.qcloud.cos.http.HandlerAfterProcess;
 import com.qcloud.cos.http.HttpProtocol;
 import com.qcloud.cos.region.Region;
 import com.qcloud.cos.retry.BackoffStrategy;
@@ -120,6 +122,10 @@ public class ClientConfig {
     private boolean checkSSLCertificate = true;
 
     private boolean useDefaultDnsResolver = true;
+
+    private HandlerAfterProcess handlerAfterProcess = new DefaultHandlerAfterProcess();
+
+    private boolean isRefreshEndpointAddr = false;
 
     // 不传入region 用于后续调用List Buckets(获取所有的bucket信息)
     public ClientConfig() {
@@ -428,5 +434,21 @@ public class ClientConfig {
 
     public boolean isUseDefaultDnsResolver() {
         return useDefaultDnsResolver;
+    }
+
+    public void setHandlerAfterProcess(HandlerAfterProcess handler) {
+        this.handlerAfterProcess = handler;
+    }
+
+    public HandlerAfterProcess getHandlerAfterProcess() {
+        return handlerAfterProcess;
+    }
+
+    public void turnOnRefreshEndpointAddrSwitch() {
+        isRefreshEndpointAddr = true;
+    }
+
+    public boolean IsRefreshEndpointAddr() {
+        return isRefreshEndpointAddr;
     }
 }

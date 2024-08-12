@@ -48,7 +48,11 @@ import com.qcloud.cos.ClientConfig;
 import com.qcloud.cos.Headers;
 import com.qcloud.cos.auth.COSCredentials;
 import com.qcloud.cos.auth.COSSigner;
+import com.qcloud.cos.endpoint.CIRegionEndpointBuilder;
+import com.qcloud.cos.endpoint.CIPicRegionEndpointBuilder;
 import com.qcloud.cos.internal.cihandler.HttpEntityEnclosingDelete;
+import com.qcloud.cos.internal.CIPicServiceRequest;
+import com.qcloud.cos.model.ListBucketsRequest;
 import com.qcloud.cos.region.Region;
 import com.qcloud.cos.event.ProgressInputStream;
 import com.qcloud.cos.event.ProgressListener;
@@ -119,12 +123,14 @@ public class DefaultCosHttpClient implements CosHttpClient {
     private BackoffStrategy backoffStrategy;
 
     private CosErrorResponseHandler errorResponseHandler;
+    private HandlerAfterProcess handlerAfterProcess;
     private static final Logger log = LoggerFactory.getLogger(DefaultCosHttpClient.class);
 
     public DefaultCosHttpClient(ClientConfig clientConfig) {
         super();
         this.errorResponseHandler = new CosErrorResponseHandler();
         this.clientConfig = clientConfig;
+        this.handlerAfterProcess = clientConfig.getHandlerAfterProcess();
         DnsResolver dnsResolver = new DnsResolver() {
             @Override
             public InetAddress[] resolve(String host) throws UnknownHostException {
@@ -557,6 +563,10 @@ public class DefaultCosHttpClient implements CosHttpClient {
             originalContent.mark(readLimit);
         }
 
+        long startTime = 0;
+        long endTime = 0;
+        int  response_status = 0;
+
         int retryIndex = 0;
         while (true) {
             try {
@@ -573,6 +583,11 @@ public class DefaultCosHttpClient implements CosHttpClient {
                     originalContent.reset();
                 }
                 if (retryIndex != 0) {
+                    response_status = 0;
+                    if (clientConfig.IsRefreshEndpointAddr()) {
+                        refreshEndpointAddr(request);
+                    }
+
                     long delay = backoffStrategy.computeDelayBeforeNextRetry(retryIndex);
                     request.addHeader("x-cos-sdk-retry", "true");
                     Thread.sleep(delay);
@@ -580,10 +595,12 @@ public class DefaultCosHttpClient implements CosHttpClient {
                 HttpContext context = HttpClientContext.create();
                 httpRequest = buildHttpRequest(request);
                 httpResponse = null;
+                startTime = System.currentTimeMillis();
                 httpResponse = executeRequest(context, httpRequest);
                 checkResponse(request, httpRequest, httpResponse);
                 break;
             } catch (CosServiceException cse) {
+                response_status = -1;
                 closeHttpResponseStream(httpResponse);
                 String errorMsg = String.format("failed to execute http request due to service exception, request timeStamp %d,"
                                 + " httpRequest: %s, retryIdx:%d, maxErrorRetry:%d", System.currentTimeMillis(), request,
@@ -601,6 +618,7 @@ public class DefaultCosHttpClient implements CosHttpClient {
                 }
                 changeEndpointForRetry(request, httpResponse, retryIndex);
             } catch (CosClientException cce) {
+                response_status = -1;
                 closeHttpResponseStream(httpResponse);
                 String errorMsg = String.format("failed to execute http request due to client exception, request timeStamp %d,"
                                 + " httpRequest: %s, retryIdx:%d, maxErrorRetry:%d", System.currentTimeMillis(), request,
@@ -612,12 +630,15 @@ public class DefaultCosHttpClient implements CosHttpClient {
                 }
                 changeEndpointForRetry(request, httpResponse, retryIndex);
             } catch (Exception exp) {
+                response_status = -1;
                 String expName = exp.getClass().getName();
                 String errorMsg = String.format("httpClient execute occur an unknown exception:%s, httpRequest: %s", expName, request);
                 closeHttpResponseStream(httpResponse);
                 log.error(errorMsg, exp);
                 throw new CosClientException(errorMsg, exp);
             } finally {
+                endTime = System.currentTimeMillis();
+                handlerAfterProcess.handle(response_status, endTime - startTime);
                 ++retryIndex;
             }
         }
@@ -764,6 +785,43 @@ public class DefaultCosHttpClient implements CosHttpClient {
                     request.setEndpoint(endpointAddr);
                 }
             }
+        }
+    }
+
+    private <X extends CosServiceRequest> void refreshEndpointAddr(CosHttpRequest<X> request) throws CosClientException {
+        boolean isCIRequest = request.getOriginalRequest() instanceof CIServiceRequest;
+        boolean isServiceRequest = request.getOriginalRequest() instanceof ListBucketsRequest;
+        String endpoint = "";
+        String endpointAddr = "";
+        if (isServiceRequest) {
+            endpoint = clientConfig.getEndpointBuilder().buildGetServiceApiEndpoint();
+            endpointAddr =
+                    clientConfig.getEndpointResolver().resolveGetServiceApiEndpoint(endpoint);
+        } else {
+
+            if (request.getOriginalRequest() instanceof CIPicServiceRequest) {
+                endpoint = new CIPicRegionEndpointBuilder(clientConfig.getRegion()).buildGeneralApiEndpoint(request.getBucketName());
+            } else if (isCIRequest) {
+                endpoint = new CIRegionEndpointBuilder(clientConfig.getRegion()).buildGeneralApiEndpoint(request.getBucketName());
+            } else {
+                endpoint = clientConfig.getEndpointBuilder().buildGeneralApiEndpoint(request.getBucketName());
+            }
+            endpointAddr = clientConfig.getEndpointResolver().resolveGeneralApiEndpoint(endpoint);
+        }
+
+        if (endpoint == null) {
+            throw new CosClientException("endpoint is null, please check your endpoint builder");
+        }
+        if (endpointAddr == null) {
+            throw new CosClientException(
+                    "endpointAddr is null, please check your endpoint resolver");
+        }
+
+        String fixedEndpointAddr = request.getOriginalRequest().getFixedEndpointAddr();
+        if (fixedEndpointAddr != null) {
+            request.setEndpoint(fixedEndpointAddr);
+        } else {
+            request.setEndpoint(endpointAddr);
         }
     }
 }
