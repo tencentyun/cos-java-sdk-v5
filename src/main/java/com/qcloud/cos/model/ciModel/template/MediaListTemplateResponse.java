@@ -17,7 +17,6 @@ public class MediaListTemplateResponse extends MediaCommonResponse {
     private List<MediaTemplateObject> templateList;
     @XStreamAlias("TemplateId")
     private String templateId;
-
     public List<MediaTemplateObject> getTemplateList() {
         if (templateList == null) {
             templateList = new ArrayList<>();

@@ -256,6 +256,7 @@ public class CIMediaXmlFactory {
         if (objIsNotValid(videoTag)) {
             xml.start("VideoTag");
             addIfNotNull(xml, "Scenario", videoTag.getScenario());
+            addIfNotNull(xml, "Text", videoTag.getText());
             xml.end();
         }
     }

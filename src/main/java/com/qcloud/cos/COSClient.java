@@ -5316,6 +5316,15 @@ public class COSClient implements COS {
         return invoke(request, new Unmarshallers.CICommonJsonUnmarshaller<UpdateFileMetaIndexResponse>(UpdateFileMetaIndexResponse.class));
     }
 
+    @Override
+    public MediaTemplateResponseV2 createMediaTemplateV2(MediaTemplateRequestV2 templateRequest) {
+        rejectNull(templateRequest,
+                "The request parameter must be specified setting the object tags");
+        CosHttpRequest<MediaTemplateRequestV2> request = this.createRequest(templateRequest.getBucketName(), "/template", templateRequest, HttpMethodName.POST);
+        this.setContent(request, CIAuditingXmlFactoryV2.convertToXmlByteArray(templateRequest), "application/xml", false);
+        return invoke(request, new Unmarshallers.CICommonUnmarshaller<MediaTemplateResponseV2>(MediaTemplateResponseV2.class));
+    }
+
     public String generateCosDomainPrivateM3U8Url(PrivateM3U8Request privateM3U8Request) {
         CosHttpRequest<PrivateM3U8Request> request = createRequest(privateM3U8Request.getBucketName(), privateM3U8Request.getObject(), privateM3U8Request, HttpMethodName.GET);
         request.addParameter("ci-process","pm3u8");
