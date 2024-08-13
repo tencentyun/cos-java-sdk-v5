@@ -3291,6 +3291,8 @@ public interface COS extends COSDirectSpi {
     UpdateDatasetResponse updateDataset(UpdateDatasetRequest customRequest);
 
     UpdateFileMetaIndexResponse updateFileMetaIndex(UpdateFileMetaIndexRequest customRequest);
+
+    MediaTemplateResponseV2 createMediaTemplateV2(MediaTemplateRequestV2 request);
 }
 
 

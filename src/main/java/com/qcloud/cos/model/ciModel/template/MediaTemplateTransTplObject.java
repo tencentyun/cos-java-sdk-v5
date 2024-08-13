@@ -1,6 +1,7 @@
 package com.qcloud.cos.model.ciModel.template;
 
 import com.qcloud.cos.model.ciModel.job.*;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  * @descript 媒体模板响应实体类。 注释详情请参见 https://cloud.tencent.com/document/product/460/46989
@@ -9,26 +10,32 @@ public class MediaTemplateTransTplObject  {
     /**
      * 容器格式
      */
-    private MediaContainerObject container = new MediaContainerObject();
+    @XStreamAlias("Container")
+    private MediaContainerObject container ;
     /**
      * 视频信息
      */
-    private MediaVideoObject video = new MediaVideoObject();
+    @XStreamAlias("Video")
+    private MediaVideoObject video ;
     /**
      * 时间区间
      */
-    private MediaTimeIntervalObject timeInterval = new MediaTimeIntervalObject();
+    @XStreamAlias("TimeInterval")
+    private MediaTimeIntervalObject timeInterval ;
 
     /**
      * 时间区间
      */
-    private MediaAudioObject audio = new MediaAudioObject();
+    @XStreamAlias("Audio")
+    private MediaAudioObject audio ;
 
     /**
      * 截图
      */
+    @XStreamAlias("Snapshot")
     private MediaSnapshotObject snapshot;
 
+    @XStreamAlias("TransConfig")
     private MediaTransConfigObject transConfig;
 
     public MediaContainerObject getContainer() {
