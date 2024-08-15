@@ -6,58 +6,58 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  * 水印模板实体类 参数详情见:https://cloud.tencent.com/document/product/460/48176
  */
 public class MediaWatermark {
-    @XStreamAlias("Type")
     /**
      * 水印类型 Text：文字水印 Image：图片水印
      */
+    @XStreamAlias("Type")
     private String type;
 
-    @XStreamAlias("LocMode")
     /**
      * 偏移方式 Relativity：按比例 Absolute：固定位置
      */
+    @XStreamAlias("LocMode")
     private String locMode;
 
-    @XStreamAlias("Dx")
     /**
      * 水平偏移
      */
+    @XStreamAlias("Dx")
     private String dx;
 
-    @XStreamAlias("Dy")
     /**
      * 垂直偏移
      */
+    @XStreamAlias("Dy")
     private String dy;
 
-    @XStreamAlias("Pos")
     /**
      * 基准位置
      */
+    @XStreamAlias("Pos")
     private String pos;
 
-    @XStreamAlias("StartTime")
     /**
      * 水印开始时间
      */
+    @XStreamAlias("StartTime")
     private String startTime;
 
-    @XStreamAlias("EndTime")
     /**
      * 水印结束时间
      */
+    @XStreamAlias("EndTime")
     private String endTime;
 
-    @XStreamAlias("Text")
     /**
      * 水印text节点
      */
+    @XStreamAlias("Text")
     private MediaWaterMarkText text;
 
-    @XStreamAlias("Image")
     /**
      * 水印图片节点
      */
+    @XStreamAlias("Image")
     private MediaWaterMarkImage image;
 
     @XStreamAlias("SlideConfig")

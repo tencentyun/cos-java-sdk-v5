@@ -1,12 +1,21 @@
 package com.qcloud.cos.model.ciModel.job;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 public class Subtitle {
+    @XStreamAlias("Url")
     private String url;
+    @XStreamAlias("Embed")
     private String embed;
+    @XStreamAlias("FontType")
     private String fontType;
+    @XStreamAlias("FontSize")
     private String fontSize;
+    @XStreamAlias("FontColor")
     private String fontColor;
+    @XStreamAlias("OutlineColor")
     private String outlineColor;
+    @XStreamAlias("VMargin")
     private String vMargin;
 
     public String getEmbed() {

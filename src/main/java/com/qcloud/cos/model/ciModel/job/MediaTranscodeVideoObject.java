@@ -66,6 +66,18 @@ public class MediaTranscodeVideoObject extends MediaVideoCommon {
     @XStreamAlias("Rotate")
     private String rotate;
 
+    @XStreamAlias("ColorParam")
+    private String colorParam;
+
+    @XStreamAlias("Interlaced")
+    private String interlaced;
+
+    @XStreamAlias("Crop")
+    private String crop;
+
+    @XStreamAlias("Roi")
+    private String roi;
+
     public String getRemove() {
         return remove;
     }
@@ -161,6 +173,38 @@ public class MediaTranscodeVideoObject extends MediaVideoCommon {
 
     public void setRotate(String rotate) {
         this.rotate = rotate;
+    }
+
+    public String getColorParam() {
+        return colorParam;
+    }
+
+    public void setColorParam(String colorParam) {
+        this.colorParam = colorParam;
+    }
+
+    public String getInterlaced() {
+        return interlaced;
+    }
+
+    public void setInterlaced(String interlaced) {
+        this.interlaced = interlaced;
+    }
+
+    public String getCrop() {
+        return crop;
+    }
+
+    public void setCrop(String crop) {
+        this.crop = crop;
+    }
+
+    public String getRoi() {
+        return roi;
+    }
+
+    public void setRoi(String roi) {
+        this.roi = roi;
     }
 
     @Override

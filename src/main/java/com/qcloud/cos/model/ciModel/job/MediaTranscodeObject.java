@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * 媒体处理 任务转码实体 https://cloud.tencent.com/document/product/460/48234
  */
-public class MediaTranscodeObject extends MediaVideoCommon {
+public class MediaTranscodeObject  {
     /**
      * 容器格式	例:mp4
      */

@@ -91,7 +91,7 @@ public class MediaJobOperation {
     @XStreamImplicit(itemFieldName = "WatermarkTemplateId")
     private List<String> watermarkTemplateId;
 
-    @XStreamImplicit(itemFieldName = "WatermarkList")
+    @XStreamImplicit(itemFieldName = "Watermark")
     private List<MediaWatermark> watermarkList;
 
     @XStreamAlias("ConcatTemplate")

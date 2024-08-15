@@ -6,6 +6,8 @@ import com.qcloud.cos.model.ciModel.job.MediaJobObject;
 import com.qcloud.cos.model.ciModel.job.MediaJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaJobsRequest;
 import com.qcloud.cos.model.ciModel.job.MediaListJobResponse;
+import com.qcloud.cos.model.ciModel.job.v2.MediaJobResponseV2;
+import com.qcloud.cos.model.ciModel.job.v2.MediaJobsRequestV2;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoRequest;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoResponse;
 import com.qcloud.cos.model.ciModel.queue.MediaListQueueResponse;
@@ -58,13 +60,29 @@ public class MediaJobTest extends AbstractCOSClientCITest {
             request.getOperation().getOutput().setBucket(bucket);
             request.getOperation().getOutput().setRegion("ap-chongqing");
             request.getOperation().getOutput().setObject("2.mp4");
-            request.setQueueId("p9900025e4ec44b5e8225e70a52170834");
             MediaJobResponse response = cosclient.createMediaJobs(request);
             jobId = response.getJobsDetail().getJobId();
         } catch (Exception e) {
 
         }
+    }
 
+    @Before
+    public void createMediaJobTestV2() {
+        try {
+            MediaJobsRequestV2 request = new MediaJobsRequestV2();
+            request.setBucketName(bucket);
+            request.setTag("Transcode");
+            request.getInput().setObject("1.mp4");
+            request.getOperation().setTemplateId("t0e2b9f4cd25184c6ab73d0c85a6ee9cb5");
+            request.getOperation().getOutput().setBucket(bucket);
+            request.getOperation().getOutput().setRegion("ap-chongqing");
+            request.getOperation().getOutput().setObject("2.mp4");
+            MediaJobResponseV2 response = cosclient.createMediaJobsV2(request);
+            jobId = response.getJobsDetail().getJobId();
+        } catch (Exception e) {
+
+        }
     }
 
     @Test(expected = NullPointerException.class)

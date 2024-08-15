@@ -52,6 +52,9 @@ public class MediaJobOperation {
     @XStreamAlias("SnapshotPrefix")
     private String snapshotPrefix;
 
+    @XStreamAlias("FreeTranscode")
+    private String freeTranscode;
+
     @XStreamAlias("Output")
     private MediaOutputObject output;
 
@@ -519,6 +522,14 @@ public class MediaJobOperation {
 
     public void setVersion(String version) {
         this.version = version;
+    }
+
+    public String getFreeTranscode() {
+        return freeTranscode;
+    }
+
+    public void setFreeTranscode(String freeTranscode) {
+        this.freeTranscode = freeTranscode;
     }
 
     public String getSnapshotPrefix() {

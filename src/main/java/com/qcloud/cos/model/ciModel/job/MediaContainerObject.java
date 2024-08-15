@@ -14,7 +14,7 @@ public class MediaContainerObject {
      * 分片配置,当format为hls和dash时有效
      */
     @XStreamAlias("ClipConfig")
-    private MediaClipConfig clipConfig = new MediaClipConfig();
+    private MediaClipConfig clipConfig ;
 
     public String getFormat() {
         return format;
