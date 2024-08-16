@@ -3,17 +3,8 @@ package com.qcloud.cos.demo.ci;
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.exception.CosServiceException;
+import com.qcloud.cos.model.*;
 import com.qcloud.cos.model.ciModel.common.ImageProcessRequest;
-import com.qcloud.cos.model.CompleteMultipartUploadRequest;
-import com.qcloud.cos.model.CompleteMultipartUploadResult;
-import com.qcloud.cos.model.InitiateMultipartUploadRequest;
-import com.qcloud.cos.model.InitiateMultipartUploadResult;
-import com.qcloud.cos.model.PartETag;
-import com.qcloud.cos.model.PutObjectRequest;
-import com.qcloud.cos.model.PutObjectResult;
-import com.qcloud.cos.model.UploadPartRequest;
-import com.qcloud.cos.model.UploadPartResult;
-import com.qcloud.cos.model.UploadResult;
 import com.qcloud.cos.model.ciModel.persistence.CIObject;
 import com.qcloud.cos.model.ciModel.persistence.CIUploadResult;
 import com.qcloud.cos.model.ciModel.persistence.PicOperations;
@@ -34,7 +25,7 @@ public class BlindWatermarkDemo {
      * 上传时添加盲水印
      */
     public static void addBlindWatermark(COSClient cosClient) {
-        String bucketName = "markjrzhang-1251704708";
+        String bucketName = "demo-123456789";
         String key = "qrcode.jpg";
         File localFile = new File("demo.jpg");
         PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, key, localFile);
@@ -45,7 +36,7 @@ public class BlindWatermarkDemo {
         rule.setBucket(bucketName);
         rule.setFileId("BlindWatermark.jpg");
         // 使用盲水印功能，水印图的宽高不得超过原图的1/8
-        rule.setRule("watermark/3/type/1/image/aHR0cHM6Ly9tYXJranJ6aGFuZy0xMjUxNzA0NzA4LmNvcy5hcC1jaG9uZ3FpbmcubXlxY2xvdWQuY29tL3NodWl5aW4uanBn");
+        rule.setRule("watermark/3/type/3/text/bWFyayB0ZXN0/version/3.0");
 
         ruleList.add(rule);
         picOperations.setRules(ruleList);
@@ -69,7 +60,7 @@ public class BlindWatermarkDemo {
      * 上传时获取盲水印
      */
     public static void getBlindWatermark(COSClient cosClient) {
-        String bucketName = "markjrzhang-1251704708";
+        String bucketName = "demo-123456789";
         String key = "qrcode.jpg";
         File localFile = new File("BlindWatermark.jpg");
         PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, key, localFile);
@@ -80,7 +71,7 @@ public class BlindWatermarkDemo {
         rule.setBucket(bucketName);
         rule.setFileId("BlindWatermark-test.jpg");
         // 使用盲水印功能，水印图的宽高不得超过原图的1/8
-        rule.setRule("watermark/4/type/2/image/aHR0cHM6Ly9tYXJranJ6aGFuZy0xMjUxNzA0NzA4LmNvcy5hcC1jaG9uZ3FpbmcubXlxY2xvdWQuY29tL3NodWl5aW4uanBn");
+        rule.setRule("watermark/4/type/3/version/3.0");
 
         ruleList.add(rule);
         picOperations.setRules(ruleList);
@@ -149,7 +140,7 @@ public class BlindWatermarkDemo {
         rule.setBucket(bucketName);
         rule.setFileId("/image/result/extract-shuiyin.jpg");
         // 抽取盲水印
-        rule.setRule("watermark/4/type/2/image/aHR0cDovL2V4YW1wbGVidWNrZXQtMTI1MDAwMDAwMC5jb3MuYXAtZ3Vhbmd6aG91Lm15cWNsb3VkLmNvbS9zaHVpeWluLnBuZw==");
+        rule.setRule("watermark/4/type/3/image/aHR0cDovL2V4YW1wbGVidWNrZXQtMTI1MDAwMDAwMC5jb3MuYXAtZ3Vhbmd6aG91Lm15cWNsb3VkLmNvbS9zaHVpeWluLnBuZw==");
 
         ruleList.add(rule);
         picOperations.setRules(ruleList);
