@@ -1,9 +1,10 @@
 package com.qcloud.cos.demo.ci;
 
 import com.qcloud.cos.COSClient;
-import com.qcloud.cos.model.ciModel.job.MediaJobResponse;
-import com.qcloud.cos.model.ciModel.job.MediaJobsRequest;
 import com.qcloud.cos.model.ciModel.job.VideoTag;
+import com.qcloud.cos.model.ciModel.job.v2.MediaJobResponseV2;
+import com.qcloud.cos.model.ciModel.job.v2.MediaJobsRequestV2;
+import com.qcloud.cos.utils.Jackson;
 
 /**
  * 媒体处理视频标签任务接口相关demo 详情见https://cloud.tencent.com/document/product/460/84779
@@ -25,7 +26,7 @@ public class VideoTagDemo {
      */
     public static void createMediaJobs(COSClient client) {
         //1.创建任务请求对象
-        MediaJobsRequest request = new MediaJobsRequest();
+        MediaJobsRequestV2 request = new MediaJobsRequestV2();
         //2.添加请求参数 参数详情请见api接口文档
         request.setBucketName("markjrzhang-1251704708");
         request.setTag("VideoTag");
@@ -35,7 +36,7 @@ public class VideoTagDemo {
         videoTag.setScenario("Stream");
         //2.1添加媒体任务操作参数
         //3.调用接口,获取任务响应对象
-        MediaJobResponse response = client.createMediaJobs(request);
+        MediaJobResponseV2 response = client.createMediaJobsV2(request);
         System.out.println(response.getJobsDetail().getJobId());
     }
 
@@ -46,13 +47,13 @@ public class VideoTagDemo {
      */
     public static void describeMediaJob(COSClient client) {
         //1.创建任务请求对象
-        MediaJobsRequest request = new MediaJobsRequest();
+        MediaJobsRequestV2 request = new MediaJobsRequestV2();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("markjrzhang-1251704708");
-        request.setJobId("j412a06a4e45211eda690e1551b253531");
+        request.setBucketName("demo-1234567890");
+        request.setJobId("jd121a0be669c11ef934ca5674d7*****");
         //3.调用接口,获取任务响应对象
-        MediaJobResponse response = client.describeMediaJob(request);
-        System.out.println(response);
+        MediaJobResponseV2 response = client.describeMediaJobV2(request);
+        System.out.println(Jackson.toJsonString(response));
     }
 
 }

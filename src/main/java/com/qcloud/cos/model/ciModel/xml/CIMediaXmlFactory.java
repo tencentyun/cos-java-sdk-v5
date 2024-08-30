@@ -217,6 +217,7 @@ public class CIMediaXmlFactory {
         addIfNotNull(xml, "EncryptIv", operation.getEncryptIv());
         addIfNotNull(xml, "EncryptMode", operation.getEncryptMode());
         addIfNotNull(xml, "UserData", operation.getUserData());
+        addIfNotNull(xml, "FreeTranscode", operation.getFreeTranscode());
 
         addWatermarkTemplateId(xml, operation.getWatermarkTemplateId());
         addWatermar(xml, operation.getWatermark());

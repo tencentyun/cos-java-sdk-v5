@@ -70,6 +70,12 @@ public class MediaJobOperation {
     @XStreamAlias("EncryptMode")
     private String encryptMode;
 
+    @XStreamAlias("FreeTranscode")
+    private String freeTranscode;
+
+    @XStreamAlias("SnapshotPrefix")
+    private String snapshotPrefix;
+
     @XStreamAlias("Output")
     private MediaOutputObject output;
 
@@ -91,7 +97,7 @@ public class MediaJobOperation {
     @XStreamImplicit(itemFieldName = "WatermarkTemplateId")
     private List<String> watermarkTemplateId;
 
-    @XStreamImplicit(itemFieldName = "WatermarkList")
+    @XStreamImplicit(itemFieldName = "Watermark")
     private List<MediaWatermark> watermarkList;
 
     @XStreamAlias("ConcatTemplate")
@@ -255,6 +261,14 @@ public class MediaJobOperation {
             segmentVideoBody = new SegmentVideoBody();
         }
         return segmentVideoBody;
+    }
+
+    public String getFreeTranscode() {
+        return freeTranscode;
+    }
+
+    public void setFreeTranscode(String freeTranscode) {
+        this.freeTranscode = freeTranscode;
     }
 
     public void setSegmentVideoBody(SegmentVideoBody segmentVideoBody) {
@@ -716,5 +730,13 @@ public class MediaJobOperation {
 
     public void setSpeechRecognitionResult(SpeechRecognitionResult speechRecognitionResult) {
         this.speechRecognitionResult = speechRecognitionResult;
+    }
+
+    public String getSnapshotPrefix() {
+        return snapshotPrefix;
+    }
+
+    public void setSnapshotPrefix(String snapshotPrefix) {
+        this.snapshotPrefix = snapshotPrefix;
     }
 }

@@ -14,6 +14,10 @@ public class MediaInputObject {
     private String url;
     @XStreamAlias("Vod")
     private MediaVod vod;
+    @XStreamAlias("BucketId")
+    private String bucketId;
+    @XStreamAlias("Region")
+    private String region;
 
     public String getObject() {
         return object;
@@ -40,6 +44,22 @@ public class MediaInputObject {
 
     public void setVod(MediaVod vod) {
         this.vod = vod;
+    }
+
+    public String getBucketId() {
+        return bucketId;
+    }
+
+    public void setBucketId(String bucketId) {
+        this.bucketId = bucketId;
+    }
+
+    public String getRegion() {
+        return region;
+    }
+
+    public void setRegion(String region) {
+        this.region = region;
     }
 
     @Override

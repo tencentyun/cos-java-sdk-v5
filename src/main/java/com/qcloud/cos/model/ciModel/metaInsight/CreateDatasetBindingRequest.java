@@ -23,6 +23,13 @@ public class CreateDatasetBindingRequest extends CIServiceRequest {
     @JsonProperty("URI")
     private String uRI;
 
+    /**
+     * 建立绑定后，以何种方式进行文件索引特征的提取，有效值：0，表示仅对增量文件建立索引；
+     * 1，表示在对增量文件建立索引的同时，也会对存储桶中存量文件建立索引，存量文件索引建立的时长与存量文件数有关；默认值为0。
+     */
+    @JsonProperty("Mode")
+    private String mode;
+
     public String getDatasetName() { return datasetName; }
 
     public void setDatasetName(String datasetName) { this.datasetName = datasetName; }
@@ -31,7 +38,11 @@ public class CreateDatasetBindingRequest extends CIServiceRequest {
 
     public void setURI(String uRI) { this.uRI = uRI; }
 
-    
+    public String getMode() {
+        return mode;
+    }
 
-
+    public void setMode(String mode) {
+        this.mode = mode;
+    }
 }

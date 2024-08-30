@@ -31,6 +31,8 @@ public class VideoTargetRec {
     private String version;
     @XStreamAlias("SnapshotFreq")
     private String snapshotFreq;
+    @XStreamAlias("Plate")
+    private String plate;
     @XStreamAlias("BodyRecognition")
     private MediaRecognition bodyRecognition;
     @XStreamAlias("CarRecognition")
@@ -164,15 +166,31 @@ public class VideoTargetRec {
     }
 
 
+    public String getPlate() {
+        return plate;
+    }
+
+    public void setPlate(String plate) {
+        this.plate = plate;
+    }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("VideoTargetRec{");
-        sb.append("body='").append(body).append('\'');
+        sb.append("processType='").append(processType).append('\'');
+        sb.append(", body='").append(body).append('\'');
         sb.append(", pet='").append(pet).append('\'');
         sb.append(", car='").append(car).append('\'');
+        sb.append(", face='").append(face).append('\'');
+        sb.append(", version='").append(version).append('\'');
+        sb.append(", snapshotFreq='").append(snapshotFreq).append('\'');
+        sb.append(", plate='").append(plate).append('\'');
         sb.append(", bodyRecognition=").append(bodyRecognition);
         sb.append(", carRecognition=").append(carRecognition);
         sb.append(", petRecognition=").append(petRecognition);
+        sb.append(", faceRecognition=").append(faceRecognition);
+        sb.append(", topKRecognition=").append(topKRecognition);
+        sb.append(", transTpl=").append(transTpl);
         sb.append('}');
         return sb.toString();
     }

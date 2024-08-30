@@ -1,5 +1,5 @@
 package com.qcloud.cos.model.ciModel.job;
 
-public class PersonTag {
+public class PersonTag extends CommonTag{
     
 }

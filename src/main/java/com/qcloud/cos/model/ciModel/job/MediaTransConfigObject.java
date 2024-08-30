@@ -68,11 +68,17 @@ public class MediaTransConfigObject implements Serializable {
     @XStreamAlias("HlsEncrypt")
     private HlsEncrypt hlsEncrypt;
 
+    @XStreamAlias("DashEncrypt")
+    private HlsEncrypt dashEncrypt;
+
     @XStreamAlias("InitialClipNum")
     private String initialClipNum;
 
     @XStreamAlias("CosTag")
     private String cosTag;
+
+    @XStreamAlias("TranscodeIndex")
+    private String transcodeIndex;
 
     public String getInitialClipNum() {
         return initialClipNum;
@@ -181,16 +187,41 @@ public class MediaTransConfigObject implements Serializable {
         this.hlsEncrypt = hlsEncrypt;
     }
 
+    public HlsEncrypt getDashEncrypt() {
+        return dashEncrypt;
+    }
+
+    public void setDashEncrypt(HlsEncrypt dashEncrypt) {
+        this.dashEncrypt = dashEncrypt;
+    }
+
+    public String getTranscodeIndex() {
+        return transcodeIndex;
+    }
+
+    public void setTranscodeIndex(String transcodeIndex) {
+        this.transcodeIndex = transcodeIndex;
+    }
+
     @Override
     public String toString() {
-        return "MediaTransConfigObject{" +
-                "adjDarMethod='" + adjDarMethod + '\'' +
-                ", isCheckReso='" + isCheckReso + '\'' +
-                ", resoAdjMethod='" + resoAdjMethod + '\'' +
-                ", isCheckVideoBitrate='" + isCheckVideoBitrate + '\'' +
-                ", videoBitrateAdjMethod='" + videoBitrateAdjMethod + '\'' +
-                ", isCheckAudioBitrate='" + isCheckAudioBitrate + '\'' +
-                ", audioBitrateAdjMethod='" + audioBitrateAdjMethod + '\'' +
-                '}';
+        final StringBuilder sb = new StringBuilder("MediaTransConfigObject{");
+        sb.append("adjDarMethod='").append(adjDarMethod).append('\'');
+        sb.append(", isCheckReso='").append(isCheckReso).append('\'');
+        sb.append(", resoAdjMethod='").append(resoAdjMethod).append('\'');
+        sb.append(", isCheckVideoBitrate='").append(isCheckVideoBitrate).append('\'');
+        sb.append(", videoBitrateAdjMethod='").append(videoBitrateAdjMethod).append('\'');
+        sb.append(", isCheckAudioBitrate='").append(isCheckAudioBitrate).append('\'');
+        sb.append(", audioBitrateAdjMethod='").append(audioBitrateAdjMethod).append('\'');
+        sb.append(", transMode='").append(transMode).append('\'');
+        sb.append(", deleteMetadata='").append(deleteMetadata).append('\'');
+        sb.append(", isHdr2Sdr='").append(isHdr2Sdr).append('\'');
+        sb.append(", hlsEncrypt=").append(hlsEncrypt);
+        sb.append(", dashEncrypt=").append(dashEncrypt);
+        sb.append(", initialClipNum='").append(initialClipNum).append('\'');
+        sb.append(", cosTag='").append(cosTag).append('\'');
+        sb.append(", transcodeIndex='").append(transcodeIndex).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 }

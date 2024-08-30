@@ -7,40 +7,40 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  */
 public class MediaWaterMarkImage {
 
-    @XStreamAlias("Transparency")
     /**
      * 透明度 值范围：[1 100]，单位为%
      */
+    @XStreamAlias("Transparency")
     private String transparency;
 
-    @XStreamAlias("Url")
     /**
      * 水印地址 需为桶bucket的水印图片地址
      */
+    @XStreamAlias("Url")
     private String url;
 
-    @XStreamAlias("Mode")
     /**
      * 尺寸模式
      */
+    @XStreamAlias("Mode")
     private String mode;
 
-    @XStreamAlias("Width")
     /**
      * 宽
      */
+    @XStreamAlias("Width")
     private String width;
 
-    @XStreamAlias("Height")
     /**
      * 高
      */
+    @XStreamAlias("Height")
     private String height;
 
-    @XStreamAlias("Background")
     /**
      * 是否背景图 true、false
      */
+    @XStreamAlias("Background")
     private String background;
 
 
