@@ -23,8 +23,18 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.InetAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.UnknownHostException;
+import java.security.NoSuchAlgorithmException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Objects;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,14 +43,16 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.Date;
-import java.util.Objects;
 
 import com.qcloud.cos.ClientConfig;
 import com.qcloud.cos.Headers;
 import com.qcloud.cos.auth.COSCredentials;
 import com.qcloud.cos.auth.COSSigner;
+import com.qcloud.cos.endpoint.CIRegionEndpointBuilder;
+import com.qcloud.cos.endpoint.CIPicRegionEndpointBuilder;
 import com.qcloud.cos.internal.cihandler.HttpEntityEnclosingDelete;
+import com.qcloud.cos.internal.CIPicServiceRequest;
+import com.qcloud.cos.model.ListBucketsRequest;
 import com.qcloud.cos.region.Region;
 import com.qcloud.cos.event.ProgressInputStream;
 import com.qcloud.cos.event.ProgressListener;
@@ -81,6 +93,14 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.config.Registry;
+import org.apache.http.config.RegistryBuilder;
+import org.apache.http.conn.DnsResolver;
+import org.apache.http.conn.socket.ConnectionSocketFactory;
+import org.apache.http.conn.socket.PlainConnectionSocketFactory;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.ssl.SSLContextBuilder;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
@@ -89,6 +109,7 @@ import org.apache.http.protocol.HttpContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.net.ssl.SSLContext;
 
 public class DefaultCosHttpClient implements CosHttpClient {
 
@@ -102,13 +123,59 @@ public class DefaultCosHttpClient implements CosHttpClient {
     private BackoffStrategy backoffStrategy;
 
     private CosErrorResponseHandler errorResponseHandler;
+    private HandlerAfterProcess handlerAfterProcess;
     private static final Logger log = LoggerFactory.getLogger(DefaultCosHttpClient.class);
 
     public DefaultCosHttpClient(ClientConfig clientConfig) {
         super();
         this.errorResponseHandler = new CosErrorResponseHandler();
         this.clientConfig = clientConfig;
-        this.connectionManager = new PoolingHttpClientConnectionManager();
+        this.handlerAfterProcess = clientConfig.getHandlerAfterProcess();
+        DnsResolver dnsResolver = new DnsResolver() {
+            @Override
+            public InetAddress[] resolve(String host) throws UnknownHostException {
+                InetAddress[] addresses = InetAddress.getAllByName(host);
+                List<InetAddress> addressList = new ArrayList<>(Arrays.asList(addresses));
+                Collections.shuffle(addressList);
+
+                InetAddress[] newAddresses = addressList.toArray(new InetAddress[0]);
+                return newAddresses;
+            }
+        };
+
+        if (clientConfig.isCheckSSLCertificate()) {
+            if (clientConfig.isUseDefaultDnsResolver()) {
+                this.connectionManager = new PoolingHttpClientConnectionManager();
+            } else {
+                Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder.<ConnectionSocketFactory> create()
+                        .register("http", PlainConnectionSocketFactory.getSocketFactory())
+                        .register("https", SSLConnectionSocketFactory.getSocketFactory()).build();
+                this.connectionManager = new PoolingHttpClientConnectionManager(socketFactoryRegistry, dnsResolver);
+            }
+        } else {
+            try {
+                SSLContext sslContext = SSLContextBuilder.create().loadTrustMaterial((chain, authType) -> true).build();
+
+                SSLConnectionSocketFactory sslSocketFactory = new SSLConnectionSocketFactory(sslContext, NoopHostnameVerifier.INSTANCE);
+                Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder.<ConnectionSocketFactory> create()
+                        .register("http", PlainConnectionSocketFactory.getSocketFactory())
+                        .register("https", sslSocketFactory).build();
+                if (clientConfig.isUseDefaultDnsResolver()) {
+                    this.connectionManager = new PoolingHttpClientConnectionManager(socketFactoryRegistry);
+                } else {
+                    this.connectionManager = new PoolingHttpClientConnectionManager(socketFactoryRegistry, dnsResolver);
+                }
+            } catch (NoSuchAlgorithmException e) {
+                log.error("fail to init http client: ", e);
+                throw new RuntimeException(e);
+            } catch (KeyStoreException e) {
+                log.error("fail to init http client: ", e);
+                throw new RuntimeException(e);
+            } catch (KeyManagementException e) {
+                log.error("fail to init http client: ", e);
+                throw new RuntimeException(e);
+            }
+        }
         this.maxErrorRetry = clientConfig.getMaxErrorRetry();
         this.retryPolicy = ValidationUtils.assertNotNull(clientConfig.getRetryPolicy(), "retry policy");
         this.backoffStrategy = ValidationUtils.assertNotNull(clientConfig.getBackoffStrategy(), "backoff strategy");
@@ -496,6 +563,10 @@ public class DefaultCosHttpClient implements CosHttpClient {
             originalContent.mark(readLimit);
         }
 
+        long startTime = 0;
+        long endTime = 0;
+        int  response_status = 0;
+
         int retryIndex = 0;
         while (true) {
             try {
@@ -512,6 +583,11 @@ public class DefaultCosHttpClient implements CosHttpClient {
                     originalContent.reset();
                 }
                 if (retryIndex != 0) {
+                    response_status = 0;
+                    if (clientConfig.IsRefreshEndpointAddr()) {
+                        refreshEndpointAddr(request);
+                    }
+
                     long delay = backoffStrategy.computeDelayBeforeNextRetry(retryIndex);
                     request.addHeader("x-cos-sdk-retry", "true");
                     Thread.sleep(delay);
@@ -519,10 +595,12 @@ public class DefaultCosHttpClient implements CosHttpClient {
                 HttpContext context = HttpClientContext.create();
                 httpRequest = buildHttpRequest(request);
                 httpResponse = null;
+                startTime = System.currentTimeMillis();
                 httpResponse = executeRequest(context, httpRequest);
                 checkResponse(request, httpRequest, httpResponse);
                 break;
             } catch (CosServiceException cse) {
+                response_status = -1;
                 closeHttpResponseStream(httpResponse);
                 String errorMsg = String.format("failed to execute http request due to service exception, request timeStamp %d,"
                                 + " httpRequest: %s, retryIdx:%d, maxErrorRetry:%d", System.currentTimeMillis(), request,
@@ -540,6 +618,7 @@ public class DefaultCosHttpClient implements CosHttpClient {
                 }
                 changeEndpointForRetry(request, httpResponse, retryIndex);
             } catch (CosClientException cce) {
+                response_status = -1;
                 closeHttpResponseStream(httpResponse);
                 String errorMsg = String.format("failed to execute http request due to client exception, request timeStamp %d,"
                                 + " httpRequest: %s, retryIdx:%d, maxErrorRetry:%d", System.currentTimeMillis(), request,
@@ -551,12 +630,15 @@ public class DefaultCosHttpClient implements CosHttpClient {
                 }
                 changeEndpointForRetry(request, httpResponse, retryIndex);
             } catch (Exception exp) {
+                response_status = -1;
                 String expName = exp.getClass().getName();
                 String errorMsg = String.format("httpClient execute occur an unknown exception:%s, httpRequest: %s", expName, request);
                 closeHttpResponseStream(httpResponse);
                 log.error(errorMsg, exp);
                 throw new CosClientException(errorMsg, exp);
             } finally {
+                endTime = System.currentTimeMillis();
+                handlerAfterProcess.handle(response_status, endTime - startTime);
                 ++retryIndex;
             }
         }
@@ -703,6 +785,43 @@ public class DefaultCosHttpClient implements CosHttpClient {
                     request.setEndpoint(endpointAddr);
                 }
             }
+        }
+    }
+
+    private <X extends CosServiceRequest> void refreshEndpointAddr(CosHttpRequest<X> request) throws CosClientException {
+        boolean isCIRequest = request.getOriginalRequest() instanceof CIServiceRequest;
+        boolean isServiceRequest = request.getOriginalRequest() instanceof ListBucketsRequest;
+        String endpoint = "";
+        String endpointAddr = "";
+        if (isServiceRequest) {
+            endpoint = clientConfig.getEndpointBuilder().buildGetServiceApiEndpoint();
+            endpointAddr =
+                    clientConfig.getEndpointResolver().resolveGetServiceApiEndpoint(endpoint);
+        } else {
+
+            if (request.getOriginalRequest() instanceof CIPicServiceRequest) {
+                endpoint = new CIPicRegionEndpointBuilder(clientConfig.getRegion()).buildGeneralApiEndpoint(request.getBucketName());
+            } else if (isCIRequest) {
+                endpoint = new CIRegionEndpointBuilder(clientConfig.getRegion()).buildGeneralApiEndpoint(request.getBucketName());
+            } else {
+                endpoint = clientConfig.getEndpointBuilder().buildGeneralApiEndpoint(request.getBucketName());
+            }
+            endpointAddr = clientConfig.getEndpointResolver().resolveGeneralApiEndpoint(endpoint);
+        }
+
+        if (endpoint == null) {
+            throw new CosClientException("endpoint is null, please check your endpoint builder");
+        }
+        if (endpointAddr == null) {
+            throw new CosClientException(
+                    "endpointAddr is null, please check your endpoint resolver");
+        }
+
+        String fixedEndpointAddr = request.getOriginalRequest().getFixedEndpointAddr();
+        if (fixedEndpointAddr != null) {
+            request.setEndpoint(fixedEndpointAddr);
+        } else {
+            request.setEndpoint(endpointAddr);
         }
     }
 }
