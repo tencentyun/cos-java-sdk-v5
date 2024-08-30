@@ -44,7 +44,7 @@ public class MediaJobsRequestV2 extends CIServiceRequest implements Serializable
      * 查询数量，默认为十个
      */
     @XStreamAlias("Size")
-    private Integer size;
+    private Integer size = 10;
 
     /**
      * 任务状态
