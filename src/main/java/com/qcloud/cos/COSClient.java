@@ -67,6 +67,7 @@ import com.qcloud.cos.internal.*;
 import com.qcloud.cos.internal.XmlResponsesSaxParser.CompleteMultipartUploadHandler;
 import com.qcloud.cos.internal.XmlResponsesSaxParser.CopyObjectResultHandler;
 import com.qcloud.cos.model.*;
+import com.qcloud.cos.model.IntelligentTiering.BucketIntelligentTieringConfiguration;
 import com.qcloud.cos.model.bucketcertificate.BucketDomainCertificateRequest;
 import com.qcloud.cos.model.bucketcertificate.BucketGetDomainCertificate;
 import com.qcloud.cos.model.bucketcertificate.BucketPutDomainCertificate;
@@ -3874,6 +3875,24 @@ public class COSClient implements COS {
         invoke(request, voidCosResponseHandler);
     }
 
+    public List<BucketIntelligentTieringConfiguration> listBucketIntelligentTieringConfiguration(String bucketName) throws CosServiceException, CosClientException {
+        rejectEmpty(bucketName,
+                "The bucket name parameter must be specified when listing bucket IntelligentTieringConfiguration");
+        CosHttpRequest<CosServiceRequest> request = createRequest(bucketName, null, new CosServiceRequest(), HttpMethodName.GET);
+        request.addParameter("intelligent-tiering", null);
+
+        try {
+            return invoke(request, new Unmarshallers.ListBucketTieringConfigurationUnmarshaller());
+        } catch (CosServiceException cse) {
+            switch (cse.getStatusCode()) {
+                case 404:
+                    return null;
+                default:
+                    throw cse;
+            }
+        }
+    }
+
     @Override
     public MediaJobResponse createMediaJobs(MediaJobsRequest req)  {
         this.rejectStartWith(req.getCallBack(),"http","The CallBack parameter mush start with http or https");
@@ -5352,6 +5371,109 @@ public class COSClient implements COS {
         putIfNotNull(params, "token", originalRequest.getToken());
         URL url = generatePresignedUrl(request.getBucketName(), request.getResourcePath(), expiredTime, HttpMethodName.GET, new HashMap<String, String>(), params, false, false);
         return url.toString();
+    }
+
+    public void putBucketEncryptionConfiguration(String bucketName, BucketEncryptionConfiguration bucketEncryptionConfiguration)
+            throws CosClientException, CosServiceException {
+        rejectEmpty(bucketName,
+                "The bucket name parameter must be specified when putting bucket encryption");
+
+        CosHttpRequest<CosServiceRequest> request = createRequest(bucketName, null, new CosServiceRequest(), HttpMethodName.PUT);
+        request.addParameter("encryption", null);
+
+        rejectEmpty(bucketEncryptionConfiguration.getSseAlgorithm(),
+                "The SseAlgorithm parameter must be specified when putting bucket encryption");
+
+        byte[] bytes = new BucketConfigurationXmlFactory().convertToXmlByteArray(bucketEncryptionConfiguration);
+        request.setContent(new ByteArrayInputStream(bytes));
+        request.addHeader(Headers.CONTENT_LENGTH, String.valueOf(bytes.length));
+
+        invoke(request, voidCosResponseHandler);
+    }
+
+    public BucketEncryptionConfiguration getBucketEncryptionConfiguration(String bucketName) throws CosClientException, CosServiceException {
+        rejectEmpty(bucketName,
+                "The bucket name parameter must be specified when getting bucket encryption");
+
+        CosHttpRequest<CosServiceRequest> request = createRequest(bucketName, null, new CosServiceRequest(), HttpMethodName.GET);
+        request.addParameter("encryption", null);
+
+        return invoke(request, new Unmarshallers.BucketEncryptionConfigurationUnmarshaller());
+    }
+
+    public void deleteBucketEncryptionConfiguration(String bucketName) throws CosClientException, CosServiceException {
+        rejectEmpty(bucketName,
+                "The bucket name parameter must be specified when deleting bucket encryption");
+
+        CosHttpRequest<CosServiceRequest> request = createRequest(bucketName, null, new CosServiceRequest(), HttpMethodName.DELETE);
+        request.addParameter("encryption", null);
+
+        invoke(request, voidCosResponseHandler);
+    }
+
+    public BucketObjectLockConfiguration getBucketObjectLockConfiguration(String bucketName) throws CosClientException, CosServiceException {
+        rejectEmpty(bucketName,
+                "The bucket name parameter must be specified when getting bucket object lock configuration");
+
+        CosHttpRequest<CosServiceRequest> request = createRequest(bucketName, null, new CosServiceRequest(), HttpMethodName.GET);
+        request.addParameter("object-lock", null);
+
+        try {
+            return invoke(request, new Unmarshallers.BucketObjectLockConfigurationUnmarshaller());
+        } catch (CosServiceException cse) {
+            switch (cse.getStatusCode()) {
+                case 404:
+                    return null;
+                default:
+                    throw cse;
+            }
+        }
+    }
+
+    public BucketGetMetadataResult getBucketMetadata(String bucketName) throws CosClientException, CosServiceException {
+        rejectEmpty(bucketName,
+                "The bucket name parameter must be specified when getting bucket metadata");
+        BucketGetMetadataResult result = new BucketGetMetadataResult();
+        HeadBucketResult headBucketResult = headBucket(new HeadBucketRequest(bucketName));
+        result.bucketName = bucketName;
+        StringBuilder strBuilder = new StringBuilder();
+        strBuilder.append(clientConfig.getHttpProtocol().toString()).append("://");
+        strBuilder.append(clientConfig.getEndpointBuilder()
+                .buildGeneralApiEndpoint(formatBucket(bucketName, null)));
+        result.bucketUrl = strBuilder.toString();
+        result.isMaz = headBucketResult.isMazBucket();
+        result.isOFS = headBucketResult.isMergeBucket();
+        result.location = headBucketResult.getBucketRegion();
+
+        try {
+            BucketEncryptionConfiguration encryptionConfiguration = getBucketEncryptionConfiguration(bucketName);
+            result.encryptionConfiguration = encryptionConfiguration;
+        } catch (CosServiceException cse) {
+            if (cse.getStatusCode() != 404) {
+                throw cse;
+            }
+        }
+
+        result.accessControlList = getBucketAcl(bucketName);
+        result.websiteConfiguration = getBucketWebsiteConfiguration(bucketName);
+        result.loggingConfiguration = getBucketLoggingConfiguration(bucketName);
+        result.crossOriginConfiguration = getBucketCrossOriginConfiguration(bucketName);
+        result.versioningConfiguration = getBucketVersioningConfiguration(bucketName);
+        result.lifecycleConfiguration = getBucketLifecycleConfiguration(bucketName);
+
+        try {
+            result.replicationConfiguration = getBucketReplicationConfiguration(bucketName);
+        } catch (CosServiceException cse) {
+            if (cse.getStatusCode() != 404) {
+                throw cse;
+            }
+        }
+
+        result.taggingConfiguration = getBucketTaggingConfiguration(bucketName);
+        result.tieringConfigurations = listBucketIntelligentTieringConfiguration(bucketName);
+        result.bucketObjectLockConfiguration = getBucketObjectLockConfiguration(bucketName);
+
+        return result;
     }
 }
 

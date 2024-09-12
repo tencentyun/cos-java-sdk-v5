@@ -109,6 +109,8 @@ public interface Headers {
      */
     public static final String BUCKET_ARCH = "x-cos-bucket-arch";
 
+    public static final String BUCKET_AZ_TYPE = "x-cos-bucket-az-type";
+
     /**
      * COS request header indicating how to handle metadata when copying an object
      */
