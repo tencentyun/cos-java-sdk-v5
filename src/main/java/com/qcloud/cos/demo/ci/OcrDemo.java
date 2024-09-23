@@ -29,7 +29,7 @@ public class OcrDemo {
         //1.创建任务请求对象
         ImageOCRRequest request = new ImageOCRRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("markjrzhang-1251704708");
+        request.setBucketName("demo-1234567890");
         //2.1设置图片位置或直接传入图片的url
         request.setObjectKey("1.jpg");
 //        request.setDetectUrl("https://demo-123456789.cos.ap-chongqing.myqcloud.com/1.png");
