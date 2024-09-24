@@ -5333,6 +5333,20 @@ public class COSClient implements COS {
         return invoke(request, new Unmarshallers.CICommonUnmarshaller<MediaTemplateResponseV2>(MediaTemplateResponseV2.class));
     }
 
+    @Override
+    public ImageOCRResponse imageOCR(ImageOCRRequest ocrRequest) {
+        CosHttpRequest<ImageOCRRequest> request = createRequest(ocrRequest.getBucketName(), ocrRequest.getObjectKey(), ocrRequest, HttpMethodName.GET);
+        request.addParameter("ci-process","OCR");
+        addParameterIfNotNull(request, "detect-url", ocrRequest.getDetectUrl());
+        addParameterIfNotNull(request, "type", ocrRequest.getType());
+        addParameterIfNotNull(request, "language-type", ocrRequest.getLanguageType());
+        addParameterIfNotNull(request, "ispdf", String.valueOf(ocrRequest.getPdf()));
+        addParameterIfNotNull(request, "pdf-pagenumber", ocrRequest.getPdfPageNumber());
+        addParameterIfNotNull(request, "isword", String.valueOf(ocrRequest.getWord()));
+        addParameterIfNotNull(request, "enable-word-polygon", String.valueOf(ocrRequest.getEnableWordPolygon()));
+        return invoke(request, new Unmarshallers.CICommonUnmarshaller<ImageOCRResponse>(ImageOCRResponse.class));
+    }
+
     public String generateCosDomainPrivateM3U8Url(PrivateM3U8Request privateM3U8Request) {
         CosHttpRequest<PrivateM3U8Request> request = createRequest(privateM3U8Request.getBucketName(), privateM3U8Request.getObject(), privateM3U8Request, HttpMethodName.GET);
         request.addParameter("ci-process","pm3u8");
