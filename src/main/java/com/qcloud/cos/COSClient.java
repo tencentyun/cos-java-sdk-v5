@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -164,6 +165,8 @@ public class COSClient implements COS {
     protected ClientConfig clientConfig;
 
     private CosHttpClient cosHttpClient;
+
+    private ConcurrentHashMap<String, Long> preflightBuckets = new ConcurrentHashMap<>();
 
     public COSClient(COSCredentials cred, ClientConfig clientConfig) {
         this(new COSStaticCredentialsProvider(cred), clientConfig);
@@ -840,6 +843,17 @@ public class COSClient implements COS {
         rejectNull(bucketName,
                 "The bucket name parameter must be specified when uploading an object");
         rejectNull(key, "The key parameter must be specified when uploading an object");
+
+        try {
+            preflightObj(bucketName, key);
+        } catch (CosServiceException cse) {
+            log.warn("fail to do the preflight request due to the service exception, will not do the upload obj request", cse);
+            throw cse;
+        } catch (CosClientException cce) {
+            log.warn("fail to do the preflight request due to the client exception, will not do the upload obj request", cce);
+            throw cce;
+        }
+
         // If a file is specified for upload, we need to pull some additional
         // information from it to auto-configure a few options
         if (file == null) {
@@ -977,6 +991,22 @@ public class COSClient implements COS {
             }
         } finally {
             CosDataSource.Utils.cleanupDataSource(uploadObjectRequest, file, isOrig, input, log);
+        }
+
+        if (returnedMetadata.isNeedPreflight()) {
+            Long currentTime = System.currentTimeMillis();
+            if ((preflightBuckets.get(bucketName) == null) || ((currentTime - preflightBuckets.get(bucketName)) > clientConfig.getPreflightStatusUpdateInterval())) {
+                String reqMsg = String.format("will update preflight status, bucket[%s]",bucketName);
+                log.info(reqMsg);
+                preflightBuckets.put(bucketName, currentTime);
+            }
+        } else {
+            Long currentTime = System.currentTimeMillis();
+            if ((preflightBuckets.get(bucketName) != null) && ((currentTime - preflightBuckets.get(bucketName)) > clientConfig.getPreflightStatusUpdateInterval())) {
+                String reqMsg = String.format("will remove bucket[%s] from preflight lists",bucketName);
+                log.info(reqMsg);
+                preflightBuckets.remove(bucketName);
+            }
         }
 
         String contentMd5 = metadata.getContentMD5();
@@ -5474,6 +5504,23 @@ public class COSClient implements COS {
         result.bucketObjectLockConfiguration = getBucketObjectLockConfiguration(bucketName);
 
         return result;
+    }
+
+    private void preflightObj(String bucketName, String key) throws CosClientException, CosServiceException {
+        rejectEmpty(bucketName,
+                "The bucket name parameter must be specified when doing preflight request");
+        rejectEmpty(key,
+                "The key parameter must be specified when doing preflight request");
+        if (clientConfig.isCheckPreflightStatus() && preflightBuckets.containsKey(bucketName)) {
+            String reqMsg = String.format("will do preflight request for put object[%s] to the bucket[%s]", key, bucketName);
+            log.debug(reqMsg);
+            CosServiceRequest serviceRequest = new CosServiceRequest();
+            CosHttpRequest<CosServiceRequest> request = createRequest(bucketName, key, serviceRequest, HttpMethodName.HEAD);
+            request.addParameter("preflight", null);
+            request.addHeader("x-cos-next-action", "PutObject");
+
+            invoke(request, voidCosResponseHandler);
+        }
     }
 }
 
