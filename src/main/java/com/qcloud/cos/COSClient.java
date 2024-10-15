@@ -845,7 +845,7 @@ public class COSClient implements COS {
         rejectNull(key, "The key parameter must be specified when uploading an object");
 
         try {
-            preflightObj(bucketName, key);
+            preflightObj(uploadObjectRequest);
         } catch (CosServiceException cse) {
             log.warn("fail to do the preflight request due to the service exception, will not do the upload obj request", cse);
             throw cse;
@@ -996,14 +996,14 @@ public class COSClient implements COS {
         if (returnedMetadata.isNeedPreflight()) {
             Long currentTime = System.currentTimeMillis();
             if ((preflightBuckets.get(bucketName) == null) || ((currentTime - preflightBuckets.get(bucketName)) > clientConfig.getPreflightStatusUpdateInterval())) {
-                String reqMsg = String.format("will update preflight status, bucket[%s]",bucketName);
+                String reqMsg = String.format("will update preflight status, bucket[%s]", bucketName);
                 log.info(reqMsg);
                 preflightBuckets.put(bucketName, currentTime);
             }
         } else {
             Long currentTime = System.currentTimeMillis();
             if ((preflightBuckets.get(bucketName) != null) && ((currentTime - preflightBuckets.get(bucketName)) > clientConfig.getPreflightStatusUpdateInterval())) {
-                String reqMsg = String.format("will remove bucket[%s] from preflight lists",bucketName);
+                String reqMsg = String.format("will remove bucket[%s] from preflight lists", bucketName);
                 log.info(reqMsg);
                 preflightBuckets.remove(bucketName);
             }
@@ -1573,11 +1573,25 @@ public class COSClient implements COS {
     @Override
     public List<Bucket> listBuckets(ListBucketsRequest listBucketsRequest)
             throws CosClientException, CosServiceException {
+        ListBucketsResult result = getService(listBucketsRequest);
+        return result.getBuckets();
+    }
+
+    public ListBucketsResult getService(ListBucketsRequest listBucketsRequest)
+            throws CosClientException, CosServiceException {
         rejectNull(listBucketsRequest,
                 "The request object parameter listBucketsRequest must be specified.");
         CosHttpRequest<ListBucketsRequest> request =
                 createRequest(null, null, listBucketsRequest, HttpMethodName.GET);
-        return invoke(request, new Unmarshallers.ListBucketsUnmarshaller());
+        if (!listBucketsRequest.getMarker().isEmpty()) {
+            request.addParameter("marker", listBucketsRequest.getMarker());
+        }
+
+        if (listBucketsRequest.getMaxKeys() != null && listBucketsRequest.getMaxKeys() > 0) {
+            request.addParameter("max-keys", listBucketsRequest.getMaxKeys().toString());
+        }
+
+        return invoke(request, new Unmarshallers.GetServiceUnmarshaller());
     }
 
     @Override
@@ -1658,7 +1672,8 @@ public class COSClient implements COS {
                         // xml payload unmarshaller
                         new Unmarshallers.InitiateMultipartUploadResultUnmarshaller(),
                         // header handlers
-                        new ServerSideEncryptionHeaderHandler<InitiateMultipartUploadResult>());
+                        new ServerSideEncryptionHeaderHandler<InitiateMultipartUploadResult>(),
+                        new VIDResultHandler<InitiateMultipartUploadResult>());
         return invoke(request, responseHandler);
     }
 
@@ -1771,6 +1786,7 @@ public class COSClient implements COS {
             result.setSSECustomerAlgorithm(metadata.getSSECustomerAlgorithm());
             result.setSSECustomerKeyMd5(metadata.getSSECustomerKeyMd5());
             result.setCrc64Ecma(metadata.getCrc64Ecma());
+            result.setRequestId(metadata.getRequestId());
 
             return result;
         } catch (Throwable t) {
@@ -2257,7 +2273,8 @@ public class COSClient implements COS {
                                 new Unmarshallers.CopyObjectUnmarshaller(),
                                 // header handlers
                                 new ServerSideEncryptionHeaderHandler<CopyObjectResultHandler>(),
-                                new COSVersionHeaderHandler());
+                                new COSVersionHeaderHandler(),
+                                new VIDResultHandler<CopyObjectResultHandler>());
                 copyObjectResultHandler = invoke(request, handler);
             } catch (CosServiceException cse) {
                 /*
@@ -2318,6 +2335,7 @@ public class COSClient implements COS {
             copyPartResult.setSSECustomerAlgorithm(copyObjectResultHandler.getSSECustomerAlgorithm());
             copyPartResult.setSSECustomerKeyMd5(copyObjectResultHandler.getSSECustomerKeyMd5());
             copyPartResult.setCrc64Ecma(copyObjectResultHandler.getCrc64Ecma());
+            copyPartResult.setRequestId(copyObjectResultHandler.getRequestId());
 
             return copyPartResult;
         }
@@ -5506,7 +5524,9 @@ public class COSClient implements COS {
         return result;
     }
 
-    private void preflightObj(String bucketName, String key) throws CosClientException, CosServiceException {
+    private void preflightObj(PutObjectRequest putObjectRequest) throws CosClientException, CosServiceException {
+        String bucketName = putObjectRequest.getBucketName();
+        String key = putObjectRequest.getKey();
         rejectEmpty(bucketName,
                 "The bucket name parameter must be specified when doing preflight request");
         rejectEmpty(key,
@@ -5516,6 +5536,9 @@ public class COSClient implements COS {
             log.debug(reqMsg);
             CosServiceRequest serviceRequest = new CosServiceRequest();
             CosHttpRequest<CosServiceRequest> request = createRequest(bucketName, key, serviceRequest, HttpMethodName.HEAD);
+            if (putObjectRequest.getFixedEndpointAddr() != null) {
+                request.setEndpoint(putObjectRequest.getFixedEndpointAddr());
+            }
             request.addParameter("preflight", null);
             request.addHeader("x-cos-next-action", "PutObject");
 

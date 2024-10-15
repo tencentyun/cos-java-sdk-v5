@@ -49,6 +49,8 @@ public class CopyPartResult extends SSEResultBase implements Serializable {
     /** The crc64ecma value for this object */
     private String crc64Ecma;
 
+    private String requestId;
+
     /**
      * Gets the part number of the newly copied part.
      */
@@ -157,5 +159,13 @@ public class CopyPartResult extends SSEResultBase implements Serializable {
 
     public void setCrc64Ecma(String crc64Ecma) {
         this.crc64Ecma = crc64Ecma;
+    }
+
+    public void setRequestId(String requestId) {
+        this.requestId = requestId;
+    }
+
+    public String getRequestId() {
+        return requestId;
     }
 }

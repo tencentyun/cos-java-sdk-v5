@@ -79,10 +79,10 @@ public class Unmarshallers {
     /**
      * Unmarshaller for the ListBuckets XML response.
      */
-    public static final class ListBucketsUnmarshaller
-            implements Unmarshaller<List<Bucket>, InputStream> {
-        public List<Bucket> unmarshall(InputStream in) throws Exception {
-            return new XmlResponsesSaxParser().parseListMyBucketsResponse(in).getBuckets();
+    public static final class GetServiceUnmarshaller
+            implements Unmarshaller<ListBucketsResult, InputStream> {
+        public ListBucketsResult unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser().parseGetServiceResponse(in).getResult();
         }
     }
 

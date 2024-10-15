@@ -127,7 +127,7 @@ public class ClientConfig {
 
     private boolean isRefreshEndpointAddr = false;
 
-    private boolean checkPreflightStatus = false;
+    private boolean checkPreflightStatus = true;
 
     private long preflightStatusUpdateInterval = 10 * 1000L;
 

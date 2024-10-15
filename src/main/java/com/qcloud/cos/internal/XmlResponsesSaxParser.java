@@ -422,9 +422,9 @@ public class XmlResponsesSaxParser {
      * @return the XML handler object populated with data parsed from the XML stream.
      * @throws CosClientException
      */
-    public ListAllMyBucketsHandler parseListMyBucketsResponse(InputStream inputStream)
+    public GetServiceHandler parseGetServiceResponse(InputStream inputStream)
             throws IOException {
-        ListAllMyBucketsHandler handler = new ListAllMyBucketsHandler();
+        GetServiceHandler handler = new GetServiceHandler();
         parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
         return handler;
     }
@@ -1130,85 +1130,6 @@ public class XmlResponsesSaxParser {
             }
         }
 
-    }
-
-    /**
-     * Handler for ListAllMyBuckets response XML documents. The document is parsed into
-     * {@link Bucket}s available via the {@link #getBuckets()} method.
-     */
-    public static class ListAllMyBucketsHandler extends AbstractHandler {
-
-        private final List<Bucket> buckets = new ArrayList<Bucket>();
-        private Owner bucketsOwner = null;
-
-        private Bucket currentBucket = null;
-
-        /**
-         * @return the buckets listed in the document.
-         */
-        public List<Bucket> getBuckets() {
-            return buckets;
-        }
-
-        /**
-         * @return the owner of the buckets.
-         */
-        public Owner getOwner() {
-            return bucketsOwner;
-        }
-
-        @Override
-        protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
-
-            if (in("ListAllMyBucketsResult")) {
-                if (name.equals("Owner")) {
-                    bucketsOwner = new Owner();
-                }
-            } else if (in("ListAllMyBucketsResult", "Buckets")) {
-                if (name.equals("Bucket")) {
-                    currentBucket = new Bucket();
-                    currentBucket.setOwner(bucketsOwner);
-                }
-            }
-        }
-
-        @Override
-        protected void doEndElement(String uri, String name, String qName) {
-            if (in("ListAllMyBucketsResult", "Owner")) {
-                if (name.equals("ID")) {
-                    bucketsOwner.setId(getText());
-
-                } else if (name.equals("DisplayName")) {
-                    bucketsOwner.setDisplayName(getText());
-                }
-            }
-
-            else if (in("ListAllMyBucketsResult", "Buckets")) {
-                if (name.equals("Bucket")) {
-                    buckets.add(currentBucket);
-                    currentBucket = null;
-                }
-            }
-
-            else if (in("ListAllMyBucketsResult", "Buckets", "Bucket")) {
-                if (name.equals("Name")) {
-                    currentBucket.setName(getText());
-
-                } else if (name.equals("CreationDate")) {
-                    Date creationDate = DateUtils.parseISO8601Date(getText());
-                    currentBucket.setCreationDate(creationDate);
-                } else if (name.equals("CreateDate")) {
-                    Date creationDate = DateUtils.parseISO8601Date(getText());
-                    currentBucket.setCreationDate(creationDate);
-                } else if (name.equals("Location")) {
-                    currentBucket.setLocation(getText());
-                } else if (name.equals("BucketType")) {
-                    currentBucket.setBucketType(getText());
-                } else if (name.equals("Type")) {
-                    currentBucket.setType(getText());
-                }
-            }
-        }
     }
 
     public static class ImagePersistenceHandler extends AbstractHandler {
@@ -7078,6 +6999,93 @@ public class XmlResponsesSaxParser {
 
         public ListJobsResult getResult() {
             return listJobsResult;
+        }
+    }
+
+    public static class GetServiceHandler extends AbstractHandler {
+
+        private final List<Bucket> buckets = new ArrayList<Bucket>();
+        private Owner bucketsOwner = null;
+
+        private Bucket currentBucket = null;
+
+        private ListBucketsResult result = new ListBucketsResult();
+
+        public ListBucketsResult getResult() {
+            return result;
+        }
+
+        @Override
+        protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
+
+            if (in("ListAllMyBucketsResult")) {
+                if (name.equals("Owner")) {
+                    bucketsOwner = new Owner();
+                }
+            } else if (in("ListAllMyBucketsResult", "Buckets")) {
+                if (name.equals("Bucket")) {
+                    currentBucket = new Bucket();
+                    currentBucket.setOwner(bucketsOwner);
+                }
+            }
+        }
+
+        @Override
+        protected void doEndElement(String uri, String name, String qName) {
+            if (in("ListAllMyBucketsResult", "Owner")) {
+                if (name.equals("ID")) {
+                    bucketsOwner.setId(getText());
+
+                } else if (name.equals("DisplayName")) {
+                    bucketsOwner.setDisplayName(getText());
+                }
+            }
+
+            else if (in("ListAllMyBucketsResult")) {
+                if (name.equals("Owner")) {
+                    result.setBucketOwner(bucketsOwner);
+                } else if (name.equals("Buckets")) {
+                    result.setBuckets(buckets);
+                } else if (name.equals( "NextMarker")) {
+                    result.setNextMarker(getText());
+                } else if (name.equals("IsTruncated")) {
+                    String isTruncatedStr = getText();
+                    if (isTruncatedStr.equalsIgnoreCase("false")) {
+                        result.setTruncated(false);
+                    } else if (isTruncatedStr.equalsIgnoreCase("true")) {
+                        result.setTruncated(true);
+                    } else {
+                        throw new IllegalStateException(
+                                "Invalid value for IsTruncated field: " + isTruncatedStr);
+                    }
+                }
+            }
+
+            else if (in("ListAllMyBucketsResult", "Buckets")) {
+                if (name.equals("Bucket")) {
+                    buckets.add(currentBucket);
+                    currentBucket = null;
+                }
+            }
+
+            else if (in("ListAllMyBucketsResult", "Buckets", "Bucket")) {
+                if (name.equals("Name")) {
+                    currentBucket.setName(getText());
+
+                } else if (name.equals("CreationDate")) {
+                    Date creationDate = DateUtils.parseISO8601Date(getText());
+                    currentBucket.setCreationDate(creationDate);
+                } else if (name.equals("CreateDate")) {
+                    Date creationDate = DateUtils.parseISO8601Date(getText());
+                    currentBucket.setCreationDate(creationDate);
+                } else if (name.equals("Location")) {
+                    currentBucket.setLocation(getText());
+                } else if (name.equals("BucketType")) {
+                    currentBucket.setBucketType(getText());
+                } else if (name.equals("Type")) {
+                    currentBucket.setType(getText());
+                }
+            }
         }
     }
 }

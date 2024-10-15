@@ -1,5 +1,6 @@
 package com.qcloud.cos.demo;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.qcloud.cos.COSClient;
@@ -11,6 +12,8 @@ import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.model.Bucket;
 import com.qcloud.cos.model.CannedAccessControlList;
 import com.qcloud.cos.model.CreateBucketRequest;
+import com.qcloud.cos.model.ListBucketsRequest;
+import com.qcloud.cos.model.ListBucketsResult;
 import com.qcloud.cos.region.Region;
 
 /**
@@ -18,10 +21,10 @@ import com.qcloud.cos.region.Region;
  *
  */
 public class BucketDemo {
-    private static String secretId = "AKIDXXXXXXXX";
-    private static String secretKey = "1A2Z3YYYYYYYYYY";
-    private static String cosRegion = "ap-guangzhou";
-    private static String bucketName = "examplebucket-12500000000";
+    private static String secretId = System.getenv("SECRETID");
+    private static String secretKey = System.getenv("SECRETKEY");
+    private static String bucketName = System.getenv("BUCKET_NAME");
+    private static String cosRegion = System.getenv("REGION");
     private static COSClient cosClient = createCli();
 
     public static void main(String[] args) {
@@ -85,6 +88,25 @@ public class BucketDemo {
             System.out.println(bucket.getType());
             System.out.println(bucket.getBucketType());
         }
+    }
+
+    private static void listAllBucket() {
+        ListBucketsRequest listBucketsRequest = new ListBucketsRequest();
+        List<Bucket> buckets = new ArrayList<>();
+        while (true) {
+            ListBucketsResult result = cosClient.getService(listBucketsRequest);
+            buckets.addAll(result.getBuckets());
+            if (result.isTruncated()) {
+                listBucketsRequest.setMarker(result.getNextMarker());
+            } else {
+                break;
+            }
+        }
+        for (Bucket bucket : buckets) {
+            System.out.println(bucket.getName());
+            System.out.println(bucket.getLocation());
+        }
+        System.out.println("finish list all buckets, totally " + buckets.size() + " buckets.");
     }
 
     //创多AZ桶
