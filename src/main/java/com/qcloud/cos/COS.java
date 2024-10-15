@@ -3293,6 +3293,8 @@ public interface COS extends COSDirectSpi {
     UpdateFileMetaIndexResponse updateFileMetaIndex(UpdateFileMetaIndexRequest customRequest);
 
     MediaTemplateResponseV2 createMediaTemplateV2(MediaTemplateRequestV2 request);
+
+    ImageOCRResponse imageOCR(ImageOCRRequest request);
 }
 
 
