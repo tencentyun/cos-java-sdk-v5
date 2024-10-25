@@ -47,55 +47,17 @@ import com.qcloud.cos.internal.cihandler.ReportBadCaseHandler;
 import com.qcloud.cos.internal.cihandler.SearchImageHandler;
 import com.qcloud.cos.internal.cihandler.TriggerWorkflowListHandler;
 import com.qcloud.cos.internal.cihandler.WebpageAuditingDescribeJobHandler;
-import com.qcloud.cos.model.AbortIncompleteMultipartUpload;
-import com.qcloud.cos.model.AccessControlList;
-import com.qcloud.cos.model.Bucket;
-import com.qcloud.cos.model.BucketCrossOriginConfiguration;
-import com.qcloud.cos.model.BucketDomainConfiguration;
-import com.qcloud.cos.model.BucketIntelligentTierConfiguration;
-import com.qcloud.cos.model.BucketLifecycleConfiguration;
+import com.qcloud.cos.model.*;
 import com.qcloud.cos.model.BucketLifecycleConfiguration.NoncurrentVersionTransition;
 import com.qcloud.cos.model.BucketLifecycleConfiguration.Rule;
 import com.qcloud.cos.model.BucketLifecycleConfiguration.Transition;
-import com.qcloud.cos.model.BucketLoggingConfiguration;
-import com.qcloud.cos.model.BucketRefererConfiguration;
-import com.qcloud.cos.model.BucketReplicationConfiguration;
-import com.qcloud.cos.model.BucketTaggingConfiguration;
-import com.qcloud.cos.model.BucketVersioningConfiguration;
-import com.qcloud.cos.model.BucketWebsiteConfiguration;
-import com.qcloud.cos.model.CORSRule;
 import com.qcloud.cos.model.CORSRule.AllowedMethods;
-import com.qcloud.cos.model.COSObjectSummary;
-import com.qcloud.cos.model.COSVersionSummary;
-import com.qcloud.cos.model.CompleteMultipartUploadResult;
-import com.qcloud.cos.model.CopyObjectResult;
-import com.qcloud.cos.model.DecompressionResult;
 import com.qcloud.cos.model.DeleteObjectsResult.DeletedObject;
-import com.qcloud.cos.model.DomainRule;
-import com.qcloud.cos.model.GetBucketInventoryConfigurationResult;
-import com.qcloud.cos.model.GetObjectTaggingResult;
-import com.qcloud.cos.model.Grantee;
-import com.qcloud.cos.model.GroupGrantee;
-import com.qcloud.cos.model.InitiateMultipartUploadResult;
-import com.qcloud.cos.model.ListBucketInventoryConfigurationsResult;
-import com.qcloud.cos.model.ListJobsResult;
-import com.qcloud.cos.model.MultipartUpload;
-import com.qcloud.cos.model.MultipartUploadListing;
-import com.qcloud.cos.model.ObjectListing;
-import com.qcloud.cos.model.Owner;
-import com.qcloud.cos.model.PartListing;
-import com.qcloud.cos.model.PartSummary;
-import com.qcloud.cos.model.Permission;
-import com.qcloud.cos.model.RedirectRule;
-import com.qcloud.cos.model.ReplicationDestinationConfig;
-import com.qcloud.cos.model.ReplicationRule;
-import com.qcloud.cos.model.RoutingRule;
-import com.qcloud.cos.model.RoutingRuleCondition;
+import com.qcloud.cos.model.IntelligentTiering.BucketIntelligentTieringConfiguration;
+import com.qcloud.cos.model.IntelligentTiering.IntelligentTieringFilter;
+import com.qcloud.cos.model.IntelligentTiering.IntelligentTieringTransition;
 import com.qcloud.cos.model.Tag.LifecycleTagPredicate;
 import com.qcloud.cos.model.Tag.Tag;
-import com.qcloud.cos.model.TagSet;
-import com.qcloud.cos.model.UinGrantee;
-import com.qcloud.cos.model.VersionListing;
 import com.qcloud.cos.model.bucketcertificate.BucketDomainCertificateParameters;
 import com.qcloud.cos.model.bucketcertificate.BucketGetDomainCertificate;
 import com.qcloud.cos.model.ciModel.auditing.AudioAuditingResponse;
@@ -271,6 +233,13 @@ public class XmlResponsesSaxParser {
             xr.parse(new InputSource(breader));
 
         } catch (IOException e) {
+            try {
+                inputStream.close();
+            } catch (IOException ie) {
+                if (log.isErrorEnabled()) {
+                    log.error("Unable to close response InputStream up after XML parse failure", ie);
+                }
+            }
             throw e;
 
         } catch (Throwable t) {
@@ -453,9 +422,9 @@ public class XmlResponsesSaxParser {
      * @return the XML handler object populated with data parsed from the XML stream.
      * @throws CosClientException
      */
-    public ListAllMyBucketsHandler parseListMyBucketsResponse(InputStream inputStream)
+    public GetServiceHandler parseGetServiceResponse(InputStream inputStream)
             throws IOException {
-        ListAllMyBucketsHandler handler = new ListAllMyBucketsHandler();
+        GetServiceHandler handler = new GetServiceHandler();
         parseXmlInputStream(handler, sanitizeXmlDocument(handler, inputStream));
         return handler;
     }
@@ -677,6 +646,27 @@ public class XmlResponsesSaxParser {
     public GetBucketIntelligentTierConfigurationHandler parseBucketIntelligentTierConfigurationsResponse(InputStream inputStream)
             throws IOException {
         GetBucketIntelligentTierConfigurationHandler handler = new GetBucketIntelligentTierConfigurationHandler();
+        parseXmlInputStream(handler, inputStream);
+        return handler;
+    }
+
+    public ListBucketIntelligentTierConfigurationHandler parseListBucketIntelligentTierConfigurationsResponse(InputStream inputStream)
+            throws IOException {
+        ListBucketIntelligentTierConfigurationHandler handler = new ListBucketIntelligentTierConfigurationHandler();
+        parseXmlInputStream(handler, inputStream);
+        return handler;
+    }
+
+    public BucketEncryptionConfigurationHandler parseBucketEncryptionResponse(InputStream inputStream)
+            throws IOException {
+        BucketEncryptionConfigurationHandler handler = new BucketEncryptionConfigurationHandler();
+        parseXmlInputStream(handler, inputStream);
+        return handler;
+    }
+
+    public BucketObjectLockConfigurationHandler parseBucketObjectLockConfigurationResponse(InputStream inputStream)
+            throws IOException {
+        BucketObjectLockConfigurationHandler handler = new BucketObjectLockConfigurationHandler();
         parseXmlInputStream(handler, inputStream);
         return handler;
     }
@@ -1140,85 +1130,6 @@ public class XmlResponsesSaxParser {
             }
         }
 
-    }
-
-    /**
-     * Handler for ListAllMyBuckets response XML documents. The document is parsed into
-     * {@link Bucket}s available via the {@link #getBuckets()} method.
-     */
-    public static class ListAllMyBucketsHandler extends AbstractHandler {
-
-        private final List<Bucket> buckets = new ArrayList<Bucket>();
-        private Owner bucketsOwner = null;
-
-        private Bucket currentBucket = null;
-
-        /**
-         * @return the buckets listed in the document.
-         */
-        public List<Bucket> getBuckets() {
-            return buckets;
-        }
-
-        /**
-         * @return the owner of the buckets.
-         */
-        public Owner getOwner() {
-            return bucketsOwner;
-        }
-
-        @Override
-        protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
-
-            if (in("ListAllMyBucketsResult")) {
-                if (name.equals("Owner")) {
-                    bucketsOwner = new Owner();
-                }
-            } else if (in("ListAllMyBucketsResult", "Buckets")) {
-                if (name.equals("Bucket")) {
-                    currentBucket = new Bucket();
-                    currentBucket.setOwner(bucketsOwner);
-                }
-            }
-        }
-
-        @Override
-        protected void doEndElement(String uri, String name, String qName) {
-            if (in("ListAllMyBucketsResult", "Owner")) {
-                if (name.equals("ID")) {
-                    bucketsOwner.setId(getText());
-
-                } else if (name.equals("DisplayName")) {
-                    bucketsOwner.setDisplayName(getText());
-                }
-            }
-
-            else if (in("ListAllMyBucketsResult", "Buckets")) {
-                if (name.equals("Bucket")) {
-                    buckets.add(currentBucket);
-                    currentBucket = null;
-                }
-            }
-
-            else if (in("ListAllMyBucketsResult", "Buckets", "Bucket")) {
-                if (name.equals("Name")) {
-                    currentBucket.setName(getText());
-
-                } else if (name.equals("CreationDate")) {
-                    Date creationDate = DateUtils.parseISO8601Date(getText());
-                    currentBucket.setCreationDate(creationDate);
-                } else if (name.equals("CreateDate")) {
-                    Date creationDate = DateUtils.parseISO8601Date(getText());
-                    currentBucket.setCreationDate(creationDate);
-                } else if (name.equals("Location")) {
-                    currentBucket.setLocation(getText());
-                } else if (name.equals("BucketType")) {
-                    currentBucket.setBucketType(getText());
-                } else if (name.equals("Type")) {
-                    currentBucket.setType(getText());
-                }
-            }
-        }
     }
 
     public static class ImagePersistenceHandler extends AbstractHandler {
@@ -3532,6 +3443,185 @@ public class XmlResponsesSaxParser {
                 }
             }
 
+        }
+    }
+
+    public static class ListBucketIntelligentTierConfigurationHandler extends AbstractHandler {
+
+        private final List<BucketIntelligentTieringConfiguration> configurations = new ArrayList<>();
+
+        private BucketIntelligentTieringConfiguration currentConfiguration;
+
+        private List<IntelligentTieringTransition> transitions;
+
+        private IntelligentTieringTransition currentTransition;
+
+        private IntelligentTieringFilter currentFilter;
+
+        private List<TagSet> currentTagSets;
+
+        private String currentTagKey;
+
+        private String currentTagValue;
+
+        public List<BucketIntelligentTieringConfiguration> getConfigurations() {
+            return configurations;
+        }
+
+        @Override
+        protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
+
+            if (in("ListBucketIntelligentTieringConfigurationsOutput")) {
+                if (name.equals("IntelligentTieringConfiguration")) {
+                    currentConfiguration = new BucketIntelligentTieringConfiguration();
+                    transitions = new ArrayList<>();
+                }
+            } else if (in ("ListBucketIntelligentTieringConfigurationsOutput", "IntelligentTieringConfiguration")) {
+                if (name.equals("Tiering")) {
+                    currentTransition = new IntelligentTieringTransition();
+                } else if (name.equals("Filter")) {
+                    currentFilter = new IntelligentTieringFilter();
+                }
+            } else if (in ("ListBucketIntelligentTieringConfigurationsOutput", "IntelligentTieringConfiguration", "Filter")) {
+                if (name.equals("And")) {
+                    currentTagSets = new ArrayList<>();
+                }
+            }
+        }
+
+        @Override
+        protected void doEndElement(String uri, String name, String qName) {
+            if (in ("ListBucketIntelligentTieringConfigurationsOutput")) {
+                if (name.equals("IntelligentTieringConfiguration")) {
+                    if (!transitions.isEmpty()) {
+                        currentConfiguration.setTieringTransitions(transitions);
+                        transitions = null;
+                    }
+                    configurations.add(currentConfiguration);
+                    currentConfiguration = null;
+                }
+            } else if (in ("ListBucketIntelligentTieringConfigurationsOutput", "IntelligentTieringConfiguration")) {
+                if (name.equals("Id")) {
+                    currentConfiguration.setRuleId(getText());
+                } else if (name.equals("Status")) {
+                    currentConfiguration.setStatus(getText());
+                } else if (name.equals("Filter")) {
+                    if (!currentTagSets.isEmpty()) {
+                        currentFilter.setTagSets(currentTagSets);
+                        currentTagSets = null;
+                    }
+                    currentConfiguration.setFilter(currentFilter);
+                    currentFilter = null;
+                } else if (name.equals("Tiering")) {
+                    transitions.add(currentTransition);
+                    currentTransition = null;
+                }
+            } else if (in ("ListBucketIntelligentTieringConfigurationsOutput", "IntelligentTieringConfiguration", "Tiering")) {
+                if (name.equals("AccessTier")) {
+                    currentTransition.setAccessTier(getText());
+                } else if (name.equals("Days")) {
+                    currentTransition.setDays(Integer.parseInt(getText()));
+                } else if (name.equals("RequestFrequent")) {
+                    currentTransition.setRequestFrequent(Integer.parseInt(getText()));
+                }
+            } else if (in ("ListBucketIntelligentTieringConfigurationsOutput", "IntelligentTieringConfiguration", "Filter")) {
+                if (name.equals("Prefix")) {
+                    currentFilter.setPrefix(getText());
+                } else if (name.equals("Tag")) {
+                    TagSet tmpTagSet = new TagSet();
+                    tmpTagSet.setTag(currentTagKey, currentTagValue);
+                    currentTagSets.add(tmpTagSet);
+                    currentTagKey = null;
+                    currentTagValue = null;
+                }
+            } else if (in ("ListBucketIntelligentTieringConfigurationsOutput", "IntelligentTieringConfiguration", "Filter", "Tag")) {
+                if (name.equals("Key")) {
+                    currentTagKey = getText();
+                } else if (name.equals("Value")) {
+                    currentTagValue = getText();
+                }
+            } else if (in ("ListBucketIntelligentTieringConfigurationsOutput", "IntelligentTieringConfiguration", "Filter", "And")) {
+                if (name.equals("Prefix")) {
+                    currentFilter.setPrefix(getText());
+                } else if (name.equals("Tag")) {
+                    TagSet tmpTagSet = new TagSet();
+                    tmpTagSet.setTag(currentTagKey, currentTagValue);
+                    currentTagSets.add(tmpTagSet);
+                    currentTagKey = null;
+                    currentTagValue = null;
+                }
+            } else if (in ("ListBucketIntelligentTieringConfigurationsOutput", "IntelligentTieringConfiguration", "Filter", "And", "Tag")) {
+                if (name.equals("Key")) {
+                    currentTagKey = getText();
+                } else if (name.equals("Value")) {
+                    currentTagValue = getText();
+                }
+            }
+        }
+    }
+
+    public static class BucketEncryptionConfigurationHandler extends AbstractHandler {
+
+        private final BucketEncryptionConfiguration bucketEncryptionConfiguration =
+                new BucketEncryptionConfiguration();
+
+        /**
+         * @return
+         * an object representing the bucket's Encryption document.
+         */
+        public BucketEncryptionConfiguration getBucketEncryptionConfiguration() {
+            return bucketEncryptionConfiguration;
+        }
+
+        @Override
+        protected void doStartElement(String uri, String name, String qName, Attributes attrs) {}
+
+        @Override
+        protected void doEndElement(String uri, String name, String qName) {
+            if (in("ServerSideEncryptionConfiguration", "Rule")) {
+                if (name.equals("BucketKeyEnabled")) {
+                    bucketEncryptionConfiguration.setBucketEnabled(getText());
+                }
+            } else if (in("ServerSideEncryptionConfiguration", "Rule", "ApplyServerSideEncryptionByDefault")) {
+                if (name.equals("SSEAlgorithm")) {
+                    bucketEncryptionConfiguration.setSseAlgorithm(getText());
+                } else if (name.equals("KMSMasterKeyID")) {
+                    bucketEncryptionConfiguration.setKmsMasterKeyID(getText());
+                } else if (name.equals("KMSAlgorithm")) {
+                    bucketEncryptionConfiguration.setKMSAlgorithm(getText());
+                }
+            }
+        }
+    }
+
+    public static class BucketObjectLockConfigurationHandler extends AbstractHandler {
+
+        private final BucketObjectLockConfiguration bucketObjectLockConfiguration = new BucketObjectLockConfiguration();
+
+        /**
+         * @return
+         * an object representing the bucket's ObjectLockConfiguration document.
+         */
+        public BucketObjectLockConfiguration getBucketObjectLockConfiguration() {
+            return bucketObjectLockConfiguration;
+        }
+
+        @Override
+        protected void doStartElement(String uri, String name, String qName, Attributes attrs) {}
+
+        @Override
+        protected void doEndElement(String uri, String name, String qName) {
+            if (in("ObjectLockConfiguration")) {
+                if (name.equals("ObjectLockEnabled")) {
+                    bucketObjectLockConfiguration.setStatus(getText());
+                }
+            } else if (in("ObjectLockConfiguration", "Rule", "DefaultRetention")) {
+                if (name.equals("Days")) {
+                    bucketObjectLockConfiguration.setRetentionDays(Integer.parseInt(getText()));
+                } else if (name.equals("Mode")) {
+                    bucketObjectLockConfiguration.setRetentionMode(getText());
+                }
+            }
         }
     }
 
@@ -6909,6 +6999,93 @@ public class XmlResponsesSaxParser {
 
         public ListJobsResult getResult() {
             return listJobsResult;
+        }
+    }
+
+    public static class GetServiceHandler extends AbstractHandler {
+
+        private final List<Bucket> buckets = new ArrayList<Bucket>();
+        private Owner bucketsOwner = null;
+
+        private Bucket currentBucket = null;
+
+        private ListBucketsResult result = new ListBucketsResult();
+
+        public ListBucketsResult getResult() {
+            return result;
+        }
+
+        @Override
+        protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
+
+            if (in("ListAllMyBucketsResult")) {
+                if (name.equals("Owner")) {
+                    bucketsOwner = new Owner();
+                }
+            } else if (in("ListAllMyBucketsResult", "Buckets")) {
+                if (name.equals("Bucket")) {
+                    currentBucket = new Bucket();
+                    currentBucket.setOwner(bucketsOwner);
+                }
+            }
+        }
+
+        @Override
+        protected void doEndElement(String uri, String name, String qName) {
+            if (in("ListAllMyBucketsResult", "Owner")) {
+                if (name.equals("ID")) {
+                    bucketsOwner.setId(getText());
+
+                } else if (name.equals("DisplayName")) {
+                    bucketsOwner.setDisplayName(getText());
+                }
+            }
+
+            else if (in("ListAllMyBucketsResult")) {
+                if (name.equals("Owner")) {
+                    result.setBucketOwner(bucketsOwner);
+                } else if (name.equals("Buckets")) {
+                    result.setBuckets(buckets);
+                } else if (name.equals( "NextMarker")) {
+                    result.setNextMarker(getText());
+                } else if (name.equals("IsTruncated")) {
+                    String isTruncatedStr = getText();
+                    if (isTruncatedStr.equalsIgnoreCase("false")) {
+                        result.setTruncated(false);
+                    } else if (isTruncatedStr.equalsIgnoreCase("true")) {
+                        result.setTruncated(true);
+                    } else {
+                        throw new IllegalStateException(
+                                "Invalid value for IsTruncated field: " + isTruncatedStr);
+                    }
+                }
+            }
+
+            else if (in("ListAllMyBucketsResult", "Buckets")) {
+                if (name.equals("Bucket")) {
+                    buckets.add(currentBucket);
+                    currentBucket = null;
+                }
+            }
+
+            else if (in("ListAllMyBucketsResult", "Buckets", "Bucket")) {
+                if (name.equals("Name")) {
+                    currentBucket.setName(getText());
+
+                } else if (name.equals("CreationDate")) {
+                    Date creationDate = DateUtils.parseISO8601Date(getText());
+                    currentBucket.setCreationDate(creationDate);
+                } else if (name.equals("CreateDate")) {
+                    Date creationDate = DateUtils.parseISO8601Date(getText());
+                    currentBucket.setCreationDate(creationDate);
+                } else if (name.equals("Location")) {
+                    currentBucket.setLocation(getText());
+                } else if (name.equals("BucketType")) {
+                    currentBucket.setBucketType(getText());
+                } else if (name.equals("Type")) {
+                    currentBucket.setType(getText());
+                }
+            }
         }
     }
 }

@@ -21,8 +21,9 @@ package com.qcloud.cos.model;
 import java.io.Serializable;
 
 import com.qcloud.cos.internal.SSEResultBase;
+import com.qcloud.cos.internal.VIDResult;
 
-public class InitiateMultipartUploadResult extends SSEResultBase implements Serializable {
+public class InitiateMultipartUploadResult extends SSEResultBase implements Serializable, VIDResult {
     /** The name of the bucket in which the new multipart upload was initiated */
     private String bucketName;
 
@@ -31,6 +32,10 @@ public class InitiateMultipartUploadResult extends SSEResultBase implements Seri
 
     /** The unique ID of the new multipart upload */
     private String uploadId;
+
+    private String requestId;
+
+    private String dateStr;
 
     /**
      * Returns the name of the bucket in which the new multipart upload was
@@ -91,5 +96,25 @@ public class InitiateMultipartUploadResult extends SSEResultBase implements Seri
      */
     public void setUploadId(String uploadId) {
         this.uploadId = uploadId;
+    }
+
+    @Override
+    public String getDateStr() {
+        return dateStr;
+    }
+
+    @Override
+    public void setDateStr(String dateStr) {
+        this.dateStr = dateStr;
+    }
+
+    @Override
+    public String getRequestId() {
+        return requestId;
+    }
+
+    @Override
+    public void setRequestId(String requestId) {
+        this.requestId = requestId;
     }
 }

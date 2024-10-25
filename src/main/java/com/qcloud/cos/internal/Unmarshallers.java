@@ -28,6 +28,7 @@ import com.qcloud.cos.internal.XmlResponsesSaxParser.CompleteMultipartUploadHand
 import com.qcloud.cos.internal.XmlResponsesSaxParser.CopyObjectResultHandler;
 import com.qcloud.cos.internal.cihandler.*;
 import com.qcloud.cos.model.*;
+import com.qcloud.cos.model.IntelligentTiering.BucketIntelligentTieringConfiguration;
 import com.qcloud.cos.model.bucketcertificate.BucketGetDomainCertificate;
 import com.qcloud.cos.model.ciModel.auditing.AudioAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.AuditingKeywordResponse;
@@ -78,10 +79,10 @@ public class Unmarshallers {
     /**
      * Unmarshaller for the ListBuckets XML response.
      */
-    public static final class ListBucketsUnmarshaller
-            implements Unmarshaller<List<Bucket>, InputStream> {
-        public List<Bucket> unmarshall(InputStream in) throws Exception {
-            return new XmlResponsesSaxParser().parseListMyBucketsResponse(in).getBuckets();
+    public static final class GetServiceUnmarshaller
+            implements Unmarshaller<ListBucketsResult, InputStream> {
+        public ListBucketsResult unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser().parseGetServiceResponse(in).getResult();
         }
     }
 
@@ -441,6 +442,14 @@ public class Unmarshallers {
         }
     }
 
+    public static final class ListBucketTieringConfigurationUnmarshaller
+            implements Unmarshaller<List<BucketIntelligentTieringConfiguration>, InputStream> {
+
+        public List<BucketIntelligentTieringConfiguration> unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser().parseListBucketIntelligentTierConfigurationsResponse(in).getConfigurations();
+        }
+    }
+
     public static final class SetObjectTaggingResponseUnmarshaller implements Unmarshaller<SetObjectTaggingResult, InputStream> {
 
         @Override
@@ -454,6 +463,28 @@ public class Unmarshallers {
         @Override
         public DeleteObjectTaggingResult unmarshall(InputStream in) throws Exception {
             return new DeleteObjectTaggingResult();
+        }
+    }
+
+    /**
+     * Unmarshaller for the BucketEncryption XML response.
+     */
+    public static final class BucketEncryptionConfigurationUnmarshaller implements
+            Unmarshaller<BucketEncryptionConfiguration, InputStream> {
+        public BucketEncryptionConfiguration unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser()
+                    .parseBucketEncryptionResponse(in).getBucketEncryptionConfiguration();
+        }
+    }
+
+    /**
+     * Unmarshaller for the BucketObjectLock XML response.
+     */
+    public static final class BucketObjectLockConfigurationUnmarshaller implements
+            Unmarshaller<BucketObjectLockConfiguration, InputStream> {
+        public BucketObjectLockConfiguration unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser()
+                    .parseBucketObjectLockConfigurationResponse(in).getBucketObjectLockConfiguration();
         }
     }
 

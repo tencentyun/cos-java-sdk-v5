@@ -127,6 +127,10 @@ public class ClientConfig {
 
     private boolean isRefreshEndpointAddr = false;
 
+    private boolean checkPreflightStatus = true;
+
+    private long preflightStatusUpdateInterval = 10 * 1000L;
+
     // 不传入region 用于后续调用List Buckets(获取所有的bucket信息)
     public ClientConfig() {
         super();
@@ -450,5 +454,17 @@ public class ClientConfig {
 
     public boolean IsRefreshEndpointAddr() {
         return isRefreshEndpointAddr;
+    }
+
+    public boolean isCheckPreflightStatus() {
+        return checkPreflightStatus;
+    }
+
+    public void setCheckPreflightStatus(boolean checkPreflightStatus) {
+        this.checkPreflightStatus = checkPreflightStatus;
+    }
+
+    public long getPreflightStatusUpdateInterval() {
+        return preflightStatusUpdateInterval;
     }
 }

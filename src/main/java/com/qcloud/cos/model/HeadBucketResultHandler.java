@@ -35,18 +35,22 @@ public class HeadBucketResultHandler extends AbstractCosResponseHandler<HeadBuck
             throws Exception {
         final CosServiceResponse<HeadBucketResult> cosResponse = new CosServiceResponse<HeadBucketResult>();
         boolean isMergeBucket = false;
+        boolean isMazBucket = false;
         for (Map.Entry<String, String> header : response.getHeaders().entrySet()) {
             String key = header.getKey();
             String value = header.getValue();
             if (key.equalsIgnoreCase(Headers.BUCKET_ARCH) &&
                     value.equalsIgnoreCase("OFS")) {
                 isMergeBucket = true;
-                break;
+            } else if (key.equalsIgnoreCase(Headers.BUCKET_AZ_TYPE) &&
+                    value.equalsIgnoreCase("MAZ")) {
+                isMazBucket = true;
             }
         }
         final HeadBucketResult result = new HeadBucketResult();
         result.setBucketRegion(response.getHeaders().get(Headers.COS_BUCKET_REGION));
         result.setMergeBucket(isMergeBucket);
+        result.setMazBucket(isMazBucket);
         cosResponse.setResult(result);
         return cosResponse;
     }

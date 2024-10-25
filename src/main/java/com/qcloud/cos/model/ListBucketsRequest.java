@@ -23,4 +23,23 @@ import java.io.Serializable;
 import com.qcloud.cos.internal.CosServiceRequest;
 
 public class ListBucketsRequest extends CosServiceRequest implements Serializable {
+    private String marker = "";
+
+    private Integer maxKeys;;
+
+    public String getMarker() {
+        return marker;
+    }
+
+    public void setMarker(String marker) {
+        this.marker = marker;
+    }
+
+    public Integer getMaxKeys() {
+        return maxKeys;
+    }
+
+    public void setMaxKeys(int maxKeys) {
+        this.maxKeys = maxKeys;
+    }
 }
