@@ -61,6 +61,9 @@ public class MediaTemplateTransTplObject  {
     }
 
     public MediaTimeIntervalObject getTimeInterval() {
+        if (timeInterval == null) {
+            timeInterval = new MediaTimeIntervalObject();
+        }
         return timeInterval;
     }
 
@@ -69,6 +72,9 @@ public class MediaTemplateTransTplObject  {
     }
 
     public MediaSnapshotObject getSnapshot() {
+        if (snapshot == null) {
+            snapshot = new MediaSnapshotObject();
+        }
         return snapshot;
     }
 
