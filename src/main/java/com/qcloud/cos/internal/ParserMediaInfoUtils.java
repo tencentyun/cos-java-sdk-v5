@@ -558,6 +558,9 @@ public class ParserMediaInfoUtils {
             case "CodecName":
                 audio.setCodecName(value);
                 break;
+            case "CreationTime":
+                audio.setCreationTime(value);
+                break;
             default:
                 break;
         }

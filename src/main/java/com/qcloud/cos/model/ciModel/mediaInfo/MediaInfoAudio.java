@@ -95,6 +95,12 @@ public class MediaInfoAudio {
     @XStreamAlias("Language")
     private String language;
 
+    /**
+     * 语言
+     */
+    @XStreamAlias("CreationTime")
+    private String creationTime;
+
     public String getBitrate() {
         return bitrate;
     }
@@ -213,6 +219,14 @@ public class MediaInfoAudio {
 
     public void setLanguage(String language) {
         this.language = language;
+    }
+
+    public String getCreationTime() {
+        return creationTime;
+    }
+
+    public void setCreationTime(String creationTime) {
+        this.creationTime = creationTime;
     }
 
     @Override
