@@ -151,7 +151,19 @@ public class MediaInfoVideo {
     @XStreamAlias("Language")
     private String language;
 
+    @XStreamAlias("Rotation")
     private String rotation;
+
+    @XStreamAlias("CreationTime")
+    private String creationTime;
+
+    public String getCreationTime() {
+        return creationTime;
+    }
+
+    public void setCreationTime(String creationTime) {
+        this.creationTime = creationTime;
+    }
 
     public String getIndex() {
         return index;
