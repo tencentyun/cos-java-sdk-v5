@@ -1,5 +1,8 @@
 package com.qcloud.cos.model.ciModel.mediaInfo;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamImplicit;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,14 +13,17 @@ public class MediaInfoStream {
     /**
      * 视频信息
      */
+    @XStreamImplicit(itemFieldName = "Video")
     private List<MediaInfoVideo> mediaInfoVideoList;
     /**
      * 音频信息
      */
+    @XStreamImplicit(itemFieldName = "Audio")
     private List<MediaInfoAudio> mediaInfoAudioList;
     /**
      * 字幕信息
      */
+    @XStreamAlias("Subtitle")
     private MediaInfoSubtitle subtitle;
 
     public List<MediaInfoVideo> getMediaInfoVideoList() {
