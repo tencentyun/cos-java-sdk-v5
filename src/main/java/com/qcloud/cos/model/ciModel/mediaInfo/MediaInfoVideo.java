@@ -44,6 +44,24 @@ public class MediaInfoVideo {
     private String codecTag;
 
     /**
+     * 色原
+     */
+    @XStreamAlias("ColorPrimaries")
+    private String colorPrimaries;
+
+    /**
+     * 色彩范围
+     */
+    @XStreamAlias("ColorRange")
+    private String colorRange;
+
+    /**
+     * 色彩通道
+     */
+    @XStreamAlias("ColorTransfer")
+    private String colorTransfer;
+
+    /**
      * 视频编码档位
      */
     @XStreamAlias("Profile")
@@ -151,7 +169,43 @@ public class MediaInfoVideo {
     @XStreamAlias("Language")
     private String language;
 
+    @XStreamAlias("Rotation")
     private String rotation;
+
+    @XStreamAlias("CreationTime")
+    private String creationTime;
+
+    public String getColorPrimaries() {
+        return colorPrimaries;
+    }
+
+    public void setColorPrimaries(String colorPrimaries) {
+        this.colorPrimaries = colorPrimaries;
+    }
+
+    public String getColorRange() {
+        return colorRange;
+    }
+
+    public void setColorRange(String colorRange) {
+        this.colorRange = colorRange;
+    }
+
+    public String getColorTransfer() {
+        return colorTransfer;
+    }
+
+    public void setColorTransfer(String colorTransfer) {
+        this.colorTransfer = colorTransfer;
+    }
+
+    public String getCreationTime() {
+        return creationTime;
+    }
+
+    public void setCreationTime(String creationTime) {
+        this.creationTime = creationTime;
+    }
 
     public String getIndex() {
         return index;
@@ -355,31 +409,37 @@ public class MediaInfoVideo {
 
     @Override
     public String toString() {
-        return "MediaInfoVideo{" +
-                "index='" + index + '\'' +
-                ", codecName='" + codecName + '\'' +
-                ", codecLongName='" + codecLongName + '\'' +
-                ", codecTimeBase='" + codecTimeBase + '\'' +
-                ", codecTagString='" + codecTagString + '\'' +
-                ", codecTag='" + codecTag + '\'' +
-                ", profile='" + profile + '\'' +
-                ", height='" + height + '\'' +
-                ", width='" + width + '\'' +
-                ", hasBFrame='" + hasBFrame + '\'' +
-                ", refFrames='" + refFrames + '\'' +
-                ", sar='" + sar + '\'' +
-                ", dar='" + dar + '\'' +
-                ", pixFormat='" + pixFormat + '\'' +
-                ", fieldOrder='" + fieldOrder + '\'' +
-                ", level='" + level + '\'' +
-                ", fps='" + fps + '\'' +
-                ", avgFps='" + avgFps + '\'' +
-                ", timebase='" + timebase + '\'' +
-                ", startTime='" + startTime + '\'' +
-                ", duration='" + duration + '\'' +
-                ", bitrate='" + bitrate + '\'' +
-                ", numFrames='" + numFrames + '\'' +
-                ", language='" + language + '\'' +
-                '}';
+        final StringBuilder sb = new StringBuilder("MediaInfoVideo{");
+        sb.append("index='").append(index).append('\'');
+        sb.append(", codecName='").append(codecName).append('\'');
+        sb.append(", codecLongName='").append(codecLongName).append('\'');
+        sb.append(", codecTimeBase='").append(codecTimeBase).append('\'');
+        sb.append(", codecTagString='").append(codecTagString).append('\'');
+        sb.append(", codecTag='").append(codecTag).append('\'');
+        sb.append(", colorPrimaries='").append(colorPrimaries).append('\'');
+        sb.append(", colorRange='").append(colorRange).append('\'');
+        sb.append(", colorTransfer='").append(colorTransfer).append('\'');
+        sb.append(", profile='").append(profile).append('\'');
+        sb.append(", height='").append(height).append('\'');
+        sb.append(", width='").append(width).append('\'');
+        sb.append(", hasBFrame='").append(hasBFrame).append('\'');
+        sb.append(", refFrames='").append(refFrames).append('\'');
+        sb.append(", sar='").append(sar).append('\'');
+        sb.append(", dar='").append(dar).append('\'');
+        sb.append(", pixFormat='").append(pixFormat).append('\'');
+        sb.append(", fieldOrder='").append(fieldOrder).append('\'');
+        sb.append(", level='").append(level).append('\'');
+        sb.append(", fps='").append(fps).append('\'');
+        sb.append(", avgFps='").append(avgFps).append('\'');
+        sb.append(", timebase='").append(timebase).append('\'');
+        sb.append(", startTime='").append(startTime).append('\'');
+        sb.append(", duration='").append(duration).append('\'');
+        sb.append(", bitrate='").append(bitrate).append('\'');
+        sb.append(", numFrames='").append(numFrames).append('\'');
+        sb.append(", language='").append(language).append('\'');
+        sb.append(", rotation='").append(rotation).append('\'');
+        sb.append(", creationTime='").append(creationTime).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 }

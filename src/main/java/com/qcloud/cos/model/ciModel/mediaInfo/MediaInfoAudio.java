@@ -95,6 +95,9 @@ public class MediaInfoAudio {
     @XStreamAlias("Language")
     private String language;
 
+    @XStreamAlias("CreationTime")
+    private String creationTime;
+
     public String getBitrate() {
         return bitrate;
     }
@@ -215,24 +218,35 @@ public class MediaInfoAudio {
         this.language = language;
     }
 
+    public String getCreationTime() {
+        return creationTime;
+    }
+
+    public void setCreationTime(String creationTime) {
+        this.creationTime = creationTime;
+    }
+
+
     @Override
     public String toString() {
-        return "MediaInfoAudio{" +
-                "bitrate='" + bitrate + '\'' +
-                ", channel='" + channel + '\'' +
-                ", channelLayout='" + channelLayout + '\'' +
-                ", codecLongName='" + codecLongName + '\'' +
-                ", codecName='" + codecName + '\'' +
-                ", codecTag='" + codecTag + '\'' +
-                ", codecTagString='" + codecTagString + '\'' +
-                ", codecTimeBase='" + codecTimeBase + '\'' +
-                ", duration='" + duration + '\'' +
-                ", index='" + index + '\'' +
-                ", sampleFmt='" + sampleFmt + '\'' +
-                ", sampleRate='" + sampleRate + '\'' +
-                ", startTime='" + startTime + '\'' +
-                ", timebase='" + timebase + '\'' +
-                ", language='" + language + '\'' +
-                '}';
+        final StringBuilder sb = new StringBuilder("MediaInfoAudio{");
+        sb.append("bitrate='").append(bitrate).append('\'');
+        sb.append(", channel='").append(channel).append('\'');
+        sb.append(", channelLayout='").append(channelLayout).append('\'');
+        sb.append(", codecLongName='").append(codecLongName).append('\'');
+        sb.append(", codecName='").append(codecName).append('\'');
+        sb.append(", codecTag='").append(codecTag).append('\'');
+        sb.append(", codecTagString='").append(codecTagString).append('\'');
+        sb.append(", codecTimeBase='").append(codecTimeBase).append('\'');
+        sb.append(", duration='").append(duration).append('\'');
+        sb.append(", index='").append(index).append('\'');
+        sb.append(", sampleFmt='").append(sampleFmt).append('\'');
+        sb.append(", sampleRate='").append(sampleRate).append('\'');
+        sb.append(", startTime='").append(startTime).append('\'');
+        sb.append(", timebase='").append(timebase).append('\'');
+        sb.append(", language='").append(language).append('\'');
+        sb.append(", creationTime='").append(creationTime).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 }

@@ -4085,8 +4085,8 @@ public class COSClient implements COS {
         rejectNull(request.getInput().getObject(),
                 "The input.object parameter must be specified setting the object tags");
         CosHttpRequest<MediaInfoRequest> httpRequest = this.createRequest(request.getBucketName(), "/mediainfo", request, HttpMethodName.POST);
-        this.setContent(httpRequest, RequestXmlFactory.convertToXmlByteArray(request), "application/xml", false);
-        return this.invoke(httpRequest, new Unmarshallers.MediaInfoUnmarshaller());
+        this.setContent(httpRequest, CIAuditingXmlFactoryV2.convertToXmlByteArray(request), "application/xml", false);
+        return this.invoke(httpRequest, new Unmarshallers.CICommonUnmarshaller<MediaInfoResponse>(MediaInfoResponse.class));
     }
 
     @Override

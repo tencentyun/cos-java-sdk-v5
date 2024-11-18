@@ -146,6 +146,8 @@ public class ParserMediaInfoUtils {
                 video.setLanguage(value);
             case "NumFrames":
                 video.setNumFrames(value);
+            case "CreationTime":
+                video.setCreationTime(value);
             default:
                 break;
         }
@@ -557,6 +559,9 @@ public class ParserMediaInfoUtils {
                 break;
             case "CodecName":
                 audio.setCodecName(value);
+                break;
+            case "CreationTime":
+                audio.setCreationTime(value);
                 break;
             default:
                 break;
