@@ -18,6 +18,7 @@ import com.qcloud.cos.model.CopyPartResult;
 import com.qcloud.cos.model.InitiateMultipartUploadRequest;
 import com.qcloud.cos.model.InitiateMultipartUploadResult;
 import com.qcloud.cos.model.ListPartsRequest;
+import com.qcloud.cos.model.ObjectMetadata;
 import com.qcloud.cos.model.PartETag;
 import com.qcloud.cos.model.PartListing;
 import com.qcloud.cos.model.PartSummary;
@@ -68,7 +69,11 @@ public class MultipartUploadDemo {
         try {
             String uploadId = initMultipartUploadDemo();
             List<PartETag> partETags = copyPartUploadDemo(uploadId);
-            completePartDemo(uploadId, partETags);
+            if (partETags != null) {
+                completePartDemo(uploadId, partETags);
+            } else {
+                abortPartUploadDemo(uploadId);
+            }
         } catch (CosServiceException cse) {
             throw cse;
         } catch (CosClientException cce) {
@@ -96,7 +101,7 @@ public class MultipartUploadDemo {
             InitiateMultipartUploadResult initResult = cosClient.initiateMultipartUpload(request);
             // 获取uploadid
             String uploadId = initResult.getUploadId();
-            System.out.println("succeed to init multipart upload, uploadid:" + uploadId);
+            System.out.println("succeed to init multipart upload, uploadId:" + uploadId + ", reqId:" + initResult.getRequestId());
             return uploadId;
         } catch (CosServiceException e) {
             throw e;
@@ -155,7 +160,7 @@ public class MultipartUploadDemo {
                 UploadPartResult uploadPartResult = cosClient.uploadPart(uploadPartRequest);
                 PartETag partETag = uploadPartResult.getPartETag();
                 partETags.add(partETag);
-                System.out.println("succeed to upload part, partNum:" + uploadPartRequest.getPartNumber());
+                System.out.println("succeed to upload part, partNum:" + uploadPartRequest.getPartNumber() + ", reqId:" + uploadPartResult.getRequestId());
             } catch (CosServiceException e) {
                 throw e;
             } catch (CosClientException e) {
@@ -205,27 +210,49 @@ public class MultipartUploadDemo {
         // 要拷贝的源文件的bucket名称
         copyPartRequest.setSourceBucketName(bucketName);
         // 要拷贝的源文件的路径
-        copyPartRequest.setSourceKey("aaa/ccc.txt");
+        String srcKey = "copySrc.txt";
+        copyPartRequest.setSourceKey(srcKey);
         // 指定要拷贝的源文件的数据范围(类似content-range)
-        copyPartRequest.setFirstByte(0L);
-        copyPartRequest.setLastByte(1048575L);
-        // 目的bucket名称
-        copyPartRequest.setDestinationBucketName(bucketName);
-        // 目的路径名称
-        copyPartRequest.setDestinationKey(key);
-        copyPartRequest.setPartNumber(1);
-        // uploadId
-        copyPartRequest.setUploadId(uploadId);
-        List<PartETag> partETags = new LinkedList<>();
+        long totalLength = 0;
         try {
-            CopyPartResult copyPartResult = cosClient.copyPart(copyPartRequest);
-            PartETag partETag = copyPartResult.getPartETag();
-            partETags.add(partETag);
-            System.out.println("succeed to copy part, partNum:" + copyPartRequest.getPartNumber());
-        } catch (CosServiceException e) {
+            ObjectMetadata objectMetadata = cosClient.getObjectMetadata(bucketName, srcKey);
+            totalLength = objectMetadata.getContentLength();
+        } catch (Exception e) {
             e.printStackTrace();
-        } catch (CosClientException e) {
-            e.printStackTrace();
+            return null;
+        }
+
+        int partNum = 1;
+        long startIndex = 0;
+        long partSize = 1024 * 1024L;
+        long remainLength = totalLength;
+        List<PartETag> partETags = new LinkedList<>();
+        while (remainLength > 0) {
+            copyPartRequest.setFirstByte(startIndex);
+            long endIndex = remainLength < partSize ? (startIndex + remainLength - 1) : (startIndex + partSize -1);
+            copyPartRequest.setLastByte(endIndex);
+            // 目的bucket名称
+            copyPartRequest.setDestinationBucketName(bucketName);
+            // 目的路径名称
+            copyPartRequest.setDestinationKey(key);
+            copyPartRequest.setPartNumber(partNum);
+            // uploadId
+            copyPartRequest.setUploadId(uploadId);
+            try {
+                CopyPartResult copyPartResult = cosClient.copyPart(copyPartRequest);
+                PartETag partETag = copyPartResult.getPartETag();
+                partETags.add(partETag);
+                System.out.println("succeed to copy part, partNum:" + copyPartRequest.getPartNumber() + ", reqId:" + copyPartResult.getRequestId());
+            } catch (CosServiceException e) {
+                e.printStackTrace();
+                return null;
+            } catch (CosClientException e) {
+                e.printStackTrace();
+                return null;
+            }
+            remainLength = remainLength < partSize ? 0 : (remainLength - partSize);
+            startIndex += partSize;
+            partNum++;
         }
 
         return partETags;

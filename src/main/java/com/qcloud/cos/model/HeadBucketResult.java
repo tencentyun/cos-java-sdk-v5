@@ -27,6 +27,7 @@ public class HeadBucketResult implements Serializable {
 
     private String bucketRegion;
     private boolean isMergeBucket;
+    private boolean isMazBucket;
 
     /**
      * Returns the region where the bucket is located.
@@ -54,6 +55,14 @@ public class HeadBucketResult implements Serializable {
 
     public void setMergeBucket(boolean isMergeBucket) {
         this.isMergeBucket = isMergeBucket;
+    }
+
+    public boolean isMazBucket() {
+        return isMazBucket;
+    }
+
+    public void setMazBucket(boolean mazBucket) {
+        isMazBucket = mazBucket;
     }
 }
 

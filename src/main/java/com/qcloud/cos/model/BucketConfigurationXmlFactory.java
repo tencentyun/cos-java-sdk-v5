@@ -162,6 +162,28 @@ public class BucketConfigurationXmlFactory {
         return xml.getBytes();
     }
 
+    public byte[] convertToXmlByteArray(BucketEncryptionConfiguration config) throws CosClientException {
+        XmlWriter xml = new XmlWriter();
+        xml.start("ServerSideEncryptionConfiguration");
+        xml.start("Rule");
+        if (!config.getBucketEnabled().isEmpty()) {
+            xml.start("BucketKeyEnabled").value(config.getBucketEnabled()).end();
+        }
+        xml.start("ApplyServerSideEncryptionByDefault");
+        xml.start("SSEAlgorithm").value(config.getSseAlgorithm()).end();
+        if (!config.getKmsMasterKeyID().isEmpty()) {
+            xml.start("KMSMasterKeyID").value(config.getKmsMasterKeyID()).end();
+        }
+        if (!config.getKMSAlgorithm().isEmpty()) {
+            xml.start("KMSAlgorithm").value(config.getKMSAlgorithm()).end();
+        }
+        xml.end(); // ApplyServerSideEncryptionByDefault
+        xml.end(); // Rule
+        xml.end(); // ServerSideEncryptionConfiguration
+
+        return xml.getBytes();
+    }
+
     private void writeInventoryDestination(XmlWriter xml, InventoryDestination destination) {
         if (destination == null) {
             return;

@@ -60,6 +60,9 @@ public class PredefinedRetryPolicies {
                 Exception exception,
                 int retryIndex) {
             if (RetryUtils.isRetryableServiceException(exception)) {
+                if (request.getParameters().containsKey("preflight")) {
+                    return false;
+                }
                 return true;
             }
 

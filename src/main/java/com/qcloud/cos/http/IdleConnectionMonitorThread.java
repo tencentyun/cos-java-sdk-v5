@@ -53,9 +53,10 @@ public final class IdleConnectionMonitorThread extends Thread {
                 }
             }
         } catch (InterruptedException e) {
-            log.error("interrupt exception occured:", e);
+            log.error("interrupt exception occurred:", e);
         } catch (Throwable t) {
-            log.error("error occured when closeExpiredConnections and closeIdleConnections, err:", t);
+            log.error("error occurred when closeExpiredConnections and closeIdleConnections, err:", t);
+            throw t;
         } finally {
             connMgr.shutdown();
         }

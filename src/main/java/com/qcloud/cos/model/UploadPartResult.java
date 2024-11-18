@@ -31,6 +31,8 @@ public class UploadPartResult extends SSEResultBase implements Serializable {
 
     private String crc64Ecma;
 
+    private String requestId;
+
     /**
      * Returns the part number of the newly uploaded part.
      *
@@ -89,5 +91,13 @@ public class UploadPartResult extends SSEResultBase implements Serializable {
 
     public void setCrc64Ecma(String crc64Ecma) {
         this.crc64Ecma = crc64Ecma;
+    }
+
+    public String getRequestId() {
+        return requestId;
+    }
+
+    public void setRequestId(String requestId) {
+        this.requestId = requestId;
     }
 }

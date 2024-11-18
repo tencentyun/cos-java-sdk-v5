@@ -636,6 +636,11 @@ public class DefaultCosHttpClient implements CosHttpClient {
                 closeHttpResponseStream(httpResponse);
                 log.error(errorMsg, exp);
                 throw new CosClientException(errorMsg, exp);
+            } catch (Error e) {
+                String errorMsg = String.format("httpClient execute occur an error, httpRequest: %s", request);
+                closeHttpResponseStream(httpResponse);
+                log.error(errorMsg, e);
+                throw e;
             } finally {
                 endTime = System.currentTimeMillis();
                 handlerAfterProcess.handle(response_status, endTime - startTime);

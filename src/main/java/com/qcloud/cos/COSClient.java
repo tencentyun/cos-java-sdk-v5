@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -67,6 +68,7 @@ import com.qcloud.cos.internal.*;
 import com.qcloud.cos.internal.XmlResponsesSaxParser.CompleteMultipartUploadHandler;
 import com.qcloud.cos.internal.XmlResponsesSaxParser.CopyObjectResultHandler;
 import com.qcloud.cos.model.*;
+import com.qcloud.cos.model.IntelligentTiering.BucketIntelligentTieringConfiguration;
 import com.qcloud.cos.model.bucketcertificate.BucketDomainCertificateRequest;
 import com.qcloud.cos.model.bucketcertificate.BucketGetDomainCertificate;
 import com.qcloud.cos.model.bucketcertificate.BucketPutDomainCertificate;
@@ -163,6 +165,8 @@ public class COSClient implements COS {
     protected ClientConfig clientConfig;
 
     private CosHttpClient cosHttpClient;
+
+    private ConcurrentHashMap<String, Long> preflightBuckets = new ConcurrentHashMap<>();
 
     public COSClient(COSCredentials cred, ClientConfig clientConfig) {
         this(new COSStaticCredentialsProvider(cred), clientConfig);
@@ -839,6 +843,17 @@ public class COSClient implements COS {
         rejectNull(bucketName,
                 "The bucket name parameter must be specified when uploading an object");
         rejectNull(key, "The key parameter must be specified when uploading an object");
+
+        try {
+            preflightObj(uploadObjectRequest);
+        } catch (CosServiceException cse) {
+            log.warn("fail to do the preflight request due to the service exception, will not do the upload obj request", cse);
+            throw cse;
+        } catch (CosClientException cce) {
+            log.warn("fail to do the preflight request due to the client exception, will not do the upload obj request", cce);
+            throw cce;
+        }
+
         // If a file is specified for upload, we need to pull some additional
         // information from it to auto-configure a few options
         if (file == null) {
@@ -976,6 +991,22 @@ public class COSClient implements COS {
             }
         } finally {
             CosDataSource.Utils.cleanupDataSource(uploadObjectRequest, file, isOrig, input, log);
+        }
+
+        if (returnedMetadata.isNeedPreflight()) {
+            Long currentTime = System.currentTimeMillis();
+            if ((preflightBuckets.get(bucketName) == null) || ((currentTime - preflightBuckets.get(bucketName)) > clientConfig.getPreflightStatusUpdateInterval())) {
+                String reqMsg = String.format("will update preflight status, bucket[%s]", bucketName);
+                log.info(reqMsg);
+                preflightBuckets.put(bucketName, currentTime);
+            }
+        } else {
+            Long currentTime = System.currentTimeMillis();
+            if ((preflightBuckets.get(bucketName) != null) && ((currentTime - preflightBuckets.get(bucketName)) > clientConfig.getPreflightStatusUpdateInterval())) {
+                String reqMsg = String.format("will remove bucket[%s] from preflight lists", bucketName);
+                log.info(reqMsg);
+                preflightBuckets.remove(bucketName);
+            }
         }
 
         String contentMd5 = metadata.getContentMD5();
@@ -1542,11 +1573,25 @@ public class COSClient implements COS {
     @Override
     public List<Bucket> listBuckets(ListBucketsRequest listBucketsRequest)
             throws CosClientException, CosServiceException {
+        ListBucketsResult result = getService(listBucketsRequest);
+        return result.getBuckets();
+    }
+
+    public ListBucketsResult getService(ListBucketsRequest listBucketsRequest)
+            throws CosClientException, CosServiceException {
         rejectNull(listBucketsRequest,
                 "The request object parameter listBucketsRequest must be specified.");
         CosHttpRequest<ListBucketsRequest> request =
                 createRequest(null, null, listBucketsRequest, HttpMethodName.GET);
-        return invoke(request, new Unmarshallers.ListBucketsUnmarshaller());
+        if (!listBucketsRequest.getMarker().isEmpty()) {
+            request.addParameter("marker", listBucketsRequest.getMarker());
+        }
+
+        if (listBucketsRequest.getMaxKeys() != null && listBucketsRequest.getMaxKeys() > 0) {
+            request.addParameter("max-keys", listBucketsRequest.getMaxKeys().toString());
+        }
+
+        return invoke(request, new Unmarshallers.GetServiceUnmarshaller());
     }
 
     @Override
@@ -1627,7 +1672,8 @@ public class COSClient implements COS {
                         // xml payload unmarshaller
                         new Unmarshallers.InitiateMultipartUploadResultUnmarshaller(),
                         // header handlers
-                        new ServerSideEncryptionHeaderHandler<InitiateMultipartUploadResult>());
+                        new ServerSideEncryptionHeaderHandler<InitiateMultipartUploadResult>(),
+                        new VIDResultHandler<InitiateMultipartUploadResult>());
         return invoke(request, responseHandler);
     }
 
@@ -1740,6 +1786,7 @@ public class COSClient implements COS {
             result.setSSECustomerAlgorithm(metadata.getSSECustomerAlgorithm());
             result.setSSECustomerKeyMd5(metadata.getSSECustomerKeyMd5());
             result.setCrc64Ecma(metadata.getCrc64Ecma());
+            result.setRequestId(metadata.getRequestId());
 
             return result;
         } catch (Throwable t) {
@@ -2226,7 +2273,8 @@ public class COSClient implements COS {
                                 new Unmarshallers.CopyObjectUnmarshaller(),
                                 // header handlers
                                 new ServerSideEncryptionHeaderHandler<CopyObjectResultHandler>(),
-                                new COSVersionHeaderHandler());
+                                new COSVersionHeaderHandler(),
+                                new VIDResultHandler<CopyObjectResultHandler>());
                 copyObjectResultHandler = invoke(request, handler);
             } catch (CosServiceException cse) {
                 /*
@@ -2287,6 +2335,7 @@ public class COSClient implements COS {
             copyPartResult.setSSECustomerAlgorithm(copyObjectResultHandler.getSSECustomerAlgorithm());
             copyPartResult.setSSECustomerKeyMd5(copyObjectResultHandler.getSSECustomerKeyMd5());
             copyPartResult.setCrc64Ecma(copyObjectResultHandler.getCrc64Ecma());
+            copyPartResult.setRequestId(copyObjectResultHandler.getRequestId());
 
             return copyPartResult;
         }
@@ -3874,6 +3923,24 @@ public class COSClient implements COS {
         invoke(request, voidCosResponseHandler);
     }
 
+    public List<BucketIntelligentTieringConfiguration> listBucketIntelligentTieringConfiguration(String bucketName) throws CosServiceException, CosClientException {
+        rejectEmpty(bucketName,
+                "The bucket name parameter must be specified when listing bucket IntelligentTieringConfiguration");
+        CosHttpRequest<CosServiceRequest> request = createRequest(bucketName, null, new CosServiceRequest(), HttpMethodName.GET);
+        request.addParameter("intelligent-tiering", null);
+
+        try {
+            return invoke(request, new Unmarshallers.ListBucketTieringConfigurationUnmarshaller());
+        } catch (CosServiceException cse) {
+            switch (cse.getStatusCode()) {
+                case 404:
+                    return null;
+                default:
+                    throw cse;
+            }
+        }
+    }
+
     @Override
     public MediaJobResponse createMediaJobs(MediaJobsRequest req)  {
         this.rejectStartWith(req.getCallBack(),"http","The CallBack parameter mush start with http or https");
@@ -5366,6 +5433,131 @@ public class COSClient implements COS {
         putIfNotNull(params, "token", originalRequest.getToken());
         URL url = generatePresignedUrl(request.getBucketName(), request.getResourcePath(), expiredTime, HttpMethodName.GET, new HashMap<String, String>(), params, false, false);
         return url.toString();
+    }
+
+    public void putBucketEncryptionConfiguration(String bucketName, BucketEncryptionConfiguration bucketEncryptionConfiguration)
+            throws CosClientException, CosServiceException {
+        rejectEmpty(bucketName,
+                "The bucket name parameter must be specified when putting bucket encryption");
+
+        CosHttpRequest<CosServiceRequest> request = createRequest(bucketName, null, new CosServiceRequest(), HttpMethodName.PUT);
+        request.addParameter("encryption", null);
+
+        rejectEmpty(bucketEncryptionConfiguration.getSseAlgorithm(),
+                "The SseAlgorithm parameter must be specified when putting bucket encryption");
+
+        byte[] bytes = new BucketConfigurationXmlFactory().convertToXmlByteArray(bucketEncryptionConfiguration);
+        request.setContent(new ByteArrayInputStream(bytes));
+        request.addHeader(Headers.CONTENT_LENGTH, String.valueOf(bytes.length));
+
+        invoke(request, voidCosResponseHandler);
+    }
+
+    public BucketEncryptionConfiguration getBucketEncryptionConfiguration(String bucketName) throws CosClientException, CosServiceException {
+        rejectEmpty(bucketName,
+                "The bucket name parameter must be specified when getting bucket encryption");
+
+        CosHttpRequest<CosServiceRequest> request = createRequest(bucketName, null, new CosServiceRequest(), HttpMethodName.GET);
+        request.addParameter("encryption", null);
+
+        return invoke(request, new Unmarshallers.BucketEncryptionConfigurationUnmarshaller());
+    }
+
+    public void deleteBucketEncryptionConfiguration(String bucketName) throws CosClientException, CosServiceException {
+        rejectEmpty(bucketName,
+                "The bucket name parameter must be specified when deleting bucket encryption");
+
+        CosHttpRequest<CosServiceRequest> request = createRequest(bucketName, null, new CosServiceRequest(), HttpMethodName.DELETE);
+        request.addParameter("encryption", null);
+
+        invoke(request, voidCosResponseHandler);
+    }
+
+    public BucketObjectLockConfiguration getBucketObjectLockConfiguration(String bucketName) throws CosClientException, CosServiceException {
+        rejectEmpty(bucketName,
+                "The bucket name parameter must be specified when getting bucket object lock configuration");
+
+        CosHttpRequest<CosServiceRequest> request = createRequest(bucketName, null, new CosServiceRequest(), HttpMethodName.GET);
+        request.addParameter("object-lock", null);
+
+        try {
+            return invoke(request, new Unmarshallers.BucketObjectLockConfigurationUnmarshaller());
+        } catch (CosServiceException cse) {
+            switch (cse.getStatusCode()) {
+                case 404:
+                    return null;
+                default:
+                    throw cse;
+            }
+        }
+    }
+
+    public BucketGetMetadataResult getBucketMetadata(String bucketName) throws CosClientException, CosServiceException {
+        rejectEmpty(bucketName,
+                "The bucket name parameter must be specified when getting bucket metadata");
+        BucketGetMetadataResult result = new BucketGetMetadataResult();
+        HeadBucketResult headBucketResult = headBucket(new HeadBucketRequest(bucketName));
+        result.bucketName = bucketName;
+        StringBuilder strBuilder = new StringBuilder();
+        strBuilder.append(clientConfig.getHttpProtocol().toString()).append("://");
+        strBuilder.append(clientConfig.getEndpointBuilder()
+                .buildGeneralApiEndpoint(formatBucket(bucketName, null)));
+        result.bucketUrl = strBuilder.toString();
+        result.isMaz = headBucketResult.isMazBucket();
+        result.isOFS = headBucketResult.isMergeBucket();
+        result.location = headBucketResult.getBucketRegion();
+
+        try {
+            BucketEncryptionConfiguration encryptionConfiguration = getBucketEncryptionConfiguration(bucketName);
+            result.encryptionConfiguration = encryptionConfiguration;
+        } catch (CosServiceException cse) {
+            if (cse.getStatusCode() != 404) {
+                throw cse;
+            }
+        }
+
+        result.accessControlList = getBucketAcl(bucketName);
+        result.websiteConfiguration = getBucketWebsiteConfiguration(bucketName);
+        result.loggingConfiguration = getBucketLoggingConfiguration(bucketName);
+        result.crossOriginConfiguration = getBucketCrossOriginConfiguration(bucketName);
+        result.versioningConfiguration = getBucketVersioningConfiguration(bucketName);
+        result.lifecycleConfiguration = getBucketLifecycleConfiguration(bucketName);
+
+        try {
+            result.replicationConfiguration = getBucketReplicationConfiguration(bucketName);
+        } catch (CosServiceException cse) {
+            if (cse.getStatusCode() != 404) {
+                throw cse;
+            }
+        }
+
+        result.taggingConfiguration = getBucketTaggingConfiguration(bucketName);
+        result.tieringConfigurations = listBucketIntelligentTieringConfiguration(bucketName);
+        result.bucketObjectLockConfiguration = getBucketObjectLockConfiguration(bucketName);
+
+        return result;
+    }
+
+    private void preflightObj(PutObjectRequest putObjectRequest) throws CosClientException, CosServiceException {
+        String bucketName = putObjectRequest.getBucketName();
+        String key = putObjectRequest.getKey();
+        rejectEmpty(bucketName,
+                "The bucket name parameter must be specified when doing preflight request");
+        rejectEmpty(key,
+                "The key parameter must be specified when doing preflight request");
+        if (clientConfig.isCheckPreflightStatus() && preflightBuckets.containsKey(bucketName)) {
+            String reqMsg = String.format("will do preflight request for put object[%s] to the bucket[%s]", key, bucketName);
+            log.debug(reqMsg);
+            CosServiceRequest serviceRequest = new CosServiceRequest();
+            CosHttpRequest<CosServiceRequest> request = createRequest(bucketName, key, serviceRequest, HttpMethodName.HEAD);
+            if (putObjectRequest.getFixedEndpointAddr() != null) {
+                request.setEndpoint(putObjectRequest.getFixedEndpointAddr());
+            }
+            request.addParameter("preflight", null);
+            request.addHeader("x-cos-next-action", "PutObject");
+
+            invoke(request, voidCosResponseHandler);
+        }
     }
 }
 

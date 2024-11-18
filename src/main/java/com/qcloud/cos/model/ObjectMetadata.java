@@ -830,4 +830,12 @@ public class ObjectMetadata extends CosServiceResult implements ServerSideEncryp
     public void setCiUploadResult(CIUploadResult ciUploadResult) {
         this.ciUploadResult = ciUploadResult;
     }
+
+    public boolean isNeedPreflight() {
+        if (metadata.containsKey("x-cos-preflight")) {
+            String preflightStatus = (String)metadata.get("x-cos-preflight");
+            return preflightStatus.equalsIgnoreCase("true");
+        }
+        return false;
+    }
 }
