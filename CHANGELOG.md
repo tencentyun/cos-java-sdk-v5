@@ -4,12 +4,42 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [5.6.234]
+- prefliht object before doing upload
+- add bucket encryption configuration API
+- add list bucket intelligent tiering Configuration API
+
+## [5.6.228]
+- ignoring certificate verification is supported
+
+## [5.6.220]
+- setting only the range start or only the range end is supported
+
+## [5.6.218]
+- add resumable upload
+
+## [5.6.208]
+- change default endpoint when retrying for the last time
+
+## [5.6.205]
+- encode source object name when renaming  OFS object
+
+## [5.6.195]
+- retry for some exceptions when copying object  
+
+## [5.6.168]
+- fetch resumable download
+
 ## [5.6.151]
 - add CI Live Auditing API
 
 ## [5.6.141]
 - add CI DetectFace API
 - update CI API
+
+## [5.6.140]
+- create MAZ bucket
 
 ## [5.6.133]
 - update CI Media Process API
