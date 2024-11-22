@@ -3,6 +3,7 @@ package com.qcloud.cos.demo.ci;
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoRequest;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoResponse;
+import com.qcloud.cos.utils.CIJackson;
 
 /**
  * GenerateMediainfo 接口用于获取媒体文件的信息。

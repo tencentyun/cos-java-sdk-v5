@@ -235,13 +235,8 @@ public abstract class COSCryptoModuleBase extends COSCryptoModule {
             long dataSize = req.getDataSize();
             long partSize = req.getPartSize();
 
-            if (dataSize < 0 || partSize < 0) {
-                throw new CosClientException("initiate multipart upload with encryption client must set dataSize and partSize");
-            }
-
-            if (partSize % 16 != 0) {
-                throw new CosClientException("initiat multipart uplaod with encryption client must set part size a mutiple of 16"
-                    + "but got " + partSize);
+            if (partSize < 0) {
+                throw new CosClientException("initiate multipart upload with encryption client must set partSize");
             }
 
             metadata.addUserMetadata(Headers.ENCRYPTION_DATA_SIZE, Long.toString(dataSize));
