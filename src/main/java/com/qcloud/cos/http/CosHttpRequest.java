@@ -27,7 +27,9 @@ import java.util.Map;
 import com.qcloud.cos.auth.COSCredentials;
 import com.qcloud.cos.event.ProgressListener;
 import com.qcloud.cos.exception.ExceptionLogDetail;
+import com.qcloud.cos.internal.CosClientAbortTaskMonitor;
 import com.qcloud.cos.internal.CosServiceRequest;
+import com.qcloud.cos.internal.DefaultClientAbortTaskImpl;
 
 public class CosHttpRequest<T extends CosServiceRequest> {
 
@@ -61,6 +63,8 @@ public class CosHttpRequest<T extends CosServiceRequest> {
     private COSCredentials cosCredentials;
 
     private List<ExceptionLogDetail> logDetails = new ArrayList<ExceptionLogDetail>();
+
+    private CosClientAbortTaskMonitor clientAbortTaskMonitor = DefaultClientAbortTaskImpl.INSTANCE;
 
     public CosHttpRequest(T originRequest) {
         this.originRequest = originRequest;
@@ -180,6 +184,14 @@ public class CosHttpRequest<T extends CosServiceRequest> {
 
     public List<ExceptionLogDetail> getExceptionsLogDetails() {
         return logDetails;
+    }
+
+    public CosClientAbortTaskMonitor getClientAbortTaskMonitor() {
+        return clientAbortTaskMonitor;
+    }
+
+    public void setClientAbortTaskMonitor(CosClientAbortTaskMonitor clientAbortTaskMonitor) {
+        this.clientAbortTaskMonitor = clientAbortTaskMonitor;
     }
 
     @Override

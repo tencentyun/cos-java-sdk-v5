@@ -373,7 +373,7 @@ public class ClientConfig {
     }
 
     public boolean getRequestTimeOutEnable() {
-        return isRequestTimeOutEnable;
+        return isRequestTimeOutEnable && (requestTimeout > 0);
     }
 
     public void setShutdownTimeout(int shutdownTimeout) {
