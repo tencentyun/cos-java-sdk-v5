@@ -131,6 +131,8 @@ public class ClientConfig {
 
     private long preflightStatusUpdateInterval = 10 * 1000L;
 
+    private boolean isRedirectsEnabled = false;
+
     // 不传入region 用于后续调用List Buckets(获取所有的bucket信息)
     public ClientConfig() {
         super();
@@ -466,5 +468,13 @@ public class ClientConfig {
 
     public long getPreflightStatusUpdateInterval() {
         return preflightStatusUpdateInterval;
+    }
+
+    public boolean isRedirectsEnabled() {
+        return isRedirectsEnabled;
+    }
+
+    public void setRedirectsEnabled(boolean redirectsEnabled) {
+        isRedirectsEnabled = redirectsEnabled;
     }
 }

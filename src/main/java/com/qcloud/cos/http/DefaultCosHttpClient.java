@@ -205,7 +205,9 @@ public class DefaultCosHttpClient implements CosHttpClient {
                         .setConnectionRequestTimeout(
                                 this.clientConfig.getConnectionRequestTimeout())
                         .setConnectTimeout(this.clientConfig.getConnectionTimeout())
-                        .setSocketTimeout(this.clientConfig.getSocketTimeout()).build();
+                        .setSocketTimeout(this.clientConfig.getSocketTimeout())
+                        .setRedirectsEnabled(this.clientConfig.isRedirectsEnabled())
+                        .build();
         this.idleConnectionMonitor = new IdleConnectionMonitorThread(this.connectionManager);
         this.idleConnectionMonitor.setIdleAliveMS(this.clientConfig.getIdleConnectionAlive());
         this.idleConnectionMonitor.setDaemon(true);
