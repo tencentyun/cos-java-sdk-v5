@@ -56,6 +56,7 @@ import com.qcloud.cos.model.ListBucketsRequest;
 import com.qcloud.cos.region.Region;
 import com.qcloud.cos.event.ProgressInputStream;
 import com.qcloud.cos.event.ProgressListener;
+import com.qcloud.cos.exception.AbortedException;
 import com.qcloud.cos.exception.ClientExceptionConstants;
 import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.exception.CosServiceException;
@@ -70,6 +71,7 @@ import com.qcloud.cos.internal.ResettableInputStream;
 import com.qcloud.cos.internal.SdkBufferedInputStream;
 import com.qcloud.cos.internal.CIWorkflowServiceRequest;
 import com.qcloud.cos.internal.CIServiceRequest;
+import com.qcloud.cos.internal.CosClientAbortTaskMonitor;
 import com.qcloud.cos.retry.BackoffStrategy;
 import com.qcloud.cos.retry.RetryPolicy;
 import com.qcloud.cos.utils.CodecUtils;
@@ -124,6 +126,7 @@ public class DefaultCosHttpClient implements CosHttpClient {
 
     private CosErrorResponseHandler errorResponseHandler;
     private HandlerAfterProcess handlerAfterProcess;
+    private final CosHttpClientTimer cosHttpClientTimer;
     private static final Logger log = LoggerFactory.getLogger(DefaultCosHttpClient.class);
 
     public DefaultCosHttpClient(ClientConfig clientConfig) {
@@ -179,6 +182,7 @@ public class DefaultCosHttpClient implements CosHttpClient {
         this.maxErrorRetry = clientConfig.getMaxErrorRetry();
         this.retryPolicy = ValidationUtils.assertNotNull(clientConfig.getRetryPolicy(), "retry policy");
         this.backoffStrategy = ValidationUtils.assertNotNull(clientConfig.getBackoffStrategy(), "backoff strategy");
+        this.cosHttpClientTimer = new CosHttpClientTimer();
         initHttpClient();
     }
 
@@ -201,7 +205,9 @@ public class DefaultCosHttpClient implements CosHttpClient {
                         .setConnectionRequestTimeout(
                                 this.clientConfig.getConnectionRequestTimeout())
                         .setConnectTimeout(this.clientConfig.getConnectionTimeout())
-                        .setSocketTimeout(this.clientConfig.getSocketTimeout()).build();
+                        .setSocketTimeout(this.clientConfig.getSocketTimeout())
+                        .setRedirectsEnabled(this.clientConfig.isRedirectsEnabled())
+                        .build();
         this.idleConnectionMonitor = new IdleConnectionMonitorThread(this.connectionManager);
         this.idleConnectionMonitor.setIdleAliveMS(this.clientConfig.getIdleConnectionAlive());
         this.idleConnectionMonitor.setDaemon(true);
@@ -224,6 +230,7 @@ public class DefaultCosHttpClient implements CosHttpClient {
             }
             log.info(trace.toString());
         }
+        cosHttpClientTimer.shutdown();
         this.idleConnectionMonitor.shutdown();
     }
 
@@ -596,7 +603,11 @@ public class DefaultCosHttpClient implements CosHttpClient {
                 httpRequest = buildHttpRequest(request);
                 httpResponse = null;
                 startTime = System.currentTimeMillis();
-                httpResponse = executeRequest(context, httpRequest);
+                if (clientConfig.getRequestTimeOutEnable()) {
+                    httpResponse = executeRequestWithTimeout(context, httpRequest, request);
+                } else {
+                    httpResponse = executeRequest(context, httpRequest);
+                }
                 checkResponse(request, httpRequest, httpResponse);
                 break;
             } catch (CosServiceException cse) {
@@ -735,6 +746,63 @@ public class DefaultCosHttpClient implements CosHttpClient {
         }
 
         return httpResponse;
+    }
+
+    private <Y extends CosServiceRequest> HttpResponse executeRequestWithTimer(HttpContext context, HttpRequestBase httpRequest, CosHttpRequest<Y> originRequest) throws Exception {
+        CosClientAbortTaskMonitor abortTaskMonitor = cosHttpClientTimer.startTimer(clientConfig.getRequestTimeout());
+        abortTaskMonitor.setCurrentHttpRequest(httpRequest);
+        HttpResponse httpResponse = null;
+        try {
+            originRequest.setClientAbortTaskMonitor(abortTaskMonitor);
+            httpResponse = executeOneRequest(context, httpRequest);
+        } catch (IOException ie) {
+            if (originRequest.getClientAbortTaskMonitor().hasTimeoutExpired()) {
+                Thread.interrupted();
+                String errorMsg = String.format("catch IOException when executing http request[%s], and execution aborted task has been done, exp:", originRequest);
+                log.error(errorMsg, ie);
+                throw new InterruptedException();
+            }
+            throw ie;
+        } finally {
+            originRequest.getClientAbortTaskMonitor().cancelTask();
+        }
+
+        return httpResponse;
+    }
+
+    private <Y extends CosServiceRequest> HttpResponse executeRequestWithTimeout(HttpContext context, HttpRequestBase httpRequest, CosHttpRequest<Y> originRequest) throws Exception {
+        try {
+            return executeRequestWithTimer(context, httpRequest, originRequest);
+        } catch (InterruptedException ie) {
+            if (originRequest.getClientAbortTaskMonitor().hasTimeoutExpired()) {
+                Thread.interrupted();
+                String errorMsg = "InterruptedException: time out after waiting  " + this.clientConfig.getRequestTimeout()/1000 + " seconds";
+                throw new CosClientException(errorMsg, ClientExceptionConstants.REQUEST_TIMEOUT, ie);
+            }
+            if (!httpRequest.isAborted()) {
+                httpRequest.abort();
+            }
+            throw ie;
+        } catch (AbortedException ae) {
+            if (originRequest.getClientAbortTaskMonitor().hasTimeoutExpired()) {
+                Thread.interrupted();
+                String errorMsg = "AbortedException: time out after waiting  " + this.clientConfig.getRequestTimeout()/1000 + " seconds";
+                throw new CosClientException(errorMsg, ClientExceptionConstants.REQUEST_TIMEOUT, ae);
+            }
+            if (!httpRequest.isAborted()) {
+                httpRequest.abort();
+            }
+            throw ae;
+        } catch (IOException ie) {
+            if (!httpRequest.isAborted()) {
+                httpRequest.abort();
+            }
+            throw ExceptionUtils.createClientException(ie);
+        } finally {
+            if (originRequest.getClientAbortTaskMonitor().hasTimeoutExpired()) {
+                Thread.interrupted();
+            }
+        }
     }
 
     private <Y extends CosServiceRequest> void handleLog(CosHttpRequest<Y> request) {

@@ -176,11 +176,7 @@ public class COSClient implements COS {
         super();
         this.credProvider = credProvider;
         this.clientConfig = clientConfig;
-        if (clientConfig.getRequestTimeOutEnable()) {
-            this.cosHttpClient = new TimeOutCosHttpClient(clientConfig);
-        } else {
-            this.cosHttpClient = new DefaultCosHttpClient(clientConfig);
-        }
+        this.cosHttpClient = new DefaultCosHttpClient(clientConfig);
     }
 
     public void shutdown() {
