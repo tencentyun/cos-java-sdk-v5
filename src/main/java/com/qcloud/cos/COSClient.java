@@ -5550,8 +5550,9 @@ public class COSClient implements COS {
                 request.setEndpoint(putObjectRequest.getFixedEndpointAddr());
             }
             request.addParameter("preflight", null);
+            ObjectMetadata metadata = putObjectRequest.getMetadata();
+            populateRequestMetadata(request, metadata);
             request.addHeader("x-cos-next-action", "PutObject");
-
             invoke(request, voidCosResponseHandler);
         }
     }
