@@ -5545,13 +5545,22 @@ public class COSClient implements COS {
             String reqMsg = String.format("will do preflight request for put object[%s] to the bucket[%s]", key, bucketName);
             log.debug(reqMsg);
             CosServiceRequest serviceRequest = new CosServiceRequest();
+            Map<String, String> customHeaders = putObjectRequest.getCustomRequestHeaders();
+            if (customHeaders != null) {
+                for (Map.Entry<String, String> e : customHeaders.entrySet()) {
+                    serviceRequest.putCustomRequestHeader(e.getKey(), e.getValue());
+                }
+            }
             CosHttpRequest<CosServiceRequest> request = createRequest(bucketName, key, serviceRequest, HttpMethodName.HEAD);
             if (putObjectRequest.getFixedEndpointAddr() != null) {
                 request.setEndpoint(putObjectRequest.getFixedEndpointAddr());
             }
             request.addParameter("preflight", null);
+            ObjectMetadata metadata = putObjectRequest.getMetadata();
+            if (metadata != null) {
+                populateRequestMetadata(request, metadata);
+            }
             request.addHeader("x-cos-next-action", "PutObject");
-
             invoke(request, voidCosResponseHandler);
         }
     }
