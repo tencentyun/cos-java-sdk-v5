@@ -133,6 +133,10 @@ public class ClientConfig {
 
     private boolean isRedirectsEnabled = false;
 
+    private boolean useConnectionMonitor = false;
+
+    private long connectionMaxIdleMillis = 60 * 1000;
+
     // 不传入region 用于后续调用List Buckets(获取所有的bucket信息)
     public ClientConfig() {
         super();
@@ -476,5 +480,21 @@ public class ClientConfig {
 
     public void setRedirectsEnabled(boolean redirectsEnabled) {
         isRedirectsEnabled = redirectsEnabled;
+    }
+
+    public boolean isUseConnectionMonitor() {
+        return useConnectionMonitor;
+    }
+
+    public void setUseConnectionMonitor(boolean isUseConnectionMonitor) {
+        useConnectionMonitor = isUseConnectionMonitor;
+    }
+
+    public long getConnectionMaxIdleMillis() {
+        return connectionMaxIdleMillis;
+    }
+
+    public void setConnectionMaxIdleMillis(long connectionMaxIdleMillis) {
+        this.connectionMaxIdleMillis = connectionMaxIdleMillis;
     }
 }

@@ -119,7 +119,7 @@ public class DefaultCosHttpClient implements CosHttpClient {
     private RequestConfig requestConfig;
     protected HttpClient httpClient;
     private PoolingHttpClientConnectionManager connectionManager;
-    private IdleConnectionMonitorThread idleConnectionMonitor;
+    private IdleConnectionMonitorThread idleConnectionMonitorThread;
     private int maxErrorRetry;
     private RetryPolicy retryPolicy;
     private BackoffStrategy backoffStrategy;
@@ -208,10 +208,14 @@ public class DefaultCosHttpClient implements CosHttpClient {
                         .setSocketTimeout(this.clientConfig.getSocketTimeout())
                         .setRedirectsEnabled(this.clientConfig.isRedirectsEnabled())
                         .build();
-        this.idleConnectionMonitor = new IdleConnectionMonitorThread(this.connectionManager);
-        this.idleConnectionMonitor.setIdleAliveMS(this.clientConfig.getIdleConnectionAlive());
-        this.idleConnectionMonitor.setDaemon(true);
-        this.idleConnectionMonitor.start();
+        if (clientConfig.isUseConnectionMonitor()) {
+            IdleConnectionMonitor.registerConnectionManager(this.connectionManager, clientConfig.getConnectionMaxIdleMillis());
+        } else {
+            this.idleConnectionMonitorThread = new IdleConnectionMonitorThread(this.connectionManager);
+            this.idleConnectionMonitorThread.setIdleAliveMS(this.clientConfig.getIdleConnectionAlive());
+            this.idleConnectionMonitorThread.setDaemon(true);
+            this.idleConnectionMonitorThread.start();
+        }
     }
 
     @Override
@@ -231,7 +235,12 @@ public class DefaultCosHttpClient implements CosHttpClient {
             log.info(trace.toString());
         }
         cosHttpClientTimer.shutdown();
-        this.idleConnectionMonitor.shutdown();
+        if (clientConfig.isUseConnectionMonitor()) {
+            IdleConnectionMonitor.removeConnectionManager(this.connectionManager);
+            this.connectionManager.shutdown();
+        } else {
+            this.idleConnectionMonitorThread.shutdown();
+        }
     }
 
     // 因为Apache HTTP库自带的URL Encode对一些特殊字符如*等不进行转换, 和COS HTTP服务的URL Encode标准不一致
