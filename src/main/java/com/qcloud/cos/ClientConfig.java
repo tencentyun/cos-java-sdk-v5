@@ -135,6 +135,8 @@ public class ClientConfig {
 
     private boolean useConnectionMonitor = false;
 
+    private boolean retryAfterPreflight = false;
+
     private long connectionMaxIdleMillis = 60 * 1000;
 
     // 不传入region 用于后续调用List Buckets(获取所有的bucket信息)
@@ -496,5 +498,13 @@ public class ClientConfig {
 
     public void setConnectionMaxIdleMillis(long connectionMaxIdleMillis) {
         this.connectionMaxIdleMillis = connectionMaxIdleMillis;
+    }
+
+    public boolean isRetryAfterPreflight() {
+        return retryAfterPreflight;
+    }
+
+    public void setRetryAfterPreflight(boolean retryAfterPreflight) {
+        this.retryAfterPreflight = retryAfterPreflight;
     }
 }

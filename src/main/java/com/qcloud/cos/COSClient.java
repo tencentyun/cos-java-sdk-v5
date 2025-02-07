@@ -843,7 +843,8 @@ public class COSClient implements COS {
         try {
             preflightObj(uploadObjectRequest);
         } catch (CosServiceException cse) {
-            log.warn("fail to do the preflight request due to the service exception, will not do the upload obj request", cse);
+            String msg = String.format("fail to do the preflight request due to the service exception[statusCode:%s, requestId:%s], will not do the upload obj request", cse.getStatusCode(), cse.getRequestId());
+            log.warn(msg);
             throw cse;
         } catch (CosClientException cce) {
             log.warn("fail to do the preflight request due to the client exception, will not do the upload obj request", cce);
@@ -5544,6 +5545,7 @@ public class COSClient implements COS {
         if (clientConfig.isCheckPreflightStatus() && preflightBuckets.containsKey(bucketName)) {
             String reqMsg = String.format("will do preflight request for put object[%s] to the bucket[%s]", key, bucketName);
             log.debug(reqMsg);
+            putObjectRequest.setHasDonePreflight(true);
             CosServiceRequest serviceRequest = new CosServiceRequest();
             Map<String, String> customHeaders = putObjectRequest.getCustomRequestHeaders();
             if (customHeaders != null) {

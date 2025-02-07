@@ -80,6 +80,8 @@ import java.io.InputStream;
  */
 public class PutObjectRequest extends AbstractPutObjectRequest implements Serializable {
     private boolean enableResumableUpload = false;
+
+    private boolean hasDonePreflight = false;
     /**
      * Constructs a new
      * {@link PutObjectRequest} object to upload a file to the
@@ -235,5 +237,13 @@ public class PutObjectRequest extends AbstractPutObjectRequest implements Serial
 
     public boolean isEnableResumableUpload() {
         return enableResumableUpload;
+    }
+
+    public boolean hasDonePreflight() {
+        return hasDonePreflight;
+    }
+
+    public void setHasDonePreflight(boolean hasDonePreflight) {
+        this.hasDonePreflight = hasDonePreflight;
     }
 }
