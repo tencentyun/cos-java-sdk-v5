@@ -181,6 +181,7 @@ public class DefaultCosHttpClient implements CosHttpClient {
         }
         this.maxErrorRetry = clientConfig.getMaxErrorRetry();
         this.retryPolicy = ValidationUtils.assertNotNull(clientConfig.getRetryPolicy(), "retry policy");
+        this.retryPolicy.setRetryAfterPreflight(clientConfig.isRetryAfterPreflight());
         this.backoffStrategy = ValidationUtils.assertNotNull(clientConfig.getBackoffStrategy(), "backoff strategy");
         this.cosHttpClientTimer = new CosHttpClientTimer();
         initHttpClient();

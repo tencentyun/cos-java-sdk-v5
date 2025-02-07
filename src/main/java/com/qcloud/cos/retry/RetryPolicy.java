@@ -22,6 +22,15 @@ import com.qcloud.cos.internal.CosServiceRequest;
 import org.apache.http.HttpResponse;
 
 public abstract class RetryPolicy {
+    private boolean retryAfterPreflight = false;
+
+    public void setRetryAfterPreflight(boolean retryAfterPreflight) {
+        this.retryAfterPreflight = retryAfterPreflight;
+    }
+
+    public boolean isRetryAfterPreflight() {
+        return retryAfterPreflight;
+    }
 
     public abstract <X extends CosServiceRequest> boolean shouldRetry(CosHttpRequest<X> request,
             HttpResponse response,
