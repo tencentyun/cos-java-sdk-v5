@@ -587,6 +587,7 @@ public class COSClient implements COS {
         result.setSSECustomerAlgorithm(metadata.getSSECustomerAlgorithm());
         result.setSSECustomerKeyMd5(metadata.getSSECustomerKeyMd5());
         result.setCrc64Ecma(metadata.getCrc64Ecma());
+        result.setCrc32c(metadata.getCrc32c());
         result.setMetadata(metadata);
         result.setCiUploadResult(metadata.getCiUploadResult());
         return result;
@@ -1328,6 +1329,11 @@ public class COSClient implements COS {
         if (deleteObjectRequest.isRecursive()) {
             request.addParameter("recursive", null);
         }
+
+        if (deleteObjectRequest.getVersionId() != null && !deleteObjectRequest.getVersionId().isEmpty()) {
+            request.addParameter("versionId", deleteObjectRequest.getVersionId());
+        }
+
         invoke(request, voidCosResponseHandler);
     }
 
@@ -1902,8 +1908,12 @@ public class COSClient implements COS {
                 Map<String, String> responseHeaders = responseHandler.getResponseHeaders();
                 String versionId = responseHeaders.get(Headers.COS_VERSION_ID);
                 String crc64Ecma = responseHeaders.get(Headers.COS_HASH_CRC64_ECMA);
+                String crc32c = responseHeaders.get(Headers.COS_HASH_CRC32_C);
                 handler.getCompleteMultipartUploadResult().setVersionId(versionId);
                 handler.getCompleteMultipartUploadResult().setCrc64Ecma(crc64Ecma);
+                if (crc32c != null) {
+                    handler.getCompleteMultipartUploadResult().setCrc32c(crc32c);
+                }
                 // if ci request, set ciUploadResult to CompleteMultipartUploadResult
                 if(completeMultipartUploadRequest.getPicOperations() != null) {
                     handler.getCompleteMultipartUploadResult().setCiUploadResult(handler.getCiUploadResult());

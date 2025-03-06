@@ -79,6 +79,10 @@ public class IdleConnectionMonitor extends Thread {
                 }
 
                 Thread.sleep(PERIOD_MILLISECONDS);
+            } catch (InterruptedException e) {
+                if (!shuttingDown) {
+                    log.error("interrupt exception occurred:", e);
+                }
             } catch (Throwable t) {
                 log.error("error occurred when closeExpiredConnections and closeIdleConnections, err:", t);
             }

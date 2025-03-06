@@ -139,6 +139,8 @@ public class ClientConfig {
 
     private long connectionMaxIdleMillis = 60 * 1000;
 
+    private boolean addLogDebugHeader = true;
+
     // 不传入region 用于后续调用List Buckets(获取所有的bucket信息)
     public ClientConfig() {
         super();
@@ -506,5 +508,13 @@ public class ClientConfig {
 
     public void setRetryAfterPreflight(boolean retryAfterPreflight) {
         this.retryAfterPreflight = retryAfterPreflight;
+    }
+
+    public boolean isAddLogDebugHeader() {
+        return addLogDebugHeader;
+    }
+
+    public void setAddLogDebugHeader(boolean addLogDebugHeader) {
+        this.addLogDebugHeader = addLogDebugHeader;
     }
 }
