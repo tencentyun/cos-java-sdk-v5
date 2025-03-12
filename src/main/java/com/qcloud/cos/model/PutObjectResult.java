@@ -61,6 +61,8 @@ public class PutObjectResult extends SSEResultBase implements ObjectExpirationRe
     /** The crc64ecma value for this object */
     private String crc64Ecma;
 
+    private String crc32c;
+
     /** The ci upload result */
     private CIUploadResult ciUploadResult;
 
@@ -228,5 +230,13 @@ public class PutObjectResult extends SSEResultBase implements ObjectExpirationRe
 
     public void setCiUploadResult(CIUploadResult ciUploadResult) {
         this.ciUploadResult = ciUploadResult;
+    }
+
+    public String getCrc32c() {
+        return crc32c;
+    }
+
+    public void setCrc32c(String crc32c) {
+        this.crc32c = crc32c;
     }
 }

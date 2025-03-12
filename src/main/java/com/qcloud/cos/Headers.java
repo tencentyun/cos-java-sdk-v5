@@ -69,6 +69,8 @@ public interface Headers {
      */
     public static final String COS_HASH_CRC64_ECMA = "x-cos-hash-crc64ecma";
 
+    public static final String COS_HASH_CRC32_C = "x-cos-hash-crc32c";
+
     /**
      * Prefix for COS user metadata: x-cos-meta-
      */

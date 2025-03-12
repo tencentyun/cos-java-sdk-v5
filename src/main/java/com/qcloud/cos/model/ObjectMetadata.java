@@ -818,6 +818,10 @@ public class ObjectMetadata extends CosServiceResult implements ServerSideEncryp
         return (String)metadata.get(Headers.COS_HASH_CRC64_ECMA);
     }
 
+    public String getCrc32c() {
+        return (String)metadata.get(Headers.COS_HASH_CRC32_C);
+    }
+
     @Override
     public String getRequestId() {
         return (String)metadata.get(Headers.REQUEST_ID);

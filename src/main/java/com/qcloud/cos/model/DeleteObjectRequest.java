@@ -38,7 +38,7 @@ public class DeleteObjectRequest extends CosServiceRequest implements Serializab
      */
     private boolean isRecursive;
 
-
+    private String versionId;
     /**
      * Constructs a new {@link DeleteObjectRequest}, specifying the object's bucket name and key.
      *
@@ -128,5 +128,13 @@ public class DeleteObjectRequest extends CosServiceRequest implements Serializab
 
     public boolean isRecursive() {
         return this.isRecursive;
+    }
+
+    public String getVersionId() {
+        return versionId;
+    }
+
+    public void setVersionId(String versionId) {
+        this.versionId = versionId;
     }
 }

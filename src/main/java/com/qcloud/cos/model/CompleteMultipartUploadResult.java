@@ -66,7 +66,7 @@ public class CompleteMultipartUploadResult extends SSEResultBase
     /*The ci upload result*/
     private CIUploadResult ciUploadResult;
 
-
+    private String crc32c;
 
     /**
      * get requestid for this upload
@@ -244,5 +244,13 @@ public class CompleteMultipartUploadResult extends SSEResultBase
 
     public void setCiUploadResult(CIUploadResult ciUploadResult) {
         this.ciUploadResult = ciUploadResult;
+    }
+
+    public String getCrc32c() {
+        return crc32c;
+    }
+
+    public void setCrc32c(String crc32c) {
+        this.crc32c = crc32c;
     }
 }
