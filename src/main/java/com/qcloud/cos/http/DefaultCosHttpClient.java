@@ -512,7 +512,6 @@ public class DefaultCosHttpClient implements CosHttpClient {
                 throw handlerErrorMessage(request, httpRequest, httpResponse);
             } catch (IOException ioe) {
                 String errorMsg = "Unable to execute HTTP request: " + ioe.getMessage();
-                log.error(errorMsg, ioe);
                 CosServiceException cse = new CosServiceException(errorMsg, ioe);
                 throw cse;
             } finally {
