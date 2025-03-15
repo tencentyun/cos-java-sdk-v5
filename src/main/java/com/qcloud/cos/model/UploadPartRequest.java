@@ -99,6 +99,7 @@ public class UploadPartRequest extends CosServiceRequest implements SSECustomerK
      */
     private SSECustomerKey sseCustomerKey;
 
+    private boolean hasDonePreflight = false;
 
     /**
      * Sets the stream containing the data to upload for the new part.
@@ -582,5 +583,13 @@ public class UploadPartRequest extends CosServiceRequest implements SSECustomerK
 
     public void setTrafficLimit(int trafficLimit) {
         this.trafficLimit = trafficLimit;
+    }
+
+    public boolean hasDonePreflight() {
+        return hasDonePreflight;
+    }
+
+    public void setHasDonePreflight(boolean hasDonePreflight) {
+        this.hasDonePreflight = hasDonePreflight;
     }
 }

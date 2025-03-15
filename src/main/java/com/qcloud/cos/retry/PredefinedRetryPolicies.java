@@ -25,6 +25,7 @@ import com.qcloud.cos.http.CosHttpRequest;
 import com.qcloud.cos.internal.CosServiceRequest;
 
 import com.qcloud.cos.model.PutObjectRequest;
+import com.qcloud.cos.model.UploadPartRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.CircularRedirectException;
 import org.slf4j.Logger;
@@ -70,6 +71,13 @@ public class PredefinedRetryPolicies {
                 if (!isRetryAfterPreflight() && request.getOriginalRequest() != null && request.getOriginalRequest() instanceof PutObjectRequest && ((PutObjectRequest) request.getOriginalRequest()).hasDonePreflight()) {
                     if (((CosServiceException) exception).getStatusCode() == 503 && Objects.equals(((CosServiceException) exception).getErrorCode(), "SlowDown")) {
                         log.info("will not retry for 503 while putting object, because preflight request has been done");
+                        return false;
+                    }
+                }
+
+                if (!isRetryAfterPreflight() && request.getOriginalRequest() != null && request.getOriginalRequest() instanceof UploadPartRequest && ((UploadPartRequest) request.getOriginalRequest()).hasDonePreflight()) {
+                    if (((CosServiceException) exception).getStatusCode() == 503 && Objects.equals(((CosServiceException) exception).getErrorCode(), "SlowDown")) {
+                        log.info("will not retry for 503 while upload part, because preflight request has been done");
                         return false;
                     }
                 }
