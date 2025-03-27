@@ -166,7 +166,7 @@ public class COSClient implements COS {
 
     private CosHttpClient cosHttpClient;
 
-    private ConcurrentHashMap<String, Long> preflightBuckets = new ConcurrentHashMap<>();
+    private static ConcurrentHashMap<String, Long> preflightBuckets = new ConcurrentHashMap<>();
 
     public COSClient(COSCredentials cred, ClientConfig clientConfig) {
         this(new COSStaticCredentialsProvider(cred), clientConfig);
@@ -1699,6 +1699,18 @@ public class COSClient implements COS {
         rejectNull(partSize, "The part size parameter must be specified when uploading a part");
         rejectNull(clientConfig.getRegion(),
                 "region is null, region in clientConfig must be specified when uploading a part");
+
+        try {
+            preflightObj(uploadPartRequest);
+        } catch (CosServiceException cse) {
+            String msg = String.format("fail to do the preflight request due to the service exception[statusCode:%s, requestId:%s], will not do the upload part request", cse.getStatusCode(), cse.getRequestId());
+            log.warn(msg);
+            throw cse;
+        } catch (CosClientException cce) {
+            log.warn("fail to do the preflight request due to the client exception, will not do the upload part request", cce);
+            throw cce;
+        }
+
         CosHttpRequest<UploadPartRequest> request =
                 createRequest(bucketName, key, uploadPartRequest, HttpMethodName.PUT);
         request.addParameter("uploadId", uploadId);
@@ -1762,6 +1774,21 @@ public class COSClient implements COS {
             ObjectMetadata metadata = invoke(request, new CosMetadataResponseHandler());
             final String etag = metadata.getETag();
 
+            if (metadata.isNeedPreflight()) {
+                Long currentTime = System.currentTimeMillis();
+                if ((preflightBuckets.get(bucketName) == null) || ((currentTime - preflightBuckets.get(bucketName)) > clientConfig.getPreflightStatusUpdateInterval())) {
+                    String reqMsg = String.format("will update preflight status, bucket[%s]", bucketName);
+                    log.info(reqMsg);
+                    preflightBuckets.put(bucketName, currentTime);
+                }
+            } else {
+                Long currentTime = System.currentTimeMillis();
+                if ((preflightBuckets.get(bucketName) != null) && ((currentTime - preflightBuckets.get(bucketName)) > clientConfig.getPreflightStatusUpdateInterval())) {
+                    String reqMsg = String.format("will remove bucket[%s] from preflight lists", bucketName);
+                    log.info(reqMsg);
+                    preflightBuckets.remove(bucketName);
+                }
+            }
 
             if (md5DigestStream != null && !skipMd5CheckStrategy
                     .skipClientSideValidationPerUploadPartResponse(metadata)) {
@@ -5573,6 +5600,38 @@ public class COSClient implements COS {
                 populateRequestMetadata(request, metadata);
             }
             request.addHeader("x-cos-next-action", "PutObject");
+            invoke(request, voidCosResponseHandler);
+        }
+    }
+
+    private void preflightObj(UploadPartRequest uploadPartRequest) throws CosClientException, CosServiceException {
+        String bucketName = uploadPartRequest.getBucketName();
+        String key = uploadPartRequest.getKey();
+        rejectEmpty(bucketName,
+                "The bucket name parameter must be specified when doing preflight request");
+        rejectEmpty(key,
+                "The key parameter must be specified when doing preflight request");
+        if (clientConfig.isCheckPreflightStatus() && preflightBuckets.containsKey(bucketName)) {
+            String reqMsg = String.format("will do preflight request for upload part object[%s] to the bucket[%s]", key, bucketName);
+            log.debug(reqMsg);
+            uploadPartRequest.setHasDonePreflight(true);
+            CosServiceRequest serviceRequest = new CosServiceRequest();
+            Map<String, String> customHeaders = uploadPartRequest.getCustomRequestHeaders();
+            if (customHeaders != null) {
+                for (Map.Entry<String, String> e : customHeaders.entrySet()) {
+                    serviceRequest.putCustomRequestHeader(e.getKey(), e.getValue());
+                }
+            }
+            CosHttpRequest<CosServiceRequest> request = createRequest(bucketName, key, serviceRequest, HttpMethodName.HEAD);
+            if (uploadPartRequest.getFixedEndpointAddr() != null) {
+                request.setEndpoint(uploadPartRequest.getFixedEndpointAddr());
+            }
+            request.addParameter("preflight", null);
+            ObjectMetadata metadata = uploadPartRequest.getObjectMetadata();
+            if (metadata != null) {
+                populateRequestMetadata(request, metadata);
+            }
+            request.addHeader("x-cos-next-action", "UploadPart");
             invoke(request, voidCosResponseHandler);
         }
     }
