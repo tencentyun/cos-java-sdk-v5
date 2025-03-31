@@ -141,6 +141,10 @@ public class ClientConfig {
 
     private boolean addLogDebugHeader = true;
 
+    private boolean throw412Directly = false;
+
+    private boolean throw304Directly = false;
+
     // 不传入region 用于后续调用List Buckets(获取所有的bucket信息)
     public ClientConfig() {
         super();
@@ -516,5 +520,21 @@ public class ClientConfig {
 
     public void setAddLogDebugHeader(boolean addLogDebugHeader) {
         this.addLogDebugHeader = addLogDebugHeader;
+    }
+
+    public boolean isThrow412Directly() {
+        return throw412Directly;
+    }
+
+    public void setThrow412Directly(boolean throw412Directly) {
+        this.throw412Directly = throw412Directly;
+    }
+
+    public boolean isThrow304Directly() {
+        return throw304Directly;
+    }
+
+    public void setThrow304Directly(boolean throw304Directly) {
+        this.throw304Directly = throw304Directly;
     }
 }
