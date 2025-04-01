@@ -60,7 +60,7 @@ public class JobDemo {
         request.getInput().setObject("2.mp4");
         //2.1添加媒体任务操作参数
         MediaJobOperation operation = request.getOperation();
-//        operation.setCustomId("t11282671b1a0846a9be6b4385630dd78a");
+//        operation.setCustomId("t11282671b1a0846a9be6b438563*****");
         MediaTranscodeObject transcode = operation.getTranscode();
         MediaContainerObject container = transcode.getContainer();
         container.setFormat("mp4");
@@ -126,7 +126,7 @@ public class JobDemo {
         MediaJobsRequest request = new MediaJobsRequest();
         //2.添加请求参数 参数详情请见api接口文档
         request.setBucketName("demo-1234567890");
-        request.setJobId("j3f4cb81a0ed811f0a970b306b67bb38c");
+        request.setJobId("j3f4cb81a0ed811f0a970b306b67*****");
         //3.调用接口,获取任务响应对象
         MediaJobResponseV2 response = client.describeMediaJobV2(request);
         System.out.println(response);
