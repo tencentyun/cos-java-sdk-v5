@@ -2922,6 +2922,8 @@ public interface COS extends COSDirectSpi {
      */
     MediaJobResponse describeMediaJob(MediaJobsRequest req);
 
+    MediaJobResponseV2 describeMediaJobV2(MediaJobsRequest req);
+
     /**
      * DescribeMediaJobs 用于拉取符合条件的任务。  https://cloud.tencent.com/document/product/460/38938
      */

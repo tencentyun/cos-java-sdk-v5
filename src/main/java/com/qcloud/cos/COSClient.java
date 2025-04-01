@@ -144,7 +144,6 @@ import com.qcloud.cos.model.transform.ObjectTaggingXmlFactory;
 import com.qcloud.cos.region.Region;
 import com.qcloud.cos.retry.RetryUtils;
 import com.qcloud.cos.utils.*;
-import com.qcloud.cos.http.TimeOutCosHttpClient;
 
 import com.qcloud.cos.utils.Base64;
 import org.apache.commons.codec.DecoderException;
@@ -4007,6 +4006,16 @@ public class COSClient implements COS {
                 "The jobId parameter must be specified setting the object tags");
         CosHttpRequest<MediaJobsRequest> request = createRequest(req.getBucketName(), "/jobs/" + req.getJobId(), req, HttpMethodName.GET);
         return invoke(request, new Unmarshallers.JobUnmarshaller());
+    }
+
+    @Override
+    public MediaJobResponseV2 describeMediaJobV2(MediaJobsRequest req) {
+        this.checkCIRequestCommon(req);
+        rejectNull(req.getJobId(),
+                "The jobId parameter must be specified setting the object tags");
+        CosHttpRequest<MediaJobsRequest> request = createRequest(req.getBucketName(), "/jobs/" + req.getJobId(), req, HttpMethodName.GET);
+
+        return invoke(request, new Unmarshallers.CICommonUnmarshaller<MediaJobResponseV2>(MediaJobResponseV2.class));
     }
 
     @Override
