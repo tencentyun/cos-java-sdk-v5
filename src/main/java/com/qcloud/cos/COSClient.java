@@ -1183,7 +1183,7 @@ public class COSClient implements COS {
              * to wrap their code in try/catch blocks and check for this status code if they want to
              * use constraints.
              */
-            if (cse.getStatusCode() == 412 || cse.getStatusCode() == 304) {
+            if ((cse.getStatusCode() == 412 && !clientConfig.isThrow412Directly()) || (cse.getStatusCode() == 304 && !clientConfig.isThrow304Directly())) {
                 return null;
             }
             throw cse;

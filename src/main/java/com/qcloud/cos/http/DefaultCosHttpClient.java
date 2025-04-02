@@ -832,7 +832,7 @@ public class DefaultCosHttpClient implements CosHttpClient {
             for (Header header : httpResponse.getAllHeaders()) {
                 if (Objects.equals(header.getName(), Headers.REQUEST_ID)) {
                     String value = CodecUtils.convertFromIso88591ToUtf8(header.getValue());
-                    if (!value.isEmpty()) {
+                    if (value != null && !value.isEmpty()) {
                         return;
                     }
                 }
