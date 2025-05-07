@@ -50,7 +50,7 @@ public enum CIJackson {
         objectMapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
-        objectMapper.setPropertyNamingStrategy(PropertyNamingStrategy.PASCAL_CASE_TO_CAMEL_CASE);
+        objectMapper.setPropertyNamingStrategy(PropertyNamingStrategy.UPPER_CAMEL_CASE);
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         SimpleBeanPropertyFilter filter = SimpleBeanPropertyFilter.serializeAllExcept(getFieldsToFilter(CosServiceRequest.class));
         FilterProvider filters = new SimpleFilterProvider().addFilter("CosServiceFilter", filter);

@@ -540,9 +540,31 @@ public class DefaultCosHttpClient implements CosHttpClient {
             return false;
         }
 
+        if (exception instanceof CosServiceException) {
+            if (((CosServiceException) exception).getStatusCode() == 301 || ((CosServiceException) exception).getStatusCode() == 302 || ((CosServiceException) exception).getStatusCode() == 307) {
+                return shouldRetry3xxException(request, (CosServiceException) exception);
+            }
+        }
+
         if (retryPolicy.shouldRetry(request, response, exception, retryIndex)) {
             return true;
         }
+        return false;
+    }
+
+    private <X extends CosServiceRequest> boolean shouldRetry3xxException(CosHttpRequest<X> request, CosServiceException cse) {
+        if (!clientConfig.isChangeEndpointRetry() || (cse.getRequestId() != null && !cse.getRequestId().isEmpty())) {
+            return false;
+        }
+
+        Map<String, String> reqHeaders = request.getHeaders();
+        if (!reqHeaders.isEmpty() && reqHeaders.containsKey(Headers.HOST)) {
+            String lastEndpoint = request.getEndpoint();
+            String lastHost = reqHeaders.get(Headers.HOST);
+
+            return isCosDefaultHost(lastHost, lastEndpoint);
+        }
+
         return false;
     }
 
@@ -824,6 +846,19 @@ public class DefaultCosHttpClient implements CosHttpClient {
     }
 
     private <Y extends CosServiceRequest> void changeEndpointForRetry(CosHttpRequest<Y> request, HttpResponse httpResponse, int retryIndex) {
+        if (httpResponse != null) {
+            StatusLine statusLine = httpResponse.getStatusLine();
+            int statusCode = -1;
+            if (statusLine != null) {
+                statusCode = statusLine.getStatusCode();
+            }
+
+            if (statusCode == 301 || statusCode == 302 || statusCode == 307) {
+                changeRequestHost(request);
+                return;
+            }
+        }
+
         if (!clientConfig.isChangeEndpointRetry() || retryIndex != (maxErrorRetry - 1)) {
             return;
         }
@@ -843,32 +878,9 @@ public class DefaultCosHttpClient implements CosHttpClient {
         if (!reqHeaders.isEmpty() && reqHeaders.containsKey(Headers.HOST)) {
             String lastEndpoint = request.getEndpoint();
             String lastHost = reqHeaders.get(Headers.HOST);
-            String regex = ".+-\\d+\\.cos\\..+\\.myqcloud\\.com";
-            Pattern pattern = Pattern.compile(regex);
-            Matcher matcherEndpoint = pattern.matcher(lastEndpoint);
-            Matcher matcherHost = pattern.matcher(lastHost);
-            boolean isAccEndpoint = lastEndpoint.endsWith("cos.accelerate.myqcloud.com");
-            boolean isAccHost = lastHost.endsWith("cos.accelerate.myqcloud.com");
 
-            if (matcherEndpoint.matches() && matcherHost.matches() && !isAccEndpoint && !isAccHost) {
-                String retryEndpoint = String.format("%s.%s.tencentcos.cn", request.getBucketName(), Region.formatRegion(clientConfig.getRegion()));
-                request.addHeader(Headers.HOST, retryEndpoint);
-                COSSigner cosSigner = clientConfig.getCosSigner();
-                COSCredentials cosCredentials = request.getCosCredentials();
-                CosServiceRequest cosServiceRequest = request.getOriginalRequest();
-                Date expiredTime = new Date(System.currentTimeMillis() + clientConfig.getSignExpired() * 1000);
-                boolean isCIWorkflowRequest = cosServiceRequest instanceof CIWorkflowServiceRequest;
-                cosSigner.setCIWorkflowRequest(isCIWorkflowRequest);
-                cosSigner.sign(request, cosCredentials, expiredTime);
-
-                String endpointAddr = clientConfig.getEndpointResolver().resolveGeneralApiEndpoint(retryEndpoint);
-
-                String fixedEndpointAddr = request.getOriginalRequest().getFixedEndpointAddr();
-                if (fixedEndpointAddr != null) {
-                    request.setEndpoint(fixedEndpointAddr);
-                } else {
-                    request.setEndpoint(endpointAddr);
-                }
+            if (isCosDefaultHost(lastHost, lastEndpoint)) {
+                changeRequestHost(request);
             }
         }
     }
@@ -901,6 +913,38 @@ public class DefaultCosHttpClient implements CosHttpClient {
             throw new CosClientException(
                     "endpointAddr is null, please check your endpoint resolver");
         }
+
+        String fixedEndpointAddr = request.getOriginalRequest().getFixedEndpointAddr();
+        if (fixedEndpointAddr != null) {
+            request.setEndpoint(fixedEndpointAddr);
+        } else {
+            request.setEndpoint(endpointAddr);
+        }
+    }
+
+    private boolean isCosDefaultHost(String host, String endPoint) {
+        String regex = ".+-\\d+\\.cos\\..+\\.myqcloud\\.com";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcherEndpoint = pattern.matcher(endPoint);
+        Matcher matcherHost = pattern.matcher(host);
+        boolean isAccEndpoint = endPoint.endsWith("cos.accelerate.myqcloud.com");
+        boolean isAccHost = host.endsWith("cos.accelerate.myqcloud.com");
+
+        return matcherEndpoint.matches() && matcherHost.matches() && !isAccEndpoint && !isAccHost;
+    }
+
+    private <Y extends CosServiceRequest> void changeRequestHost(CosHttpRequest<Y> request) {
+        String retryEndpoint = String.format("%s.%s.tencentcos.cn", request.getBucketName(), Region.formatRegion(clientConfig.getRegion()));
+        request.addHeader(Headers.HOST, retryEndpoint);
+        COSSigner cosSigner = clientConfig.getCosSigner();
+        COSCredentials cosCredentials = request.getCosCredentials();
+        CosServiceRequest cosServiceRequest = request.getOriginalRequest();
+        Date expiredTime = new Date(System.currentTimeMillis() + clientConfig.getSignExpired() * 1000);
+        boolean isCIWorkflowRequest = cosServiceRequest instanceof CIWorkflowServiceRequest;
+        cosSigner.setCIWorkflowRequest(isCIWorkflowRequest);
+        cosSigner.sign(request, cosCredentials, expiredTime);
+
+        String endpointAddr = clientConfig.getEndpointResolver().resolveGeneralApiEndpoint(retryEndpoint);
 
         String fixedEndpointAddr = request.getOriginalRequest().getFixedEndpointAddr();
         if (fixedEndpointAddr != null) {
