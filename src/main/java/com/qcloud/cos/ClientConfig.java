@@ -145,6 +145,8 @@ public class ClientConfig {
 
     private boolean throw304Directly = false;
 
+    private boolean renameFaultTolerant = false;
+
     // 不传入region 用于后续调用List Buckets(获取所有的bucket信息)
     public ClientConfig() {
         super();
@@ -536,5 +538,13 @@ public class ClientConfig {
 
     public void setThrow304Directly(boolean throw304Directly) {
         this.throw304Directly = throw304Directly;
+    }
+
+    public boolean isRenameFaultTolerant() {
+        return renameFaultTolerant;
+    }
+
+    public void setRenameFaultTolerant(boolean renameFaultTolerant) {
+        this.renameFaultTolerant = renameFaultTolerant;
     }
 }
