@@ -814,11 +814,72 @@ public class COSClient implements COS {
                 "region is null, region in clientConfig must be specified when rename");
         rejectEmpty(renameRequest.getSrcObject(), "The length of the src key must be greater than 0");
         rejectEmpty(renameRequest.getDstObject(), "The length of the dst key must be greater than 0");
+
+        String srcInodeId = "";
+        if (clientConfig.isRenameFaultTolerant()) {
+            srcInodeId = getObjectInodeId(renameRequest.getBucketName(), renameRequest.getSrcObject(), renameRequest.getFixedEndpointAddr(),
+                    renameRequest.getCustomRequestHeaders());
+        }
+
         CosHttpRequest<RenameRequest> request = createRequest(renameRequest.getBucketName(),
                 renameRequest.getDstObject(), renameRequest, HttpMethodName.PUT);
         request.addParameter("rename", null);
         request.addHeader("x-cos-rename-source", UrlEncoderUtils.encodeEscapeDelimiter(renameRequest.getSrcObject()));
-        invoke(request, voidCosResponseHandler);
+        try {
+            invoke(request, voidCosResponseHandler);
+        } catch (CosServiceException cse) {
+            if (clientConfig.isRenameFaultTolerant() && cse.getStatusCode() == 404 && !srcInodeId.isEmpty()) {
+                if (!checkResultForRenameObject(srcInodeId, renameRequest)) {
+                    throw cse;
+                }
+            } else {
+                throw cse;
+            }
+        }
+    }
+
+    private boolean checkResultForRenameObject(String srcInodeId, RenameRequest renameRequest) {
+        /**
+         * try to head src object and dst object, and check their inode ids when catch exception
+         * rename request is successful only if src object does not exist and the inode ids of the source object and the target object are the same
+         * */
+        try {
+            getObjectInodeId(renameRequest.getBucketName(), renameRequest.getSrcObject(), renameRequest.getFixedEndpointAddr(), renameRequest.getCustomRequestHeaders());
+        } catch (CosServiceException cse) {
+            if (cse.getStatusCode() != 404) {
+                log.info("catch CosServiceException and status code is not 404 when getting the inode id of the source object, exp: ", cse);
+                return false;
+            }
+        } catch (CosClientException cce) {
+            log.info("catch CosClientException when getting the inode id of the source object, exp: ", cce);
+            return false;
+        }
+
+        String dstInodeId;
+        try {
+            dstInodeId = getObjectInodeId(renameRequest.getBucketName(), renameRequest.getDstObject(), renameRequest.getFixedEndpointAddr(), renameRequest.getCustomRequestHeaders());
+        } catch (Exception e) {
+            log.info("catch exception when getting the inode id of the target object, exp: ", e);
+            return false;
+        }
+        return Objects.equals(dstInodeId, srcInodeId);
+    }
+
+    private String getObjectInodeId(String bucketName, String key, String fixedEndpointAddr, Map<String, String> customHeaders)
+            throws CosServiceException, CosClientException {
+        GetObjectMetadataRequest getObjectMetadataRequest = new GetObjectMetadataRequest(bucketName, key);
+        if (fixedEndpointAddr != null && !fixedEndpointAddr.isEmpty()) {
+            getObjectMetadataRequest.setFixedEndpointAddr(fixedEndpointAddr);
+        }
+
+        if (customHeaders != null) {
+            for (Map.Entry<String, String> e : customHeaders.entrySet()) {
+                getObjectMetadataRequest.putCustomRequestHeader(e.getKey(), e.getValue());
+            }
+        }
+
+        ObjectMetadata objectMetadata = getObjectMetadata(getObjectMetadataRequest);
+        return objectMetadata.getInodeId() == null ? "" : objectMetadata.getInodeId();
     }
 
     protected <UploadObjectRequest extends PutObjectRequest>
