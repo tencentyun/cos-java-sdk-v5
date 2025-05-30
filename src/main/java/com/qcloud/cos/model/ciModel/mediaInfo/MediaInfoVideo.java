@@ -94,13 +94,13 @@ public class MediaInfoVideo {
     /**
      * 采样宽高比
      */
-    @XStreamAlias("SAR")
+    @XStreamAlias("Sar")
     private String sar;
 
     /**
      * 显示宽高比
      */
-    @XStreamAlias("DAR")
+    @XStreamAlias("Dar")
     private String dar;
 
     /**
@@ -124,13 +124,13 @@ public class MediaInfoVideo {
     /**
      * 视频帧率
      */
-    @XStreamAlias("FPS")
+    @XStreamAlias("Fps")
     private String fps;
 
     /**
      * 平均帧率
      */
-    @XStreamAlias("AvgFPS")
+    @XStreamAlias("AvgFps")
     private String avgFps;
 
     /**

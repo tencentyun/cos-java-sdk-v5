@@ -18,7 +18,8 @@ import org.junit.runners.Suite.SuiteClasses;
         UrlEncoderUtilsTest.class, CRC64Test.class, BucketInventoryTest.class, BucketLoggingTest.class, BucketTaggingTest.class,
         GetSetDelPolicyTest.class, ObjecTaggingTest.class, RestoreObjectTest.class,
 	MediaBucketTest.class, MediaJobTest.class, MediaQueueTest.class, MediaTemplateTest.class,MediaWorkflowTest.class,
-        DefaultClientErrorTest.class, CosClientWithErrorTest.class, CosClientWithMockTest.class, DefaultHttpClientTest.class
+        DefaultClientErrorTest.class, CosClientWithErrorTest.class, CosClientWithMockTest.class, DefaultHttpClientTest.class,
+        CosServiceExceptionTest.class
         })
 public class SuiteTest {
 }

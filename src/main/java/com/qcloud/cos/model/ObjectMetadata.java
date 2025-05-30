@@ -842,4 +842,8 @@ public class ObjectMetadata extends CosServiceResult implements ServerSideEncryp
         }
         return false;
     }
+
+    public String getInodeId() {
+        return (String) metadata.get(Headers.INODE_ID);
+    }
 }
