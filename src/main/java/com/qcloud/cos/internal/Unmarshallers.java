@@ -423,6 +423,15 @@ public class Unmarshallers {
             return new SetBucketInventoryConfigurationResult();
         }
     }
+
+    public static final class PostBucketInventoryConfigurationUnmarshaller implements
+            Unmarshaller<PostBucketInventoryConfigurationResult, InputStream> {
+
+        public PostBucketInventoryConfigurationResult unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser().parsePostBucketInventoryConfigurationsResponse(in).getResult();
+        }
+    }
+
     public static final class GetObjectTaggingResponseUnmarshaller implements Unmarshaller<GetObjectTaggingResult, InputStream> {
 
         @Override

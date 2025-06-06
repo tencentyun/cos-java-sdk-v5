@@ -130,12 +130,14 @@ public class BucketConfigurationXmlFactory {
         return xml.getBytes();
     }
 
-    public byte[] convertToXmlByteArray(InventoryConfiguration config) throws CosClientException {
+    public byte[] convertToXmlByteArray(InventoryConfiguration config, boolean isOneTimeInventory) throws CosClientException {
         XmlWriter xml = new XmlWriter();
         xml.start("InventoryConfiguration");
 
         xml.start("Id").value(config.getId()).end();
-        xml.start("IsEnabled").value(String.valueOf(config.isEnabled())).end();
+        if (!isOneTimeInventory) {
+            xml.start("IsEnabled").value(String.valueOf(config.isEnabled())).end();
+        }
         xml.start("IncludedObjectVersions").value(config.getIncludedObjectVersions()).end();
 
         writeInventoryDestination(xml, config.getDestination());
