@@ -3761,7 +3761,7 @@ public class COSClient implements COS {
         request.addParameter("id", id);
 
         if (!setBucketInventoryConfigurationRequest.IsUseInventoryText()) {
-            final byte[] bytes = new BucketConfigurationXmlFactory().convertToXmlByteArray(inventoryConfiguration);
+            final byte[] bytes = new BucketConfigurationXmlFactory().convertToXmlByteArray(inventoryConfiguration, false);
             request.addHeader("Content-Length", String.valueOf(bytes.length));
             request.addHeader("Content-Type", "application/xml");
             request.setContent(new ByteArrayInputStream(bytes));
@@ -3791,6 +3791,40 @@ public class COSClient implements COS {
 
         return invoke(request, new Unmarshallers.ListBucketInventoryConfigurationsUnmarshaller());
     }
+
+    public PostBucketInventoryConfigurationResult postBucketInventoryConfiguration(
+            SetBucketInventoryConfigurationRequest setBucketInventoryConfigurationRequest)
+            throws CosClientException, CosServiceException {
+        rejectNull(setBucketInventoryConfigurationRequest, "The request cannot be null");
+        rejectNull(setBucketInventoryConfigurationRequest.getBucketName(), "The bucketName cannot be null");
+        rejectNull(setBucketInventoryConfigurationRequest.getInventoryConfiguration(), "The inventoryConfiguration cannot be null");
+        rejectNull(setBucketInventoryConfigurationRequest.getInventoryConfiguration().getId(), "The inventoryConfiguration.id cannot be null");
+        final String bucketName = setBucketInventoryConfigurationRequest.getBucketName();
+        final InventoryConfiguration inventoryConfiguration = setBucketInventoryConfigurationRequest.getInventoryConfiguration();
+        final String id = inventoryConfiguration.getId();
+
+        CosHttpRequest<SetBucketInventoryConfigurationRequest> request = createRequest(bucketName, null, setBucketInventoryConfigurationRequest, HttpMethodName.POST);
+        request.addParameter("inventory", null);
+        request.addParameter("id", id);
+
+        if (!setBucketInventoryConfigurationRequest.IsUseInventoryText()) {
+            final byte[] bytes = new BucketConfigurationXmlFactory().convertToXmlByteArray(inventoryConfiguration, true);
+            request.addHeader("Content-Length", String.valueOf(bytes.length));
+            request.addHeader("Content-Type", "application/xml");
+            request.setContent(new ByteArrayInputStream(bytes));
+        } else {
+            final String contentStr = setBucketInventoryConfigurationRequest.getInventoryText();
+            if (contentStr == null || contentStr.length() <= 0) {
+                throw new IllegalArgumentException("The inventory text should be specified");
+            }
+            request.addHeader("Content-Length", String.valueOf(contentStr.length()));
+            request.addHeader("Content-Type", "application/xml");
+            request.setContent(new ByteArrayInputStream(contentStr.getBytes(StringUtils.UTF8)));
+        }
+
+        return invoke(request, new Unmarshallers.PostBucketInventoryConfigurationUnmarshaller());
+    }
+
     @Override
     public BucketTaggingConfiguration getBucketTaggingConfiguration(String bucketName) {
         return getBucketTaggingConfiguration(new GetBucketTaggingConfigurationRequest(bucketName));

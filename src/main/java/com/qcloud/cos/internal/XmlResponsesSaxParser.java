@@ -637,6 +637,13 @@ public class XmlResponsesSaxParser {
         return handler;
     }
 
+    public PostBucketInventoryConfigurationsHandler parsePostBucketInventoryConfigurationsResponse(InputStream inputStream)
+            throws IOException {
+        PostBucketInventoryConfigurationsHandler handler = new PostBucketInventoryConfigurationsHandler();
+        parseXmlInputStream(handler, inputStream);
+        return handler;
+    }
+
     public GetObjectTaggingHandler parseObjectTaggingResponse(InputStream inputStream) throws IOException {
         GetObjectTaggingHandler handler = new GetObjectTaggingHandler();
         parseXmlInputStream(handler, inputStream);
@@ -7084,6 +7091,32 @@ public class XmlResponsesSaxParser {
                     currentBucket.setBucketType(getText());
                 } else if (name.equals("Type")) {
                     currentBucket.setType(getText());
+                }
+            }
+        }
+    }
+
+    public static class PostBucketInventoryConfigurationsHandler extends AbstractHandler {
+        private final PostBucketInventoryConfigurationResult result = new PostBucketInventoryConfigurationResult();
+
+        public PostBucketInventoryConfigurationResult getResult() {
+            return result;
+        }
+
+        @Override
+        protected void doStartElement(
+                String uri,
+                String name,
+                String qName,
+                Attributes attrs) {
+        }
+
+        @Override
+        protected void doEndElement(String uri, String name, String qName) {
+
+            if (in("PostInventoryResult")) {
+                if (name.equals("JobId")) {
+                    result.setJobId(getText());
                 }
             }
         }

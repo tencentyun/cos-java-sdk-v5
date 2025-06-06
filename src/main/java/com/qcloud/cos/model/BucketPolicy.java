@@ -27,11 +27,9 @@ public class BucketPolicy implements Serializable {
     private String policyText;
 
     /**
-     * Gets the raw policy JSON text as returned by COS. If no policy has been applied to the
-     * specified bucket, the policy text will be null.
+     * Gets the raw policy JSON text as returned by COS.
      * 
-     * @return The raw policy JSON text as returned by COS. If no policy has been applied to the
-     *         specified bucket, this method returns null policy text.
+     * @return The raw policy JSON text as returned by COS.
      * 
      * @see BucketPolicy#setPolicyText(String)
      */
