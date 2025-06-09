@@ -71,6 +71,7 @@ import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowExecutionResponse;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowExecutionsResponse;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowListResponse;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowResponse;
+import com.qcloud.cos.model.inventory.PostBucketInventoryConfigurationResult;
 
 /*** Collection of unmarshallers for COS XML responses. */
 

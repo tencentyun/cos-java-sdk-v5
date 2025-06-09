@@ -40,6 +40,7 @@ import com.qcloud.cos.model.inventory.InventoryFilterPredicate;
 import com.qcloud.cos.model.inventory.InventoryPrefixPredicate;
 import com.qcloud.cos.model.inventory.InventorySchedule;
 import com.qcloud.cos.model.inventory.ServerSideEncryptionCOS;
+import com.qcloud.cos.model.inventory.InventoryAndPredicate;
 import com.qcloud.cos.model.lifecycle.LifecycleAndOperator;
 import com.qcloud.cos.model.lifecycle.LifecycleFilter;
 import com.qcloud.cos.model.lifecycle.LifecycleFilterPredicate;
@@ -233,6 +234,18 @@ public class BucketConfigurationXmlFactory {
 
         if (predicate instanceof InventoryPrefixPredicate) {
             writePrefix(xml, ((InventoryPrefixPredicate) predicate).getPrefix());
+        }
+
+        if (predicate instanceof InventoryAndPredicate) {
+            xml.start("And");
+            writePrefix(xml, ((InventoryAndPredicate) predicate).getPrefix());
+            List<Tag> tags = ((InventoryAndPredicate) predicate).getTags();
+            if (tags != null && !tags.isEmpty()) {
+                for (Tag tag : tags) {
+                    writeTag(xml, tag);
+                }
+            }
+            xml.end();
         }
     }
 
