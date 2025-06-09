@@ -140,11 +140,11 @@ import com.qcloud.cos.model.fetch.PutAsyncFetchTaskResult;
 import com.qcloud.cos.model.fetch.PutAsyncFetchTaskResultHandler;
 import com.qcloud.cos.model.fetch.PutAsyncFetchTaskSerializer;
 import com.qcloud.cos.model.inventory.InventoryConfiguration;
+import com.qcloud.cos.model.inventory.PostBucketInventoryConfigurationResult;
 import com.qcloud.cos.model.transform.ObjectTaggingXmlFactory;
 import com.qcloud.cos.region.Region;
 import com.qcloud.cos.retry.RetryUtils;
 import com.qcloud.cos.utils.*;
-import com.qcloud.cos.http.TimeOutCosHttpClient;
 
 import com.qcloud.cos.utils.Base64;
 import org.apache.commons.codec.DecoderException;

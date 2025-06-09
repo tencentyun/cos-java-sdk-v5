@@ -9,7 +9,7 @@ import com.qcloud.cos.model.ListBucketInventoryConfigurationsRequest;
 import com.qcloud.cos.model.ListBucketInventoryConfigurationsResult;
 import com.qcloud.cos.model.SetBucketInventoryConfigurationRequest;
 import com.qcloud.cos.model.DeleteBucketInventoryConfigurationRequest;
-import com.qcloud.cos.model.PostBucketInventoryConfigurationResult;
+import com.qcloud.cos.model.inventory.PostBucketInventoryConfigurationResult;
 import com.qcloud.cos.model.inventory.InventoryConfiguration;
 import com.qcloud.cos.model.inventory.InventoryCosBucketDestination;
 import com.qcloud.cos.model.inventory.InventoryFrequency;
@@ -18,11 +18,14 @@ import com.qcloud.cos.model.inventory.InventoryFormat;
 import com.qcloud.cos.model.inventory.InventoryDestination;
 import com.qcloud.cos.model.inventory.InventorySchedule;
 import com.qcloud.cos.model.inventory.InventoryPrefixPredicate;
+import com.qcloud.cos.model.inventory.InventoryAndPredicate;
 import com.qcloud.cos.model.inventory.InventoryFilter;
 import com.qcloud.cos.model.inventory.InventoryIncludedObjectVersions;
 import com.qcloud.cos.model.inventory.InventoryOptionalField;
+import com.qcloud.cos.model.Tag.Tag;
 import com.qcloud.cos.region.Region;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -172,16 +175,29 @@ public class BucketInventoryDemo {
         inventoryDestination.setCosBucketDestination(inventoryCosBucketDestination);
         inventoryConfiguration.setDestination(inventoryDestination);
 
-        // 设置清单的调度周期，扫描前缀和id等
-        inventoryConfiguration.setId("4");
+        // 设置清单，扫描前缀和id等
+        inventoryConfiguration.setId("1");
+        // prefix filter
         InventoryPrefixPredicate inventoryFilter = new InventoryPrefixPredicate("test/");
         inventoryConfiguration.setInventoryFilter(new InventoryFilter(inventoryFilter));
+
+        // and Filter
+//        InventoryAndPredicate inventoryAndPredicate = new InventoryAndPredicate();
+//        inventoryAndPredicate.setPrefix("bbb");
+//        List<Tag> filterTags = new ArrayList<>();
+//        filterTags.add(new Tag("Testkey1", "value1"));
+//        filterTags.add(new Tag("Testkey2", "value2"));
+//        inventoryAndPredicate.setTags(filterTags);
+//        inventoryConfiguration.setInventoryFilter(new InventoryFilter(inventoryAndPredicate));
+
         inventoryConfiguration.setIncludedObjectVersions(InventoryIncludedObjectVersions.All);
         // 设置可选的输出字段
         List<String> optionalFields = new LinkedList<String>();
         optionalFields.add(InventoryOptionalField.Size.toString());
         optionalFields.add(InventoryOptionalField.LastModifiedDate.toString());
+        optionalFields.add(InventoryOptionalField.Tag.toString());
         inventoryConfiguration.setOptionalFields(optionalFields);
+
         SetBucketInventoryConfigurationRequest setBucketInventoryConfigurationRequest = new SetBucketInventoryConfigurationRequest();
         setBucketInventoryConfigurationRequest.setBucketName(bucketName);
         setBucketInventoryConfigurationRequest.setInventoryConfiguration(inventoryConfiguration);
