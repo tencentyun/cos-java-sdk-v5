@@ -9,6 +9,7 @@ import com.qcloud.cos.model.ciModel.job.AigcMetadata;
 import com.qcloud.cos.model.ciModel.job.AudioConfig;
 import com.qcloud.cos.model.ciModel.job.BatchJobOperation;
 import com.qcloud.cos.model.ciModel.job.BatchJobRequest;
+import com.qcloud.cos.model.ciModel.job.CallBackKafkaConfig;
 import com.qcloud.cos.model.ciModel.job.CallBackMqConfig;
 import com.qcloud.cos.model.ciModel.job.ColorEnhance;
 import com.qcloud.cos.model.ciModel.job.EffectConfig;
@@ -375,8 +376,10 @@ public class CIMediaXmlFactory {
 
         addJobParam(xml, operation.getJobParam());
         addOutput(xml, operation.getOutput());
+        addIfNotNull(xml, "CallBackFormat", operation.getCallBackFormat());
+        addIfNotNull(xml, "CallBackType", operation.getCallBackType());
         addCallBackMqConfig(xml, operation.getCallBackMqConfig());
-
+        addCallBackKafkaConfig(xml, operation.getCallBackKafkaConfig());
         xml.end();
     }
 
@@ -390,12 +393,22 @@ public class CIMediaXmlFactory {
         }
     }
 
-    private static void addCallBackMqConfig(XmlWriter xml, CallBackMqConfig callBackMqConfig) {
+    public static void addCallBackMqConfig(XmlWriter xml, CallBackMqConfig callBackMqConfig) {
         if (objIsNotValid(callBackMqConfig)) {
             xml.start("CallBackMqConfig");
             addIfNotNull(xml, "MqMode", callBackMqConfig.getMqMode());
             addIfNotNull(xml, "MqName", callBackMqConfig.getMqName());
             addIfNotNull(xml, "MqRegion", callBackMqConfig.getMqRegion());
+            xml.end();
+        }
+    }
+
+    public static void addCallBackKafkaConfig(XmlWriter xml, CallBackKafkaConfig callBackKafkaConfig) {
+        if (objIsNotValid(callBackKafkaConfig)) {
+            xml.start("CallBackKafkaConfig");
+            addIfNotNull(xml, "Region", callBackKafkaConfig.getRegion());
+            addIfNotNull(xml, "InstanceId", callBackKafkaConfig.getInstanceId());
+            addIfNotNull(xml, "Topic", callBackKafkaConfig.getTopic());
             xml.end();
         }
     }
@@ -616,6 +629,7 @@ public class CIMediaXmlFactory {
             addIfNotNull(xml, "CallBackFormat", request.getCallBackFormat());
             addIfNotNull(xml, "CallBackType", request.getCallBackType());
             addIfNotNull(xml, "QueueType", request.getQueueType());
+            addCallBackKafkaConfig(xml, request.getCallBackKafkaConfig());
         }
     }
 

@@ -5103,6 +5103,14 @@ public class XmlResponsesSaxParser {
                     default:
                         break;
                 }
+            } else if (in("Response", "JobsDetail", "Operation")) {
+                switch (name) {
+                    case "UserData":
+                        response.getJobsDetail().getOperation().setUserData(getText());
+                        break;
+                    default:
+                        break;
+                }
             } else if (in("Response", "JobsDetail", "Input")) {
                 if ("Object".equalsIgnoreCase(name)) {
                     response.getJobsDetail().getInput().setObject(getText());
@@ -5212,6 +5220,14 @@ public class XmlResponsesSaxParser {
                         break;
                     case "Tag":
                         jobsDetail.setTag(getText());
+                        break;
+                    default:
+                        break;
+                }
+            } else if (in("Response", "JobsDetail", "Operation")) {
+                switch (name) {
+                    case "UserData":
+                        response.getJobsDetail().getOperation().setUserData(getText());
                         break;
                     default:
                         break;

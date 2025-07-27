@@ -2,6 +2,7 @@ package com.qcloud.cos.model.ciModel.job;
 
 import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 import java.util.List;
 
 /**
@@ -23,6 +24,7 @@ public class DocOperationObject {
      */
     private DocProcessResult docProcessResult;
 
+    private String UserData;
 
     public MediaOutputObject getOutput() {
         if (output == null) {
@@ -55,6 +57,14 @@ public class DocOperationObject {
 
     public void setDocProcessResult(DocProcessResult docProcessResult) {
         this.docProcessResult = docProcessResult;
+    }
+
+    public String getUserData() {
+        return UserData;
+    }
+
+    public void setUserData(String userData) {
+        UserData = userData;
     }
 
     @Override

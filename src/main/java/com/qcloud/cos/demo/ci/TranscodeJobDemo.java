@@ -2,6 +2,7 @@ package com.qcloud.cos.demo.ci;
 
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.model.ciModel.job.AigcMetadata;
+import com.qcloud.cos.model.ciModel.job.CallBackKafkaConfig;
 import com.qcloud.cos.model.ciModel.job.MediaAudioMixObject;
 import com.qcloud.cos.model.ciModel.job.MediaAudioObject;
 import com.qcloud.cos.model.ciModel.job.MediaContainerObject;
@@ -137,6 +138,45 @@ public class TranscodeJobDemo {
         operation.getOutput().setRegion("ap-chongqing");
         operation.getOutput().setObject("demo2.mp4");
         request.setCallBack("https://cloud.tencent.com/xxx");
+        //3.调用接口,获取任务响应对象
+        MediaJobResponse response = client.createMediaJobs(request);
+        System.out.println(response.getJobsDetail().getJobId());
+    }
+
+    public static void createMediaJobsWithKafkaCallback(COSClient client) {
+        //1.创建任务请求对象
+        MediaJobsRequest request = new MediaJobsRequest();
+        //2.添加请求参数 参数详情请见api接口文档
+        request.setBucketName("demo-1234567890");
+        request.setTag("Transcode");
+        request.getInput().setObject("1.mp4");
+        //2.1添加媒体任务操作参数
+        MediaTranscodeObject transcode = request.getOperation().getTranscode();
+        MediaContainerObject container = transcode.getContainer();
+        container.setFormat("mp4");
+        MediaTranscodeVideoObject video = transcode.getVideo();
+        video.setCodec("H.264");
+
+        MediaAudioObject audio = transcode.getAudio();
+        audio.setCodec("aac");
+        audio.setSamplerate("44100");
+        audio.setBitrate("128");
+        audio.setChannels("4");
+
+        MediaTransConfigObject transConfig = transcode.getTransConfig();
+        transConfig.setAdjDarMethod("scale");
+        transConfig.setIsCheckAudioBitrate("false");
+        transConfig.setResoAdjMethod("1");
+
+        request.getOperation().getOutput().setBucket("demo-1234567890");
+        request.getOperation().getOutput().setRegion("ap-chongqing");
+        request.getOperation().getOutput().setObject("demo1.mp4");
+        request.getOperation().setUserData("user_data");
+        request.setCallBackType("Kafka");
+        CallBackKafkaConfig callBackKafkaConfig = request.getCallBackKafkaConfig();
+        callBackKafkaConfig.setRegion("ap-chongqing");
+        callBackKafkaConfig.setInstanceId("instance-id");
+        callBackKafkaConfig.setTopic("topic");
         //3.调用接口,获取任务响应对象
         MediaJobResponse response = client.createMediaJobs(request);
         System.out.println(response.getJobsDetail().getJobId());

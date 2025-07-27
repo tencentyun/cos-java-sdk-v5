@@ -19,6 +19,8 @@
 package com.qcloud.cos.internal;
 
 import static com.qcloud.cos.model.ciModel.xml.CIMediaXmlFactory.addAigcMetadata;
+import static com.qcloud.cos.model.ciModel.xml.CIMediaXmlFactory.addCallBackKafkaConfig;
+import static com.qcloud.cos.model.ciModel.xml.CIMediaXmlFactory.addCallBackMqConfig;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
@@ -693,6 +695,11 @@ public class RequestXmlFactory {
         xml.start("Input");
         xml.start("Object").value(docJobObject.getInput().getObject()).end();
         xml.end();
+        addIfNotNull(xml, "CallBack", docJobObject.getCallBack());
+        addIfNotNull(xml, "CallBackFormat", docJobObject.getCallBackFormat());
+        addIfNotNull(xml, "CallBackType", docJobObject.getCallBackType());
+        addCallBackMqConfig(xml, docJobObject.getCallBackMqConfig());
+        addCallBackKafkaConfig(xml, docJobObject.getCallBackKafkaConfig());
 
         if (CheckObjectUtils.objIsNotValid(docJobObject)){
             xml.start("Operation");
@@ -719,7 +726,7 @@ public class RequestXmlFactory {
             addIfNotNull(xml, "PicPagination", docProcess.getPicPagination());
             addIfNotNull(xml, "ImageDpi", docProcess.getImageDpi());
             xml.end();
-
+            addIfNotNull(xml, "UserData", docJobObject.getOperation().getUserData());
             xml.end();
         }
         xml.end();

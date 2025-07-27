@@ -2,6 +2,8 @@ package com.qcloud.cos.demo.ci;
 
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
+import com.qcloud.cos.model.ciModel.job.CallBackKafkaConfig;
+import com.qcloud.cos.model.ciModel.job.CallBackMqConfig;
 import com.qcloud.cos.model.ciModel.job.DocHtmlRequest;
 import com.qcloud.cos.model.ciModel.job.DocJobDetail;
 import com.qcloud.cos.model.ciModel.job.DocJobListRequest;
@@ -50,6 +52,23 @@ public class DocJobDemo {
         output.setRegion("ap-chongqing");
         output.setBucket("examplebucket-1250000000");
         output.setObject("mark/pic-${Page}.jpg");
+
+        docJobObject.getOperation().setUserData("user-data");
+
+        docJobObject.setCallBackFormat("json");
+
+        docJobObject.setCallBack("www.callback.com");
+//        docJobObject.setCallBackType("TDMQ");
+//        CallBackMqConfig callBackMqConfig = docJobObject.getCallBackMqConfig();
+//        callBackMqConfig.setMqRegion("sh");
+//        callBackMqConfig.setMqName("name");
+//        callBackMqConfig.setMqMode("Queue");
+
+//        docJobObject.setCallBackType("Kafka");
+//        CallBackKafkaConfig callBackKafkaConfig = docJobObject.getCallBackKafkaConfig();
+//        callBackKafkaConfig.setRegion("ap-chongqing");
+//        callBackKafkaConfig.setInstanceId("instance-id");
+//        callBackKafkaConfig.setTopic("topic");
         //3.调用接口,获取任务响应对象
         DocJobResponse docProcessJobs = client.createDocProcessJobs(request);
         System.out.println(docProcessJobs);
