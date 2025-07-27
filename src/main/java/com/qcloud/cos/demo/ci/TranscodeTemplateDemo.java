@@ -1,6 +1,7 @@
 package com.qcloud.cos.demo.ci;
 
 import com.qcloud.cos.COSClient;
+import com.qcloud.cos.model.ciModel.job.AigcMetadata;
 import com.qcloud.cos.model.ciModel.job.MediaAudioObject;
 import com.qcloud.cos.model.ciModel.job.MediaTimeIntervalObject;
 import com.qcloud.cos.model.ciModel.job.MediaTransConfigObject;
@@ -12,6 +13,7 @@ import com.qcloud.cos.model.ciModel.template.MediaTemplateResponse;
 
 import java.io.UnsupportedEncodingException;
 import java.util.List;
+import org.apache.commons.codec.binary.Base64;
 
 /**
  * 转码模板接口相关demo 请求详情参见：https://cloud.tencent.com/document/product/460/46999
@@ -58,6 +60,14 @@ public class TranscodeTemplateDemo {
         transConfig.setAdjDarMethod("scale");
         transConfig.setIsCheckReso("false");
         transConfig.setResoAdjMethod("1");
+        AigcMetadata aigcMetadata = transConfig.getAigcMetadata();
+        aigcMetadata.setLabel("label");
+        aigcMetadata.setContentProducer("testProducer");
+        aigcMetadata.setProduceId("testProduceId");
+        aigcMetadata.setReservedCode1(new String(Base64.encodeBase64("test".getBytes())));
+        aigcMetadata.setReservedCode2(new String(Base64.encodeBase64("test".getBytes())));
+        aigcMetadata.setPropagateId("testPropagateId");
+        aigcMetadata.setContentPropagator("testPropagator");
         //2.4 添加TimeInterval对象的值
         MediaTimeIntervalObject timeInterval = request.getTimeInterval();
         timeInterval.setStart("0");
@@ -134,6 +144,14 @@ public class TranscodeTemplateDemo {
         transConfig.setAdjDarMethod("scale");
         transConfig.setIsCheckReso("false");
         transConfig.setResoAdjMethod("1");
+        AigcMetadata aigcMetadata = transConfig.getAigcMetadata();
+        aigcMetadata.setLabel("label");
+        aigcMetadata.setContentProducer("testProducer");
+        aigcMetadata.setProduceId("testProduceId");
+        aigcMetadata.setReservedCode1(new String(Base64.encodeBase64("test".getBytes())));
+        aigcMetadata.setReservedCode2(new String(Base64.encodeBase64("test".getBytes())));
+        aigcMetadata.setPropagateId("testPropagateId");
+        aigcMetadata.setContentPropagator("testPropagator");
         MediaTimeIntervalObject timeInterval = request.getTimeInterval();
         timeInterval.setStart("1");
         timeInterval.setDuration("30");

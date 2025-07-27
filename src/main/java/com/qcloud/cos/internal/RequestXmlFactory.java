@@ -18,6 +18,8 @@
 
 package com.qcloud.cos.internal;
 
+import static com.qcloud.cos.model.ciModel.xml.CIMediaXmlFactory.addAigcMetadata;
+
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.util.Collections;
@@ -632,6 +634,7 @@ public class RequestXmlFactory {
             addIfNotNull(xml, "ResoAdjMethod", request.getTransConfig().getResoAdjMethod());
             addIfNotNull(xml, "TransMode", request.getTransConfig().getTransMode());
             addIfNotNull(xml, "VideoBitrateAdjMethod", request.getTransConfig().getVideoBitrateAdjMethod());
+            addAigcMetadata(xml, request.getTransConfig().getAigcMetadata());
             xml.end();
 
             addVideo(xml, request);

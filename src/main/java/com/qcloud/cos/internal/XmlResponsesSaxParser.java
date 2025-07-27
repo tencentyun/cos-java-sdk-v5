@@ -18,6 +18,7 @@
 
 package com.qcloud.cos.internal;
 
+import com.qcloud.cos.model.ciModel.job.AigcMetadata;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -4334,6 +4335,9 @@ public class XmlResponsesSaxParser {
             } else if (in("Response", "JobsDetail", "Operation", "Transcode", "TransConfig")) {
                 MediaTransConfigObject transConfig = jobsDetail.getOperation().getTranscode().getTransConfig();
                 ParserMediaInfoUtils.ParsingTransConfig(transConfig, name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "Transcode", "TransConfig", "AIGCMetadata")) {
+                AigcMetadata aigcMetadata = jobsDetail.getOperation().getTranscode().getTransConfig().getAigcMetadata();
+                ParserMediaInfoUtils.ParsingAigcMetadata(aigcMetadata, name, getText());
             } else if (in("Response", "JobsDetail", "Operation", "Transcode", "TimeInterval")) {
                 MediaTimeIntervalObject timeInterval = jobsDetail.getOperation().getTranscode().getTimeInterval();
                 ParserMediaInfoUtils.ParsingMediaTimeInterval(timeInterval, name, getText());
@@ -4384,8 +4388,14 @@ public class XmlResponsesSaxParser {
                 ParserMediaInfoUtils.ParseTtsTpl(jobsDetail.getOperation().getTtsTpl(), name, getText());
             } else if (in("Response", "JobsDetail", "Operation", "VideoTag")) {
                 ParserMediaInfoUtils.ParseVideoTag(jobsDetail.getOperation().getVideoTag(), name, getText());
-            }else if (in("Response", "JobsDetail", "Operation", "QualityEstimateConfig")) {
+            } else if (in("Response", "JobsDetail", "Operation", "QualityEstimateConfig")) {
                 ParserMediaInfoUtils.ParseQualityEstimateConfig(jobsDetail.getOperation().getQualityEstimateConfig(), name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "Segment")) {
+                MediaSegmentObject segment = jobsDetail.getOperation().getSegment();
+                ParserMediaInfoUtils.ParsingSegment(segment, name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "Segment", "AIGCMetadata")) {
+                AigcMetadata aigcMetadata = jobsDetail.getOperation().getSegment().getAigcMetadata();
+                ParserMediaInfoUtils.ParsingAigcMetadata(aigcMetadata, name, getText());
             }
         }
 
@@ -4504,6 +4514,9 @@ public class XmlResponsesSaxParser {
             } else if (in("Response", "JobsDetail", "Operation", "Transcode", "TransConfig")) {
                 MediaTransConfigObject transConfig = jobsDetail.getOperation().getTranscode().getTransConfig();
                 ParserMediaInfoUtils.ParsingTransConfig(transConfig, name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "Transcode", "TransConfig", "AIGCMetadata")) {
+                AigcMetadata aigcMetadata = jobsDetail.getOperation().getTranscode().getTransConfig().getAigcMetadata();
+                ParserMediaInfoUtils.ParsingAigcMetadata(aigcMetadata, name, getText());
             } else if (in("Response", "JobsDetail", "Operation", "Transcode", "TimeInterval")) {
                 MediaTimeIntervalObject timeInterval = jobsDetail.getOperation().getTranscode().getTimeInterval();
                 ParserMediaInfoUtils.ParsingMediaTimeInterval(timeInterval, name, getText());
@@ -4513,6 +4526,9 @@ public class XmlResponsesSaxParser {
             } else if (in("Response", "JobsDetail", "Operation", "Segment")) {
                 MediaSegmentObject segment = jobsDetail.getOperation().getSegment();
                 ParserMediaInfoUtils.ParsingSegment(segment, name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "Segment", "AIGCMetadata")) {
+                AigcMetadata aigcMetadata = jobsDetail.getOperation().getSegment().getAigcMetadata();
+                ParserMediaInfoUtils.ParsingAigcMetadata(aigcMetadata, name, getText());
             } else if (in("Response", "JobsDetail", "Operation", "Snapshot", "SpriteSnapshotConfig")) {
                 SpriteSnapshotConfig snapshotConfig = jobsDetail.getOperation().getSnapshot().getSnapshotConfig();
                 ParserMediaInfoUtils.ParsingSnapshotConfig(snapshotConfig, name, getText());
@@ -4748,6 +4764,9 @@ public class XmlResponsesSaxParser {
             } else if (in("Response", "Template", "TransTpl", "TransConfig")) {
                 MediaTransConfigObject transConfig = transTpl.getTransConfig();
                 ParserMediaInfoUtils.ParsingTransConfig(transConfig, name, getText());
+            } else if (in("Response", "Template", "TransTpl", "TransConfig", "AIGCMetadata")) {
+                AigcMetadata aigcMetadata = transTpl.getTransConfig().getAigcMetadata();
+                ParserMediaInfoUtils.ParsingAigcMetadata(aigcMetadata, name, getText());
             } else if (in("Response", "Template", "Snapshot")) {
                 MediaSnapshotObject snapshot = response.getTemplate().getSnapshot();
                 ParserMediaInfoUtils.ParsingSnapshot(snapshot, name, getText());
@@ -4887,6 +4906,9 @@ public class XmlResponsesSaxParser {
             } else if (in("Response", "TemplateList", "TransTpl", "TransConfig")) {
                 MediaTransConfigObject transConfig = transTpl.getTransConfig();
                 ParserMediaInfoUtils.ParsingTransConfig(transConfig, name, getText());
+            } else if (in("Response", "TemplateList", "TransTpl", "TransConfig", "AIGCMetadata")) {
+                AigcMetadata aigcMetadata = transTpl.getTransConfig().getAigcMetadata();
+                ParserMediaInfoUtils.ParsingAigcMetadata(aigcMetadata, name, getText());
             } else if (in("Response", "TemplateList", "Snapshot")) {
                 MediaSnapshotObject snapshot = template.getSnapshot();
                 ParserMediaInfoUtils.ParsingSnapshot(snapshot, name, getText());

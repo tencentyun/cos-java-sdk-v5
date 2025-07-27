@@ -1,6 +1,7 @@
 package com.qcloud.cos.demo.ci;
 
 import com.qcloud.cos.COSClient;
+import com.qcloud.cos.model.ciModel.job.AigcMetadata;
 import com.qcloud.cos.model.ciModel.job.MediaAudioObject;
 import com.qcloud.cos.model.ciModel.job.MediaContainerObject;
 import com.qcloud.cos.model.ciModel.job.MediaJobObject;
@@ -17,6 +18,7 @@ import com.qcloud.cos.model.ciModel.job.v2.MediaJobsRequestV2;
 
 import java.io.UnsupportedEncodingException;
 import java.util.List;
+import org.apache.commons.codec.binary.Base64;
 
 /**
  * 媒体处理 job接口相关demo 详情见https://cloud.tencent.com/document/product/460/84790
@@ -97,6 +99,15 @@ public class JobDemo {
         transConfig.setAdjDarMethod("scale");
         transConfig.setIsCheckAudioBitrate("false");
         transConfig.setResoAdjMethod("1");
+        // 配置aigc元数据信息
+        AigcMetadata aigcMetadata = transConfig.getAigcMetadata();
+        aigcMetadata.setLabel("label");
+        aigcMetadata.setContentProducer("testProducer");
+        aigcMetadata.setProduceId("testProduceId");
+        aigcMetadata.setReservedCode1(new String(Base64.encodeBase64("test".getBytes())));
+        aigcMetadata.setReservedCode2(new String(Base64.encodeBase64("test".getBytes())));
+        aigcMetadata.setPropagateId("testPropagateId");
+        aigcMetadata.setContentPropagator("testPropagator");
 
         operation.getOutput().setBucket("demo-123456789");
         operation.getOutput().setRegion("ap-chongqing");

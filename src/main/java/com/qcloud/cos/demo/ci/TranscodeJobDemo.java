@@ -1,6 +1,7 @@
 package com.qcloud.cos.demo.ci;
 
 import com.qcloud.cos.COSClient;
+import com.qcloud.cos.model.ciModel.job.AigcMetadata;
 import com.qcloud.cos.model.ciModel.job.MediaAudioMixObject;
 import com.qcloud.cos.model.ciModel.job.MediaAudioObject;
 import com.qcloud.cos.model.ciModel.job.MediaContainerObject;
@@ -10,10 +11,12 @@ import com.qcloud.cos.model.ciModel.job.MediaJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaJobsRequest;
 import com.qcloud.cos.model.ciModel.job.MediaListJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaTimeIntervalObject;
+import com.qcloud.cos.model.ciModel.job.MediaTransConfigObject;
 import com.qcloud.cos.model.ciModel.job.MediaTranscodeObject;
 import com.qcloud.cos.model.ciModel.job.MediaTranscodeVideoObject;
 
 import java.util.List;
+import org.apache.commons.codec.binary.Base64;
 
 /**
  * 媒体处理 job接口相关demo 详情见https://cloud.tencent.com/document/product/460/48216
@@ -63,6 +66,18 @@ public class TranscodeJobDemo {
         MediaTimeIntervalObject timeInterval = transcode.getTimeInterval();
         timeInterval.setStart("0");
         timeInterval.setDuration("60");
+        MediaTransConfigObject transConfig = transcode.getTransConfig();
+        transConfig.setAdjDarMethod("scale");
+        transConfig.setIsCheckAudioBitrate("false");
+        transConfig.setResoAdjMethod("1");
+        AigcMetadata aigcMetadata = transConfig.getAigcMetadata();
+        aigcMetadata.setLabel("label");
+        aigcMetadata.setContentProducer("testProducer");
+        aigcMetadata.setProduceId("testProduceId");
+        aigcMetadata.setReservedCode1(new String(Base64.encodeBase64("test".getBytes())));
+        aigcMetadata.setReservedCode2(new String(Base64.encodeBase64("test".getBytes())));
+        aigcMetadata.setPropagateId("testPropagateId");
+        aigcMetadata.setContentPropagator("testPropagator");
 
         request.getOperation().getOutput().setBucket("demo-1234567890");
         request.getOperation().getOutput().setRegion("ap-chongqing");

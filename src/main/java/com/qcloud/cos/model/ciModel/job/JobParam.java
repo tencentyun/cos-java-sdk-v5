@@ -1,9 +1,12 @@
 package com.qcloud.cos.model.ciModel.job;
 
+import com.qcloud.cos.model.ciModel.template.MediaSegmentObject;
+
 public class JobParam {
     private String templateId;
     private MediaPicProcessTemplateObject picProcess;
     private PicProcessResult picProcessResult;
+    private MediaSegmentObject segment;
 
     public String getTemplateId() {
         return templateId;
@@ -33,6 +36,17 @@ public class JobParam {
 
     public void setPicProcessResult(PicProcessResult picProcessResult) {
         this.picProcessResult = picProcessResult;
+    }
+
+    public MediaSegmentObject getSegment() {
+        if (segment == null) {
+            segment = new MediaSegmentObject();
+        }
+        return segment;
+    }
+
+    public void setSegment(MediaSegmentObject segment) {
+        this.segment = segment;
     }
 
     @Override

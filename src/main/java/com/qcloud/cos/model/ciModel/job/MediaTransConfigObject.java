@@ -80,6 +80,12 @@ public class MediaTransConfigObject implements Serializable {
     @XStreamAlias("TranscodeIndex")
     private String transcodeIndex;
 
+    /**
+     * aigc 元数据信息配置
+     */
+    @XStreamAlias("AIGCMetadata")
+    private AigcMetadata aigcMetadata;
+
     public String getInitialClipNum() {
         return initialClipNum;
     }
@@ -203,6 +209,17 @@ public class MediaTransConfigObject implements Serializable {
         this.transcodeIndex = transcodeIndex;
     }
 
+    public AigcMetadata getAigcMetadata() {
+        if (aigcMetadata == null) {
+            aigcMetadata = new AigcMetadata();
+        }
+        return aigcMetadata;
+    }
+
+    public void setAigcMetadata(AigcMetadata aigcMetadata) {
+        this.aigcMetadata = aigcMetadata;
+    }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("MediaTransConfigObject{");
@@ -221,6 +238,7 @@ public class MediaTransConfigObject implements Serializable {
         sb.append(", initialClipNum='").append(initialClipNum).append('\'');
         sb.append(", cosTag='").append(cosTag).append('\'');
         sb.append(", transcodeIndex='").append(transcodeIndex).append('\'');
+        sb.append(", aigcMetadata='").append(aigcMetadata).append('\'');
         sb.append('}');
         return sb.toString();
     }
