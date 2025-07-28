@@ -3,6 +3,8 @@ package com.qcloud.cos.demo.ci;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -44,7 +46,22 @@ public class ImagePersistenceDemo {
         PicOperations.Rule rule1 = new PicOperations.Rule();
         rule1.setBucket(bucketName);
         rule1.setFileId("test-1.jpg");
-        rule1.setRule("imageMogr2/rotate/90");
+        String label = Base64.getUrlEncoder().withoutPadding().encodeToString("label".getBytes(StandardCharsets.UTF_8));
+        String contentProducer = Base64.getUrlEncoder().withoutPadding().encodeToString("content_producer".getBytes(StandardCharsets.UTF_8));
+        String produceId = Base64.getUrlEncoder().withoutPadding().encodeToString("produce_id".getBytes(StandardCharsets.UTF_8));
+        String reservedCode1 = Base64.getUrlEncoder().withoutPadding().encodeToString("reserved_code1".getBytes(StandardCharsets.UTF_8));
+        String reservedCode2 = Base64.getUrlEncoder().withoutPadding().encodeToString("reserved_code2".getBytes(StandardCharsets.UTF_8));
+        String propagateId = Base64.getUrlEncoder().withoutPadding().encodeToString("propagate_id".getBytes(StandardCharsets.UTF_8));
+        String contentPropagator = Base64.getUrlEncoder().withoutPadding().encodeToString("content_propagator".getBytes(StandardCharsets.UTF_8));
+
+        String rule = "imageMogr2/AIGCMetadata/Label/" + label
+                + "/ContentProducer/" + contentProducer
+                + "/ProduceID/" + produceId
+                + "/ReservedCode1/" + reservedCode1
+                + "/ReservedCode2/" + reservedCode2
+                + "/PropagateID/" + propagateId
+                + "/ContentPropagator/" + contentPropagator;
+        rule1.setRule(rule);
         ruleList.add(rule1);
         PicOperations.Rule rule2 = new PicOperations.Rule();
         rule2.setBucket(bucketName);
@@ -60,6 +77,7 @@ public class ImagePersistenceDemo {
             for(CIObject ciObject:ciUploadResult.getProcessResults().getObjectList()) {
                 System.out.println(ciObject.getLocation());
                 System.out.println(ciObject.getEtag());
+                System.out.println(ciObject.getAigcMetadata());
             }
         } catch (CosServiceException e) {
             e.printStackTrace();
@@ -172,7 +190,22 @@ public class ImagePersistenceDemo {
         PicOperations.Rule rule1 = new PicOperations.Rule();
         rule1.setBucket(bucketName);
         rule1.setFileId("test-1.jpg");
-        rule1.setRule("imageMogr2/rotate/90");
+        String label = Base64.getUrlEncoder().withoutPadding().encodeToString("label".getBytes(StandardCharsets.UTF_8));
+        String contentProducer = Base64.getUrlEncoder().withoutPadding().encodeToString("content_producer".getBytes(StandardCharsets.UTF_8));
+        String produceId = Base64.getUrlEncoder().withoutPadding().encodeToString("produce_id".getBytes(StandardCharsets.UTF_8));
+        String reservedCode1 = Base64.getUrlEncoder().withoutPadding().encodeToString("reserved_code1".getBytes(StandardCharsets.UTF_8));
+        String reservedCode2 = Base64.getUrlEncoder().withoutPadding().encodeToString("reserved_code2".getBytes(StandardCharsets.UTF_8));
+        String propagateId = Base64.getUrlEncoder().withoutPadding().encodeToString("propagate_id".getBytes(StandardCharsets.UTF_8));
+        String contentPropagator = Base64.getUrlEncoder().withoutPadding().encodeToString("content_propagator".getBytes(StandardCharsets.UTF_8));
+
+        String rule = "imageMogr2/AIGCMetadata/Label/" + label
+                + "/ContentProducer/" + contentProducer
+                + "/ProduceID/" + produceId
+                + "/ReservedCode1/" + reservedCode1
+                + "/ReservedCode2/" + reservedCode2
+                + "/PropagateID/" + propagateId
+                + "/ContentPropagator/" + contentPropagator;
+        rule1.setRule(rule);
         ruleList.add(rule1);
         PicOperations.Rule rule2 = new PicOperations.Rule();
         rule2.setBucket(bucketName);
@@ -189,6 +222,7 @@ public class ImagePersistenceDemo {
             for(CIObject ciObject:ciUploadResult.getProcessResults().getObjectList()) {
                 System.out.println(ciObject.getLocation());
                 System.out.println(ciObject.getEtag());
+                System.out.println(ciObject.getAigcMetadata());
             }
         } catch (CosServiceException e) {
             e.printStackTrace();

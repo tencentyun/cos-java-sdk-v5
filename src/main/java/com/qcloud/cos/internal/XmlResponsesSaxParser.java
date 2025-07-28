@@ -1248,6 +1248,33 @@ public class XmlResponsesSaxParser {
                 if(name.equals("Point")) {
                     codeLocation.getPoints().add(getText());
                 }
+            } else if(in("UploadResult", "ProcessResults", "Object", "AIGCMetadata")) {
+                AigcMetadata aigcMetadata = ciObject.getAigcMetadata();
+                switch (name) {
+                    case "Label":
+                        aigcMetadata.setLabel(getText());
+                        break;
+                    case "ContentProducer":
+                        aigcMetadata.setContentProducer(getText());
+                        break;
+                    case "ProduceID":
+                        aigcMetadata.setProduceId(getText());
+                        break;
+                    case "ReservedCode1":
+                        aigcMetadata.setReservedCode1(getText());
+                        break;
+                    case "ReservedCode2":
+                        aigcMetadata.setReservedCode2(getText());
+                        break;
+                    case "ContentPropagator":
+                        aigcMetadata.setContentPropagator(getText());
+                        break;
+                    case "PropagateID":
+                        aigcMetadata.setPropagateId(getText());
+                        break;
+                    default:
+                        break;
+                }
             }
         }
     }
