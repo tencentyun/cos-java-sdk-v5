@@ -54,21 +54,54 @@ public class DocJobDemo {
         output.setObject("mark/pic-${Page}.jpg");
 
         docJobObject.getOperation().setUserData("user-data");
+        docJobObject.setCallBackFormat("json");
+        docJobObject.setCallBack("www.callback.com");
+        //3.调用接口,获取任务响应对象
+        DocJobResponse docProcessJobs = client.createDocProcessJobs(request);
+        System.out.println(docProcessJobs);
+    }
 
+    /**
+     * createDocJobsWithKafkaCallback 接口用于创建异步文档预览任务（包含kafka回调配置）。
+     * 将文档转为指定类型（jpg、png、pdf）并保存至指定的cos路径下
+     * 该接口为发送任务，如果需要获取转换结果 需要调用查询接口。
+     *
+     * @param client
+     */
+    public static void createDocJobsWithKafkaCallback(COSClient client) {
+        //1.创建任务请求对象
+        DocJobRequest request = new DocJobRequest();
+        //2.添加请求参数 参数详情请见api接口文档
+        request.setBucketName("examplebucket-1250000000");
+        DocJobObject docJobObject = request.getDocJobObject();
+        docJobObject.setTag("DocProcess");
+        docJobObject.getInput().setObject("demo.docx");
+        DocProcessObject docProcessObject = docJobObject.getOperation().getDocProcessObject();
+        docProcessObject.setQuality("100");
+        docProcessObject.setZoom("100");
+        docProcessObject.setStartPage("1");
+        docProcessObject.setEndPage("3");
+        docProcessObject.setTgtType("png");
+        docProcessObject.setDocPassword("123");
+        MediaOutputObject output = docJobObject.getOperation().getOutput();
+        output.setRegion("ap-chongqing");
+        output.setBucket("examplebucket-1250000000");
+        output.setObject("mark/pic-${Page}.jpg");
+
+        docJobObject.getOperation().setUserData("user-data");
         docJobObject.setCallBackFormat("json");
 
-        docJobObject.setCallBack("www.callback.com");
 //        docJobObject.setCallBackType("TDMQ");
 //        CallBackMqConfig callBackMqConfig = docJobObject.getCallBackMqConfig();
 //        callBackMqConfig.setMqRegion("sh");
 //        callBackMqConfig.setMqName("name");
 //        callBackMqConfig.setMqMode("Queue");
 
-//        docJobObject.setCallBackType("Kafka");
-//        CallBackKafkaConfig callBackKafkaConfig = docJobObject.getCallBackKafkaConfig();
-//        callBackKafkaConfig.setRegion("ap-chongqing");
-//        callBackKafkaConfig.setInstanceId("instance-id");
-//        callBackKafkaConfig.setTopic("topic");
+        docJobObject.setCallBackType("Kafka");
+        CallBackKafkaConfig callBackKafkaConfig = docJobObject.getCallBackKafkaConfig();
+        callBackKafkaConfig.setRegion("ap-chongqing");
+        callBackKafkaConfig.setInstanceId("instance-id");
+        callBackKafkaConfig.setTopic("topic");
         //3.调用接口,获取任务响应对象
         DocJobResponse docProcessJobs = client.createDocProcessJobs(request);
         System.out.println(docProcessJobs);

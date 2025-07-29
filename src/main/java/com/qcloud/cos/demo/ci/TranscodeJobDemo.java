@@ -67,18 +67,6 @@ public class TranscodeJobDemo {
         MediaTimeIntervalObject timeInterval = transcode.getTimeInterval();
         timeInterval.setStart("0");
         timeInterval.setDuration("60");
-        MediaTransConfigObject transConfig = transcode.getTransConfig();
-        transConfig.setAdjDarMethod("scale");
-        transConfig.setIsCheckAudioBitrate("false");
-        transConfig.setResoAdjMethod("1");
-        AigcMetadata aigcMetadata = transConfig.getAigcMetadata();
-        aigcMetadata.setLabel("label");
-        aigcMetadata.setContentProducer("testProducer");
-        aigcMetadata.setProduceId("testProduceId");
-        aigcMetadata.setReservedCode1(new String(Base64.encodeBase64("test".getBytes())));
-        aigcMetadata.setReservedCode2(new String(Base64.encodeBase64("test".getBytes())));
-        aigcMetadata.setPropagateId("testPropagateId");
-        aigcMetadata.setContentPropagator("testPropagator");
 
         request.getOperation().getOutput().setBucket("demo-1234567890");
         request.getOperation().getOutput().setRegion("ap-chongqing");
@@ -138,6 +126,63 @@ public class TranscodeJobDemo {
         operation.getOutput().setRegion("ap-chongqing");
         operation.getOutput().setObject("demo2.mp4");
         request.setCallBack("https://cloud.tencent.com/xxx");
+        //3.调用接口,获取任务响应对象
+        MediaJobResponse response = client.createMediaJobs(request);
+        System.out.println(response.getJobsDetail().getJobId());
+    }
+
+    /**
+     * createMediaJobsWithAigcMetadata 接口用于创建媒体转码任务（包含aigcMetadata信息）
+     * demo 使用转码参数创建任务 推荐使用模板创建媒体任务
+     *
+     * @param client
+     */
+    public static void createMediaJobsWithAigcMetadata(COSClient client) {
+        //1.创建任务请求对象
+        MediaJobsRequest request = new MediaJobsRequest();
+        //2.添加请求参数 参数详情请见api接口文档
+        request.setBucketName("demo-1234567890");
+        request.setTag("Transcode");
+        request.getInput().setObject("1.mp4");
+        //2.1添加媒体任务操作参数
+        MediaTranscodeObject transcode = request.getOperation().getTranscode();
+        MediaContainerObject container = transcode.getContainer();
+        container.setFormat("mp4");
+        MediaTranscodeVideoObject video = transcode.getVideo();
+        video.setCodec("H.264");
+        video.setProfile("high");
+        video.setBitrate("1000");
+        video.setWidth("1280");
+        video.setFps("30");
+        video.setPreset("medium");
+        video.setBufSize("0");
+        video.setMaxrate("50000");
+
+        MediaAudioObject audio = transcode.getAudio();
+        audio.setCodec("aac");
+        audio.setSamplerate("44100");
+        audio.setBitrate("128");
+        audio.setChannels("4");
+
+        MediaTransConfigObject transConfig = transcode.getTransConfig();
+        transConfig.setAdjDarMethod("scale");
+        transConfig.setIsCheckAudioBitrate("false");
+        transConfig.setResoAdjMethod("1");
+        AigcMetadata aigcMetadata = transConfig.getAigcMetadata();
+        aigcMetadata.setLabel("label");
+        aigcMetadata.setContentProducer("testProducer");
+        aigcMetadata.setProduceId("testProduceId");
+        aigcMetadata.setReservedCode1(new String(Base64.encodeBase64("test".getBytes())));
+        aigcMetadata.setReservedCode2(new String(Base64.encodeBase64("test".getBytes())));
+        aigcMetadata.setPropagateId("testPropagateId");
+        aigcMetadata.setContentPropagator("testPropagator");
+
+        request.getOperation().getOutput().setBucket("demo-1234567890");
+        request.getOperation().getOutput().setRegion("ap-chongqing");
+        request.getOperation().getOutput().setObject("demo1.mp4");
+        request.setCallBack("https://cloud.tencent.com/xxx");
+        //任务所在的队列类型，限制为 SpeedTranscoding, 表示为开启倍速转码
+//        request.setQueueType("SpeedTranscoding");
         //3.调用接口,获取任务响应对象
         MediaJobResponse response = client.createMediaJobs(request);
         System.out.println(response.getJobsDetail().getJobId());

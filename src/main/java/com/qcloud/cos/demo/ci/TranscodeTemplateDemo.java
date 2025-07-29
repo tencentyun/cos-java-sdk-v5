@@ -60,6 +60,50 @@ public class TranscodeTemplateDemo {
         transConfig.setAdjDarMethod("scale");
         transConfig.setIsCheckReso("false");
         transConfig.setResoAdjMethod("1");
+        //2.4 添加TimeInterval对象的值
+        MediaTimeIntervalObject timeInterval = request.getTimeInterval();
+        timeInterval.setStart("0");
+        timeInterval.setDuration("60");
+        //3. 调用接口 获取模板响应对象
+        MediaTemplateResponse response = client.createMediaTemplate(request);
+        System.out.println(response);
+    }
+
+    /**
+     * CreateMediaTemplate 用于新增转码模板（包含aigcMetadata信息）。
+     *
+     * @param client
+     */
+    public static void createMediaTemplateWithAigcMetadata(COSClient client) throws UnsupportedEncodingException {
+        //1.创建模板请求对象
+        MediaTemplateRequest request = new MediaTemplateRequest();
+        //2.添加请求参数 参数详情请见api接口文档
+        request.setBucketName("DemoBucket-123456789");
+        request.setTag("Transcode");
+        request.setName("mark-test-2");
+        request.getContainer().setFormat("mp4");
+        //2.1 添加video对象的值
+        MediaVideoObject video = request.getVideo();
+        video.setCodec("H.264");
+        video.setProfile("high");
+        video.setBitrate("1000");
+        video.setWidth("1280");
+        video.setFps("30");
+        video.setPreset("medium");
+        video.setBufSize("1000");
+        video.setMaxrate("10");
+        //2.2  添加audio对象的值
+        MediaAudioObject audio = request.getAudio();
+        audio.setCodec("aac");
+        audio.setSamplerate("44100");
+        audio.setBitrate("128");
+        audio.setChannels("1");
+        //2.3 添加TransConfig对象的值
+        MediaTransConfigObject transConfig = request.getTransConfig();
+        transConfig.setAdjDarMethod("scale");
+        transConfig.setIsCheckReso("false");
+        transConfig.setResoAdjMethod("1");
+        // 添加aigc元数据信息
         AigcMetadata aigcMetadata = transConfig.getAigcMetadata();
         aigcMetadata.setLabel("label");
         aigcMetadata.setContentProducer("testProducer");
@@ -118,6 +162,46 @@ public class TranscodeTemplateDemo {
      * @param client
      */
     public static void updateMediaTemplate(COSClient client) throws UnsupportedEncodingException {
+        //1.创建模板请求对象
+        MediaTemplateRequest request = new MediaTemplateRequest();
+        //2.添加请求参数 参数详情请见api接口文档
+        request.setBucketName("DemoBucket-123456789");
+        request.setTemplateId("t138b37dc82e59422d85f03bb7a8*****");
+        request.setTag("Transcode");
+        request.setName("mark-test-update-01");
+        request.getContainer().setFormat("mp4");
+        MediaVideoObject video = request.getVideo();
+        video.setCodec("H.264");
+        video.setProfile("high");
+        video.setBitrate("1000");
+        video.setWidth("1280");
+        video.setFps("30");
+        video.setPreset("medium");
+        video.setBufSize("1000");
+        video.setMaxrate("10");
+        MediaAudioObject audio = request.getAudio();
+        audio.setCodec("aac");
+        audio.setSamplerate("44100");
+        audio.setBitrate("128");
+        audio.setChannels("1");
+        MediaTransConfigObject transConfig = request.getTransConfig();
+        transConfig.setAdjDarMethod("scale");
+        transConfig.setIsCheckReso("false");
+        transConfig.setResoAdjMethod("1");
+        MediaTimeIntervalObject timeInterval = request.getTimeInterval();
+        timeInterval.setStart("1");
+        timeInterval.setDuration("30");
+        //3.调用接口,获取模板响应对象
+        Boolean aBoolean = client.updateMediaTemplate(request);
+        System.out.println(aBoolean);
+    }
+
+    /**
+     * UpdateMediaTemplate 用于更新转码模板。
+     *
+     * @param client
+     */
+    public static void updateMediaTemplateWithAigcMetadata(COSClient client) throws UnsupportedEncodingException {
         //1.创建模板请求对象
         MediaTemplateRequest request = new MediaTemplateRequest();
         //2.添加请求参数 参数详情请见api接口文档

@@ -99,6 +99,58 @@ public class JobDemo {
         transConfig.setAdjDarMethod("scale");
         transConfig.setIsCheckAudioBitrate("false");
         transConfig.setResoAdjMethod("1");
+
+        operation.getOutput().setBucket("demo-123456789");
+        operation.getOutput().setRegion("ap-chongqing");
+        operation.getOutput().setObject("demo1.mp4");
+        request.setCallBack("https://cloud.tencent.com/xxx");
+        //3.调用接口,获取任务响应对象
+        MediaJobResponseV2 response = client.createMediaJobsV2(request);
+        System.out.println(response.getJobsDetail().getJobId());
+    }
+
+    /**
+     * createMediaJobsWithAigcMetadata 接口用于创建媒体转码任务（包含aigcMetadata信息）
+     * demo 使用转码参数创建任务 推荐使用模板创建媒体任务
+     *
+     * @param client
+     */
+    public static void createMediaJobsWithAigcMetadata(COSClient client) throws UnsupportedEncodingException {
+        //1.创建任务请求对象
+        MediaJobsRequestV2 request = new MediaJobsRequestV2();
+        //2.添加请求参数 参数详情请见api接口文档
+        request.setBucketName("demo-123456789");
+        request.setTag("Transcode");
+        request.getInput().setObject("2.mp4");
+        //2.1添加媒体任务操作参数
+        MediaJobOperation operation = request.getOperation();
+        MediaTranscodeObject transcode = operation.getTranscode();
+        MediaContainerObject container = transcode.getContainer();
+        container.setFormat("mp4");
+        MediaTranscodeVideoObject video = transcode.getVideo();
+        video.setCodec("H.264");
+        video.setProfile("high");
+        video.setBitrate("1000");
+        video.setWidth("1280");
+        video.setFps("30");
+        video.setPreset("medium");
+        video.setBufSize("0");
+        video.setMaxrate("50000");
+
+        MediaAudioObject audio = transcode.getAudio();
+        audio.setCodec("aac");
+        audio.setSamplerate("44100");
+        audio.setBitrate("128");
+        audio.setChannels("4");
+
+        MediaTimeIntervalObject timeInterval = transcode.getTimeInterval();
+        timeInterval.setStart("0");
+        timeInterval.setDuration("60");
+
+        MediaTransConfigObject transConfig = transcode.getTransConfig();
+        transConfig.setAdjDarMethod("scale");
+        transConfig.setIsCheckAudioBitrate("false");
+        transConfig.setResoAdjMethod("1");
         // 配置aigc元数据信息
         AigcMetadata aigcMetadata = transConfig.getAigcMetadata();
         aigcMetadata.setLabel("label");

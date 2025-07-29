@@ -78,12 +78,6 @@ public class BatchJobDemo {
         request.getInput().setPrefix("mark1/1");
         BatchJobOperation operation = request.getOperation();
         operation.setTag("PicProcess");
-//        operation.setCallBackFormat("json");
-//        operation.setCallBackType("Kafka");
-//        CallBackKafkaConfig callBackKafkaConfig = operation.getCallBackKafkaConfig();
-//        callBackKafkaConfig.setRegion("ap-chongqing");
-//        callBackKafkaConfig.setInstanceId("instance_id");
-//        callBackKafkaConfig.setTopic("topic");
         MediaPicProcessTemplateObject picProcess = operation.getJobParam().getPicProcess();
         picProcess.setIsPicInfo("true");
         picProcess.setProcessRule("imageMogr2/thumbnail/!50p");
@@ -130,6 +124,38 @@ public class BatchJobDemo {
         BatchJobResponse response = client.createInventoryTriggerJob(request);
         System.out.println(response.getJobDetail().getJobId());
         System.out.println(response.getJobDetail().getOperation().getJobParam().getSegment().getAigcMetadata());
+    }
+
+    /**
+     * 图片处理参数创建批量处理任务demo（包含配置kafka回调信息）
+     */
+    public static void createInventoryTriggerJobWithKafkaCallback(COSClient client) {
+        //1.创建任务请求对象
+        BatchJobRequest request = new BatchJobRequest();
+        //2.添加请求参数 参数详情请见api接口文档
+        request.setBucketName("demo-1234567890");
+        request.setName("demo");
+        request.setType("Job");
+        request.getInput().setPrefix("mark1/1");
+        BatchJobOperation operation = request.getOperation();
+        operation.setTag("PicProcess");
+        operation.setCallBackFormat("json");
+        operation.setCallBackType("Kafka");
+        CallBackKafkaConfig callBackKafkaConfig = operation.getCallBackKafkaConfig();
+        callBackKafkaConfig.setRegion("ap-chongqing");
+        callBackKafkaConfig.setInstanceId("instance_id");
+        callBackKafkaConfig.setTopic("topic");
+        MediaPicProcessTemplateObject picProcess = operation.getJobParam().getPicProcess();
+        picProcess.setIsPicInfo("true");
+        picProcess.setProcessRule("imageMogr2/thumbnail/!50p");
+        MediaOutputObject output = operation.getOutput();
+        output.setRegion("ap-chongqing");
+        output.setBucket("demo-1234567890");
+        output.setObject("out/${InventoryTriggerJobId}");
+//        request.setCallBackFormat("json");
+        //3.调用接口,获取任务响应对象
+        BatchJobResponse response = client.createInventoryTriggerJob(request);
+        System.out.println(response.getJobDetail().getJobId());
     }
 
 
