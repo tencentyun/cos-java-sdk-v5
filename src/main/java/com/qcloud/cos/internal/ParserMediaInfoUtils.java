@@ -17,6 +17,7 @@ import com.qcloud.cos.model.ciModel.auditing.SnapshotInfo;
 import com.qcloud.cos.model.ciModel.auditing.UserInfo;
 import com.qcloud.cos.model.ciModel.common.BatchInputObject;
 import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
+import com.qcloud.cos.model.ciModel.job.AigcMetadata;
 import com.qcloud.cos.model.ciModel.job.AudioConfig;
 import com.qcloud.cos.model.ciModel.job.ColorEnhance;
 import com.qcloud.cos.model.ciModel.job.DetailedResult;
@@ -404,6 +405,34 @@ public class ParserMediaInfoUtils {
                 break;
             case "VideoBitrateAdjMethod":
                 transConfig.setVideoBitrateAdjMethod(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParsingAigcMetadata(AigcMetadata aigcMetadata, String name, String value) {
+        switch (name) {
+            case "Label":
+                aigcMetadata.setLabel(value);
+                break;
+            case "ContentProducer":
+                aigcMetadata.setContentProducer(value);
+                break;
+            case "ProduceID":
+                aigcMetadata.setProduceId(value);
+                break;
+            case "ReservedCode1":
+                aigcMetadata.setReservedCode1(value);
+                break;
+            case "ReservedCode2":
+                aigcMetadata.setReservedCode2(value);
+                break;
+            case "ContentPropagator":
+                aigcMetadata.setContentPropagator(value);
+                break;
+            case "PropagateID":
+                aigcMetadata.setPropagateId(value);
                 break;
             default:
                 break;

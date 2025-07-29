@@ -5,14 +5,17 @@ import com.qcloud.cos.internal.XmlWriter;
 import com.qcloud.cos.model.ciModel.common.BatchInputObject;
 import com.qcloud.cos.model.ciModel.common.MediaInputObject;
 import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
+import com.qcloud.cos.model.ciModel.job.AigcMetadata;
 import com.qcloud.cos.model.ciModel.job.AudioConfig;
 import com.qcloud.cos.model.ciModel.job.BatchJobOperation;
 import com.qcloud.cos.model.ciModel.job.BatchJobRequest;
+import com.qcloud.cos.model.ciModel.job.CallBackKafkaConfig;
 import com.qcloud.cos.model.ciModel.job.CallBackMqConfig;
 import com.qcloud.cos.model.ciModel.job.ColorEnhance;
 import com.qcloud.cos.model.ciModel.job.EffectConfig;
 import com.qcloud.cos.model.ciModel.job.ExtractDigitalWatermark;
 import com.qcloud.cos.model.ciModel.job.FrameEnhance;
+import com.qcloud.cos.model.ciModel.job.HlsEncrypt;
 import com.qcloud.cos.model.ciModel.job.JobParam;
 import com.qcloud.cos.model.ciModel.job.MediaAudioMixObject;
 import com.qcloud.cos.model.ciModel.job.MediaAudioObject;
@@ -373,8 +376,10 @@ public class CIMediaXmlFactory {
 
         addJobParam(xml, operation.getJobParam());
         addOutput(xml, operation.getOutput());
+        addIfNotNull(xml, "CallBackFormat", operation.getCallBackFormat());
+        addIfNotNull(xml, "CallBackType", operation.getCallBackType());
         addCallBackMqConfig(xml, operation.getCallBackMqConfig());
-
+        addCallBackKafkaConfig(xml, operation.getCallBackKafkaConfig());
         xml.end();
     }
 
@@ -383,16 +388,27 @@ public class CIMediaXmlFactory {
             xml.start("JobParam");
             addIfNotNull(xml, "TemplateId", jobParam.getTemplateId());
             addPicProcess(xml, jobParam.getPicProcess());
+            addSegment(xml, jobParam.getSegment());
             xml.end();
         }
     }
 
-    private static void addCallBackMqConfig(XmlWriter xml, CallBackMqConfig callBackMqConfig) {
+    public static void addCallBackMqConfig(XmlWriter xml, CallBackMqConfig callBackMqConfig) {
         if (objIsNotValid(callBackMqConfig)) {
             xml.start("CallBackMqConfig");
             addIfNotNull(xml, "MqMode", callBackMqConfig.getMqMode());
             addIfNotNull(xml, "MqName", callBackMqConfig.getMqName());
             addIfNotNull(xml, "MqRegion", callBackMqConfig.getMqRegion());
+            xml.end();
+        }
+    }
+
+    public static void addCallBackKafkaConfig(XmlWriter xml, CallBackKafkaConfig callBackKafkaConfig) {
+        if (objIsNotValid(callBackKafkaConfig)) {
+            xml.start("CallBackKafkaConfig");
+            addIfNotNull(xml, "Region", callBackKafkaConfig.getRegion());
+            addIfNotNull(xml, "InstanceId", callBackKafkaConfig.getInstanceId());
+            addIfNotNull(xml, "Topic", callBackKafkaConfig.getTopic());
             xml.end();
         }
     }
@@ -573,6 +589,21 @@ public class CIMediaXmlFactory {
                 addIfNotNull(xml, "UriKey", hlsEncrypt.getUriKey());
                 xml.end();
             }
+            addAigcMetadata(xml, segment.getAigcMetadata());
+            xml.end();
+        }
+    }
+
+    public static void addAigcMetadata(XmlWriter xml, AigcMetadata aigcMetadata) {
+        if (objIsNotValid(aigcMetadata)) {
+            xml.start("AIGCMetadata");
+            addIfNotNull(xml, "Label", aigcMetadata.getLabel());
+            addIfNotNull(xml, "ContentProducer", aigcMetadata.getContentProducer());
+            addIfNotNull(xml, "ProduceID", aigcMetadata.getProduceId());
+            addIfNotNull(xml, "ReservedCode1", aigcMetadata.getReservedCode1());
+            addIfNotNull(xml, "ContentPropagator", aigcMetadata.getContentPropagator());
+            addIfNotNull(xml, "PropagateID", aigcMetadata.getPropagateId());
+            addIfNotNull(xml, "ReservedCode2", aigcMetadata.getReservedCode2());
             xml.end();
         }
     }
@@ -598,6 +629,7 @@ public class CIMediaXmlFactory {
             addIfNotNull(xml, "CallBackFormat", request.getCallBackFormat());
             addIfNotNull(xml, "CallBackType", request.getCallBackType());
             addIfNotNull(xml, "QueueType", request.getQueueType());
+            addCallBackKafkaConfig(xml, request.getCallBackKafkaConfig());
         }
     }
 
@@ -632,7 +664,7 @@ public class CIMediaXmlFactory {
         if (format != null) {
             xml.start("Container");
             xml.start("Format").value(format).end();
-            if (container.getClipConfig().getDuration() != null) {
+            if (container.getClipConfig() != null && container.getClipConfig().getDuration() != null) {
                 xml.start("ClipConfig");
                 xml.start("Duration").value(container.getClipConfig().getDuration()).end();
                 xml.end();
@@ -763,7 +795,14 @@ public class CIMediaXmlFactory {
             addIfNotNull(xml, "TransMode", transConfig.getTransMode());
             addIfNotNull(xml, "DeleteMetadata", transConfig.getDeleteMetadata());
             addIfNotNull(xml, "IsHdr2Sdr", transConfig.getIsHdr2Sdr());
-            addIfNotNull(xml, "HlsEncrypt", transConfig.getHlsEncrypt());
+            HlsEncrypt hlsEncrypt = transConfig.getHlsEncrypt();
+            if (objIsNotValid(hlsEncrypt)) {
+                xml.start("HlsEncrypt");
+                addIfNotNull(xml, "IsHlsEncrypt", hlsEncrypt.getIsHlsEncrypt());
+                addIfNotNull(xml, "UriKey", hlsEncrypt.getUriKey());
+                xml.end();
+            }
+            addAigcMetadata(xml, transConfig.getAigcMetadata());
             xml.end();
         }
     }

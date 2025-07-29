@@ -92,12 +92,15 @@ public class MediaJobsRequest extends CIServiceRequest implements Serializable {
     private String callBackFormat;
 
     /**
-     * 任务回调类型，Url 或 TDMQ，默认 Url，优先级高于队列的回调类型
+     * 任务回调类型，Url 或 TDMQ 或 Kafka，默认 Url，优先级高于队列的回调类型
      */
     @XStreamAlias("CallBackType")
     private String callBackType;
     @XStreamAlias("CallBackMqConfig")
     private CallBackMqConfig callBackMqConfig;
+
+    @XStreamAlias("CallBackKafkaConfig")
+    private CallBackKafkaConfig callBackKafkaConfig;
 
     @XStreamAlias("QueueType")
     private String queueType;
@@ -247,8 +250,20 @@ public class MediaJobsRequest extends CIServiceRequest implements Serializable {
         this.callBackFormat = callBackFormat;
     }
 
+
+    public CallBackKafkaConfig getCallBackKafkaConfig() {
+        if (callBackKafkaConfig == null) {
+            callBackKafkaConfig = new CallBackKafkaConfig();
+        }
+        return callBackKafkaConfig;
+    }
+
+    public void setCallBackKafkaConfig(CallBackKafkaConfig callBackKafkaConfig) {
+        this.callBackKafkaConfig = callBackKafkaConfig;
+    }
+
     @Override
     public String toString() {
-        return "MediaJobsRequest{" + "bucketName='" + bucketName + '\'' + ", queueId='" + queueId + '\'' + ", tag='" + tag + '\'' + ", orderByTime='" + orderByTime + '\'' + ", nextToken='" + nextToken + '\'' + ", size=" + size + ", states='" + states + '\'' + ", startCreationTime='" + startCreationTime + '\'' + ", endCreationTime='" + endCreationTime + '\'' + ", jobId='" + jobId + '\'' + ", input=" + input + ", operation=" + operation + ", callBack='" + callBack + '\'' + ", callBackFormat='" + callBackFormat + '\'' + '}';
+        return "MediaJobsRequest{" + "bucketName='" + bucketName + '\'' + ", queueId='" + queueId + '\'' + ", tag='" + tag + '\'' + ", orderByTime='" + orderByTime + '\'' + ", nextToken='" + nextToken + '\'' + ", size=" + size + ", states='" + states + '\'' + ", startCreationTime='" + startCreationTime + '\'' + ", endCreationTime='" + endCreationTime + '\'' + ", jobId='" + jobId + '\'' + ", input=" + input + ", operation=" + operation + ", callBack='" + callBack + '\'' + ", callBackFormat='" + callBackFormat + '\'' + "callBackKafkaConfig={" + callBackKafkaConfig + "}}";
     }
 }
