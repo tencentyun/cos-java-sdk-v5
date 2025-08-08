@@ -40,6 +40,7 @@ import com.qcloud.cos.model.inventory.InventoryFilterPredicate;
 import com.qcloud.cos.model.inventory.InventoryPrefixPredicate;
 import com.qcloud.cos.model.inventory.InventorySchedule;
 import com.qcloud.cos.model.inventory.ServerSideEncryptionCOS;
+import com.qcloud.cos.model.inventory.InventoryAndPredicate;
 import com.qcloud.cos.model.lifecycle.LifecycleAndOperator;
 import com.qcloud.cos.model.lifecycle.LifecycleFilter;
 import com.qcloud.cos.model.lifecycle.LifecycleFilterPredicate;
@@ -130,12 +131,14 @@ public class BucketConfigurationXmlFactory {
         return xml.getBytes();
     }
 
-    public byte[] convertToXmlByteArray(InventoryConfiguration config) throws CosClientException {
+    public byte[] convertToXmlByteArray(InventoryConfiguration config, boolean isOneTimeInventory) throws CosClientException {
         XmlWriter xml = new XmlWriter();
         xml.start("InventoryConfiguration");
 
         xml.start("Id").value(config.getId()).end();
-        xml.start("IsEnabled").value(String.valueOf(config.isEnabled())).end();
+        if (!isOneTimeInventory) {
+            xml.start("IsEnabled").value(String.valueOf(config.isEnabled())).end();
+        }
         xml.start("IncludedObjectVersions").value(config.getIncludedObjectVersions()).end();
 
         writeInventoryDestination(xml, config.getDestination());
@@ -231,6 +234,18 @@ public class BucketConfigurationXmlFactory {
 
         if (predicate instanceof InventoryPrefixPredicate) {
             writePrefix(xml, ((InventoryPrefixPredicate) predicate).getPrefix());
+        }
+
+        if (predicate instanceof InventoryAndPredicate) {
+            xml.start("And");
+            writePrefix(xml, ((InventoryAndPredicate) predicate).getPrefix());
+            List<Tag> tags = ((InventoryAndPredicate) predicate).getTags();
+            if (tags != null && !tags.isEmpty()) {
+                for (Tag tag : tags) {
+                    writeTag(xml, tag);
+                }
+            }
+            xml.end();
         }
     }
 

@@ -1,6 +1,7 @@
 package com.qcloud.cos.model.ciModel.template;
 
 
+import com.qcloud.cos.model.ciModel.job.AigcMetadata;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 public class MediaSegmentObject {
@@ -44,6 +45,13 @@ public class MediaSegmentObject {
 
     @XStreamAlias("MediaHlsEncrypt")
     private MediaHlsEncryptObject hlsEncrypt;
+
+    /**
+     * aigc 元数据信息配置
+     */
+    @XStreamAlias("AIGCMetadata")
+    private AigcMetadata aigcMetadata;
+
     public String getTranscodeIndex() {
         return transcodeIndex;
     }
@@ -95,6 +103,16 @@ public class MediaSegmentObject {
         this.hlsEncrypt = hlsEncrypt;
     }
 
+    public AigcMetadata getAigcMetadata() {
+        if (aigcMetadata == null) {
+            aigcMetadata = new AigcMetadata();
+        }
+        return aigcMetadata;
+    }
+
+    public void setAigcMetadata(AigcMetadata aigcMetadata) {
+        this.aigcMetadata = aigcMetadata;
+    }
 
     @Override
     public String toString() {
@@ -102,6 +120,7 @@ public class MediaSegmentObject {
                 "format='" + format + '\'' +
                 ", duration='" + duration + '\'' +
                 ", hlsEncrypt=" + hlsEncrypt +
+                ", aigcMetadata=" + aigcMetadata +
                 '}';
     }
 }

@@ -18,6 +18,7 @@ public class BatchJobOperation {
     private String callBackType;
     private String callBack;
     private CallBackMqConfig callBackMqConfig;
+    private CallBackKafkaConfig callBackKafkaConfig;
     private String workflowIds;
 
     public MediaTimeIntervalObject getTimeInterval() {
@@ -128,6 +129,17 @@ public class BatchJobOperation {
         this.workflowIds = workflowIds;
     }
 
+    public CallBackKafkaConfig getCallBackKafkaConfig() {
+        if (callBackKafkaConfig == null) {
+            callBackKafkaConfig = new CallBackKafkaConfig();
+        }
+        return callBackKafkaConfig;
+    }
+
+    public void setCallBackKafkaConfig(CallBackKafkaConfig callBackKafkaConfig) {
+        this.callBackKafkaConfig = callBackKafkaConfig;
+    }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("BatchJobOperation{");
@@ -142,6 +154,7 @@ public class BatchJobOperation {
         sb.append(", callBackType='").append(callBackType).append('\'');
         sb.append(", callBack='").append(callBack).append('\'');
         sb.append(", callBackMqConfig='").append(callBackMqConfig).append('\'');
+        sb.append(", callBackKafkaConfig='").append(callBackKafkaConfig).append('\'');
         sb.append('}');
         return sb.toString();
     }

@@ -2,6 +2,7 @@ package com.qcloud.cos.internal.cihandler;
 
 import com.qcloud.cos.internal.ParserMediaInfoUtils;
 import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
+import com.qcloud.cos.model.ciModel.job.AigcMetadata;
 import com.qcloud.cos.model.ciModel.job.DetailedResult;
 import com.qcloud.cos.model.ciModel.job.ExtractDigitalWatermark;
 import com.qcloud.cos.model.ciModel.job.Md5Info;
@@ -130,6 +131,9 @@ public class MediaJobResponseHandler extends CIAbstractHandler {
         } else if (in("Response", "JobsDetail", "Operation", "Transcode", "TransConfig")) {
             MediaTransConfigObject transConfig = jobsDetail.getOperation().getTranscode().getTransConfig();
             ParserMediaInfoUtils.ParsingTransConfig(transConfig, name, getText());
+        }  else if (in("Response", "JobsDetail", "Operation", "Transcode", "TransConfig", "AIGCMetadata")) {
+            AigcMetadata aigcMetadata = jobsDetail.getOperation().getTranscode().getTransConfig().getAigcMetadata();
+            ParserMediaInfoUtils.ParsingAigcMetadata(aigcMetadata, name, getText());
         } else if (in("Response", "JobsDetail", "Operation", "Transcode", "TimeInterval")) {
             MediaTimeIntervalObject timeInterval = jobsDetail.getOperation().getTranscode().getTimeInterval();
             ParserMediaInfoUtils.ParsingMediaTimeInterval(timeInterval, name, getText());
@@ -145,6 +149,9 @@ public class MediaJobResponseHandler extends CIAbstractHandler {
         } else if (in("Response", "JobsDetail", "Operation", "Segment")) {
             MediaSegmentObject segment = response.getJobsDetail().getOperation().getSegment();
             ParserMediaInfoUtils.ParsingSegment(segment, name, getText());
+        } else if (in("Response", "JobsDetail", "Operation", "Segment", "AIGCMetadata")) {
+            AigcMetadata aigcMetadata = response.getJobsDetail().getOperation().getSegment().getAigcMetadata();
+            ParserMediaInfoUtils.ParsingAigcMetadata(aigcMetadata, name, getText());
         } else if (in("Response", "JobsDetail", "Operation", "Snapshot", "SpriteSnapshotConfig")) {
             SpriteSnapshotConfig snapshotConfig = response.getJobsDetail().getOperation().getSnapshot().getSnapshotConfig();
             ParserMediaInfoUtils.ParsingSnapshotConfig(snapshotConfig, name, getText());

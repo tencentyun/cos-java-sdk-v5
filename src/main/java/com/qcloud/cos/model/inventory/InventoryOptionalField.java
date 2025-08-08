@@ -33,6 +33,8 @@ public enum InventoryOptionalField {
 
     ReplicationStatus("ReplicationStatus"),
 
+    Tag("Tag"),
+
     ;
 
     private final String field;
