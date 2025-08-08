@@ -2929,6 +2929,8 @@ public interface COS extends COSDirectSpi {
      */
     MediaListJobResponse describeMediaJobs(MediaJobsRequest cIMediaJobsRequest);
 
+    MediaListJobResponse describeMediaJobsV2(MediaJobsRequest req);
+
     /**
      * DescribeMediaQueues 接口用于搜索队列。 https://cloud.tencent.com/document/product/460/38913
      */

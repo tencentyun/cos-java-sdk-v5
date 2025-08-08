@@ -1,8 +1,13 @@
 package com.qcloud.cos.model.ciModel.job;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 public class ColorEnhance {
+    @XStreamAlias("Contrast")
     private String contrast;
+    @XStreamAlias("Correction")
     private String correction;
+    @XStreamAlias("Saturation")
     private String saturation;
 
     public String getContrast() {

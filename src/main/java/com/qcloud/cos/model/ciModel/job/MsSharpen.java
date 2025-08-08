@@ -1,6 +1,9 @@
 package com.qcloud.cos.model.ciModel.job;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 public class MsSharpen {
+    @XStreamAlias("SharpenLevel")
     private String sharpenLevel;
 
     public String getSharpenLevel() {

@@ -4414,7 +4414,12 @@ public class XmlResponsesSaxParser {
             } else {
                 jobsDetail = jobsDetailList.get(jobsDetailList.size() - 1);
             }
-            if (in("Response", "JobsDetail")) {
+
+            if (in("Response")){
+                if ("nextToken".equalsIgnoreCase(name)){
+                    response.setNextToken(getText());
+                }
+            } else if (in("Response", "JobsDetail")) {
 
                 switch (name) {
                     case "Code":

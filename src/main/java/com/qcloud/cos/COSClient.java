@@ -4097,6 +4097,23 @@ public class COSClient implements COS {
     }
 
     @Override
+    public MediaListJobResponse describeMediaJobsV2(MediaJobsRequest req) {
+        this.checkCIRequestCommon(req);
+        CosHttpRequest<MediaJobsRequest> request = createRequest(req.getBucketName(), "/jobs", req, HttpMethodName.GET);
+        addParameterIfNotNull(request, "queueId", req.getQueueId());
+        addParameterIfNotNull(request, "tag", req.getTag());
+        addParameterIfNotNull(request, "orderByTime", req.getOrderByTime());
+        addParameterIfNotNull(request, "nextToken", req.getNextToken());
+        addParameterIfNotNull(request, "size", req.getSize().toString());
+        addParameterIfNotNull(request, "states", req.getStates());
+        addParameterIfNotNull(request, "startCreationTime", req.getStartCreationTime());
+        addParameterIfNotNull(request, "endCreationTime", req.getEndCreationTime());
+        MediaListJobResponse response = invoke(request, new Unmarshallers.CICommonUnmarshaller<MediaListJobResponse>(MediaListJobResponse.class));
+        this.checkMediaListJobResponse(response);
+        return response;
+    }
+
+    @Override
     public MediaListQueueResponse describeMediaQueues(MediaQueueRequest req) {
         this.checkCIRequestCommon(req);
         CosHttpRequest<MediaQueueRequest> request = createRequest(req.getBucketName(), "/queue", req, HttpMethodName.GET);
