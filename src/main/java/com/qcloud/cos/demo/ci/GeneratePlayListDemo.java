@@ -83,7 +83,9 @@ public class GeneratePlayListDemo {
     }
 
 
-
+    /**
+     * getPlayList 生成边转边播请求url地址
+     */
     public static void getPlayList(COSClient client)  {
         String bucketName = bucket;
         String key = objectKey;
@@ -92,8 +94,12 @@ public class GeneratePlayListDemo {
         Instant expire = now.plus(Long.parseLong(expires), ChronoUnit.SECONDS);
         Date expirationDate = Date.from(expire);
         Map<String, String> params = new HashMap<String, String>();
+        //数据万象处理接口key
         params.put("ci-process", "getplaylist");
+        //过期时间
         params.put("expires", "43200");
+        //试看参数
+        params.put("exper", "30");
         Map<String, String> headers = new HashMap<String, String>();
 
         HttpMethodName method = HttpMethodName.GET;

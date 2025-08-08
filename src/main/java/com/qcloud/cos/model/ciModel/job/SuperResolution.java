@@ -1,8 +1,13 @@
 package com.qcloud.cos.model.ciModel.job;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 public class SuperResolution {
+    @XStreamAlias("Resolution")
     private String resolution;
+    @XStreamAlias("EnableScaleUp")
     private String enableScaleUp;
+    @XStreamAlias("Version")
     private String version;
 
     public String getResolution() {

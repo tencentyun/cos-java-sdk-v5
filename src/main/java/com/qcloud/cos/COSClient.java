@@ -4105,6 +4105,16 @@ public class COSClient implements COS {
     }
 
     @Override
+    public MediaJobResponseV2 describeMediaJobV2(MediaJobsRequest req) {
+        this.checkCIRequestCommon(req);
+        rejectNull(req.getJobId(),
+                "The jobId parameter must be specified setting the object tags");
+        CosHttpRequest<MediaJobsRequest> request = createRequest(req.getBucketName(), "/jobs/" + req.getJobId(), req, HttpMethodName.GET);
+
+        return invoke(request, new Unmarshallers.CICommonUnmarshaller<MediaJobResponseV2>(MediaJobResponseV2.class));
+    }
+
+    @Override
     public MediaListJobResponse describeMediaJobs(MediaJobsRequest req) {
         this.checkCIRequestCommon(req);
         CosHttpRequest<MediaJobsRequest> request = createRequest(req.getBucketName(), "/jobs", req, HttpMethodName.GET);
@@ -4117,6 +4127,23 @@ public class COSClient implements COS {
         addParameterIfNotNull(request, "startCreationTime", req.getStartCreationTime());
         addParameterIfNotNull(request, "endCreationTime", req.getEndCreationTime());
         MediaListJobResponse response = invoke(request, new Unmarshallers.ListJobUnmarshaller());
+        this.checkMediaListJobResponse(response);
+        return response;
+    }
+
+    @Override
+    public MediaListJobResponse describeMediaJobsV2(MediaJobsRequest req) {
+        this.checkCIRequestCommon(req);
+        CosHttpRequest<MediaJobsRequest> request = createRequest(req.getBucketName(), "/jobs", req, HttpMethodName.GET);
+        addParameterIfNotNull(request, "queueId", req.getQueueId());
+        addParameterIfNotNull(request, "tag", req.getTag());
+        addParameterIfNotNull(request, "orderByTime", req.getOrderByTime());
+        addParameterIfNotNull(request, "nextToken", req.getNextToken());
+        addParameterIfNotNull(request, "size", req.getSize().toString());
+        addParameterIfNotNull(request, "states", req.getStates());
+        addParameterIfNotNull(request, "startCreationTime", req.getStartCreationTime());
+        addParameterIfNotNull(request, "endCreationTime", req.getEndCreationTime());
+        MediaListJobResponse response = invoke(request, new Unmarshallers.CICommonUnmarshaller<MediaListJobResponse>(MediaListJobResponse.class));
         this.checkMediaListJobResponse(response);
         return response;
     }

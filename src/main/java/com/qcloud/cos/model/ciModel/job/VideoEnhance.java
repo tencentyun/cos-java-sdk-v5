@@ -1,16 +1,24 @@
 package com.qcloud.cos.model.ciModel.job;
 
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  * 媒体处理 画质增强参数
  */
 public class VideoEnhance {
 
+    @XStreamAlias("Transcode")
     private MediaTranscodeObject trascode;
+    @XStreamAlias("SuperResolution")
     private SuperResolution superResolution;
+    @XStreamAlias("SDRtoHDR")
     private SDRtoHDR sdrToHDR;
+    @XStreamAlias("ColorEnhance")
     private ColorEnhance colorEnhance;
+    @XStreamAlias("MsSharpen")
     private MsSharpen msSharpen;
+    @XStreamAlias("FrameEnhance")
     private FrameEnhance frameEnhance;
 
     public MediaTranscodeObject getTrascode() {

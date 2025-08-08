@@ -116,6 +116,7 @@ public class CIAuditingXmlFactory {
         CIMediaXmlFactory.addIfNotNull(xml, "SuggestedLabel", request.getSuggestedLabel());
         CIMediaXmlFactory.addIfNotNull(xml, "JobId", request.getJobId());
         CIMediaXmlFactory.addIfNotNull(xml, "ModerationTime", request.getModerationTime());
+        CIMediaXmlFactory.addIfNotNull(xml, "Url", request.getUrl());
         xml.end();
         return xml.getBytes();
     }
