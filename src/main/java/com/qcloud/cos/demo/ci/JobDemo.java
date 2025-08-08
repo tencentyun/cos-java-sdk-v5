@@ -206,6 +206,9 @@ public class JobDemo {
         System.out.println(response);
     }
 
+    /**
+     * describeMediaJobs 批量查询任务信息
+     */
     public static void describeMediaJobs(COSClient client) {
         //1.创建任务请求对象
         MediaJobsRequest request = new MediaJobsRequest();
