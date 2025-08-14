@@ -3298,6 +3298,8 @@ public interface COS extends COSDirectSpi {
     MediaTemplateResponseV2 createMediaTemplateV2(MediaTemplateRequestV2 request);
 
     ImageOCRResponse imageOCR(ImageOCRRequest request);
+
+    TranslationResponse createTranslationJob(TranslationRequest translationRequest);
 }
 
 

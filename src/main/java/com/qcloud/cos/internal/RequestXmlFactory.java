@@ -18,10 +18,6 @@
 
 package com.qcloud.cos.internal;
 
-import static com.qcloud.cos.model.ciModel.xml.CIMediaXmlFactory.addAigcMetadata;
-import static com.qcloud.cos.model.ciModel.xml.CIMediaXmlFactory.addCallBackKafkaConfig;
-import static com.qcloud.cos.model.ciModel.xml.CIMediaXmlFactory.addCallBackMqConfig;
-
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.util.Collections;
@@ -52,22 +48,7 @@ import com.qcloud.cos.model.ciModel.auditing.UserInfo;
 import com.qcloud.cos.model.ciModel.auditing.VideoAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.WebpageAuditingRequest;
 import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
-import com.qcloud.cos.model.ciModel.job.DocJobObject;
-import com.qcloud.cos.model.ciModel.job.DocJobRequest;
-import com.qcloud.cos.model.ciModel.job.DocProcessObject;
-import com.qcloud.cos.model.ciModel.job.ExtractDigitalWatermark;
-import com.qcloud.cos.model.ciModel.job.MediaAudioObject;
-import com.qcloud.cos.model.ciModel.job.MediaConcatFragmentObject;
-import com.qcloud.cos.model.ciModel.job.MediaConcatTemplateObject;
-import com.qcloud.cos.model.ciModel.job.MediaDigitalWatermark;
-import com.qcloud.cos.model.ciModel.job.MediaJobOperation;
-import com.qcloud.cos.model.ciModel.job.MediaJobsRequest;
-import com.qcloud.cos.model.ciModel.job.MediaRemoveWaterMark;
-import com.qcloud.cos.model.ciModel.job.MediaTimeIntervalObject;
-import com.qcloud.cos.model.ciModel.job.MediaTransConfigObject;
-import com.qcloud.cos.model.ciModel.job.MediaTranscodeObject;
-import com.qcloud.cos.model.ciModel.job.MediaTranscodeVideoObject;
-import com.qcloud.cos.model.ciModel.job.MediaVideoObject;
+import com.qcloud.cos.model.ciModel.job.*;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoRequest;
 import com.qcloud.cos.model.ciModel.queue.DocQueueRequest;
 import com.qcloud.cos.model.ciModel.queue.MediaQueueRequest;
@@ -636,7 +617,6 @@ public class RequestXmlFactory {
             addIfNotNull(xml, "ResoAdjMethod", request.getTransConfig().getResoAdjMethod());
             addIfNotNull(xml, "TransMode", request.getTransConfig().getTransMode());
             addIfNotNull(xml, "VideoBitrateAdjMethod", request.getTransConfig().getVideoBitrateAdjMethod());
-            addAigcMetadata(xml, request.getTransConfig().getAigcMetadata());
             xml.end();
 
             addVideo(xml, request);
@@ -695,11 +675,6 @@ public class RequestXmlFactory {
         xml.start("Input");
         xml.start("Object").value(docJobObject.getInput().getObject()).end();
         xml.end();
-        addIfNotNull(xml, "CallBack", docJobObject.getCallBack());
-        addIfNotNull(xml, "CallBackFormat", docJobObject.getCallBackFormat());
-        addIfNotNull(xml, "CallBackType", docJobObject.getCallBackType());
-        addCallBackMqConfig(xml, docJobObject.getCallBackMqConfig());
-        addCallBackKafkaConfig(xml, docJobObject.getCallBackKafkaConfig());
 
         if (CheckObjectUtils.objIsNotValid(docJobObject)){
             xml.start("Operation");
@@ -726,7 +701,7 @@ public class RequestXmlFactory {
             addIfNotNull(xml, "PicPagination", docProcess.getPicPagination());
             addIfNotNull(xml, "ImageDpi", docProcess.getImageDpi());
             xml.end();
-            addIfNotNull(xml, "UserData", docJobObject.getOperation().getUserData());
+
             xml.end();
         }
         xml.end();
@@ -929,6 +904,70 @@ public class RequestXmlFactory {
         return xml.getBytes();
     }
 
+    public static byte[] convertToXmlByteArray(TranslationRequest request) {
+        XmlWriter xml = new XmlWriter();
+
+        xml.start("Request");
+        addIfNotNull(xml, "Tag", request.getTag());
+
+        // 输入配置
+        TranslationInput input = request.getInput();
+        if (input != null) {
+            xml.start("Input");
+            addIfNotNull(xml, "Object", input.getObject());
+            addIfNotNull(xml, "Lang", input.getLang());
+            addIfNotNull(xml, "Type", input.getType());
+            addIfNotNull(xml, "BasicType", input.getBasicType());
+            xml.end();
+        }
+
+        // 操作配置
+        TranslationOperation operation = request.getOperation();
+        if (operation != null) {
+            xml.start("Operation");
+
+            // 翻译参数
+            xml.start("Translation");
+            addIfNotNull(xml, "Lang", operation.getLang());
+            addIfNotNull(xml, "Type", operation.getType());
+            xml.end();
+
+            // 输出配置
+            TranslationOutput output = operation.getOutput();
+            if (output != null) {
+                xml.start("Output");
+                addIfNotNull(xml, "Region", output.getRegion());
+                addIfNotNull(xml, "Bucket", output.getBucket());
+                addIfNotNull(xml, "Object", output.getObject());
+                xml.end();
+            }
+
+            addIfNotNull(xml, "UserData", operation.getUserData());
+            addIfNotNull(xml, "JobLevel", operation.getJobLevel());
+            addIfNotNull(xml, "NoNeedOutput", operation.getNoNeedOutput());
+
+            xml.end();
+        }
+
+        // 回调配置
+        addIfNotNull(xml, "CallBack", request.getCallBack());
+        addIfNotNull(xml, "CallBackFormat", request.getCallBackFormat());
+        addIfNotNull(xml, "CallBackType", request.getCallBackType());
+
+        // 回调MQ配置
+        CallBackMqConfig mqConfig = request.getCallBackMqConfig();
+        if (mqConfig != null) {
+            xml.start("CallBackMqConfig");
+            addIfNotNull(xml, "MqRegion", mqConfig.getMqRegion());
+            addIfNotNull(xml, "MqMode", mqConfig.getMqMode());
+            addIfNotNull(xml, "MqName", mqConfig.getMqName());
+            xml.end();
+        }
+
+        xml.end();
+
+        return xml.getBytes();
+    }
 
     private static void addIfNotNull(XmlWriter xml, String xmlTag, String value) {
         if (value != null) {

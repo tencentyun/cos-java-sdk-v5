@@ -5757,5 +5757,36 @@ public class COSClient implements COS {
             invoke(request, voidCosResponseHandler);
         }
     }
+
+    @Override
+    public TranslationResponse createTranslationJob(TranslationRequest translationRequest) {
+        // 1. 参数校验
+        rejectNull(translationRequest, "The translation request must not be null");
+        rejectNull(translationRequest.getBucketName(), "The bucketName must not be null in translation request");
+
+        // 2. 构造API请求路径
+        String apiPath = "/jobs";
+
+        // 3. 创建HTTP请求对象
+        CosHttpRequest<TranslationRequest> request = createRequest(
+                translationRequest.getBucketName(),
+                apiPath,
+                translationRequest,
+                HttpMethodName.POST
+        );
+
+        // 4. 添加CI处理标识
+        request.addParameter("ci-process", "Translation");
+
+        // 5. 设置XML请求体
+        byte[] xmlBytes = RequestXmlFactory.convertToXmlByteArray(translationRequest);
+        setContent(request, xmlBytes, "application/xml", false);
+
+        // 6. 执行请求并解析响应
+        return invoke(
+                request,
+                new Unmarshallers.CICommonUnmarshaller<TranslationResponse>(TranslationResponse.class)
+        );
+    }
 }
 
