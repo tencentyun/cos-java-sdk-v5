@@ -5759,34 +5759,23 @@ public class COSClient implements COS {
     }
 
     @Override
-    public TranslationResponse createTranslationJob(TranslationRequest translationRequest) {
-        // 1. 参数校验
-        rejectNull(translationRequest, "The translation request must not be null");
-        rejectNull(translationRequest.getBucketName(), "The bucketName must not be null in translation request");
+    public TranslationResponse createTranslationJob(TranslationRequest req) {
+        CosHttpRequest<TranslationRequest> request = createRequest(req.getBucketName(), "/jobs", req, HttpMethodName.POST);
 
-        // 2. 构造API请求路径
-        String apiPath = "/jobs";
+        this.setContent(request, CIAuditingXmlFactoryV2.convertToXmlByteArray(req), "application/xml", false);
 
-        // 3. 创建HTTP请求对象
-        CosHttpRequest<TranslationRequest> request = createRequest(
-                translationRequest.getBucketName(),
-                apiPath,
-                translationRequest,
-                HttpMethodName.POST
-        );
+        return invoke(request, new Unmarshallers.CICommonUnmarshaller<TranslationResponse>(TranslationResponse.class));
+    }
 
-        // 4. 添加CI处理标识
-        request.addParameter("ci-process", "Translation");
+    @Override
+    public ImageQualityResponse AccessImageQulity(ImageQualityRequest req) {
+        CosHttpRequest<ImageQualityRequest> request = createRequest(req.getBucketName(), req.getObjectKey(), req, HttpMethodName.GET);
 
-        // 5. 设置XML请求体
-        byte[] xmlBytes = RequestXmlFactory.convertToXmlByteArray(translationRequest);
-        setContent(request, xmlBytes, "application/xml", false);
+        addParameterIfNotNull(request, "ci-process", "AssessQuality");
 
-        // 6. 执行请求并解析响应
-        return invoke(
-                request,
-                new Unmarshallers.CICommonUnmarshaller<TranslationResponse>(TranslationResponse.class)
-        );
+        request.addHeader("Accept", "application/xml");
+
+        return invoke(request, new Unmarshallers.CICommonUnmarshaller<ImageQualityResponse>(ImageQualityResponse.class));
     }
 }
 

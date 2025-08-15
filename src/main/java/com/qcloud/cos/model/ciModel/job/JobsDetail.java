@@ -116,4 +116,21 @@ public class JobsDetail {
     public void setOperation(TranslationOperation operation) {
         this.operation = operation;
     }
+
+    @Override
+    public String toString() {
+        return "JobsDetail{" +
+                "jobId='" + jobId + '\'' +
+                ", code='" + code + '\'' +
+                ", message='" + message + '\'' +
+                ", state='" + state + '\'' +
+                ", creationTime='" + creationTime + '\'' +
+                ", startTime='" + startTime + '\'' +
+                ", endTime='" + endTime + '\'' +
+                ", queueId='" + queueId + '\'' +
+                ", tag='" + tag + '\'' +
+                ", input=" + input +
+                ", operation=" + operation +
+                '}';
+    }
 }

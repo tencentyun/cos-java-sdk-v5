@@ -327,7 +327,7 @@ public class RequestXmlFactory {
 
         MediaJobOperation operation = request.getOperation();
         xml.start("Operation");
-        addIfNotNull(xml,"TemplateId",operation.getTemplateId());
+        addIfNotNull(xml, "TemplateId", operation.getTemplateId());
 
         List<String> watermarkTemplateId = operation.getWatermarkTemplateId();
         if (watermarkTemplateId.size() != 0) {
@@ -378,20 +378,20 @@ public class RequestXmlFactory {
         }
 
         MediaConcatTemplateObject mediaConcatTemplate = operation.getMediaConcatTemplate();
-        if (CheckObjectUtils.objIsNotValid(mediaConcatTemplate)){
+        if (CheckObjectUtils.objIsNotValid(mediaConcatTemplate)) {
             xml.start("ConcatTemplate");
             List<MediaConcatFragmentObject> concatFragmentList = mediaConcatTemplate.getConcatFragmentList();
             for (MediaConcatFragmentObject concatFragment : concatFragmentList) {
                 xml.start("ConcatFragment");
-                addIfNotNull(xml,"Mode",concatFragment.getMode());
-                addIfNotNull(xml,"Url",concatFragment.getUrl());
+                addIfNotNull(xml, "Mode", concatFragment.getMode());
+                addIfNotNull(xml, "Url", concatFragment.getUrl());
                 xml.end();
             }
-            addVideo(xml,mediaConcatTemplate.getVideo());
-            addAudio(xml,mediaConcatTemplate.getAudio());
-            addIfNotNull(xml,"Index",mediaConcatTemplate.getIndex());
+            addVideo(xml, mediaConcatTemplate.getVideo());
+            addAudio(xml, mediaConcatTemplate.getAudio());
+            addIfNotNull(xml, "Index", mediaConcatTemplate.getIndex());
             String format = mediaConcatTemplate.getContainer().getFormat();
-            if (!StringUtils.isNullOrEmpty(format)){
+            if (!StringUtils.isNullOrEmpty(format)) {
                 xml.start("Container");
                 xml.start("Format").value(format).end();
                 xml.end();
@@ -444,26 +444,26 @@ public class RequestXmlFactory {
         MediaDigitalWatermark digitalWatermark = operation.getDigitalWatermark();
         if (CheckObjectUtils.objIsNotValid(digitalWatermark)) {
             xml.start("DigitalWatermark");
-            addIfNotNull(xml, "Message",digitalWatermark.getMessage());
-            addIfNotNull(xml, "Type",digitalWatermark.getType());
-            addIfNotNull(xml, "Version",digitalWatermark.getVersion());
+            addIfNotNull(xml, "Message", digitalWatermark.getMessage());
+            addIfNotNull(xml, "Type", digitalWatermark.getType());
+            addIfNotNull(xml, "Version", digitalWatermark.getVersion());
             xml.end();
         }
 
         ExtractDigitalWatermark extractDigitalWatermark = operation.getExtractDigitalWatermark();
         if (extractDigitalWatermark.getType() != null || extractDigitalWatermark.getMessage() != null) {
             xml.start("ExtractDigitalWatermark");
-            addIfNotNull(xml, "Message",extractDigitalWatermark.getMessage());
-            addIfNotNull(xml, "Type",extractDigitalWatermark.getType());
-            addIfNotNull(xml, "Version",extractDigitalWatermark.getVersion());
+            addIfNotNull(xml, "Message", extractDigitalWatermark.getMessage());
+            addIfNotNull(xml, "Type", extractDigitalWatermark.getType());
+            addIfNotNull(xml, "Version", extractDigitalWatermark.getVersion());
             xml.end();
         }
         MediaOutputObject output = operation.getOutput();
-        if (CheckObjectUtils.objIsNotValid(output)){
+        if (CheckObjectUtils.objIsNotValid(output)) {
             xml.start("Output");
-            addIfNotNull(xml,"Region",output.getRegion());
-            addIfNotNull(xml,"Object",output.getObject());
-            addIfNotNull(xml,"Bucket",output.getBucket());
+            addIfNotNull(xml, "Region", output.getRegion());
+            addIfNotNull(xml, "Object", output.getObject());
+            addIfNotNull(xml, "Bucket", output.getBucket());
             xml.end();
         }
 
@@ -676,7 +676,7 @@ public class RequestXmlFactory {
         xml.start("Object").value(docJobObject.getInput().getObject()).end();
         xml.end();
 
-        if (CheckObjectUtils.objIsNotValid(docJobObject)){
+        if (CheckObjectUtils.objIsNotValid(docJobObject)) {
             xml.start("Operation");
             xml.start("Output");
             MediaOutputObject output = docJobObject.getOperation().getOutput();
@@ -788,7 +788,7 @@ public class RequestXmlFactory {
         Conf conf = request.getConf();
         xml.start("Conf");
         String detectType = conf.getDetectType();
-        addAuditingDetectType(xml,detectType);
+        addAuditingDetectType(xml, detectType);
         addIfNotNull(xml, "Callback", conf.getCallback());
         addIfNotNull(xml, "CallbackVersion", conf.getCallbackVersion());
         addIfNotNull(xml, "BizType", conf.getBizType());
@@ -819,7 +819,7 @@ public class RequestXmlFactory {
         Conf conf = request.getConf();
         xml.start("Conf");
         String detectType = conf.getDetectType();
-        addAuditingDetectType(xml,detectType);
+        addAuditingDetectType(xml, detectType);
         addIfNotNull(xml, "Callback", conf.getCallback());
         addIfNotNull(xml, "BizType", conf.getBizType());
         addIfNotNull(xml, "CallbackVersion", conf.getCallbackVersion());
@@ -844,7 +844,7 @@ public class RequestXmlFactory {
         Conf conf = request.getConf();
         xml.start("Conf");
         String detectType = conf.getDetectType();
-        addAuditingDetectType(xml,detectType);
+        addAuditingDetectType(xml, detectType);
         addIfNotNull(xml, "Callback", conf.getCallback());
         addIfNotNull(xml, "BizType", conf.getBizType());
         xml.end();
@@ -863,7 +863,7 @@ public class RequestXmlFactory {
         Conf conf = request.getConf();
         xml.start("Conf");
         String detectType = conf.getDetectType();
-        addAuditingDetectType(xml,detectType);
+        addAuditingDetectType(xml, detectType);
         addIfNotNull(xml, "Callback", conf.getCallback());
         addIfNotNull(xml, "BizType", conf.getBizType());
         addIfNotNull(xml, "ReturnHighlightHtml", conf.getReturnHighlightHtml());
@@ -887,85 +887,20 @@ public class RequestXmlFactory {
             addIfNotNull(xml, "Interval", inputObject.getInterval());
             addIfNotNull(xml, "LargeImageDetect", inputObject.getLargeImageDetect());
             addIfNotNull(xml, "Content", inputObject.getContent());
-            addUserInfo(xml,inputObject.getUserInfo());
+            addUserInfo(xml, inputObject.getUserInfo());
             xml.end();
         }
 
         Conf conf = request.getConf();
         xml.start("Conf");
         String detectType = conf.getDetectType();
-        addAuditingDetectType(xml,detectType);
+        addAuditingDetectType(xml, detectType);
         addIfNotNull(xml, "BizType", conf.getBizType());
         addIfNotNull(xml, "Async", conf.getAsync());
         addIfNotNull(xml, "Callback", conf.getCallback());
         xml.end();
 
         xml.end();
-        return xml.getBytes();
-    }
-
-    public static byte[] convertToXmlByteArray(TranslationRequest request) {
-        XmlWriter xml = new XmlWriter();
-
-        xml.start("Request");
-        addIfNotNull(xml, "Tag", request.getTag());
-
-        // 输入配置
-        TranslationInput input = request.getInput();
-        if (input != null) {
-            xml.start("Input");
-            addIfNotNull(xml, "Object", input.getObject());
-            addIfNotNull(xml, "Lang", input.getLang());
-            addIfNotNull(xml, "Type", input.getType());
-            addIfNotNull(xml, "BasicType", input.getBasicType());
-            xml.end();
-        }
-
-        // 操作配置
-        TranslationOperation operation = request.getOperation();
-        if (operation != null) {
-            xml.start("Operation");
-
-            // 翻译参数
-            xml.start("Translation");
-            addIfNotNull(xml, "Lang", operation.getLang());
-            addIfNotNull(xml, "Type", operation.getType());
-            xml.end();
-
-            // 输出配置
-            TranslationOutput output = operation.getOutput();
-            if (output != null) {
-                xml.start("Output");
-                addIfNotNull(xml, "Region", output.getRegion());
-                addIfNotNull(xml, "Bucket", output.getBucket());
-                addIfNotNull(xml, "Object", output.getObject());
-                xml.end();
-            }
-
-            addIfNotNull(xml, "UserData", operation.getUserData());
-            addIfNotNull(xml, "JobLevel", operation.getJobLevel());
-            addIfNotNull(xml, "NoNeedOutput", operation.getNoNeedOutput());
-
-            xml.end();
-        }
-
-        // 回调配置
-        addIfNotNull(xml, "CallBack", request.getCallBack());
-        addIfNotNull(xml, "CallBackFormat", request.getCallBackFormat());
-        addIfNotNull(xml, "CallBackType", request.getCallBackType());
-
-        // 回调MQ配置
-        CallBackMqConfig mqConfig = request.getCallBackMqConfig();
-        if (mqConfig != null) {
-            xml.start("CallBackMqConfig");
-            addIfNotNull(xml, "MqRegion", mqConfig.getMqRegion());
-            addIfNotNull(xml, "MqMode", mqConfig.getMqMode());
-            addIfNotNull(xml, "MqName", mqConfig.getMqName());
-            xml.end();
-        }
-
-        xml.end();
-
         return xml.getBytes();
     }
 
@@ -983,9 +918,10 @@ public class RequestXmlFactory {
 
     private static void addVideo(XmlWriter xml, MediaTemplateRequest request) {
         MediaVideoObject video = request.getVideo();
-        addVideo(xml,video);
+        addVideo(xml, video);
     }
-    private static void addVideo(XmlWriter xml, MediaVideoObject video){
+
+    private static void addVideo(XmlWriter xml, MediaVideoObject video) {
         if (CheckObjectUtils.objIsValid(video)) {
             return;
         }
@@ -1016,7 +952,7 @@ public class RequestXmlFactory {
         xml.end();
     }
 
-    private static void addVideo(XmlWriter xml, MediaTranscodeVideoObject video){
+    private static void addVideo(XmlWriter xml, MediaTranscodeVideoObject video) {
         if (CheckObjectUtils.objIsValid(video)) {
             return;
         }

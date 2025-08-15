@@ -69,6 +69,8 @@ public class FileProcessJobDemo {
         FileUnCompressConfig fileUnCompressConfig = request.getOperation().getFileUnCompressConfig();
         fileUnCompressConfig.setPrefix("output/");
         fileUnCompressConfig.setPrefixReplaced("1");
+        fileUnCompressConfig.setUnCompressKey("demo");
+        fileUnCompressConfig.setListingFile(true);
         MediaOutputObject output = request.getOperation().getOutput();
         output.setBucket("demo-1234567890");
         output.setRegion("ap-chongqing");

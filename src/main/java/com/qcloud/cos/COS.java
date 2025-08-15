@@ -3300,6 +3300,8 @@ public interface COS extends COSDirectSpi {
     ImageOCRResponse imageOCR(ImageOCRRequest request);
 
     TranslationResponse createTranslationJob(TranslationRequest translationRequest);
+
+    ImageQualityResponse AccessImageQulity(ImageQualityRequest request);
 }
 
 

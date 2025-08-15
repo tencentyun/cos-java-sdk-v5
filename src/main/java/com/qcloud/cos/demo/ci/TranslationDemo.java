@@ -16,7 +16,7 @@ public class TranslationDemo {
 
         // 2. 创建翻译任务
         TranslationResponse response = createTranslationJob(client);
-        System.out.println("翻译任务创建成功，JobId: " + response.getJobId());
+        System.out.println(response.getJobsDetail().getJobId());
     }
 
     public static TranslationResponse createTranslationJob(COSClient client) {
@@ -38,17 +38,20 @@ public class TranslationDemo {
         TranslationOutput output = new TranslationOutput();
         output.setRegion("ap-guangzhou");
         output.setBucket("demobucket-1251704708");
-        output.setObject("translated.txt");
+        output.setObject("translated1.txt");
         request.getOperation().setOutput(output);
 
         // 5. 配置翻译参数
-        request.getOperation().setLang("en");
-        request.getOperation().setType("txt");
+        request.getOperation().getTranslation().setLang("en");
+        request.getOperation().getTranslation().setType("txt");
 
-        request.setCallBack("http://callback-url.com");
+        // 6. 配置其他参数
+        request.getOperation().setJobLevel("0");
+        request.getOperation().setUserData("userData");
+
+        request.setCallBack("http://xxxx.xxxx.xxxx:xxxx");
         request.setCallBackFormat("JSON");
 
-        // 7. 提交任务
         return client.createTranslationJob(request);
     }
 }

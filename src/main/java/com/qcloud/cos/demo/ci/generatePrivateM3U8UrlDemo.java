@@ -17,6 +17,7 @@ public class generatePrivateM3U8UrlDemo {
     private static String bucket = "demo-123456789";
     private static String objectKey = "test.m3u8";
     private static String expires = "3600";
+    // 播放密钥：到 对象存储控制台，桶详情页面的数据处理>媒体处理，在上方选中媒体处理页签。编辑开启媒体处理，并生成和复制播放密钥。用于后续 token 服务搭建。
     private static byte[] secret = "YourSecret".getBytes();
 
     public static String  generateCosDomainPrivateM3U8Url(COSClient client) throws UnsupportedEncodingException {
