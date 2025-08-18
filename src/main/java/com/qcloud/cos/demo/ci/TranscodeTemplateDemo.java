@@ -60,6 +60,7 @@ public class TranscodeTemplateDemo {
         transConfig.setAdjDarMethod("scale");
         transConfig.setIsCheckReso("false");
         transConfig.setResoAdjMethod("1");
+        transConfig.setIsCheckVideoFps("true");
         //2.4 添加TimeInterval对象的值
         MediaTimeIntervalObject timeInterval = request.getTimeInterval();
         timeInterval.setStart("0");

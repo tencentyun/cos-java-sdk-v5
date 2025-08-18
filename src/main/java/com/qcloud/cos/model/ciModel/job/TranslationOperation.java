@@ -6,7 +6,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 public class TranslationOperation {
 
     @XStreamAlias("Output")
-    private TranslationOutput translationOutput;
+    private TranslationOutput output;
     @XStreamAlias("UserData")
     private String userData;
     @XStreamAlias("JobLevel")
@@ -16,26 +16,15 @@ public class TranslationOperation {
     @XStreamAlias("Translation")
     private OperationTranslation translation;
 
-    public TranslationOutput getTranslationOutput() {
-        if (translationOutput == null) {
-            translationOutput = new TranslationOutput();
-        }
-        return translationOutput;
-    }
-
-    public void setTranslationOutput(TranslationOutput translationOutput) {
-        this.translationOutput = translationOutput;
-    }
-
     public TranslationOutput getOutput() {
-        if (translationOutput == null) {
-            translationOutput = new TranslationOutput();
+        if (output == null) {
+            output = new TranslationOutput();
         }
-        return translationOutput;
+        return output;
     }
 
     public void setOutput(TranslationOutput translationOutput) {
-        this.translationOutput = translationOutput;
+        this.output = translationOutput;
     }
 
     public String getUserData() {

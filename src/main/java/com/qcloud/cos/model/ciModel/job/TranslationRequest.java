@@ -11,9 +11,9 @@ public class TranslationRequest extends CIServiceRequest implements Serializable
     @XStreamAlias("Tag")
     private String tag;
     @XStreamAlias("Input")
-    private TranslationInput translationInput;
+    private TranslationInput input;
     @XStreamAlias("Operation")
-    private TranslationOperation translationOperation;
+    private TranslationOperation operation;
     @XStreamAlias("CallBack")
     private String callBack;
     @XStreamAlias("CallBackFormat")
@@ -32,25 +32,25 @@ public class TranslationRequest extends CIServiceRequest implements Serializable
     }
 
     public TranslationInput getInput() {
-        if (translationInput == null) {
-            translationInput = new TranslationInput();
+        if (input == null) {
+            input = new TranslationInput();
         }
-        return translationInput;
+        return input;
     }
 
     public void setInput(TranslationInput translationInput) {
-        this.translationInput = translationInput;
+        this.input = translationInput;
     }
 
     public TranslationOperation getOperation() {
-        if (translationOperation == null) {
-            translationOperation = new TranslationOperation();
+        if (operation == null) {
+            operation = new TranslationOperation();
         }
-        return translationOperation;
+        return operation;
     }
 
     public void setOperation(TranslationOperation translationOperation) {
-        this.translationOperation = translationOperation;
+        this.operation = translationOperation;
     }
 
     public String getCallBack() {
