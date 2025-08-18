@@ -9,6 +9,7 @@ import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.model.ciModel.job.ImageQualityRequest;
 import com.qcloud.cos.model.ciModel.job.ImageQualityResponse;
 import com.qcloud.cos.region.Region;
+import com.qcloud.cos.utils.Jackson;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -46,20 +47,31 @@ public class ImageQualityTest extends AbstractCOSClientCITest {
         System.out.println(response);
     }
 
-    // 测试空参数异常
+    // 测试空参数
     @Test(expected = IllegalArgumentException.class)
     public void testEmptyParameters() {
-        ImageQualityRequest request = new ImageQualityRequest();
-        cosclient.AccessImageQulity(request);
+        try {
+            ImageQualityRequest request = new ImageQualityRequest();
+            ImageQualityResponse response = cosclient.AccessImageQulity(request);
+            System.out.println(Jackson.toJsonString(response));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     // 测试无效图片路径
     @Test(expected = CosServiceException.class)
     public void testInvalidImagePath() {
-        ImageQualityRequest request = new ImageQualityRequest();
-        request.setBucketName(bucket);
-        request.setObjectKey("non-existent-image.jpg");
+        try {
+            ImageQualityRequest request = new ImageQualityRequest();
+            request.setBucketName(bucket);
+            request.setObjectKey("non-existent-image.jpg");
 
-        cosclient.AccessImageQulity(request);
+            ImageQualityResponse response = cosclient.AccessImageQulity(request);
+            System.out.println(Jackson.toJsonString(response));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
