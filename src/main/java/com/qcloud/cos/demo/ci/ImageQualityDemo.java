@@ -11,11 +11,10 @@ public class ImageQualityDemo {
     public static void main(String[] args) {
         // 1. 初始化客户端
         COSClient client = ClientUtils.getTestClient();
-        ImageQualityResponse response = assessImageQuality(client);
-        System.out.println(response.toString());
+        assessImageQuality(client);
     }
 
-    public static ImageQualityResponse assessImageQuality(COSClient client) {
+    public static void assessImageQuality(COSClient client) {
         // 1. 创建请求对象
         ImageQualityRequest request = new ImageQualityRequest();
 
@@ -24,6 +23,7 @@ public class ImageQualityDemo {
         request.setObjectKey("demo.jpeg");
 
         // 3. 发起GET请求，返回结果
-        return client.AccessImageQulity(request);
+        ImageQualityResponse response = client.AccessImageQulity(request);
+        System.out.println(response.getRequestId());
     }
 }

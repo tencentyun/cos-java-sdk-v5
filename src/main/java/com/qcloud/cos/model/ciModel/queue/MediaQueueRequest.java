@@ -24,6 +24,15 @@ public class MediaQueueRequest extends CIServiceRequest implements Serializable 
      */
     private String pageSize;
     private String name;
+
+    /**
+     * CateAll：所有类型
+     * Transcoding：媒体处理队列
+     * SpeedTranscoding：媒体处理倍速转码队列
+     * 默认为 Transcoding
+     */
+    private String category;
+
     private MediaNotifyConfig notifyConfig = new MediaNotifyConfig();
 
     public String getQueueId() {
@@ -72,6 +81,14 @@ public class MediaQueueRequest extends CIServiceRequest implements Serializable 
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 
     @Override

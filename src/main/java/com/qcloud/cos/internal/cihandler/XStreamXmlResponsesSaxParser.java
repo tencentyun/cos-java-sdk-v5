@@ -26,6 +26,9 @@ public abstract class XStreamXmlResponsesSaxParser<T> {
             //对指定的类使用Annotations 进行序列化
             xstream.processAnnotations(cls);
             xstream.addPermission(AnyTypePermission.ANY);
+            //添加 Map 类型converter
+            xstream.registerConverter(new MediaWorkflowMapConverter());
+
             Field[] fields = CosServiceRequest.class.getDeclaredFields();
             for (Field field : fields) {
                 xstream.omitField(CosServiceRequest.class, field.getName());

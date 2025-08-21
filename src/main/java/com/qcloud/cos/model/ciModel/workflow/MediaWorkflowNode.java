@@ -1,8 +1,16 @@
 package com.qcloud.cos.model.ciModel.workflow;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
+@XStreamAlias("Node")
 public class MediaWorkflowNode {
+    @XStreamAlias("Type")
     private String type;
+
+    @XStreamAlias("Operation")
     private MediaOperation operation;
+
+    @XStreamAlias("Input")
     private MediaWorkflowInput input;
 
     public String getType() {

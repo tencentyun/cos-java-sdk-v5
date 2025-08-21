@@ -15,43 +15,43 @@ public class TranslationDemo {
         COSClient client = ClientUtils.getTestClient();
 
         // 2. 创建翻译任务
-        TranslationResponse response = createTranslationJob(client);
-        System.out.println(response.getJobsDetail().getJobId());
+        createTranslationJob(client);
     }
 
-    public static TranslationResponse createTranslationJob(COSClient client) {
-        // 1. 构建请求对象
-        TranslationRequest request = new TranslationRequest();
+public static void createTranslationJob(COSClient client) {
+    // 1. 构建请求对象
+    TranslationRequest request = new TranslationRequest();
 
-        // 2. 设置基础参数
-        request.setBucketName("demobucket-1251704708");
-        request.setTag("Translation");
+    // 2. 设置基础参数
+    request.setBucketName("demobucket-1251704708");
+    request.setTag("Translation");
 
-        // 3. 配置输入
-        TranslationInput input = new TranslationInput();
-        input.setObject("demo.txt");
-        input.setLang("zh");
-        input.setType("txt");
-        request.setInput(input);
+    // 3. 配置输入
+    TranslationInput input = new TranslationInput();
+    input.setObject("demo.txt");
+    input.setLang("zh");
+    input.setType("txt");
+    request.setInput(input);
 
-        // 4. 配置输出
-        TranslationOutput output = new TranslationOutput();
-        output.setRegion("ap-guangzhou");
-        output.setBucket("demobucket-1251704708");
-        output.setObject("translated1.txt");
-        request.getOperation().setOutput(output);
+    // 4. 配置输出
+    TranslationOutput output = new TranslationOutput();
+    output.setRegion("ap-guangzhou");
+    output.setBucket("demobucket-1251704708");
+    output.setObject("translated1.txt");
+    request.getOperation().setOutput(output);
 
-        // 5. 配置翻译参数
-        request.getOperation().getTranslation().setLang("en");
-        request.getOperation().getTranslation().setType("txt");
+    // 5. 配置翻译参数
+    request.getOperation().getTranslation().setLang("en");
+    request.getOperation().getTranslation().setType("txt");
 
-        // 6. 配置其他参数
-        request.getOperation().setJobLevel("0");
-        request.getOperation().setUserData("userData");
+    // 6. 配置其他参数
+    request.getOperation().setJobLevel("0");
+    request.getOperation().setUserData("userData");
 
-        request.setCallBack("http://xxxx.xxxx.xxxx:xxxx");
-        request.setCallBackFormat("JSON");
+    request.setCallBack("http://xxxx.xxxx.xxxx:xxxx");
+    request.setCallBackFormat("JSON");
 
-        return client.createTranslationJob(request);
-    }
+    TranslationResponse response = client.createTranslationJob(request);
+    System.out.println(response.getJobId());
+}
 }

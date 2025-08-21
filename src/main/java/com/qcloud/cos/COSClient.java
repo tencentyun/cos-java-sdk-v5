@@ -4155,6 +4155,7 @@ public class COSClient implements COS {
         addParameterIfNotNull(request, "queueIds", req.getQueueId());
         addParameterIfNotNull(request, "state", req.getState());
         addParameterIfNotNull(request, "pageNumber", req.getPageNumber());
+        addParameterIfNotNull(request, "category", req.getCategory());
         addParameterIfNotNull(request, "pageSize", req.getPageSize());
         return invoke(request, new Unmarshallers.ListQueueUnmarshaller());
     }
@@ -4269,7 +4270,7 @@ public class COSClient implements COS {
     public MediaWorkflowExecutionResponse describeWorkflowExecution(MediaWorkflowListRequest request) {
         this.checkCIRequestCommon(request);
         CosHttpRequest<MediaWorkflowListRequest> httpRequest = this.createRequest(request.getBucketName(), "/workflowexecution/" + request.getRunId(), request, HttpMethodName.GET);
-        return this.invoke(httpRequest, new Unmarshallers.WorkflowExecutionUnmarshaller());
+        return this.invoke(httpRequest, new Unmarshallers.CICommonUnmarshaller<MediaWorkflowExecutionResponse>(MediaWorkflowExecutionResponse.class));
     }
 
     @Override
