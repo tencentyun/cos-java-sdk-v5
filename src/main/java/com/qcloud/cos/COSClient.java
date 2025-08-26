@@ -4406,6 +4406,24 @@ public class COSClient implements COS {
     }
 
     @Override
+    public CreateAuditingPictureJobResponse imageAuditingV2(ImageAuditingRequest customRequest) {
+        CosHttpRequest<ImageAuditingRequest> request = createRequest(customRequest.getBucketName(), "/" + customRequest.getObjectKey(), customRequest , HttpMethodName.GET);
+        request.addParameter("ci-process", "sensitive-content-recognition");
+        addParameterIfNotNull(request, "biz-type", customRequest.getBizType());
+        addParameterIfNotNull(request, "detect-url", customRequest.getDetectUrl());
+        addParameterIfNotNull(request, "interval", customRequest.getInterval());
+        addParameterIfNotNull(request, "max-frames", customRequest.getMaxFrames());
+        addParameterIfNotNull(request, "large-image-detect", customRequest.getLargeImageDetect());
+        addParameterIfNotNull(request, "dataid", customRequest.getDataId());
+        addParameterIfNotNull(request, "async", customRequest.getAsync());
+        addParameterIfNotNull(request, "callback", customRequest.getCallback());
+
+        return invoke(request, new Unmarshallers.CICommonUnmarshaller<CreateAuditingPictureJobResponse>(CreateAuditingPictureJobResponse.class));
+    }
+
+
+
+    @Override
     public VideoAuditingResponse createVideoAuditingJob(VideoAuditingRequest videoAuditingRequest) {
         this.checkCIRequestCommon(videoAuditingRequest);
         this.rejectStartWith(videoAuditingRequest.getConf().getCallback(), "http", "The Conf.CallBack parameter mush start with http or https");

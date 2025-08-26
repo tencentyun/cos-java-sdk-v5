@@ -3044,6 +3044,8 @@ public interface COS extends COSDirectSpi {
      */
     ImageAuditingResponse imageAuditing(ImageAuditingRequest request);
 
+    CreateAuditingPictureJobResponse imageAuditingV2(ImageAuditingRequest customRequest);
+
     /**
      * CreateVideoAuditingJob 视频审核任务发起接口 https://cloud.tencent.com/document/product/460/46427
      */

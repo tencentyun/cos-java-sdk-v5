@@ -5684,6 +5684,8 @@ public class XmlResponsesSaxParser {
                 ParserMediaInfoUtils.parseOrcInfo(response.getAdsInfo().getOcrResults(), name, getText());
             } else if (in("RecognitionResult", "TeenagerInfo","OcrResults")) {
                 ParserMediaInfoUtils.parseOrcInfo(response.getTeenagerInfo().getOcrResults(), name, getText());
+            } else if (in("RecognitionResult","PoliticsInfo","ObjectResults")) {
+                ParserMediaInfoUtils.parseObjectResultsInfo(response.getPoliticsInfo().getPoliticsInfoObjectResults(), name, getText());
             }
         }
 
@@ -5703,6 +5705,9 @@ public class XmlResponsesSaxParser {
                     break;
                 case "Label":
                     obj.setLabel(getText());
+                    break;
+                case "SubLabel":
+                    obj.setSubLabel(getText());
                     break;
                 default:
                     break;
