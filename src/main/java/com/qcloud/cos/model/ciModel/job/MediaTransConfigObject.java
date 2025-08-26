@@ -58,6 +58,20 @@ public class MediaTransConfigObject implements Serializable {
     @XStreamAlias("DeleteMetadata")
     private String deleteMetadata;
     /**
+     * 是否检查视频帧率
+     * true、false
+     * 当为 false 时，按照配置参数转码
+     */
+    @XStreamAlias("IsCheckVideoFps")
+    private String isCheckVideoFps;
+    /**
+     * 视频帧率调整方式
+     * IsCheckVideoFps 为 true 时生效，取值0、1；
+     * 当输出视频帧率大于原视频帧率时，0表示使用原视频帧率；1表示返回转码失败
+     */
+    @XStreamAlias("VideoFpsAdjMethod")
+    private String videoFpsAdjMethod;
+    /**
      * 是否开启 HDR 转 SDR	 true/false
      */
     @XStreamAlias("IsHdr2Sdr")
@@ -205,6 +219,22 @@ public class MediaTransConfigObject implements Serializable {
         return transcodeIndex;
     }
 
+    public String getIsCheckVideoFps() {
+        return isCheckVideoFps;
+    }
+
+    public void setIsCheckVideoFps(String isCheckVideoFps) {
+        this.isCheckVideoFps = isCheckVideoFps;
+    }
+
+    public String getVideoFpsAdjMethod() {
+        return videoFpsAdjMethod;
+    }
+
+    public void setVideoFpsAdjMethod(String videoFpsAdjMethod) {
+        this.videoFpsAdjMethod = videoFpsAdjMethod;
+    }
+
     public void setTranscodeIndex(String transcodeIndex) {
         this.transcodeIndex = transcodeIndex;
     }
@@ -239,6 +269,8 @@ public class MediaTransConfigObject implements Serializable {
         sb.append(", cosTag='").append(cosTag).append('\'');
         sb.append(", transcodeIndex='").append(transcodeIndex).append('\'');
         sb.append(", aigcMetadata='").append(aigcMetadata).append('\'');
+        sb.append(", isCheckVideoFps='").append(isCheckVideoFps).append('\'');
+        sb.append(", videoFpsAdjMethod='").append(videoFpsAdjMethod).append('\'');
         sb.append('}');
         return sb.toString();
     }

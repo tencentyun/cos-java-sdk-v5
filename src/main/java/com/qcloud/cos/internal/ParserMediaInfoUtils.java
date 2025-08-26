@@ -772,6 +772,12 @@ public class ParserMediaInfoUtils {
             case "Name":
                 obj.setName(value);
                 break;
+            case "Location":
+                obj.setLocation(value);
+                break;
+            case "SubLabel":
+                obj.setSubLabel(value);
+                break;
             default:
                 break;
         }

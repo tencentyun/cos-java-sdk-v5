@@ -1,12 +1,41 @@
 package com.qcloud.cos.model.ciModel.workflow;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
+@XStreamAlias("Tasks")
 public class MediaTasks {
+    @XStreamAlias("Type")
     private String type;
-    private String createTime;
-    private String endTime;
+
+    @XStreamAlias("State")
     private String state;
+
+    @XStreamAlias("JobId")
     private String jobId;
+
+    @XStreamAlias("CreateTime")
+    private String createTime;
+
+    @XStreamAlias("EndTime")
+    private String endTime;
+
+    @XStreamAlias("Code")
+    private String code;
+
+    @XStreamAlias("Message")
+    private String message;
+
+    @XStreamAlias("Name")
     private String name;
+
+    @XStreamAlias("ResultInfo")
+    private MediaTaskResultInfo resultInfo;
+
+    @XStreamAlias("JudgementInfo")
+    private MediaTaskJudgementInfo judgementInfo;
+
+    @XStreamAlias("FileInfo")
+    private FileInfoObject fileInfo;
 
     public String getType() {
         return type;
@@ -56,15 +85,69 @@ public class MediaTasks {
         this.name = name;
     }
 
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public MediaTaskResultInfo getResultInfo() {
+        if (resultInfo == null) {
+            resultInfo = new MediaTaskResultInfo();
+        }
+        return resultInfo;
+    }
+
+    public void setResultInfo(MediaTaskResultInfo resultInfo) {
+        this.resultInfo = resultInfo;
+    }
+
+    public MediaTaskJudgementInfo getJudgementInfo() {
+        if (judgementInfo == null) {
+            judgementInfo = new MediaTaskJudgementInfo();
+        }
+        return judgementInfo;
+    }
+
+    public void setJudgementInfo(MediaTaskJudgementInfo judgementInfo) {
+        this.judgementInfo = judgementInfo;
+    }
+
+    public FileInfoObject getFileInfo() {
+        if (fileInfo == null) {
+            fileInfo = new FileInfoObject();
+        }
+        return fileInfo;
+    }
+
+    public void setFileInfo(FileInfoObject fileInfo) {
+        this.fileInfo = fileInfo;
+    }
+
     @Override
     public String toString() {
         return "MediaTasks{" +
                 "type='" + type + '\'' +
-                ", createTime='" + createTime + '\'' +
-                ", endTime='" + endTime + '\'' +
                 ", state='" + state + '\'' +
                 ", jobId='" + jobId + '\'' +
+                ", createTime='" + createTime + '\'' +
+                ", endTime='" + endTime + '\'' +
+                ", code='" + code + '\'' +
+                ", message='" + message + '\'' +
                 ", name='" + name + '\'' +
+                ", resultInfo=" + resultInfo +
+                ", judgementInfo=" + judgementInfo +
+                ", fileInfo=" + fileInfo +
                 '}';
     }
 }

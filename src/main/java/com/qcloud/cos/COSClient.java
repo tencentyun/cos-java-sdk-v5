@@ -4155,6 +4155,7 @@ public class COSClient implements COS {
         addParameterIfNotNull(request, "queueIds", req.getQueueId());
         addParameterIfNotNull(request, "state", req.getState());
         addParameterIfNotNull(request, "pageNumber", req.getPageNumber());
+        addParameterIfNotNull(request, "category", req.getCategory());
         addParameterIfNotNull(request, "pageSize", req.getPageSize());
         return invoke(request, new Unmarshallers.ListQueueUnmarshaller());
     }
@@ -4269,7 +4270,7 @@ public class COSClient implements COS {
     public MediaWorkflowExecutionResponse describeWorkflowExecution(MediaWorkflowListRequest request) {
         this.checkCIRequestCommon(request);
         CosHttpRequest<MediaWorkflowListRequest> httpRequest = this.createRequest(request.getBucketName(), "/workflowexecution/" + request.getRunId(), request, HttpMethodName.GET);
-        return this.invoke(httpRequest, new Unmarshallers.WorkflowExecutionUnmarshaller());
+        return this.invoke(httpRequest, new Unmarshallers.CICommonUnmarshaller<MediaWorkflowExecutionResponse>(MediaWorkflowExecutionResponse.class));
     }
 
     @Override
@@ -4403,6 +4404,24 @@ public class COSClient implements COS {
         addParameterIfNotNull(request, "callback", imageAuditingRequest.getCallback());
         return invoke(request, new Unmarshallers.ImageAuditingUnmarshaller());
     }
+
+    @Override
+    public CreateAuditingPictureJobResponse imageAuditingV2(ImageAuditingRequest customRequest) {
+        CosHttpRequest<ImageAuditingRequest> request = createRequest(customRequest.getBucketName(), "/" + customRequest.getObjectKey(), customRequest , HttpMethodName.GET);
+        request.addParameter("ci-process", "sensitive-content-recognition");
+        addParameterIfNotNull(request, "biz-type", customRequest.getBizType());
+        addParameterIfNotNull(request, "detect-url", customRequest.getDetectUrl());
+        addParameterIfNotNull(request, "interval", customRequest.getInterval());
+        addParameterIfNotNull(request, "max-frames", customRequest.getMaxFrames());
+        addParameterIfNotNull(request, "large-image-detect", customRequest.getLargeImageDetect());
+        addParameterIfNotNull(request, "dataid", customRequest.getDataId());
+        addParameterIfNotNull(request, "async", customRequest.getAsync());
+        addParameterIfNotNull(request, "callback", customRequest.getCallback());
+
+        return invoke(request, new Unmarshallers.CICommonUnmarshaller<CreateAuditingPictureJobResponse>(CreateAuditingPictureJobResponse.class));
+    }
+
+
 
     @Override
     public VideoAuditingResponse createVideoAuditingJob(VideoAuditingRequest videoAuditingRequest) {
@@ -5756,6 +5775,26 @@ public class COSClient implements COS {
             request.addHeader("x-cos-next-action", "UploadPart");
             invoke(request, voidCosResponseHandler);
         }
+    }
+
+    @Override
+    public TranslationResponse createTranslationJob(TranslationRequest req) {
+        CosHttpRequest<TranslationRequest> request = createRequest(req.getBucketName(), "/jobs", req, HttpMethodName.POST);
+
+        this.setContent(request, CIAuditingXmlFactoryV2.convertToXmlByteArray(req), "application/xml", false);
+
+        return invoke(request, new Unmarshallers.CICommonUnmarshaller<TranslationResponse>(TranslationResponse.class));
+    }
+
+    @Override
+    public ImageQualityResponse AccessImageQulity(ImageQualityRequest req) {
+        CosHttpRequest<ImageQualityRequest> request = createRequest(req.getBucketName(), req.getObjectKey(), req, HttpMethodName.GET);
+
+        addParameterIfNotNull(request, "ci-process", "AssessQuality");
+
+        request.addHeader("Accept", "application/xml");
+
+        return invoke(request, new Unmarshallers.CICommonUnmarshaller<ImageQualityResponse>(ImageQualityResponse.class));
     }
 }
 

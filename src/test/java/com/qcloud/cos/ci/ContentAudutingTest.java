@@ -11,6 +11,7 @@ import com.qcloud.cos.model.ciModel.auditing.BatchImageAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.BatchImageAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.BatchImageJobDetail;
 import com.qcloud.cos.model.ciModel.auditing.CallbackVersion;
+import com.qcloud.cos.model.ciModel.auditing.CreateAuditingPictureJobResponse;
 import com.qcloud.cos.model.ciModel.auditing.DescribeImageAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.DocumentAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.DocumentAuditingResponse;
@@ -351,4 +352,19 @@ public class ContentAudutingTest extends AbstractCOSClientCITest {
         }
     }
 
+    @Test
+    public void imageAuditingV2Test() {
+        try {
+            if (!judgeUserInfoValid()) {
+                return;
+            }
+            ImageAuditingRequest request = new ImageAuditingRequest();
+            request.setBucketName(bucket);
+            request.setObjectKey("ceshi.png");
+            CreateAuditingPictureJobResponse response = cosclient.imageAuditingV2(request);
+            System.out.println(Jackson.toJsonString(response));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

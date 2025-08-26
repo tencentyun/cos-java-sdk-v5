@@ -1,43 +1,55 @@
 package com.qcloud.cos.model.ciModel.workflow;
 
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamImplicit;
+
 import java.util.LinkedList;
 
 /**
  * 工作流请求实体类 请见：https://cloud.tencent.com/document/product/460/45947
  */
+@XStreamAlias("WorkflowExecution")
 public class MediaWorkflowExecutionObject {
     /**
      * 工作流实例 ID
      */
+    @XStreamAlias("RunId")
     private String runId;
     /**
      * 工作流 ID
      */
+    @XStreamAlias("WorkflowId")
     private String workflowId;
     /**
      * 工作流名称
      */
+    @XStreamAlias("WorkflowName")
     private String workflowName;
     /**
      * 工作流实例状态
      */
+    @XStreamAlias("State")
     private String state;
     /**
      * 创建时间
      */
+    @XStreamAlias("CreateTime")
     private String createTime;
     /**
      * cos对象地址
      */
+    @XStreamAlias("Object")
     private String object;
     /**
      * 拓扑信息
      */
+    @XStreamAlias("Topology")
     private MediaTopology topology;
     /**
      * cos对象地址
      */
+    @XStreamImplicit(itemFieldName="Tasks")
     private LinkedList<MediaTasks> tasks;
 
     public String getRunId() {

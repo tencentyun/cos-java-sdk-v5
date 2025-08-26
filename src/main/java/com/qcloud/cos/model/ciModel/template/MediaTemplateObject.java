@@ -136,6 +136,9 @@ public class MediaTemplateObject extends MediaCommonResponse {
     }
 
     public MediaTransConfigObject getTransConfig() {
+        if (transConfig == null) {
+            transConfig = new MediaTransConfigObject();
+        }
         return transConfig;
     }
 
