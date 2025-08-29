@@ -48,22 +48,7 @@ import com.qcloud.cos.model.ciModel.auditing.UserInfo;
 import com.qcloud.cos.model.ciModel.auditing.VideoAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.WebpageAuditingRequest;
 import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
-import com.qcloud.cos.model.ciModel.job.DocJobObject;
-import com.qcloud.cos.model.ciModel.job.DocJobRequest;
-import com.qcloud.cos.model.ciModel.job.DocProcessObject;
-import com.qcloud.cos.model.ciModel.job.ExtractDigitalWatermark;
-import com.qcloud.cos.model.ciModel.job.MediaAudioObject;
-import com.qcloud.cos.model.ciModel.job.MediaConcatFragmentObject;
-import com.qcloud.cos.model.ciModel.job.MediaConcatTemplateObject;
-import com.qcloud.cos.model.ciModel.job.MediaDigitalWatermark;
-import com.qcloud.cos.model.ciModel.job.MediaJobOperation;
-import com.qcloud.cos.model.ciModel.job.MediaJobsRequest;
-import com.qcloud.cos.model.ciModel.job.MediaRemoveWaterMark;
-import com.qcloud.cos.model.ciModel.job.MediaTimeIntervalObject;
-import com.qcloud.cos.model.ciModel.job.MediaTransConfigObject;
-import com.qcloud.cos.model.ciModel.job.MediaTranscodeObject;
-import com.qcloud.cos.model.ciModel.job.MediaTranscodeVideoObject;
-import com.qcloud.cos.model.ciModel.job.MediaVideoObject;
+import com.qcloud.cos.model.ciModel.job.*;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoRequest;
 import com.qcloud.cos.model.ciModel.queue.DocQueueRequest;
 import com.qcloud.cos.model.ciModel.queue.MediaQueueRequest;
@@ -687,12 +672,14 @@ public class RequestXmlFactory {
         xml.start("Request");
         xml.start("Tag").value(docJobObject.getTag()).end();
         xml.start("QueueId").value(docJobObject.getQueueId()).end();
+
         xml.start("Input");
         xml.start("Object").value(docJobObject.getInput().getObject()).end();
         xml.end();
 
         if (CheckObjectUtils.objIsNotValid(docJobObject)) {
             xml.start("Operation");
+            xml.start("UserData").value(docJobObject.getOperation().getUserData()).end();
             xml.start("Output");
             MediaOutputObject output = docJobObject.getOperation().getOutput();
             addIfNotNull(xml, "Region", output.getRegion());
@@ -700,27 +687,48 @@ public class RequestXmlFactory {
             addIfNotNull(xml, "Object", output.getObject());
             xml.end();
 
-            xml.start("DocProcess");
-            DocProcessObject docProcess = docJobObject.getOperation().getDocProcessObject();
-            addIfNotNull(xml, "SrcType", docProcess.getSrcType());
-            addIfNotNull(xml, "TgtType", docProcess.getTgtType());
-            addIfNotNull(xml, "SheetId", docProcess.getSheetId());
-            addIfNotNull(xml, "StartPage", docProcess.getStartPage());
-            addIfNotNull(xml, "EndPage", docProcess.getEndPage());
-            addIfNotNull(xml, "ImageParams", docProcess.getImageParams());
-            addIfNotNull(xml, "DocPassword", docProcess.getDocPassword());
-            addIfNotNull(xml, "Comments", docProcess.getComments());
-            addIfNotNull(xml, "PaperDirection", docProcess.getPaperDirection());
-            addIfNotNull(xml, "Quality", docProcess.getQuality());
-            addIfNotNull(xml, "Zoom", docProcess.getZoom());
-            addIfNotNull(xml, "PicPagination", docProcess.getPicPagination());
-            addIfNotNull(xml, "ImageDpi", docProcess.getImageDpi());
+            addDocProcess(xml, docJobObject);
+            addWatermark(xml, docJobObject.getOperation().getDocWatermarkObject());
             xml.end();
 
-            xml.end();
         }
         xml.end();
         return xml.getBytes();
+    }
+
+    private static void addDocProcess(XmlWriter xml, DocJobObject docJobObject) {
+        DocProcessObject docProcess = docJobObject.getOperation().getDocProcessObject();
+        if (CheckObjectUtils.objIsValid(docProcess)) {
+            return;
+        }
+        xml.start("DocProcess");
+        addIfNotNull(xml, "SrcType", docProcess.getSrcType());
+        addIfNotNull(xml, "TgtType", docProcess.getTgtType());
+        addIfNotNull(xml, "SheetId", docProcess.getSheetId());
+        addIfNotNull(xml, "StartPage", docProcess.getStartPage());
+        addIfNotNull(xml, "EndPage", docProcess.getEndPage());
+        addIfNotNull(xml, "ImageParams", docProcess.getImageParams());
+        addIfNotNull(xml, "DocPassword", docProcess.getDocPassword());
+        addIfNotNull(xml, "Comments", docProcess.getComments());
+        addIfNotNull(xml, "PaperDirection", docProcess.getPaperDirection());
+        addIfNotNull(xml, "Quality", docProcess.getQuality());
+        addIfNotNull(xml, "Zoom", docProcess.getZoom());
+        addIfNotNull(xml, "PicPagination", docProcess.getPicPagination());
+        addIfNotNull(xml, "ImageDpi", docProcess.getImageDpi());
+        addWatermark(xml, docProcess.getDocWatermark());
+        xml.end();
+    }
+
+    private static void addWatermark(XmlWriter xml, DocWatermark docWatermark) {
+        if (CheckObjectUtils.objIsValid(docWatermark)) {
+            return;
+        }
+        xml.start("DocWatermark");
+        addIfNotNull(xml, "Type", docWatermark.getType());
+        addIfNotNull(xml, "Image", docWatermark.getImage());
+        addIfNotNull(xml, "Dx", docWatermark.getDx());
+        addIfNotNull(xml, "Dy", docWatermark.getDy());
+        xml.end();
     }
 
     /**

@@ -49,9 +49,7 @@ public class ImageAuditingDemo {
 //        request.setAsync("1");
         //3.调用接口,获取任务响应对象
         ImageAuditingResponse response = client.imageAuditing(request);
-        System.out.println(Jackson.toJsonString(response));
         //4调用工具类，获取各审核类型详情集合 (也可自行根据业务解析)
-        List<AuditingInfo> imageInfoList = AuditingResultUtil.getImageInfoList(response);
         System.out.println(response);
     }
 

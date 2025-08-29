@@ -2,16 +2,7 @@ package com.qcloud.cos.demo.ci;
 
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
-import com.qcloud.cos.model.ciModel.job.CallBackKafkaConfig;
-import com.qcloud.cos.model.ciModel.job.CallBackMqConfig;
-import com.qcloud.cos.model.ciModel.job.DocHtmlRequest;
-import com.qcloud.cos.model.ciModel.job.DocJobDetail;
-import com.qcloud.cos.model.ciModel.job.DocJobListRequest;
-import com.qcloud.cos.model.ciModel.job.DocJobListResponse;
-import com.qcloud.cos.model.ciModel.job.DocJobObject;
-import com.qcloud.cos.model.ciModel.job.DocJobRequest;
-import com.qcloud.cos.model.ciModel.job.DocJobResponse;
-import com.qcloud.cos.model.ciModel.job.DocProcessObject;
+import com.qcloud.cos.model.ciModel.job.*;
 
 import java.net.URISyntaxException;
 
@@ -37,30 +28,61 @@ public class DocJobDemo {
         //1.创建任务请求对象
         DocJobRequest request = new DocJobRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("examplebucket-1250000000");
+        request.setBucketName("demo-1234567890");
         DocJobObject docJobObject = request.getDocJobObject();
         docJobObject.setTag("DocProcess");
-        docJobObject.getInput().setObject("demo.docx");
+        docJobObject.getInput().setObject("1.docx");
         DocProcessObject docProcessObject = docJobObject.getOperation().getDocProcessObject();
         docProcessObject.setQuality("100");
         docProcessObject.setZoom("100");
         docProcessObject.setStartPage("1");
         docProcessObject.setEndPage("3");
-        docProcessObject.setTgtType("png");
+        docProcessObject.setTgtType("pdf");
         docProcessObject.setDocPassword("123");
+        DocWatermark docWatermark = docProcessObject.getDocWatermark();
+        docWatermark.setType("1");
+        docWatermark.setImage("https://markjrzhang-1251704708.cos.ap-chongqing.myqcloud.com/case/xhs.png");
+        docWatermark.setDx("10");
+        docWatermark.setDy("10");
+
         MediaOutputObject output = docJobObject.getOperation().getOutput();
-        output.setRegion("ap-chongqing");
-        output.setBucket("examplebucket-1250000000");
-        output.setObject("mark/pic-${Page}.jpg");
+        output.setRegion("ap-singapore");
+        output.setBucket("demo-1234567890");
+        output.setObject("mark/test-${Page}.pdf");
 
         docJobObject.getOperation().setUserData("user-data");
         docJobObject.setCallBackFormat("json");
-        docJobObject.setCallBack("www.callback.com");
+//        docJobObject.setCallBack("www.callback.com");
         //3.调用接口,获取任务响应对象
         DocJobResponse docProcessJobs = client.createDocProcessJobs(request);
         System.out.println(docProcessJobs);
     }
 
+    public static void createWatermarkDocJobs(COSClient client) {
+        //1.创建任务请求对象
+        DocJobRequest request = new DocJobRequest();
+        //2.添加请求参数 参数详情请见api接口文档
+        request.setBucketName("demo-1234567890");
+        DocJobObject docJobObject = request.getDocJobObject();
+        docJobObject.setTag("DocWatermark");
+        docJobObject.getInput().setObject("1.docx");
+        DocWatermark docWatermark = docJobObject.getOperation().getDocWatermarkObject();
+        docWatermark.setType("1");
+        docWatermark.setImage("https://markjrzhang-1251704708.cos.ap-chongqing.myqcloud.com/case/xhs.png");
+        docWatermark.setDx("10");
+        docWatermark.setDy("10");
+
+        MediaOutputObject output = docJobObject.getOperation().getOutput();
+        output.setRegion("ap-singapore");
+        output.setBucket("demo-1234567890");
+        output.setObject("result/watermarked.docx");
+
+        docJobObject.getOperation().setUserData("testdata");
+        docJobObject.setCallBackFormat("json");
+//        docJobObject.setCallBack("www.callback.com");
+        //3.调用接口,获取任务响应对象
+        DocJobResponse docProcessJobs = client.createDocProcessJobs(request);
+    }
     /**
      * createDocJobsWithKafkaCallback 接口用于创建异步文档预览任务（包含kafka回调配置）。
      * 将文档转为指定类型（jpg、png、pdf）并保存至指定的cos路径下
@@ -72,7 +94,7 @@ public class DocJobDemo {
         //1.创建任务请求对象
         DocJobRequest request = new DocJobRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("examplebucket-1250000000");
+        request.setBucketName("demo-1234567890");
         DocJobObject docJobObject = request.getDocJobObject();
         docJobObject.setTag("DocProcess");
         docJobObject.getInput().setObject("demo.docx");
@@ -85,17 +107,11 @@ public class DocJobDemo {
         docProcessObject.setDocPassword("123");
         MediaOutputObject output = docJobObject.getOperation().getOutput();
         output.setRegion("ap-chongqing");
-        output.setBucket("examplebucket-1250000000");
+        output.setBucket("markjrzhang-1251704708");
         output.setObject("mark/pic-${Page}.jpg");
 
         docJobObject.getOperation().setUserData("user-data");
         docJobObject.setCallBackFormat("json");
-
-//        docJobObject.setCallBackType("TDMQ");
-//        CallBackMqConfig callBackMqConfig = docJobObject.getCallBackMqConfig();
-//        callBackMqConfig.setMqRegion("sh");
-//        callBackMqConfig.setMqName("name");
-//        callBackMqConfig.setMqMode("Queue");
 
         docJobObject.setCallBackType("Kafka");
         CallBackKafkaConfig callBackKafkaConfig = docJobObject.getCallBackKafkaConfig();
@@ -116,8 +132,8 @@ public class DocJobDemo {
         //1.创建任务请求对象
         DocJobRequest request = new DocJobRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("examplebucket-1250000000");
-        request.setJobId("d75b6ea083df711eb8d09476dfb8*****");
+        request.setBucketName("demo-1234567890");
+        request.setJobId("d16a7e4f284ad11f0a3499b983ea*****");
         //3.调用接口,获取任务响应对象
         DocJobResponse docJobResponse = client.describeDocProcessJob(request);
         System.out.println(docJobResponse);
@@ -132,7 +148,7 @@ public class DocJobDemo {
         //1.创建任务请求对象
         DocJobListRequest request = new DocJobListRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("examplebucket-1250000000");
+        request.setBucketName("demo-1234567890");
         request.setTag("DocProcess");
         request.setStartCreationTime("2020-12-10T16:20:07+0800");
         //3.调用接口,获取任务响应对象

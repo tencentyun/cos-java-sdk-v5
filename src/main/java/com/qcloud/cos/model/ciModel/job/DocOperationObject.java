@@ -19,6 +19,8 @@ public class DocOperationObject {
      */
     private DocProcessObject docProcessObject;
 
+    private DocWatermark docWatermarkObject;
+
     /**
      * 文档预览任务参数
      */
@@ -67,12 +69,24 @@ public class DocOperationObject {
         UserData = userData;
     }
 
+    public DocWatermark getDocWatermarkObject() {
+        if (docWatermarkObject == null) {
+            docWatermarkObject = new DocWatermark();
+        }
+        return docWatermarkObject;
+    }
+    public void setDocWatermarkObject(DocWatermark docWatermarkObject) {
+        this.docWatermarkObject = docWatermarkObject;
+    }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("DocOperationObject{");
         sb.append("output=").append(output);
         sb.append(", docProcessObject=").append(docProcessObject);
+        sb.append(", docWatermarkObject=").append(docWatermarkObject);
         sb.append(", docProcessResult=").append(docProcessResult);
+        sb.append(", UserData='").append(UserData).append('\'');
         sb.append('}');
         return sb.toString();
     }
