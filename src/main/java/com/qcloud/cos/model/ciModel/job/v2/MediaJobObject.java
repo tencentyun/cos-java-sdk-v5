@@ -29,6 +29,9 @@ public class MediaJobObject implements Serializable {
     @XStreamAlias("CreationTime")
     private String creationTime;
 
+    @XStreamAlias("StartTime")
+    private String startTime;
+
     @XStreamAlias("EndTime")
     private String endTime;
 
@@ -55,6 +58,9 @@ public class MediaJobObject implements Serializable {
 
     @XStreamAlias("Operation")
     private MediaJobOperation operation = new MediaJobOperation();
+
+    @XStreamAlias("SubTag")
+    private String subTag;
 
     public String getCode() {
         return code;
@@ -94,6 +100,14 @@ public class MediaJobObject implements Serializable {
 
     public void setCreationTime(String creationTime) {
         this.creationTime = creationTime;
+    }
+
+    public String getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(String startTime) {
+        this.startTime = startTime;
     }
 
     public String getQueueId() {
@@ -174,6 +188,14 @@ public class MediaJobObject implements Serializable {
         this.queueType = queueType;
     }
 
+    public String getSubTag() {
+        return subTag;
+    }
+
+    public void setSubTag(String subTag) {
+        this.subTag = subTag;
+    }
+
     public String getBucketName() {
         return bucketName;
     }
@@ -190,6 +212,7 @@ public class MediaJobObject implements Serializable {
         sb.append(", jobId='").append(jobId).append('\'');
         sb.append(", state='").append(state).append('\'');
         sb.append(", creationTime='").append(creationTime).append('\'');
+        sb.append(", startTime='").append(startTime).append('\'');
         sb.append(", endTime='").append(endTime).append('\'');
         sb.append(", queueId='").append(queueId).append('\'');
         sb.append(", tag='").append(tag).append('\'');
@@ -199,6 +222,7 @@ public class MediaJobObject implements Serializable {
         sb.append(", queueType='").append(queueType).append('\'');
         sb.append(", input=").append(input);
         sb.append(", operation=").append(operation);
+        sb.append(", subTag='").append(subTag).append('\'');
         sb.append('}');
         return sb.toString();
     }

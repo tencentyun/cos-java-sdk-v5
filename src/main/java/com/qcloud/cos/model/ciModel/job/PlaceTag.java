@@ -3,6 +3,7 @@ package com.qcloud.cos.model.ciModel.job;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PlaceTag extends MediaTags {
@@ -20,6 +21,9 @@ public class PlaceTag extends MediaTags {
     List<MediaTags> tags;
 
     public List<String> getClipFrameResult() {
+        if (clipFrameResult == null) {
+            clipFrameResult = new ArrayList<>();
+        }
         return clipFrameResult;
     }
 
@@ -60,6 +64,9 @@ public class PlaceTag extends MediaTags {
     }
 
     public List<MediaTags> getTags() {
+        if (tags == null) {
+            tags = new ArrayList<>();
+        }
         return tags;
     }
 

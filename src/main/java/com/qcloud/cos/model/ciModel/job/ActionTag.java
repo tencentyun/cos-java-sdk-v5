@@ -3,6 +3,7 @@ package com.qcloud.cos.model.ciModel.job;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ActionTag {
@@ -30,6 +31,9 @@ public class ActionTag {
     }
 
     public List<MediaTags> getTags() {
+        if (tags == null) {
+            tags = new ArrayList<>();
+        }
         return tags;
     }
 

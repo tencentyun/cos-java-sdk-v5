@@ -100,6 +100,13 @@ public class MediaTransConfigObject implements Serializable {
     @XStreamAlias("AIGCMetadata")
     private AigcMetadata aigcMetadata;
 
+    @XStreamAlias("IsCheckAudioChannel")
+    private String isCheckAudioChannel;
+
+    @XStreamAlias("IsStreamCopy")
+    private String isStreamCopy;
+
+
     public String getInitialClipNum() {
         return initialClipNum;
     }
@@ -201,6 +208,22 @@ public class MediaTransConfigObject implements Serializable {
             hlsEncrypt = new HlsEncrypt();
         }
         return hlsEncrypt;
+    }
+
+    public String getIsCheckAudioChannel() {
+        return isCheckAudioChannel;
+    }
+
+    public void setIsCheckAudioChannel(String isCheckAudioChannel) {
+        this.isCheckAudioChannel = isCheckAudioChannel;
+    }
+
+    public String getIsStreamCopy() {
+        return isStreamCopy;
+    }
+
+    public void setIsStreamCopy(String isStreamCopy) {
+        this.isStreamCopy = isStreamCopy;
     }
 
     public void setHlsEncrypt(HlsEncrypt hlsEncrypt) {
