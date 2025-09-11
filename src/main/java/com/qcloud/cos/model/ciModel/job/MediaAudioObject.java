@@ -48,6 +48,9 @@ public class MediaAudioObject implements Serializable {
     @XStreamAlias("Profile")
     private String profile;
 
+    @XStreamAlias("KeepAllTracks")
+    private String keepAllTracks;
+
     /**
      * 保持双音轨
      * 取值 true、false。 当 Video.Codec 为H.265时，此参数无效。
@@ -145,6 +148,14 @@ public class MediaAudioObject implements Serializable {
         this.sampleFormat = sampleFormat;
     }
 
+    public String getKeepAllTracks() {
+        return keepAllTracks;
+    }
+
+    public void setKeepAllTracks(String keepAllTracks) {
+        this.keepAllTracks = keepAllTracks;
+    }
+
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("MediaAudioObject{");
@@ -157,6 +168,7 @@ public class MediaAudioObject implements Serializable {
         sb.append(", keepTwoTracks='").append(keepTwoTracks).append('\'');
         sb.append(", switchTrack='").append(switchTrack).append('\'');
         sb.append(", sampleFormat='").append(sampleFormat).append('\'');
+        sb.append(", keepAllTracks='").append(keepAllTracks).append('\'');
         sb.append('}');
         return sb.toString();
     }

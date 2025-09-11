@@ -1,8 +1,8 @@
 package com.qcloud.cos.model.ciModel.job;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class VideoTagData {
@@ -16,8 +16,13 @@ public class VideoTagData {
     private List<ActionTag> actionTags;
     @XStreamImplicit(itemFieldName = "ObjectTags")
     private List<ObjectTag> ObjectTags;
+    @XStreamImplicit(itemFieldName = "Labels")
+    private List<VideoTagLabels> labels;
 
     public List<PersonTag> getPersonTags() {
+        if (personTags == null) {
+            personTags = new ArrayList<>();
+        }
         return personTags;
     }
 
@@ -26,6 +31,9 @@ public class VideoTagData {
     }
 
     public List<PlaceTag> getPlaceTags() {
+        if (placeTags == null) {
+            placeTags = new ArrayList<>();
+        }
         return placeTags;
     }
 
@@ -34,6 +42,9 @@ public class VideoTagData {
     }
 
     public List<ActionTag> getActionTags() {
+        if (actionTags == null) {
+            actionTags = new ArrayList<>();
+        }
         return actionTags;
     }
 
@@ -42,6 +53,9 @@ public class VideoTagData {
     }
 
     public List<ObjectTag> getObjectTags() {
+        if (ObjectTags == null) {
+            ObjectTags = new ArrayList<>();
+        }
         return ObjectTags;
     }
 
@@ -50,10 +64,24 @@ public class VideoTagData {
     }
 
     public List<MediaTags> getTags() {
+        if (tags == null) {
+            tags = new ArrayList<>();
+        }
         return tags;
     }
 
     public void setTags(List<MediaTags> tags) {
         this.tags = tags;
+    }
+
+    public List<VideoTagLabels> getLabels() {
+        if (labels == null) {
+            labels = new ArrayList<>();
+        }
+        return labels;
+    }
+
+    public void setLabels(List<VideoTagLabels> labels) {
+        this.labels = labels;
     }
 }

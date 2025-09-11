@@ -11,6 +11,9 @@ public class StreamData {
     private String subErrMsg;
 
     public VideoTagData getData() {
+        if (data == null) {
+            data = new VideoTagData();
+        }
         return data;
     }
 
