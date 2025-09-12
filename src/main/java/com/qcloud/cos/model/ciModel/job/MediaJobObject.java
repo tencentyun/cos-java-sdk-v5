@@ -195,23 +195,23 @@ public class MediaJobObject extends CIServiceRequest implements Serializable {
 
     @Override
     public String toString() {
-        return "MediaJobObject{" +
-                "code='" + code + '\'' +
-                ", message='" + message + '\'' +
-                ", jobId='" + jobId + '\'' +
-                ", state='" + state + '\'' +
-                ", creationTime='" + creationTime + '\'' +
-                ", startTime='" + startTime + '\'' +
-                ", endTime='" + endTime + '\'' +
-                ", subTag='" + subTag + '\'' +
-                ", queueId='" + queueId + '\'' +
-                ", tag='" + tag + '\'' +
-                ", name='" + name + '\'' +
-                ", type='" + type + '\'' +
-                ", progress='" + progress + '\'' +
-                ", queueType='" + queueType + '\'' +
-                ", input=" + input +
-                ", operation=" + operation +
-                '}';
+        final StringBuilder sb = new StringBuilder("MediaJobObject{");
+        sb.append("code='").append(code).append('\'');
+        sb.append(", message='").append(message).append('\'');
+        sb.append(", jobId='").append(jobId).append('\'');
+        sb.append(", state='").append(state).append('\'');
+        sb.append(", creationTime='").append(creationTime).append('\'');
+        sb.append(", startTime='").append(startTime).append('\'');
+        sb.append(", endTime='").append(endTime).append('\'');
+        sb.append(", queueId='").append(queueId).append('\'');
+        sb.append(", tag='").append(tag).append('\'');
+        sb.append(", name='").append(name).append('\'');
+        sb.append(", type='").append(type).append('\'');
+        sb.append(", progress='").append(progress).append('\'');
+        sb.append(", queueType='").append(queueType).append('\'');
+        sb.append(", input=").append(input);
+        sb.append(", operation=").append(operation);
+        sb.append('}');
+        return sb.toString();
     }
 }

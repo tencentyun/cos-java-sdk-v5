@@ -207,7 +207,8 @@ public class MediaJobObject implements Serializable {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("MediaJobObject{");
-        sb.append("code='").append(code).append('\'');
+        sb.append("bucketName='").append(bucketName).append('\'');
+        sb.append(", code='").append(code).append('\'');
         sb.append(", message='").append(message).append('\'');
         sb.append(", jobId='").append(jobId).append('\'');
         sb.append(", state='").append(state).append('\'');
