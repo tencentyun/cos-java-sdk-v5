@@ -3304,6 +3304,10 @@ public interface COS extends COSDirectSpi {
     TranslationResponse createTranslationJob(TranslationRequest translationRequest);
 
     ImageQualityResponse AccessImageQulity(ImageQualityRequest request);
+
+    AIGCMetadataResponse getImageAIGCMetadata(String bucketName, String key);
+
+    AIGCMetadataResponse getMediaAIGCMetadata(String bucketName, String key);
 }
 
 

@@ -19,6 +19,8 @@ public class JobsDetail {
     private String startTime;
     @XStreamAlias("EndTime")
     private String endTime;
+    @XStreamAlias("QueueType")
+    private String queueType;
     @XStreamAlias("QueueId")
     private String queueId;
     @XStreamAlias("Tag")
@@ -117,6 +119,14 @@ public class JobsDetail {
         this.operation = operation;
     }
 
+    public String getQueueType() {
+        return queueType;
+    }
+
+    public void setQueueType(String queueType) {
+        this.queueType = queueType;
+    }
+
     @Override
     public String toString() {
         return "JobsDetail{" +
@@ -127,6 +137,7 @@ public class JobsDetail {
                 ", creationTime='" + creationTime + '\'' +
                 ", startTime='" + startTime + '\'' +
                 ", endTime='" + endTime + '\'' +
+                ", queueType='" + queueType + '\'' +
                 ", queueId='" + queueId + '\'' +
                 ", tag='" + tag + '\'' +
                 ", input=" + input +

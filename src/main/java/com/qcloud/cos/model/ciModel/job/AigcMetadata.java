@@ -1,27 +1,35 @@
 package com.qcloud.cos.model.ciModel.job;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 public class AigcMetadata {
     @XStreamAlias("Label")
+    @JsonProperty("Label")
     private String label;
 
     @XStreamAlias("ContentProducer")
+    @JsonProperty("ContentProducer")
     private String contentProducer;
 
     @XStreamAlias("ProduceID")
+    @JsonProperty("ProduceID")
     private String produceId;
 
     @XStreamAlias("ReservedCode1")
+    @JsonProperty("ReservedCode1")
     private String reservedCode1;
 
     @XStreamAlias("ContentPropagator")
+    @JsonProperty("ContentPropagator")
     private String contentPropagator;
 
     @XStreamAlias("PropagateID")
+    @JsonProperty("PropagateID")
     private String propagateId;
 
     @XStreamAlias("ReservedCode2")
+    @JsonProperty("ReservedCode2")
     private String reservedCode2;
 
     public String getContentProducer() {

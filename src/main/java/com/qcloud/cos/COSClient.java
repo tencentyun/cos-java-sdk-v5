@@ -5796,5 +5796,29 @@ public class COSClient implements COS {
 
         return invoke(request, new Unmarshallers.CICommonUnmarshaller<ImageQualityResponse>(ImageQualityResponse.class));
     }
+
+    @Override
+    public AIGCMetadataResponse getImageAIGCMetadata(String bucketName, String key) {
+        rejectNull(bucketName, "The bucket name parameter must be specified when getting AIGC metadata");
+        rejectNull(key, "The key parameter must be specified when getting AIGC metadata");
+
+        GetObjectRequest getObjectRequest = new GetObjectRequest(bucketName, key);
+        CosHttpRequest<GetObjectRequest> request = createRequest(bucketName, key, getObjectRequest, HttpMethodName.GET);
+        request.addParameter("ci-process", "ImageAIGCMetadata");
+
+        return invoke(request, new Unmarshallers.AigcMetadataUnmarshaller());
+    }
+
+    @Override
+    public AIGCMetadataResponse getMediaAIGCMetadata(String bucketName, String key) {
+        rejectNull(bucketName, "The bucket name parameter must be specified when getting AIGC metadata");
+        rejectNull(key, "The key parameter must be specified when getting AIGC metadata");
+
+        GetObjectRequest getObjectRequest = new GetObjectRequest(bucketName, key);
+        CosHttpRequest<GetObjectRequest> request = createRequest(bucketName, key, getObjectRequest, HttpMethodName.GET);
+        request.addParameter("ci-process", "MediaAIGCMetadata");
+
+        return invoke(request, new Unmarshallers.AigcMetadataUnmarshaller());
+    }
 }
 

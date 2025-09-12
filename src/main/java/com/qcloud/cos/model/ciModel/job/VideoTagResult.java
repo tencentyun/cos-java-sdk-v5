@@ -7,10 +7,20 @@ public class VideoTagResult {
     private StreamData streamData;
 
     public StreamData getStreamData() {
+        if (streamData == null) {
+            streamData = new StreamData();
+        }
         return streamData;
     }
 
     public void setStreamData(StreamData streamData) {
         this.streamData = streamData;
+    }
+
+    @Override
+    public String toString() {
+        return "VideoTagResult{" +
+                "streamData=" + streamData +
+                '}';
     }
 }
