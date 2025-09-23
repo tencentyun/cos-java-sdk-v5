@@ -27,6 +27,7 @@ import com.qcloud.cos.model.ciModel.persistence.CIUploadResult;
 import com.qcloud.cos.model.ciModel.persistence.PicOperations;
 import com.qcloud.cos.transfer.TransferManager;
 import com.qcloud.cos.transfer.Upload;
+import com.qcloud.cos.utils.AIGCMetadataRuleBuilder;
 
 /**
  * 基础图片处理相关demo  相关API https://cloud.tencent.com/document/product/460/36540
@@ -92,13 +93,14 @@ public class ImagePersistenceDemo {
         String propagateId = Base64.getUrlEncoder().withoutPadding().encodeToString("propagate_id".getBytes(StandardCharsets.UTF_8));
         String contentPropagator = Base64.getUrlEncoder().withoutPadding().encodeToString("content_propagator".getBytes(StandardCharsets.UTF_8));
 
-        String rule = "imageMogr2/AIGCMetadata/Label/" + label
-                + "/ContentProducer/" + contentProducer
-                + "/ProduceID/" + produceId
-                + "/ReservedCode1/" + reservedCode1
-                + "/ReservedCode2/" + reservedCode2
-                + "/PropagateID/" + propagateId
-                + "/ContentPropagator/" + contentPropagator;
+        String rule = AIGCMetadataRuleBuilder.create(label)
+                .contentProducer(contentProducer)  // 可选参数
+                .produceId(produceId)              // 可选参数
+                .reservedCode1(reservedCode1)
+                .reservedCode2(reservedCode2)
+                .propagateId(propagateId)
+                .contentPropagator(contentPropagator)
+                .build();
         rule1.setRule(rule);
         ruleList.add(rule1);
         PicOperations.Rule rule2 = new PicOperations.Rule();
@@ -267,6 +269,7 @@ public class ImagePersistenceDemo {
         PicOperations.Rule rule1 = new PicOperations.Rule();
         rule1.setBucket(bucketName);
         rule1.setFileId("test-1.jpg");
+
         String label = Base64.getUrlEncoder().withoutPadding().encodeToString("label".getBytes(StandardCharsets.UTF_8));
         String contentProducer = Base64.getUrlEncoder().withoutPadding().encodeToString("content_producer".getBytes(StandardCharsets.UTF_8));
         String produceId = Base64.getUrlEncoder().withoutPadding().encodeToString("produce_id".getBytes(StandardCharsets.UTF_8));
@@ -275,13 +278,15 @@ public class ImagePersistenceDemo {
         String propagateId = Base64.getUrlEncoder().withoutPadding().encodeToString("propagate_id".getBytes(StandardCharsets.UTF_8));
         String contentPropagator = Base64.getUrlEncoder().withoutPadding().encodeToString("content_propagator".getBytes(StandardCharsets.UTF_8));
 
-        String rule = "imageMogr2/AIGCMetadata/Label/" + label
-                + "/ContentProducer/" + contentProducer
-                + "/ProduceID/" + produceId
-                + "/ReservedCode1/" + reservedCode1
-                + "/ReservedCode2/" + reservedCode2
-                + "/PropagateID/" + propagateId
-                + "/ContentPropagator/" + contentPropagator;
+        String rule = AIGCMetadataRuleBuilder.create(label)
+                .contentProducer(contentProducer)  // 可选参数
+                .produceId(produceId)              // 可选参数
+                .reservedCode1(reservedCode1)
+                .reservedCode2(reservedCode2)
+                .propagateId(propagateId)
+                .contentPropagator(contentPropagator)
+                .build();
+
         rule1.setRule(rule);
         ruleList.add(rule1);
         PicOperations.Rule rule2 = new PicOperations.Rule();
