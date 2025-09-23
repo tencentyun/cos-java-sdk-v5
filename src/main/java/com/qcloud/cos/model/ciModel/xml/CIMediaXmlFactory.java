@@ -866,7 +866,7 @@ public class CIMediaXmlFactory {
             xml.start("SlideConfig");
             addIfNotNull(xml, "SlideMode", slideConfig.getSlideMode());
             addIfNotNull(xml, "XSlideSpeed", slideConfig.getxSlideSpeed());
-            addIfNotNull(xml, "YSlideSpeed", slideConfig.getxSlideSpeed());
+            addIfNotNull(xml, "YSlideSpeed", slideConfig.getySlideSpeed());
             xml.end();
         }
     }
