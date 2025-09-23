@@ -178,13 +178,13 @@ public class ParserMediaInfoUtils {
             case "Width":
                 video.setWidth(value);
                 break;
-            case "PixFmt":
+            case "Pixfmt":
                 video.setPixFmt(value);
                 break;
             case "Maxrate":
                 video.setMaxrate(value);
                 break;
-            case "BufSize":
+            case "Bufsize":
                 video.setBufSize(value);
                 break;
             case "Preset":
@@ -258,7 +258,7 @@ public class ParserMediaInfoUtils {
             case "Maxrate":
                 video.setMaxrate(value);
                 break;
-            case "BufSize":
+            case "Bufsize":
                 video.setBufSize(value);
                 break;
             case "Preset":

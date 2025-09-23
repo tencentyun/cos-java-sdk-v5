@@ -716,14 +716,14 @@ public class CIMediaXmlFactory {
         addIfNotNull(xml, "Height", video.getHeight());
         addIfNotNull(xml, "Fps", video.getFps());
         addIfNotNull(xml, "Bitrate", video.getBitrate());
-        addIfNotNull(xml, "BufSize", video.getBufSize());
+        addIfNotNull(xml, "Bufsize", video.getBufSize());
         addIfNotNull(xml, "Crf", video.getCrf());
         addIfNotNull(xml, "Crop", video.getCrop());
         addIfNotNull(xml, "Gop", video.getGop());
         addIfNotNull(xml, "LongShortMode", video.getLongShortMode());
         addIfNotNull(xml, "Maxrate", video.getMaxrate());
         addIfNotNull(xml, "Pad", video.getPad());
-        addIfNotNull(xml, "PixFmt", video.getPixFmt());
+        addIfNotNull(xml, "Pixfmt", video.getPixFmt());
         addIfNotNull(xml, "Preset", video.getPreset());
         addIfNotNull(xml, "Profile", video.getProfile());
         addIfNotNull(xml, "Qality", video.getQality());
@@ -748,7 +748,7 @@ public class CIMediaXmlFactory {
         addIfNotNull(xml, "Height", video.getHeight());
         addIfNotNull(xml, "Fps", video.getFps());
         addIfNotNull(xml, "Bitrate", video.getBitrate());
-        addIfNotNull(xml, "BufSize", video.getBufSize());
+        addIfNotNull(xml, "Bufsize", video.getBufSize());
         addIfNotNull(xml, "Crf", video.getCrf());
         addIfNotNull(xml, "Gop", video.getGop());
         addIfNotNull(xml, "Maxrate", video.getMaxrate());

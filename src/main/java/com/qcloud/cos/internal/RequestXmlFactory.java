@@ -954,7 +954,7 @@ public class RequestXmlFactory {
         addIfNotNull(xml, "Height", video.getHeight());
         addIfNotNull(xml, "Fps", video.getFps());
         addIfNotNull(xml, "Bitrate", video.getBitrate());
-        addIfNotNull(xml, "BufSize", video.getBufSize());
+        addIfNotNull(xml, "Bufsize", video.getBufSize());
         addIfNotNull(xml, "Crf", video.getCrf());
         addIfNotNull(xml, "Crop", video.getCrop());
         addIfNotNull(xml, "Gop", video.getGop());
@@ -985,7 +985,7 @@ public class RequestXmlFactory {
         addIfNotNull(xml, "Height", video.getHeight());
         addIfNotNull(xml, "Fps", video.getFps());
         addIfNotNull(xml, "Bitrate", video.getBitrate());
-        addIfNotNull(xml, "BufSize", video.getBufSize());
+        addIfNotNull(xml, "Bufsize", video.getBufSize());
         addIfNotNull(xml, "Crf", video.getCrf());
         addIfNotNull(xml, "Gop", video.getGop());
         addIfNotNull(xml, "Maxrate", video.getMaxrate());
@@ -993,6 +993,7 @@ public class RequestXmlFactory {
         addIfNotNull(xml, "Profile", video.getProfile());
         addIfNotNull(xml, "Remove", video.getRemove());
         addIfNotNull(xml, "ScanMode", video.getScanMode());
+        addIfNotNull(xml, "Pixfmt", video.getPixfmt());
         xml.end();
     }
 
