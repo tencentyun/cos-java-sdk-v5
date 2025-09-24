@@ -54,7 +54,7 @@ public class ReplicationRule implements Serializable {
 
     private List<TagSet> tagSets = null;
 
-    private String deleteMarkerReplication;
+    private String deleteMarkerReplication = "";
 
     /**
      * Returns the id of the replication rule.
@@ -221,6 +221,10 @@ public class ReplicationRule implements Serializable {
 
     public void setDeleteMarkerReplication(ReplicationRuleStatus status) {
         this.deleteMarkerReplication = status.getStatus();
+    }
+
+    public void setDeleteMarkerReplication(String status) {
+        this.deleteMarkerReplication = status;
     }
 
     public String getDeleteMarkerReplication() {
