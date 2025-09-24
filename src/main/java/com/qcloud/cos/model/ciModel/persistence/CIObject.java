@@ -1,5 +1,6 @@
 package com.qcloud.cos.model.ciModel.persistence;
 
+import com.qcloud.cos.model.ciModel.job.AigcMetadata;
 import com.qcloud.cos.model.ciModel.recognition.QRcodeInfo;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
@@ -40,6 +41,11 @@ public class CIObject {
     private Integer codeStatus;
     @XStreamImplicit(keyFieldName = "QRcodeInfo")
     private List<QRcodeInfo> QRcodeInfoList;
+
+
+    @XStreamAlias("AIGCMetadata")
+    private AigcMetadata aigcMetadata;
+
 
     public String getKey() {
         return key;
@@ -151,5 +157,17 @@ public class CIObject {
 
     public void setFrameCount(int frameCount) {
         this.frameCount = frameCount;
+    }
+
+
+    public AigcMetadata getAigcMetadata() {
+        if (aigcMetadata == null) {
+            aigcMetadata = new AigcMetadata();
+        }
+        return aigcMetadata;
+    }
+
+    public void setAigcMetadata(AigcMetadata aigcMetadata) {
+        this.aigcMetadata = aigcMetadata;
     }
 }

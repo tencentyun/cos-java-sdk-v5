@@ -140,11 +140,11 @@ import com.qcloud.cos.model.fetch.PutAsyncFetchTaskResult;
 import com.qcloud.cos.model.fetch.PutAsyncFetchTaskResultHandler;
 import com.qcloud.cos.model.fetch.PutAsyncFetchTaskSerializer;
 import com.qcloud.cos.model.inventory.InventoryConfiguration;
+import com.qcloud.cos.model.inventory.PostBucketInventoryConfigurationResult;
 import com.qcloud.cos.model.transform.ObjectTaggingXmlFactory;
 import com.qcloud.cos.region.Region;
 import com.qcloud.cos.retry.RetryUtils;
 import com.qcloud.cos.utils.*;
-import com.qcloud.cos.http.TimeOutCosHttpClient;
 
 import com.qcloud.cos.utils.Base64;
 import org.apache.commons.codec.DecoderException;
@@ -814,11 +814,72 @@ public class COSClient implements COS {
                 "region is null, region in clientConfig must be specified when rename");
         rejectEmpty(renameRequest.getSrcObject(), "The length of the src key must be greater than 0");
         rejectEmpty(renameRequest.getDstObject(), "The length of the dst key must be greater than 0");
+
+        String srcInodeId = "";
+        if (clientConfig.isRenameFaultTolerant()) {
+            srcInodeId = getObjectInodeId(renameRequest.getBucketName(), renameRequest.getSrcObject(), renameRequest.getFixedEndpointAddr(),
+                    renameRequest.getCustomRequestHeaders());
+        }
+
         CosHttpRequest<RenameRequest> request = createRequest(renameRequest.getBucketName(),
                 renameRequest.getDstObject(), renameRequest, HttpMethodName.PUT);
         request.addParameter("rename", null);
         request.addHeader("x-cos-rename-source", UrlEncoderUtils.encodeEscapeDelimiter(renameRequest.getSrcObject()));
-        invoke(request, voidCosResponseHandler);
+        try {
+            invoke(request, voidCosResponseHandler);
+        } catch (CosServiceException cse) {
+            if (clientConfig.isRenameFaultTolerant() && cse.getStatusCode() == 404 && !srcInodeId.isEmpty()) {
+                if (!checkResultForRenameObject(srcInodeId, renameRequest)) {
+                    throw cse;
+                }
+            } else {
+                throw cse;
+            }
+        }
+    }
+
+    private boolean checkResultForRenameObject(String srcInodeId, RenameRequest renameRequest) {
+        /**
+         * try to head src object and dst object, and check their inode ids when catch exception
+         * rename request is successful only if src object does not exist and the inode ids of the source object and the target object are the same
+         * */
+        try {
+            getObjectInodeId(renameRequest.getBucketName(), renameRequest.getSrcObject(), renameRequest.getFixedEndpointAddr(), renameRequest.getCustomRequestHeaders());
+        } catch (CosServiceException cse) {
+            if (cse.getStatusCode() != 404) {
+                log.info("catch CosServiceException and status code is not 404 when getting the inode id of the source object, exp: ", cse);
+                return false;
+            }
+        } catch (CosClientException cce) {
+            log.info("catch CosClientException when getting the inode id of the source object, exp: ", cce);
+            return false;
+        }
+
+        String dstInodeId;
+        try {
+            dstInodeId = getObjectInodeId(renameRequest.getBucketName(), renameRequest.getDstObject(), renameRequest.getFixedEndpointAddr(), renameRequest.getCustomRequestHeaders());
+        } catch (Exception e) {
+            log.info("catch exception when getting the inode id of the target object, exp: ", e);
+            return false;
+        }
+        return Objects.equals(dstInodeId, srcInodeId);
+    }
+
+    private String getObjectInodeId(String bucketName, String key, String fixedEndpointAddr, Map<String, String> customHeaders)
+            throws CosServiceException, CosClientException {
+        GetObjectMetadataRequest getObjectMetadataRequest = new GetObjectMetadataRequest(bucketName, key);
+        if (fixedEndpointAddr != null && !fixedEndpointAddr.isEmpty()) {
+            getObjectMetadataRequest.setFixedEndpointAddr(fixedEndpointAddr);
+        }
+
+        if (customHeaders != null) {
+            for (Map.Entry<String, String> e : customHeaders.entrySet()) {
+                getObjectMetadataRequest.putCustomRequestHeader(e.getKey(), e.getValue());
+            }
+        }
+
+        ObjectMetadata objectMetadata = getObjectMetadata(getObjectMetadataRequest);
+        return objectMetadata.getInodeId() == null ? "" : objectMetadata.getInodeId();
     }
 
     protected <UploadObjectRequest extends PutObjectRequest>
@@ -984,6 +1045,9 @@ public class COSClient implements COS {
                 } else {
                     returnedMetadata = invoke(request, new CosMetadataResponseHandler());
                 }
+            } catch (CosServiceException cse) {
+                updatePreflightStatus(cse.isNeedPreflight(), bucketName);
+                throw cse;
             } catch (Throwable t) {
                 throw Throwables.failure(t);
             }
@@ -991,21 +1055,7 @@ public class COSClient implements COS {
             CosDataSource.Utils.cleanupDataSource(uploadObjectRequest, file, isOrig, input, log);
         }
 
-        if (returnedMetadata.isNeedPreflight()) {
-            Long currentTime = System.currentTimeMillis();
-            if ((preflightBuckets.get(bucketName) == null) || ((currentTime - preflightBuckets.get(bucketName)) > clientConfig.getPreflightStatusUpdateInterval())) {
-                String reqMsg = String.format("will update preflight status, bucket[%s]", bucketName);
-                log.info(reqMsg);
-                preflightBuckets.put(bucketName, currentTime);
-            }
-        } else {
-            Long currentTime = System.currentTimeMillis();
-            if ((preflightBuckets.get(bucketName) != null) && ((currentTime - preflightBuckets.get(bucketName)) > clientConfig.getPreflightStatusUpdateInterval())) {
-                String reqMsg = String.format("will remove bucket[%s] from preflight lists", bucketName);
-                log.info(reqMsg);
-                preflightBuckets.remove(bucketName);
-            }
-        }
+        updatePreflightStatus(returnedMetadata.isNeedPreflight(), bucketName);
 
         String contentMd5 = metadata.getContentMD5();
         if (md5DigestStream != null) {
@@ -1183,7 +1233,7 @@ public class COSClient implements COS {
              * to wrap their code in try/catch blocks and check for this status code if they want to
              * use constraints.
              */
-            if (cse.getStatusCode() == 412 || cse.getStatusCode() == 304) {
+            if ((cse.getStatusCode() == 412 && !clientConfig.isThrow412Directly()) || (cse.getStatusCode() == 304 && !clientConfig.isThrow304Directly())) {
                 return null;
             }
             throw cse;
@@ -1774,21 +1824,7 @@ public class COSClient implements COS {
             ObjectMetadata metadata = invoke(request, new CosMetadataResponseHandler());
             final String etag = metadata.getETag();
 
-            if (metadata.isNeedPreflight()) {
-                Long currentTime = System.currentTimeMillis();
-                if ((preflightBuckets.get(bucketName) == null) || ((currentTime - preflightBuckets.get(bucketName)) > clientConfig.getPreflightStatusUpdateInterval())) {
-                    String reqMsg = String.format("will update preflight status, bucket[%s]", bucketName);
-                    log.info(reqMsg);
-                    preflightBuckets.put(bucketName, currentTime);
-                }
-            } else {
-                Long currentTime = System.currentTimeMillis();
-                if ((preflightBuckets.get(bucketName) != null) && ((currentTime - preflightBuckets.get(bucketName)) > clientConfig.getPreflightStatusUpdateInterval())) {
-                    String reqMsg = String.format("will remove bucket[%s] from preflight lists", bucketName);
-                    log.info(reqMsg);
-                    preflightBuckets.remove(bucketName);
-                }
-            }
+            updatePreflightStatus(metadata.isNeedPreflight(), bucketName);
 
             if (md5DigestStream != null && !skipMd5CheckStrategy
                     .skipClientSideValidationPerUploadPartResponse(metadata)) {
@@ -1819,6 +1855,9 @@ public class COSClient implements COS {
             result.setRequestId(metadata.getRequestId());
 
             return result;
+        } catch (CosServiceException cse) {
+            updatePreflightStatus(cse.isNeedPreflight(), bucketName);
+            throw Throwables.failure(cse);
         } catch (Throwable t) {
             throw Throwables.failure(t);
         }
@@ -3700,7 +3739,7 @@ public class COSClient implements COS {
         request.addParameter("id", id);
 
         if (!setBucketInventoryConfigurationRequest.IsUseInventoryText()) {
-            final byte[] bytes = new BucketConfigurationXmlFactory().convertToXmlByteArray(inventoryConfiguration);
+            final byte[] bytes = new BucketConfigurationXmlFactory().convertToXmlByteArray(inventoryConfiguration, false);
             request.addHeader("Content-Length", String.valueOf(bytes.length));
             request.addHeader("Content-Type", "application/xml");
             request.setContent(new ByteArrayInputStream(bytes));
@@ -3730,6 +3769,40 @@ public class COSClient implements COS {
 
         return invoke(request, new Unmarshallers.ListBucketInventoryConfigurationsUnmarshaller());
     }
+
+    public PostBucketInventoryConfigurationResult postBucketInventoryConfiguration(
+            SetBucketInventoryConfigurationRequest setBucketInventoryConfigurationRequest)
+            throws CosClientException, CosServiceException {
+        rejectNull(setBucketInventoryConfigurationRequest, "The request cannot be null");
+        rejectNull(setBucketInventoryConfigurationRequest.getBucketName(), "The bucketName cannot be null");
+        rejectNull(setBucketInventoryConfigurationRequest.getInventoryConfiguration(), "The inventoryConfiguration cannot be null");
+        rejectNull(setBucketInventoryConfigurationRequest.getInventoryConfiguration().getId(), "The inventoryConfiguration.id cannot be null");
+        final String bucketName = setBucketInventoryConfigurationRequest.getBucketName();
+        final InventoryConfiguration inventoryConfiguration = setBucketInventoryConfigurationRequest.getInventoryConfiguration();
+        final String id = inventoryConfiguration.getId();
+
+        CosHttpRequest<SetBucketInventoryConfigurationRequest> request = createRequest(bucketName, null, setBucketInventoryConfigurationRequest, HttpMethodName.POST);
+        request.addParameter("inventory", null);
+        request.addParameter("id", id);
+
+        if (!setBucketInventoryConfigurationRequest.IsUseInventoryText()) {
+            final byte[] bytes = new BucketConfigurationXmlFactory().convertToXmlByteArray(inventoryConfiguration, true);
+            request.addHeader("Content-Length", String.valueOf(bytes.length));
+            request.addHeader("Content-Type", "application/xml");
+            request.setContent(new ByteArrayInputStream(bytes));
+        } else {
+            final String contentStr = setBucketInventoryConfigurationRequest.getInventoryText();
+            if (contentStr == null || contentStr.length() <= 0) {
+                throw new IllegalArgumentException("The inventory text should be specified");
+            }
+            request.addHeader("Content-Length", String.valueOf(contentStr.length()));
+            request.addHeader("Content-Type", "application/xml");
+            request.setContent(new ByteArrayInputStream(contentStr.getBytes(StringUtils.UTF8)));
+        }
+
+        return invoke(request, new Unmarshallers.PostBucketInventoryConfigurationUnmarshaller());
+    }
+
     @Override
     public BucketTaggingConfiguration getBucketTaggingConfiguration(String bucketName) {
         return getBucketTaggingConfiguration(new GetBucketTaggingConfigurationRequest(bucketName));
@@ -4010,6 +4083,16 @@ public class COSClient implements COS {
     }
 
     @Override
+    public MediaJobResponseV2 describeMediaJobV2(MediaJobsRequest req) {
+        this.checkCIRequestCommon(req);
+        rejectNull(req.getJobId(),
+                "The jobId parameter must be specified setting the object tags");
+        CosHttpRequest<MediaJobsRequest> request = createRequest(req.getBucketName(), "/jobs/" + req.getJobId(), req, HttpMethodName.GET);
+
+        return invoke(request, new Unmarshallers.CICommonUnmarshaller<MediaJobResponseV2>(MediaJobResponseV2.class));
+    }
+
+    @Override
     public MediaListJobResponse describeMediaJobs(MediaJobsRequest req) {
         this.checkCIRequestCommon(req);
         CosHttpRequest<MediaJobsRequest> request = createRequest(req.getBucketName(), "/jobs", req, HttpMethodName.GET);
@@ -4022,6 +4105,23 @@ public class COSClient implements COS {
         addParameterIfNotNull(request, "startCreationTime", req.getStartCreationTime());
         addParameterIfNotNull(request, "endCreationTime", req.getEndCreationTime());
         MediaListJobResponse response = invoke(request, new Unmarshallers.ListJobUnmarshaller());
+        this.checkMediaListJobResponse(response);
+        return response;
+    }
+
+    @Override
+    public MediaListJobResponse describeMediaJobsV2(MediaJobsRequest req) {
+        this.checkCIRequestCommon(req);
+        CosHttpRequest<MediaJobsRequest> request = createRequest(req.getBucketName(), "/jobs", req, HttpMethodName.GET);
+        addParameterIfNotNull(request, "queueId", req.getQueueId());
+        addParameterIfNotNull(request, "tag", req.getTag());
+        addParameterIfNotNull(request, "orderByTime", req.getOrderByTime());
+        addParameterIfNotNull(request, "nextToken", req.getNextToken());
+        addParameterIfNotNull(request, "size", req.getSize().toString());
+        addParameterIfNotNull(request, "states", req.getStates());
+        addParameterIfNotNull(request, "startCreationTime", req.getStartCreationTime());
+        addParameterIfNotNull(request, "endCreationTime", req.getEndCreationTime());
+        MediaListJobResponse response = invoke(request, new Unmarshallers.CICommonUnmarshaller<MediaListJobResponse>(MediaListJobResponse.class));
         this.checkMediaListJobResponse(response);
         return response;
     }
@@ -5633,6 +5733,23 @@ public class COSClient implements COS {
             }
             request.addHeader("x-cos-next-action", "UploadPart");
             invoke(request, voidCosResponseHandler);
+        }
+    }
+
+    private void updatePreflightStatus(boolean needPreflight, String bucketName) {
+        Long currentTime = System.currentTimeMillis();
+        if (needPreflight) {
+            if ((preflightBuckets.get(bucketName) == null) || ((currentTime - preflightBuckets.get(bucketName)) > clientConfig.getPreflightStatusUpdateInterval())) {
+                String reqMsg = String.format("will update preflight status, bucket[%s]", bucketName);
+                log.info(reqMsg);
+                preflightBuckets.put(bucketName, currentTime);
+            }
+        } else {
+            if ((preflightBuckets.get(bucketName) != null) && ((currentTime - preflightBuckets.get(bucketName)) > clientConfig.getPreflightStatusUpdateInterval())) {
+                String reqMsg = String.format("will remove bucket[%s] from preflight lists", bucketName);
+                log.info(reqMsg);
+                preflightBuckets.remove(bucketName);
+            }
         }
     }
 }

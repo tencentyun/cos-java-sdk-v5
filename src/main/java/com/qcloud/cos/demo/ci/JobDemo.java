@@ -1,22 +1,17 @@
 package com.qcloud.cos.demo.ci;
 
 import com.qcloud.cos.COSClient;
-import com.qcloud.cos.model.ciModel.job.MediaAudioObject;
-import com.qcloud.cos.model.ciModel.job.MediaContainerObject;
-import com.qcloud.cos.model.ciModel.job.MediaJobObject;
-import com.qcloud.cos.model.ciModel.job.MediaJobResponse;
-import com.qcloud.cos.model.ciModel.job.MediaJobsRequest;
-import com.qcloud.cos.model.ciModel.job.MediaListJobResponse;
-import com.qcloud.cos.model.ciModel.job.MediaTimeIntervalObject;
-import com.qcloud.cos.model.ciModel.job.MediaTransConfigObject;
-import com.qcloud.cos.model.ciModel.job.MediaTranscodeObject;
-import com.qcloud.cos.model.ciModel.job.MediaTranscodeVideoObject;
+import com.qcloud.cos.model.ciModel.job.*;
 import com.qcloud.cos.model.ciModel.job.v2.MediaJobOperation;
 import com.qcloud.cos.model.ciModel.job.v2.MediaJobResponseV2;
 import com.qcloud.cos.model.ciModel.job.v2.MediaJobsRequestV2;
+import com.qcloud.cos.model.ciModel.template.MediaWaterMarkText;
+import com.qcloud.cos.model.ciModel.template.MediaWatermark;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.codec.binary.Base64;
 
 /**
  * 媒体处理 job接口相关demo 详情见https://cloud.tencent.com/document/product/460/84790
@@ -27,7 +22,7 @@ public class JobDemo {
         // 1 初始化用户身份信息（secretId, secretKey）。
         COSClient client = ClientUtils.getTestClient();
         // 2 调用要使用的方法。
-        describeMediaJob(client);
+        createMediaJobs(client);
     }
 
     /**
@@ -40,11 +35,14 @@ public class JobDemo {
         //1.创建任务请求对象
         MediaJobsRequestV2 request = new MediaJobsRequestV2();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("demo-123456789");
+        request.setBucketName("demo-1234567890");
         request.setTag("Transcode");
         request.getInput().setObject("1.mp4");
+        ArrayList<String> watermarkTemplateList = new ArrayList<>();
+        watermarkTemplateList.add("templateId");
+        request.getOperation().setWatermarkTemplateId(watermarkTemplateList);
         request.getOperation().setTemplateId("t0e09a9456d4124542b1f0e44d501*****");
-        request.getOperation().getOutput().setBucket("demo-123456789");
+        request.getOperation().getOutput().setBucket("demo-1234567890");
         request.getOperation().getOutput().setRegion("ap-chongqing");
         request.getOperation().getOutput().setObject("2.mp4");
         request.setCallBack("https://cloud.tencent.com/xxx");
@@ -64,12 +62,12 @@ public class JobDemo {
         //1.创建任务请求对象
         MediaJobsRequestV2 request = new MediaJobsRequestV2();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("demo-123456789");
+        request.setBucketName("demo-1234567890");
         request.setTag("Transcode");
         request.getInput().setObject("2.mp4");
         //2.1添加媒体任务操作参数
         MediaJobOperation operation = request.getOperation();
-        operation.setFreeTranscode("true");
+//        operation.setCustomId("t11282671b1a0846a9be6b438563*****");
         MediaTranscodeObject transcode = operation.getTranscode();
         MediaContainerObject container = transcode.getContainer();
         container.setFormat("mp4");
@@ -98,6 +96,153 @@ public class JobDemo {
         transConfig.setIsCheckAudioBitrate("false");
         transConfig.setResoAdjMethod("1");
 
+        List<MediaRemoveWaterMark> removeWatermarkList = operation.getRemoveWatermarkList();
+        MediaRemoveWaterMark removeWaterMark = new MediaRemoveWaterMark();
+        removeWaterMark.setDx("1");
+        removeWaterMark.setDy("2");
+        removeWaterMark.setWidth("10");
+        removeWaterMark.setHeight("10");
+        removeWaterMark.setStartTime("0");
+        removeWaterMark.setEndTime("1");
+        removeWatermarkList.add(removeWaterMark);
+
+        removeWaterMark = new MediaRemoveWaterMark();
+        removeWaterMark.setDx("2");
+        removeWaterMark.setDy("3");
+        removeWaterMark.setWidth("10");
+        removeWaterMark.setHeight("10");
+        removeWaterMark.setStartTime("1");
+        removeWaterMark.setEndTime("3");
+        removeWatermarkList.add(removeWaterMark);
+        operation.getOutput().setBucket("demo-1234567890");
+        operation.getOutput().setRegion("ap-chongqing");
+        operation.getOutput().setObject("demo1.mp4");
+        request.setCallBack("https://cloud.tencent.com/xxx");
+        //3.调用接口,获取任务响应对象
+        MediaJobResponseV2 response = client.createMediaJobsV2(request);
+        System.out.println(response.getJobsDetail().getJobId());
+    }
+
+
+
+    /**
+     * createMediaJobs 接口用于创建媒体任务  并且添加水印参数
+     * demo 使用转码参数创建任务 推荐使用模板创建媒体任务
+     *
+     * @param client
+     */
+    public static void createMediaJobs3(COSClient client) throws UnsupportedEncodingException {
+        //1.创建任务请求对象
+        MediaJobsRequestV2 request = new MediaJobsRequestV2();
+        //2.添加请求参数 参数详情请见api接口文档
+        request.setBucketName("demo-1234567890");
+        request.setTag("Transcode");
+        request.getInput().setObject("2.mp4");
+        //2.1添加媒体任务操作参数
+        MediaJobOperation operation = request.getOperation();
+        MediaWatermark watermark = operation.getWatermark();
+        watermark.setType("Text");
+        watermark.setLocMode("Absolute");
+        watermark.setDx("10");
+        watermark.setDy("10");
+        watermark.setPos("Pos");
+        watermark.setPos("TopRight");
+        watermark.setStartTime("0");
+        watermark.setEndTime("100.5");
+        MediaWaterMarkText text = watermark.getText();
+        text.setFontType("simfang.ttf");
+        text.setText("水印内容");
+        text.setFontSize("30");
+        text.setFontColor("0xFF0000");
+        text.setTransparency("30");
+        MediaTranscodeObject transcode = operation.getTranscode();
+        MediaContainerObject container = transcode.getContainer();
+        container.setFormat("mp4");
+        MediaTranscodeVideoObject video = transcode.getVideo();
+        video.setCodec("H.264");
+        video.setProfile("high");
+        video.setBitrate("1000");
+        video.setWidth("1280");
+        video.setFps("30");
+        video.setPreset("medium");
+        video.setBufSize("0");
+        video.setMaxrate("50000");
+
+        MediaAudioObject audio = transcode.getAudio();
+        audio.setCodec("aac");
+        audio.setSamplerate("44100");
+        audio.setBitrate("128");
+        audio.setChannels("4");
+
+        MediaTimeIntervalObject timeInterval = transcode.getTimeInterval();
+        timeInterval.setStart("0");
+        timeInterval.setDuration("60");
+
+        MediaTransConfigObject transConfig = transcode.getTransConfig();
+        transConfig.setAdjDarMethod("scale");
+        transConfig.setIsCheckAudioBitrate("false");
+        transConfig.setResoAdjMethod("1");
+
+        operation.getOutput().setBucket("demo-1234567890");
+        operation.getOutput().setRegion("ap-chongqing");
+        operation.getOutput().setObject("result.mp4");
+        //3.调用接口,获取任务响应对象
+        MediaJobResponseV2 response = client.createMediaJobsV2(request);
+        System.out.println(response.getJobsDetail().getJobId());
+    }
+
+    /**
+     * createMediaJobsWithAigcMetadata 接口用于创建媒体转码任务（包含aigcMetadata信息）
+     * demo 使用转码参数创建任务 推荐使用模板创建媒体任务
+     *
+     * @param client
+     */
+    public static void createMediaJobsWithAigcMetadata(COSClient client) throws UnsupportedEncodingException {
+        //1.创建任务请求对象
+        MediaJobsRequestV2 request = new MediaJobsRequestV2();
+        //2.添加请求参数 参数详情请见api接口文档
+        request.setBucketName("demo-123456789");
+        request.setTag("Transcode");
+        request.getInput().setObject("2.mp4");
+        //2.1添加媒体任务操作参数
+        MediaJobOperation operation = request.getOperation();
+        MediaTranscodeObject transcode = operation.getTranscode();
+        MediaContainerObject container = transcode.getContainer();
+        container.setFormat("mp4");
+        MediaTranscodeVideoObject video = transcode.getVideo();
+        video.setCodec("H.264");
+        video.setProfile("high");
+        video.setBitrate("1000");
+        video.setWidth("1280");
+        video.setFps("30");
+        video.setPreset("medium");
+        video.setBufSize("0");
+        video.setMaxrate("50000");
+
+        MediaAudioObject audio = transcode.getAudio();
+        audio.setCodec("aac");
+        audio.setSamplerate("44100");
+        audio.setBitrate("128");
+        audio.setChannels("4");
+
+        MediaTimeIntervalObject timeInterval = transcode.getTimeInterval();
+        timeInterval.setStart("0");
+        timeInterval.setDuration("60");
+
+        MediaTransConfigObject transConfig = transcode.getTransConfig();
+        transConfig.setAdjDarMethod("scale");
+        transConfig.setIsCheckAudioBitrate("false");
+        transConfig.setResoAdjMethod("1");
+        // 配置aigc元数据信息
+        AigcMetadata aigcMetadata = transConfig.getAigcMetadata();
+        aigcMetadata.setLabel("label");
+        aigcMetadata.setContentProducer("testProducer");
+        aigcMetadata.setProduceId("testProduceId");
+        aigcMetadata.setReservedCode1(new String(Base64.encodeBase64("test".getBytes())));
+        aigcMetadata.setReservedCode2(new String(Base64.encodeBase64("test".getBytes())));
+        aigcMetadata.setPropagateId("testPropagateId");
+        aigcMetadata.setContentPropagator("testPropagator");
+
         operation.getOutput().setBucket("demo-123456789");
         operation.getOutput().setRegion("ap-chongqing");
         operation.getOutput().setObject("demo1.mp4");
@@ -116,24 +261,28 @@ public class JobDemo {
         //1.创建任务请求对象
         MediaJobsRequest request = new MediaJobsRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("demo-123456789");
-        request.setJobId("j0668d96a5ba111efad510f605e2fde87");
+        request.setBucketName("demo-1234567890");
+        request.setJobId("j12007314677b11f09e4931a92d9*****");
         //3.调用接口,获取任务响应对象
-        MediaJobResponse response = client.describeMediaJob(request);
-        System.out.println(response.getJobsDetail().getState());
+        MediaJobResponseV2 response = client.describeMediaJobV2(request);
+        System.out.println(response);
     }
 
+    /**
+     * describeMediaJobs 批量查询任务信息
+     */
     public static void describeMediaJobs(COSClient client) {
         //1.创建任务请求对象
         MediaJobsRequest request = new MediaJobsRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("demo-123456789");
+        request.setBucketName("markjrzhang-1251704708");
         request.setTag("Transcode");
         //3.调用接口,获取任务响应对象
-        MediaListJobResponse response = client.describeMediaJobs(request);
+        MediaListJobResponse response = client.describeMediaJobsV2(request);
         List<MediaJobObject> jobsDetail = response.getJobsDetailList();
         for (MediaJobObject mediaJobObject : jobsDetail) {
-            System.out.println(mediaJobObject.getOperation().getTranscode());
+            System.out.println(mediaJobObject.getJobId());
+            System.out.println(mediaJobObject.getState());
         }
     }
 
@@ -141,7 +290,7 @@ public class JobDemo {
         //1.创建任务请求对象
         MediaJobsRequest request = new MediaJobsRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("demo-123456789");
+        request.setBucketName("demo-1234567890");
         request.setJobId("jbfb0d02a092111ebb3167781d*****");
         //3.调用接口,获取任务响应对象
         Boolean response = client.cancelMediaJob(request);

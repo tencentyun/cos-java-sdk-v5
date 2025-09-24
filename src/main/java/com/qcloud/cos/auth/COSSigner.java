@@ -170,7 +170,7 @@ public class COSSigner {
     }
 
     public boolean needSignedHeader(String header) {
-        return needSignedHeaderSet.contains(header) || header.startsWith("x-cos-");
+        return needSignedHeaderSet.contains(header) || header.startsWith("x-cos-") || header.startsWith("x-ci-");
     }
 
     private Map<String, String> buildSignHeaders(Map<String, String> originHeaders, Boolean signHost) {

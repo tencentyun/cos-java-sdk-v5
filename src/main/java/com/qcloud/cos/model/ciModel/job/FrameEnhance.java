@@ -1,6 +1,9 @@
 package com.qcloud.cos.model.ciModel.job;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 public class FrameEnhance {
+    @XStreamAlias("FrameDoubling")
     private String frameDoubling;
 
     public String getFrameDoubling() {

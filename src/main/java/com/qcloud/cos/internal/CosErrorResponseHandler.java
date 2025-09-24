@@ -84,11 +84,18 @@ public class CosErrorResponseHandler implements HttpResponseHandler<CosServiceEx
     public CosServiceException handle(CosHttpResponse httpResponse) throws XMLStreamException, IOException {
         final InputStream is = httpResponse.getContent();
         Map<String, String> headers = httpResponse.getHeaders();
+        CosServiceException cosServiceException = new CosServiceException("");
         if ("application/json".equalsIgnoreCase(headers.get(Headers.CONTENT_TYPE))) {
-            return handleJsonErrorResponse(httpResponse, is);
+            cosServiceException = handleJsonErrorResponse(httpResponse, is);
         } else {
-            return handleXmlErrorResponse(httpResponse, is);
+            cosServiceException = handleXmlErrorResponse(httpResponse, is);
         }
+
+        if (headers.containsKey("x-cos-preflight") && "true".equalsIgnoreCase(headers.get("x-cos-preflight"))) {
+            cosServiceException.setNeedPreflight(true);
+        }
+
+        return cosServiceException;
     }
 
     private CosServiceException handleXmlErrorResponse(CosHttpResponse httpResponse, InputStream is) throws XMLStreamException {

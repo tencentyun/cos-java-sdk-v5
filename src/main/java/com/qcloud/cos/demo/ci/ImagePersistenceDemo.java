@@ -3,6 +3,8 @@ package com.qcloud.cos.demo.ci;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -60,6 +62,60 @@ public class ImagePersistenceDemo {
             for(CIObject ciObject:ciUploadResult.getProcessResults().getObjectList()) {
                 System.out.println(ciObject.getLocation());
                 System.out.println(ciObject.getEtag());
+            }
+        } catch (CosServiceException e) {
+            e.printStackTrace();
+        } catch (CosClientException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void persistenceImageWithAigcMetadata(COSClient cosClient) {
+        // bucket名需包含appid
+        // api 请参考 https://cloud.tencent.com/document/product/436/54050
+        String bucketName = "examplebucket-1250000000";
+
+        String key = "test.jpg";
+        File localFile = new File("E://test.jpg");
+        PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, key, localFile);
+        PicOperations picOperations = new PicOperations();
+        picOperations.setIsPicInfo(1);
+        List<PicOperations.Rule> ruleList = new LinkedList<>();
+        PicOperations.Rule rule1 = new PicOperations.Rule();
+        rule1.setBucket(bucketName);
+        rule1.setFileId("test-1.jpg");
+        String label = Base64.getUrlEncoder().withoutPadding().encodeToString("label".getBytes(StandardCharsets.UTF_8));
+        String contentProducer = Base64.getUrlEncoder().withoutPadding().encodeToString("content_producer".getBytes(StandardCharsets.UTF_8));
+        String produceId = Base64.getUrlEncoder().withoutPadding().encodeToString("produce_id".getBytes(StandardCharsets.UTF_8));
+        String reservedCode1 = Base64.getUrlEncoder().withoutPadding().encodeToString("reserved_code1".getBytes(StandardCharsets.UTF_8));
+        String reservedCode2 = Base64.getUrlEncoder().withoutPadding().encodeToString("reserved_code2".getBytes(StandardCharsets.UTF_8));
+        String propagateId = Base64.getUrlEncoder().withoutPadding().encodeToString("propagate_id".getBytes(StandardCharsets.UTF_8));
+        String contentPropagator = Base64.getUrlEncoder().withoutPadding().encodeToString("content_propagator".getBytes(StandardCharsets.UTF_8));
+
+        String rule = "imageMogr2/AIGCMetadata/Label/" + label
+                + "/ContentProducer/" + contentProducer
+                + "/ProduceID/" + produceId
+                + "/ReservedCode1/" + reservedCode1
+                + "/ReservedCode2/" + reservedCode2
+                + "/PropagateID/" + propagateId
+                + "/ContentPropagator/" + contentPropagator;
+        rule1.setRule(rule);
+        ruleList.add(rule1);
+        PicOperations.Rule rule2 = new PicOperations.Rule();
+        rule2.setBucket(bucketName);
+        rule2.setFileId("test-2.jpg");
+        rule2.setRule("imageMogr2/rotate/180");
+        ruleList.add(rule2);
+        picOperations.setRules(ruleList);
+        putObjectRequest.setPicOperations(picOperations);
+        try {
+            PutObjectResult putObjectResult = cosClient.putObject(putObjectRequest);
+            CIUploadResult ciUploadResult = putObjectResult.getCiUploadResult();
+            System.out.println(putObjectResult.getRequestId());
+            for(CIObject ciObject:ciUploadResult.getProcessResults().getObjectList()) {
+                System.out.println(ciObject.getLocation());
+                System.out.println(ciObject.getEtag());
+                System.out.println(ciObject.getAigcMetadata());
             }
         } catch (CosServiceException e) {
             e.printStackTrace();
@@ -189,6 +245,61 @@ public class ImagePersistenceDemo {
             for(CIObject ciObject:ciUploadResult.getProcessResults().getObjectList()) {
                 System.out.println(ciObject.getLocation());
                 System.out.println(ciObject.getEtag());
+            }
+        } catch (CosServiceException e) {
+            e.printStackTrace();
+        } catch (CosClientException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 云上图片处理
+     */
+    public static void persistenceImagePostWithAigcMetadata(COSClient cosClient) {
+        String bucketName = "examplebucket-1250000000";
+        String key = "test.jpg";
+        ImageProcessRequest imageReq = new ImageProcessRequest(bucketName, key);
+
+        PicOperations picOperations = new PicOperations();
+        picOperations.setIsPicInfo(1);
+        List<PicOperations.Rule> ruleList = new LinkedList<>();
+        PicOperations.Rule rule1 = new PicOperations.Rule();
+        rule1.setBucket(bucketName);
+        rule1.setFileId("test-1.jpg");
+        String label = Base64.getUrlEncoder().withoutPadding().encodeToString("label".getBytes(StandardCharsets.UTF_8));
+        String contentProducer = Base64.getUrlEncoder().withoutPadding().encodeToString("content_producer".getBytes(StandardCharsets.UTF_8));
+        String produceId = Base64.getUrlEncoder().withoutPadding().encodeToString("produce_id".getBytes(StandardCharsets.UTF_8));
+        String reservedCode1 = Base64.getUrlEncoder().withoutPadding().encodeToString("reserved_code1".getBytes(StandardCharsets.UTF_8));
+        String reservedCode2 = Base64.getUrlEncoder().withoutPadding().encodeToString("reserved_code2".getBytes(StandardCharsets.UTF_8));
+        String propagateId = Base64.getUrlEncoder().withoutPadding().encodeToString("propagate_id".getBytes(StandardCharsets.UTF_8));
+        String contentPropagator = Base64.getUrlEncoder().withoutPadding().encodeToString("content_propagator".getBytes(StandardCharsets.UTF_8));
+
+        String rule = "imageMogr2/AIGCMetadata/Label/" + label
+                + "/ContentProducer/" + contentProducer
+                + "/ProduceID/" + produceId
+                + "/ReservedCode1/" + reservedCode1
+                + "/ReservedCode2/" + reservedCode2
+                + "/PropagateID/" + propagateId
+                + "/ContentPropagator/" + contentPropagator;
+        rule1.setRule(rule);
+        ruleList.add(rule1);
+        PicOperations.Rule rule2 = new PicOperations.Rule();
+        rule2.setBucket(bucketName);
+        rule2.setFileId("test-2.jpg");
+        rule2.setRule("imageMogr2/rotate/180");
+        ruleList.add(rule2);
+        picOperations.setRules(ruleList);
+
+        imageReq.setPicOperations(picOperations);
+
+        try {
+            CIUploadResult ciUploadResult = cosClient.processImage(imageReq);
+            System.out.println(ciUploadResult.getOriginalInfo().getEtag());
+            for(CIObject ciObject:ciUploadResult.getProcessResults().getObjectList()) {
+                System.out.println(ciObject.getLocation());
+                System.out.println(ciObject.getEtag());
+                System.out.println(ciObject.getAigcMetadata());
             }
         } catch (CosServiceException e) {
             e.printStackTrace();

@@ -18,6 +18,7 @@
 
 package com.qcloud.cos.internal;
 
+import com.qcloud.cos.model.ciModel.job.AigcMetadata;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -74,7 +75,6 @@ import com.qcloud.cos.model.ciModel.auditing.LanguageResult;
 import com.qcloud.cos.model.ciModel.auditing.LibResult;
 import com.qcloud.cos.model.ciModel.auditing.ListResult;
 import com.qcloud.cos.model.ciModel.auditing.ObjectResults;
-import com.qcloud.cos.model.ciModel.auditing.OcrResults;
 import com.qcloud.cos.model.ciModel.auditing.SectionInfo;
 import com.qcloud.cos.model.ciModel.auditing.SnapshotInfo;
 import com.qcloud.cos.model.ciModel.auditing.TextAuditingResponse;
@@ -163,6 +163,7 @@ import com.qcloud.cos.model.inventory.InventoryFilter;
 import com.qcloud.cos.model.inventory.InventoryPrefixPredicate;
 import com.qcloud.cos.model.inventory.InventorySchedule;
 import com.qcloud.cos.model.inventory.ServerSideEncryptionCOS;
+import com.qcloud.cos.model.inventory.PostBucketInventoryConfigurationResult;
 import com.qcloud.cos.model.lifecycle.LifecycleAndOperator;
 import com.qcloud.cos.model.lifecycle.LifecycleFilter;
 import com.qcloud.cos.model.lifecycle.LifecycleFilterPredicate;
@@ -633,6 +634,13 @@ public class XmlResponsesSaxParser {
     public ListBucketInventoryConfigurationsHandler parseBucketListInventoryConfigurationsResponse(InputStream inputStream)
             throws IOException {
         ListBucketInventoryConfigurationsHandler handler = new ListBucketInventoryConfigurationsHandler();
+        parseXmlInputStream(handler, inputStream);
+        return handler;
+    }
+
+    public PostBucketInventoryConfigurationsHandler parsePostBucketInventoryConfigurationsResponse(InputStream inputStream)
+            throws IOException {
+        PostBucketInventoryConfigurationsHandler handler = new PostBucketInventoryConfigurationsHandler();
         parseXmlInputStream(handler, inputStream);
         return handler;
     }
@@ -1239,6 +1247,33 @@ public class XmlResponsesSaxParser {
                 }
                 if(name.equals("Point")) {
                     codeLocation.getPoints().add(getText());
+                }
+            } else if(in("UploadResult", "ProcessResults", "Object", "AIGCMetadata")) {
+                AigcMetadata aigcMetadata = ciObject.getAigcMetadata();
+                switch (name) {
+                    case "Label":
+                        aigcMetadata.setLabel(getText());
+                        break;
+                    case "ContentProducer":
+                        aigcMetadata.setContentProducer(getText());
+                        break;
+                    case "ProduceID":
+                        aigcMetadata.setProduceId(getText());
+                        break;
+                    case "ReservedCode1":
+                        aigcMetadata.setReservedCode1(getText());
+                        break;
+                    case "ReservedCode2":
+                        aigcMetadata.setReservedCode2(getText());
+                        break;
+                    case "ContentPropagator":
+                        aigcMetadata.setContentPropagator(getText());
+                        break;
+                    case "PropagateID":
+                        aigcMetadata.setPropagateId(getText());
+                        break;
+                    default:
+                        break;
                 }
             }
         }
@@ -2427,6 +2462,18 @@ public class XmlResponsesSaxParser {
         private static final String BUCKET = "Bucket";
         private static final String STORAGECLASS = "StorageClass";
 
+        private static final String FILTER = "Filter";
+        private static final String AND = "And";
+        private static final String TAG = "Tag";
+        private static final String KEY = "Key";
+        private static final String VALUE = "Value";
+
+        private List<TagSet> currentTagSets = new ArrayList<>();
+
+        private String currentTagKey = "";
+
+        private String currentTagValue = "";
+
         public BucketReplicationConfiguration getConfiguration() {
             return bucketReplicationConfiguration;
         }
@@ -2460,6 +2507,11 @@ public class XmlResponsesSaxParser {
                     currentRule.setID(getText());
                 } else if (name.equals(PREFIX)) {
                     currentRule.setPrefix(getText());
+                } else if (name.equals(FILTER)) {
+                    if (!currentTagSets.isEmpty()) {
+                        currentRule.setTagSets(currentTagSets);
+                        currentTagSets = new ArrayList<>();
+                    }
                 } else {
                     if (name.equals(STATUS)) {
                         currentRule.setStatus(getText());
@@ -2468,11 +2520,53 @@ public class XmlResponsesSaxParser {
                         currentRule.setDestinationConfig(destinationConfig);
                     }
                 }
-            } else if (in(REPLICATION_CONFIG, RULE, DESTINATION)) {
+            } else if (in(REPLICATION_CONFIG, RULE, "DeleteMarkerReplication")) {
+                if (name.equals("Status")) {
+                    currentRule.setDeleteMarkerReplication(getText());
+                }
+            }else if (in(REPLICATION_CONFIG, RULE, DESTINATION)) {
                 if (name.equals(BUCKET)) {
                     destinationConfig.setBucketQCS(getText());
                 } else if (name.equals(STORAGECLASS)) {
                     destinationConfig.setStorageClass(getText());
+                }
+            } else if (in(REPLICATION_CONFIG, RULE, FILTER)) {
+                if (name.equals(PREFIX)) {
+                    currentRule.setPrefix(getText());
+                } else if (name.equals(TAG)) {
+                    if (!currentTagKey.isEmpty() && !currentTagValue.isEmpty()) {
+                        TagSet tagSet = new TagSet();
+                        tagSet.setTag(currentTagKey, currentTagValue);
+                        currentTagSets.add(tagSet);
+
+                        currentTagKey = "";
+                        currentTagValue = "";
+                    }
+                }
+            } else if (in(REPLICATION_CONFIG, RULE, FILTER, TAG)) {
+                if (name.equals(KEY)) {
+                    currentTagKey = getText();
+                } else if (name.equals(VALUE)) {
+                    currentTagValue = getText();
+                }
+            } else if (in(REPLICATION_CONFIG, RULE, FILTER, AND)) {
+                if (name.equals(PREFIX)) {
+                    currentRule.setPrefix(getText());
+                } else if (name.equals(TAG)) {
+                    if (!currentTagKey.isEmpty() && !currentTagValue.isEmpty()) {
+                        TagSet tagSet = new TagSet();
+                        tagSet.setTag(currentTagKey, currentTagValue);
+                        currentTagSets.add(tagSet);
+
+                        currentTagKey = "";
+                        currentTagValue = "";
+                    }
+                }
+            } else if (in(REPLICATION_CONFIG, RULE, FILTER, AND, TAG)) {
+                if (name.equals(KEY)) {
+                    currentTagKey = getText();
+                } else if (name.equals(VALUE)) {
+                    currentTagValue = getText();
                 }
             }
         }
@@ -4327,6 +4421,9 @@ public class XmlResponsesSaxParser {
             } else if (in("Response", "JobsDetail", "Operation", "Transcode", "TransConfig")) {
                 MediaTransConfigObject transConfig = jobsDetail.getOperation().getTranscode().getTransConfig();
                 ParserMediaInfoUtils.ParsingTransConfig(transConfig, name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "Transcode", "TransConfig", "AIGCMetadata")) {
+                AigcMetadata aigcMetadata = jobsDetail.getOperation().getTranscode().getTransConfig().getAigcMetadata();
+                ParserMediaInfoUtils.ParsingAigcMetadata(aigcMetadata, name, getText());
             } else if (in("Response", "JobsDetail", "Operation", "Transcode", "TimeInterval")) {
                 MediaTimeIntervalObject timeInterval = jobsDetail.getOperation().getTranscode().getTimeInterval();
                 ParserMediaInfoUtils.ParsingMediaTimeInterval(timeInterval, name, getText());
@@ -4377,8 +4474,14 @@ public class XmlResponsesSaxParser {
                 ParserMediaInfoUtils.ParseTtsTpl(jobsDetail.getOperation().getTtsTpl(), name, getText());
             } else if (in("Response", "JobsDetail", "Operation", "VideoTag")) {
                 ParserMediaInfoUtils.ParseVideoTag(jobsDetail.getOperation().getVideoTag(), name, getText());
-            }else if (in("Response", "JobsDetail", "Operation", "QualityEstimateConfig")) {
+            } else if (in("Response", "JobsDetail", "Operation", "QualityEstimateConfig")) {
                 ParserMediaInfoUtils.ParseQualityEstimateConfig(jobsDetail.getOperation().getQualityEstimateConfig(), name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "Segment")) {
+                MediaSegmentObject segment = jobsDetail.getOperation().getSegment();
+                ParserMediaInfoUtils.ParsingSegment(segment, name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "Segment", "AIGCMetadata")) {
+                AigcMetadata aigcMetadata = jobsDetail.getOperation().getSegment().getAigcMetadata();
+                ParserMediaInfoUtils.ParsingAigcMetadata(aigcMetadata, name, getText());
             }
         }
 
@@ -4414,7 +4517,12 @@ public class XmlResponsesSaxParser {
             } else {
                 jobsDetail = jobsDetailList.get(jobsDetailList.size() - 1);
             }
-            if (in("Response", "JobsDetail")) {
+
+            if (in("Response")){
+                if ("nextToken".equalsIgnoreCase(name)){
+                    response.setNextToken(getText());
+                }
+            } else if (in("Response", "JobsDetail")) {
 
                 switch (name) {
                     case "Code":
@@ -4497,6 +4605,9 @@ public class XmlResponsesSaxParser {
             } else if (in("Response", "JobsDetail", "Operation", "Transcode", "TransConfig")) {
                 MediaTransConfigObject transConfig = jobsDetail.getOperation().getTranscode().getTransConfig();
                 ParserMediaInfoUtils.ParsingTransConfig(transConfig, name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "Transcode", "TransConfig", "AIGCMetadata")) {
+                AigcMetadata aigcMetadata = jobsDetail.getOperation().getTranscode().getTransConfig().getAigcMetadata();
+                ParserMediaInfoUtils.ParsingAigcMetadata(aigcMetadata, name, getText());
             } else if (in("Response", "JobsDetail", "Operation", "Transcode", "TimeInterval")) {
                 MediaTimeIntervalObject timeInterval = jobsDetail.getOperation().getTranscode().getTimeInterval();
                 ParserMediaInfoUtils.ParsingMediaTimeInterval(timeInterval, name, getText());
@@ -4506,6 +4617,9 @@ public class XmlResponsesSaxParser {
             } else if (in("Response", "JobsDetail", "Operation", "Segment")) {
                 MediaSegmentObject segment = jobsDetail.getOperation().getSegment();
                 ParserMediaInfoUtils.ParsingSegment(segment, name, getText());
+            } else if (in("Response", "JobsDetail", "Operation", "Segment", "AIGCMetadata")) {
+                AigcMetadata aigcMetadata = jobsDetail.getOperation().getSegment().getAigcMetadata();
+                ParserMediaInfoUtils.ParsingAigcMetadata(aigcMetadata, name, getText());
             } else if (in("Response", "JobsDetail", "Operation", "Snapshot", "SpriteSnapshotConfig")) {
                 SpriteSnapshotConfig snapshotConfig = jobsDetail.getOperation().getSnapshot().getSnapshotConfig();
                 ParserMediaInfoUtils.ParsingSnapshotConfig(snapshotConfig, name, getText());
@@ -4741,6 +4855,9 @@ public class XmlResponsesSaxParser {
             } else if (in("Response", "Template", "TransTpl", "TransConfig")) {
                 MediaTransConfigObject transConfig = transTpl.getTransConfig();
                 ParserMediaInfoUtils.ParsingTransConfig(transConfig, name, getText());
+            } else if (in("Response", "Template", "TransTpl", "TransConfig", "AIGCMetadata")) {
+                AigcMetadata aigcMetadata = transTpl.getTransConfig().getAigcMetadata();
+                ParserMediaInfoUtils.ParsingAigcMetadata(aigcMetadata, name, getText());
             } else if (in("Response", "Template", "Snapshot")) {
                 MediaSnapshotObject snapshot = response.getTemplate().getSnapshot();
                 ParserMediaInfoUtils.ParsingSnapshot(snapshot, name, getText());
@@ -4880,6 +4997,9 @@ public class XmlResponsesSaxParser {
             } else if (in("Response", "TemplateList", "TransTpl", "TransConfig")) {
                 MediaTransConfigObject transConfig = transTpl.getTransConfig();
                 ParserMediaInfoUtils.ParsingTransConfig(transConfig, name, getText());
+            } else if (in("Response", "TemplateList", "TransTpl", "TransConfig", "AIGCMetadata")) {
+                AigcMetadata aigcMetadata = transTpl.getTransConfig().getAigcMetadata();
+                ParserMediaInfoUtils.ParsingAigcMetadata(aigcMetadata, name, getText());
             } else if (in("Response", "TemplateList", "Snapshot")) {
                 MediaSnapshotObject snapshot = template.getSnapshot();
                 ParserMediaInfoUtils.ParsingSnapshot(snapshot, name, getText());
@@ -5074,6 +5194,14 @@ public class XmlResponsesSaxParser {
                     default:
                         break;
                 }
+            } else if (in("Response", "JobsDetail", "Operation")) {
+                switch (name) {
+                    case "UserData":
+                        response.getJobsDetail().getOperation().setUserData(getText());
+                        break;
+                    default:
+                        break;
+                }
             } else if (in("Response", "JobsDetail", "Input")) {
                 if ("Object".equalsIgnoreCase(name)) {
                     response.getJobsDetail().getInput().setObject(getText());
@@ -5183,6 +5311,14 @@ public class XmlResponsesSaxParser {
                         break;
                     case "Tag":
                         jobsDetail.setTag(getText());
+                        break;
+                    default:
+                        break;
+                }
+            } else if (in("Response", "JobsDetail", "Operation")) {
+                switch (name) {
+                    case "UserData":
+                        response.getJobsDetail().getOperation().setUserData(getText());
                         break;
                     default:
                         break;
@@ -7084,6 +7220,32 @@ public class XmlResponsesSaxParser {
                     currentBucket.setBucketType(getText());
                 } else if (name.equals("Type")) {
                     currentBucket.setType(getText());
+                }
+            }
+        }
+    }
+
+    public static class PostBucketInventoryConfigurationsHandler extends AbstractHandler {
+        private final PostBucketInventoryConfigurationResult result = new PostBucketInventoryConfigurationResult();
+
+        public PostBucketInventoryConfigurationResult getResult() {
+            return result;
+        }
+
+        @Override
+        protected void doStartElement(
+                String uri,
+                String name,
+                String qName,
+                Attributes attrs) {
+        }
+
+        @Override
+        protected void doEndElement(String uri, String name, String qName) {
+
+            if (in("PostInventoryResult")) {
+                if (name.equals("JobId")) {
+                    result.setJobId(getText());
                 }
             }
         }

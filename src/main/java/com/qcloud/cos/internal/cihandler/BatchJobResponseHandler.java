@@ -3,6 +3,7 @@ package com.qcloud.cos.internal.cihandler;
 import com.qcloud.cos.internal.ParserMediaInfoUtils;
 import com.qcloud.cos.model.ciModel.common.BatchInputObject;
 import com.qcloud.cos.model.ciModel.common.MediaInputObject;
+import com.qcloud.cos.model.ciModel.job.AigcMetadata;
 import com.qcloud.cos.model.ciModel.job.BatchJobDetail;
 import com.qcloud.cos.model.ciModel.job.BatchJobOperation;
 import com.qcloud.cos.model.ciModel.job.BatchJobResponse;
@@ -12,6 +13,7 @@ import com.qcloud.cos.model.ciModel.job.MediaPicProcessTemplateObject;
 import com.qcloud.cos.model.ciModel.job.MediaTimeIntervalObject;
 import com.qcloud.cos.model.ciModel.job.ProcessResult;
 import com.qcloud.cos.model.ciModel.persistence.ImageInfo;
+import com.qcloud.cos.model.ciModel.template.MediaSegmentObject;
 import org.xml.sax.Attributes;
 
 public class BatchJobResponseHandler extends CIAbstractHandler {
@@ -137,6 +139,12 @@ public class BatchJobResponseHandler extends CIAbstractHandler {
         } else if (in("Response", "JobsDetail", "Operation", "JobParam", "PicProcessResult", "ProcessResult")) {
             ProcessResult processResult = jobDetail.getOperation().getJobParam().getPicProcessResult().getProcessResult();
             ParserMediaInfoUtils.ParsingProcessResult(processResult, name, getText());
+        } else if (in("Response", "JobsDetail", "Operation", "JobParam", "Segment")) {
+            MediaSegmentObject segment = jobDetail.getOperation().getJobParam().getSegment();
+            ParserMediaInfoUtils.ParsingSegment(segment, name, getText());
+        } else if (in("Response", "JobsDetail", "Operation", "JobParam", "Segment", "AIGCMetadata")) {
+            AigcMetadata aigcMetadata = jobDetail.getOperation().getJobParam().getSegment().getAigcMetadata();
+            ParserMediaInfoUtils.ParsingAigcMetadata(aigcMetadata, name, getText());
         }
     }
 

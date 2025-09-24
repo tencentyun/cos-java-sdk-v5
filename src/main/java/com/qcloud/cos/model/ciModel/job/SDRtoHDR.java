@@ -1,6 +1,9 @@
 package com.qcloud.cos.model.ciModel.job;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 public class SDRtoHDR {
+    @XStreamAlias("HdrMode")
     private String hdrMode;
 
     public String getHdrMode() {
