@@ -649,6 +649,12 @@ public class BucketConfigurationXmlFactory {
             }
             xml.end(); // xml.start("Destination")
 
+            if (!rule.getDeleteMarkerReplication().isEmpty()) {
+                xml.start("DeleteMarkerReplication");
+                xml.start("Status").value(rule.getDeleteMarkerReplication()).end();
+                xml.end();
+            }
+
             xml.end(); // xml.start("Rule");
         }
         xml.end();
