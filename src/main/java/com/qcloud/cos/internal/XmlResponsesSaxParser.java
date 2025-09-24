@@ -2462,18 +2462,6 @@ public class XmlResponsesSaxParser {
         private static final String BUCKET = "Bucket";
         private static final String STORAGECLASS = "StorageClass";
 
-        private static final String FILTER = "Filter";
-        private static final String AND = "And";
-        private static final String TAG = "Tag";
-        private static final String KEY = "Key";
-        private static final String VALUE = "Value";
-
-        private List<TagSet> currentTagSets = new ArrayList<>();
-
-        private String currentTagKey = "";
-
-        private String currentTagValue = "";
-
         public BucketReplicationConfiguration getConfiguration() {
             return bucketReplicationConfiguration;
         }
@@ -2507,11 +2495,6 @@ public class XmlResponsesSaxParser {
                     currentRule.setID(getText());
                 } else if (name.equals(PREFIX)) {
                     currentRule.setPrefix(getText());
-                } else if (name.equals(FILTER)) {
-                    if (!currentTagSets.isEmpty()) {
-                        currentRule.setTagSets(currentTagSets);
-                        currentTagSets = new ArrayList<>();
-                    }
                 } else {
                     if (name.equals(STATUS)) {
                         currentRule.setStatus(getText());
@@ -2520,53 +2503,11 @@ public class XmlResponsesSaxParser {
                         currentRule.setDestinationConfig(destinationConfig);
                     }
                 }
-            } else if (in(REPLICATION_CONFIG, RULE, "DeleteMarkerReplication")) {
-                if (name.equals("Status")) {
-                    currentRule.setDeleteMarkerReplication(getText());
-                }
-            }else if (in(REPLICATION_CONFIG, RULE, DESTINATION)) {
+            } else if (in(REPLICATION_CONFIG, RULE, DESTINATION)) {
                 if (name.equals(BUCKET)) {
                     destinationConfig.setBucketQCS(getText());
                 } else if (name.equals(STORAGECLASS)) {
                     destinationConfig.setStorageClass(getText());
-                }
-            } else if (in(REPLICATION_CONFIG, RULE, FILTER)) {
-                if (name.equals(PREFIX)) {
-                    currentRule.setPrefix(getText());
-                } else if (name.equals(TAG)) {
-                    if (!currentTagKey.isEmpty() && !currentTagValue.isEmpty()) {
-                        TagSet tagSet = new TagSet();
-                        tagSet.setTag(currentTagKey, currentTagValue);
-                        currentTagSets.add(tagSet);
-
-                        currentTagKey = "";
-                        currentTagValue = "";
-                    }
-                }
-            } else if (in(REPLICATION_CONFIG, RULE, FILTER, TAG)) {
-                if (name.equals(KEY)) {
-                    currentTagKey = getText();
-                } else if (name.equals(VALUE)) {
-                    currentTagValue = getText();
-                }
-            } else if (in(REPLICATION_CONFIG, RULE, FILTER, AND)) {
-                if (name.equals(PREFIX)) {
-                    currentRule.setPrefix(getText());
-                } else if (name.equals(TAG)) {
-                    if (!currentTagKey.isEmpty() && !currentTagValue.isEmpty()) {
-                        TagSet tagSet = new TagSet();
-                        tagSet.setTag(currentTagKey, currentTagValue);
-                        currentTagSets.add(tagSet);
-
-                        currentTagKey = "";
-                        currentTagValue = "";
-                    }
-                }
-            } else if (in(REPLICATION_CONFIG, RULE, FILTER, AND, TAG)) {
-                if (name.equals(KEY)) {
-                    currentTagKey = getText();
-                } else if (name.equals(VALUE)) {
-                    currentTagValue = getText();
                 }
             }
         }
