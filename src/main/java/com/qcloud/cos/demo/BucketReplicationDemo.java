@@ -1,8 +1,5 @@
 package com.qcloud.cos.demo;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.ClientConfig;
 import com.qcloud.cos.auth.BasicCOSCredentials;
@@ -11,7 +8,6 @@ import com.qcloud.cos.model.BucketReplicationConfiguration;
 import com.qcloud.cos.model.ReplicationDestinationConfig;
 import com.qcloud.cos.model.ReplicationRule;
 import com.qcloud.cos.model.ReplicationRuleStatus;
-import com.qcloud.cos.model.TagSet;
 import com.qcloud.cos.region.Region;
 
 public class BucketReplicationDemo {
@@ -65,15 +61,8 @@ public class BucketReplicationDemo {
 
         ReplicationRule replicationRule2 = new ReplicationRule();
         replicationRule2.setID("test2");
-        replicationRule2.setStatus(ReplicationRuleStatus.Enabled);
+        replicationRule2.setStatus(ReplicationRuleStatus.Disabled);
         replicationRule2.setPrefix("test2Replication");
-        List<TagSet> tagSetList = new LinkedList<TagSet>();
-        TagSet tagSet = new TagSet();
-        tagSet.setTag("age", "18");
-        tagSet.setTag("name", "xiaoming");
-        tagSetList.add(tagSet);
-        replicationRule.setTagSets(tagSetList);
-        replicationRule.setDeleteMarkerReplication(ReplicationRuleStatus.Disabled);
         ReplicationDestinationConfig replicationDestinationConfig2 = new ReplicationDestinationConfig();
         replicationDestinationConfig2.setBucketQCS("qcs::cos:ap-shanghai::examplebucket-cp-12500000000");
         replicationRule2.setDestinationConfig(replicationDestinationConfig2);
