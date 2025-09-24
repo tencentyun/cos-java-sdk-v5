@@ -15,7 +15,7 @@ public class InstanceCredentialsFetcher extends HttpCredentialsFetcher {
 
     static {
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        mapper.setPropertyNamingStrategy(PropertyNamingStrategy.PASCAL_CASE_TO_CAMEL_CASE);
+        mapper.setPropertyNamingStrategy(PropertyNamingStrategy.UPPER_CAMEL_CASE);
     }
 
     private static class CAMSecurityCredentials {

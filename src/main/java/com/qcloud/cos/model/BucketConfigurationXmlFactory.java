@@ -40,6 +40,7 @@ import com.qcloud.cos.model.inventory.InventoryFilterPredicate;
 import com.qcloud.cos.model.inventory.InventoryPrefixPredicate;
 import com.qcloud.cos.model.inventory.InventorySchedule;
 import com.qcloud.cos.model.inventory.ServerSideEncryptionCOS;
+import com.qcloud.cos.model.inventory.InventoryAndPredicate;
 import com.qcloud.cos.model.lifecycle.LifecycleAndOperator;
 import com.qcloud.cos.model.lifecycle.LifecycleFilter;
 import com.qcloud.cos.model.lifecycle.LifecycleFilterPredicate;
@@ -130,12 +131,14 @@ public class BucketConfigurationXmlFactory {
         return xml.getBytes();
     }
 
-    public byte[] convertToXmlByteArray(InventoryConfiguration config) throws CosClientException {
+    public byte[] convertToXmlByteArray(InventoryConfiguration config, boolean isOneTimeInventory) throws CosClientException {
         XmlWriter xml = new XmlWriter();
         xml.start("InventoryConfiguration");
 
         xml.start("Id").value(config.getId()).end();
-        xml.start("IsEnabled").value(String.valueOf(config.isEnabled())).end();
+        if (!isOneTimeInventory) {
+            xml.start("IsEnabled").value(String.valueOf(config.isEnabled())).end();
+        }
         xml.start("IncludedObjectVersions").value(config.getIncludedObjectVersions()).end();
 
         writeInventoryDestination(xml, config.getDestination());
@@ -231,6 +234,18 @@ public class BucketConfigurationXmlFactory {
 
         if (predicate instanceof InventoryPrefixPredicate) {
             writePrefix(xml, ((InventoryPrefixPredicate) predicate).getPrefix());
+        }
+
+        if (predicate instanceof InventoryAndPredicate) {
+            xml.start("And");
+            writePrefix(xml, ((InventoryAndPredicate) predicate).getPrefix());
+            List<Tag> tags = ((InventoryAndPredicate) predicate).getTags();
+            if (tags != null && !tags.isEmpty()) {
+                for (Tag tag : tags) {
+                    writeTag(xml, tag);
+                }
+            }
+            xml.end();
         }
     }
 
@@ -485,6 +500,15 @@ public class BucketConfigurationXmlFactory {
         xml.end(); // </TagSet>
     }
 
+    private void writeFilterTagRule(XmlWriter xml, TagSet tagset) {
+        for ( String key : tagset.getAllTags().keySet() ) {
+            xml.start("Tag");
+            xml.start("Key").value(key).end();
+            xml.start("Value").value(tagset.getTag(key)).end();
+            xml.end(); // </Tag>
+        }
+    }
+
     private void addTransitions(XmlWriter xml, List<Transition> transitions) {
         if (transitions == null || transitions.isEmpty()) {
             return;
@@ -591,7 +615,30 @@ public class BucketConfigurationXmlFactory {
 
             xml.start("Rule");
             xml.start("ID").value(ruleId).end();
-            xml.start("Prefix").value(rule.getPrefix()).end();
+
+            xml.start("Filter");
+            if (rule.getAllTagSets() != null && !rule.getPrefix().isEmpty()) {
+                xml.start("And");
+                xml.start("Prefix").value(rule.getPrefix()).end();
+                for (TagSet tagSet : rule.getAllTagSets()) {
+                    writeFilterTagRule(xml, tagSet);
+                }
+                xml.end(); // xml.start("And");
+            } else if (!rule.getPrefix().isEmpty()) {
+                xml.start("Prefix").value(rule.getPrefix()).end();
+            } else if (rule.getAllTagSets() != null && rule.getAllTagSets().size() > 1) {
+                xml.start("And");
+                for (TagSet tagSet : rule.getAllTagSets()) {
+                    writeFilterTagRule(xml, tagSet);
+                }
+                xml.end(); // xml.start("And");
+            } else if (rule.getAllTagSets() != null && rule.getAllTagSets().size() == 1) {
+                for (TagSet tagSet : rule.getAllTagSets()) {
+                    writeFilterTagRule(xml, tagSet);
+                }
+            }
+            xml.end(); // xml.start("Filter");
+
             xml.start("Status").value(rule.getStatus()).end();
 
             final ReplicationDestinationConfig config = rule.getDestinationConfig();
@@ -600,9 +647,9 @@ public class BucketConfigurationXmlFactory {
             if (config.getStorageClass() != null) {
                 xml.start("StorageClass").value(config.getStorageClass()).end();
             }
-            xml.end();
+            xml.end(); // xml.start("Destination")
 
-            xml.end();
+            xml.end(); // xml.start("Rule");
         }
         xml.end();
         return xml.getBytes();

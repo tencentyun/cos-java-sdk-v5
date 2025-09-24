@@ -19,6 +19,9 @@
 package com.qcloud.cos.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import com.qcloud.cos.utils.Jackson;
 
@@ -48,6 +51,8 @@ public class ReplicationRule implements Serializable {
      * Destination configuration for the replication rule.
      */
     private ReplicationDestinationConfig destinationConfig;
+
+    private List<TagSet> tagSets = null;
 
     /**
      * Returns the id of the replication rule.
@@ -201,6 +206,15 @@ public class ReplicationRule implements Serializable {
             ReplicationDestinationConfig destinationConfig) {
         setDestinationConfig(destinationConfig);
         return this;
+    }
+
+    public void setTagSets( Collection<TagSet> tagSets ) {
+        this.tagSets = new ArrayList<>();
+        this.tagSets.addAll( tagSets );
+    }
+
+    public List<TagSet> getAllTagSets() {
+        return this.tagSets;
     }
 
     @Override

@@ -43,6 +43,9 @@ public class MediaJobOperation {
     @XStreamAlias("TemplateId")
     private String templateId;
 
+    @XStreamAlias("CustomId")
+    private String customId;
+
     @XStreamAlias("JobLevel")
     private String jobLevel;
 
@@ -85,8 +88,8 @@ public class MediaJobOperation {
     @XStreamAlias("Info")
     private MediaInfoObjcet mediaInfo;
 
-    @XStreamAlias("RemoveWaterMark")
-    private MediaRemoveWaterMark removeWatermark;
+    @XStreamImplicit(itemFieldName = "RemoveWatermark")
+    private List<MediaRemoveWaterMark> removeWatermarkList;
 
     @XStreamAlias("Watermark")
     private MediaWatermark watermark;
@@ -209,6 +212,14 @@ public class MediaJobOperation {
 
     public void setVideoTargetRecResult(VideoTargetRecResult videoTargetRecResult) {
         this.videoTargetRecResult = videoTargetRecResult;
+    }
+
+    public String getCustomId() {
+        return customId;
+    }
+
+    public void setCustomId(String customId) {
+        this.customId = customId;
     }
 
     public void setDnaResult(DNAResult dnaResult) {
@@ -394,17 +405,6 @@ public class MediaJobOperation {
 
     public void setMediaInfo(MediaInfoObjcet mediaInfo) {
         this.mediaInfo = mediaInfo;
-    }
-
-    public MediaRemoveWaterMark getRemoveWatermark() {
-        if (removeWatermark == null) {
-            removeWatermark = new MediaRemoveWaterMark();
-        }
-        return removeWatermark;
-    }
-
-    public void setRemoveWatermark(MediaRemoveWaterMark removeWatermark) {
-        this.removeWatermark = removeWatermark;
     }
 
     public MediaWatermark getWatermark() {
@@ -738,5 +738,16 @@ public class MediaJobOperation {
 
     public void setSnapshotPrefix(String snapshotPrefix) {
         this.snapshotPrefix = snapshotPrefix;
+    }
+
+    public List<MediaRemoveWaterMark> getRemoveWatermarkList() {
+        if (removeWatermarkList == null) {
+            removeWatermarkList = new ArrayList<>();
+        }
+        return removeWatermarkList;
+    }
+
+    public void setRemoveWatermarkList(List<MediaRemoveWaterMark> removeWatermarkList) {
+        this.removeWatermarkList = removeWatermarkList;
     }
 }

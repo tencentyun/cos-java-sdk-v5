@@ -5,6 +5,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.6.246.3]
+- Tag Filter of post bucket inventory 
+
+## [5.6.246.2]
+- post bucket inventory
+
+## [5.6.246]
+- rename fault tolerant
+
+## [5.6.244.4]
+- 3xx exception retry
+
+## [5.6.244.3]
+- preflight for upload part 
+- x-cos-hash-crc32c
+- delete object version
+- throw 412 & 304 directly
+
+## [5.6.240.2]
+- update IdleConnectionMonitor
+
+## [5.6.240]
+- update tencentcloud-sdk-java-kms version
+- populate preflight request metadata
+
+## [5.6.238]
+- update request timeout
+- do not follow 302 by default
+
 ## [5.6.234]
 - prefliht object before doing upload
 - add bucket encryption configuration API

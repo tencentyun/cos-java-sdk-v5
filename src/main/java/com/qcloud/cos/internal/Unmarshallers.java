@@ -71,6 +71,7 @@ import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowExecutionResponse;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowExecutionsResponse;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowListResponse;
 import com.qcloud.cos.model.ciModel.workflow.MediaWorkflowResponse;
+import com.qcloud.cos.model.inventory.PostBucketInventoryConfigurationResult;
 
 /*** Collection of unmarshallers for COS XML responses. */
 
@@ -423,6 +424,15 @@ public class Unmarshallers {
             return new SetBucketInventoryConfigurationResult();
         }
     }
+
+    public static final class PostBucketInventoryConfigurationUnmarshaller implements
+            Unmarshaller<PostBucketInventoryConfigurationResult, InputStream> {
+
+        public PostBucketInventoryConfigurationResult unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser().parsePostBucketInventoryConfigurationsResponse(in).getResult();
+        }
+    }
+
     public static final class GetObjectTaggingResponseUnmarshaller implements Unmarshaller<GetObjectTaggingResult, InputStream> {
 
         @Override
