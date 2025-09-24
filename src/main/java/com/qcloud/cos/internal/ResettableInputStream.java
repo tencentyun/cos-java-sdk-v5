@@ -121,7 +121,7 @@ public class ResettableInputStream extends ReleasableInputStream {
      * @param _ ignored
      */
     @Override
-    public void mark(int _) {
+    public void mark(int readlimit) {
         abortIfNeeded();
         try {
             markPos = fileChannel.position();
