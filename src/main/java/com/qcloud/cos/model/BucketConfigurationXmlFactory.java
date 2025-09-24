@@ -594,6 +594,15 @@ public class BucketConfigurationXmlFactory {
         }
     }
 
+    private void writeFilterTagRule(XmlWriter xml, TagSet tagset) {
+        for ( String key : tagset.getAllTags().keySet() ) {
+            xml.start("Tag");
+            xml.start("Key").value(key).end();
+            xml.start("Value").value(tagset.getTag(key)).end();
+            xml.end(); // </Tag>
+        }
+    }
+
     public byte[] convertToXmlByteArray(BucketReplicationConfiguration replicationConfiguration) {
         XmlWriter xml = new XmlWriter();
         xml.start("ReplicationConfiguration");
@@ -606,7 +615,30 @@ public class BucketConfigurationXmlFactory {
 
             xml.start("Rule");
             xml.start("ID").value(ruleId).end();
-            xml.start("Prefix").value(rule.getPrefix()).end();
+
+            xml.start("Filter");
+            if (rule.getAllTagSets() != null && !rule.getPrefix().isEmpty()) {
+                xml.start("And");
+                xml.start("Prefix").value(rule.getPrefix()).end();
+                for (TagSet tagSet : rule.getAllTagSets()) {
+                    writeFilterTagRule(xml, tagSet);
+                }
+                xml.end(); // xml.start("And");
+            } else if (!rule.getPrefix().isEmpty()) {
+                xml.start("Prefix").value(rule.getPrefix()).end();
+            } else if (rule.getAllTagSets() != null && rule.getAllTagSets().size() > 1) {
+                xml.start("And");
+                for (TagSet tagSet : rule.getAllTagSets()) {
+                    writeFilterTagRule(xml, tagSet);
+                }
+                xml.end(); // xml.start("And");
+            } else if (rule.getAllTagSets() != null && rule.getAllTagSets().size() == 1) {
+                for (TagSet tagSet : rule.getAllTagSets()) {
+                    writeFilterTagRule(xml, tagSet);
+                }
+            }
+            xml.end(); // xml.start("Filter");
+
             xml.start("Status").value(rule.getStatus()).end();
 
             final ReplicationDestinationConfig config = rule.getDestinationConfig();
@@ -615,9 +647,15 @@ public class BucketConfigurationXmlFactory {
             if (config.getStorageClass() != null) {
                 xml.start("StorageClass").value(config.getStorageClass()).end();
             }
-            xml.end();
+            xml.end(); // xml.start("Destination")
 
-            xml.end();
+            if (!rule.getDeleteMarkerReplication().isEmpty()) {
+                xml.start("DeleteMarkerReplication");
+                xml.start("Status").value(rule.getDeleteMarkerReplication()).end();
+                xml.end();
+            }
+
+            xml.end(); // xml.start("Rule");
         }
         xml.end();
         return xml.getBytes();
