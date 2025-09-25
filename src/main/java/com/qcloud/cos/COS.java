@@ -3308,6 +3308,8 @@ public interface COS extends COSDirectSpi {
     AIGCMetadataResponse getImageAIGCMetadata(String bucketName, String key);
 
     AIGCMetadataResponse getMediaAIGCMetadata(String bucketName, String key);
+
+    CreatePosterProductionResponse createPosterProduction(CreatePosterProductionRequest customRequest);
 }
 
 

@@ -5820,5 +5820,16 @@ public class COSClient implements COS {
 
         return invoke(request, new Unmarshallers.AigcMetadataUnmarshaller());
     }
+
+    @Override
+    public CreatePosterProductionResponse createPosterProduction(CreatePosterProductionRequest customRequest) {
+        rejectNull(customRequest, "The request parameter must be specified setting the object tags");
+
+        CosHttpRequest<CreatePosterProductionRequest> request = createRequest(customRequest.getBucketName(), "/pic_jobs", customRequest , HttpMethodName.POST);
+
+        this.setContent(request, CIAuditingXmlFactoryV2.convertToXmlByteArray( customRequest ), "application/xml", false);
+        return invoke(request, new Unmarshallers.CICommonUnmarshaller<CreatePosterProductionResponse>(CreatePosterProductionResponse.class));
+    }
+
 }
 
