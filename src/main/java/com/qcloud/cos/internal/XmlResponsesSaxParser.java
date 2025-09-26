@@ -18,7 +18,8 @@
 
 package com.qcloud.cos.internal;
 
-import com.qcloud.cos.model.ciModel.job.AigcMetadata;
+import com.qcloud.cos.model.ciModel.job.*;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -91,32 +92,6 @@ import com.qcloud.cos.model.ciModel.image.ImageLabelV2Response;
 import com.qcloud.cos.model.ciModel.image.Label;
 import com.qcloud.cos.model.ciModel.image.LabelV2;
 import com.qcloud.cos.model.ciModel.image.LocationLabel;
-import com.qcloud.cos.model.ciModel.job.DocJobDetail;
-import com.qcloud.cos.model.ciModel.job.DocJobListResponse;
-import com.qcloud.cos.model.ciModel.job.DocJobResponse;
-import com.qcloud.cos.model.ciModel.job.DocProcessObject;
-import com.qcloud.cos.model.ciModel.job.DocProcessPageInfo;
-import com.qcloud.cos.model.ciModel.job.DocProcessResult;
-import com.qcloud.cos.model.ciModel.job.ExtractDigitalWatermark;
-import com.qcloud.cos.model.ciModel.job.Md5Info;
-import com.qcloud.cos.model.ciModel.job.MediaAudioObject;
-import com.qcloud.cos.model.ciModel.job.MediaConcatFragmentObject;
-import com.qcloud.cos.model.ciModel.job.MediaConcatTemplateObject;
-import com.qcloud.cos.model.ciModel.job.MediaContainerObject;
-import com.qcloud.cos.model.ciModel.job.MediaDigitalWatermark;
-import com.qcloud.cos.model.ciModel.job.MediaJobObject;
-import com.qcloud.cos.model.ciModel.job.MediaJobOperation;
-import com.qcloud.cos.model.ciModel.job.MediaJobResponse;
-import com.qcloud.cos.model.ciModel.job.MediaListJobResponse;
-import com.qcloud.cos.model.ciModel.job.MediaPicProcessTemplateObject;
-import com.qcloud.cos.model.ciModel.job.MediaRemoveWaterMark;
-import com.qcloud.cos.model.ciModel.job.MediaTimeIntervalObject;
-import com.qcloud.cos.model.ciModel.job.MediaTransConfigObject;
-import com.qcloud.cos.model.ciModel.job.MediaTranscodeVideoObject;
-import com.qcloud.cos.model.ciModel.job.MediaVideoObject;
-import com.qcloud.cos.model.ciModel.job.OutputFile;
-import com.qcloud.cos.model.ciModel.job.ProcessResult;
-import com.qcloud.cos.model.ciModel.job.VideoTargetRec;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaFormat;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoAudio;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoResponse;
@@ -5201,6 +5176,42 @@ public class XmlResponsesSaxParser {
                     default:
                         break;
                 }
+            }else if (in("Response", "JobsDetail", "Operation", "DocWatermark")) {
+                DocWatermark docWatermarkObject = response.getJobsDetail().getOperation().getDocWatermarkObject();
+                switch (name) {
+                    case "Dx":
+                        docWatermarkObject.setDx(getText());
+                        break;
+                    case "Dy":
+                        docWatermarkObject.setDy(getText());
+                        break;
+                    case "Image":
+                        docWatermarkObject.setImage(getText());
+                        break;
+                    case "Type":
+                        docWatermarkObject.setType(getText());
+                        break;
+                    default:
+                        break;
+                }
+            }else if (in("Response", "JobsDetail", "Operation", "DocProcess","DocWatermark")) {
+                DocWatermark docWatermarkObject = response.getJobsDetail().getOperation().getDocProcessObject().getDocWatermark();
+                switch (name) {
+                    case "Dx":
+                        docWatermarkObject.setDx(getText());
+                        break;
+                    case "Dy":
+                        docWatermarkObject.setDy(getText());
+                        break;
+                    case "Image":
+                        docWatermarkObject.setImage(getText());
+                        break;
+                    case "Type":
+                        docWatermarkObject.setType(getText());
+                        break;
+                    default:
+                        break;
+                }
             }
         }
 
@@ -5366,6 +5377,48 @@ public class XmlResponsesSaxParser {
                         break;
                 }
 
+            } else if (in("Response", "JobsDetail", "Operation", "DocProcessResult", "WatermarkInfo")) {
+                WatermarkInfo watermarkInfo = response.getJobsDetail().getOperation().getDocProcessResult().getWatermarkInfo();
+                switch (name) {
+                    case "Etag":
+                        watermarkInfo.setEtag(getText());
+                        break;
+                    case "Size":
+                        watermarkInfo.setSize(getText());
+                        break;
+                    default:
+                        break;
+                }
+            }else if (in("Response", "JobsDetail", "Operation", "DocWatermarkResult")) {
+                WatermarkInfo watermarkInfo = response.getJobsDetail().getOperation().getDocProcessResult().getWatermarkInfo();
+                switch (name) {
+                    case "Etag":
+                        watermarkInfo.setEtag(getText());
+                        break;
+                    case "Size":
+                        watermarkInfo.setSize(getText());
+                        break;
+                    default:
+                        break;
+                }
+            } else if (in("Response", "JobsDetail", "Operation", "DocWatermark")) {
+                DocWatermark docWatermarkObject = response.getJobsDetail().getOperation().getDocWatermarkObject();
+                switch (name) {
+                    case "Dx":
+                        docWatermarkObject.setDx(getText());
+                        break;
+                    case "Dy":
+                        docWatermarkObject.setDy(getText());
+                        break;
+                    case "Image":
+                        docWatermarkObject.setImage(getText());
+                        break;
+                    case "Type":
+                        docWatermarkObject.setType(getText());
+                        break;
+                    default:
+                        break;
+                }
             }
 
             if ("PageInfo".equalsIgnoreCase(name)) {
@@ -5684,6 +5737,8 @@ public class XmlResponsesSaxParser {
                 ParserMediaInfoUtils.parseOrcInfo(response.getAdsInfo().getOcrResults(), name, getText());
             } else if (in("RecognitionResult", "TeenagerInfo","OcrResults")) {
                 ParserMediaInfoUtils.parseOrcInfo(response.getTeenagerInfo().getOcrResults(), name, getText());
+            } else if (in("RecognitionResult","PoliticsInfo","ObjectResults")) {
+                ParserMediaInfoUtils.parseObjectResultsInfo(response.getPoliticsInfo().getPoliticsInfoObjectResults(), name, getText());
             }
         }
 
@@ -5703,6 +5758,9 @@ public class XmlResponsesSaxParser {
                     break;
                 case "Label":
                     obj.setLabel(getText());
+                    break;
+                case "SubLabel":
+                    obj.setSubLabel(getText());
                     break;
                 default:
                     break;

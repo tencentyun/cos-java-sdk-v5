@@ -3044,6 +3044,8 @@ public interface COS extends COSDirectSpi {
      */
     ImageAuditingResponse imageAuditing(ImageAuditingRequest request);
 
+    CreateAuditingPictureJobResponse imageAuditingV2(ImageAuditingRequest customRequest);
+
     /**
      * CreateVideoAuditingJob 视频审核任务发起接口 https://cloud.tencent.com/document/product/460/46427
      */
@@ -3298,6 +3300,14 @@ public interface COS extends COSDirectSpi {
     MediaTemplateResponseV2 createMediaTemplateV2(MediaTemplateRequestV2 request);
 
     ImageOCRResponse imageOCR(ImageOCRRequest request);
+
+    TranslationResponse createTranslationJob(TranslationRequest translationRequest);
+
+    ImageQualityResponse AccessImageQulity(ImageQualityRequest request);
+
+    AIGCMetadataResponse getImageAIGCMetadata(String bucketName, String key);
+
+    AIGCMetadataResponse getMediaAIGCMetadata(String bucketName, String key);
 }
 
 

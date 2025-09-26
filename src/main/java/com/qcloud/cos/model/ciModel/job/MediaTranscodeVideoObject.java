@@ -39,7 +39,7 @@ public class MediaTranscodeVideoObject extends MediaVideoCommon {
     /**
      * 缓冲区大小
      */
-    @XStreamAlias("BufSize")
+    @XStreamAlias("Bufsize")
     private String bufSize;
     /**
      * 视频码率峰值
@@ -53,7 +53,7 @@ public class MediaTranscodeVideoObject extends MediaVideoCommon {
     /**
      * 视频颜色格式
      */
-    @XStreamAlias("PixFmt")
+    @XStreamAlias("Pixfmt")
     private String pixfmt;
     /**
      * 长短边自适应

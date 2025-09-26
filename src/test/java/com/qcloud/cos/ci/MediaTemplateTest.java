@@ -1,14 +1,10 @@
 package com.qcloud.cos.ci;
 
 import com.qcloud.cos.AbstractCOSClientCITest;
-import com.qcloud.cos.model.ciModel.template.MediaListTemplateResponse;
-import com.qcloud.cos.model.ciModel.template.MediaTemplateObject;
-import com.qcloud.cos.model.ciModel.template.MediaTemplateRequest;
-import com.qcloud.cos.model.ciModel.template.MediaWaterMarkText;
-import com.qcloud.cos.model.ciModel.template.MediaWatermark;
+import com.qcloud.cos.model.ciModel.job.MediaVideoObject;
+import com.qcloud.cos.model.ciModel.template.*;
 import com.qcloud.cos.utils.Jackson;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -144,4 +140,58 @@ public class MediaTemplateTest extends AbstractCOSClientCITest {
         }
 
     }
+
+    @Test
+    public void createMediaTemplateWithVideoFpsCheckTest() {
+        try {
+            // 1. 创建模板请求对象
+            MediaTemplateRequest request = new MediaTemplateRequest();
+
+            // 2. 设置基本参数
+            request.setBucketName(bucket);
+            String uniqueName = "unit-test-fps-check-" + UUID.randomUUID();
+            request.setName(uniqueName);
+            request.setTag("Transcode");
+
+            // 3. 设置Container格式
+            request.getContainer().setFormat("mp4");
+
+            // 4. 设置Video参数
+            MediaVideoObject video = request.getVideo();
+            video.setCodec("H.264");
+            video.setProfile("high");
+            video.setBitrate("1000");
+            video.setWidth("1280");
+            video.setFps("30");
+            video.setPreset("medium");
+            video.setBufSize("1000");
+            video.setMaxrate("1000");
+
+            // 5. 设置Audio参数
+            request.getAudio().setCodec("aac");
+            request.getAudio().setSamplerate("44100");
+            request.getAudio().setBitrate("128");
+            request.getAudio().setChannels("2");
+
+            // 6. 设置转码配置，新增的两个字段
+            request.getTransConfig().setAdjDarMethod("scale");
+            request.getTransConfig().setIsCheckReso("false");
+            request.getTransConfig().setResoAdjMethod("1");
+            // 6.1 新增：开启视频帧率检查
+            request.getTransConfig().setIsCheckVideoFps("true");
+            // 6.2 新增：帧率调整方式，0使用原帧率
+            request.getTransConfig().setVideoFpsAdjMethod("0");
+
+            // 7. 调用接口创建模板
+            MediaTemplateResponse response = cosclient.createMediaTemplate(request);
+
+            System.out.println(response.getTemplate().getTemplateId());
+            System.out.println("IsCheckVideoFps: " + response.getTemplate().getTransConfig().getIsCheckVideoFps());
+            System.out.println("VideoFpsAdjMethod: " + response.getTemplate().getTransConfig().getVideoFpsAdjMethod());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }

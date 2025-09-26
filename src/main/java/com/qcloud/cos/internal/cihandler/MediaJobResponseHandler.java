@@ -14,7 +14,6 @@ import com.qcloud.cos.model.ciModel.job.MediaConcatTemplateObject;
 import com.qcloud.cos.model.ciModel.job.MediaContainerObject;
 import com.qcloud.cos.model.ciModel.job.MediaDigitalWatermark;
 import com.qcloud.cos.model.ciModel.job.MediaJobObject;
-import com.qcloud.cos.model.ciModel.job.MediaJobOperation;
 import com.qcloud.cos.model.ciModel.job.MediaJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaPicProcessTemplateObject;
 import com.qcloud.cos.model.ciModel.job.MediaRecognition;
@@ -27,10 +26,13 @@ import com.qcloud.cos.model.ciModel.job.MediaVideoObject;
 import com.qcloud.cos.model.ciModel.job.OutputFile;
 import com.qcloud.cos.model.ciModel.job.ProcessResult;
 import com.qcloud.cos.model.ciModel.job.QualityEstimateItem;
+import com.qcloud.cos.model.ciModel.job.StreamData;
 import com.qcloud.cos.model.ciModel.job.Subtitle;
-import com.qcloud.cos.model.ciModel.job.Subtitles;
+import com.qcloud.cos.model.ciModel.job.VideoTagData;
 import com.qcloud.cos.model.ciModel.job.VideoTargetRec;
-import com.qcloud.cos.model.ciModel.job.VqaPlusResult;
+import com.qcloud.cos.model.ciModel.job.ActionTag;
+import com.qcloud.cos.model.ciModel.job.PlaceTag;
+import com.qcloud.cos.model.ciModel.job.MediaTags;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaFormat;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoAudio;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoSubtitle;
@@ -75,6 +77,36 @@ public class MediaJobResponseHandler extends CIAbstractHandler {
                 } else if ("PetInfo".equalsIgnoreCase(name)) {
                     mediaTopkRecognition.getPetInfoList().add(new MediaBodyInfo());
                 }
+            }
+        } else if (in("Response", "JobsDetail", "Operation", "VideoTagResult", "StreamData", "Data") && "ActionTags".equalsIgnoreCase(name)) {
+            VideoTagData data = response.getJobsDetail().getOperation().getVideoTagResult().getStreamData().getData();
+            data.getActionTags().add(new ActionTag());
+        } else if (in("Response", "JobsDetail", "Operation", "VideoTagResult", "StreamData", "Data") && "PlaceTags".equalsIgnoreCase(name)) {
+            VideoTagData data = response.getJobsDetail().getOperation().getVideoTagResult().getStreamData().getData();
+            data.getPlaceTags().add(new PlaceTag());
+        } else if (in("Response", "JobsDetail", "Operation", "VideoTagResult", "StreamData", "Data") && "Tags".equalsIgnoreCase(name)) {
+            VideoTagData data = response.getJobsDetail().getOperation().getVideoTagResult().getStreamData().getData();
+            data.getTags().add(new MediaTags());
+        } else if (in("Response", "JobsDetail", "Operation", "VideoTagResult", "StreamData", "Data", "ActionTags") && "Tags".equalsIgnoreCase(name)) {
+            VideoTagData data = response.getJobsDetail().getOperation().getVideoTagResult().getStreamData().getData();
+            List<ActionTag> actionTags = data.getActionTags();
+            if (!actionTags.isEmpty()) {
+                ActionTag actionTag = actionTags.get(actionTags.size() - 1);
+                actionTag.getTags().add(new MediaTags());
+            }
+        } else if (in("Response", "JobsDetail", "Operation", "VideoTagResult", "StreamData", "Data", "PlaceTags") && "Tags".equalsIgnoreCase(name)) {
+            VideoTagData data = response.getJobsDetail().getOperation().getVideoTagResult().getStreamData().getData();
+            List<PlaceTag> placeTags = data.getPlaceTags();
+            if (!placeTags.isEmpty()) {
+                PlaceTag placeTag = placeTags.get(placeTags.size() - 1);
+                placeTag.getTags().add(new MediaTags());
+            }
+        } else if (in("Response", "JobsDetail", "Operation", "VideoTagResult", "StreamData", "Data", "PlaceTags") && "ClipFrameResult".equalsIgnoreCase(name)) {
+            VideoTagData data = response.getJobsDetail().getOperation().getVideoTagResult().getStreamData().getData();
+            List<PlaceTag> placeTags = data.getPlaceTags();
+            if (!placeTags.isEmpty()) {
+                PlaceTag placeTag = placeTags.get(placeTags.size() - 1);
+                placeTag.getClipFrameResult().add(getText());
             }
         } else if (in("Response", "JobsDetail", "Operation", "Transcode") && "AudioMixArray".equalsIgnoreCase(name)) {
             List<MediaAudioMixObject> audioMixArray = response.getJobsDetail().getOperation().getTranscode().getAudioMixArray();
@@ -383,6 +415,52 @@ public class MediaJobResponseHandler extends CIAbstractHandler {
             ParserMediaInfoUtils.ParsingSubtitles(jobsDetail.getOperation().getSubtitles(), name, getText());
         } else if (in("Response", "JobsDetail", "Operation", "VideoTag")) {
             ParserMediaInfoUtils.ParseVideoTag(jobsDetail.getOperation().getVideoTag(), name, getText());
+        } else if (in("Response", "JobsDetail", "Operation", "VideoTagResult", "StreamData")) {
+            StreamData streamData = jobsDetail.getOperation().getVideoTagResult().getStreamData();
+            ParserMediaInfoUtils.ParseStreamData(streamData, name, getText());
+        } else if (in("Response", "JobsDetail", "Operation", "VideoTagResult", "StreamData", "Data", "ActionTags")) {
+            VideoTagData data = jobsDetail.getOperation().getVideoTagResult().getStreamData().getData();
+            List<ActionTag> actionTags = data.getActionTags();
+            if (!actionTags.isEmpty()) {
+                ActionTag actionTag = actionTags.get(actionTags.size() - 1);
+                ParserMediaInfoUtils.ParseActionTag(actionTag, name, getText());
+            }
+        } else if (in("Response", "JobsDetail", "Operation", "VideoTagResult", "StreamData", "Data", "PlaceTags")) {
+            VideoTagData data = jobsDetail.getOperation().getVideoTagResult().getStreamData().getData();
+            List<PlaceTag> placeTags = data.getPlaceTags();
+            if (!placeTags.isEmpty()) {
+                PlaceTag placeTag = placeTags.get(placeTags.size() - 1);
+                ParserMediaInfoUtils.ParsePlaceTag(placeTag, name, getText());
+            }
+        } else if (in("Response", "JobsDetail", "Operation", "VideoTagResult", "StreamData", "Data", "Tags")) {
+            VideoTagData data = jobsDetail.getOperation().getVideoTagResult().getStreamData().getData();
+            List<MediaTags> tags = data.getTags();
+            if (!tags.isEmpty()) {
+                MediaTags mediaTag = tags.get(tags.size() - 1);
+                ParserMediaInfoUtils.ParseMediaTags(mediaTag, name, getText());
+            }
+        } else if (in("Response", "JobsDetail", "Operation", "VideoTagResult", "StreamData", "Data", "ActionTags", "Tags")) {
+            VideoTagData data = jobsDetail.getOperation().getVideoTagResult().getStreamData().getData();
+            List<ActionTag> actionTags = data.getActionTags();
+            if (!actionTags.isEmpty()) {
+                ActionTag actionTag = actionTags.get(actionTags.size() - 1);
+                List<MediaTags> tags = actionTag.getTags();
+                if (!tags.isEmpty()) {
+                    MediaTags mediaTag = tags.get(tags.size() - 1);
+                    ParserMediaInfoUtils.ParseMediaTags(mediaTag, name, getText());
+                }
+            }
+        } else if (in("Response", "JobsDetail", "Operation", "VideoTagResult", "StreamData", "Data", "PlaceTags", "Tags")) {
+            VideoTagData data = jobsDetail.getOperation().getVideoTagResult().getStreamData().getData();
+            List<PlaceTag> placeTags = data.getPlaceTags();
+            if (!placeTags.isEmpty()) {
+                PlaceTag placeTag = placeTags.get(placeTags.size() - 1);
+                List<MediaTags> tags = placeTag.getTags();
+                if (!tags.isEmpty()) {
+                    MediaTags mediaTag = tags.get(tags.size() - 1);
+                    ParserMediaInfoUtils.ParseMediaTags(mediaTag, name, getText());
+                }
+            }
         } else if (in("Response", "JobsDetail", "Operation", "QualityEstimateConfig")) {
             ParserMediaInfoUtils.ParseQualityEstimateConfig(jobsDetail.getOperation().getQualityEstimateConfig(), name, getText());
         } else if (in("Response", "JobsDetail", "Operation", "QualityEstimate")) {

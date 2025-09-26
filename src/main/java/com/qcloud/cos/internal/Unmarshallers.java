@@ -31,7 +31,6 @@ import com.qcloud.cos.model.*;
 import com.qcloud.cos.model.IntelligentTiering.BucketIntelligentTieringConfiguration;
 import com.qcloud.cos.model.bucketcertificate.BucketGetDomainCertificate;
 import com.qcloud.cos.model.ciModel.auditing.AudioAuditingResponse;
-import com.qcloud.cos.model.ciModel.auditing.AuditingKeywordResponse;
 import com.qcloud.cos.model.ciModel.auditing.AuditingStrategyListResponse;
 import com.qcloud.cos.model.ciModel.auditing.AuditingStrategyResponse;
 import com.qcloud.cos.model.ciModel.auditing.AuditingTextLibResponse;
@@ -45,11 +44,11 @@ import com.qcloud.cos.model.ciModel.bucket.DocBucketResponse;
 import com.qcloud.cos.model.ciModel.bucket.MediaBucketResponse;
 import com.qcloud.cos.model.ciModel.image.AutoTranslationBlockResponse;
 import com.qcloud.cos.model.ciModel.image.DetectFaceResponse;
-import com.qcloud.cos.model.ciModel.image.ImageInspectRequest;
 import com.qcloud.cos.model.ciModel.image.ImageLabelResponse;
 import com.qcloud.cos.model.ciModel.image.ImageLabelV2Response;
 import com.qcloud.cos.model.ciModel.image.ImageSearchResponse;
 import com.qcloud.cos.model.ciModel.image.ImageStyleResponse;
+import com.qcloud.cos.model.ciModel.job.AIGCMetadataResponse;
 import com.qcloud.cos.model.ciModel.job.BatchJobResponse;
 import com.qcloud.cos.model.ciModel.job.DocJobListResponse;
 import com.qcloud.cos.model.ciModel.job.DocJobResponse;
@@ -993,6 +992,12 @@ public class Unmarshallers {
         @Override
         public T unmarshall(InputStream in) throws Exception {
             return new CIJsonHandler<T>().getResponse(in,tClass);
+        }
+    }
+
+    public static final class AigcMetadataUnmarshaller implements Unmarshaller<AIGCMetadataResponse, InputStream> {
+        public AIGCMetadataResponse unmarshall(InputStream in) throws IOException {
+            return new AigcMetadataJsonResponseHandler().getResponse(in);
         }
     }
 }
