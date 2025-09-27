@@ -5831,5 +5831,21 @@ public class COSClient implements COS {
         return invoke(request, new Unmarshallers.CICommonUnmarshaller<CreatePosterProductionResponse>(CreatePosterProductionResponse.class));
     }
 
+    @Override 
+    public VirusDetectResponse createVirusDetectJob(VirusDetectRequest request) {
+        CosHttpRequest<VirusDetectRequest> req = createRequest(request.getBucketName(), "/virus/detect", request, HttpMethodName.POST);
+        this.setContent(req, CIAuditingXmlFactoryV2.convertToXmlByteArray(request), "application/xml", false);
+        return invoke(req, new Unmarshallers.CICommonUnmarshaller<VirusDetectResponse>(VirusDetectResponse.class));
+    }
+
+    @Override
+    public VirusDetectJobResponse describeVirusDetectJob(VirusDetectJobRequest request) {
+        rejectNull(request, "The request parameter must be specified");
+        rejectNull(request.getJobId(), "The jobId parameter must be specified");
+        rejectNull(request.getBucketName(), "The bucketName parameter must be specified");
+
+        CosHttpRequest<VirusDetectJobRequest> req = createRequest(request.getBucketName(), "/virus/detect/" + request.getJobId(), request, HttpMethodName.GET);
+        return invoke(req, new Unmarshallers.CICommonUnmarshaller<VirusDetectJobResponse>(VirusDetectJobResponse.class));
+    }
 }
 
