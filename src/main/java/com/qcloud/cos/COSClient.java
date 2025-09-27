@@ -97,6 +97,7 @@ import com.qcloud.cos.model.ciModel.image.ImageLabelV2Request;
 import com.qcloud.cos.model.ciModel.image.ImageLabelV2Response;
 import com.qcloud.cos.model.ciModel.image.ImageSearchRequest;
 import com.qcloud.cos.model.ciModel.image.ImageSearchResponse;
+import com.qcloud.cos.model.ciModel.image.ImageSlimRequest;
 import com.qcloud.cos.model.ciModel.image.ImageStyleRequest;
 import com.qcloud.cos.model.ciModel.image.ImageStyleResponse;
 import com.qcloud.cos.model.ciModel.image.OpenImageSearchRequest;
@@ -5847,5 +5848,44 @@ public class COSClient implements COS {
         CosHttpRequest<VirusDetectJobRequest> req = createRequest(request.getBucketName(), "/virus/detect/" + request.getJobId(), request, HttpMethodName.GET);
         return invoke(req, new Unmarshallers.CICommonUnmarshaller<VirusDetectJobResponse>(VirusDetectJobResponse.class));
     }
+
+    @Override
+    public InputStream imageSlimDownload(ImageSlimRequest imageSlimRequest) {
+
+        CosHttpRequest<ImageSlimRequest> request =
+                createRequest(imageSlimRequest.getBucketName(), imageSlimRequest.getObjectKey(), imageSlimRequest, HttpMethodName.GET);
+
+        request.addParameter("imageSlim", null);
+
+        return invoke(request, new CIGetSnapshotResponseHandler());
+    }
+
+    @Override
+    public CIUploadResult imageSlimProcess(ImageProcessRequest imageProcessRequest) {
+
+        String bucketName = imageProcessRequest.getBucketName();
+        String key = imageProcessRequest.getKey();
+
+        CosHttpRequest<ImageProcessRequest> request =
+                createRequest(bucketName, key, imageProcessRequest, HttpMethodName.POST);
+        request.addParameter("image_process", null);
+        request.addHeader(Headers.PIC_OPERATIONS, Jackson.toJsonString(imageProcessRequest.getPicOperations()));
+
+        Map<String, String> customRequestHeader = imageProcessRequest.getCustomRequestHeader();
+        if (customRequestHeader != null) {
+            for (String headerKey : customRequestHeader.keySet()) {
+                request.addHeader(headerKey, customRequestHeader.get(headerKey));
+            }
+        }
+
+        ObjectMetadata returnedMetadata = invoke(request, new ResponseHeaderHandlerChain<>(
+                new Unmarshallers.ImagePersistenceUnmarshaller(), new CosMetadataResponseHandler()));
+        if (returnedMetadata.getRequestId() != null) {
+            returnedMetadata.getCiUploadResult().setRequestId(returnedMetadata.getRequestId());
+        }
+        return returnedMetadata.getCiUploadResult();
+    }
+
+
 }
 
