@@ -111,6 +111,8 @@ import com.qcloud.cos.model.ciModel.persistence.AIGameRecResponse;
 import com.qcloud.cos.model.ciModel.persistence.CIUploadResult;
 import com.qcloud.cos.model.ciModel.persistence.AIRecRequest;
 import com.qcloud.cos.model.ciModel.persistence.DetectCarResponse;
+import com.qcloud.cos.model.ciModel.persistence.DetectPetRequest;
+import com.qcloud.cos.model.ciModel.persistence.DetectPetResponse;
 import com.qcloud.cos.model.ciModel.queue.DocListQueueResponse;
 import com.qcloud.cos.model.ciModel.queue.DocQueueRequest;
 import com.qcloud.cos.model.ciModel.queue.MediaListQueueResponse;
@@ -5884,6 +5886,15 @@ public class COSClient implements COS {
             returnedMetadata.getCiUploadResult().setRequestId(returnedMetadata.getRequestId());
         }
         return returnedMetadata.getCiUploadResult();
+    }
+
+    @Override
+    public DetectPetResponse detectPet(DetectPetRequest detectPetRequest) {
+        rejectNull(detectPetRequest.getBucketName(),
+                "The bucketName parameter must be specified setting the object tags");
+        CosHttpRequest<DetectPetRequest> request = createRequest(detectPetRequest.getBucketName(), detectPetRequest.getObjectKey(), detectPetRequest, HttpMethodName.GET);
+        request.addParameter("ci-process", "detect-pet");
+        return invoke(request, new Unmarshallers.CICommonUnmarshaller<DetectPetResponse>(DetectPetResponse.class));
     }
 
 

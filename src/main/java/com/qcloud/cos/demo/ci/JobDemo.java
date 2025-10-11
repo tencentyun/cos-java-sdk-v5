@@ -22,7 +22,7 @@ public class JobDemo {
         // 1 初始化用户身份信息（secretId, secretKey）。
         COSClient client = ClientUtils.getTestClient();
         // 2 调用要使用的方法。
-        createMediaJobs(client);
+        createMediaJobsWithAigcMetadata(client);
     }
 
     /**
@@ -201,9 +201,9 @@ public class JobDemo {
         //1.创建任务请求对象
         MediaJobsRequestV2 request = new MediaJobsRequestV2();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("demo-123456789");
+        request.setBucketName("chongqingtest-1251704708");
         request.setTag("Transcode");
-        request.getInput().setObject("2.mp4");
+        request.getInput().setObject("SDK/Media/demo.mp4");
         //2.1添加媒体任务操作参数
         MediaJobOperation operation = request.getOperation();
         MediaTranscodeObject transcode = operation.getTranscode();
@@ -216,7 +216,7 @@ public class JobDemo {
         video.setWidth("1280");
         video.setFps("30");
         video.setPreset("medium");
-        video.setBufSize("0");
+        video.setBufSize("10000");
         video.setMaxrate("50000");
 
         MediaAudioObject audio = transcode.getAudio();
@@ -236,17 +236,18 @@ public class JobDemo {
         // 配置aigc元数据信息
         AigcMetadata aigcMetadata = transConfig.getAigcMetadata();
         aigcMetadata.setLabel("label");
-        aigcMetadata.setContentProducer("testProducer");
-        aigcMetadata.setProduceId("testProduceId");
+        // 以下信息可选
+//        aigcMetadata.setContentProducer("testProducer");
+//        aigcMetadata.setProduceId("testProduceId");
         aigcMetadata.setReservedCode1(new String(Base64.encodeBase64("test".getBytes())));
         aigcMetadata.setReservedCode2(new String(Base64.encodeBase64("test".getBytes())));
         aigcMetadata.setPropagateId("testPropagateId");
         aigcMetadata.setContentPropagator("testPropagator");
 
-        operation.getOutput().setBucket("demo-123456789");
+        operation.getOutput().setBucket("chongqingtest-1251704708");
         operation.getOutput().setRegion("ap-chongqing");
-        operation.getOutput().setObject("demo1.mp4");
-        request.setCallBack("https://cloud.tencent.com/xxx");
+        operation.getOutput().setObject("SDK/Media/out/demo2.mp4");
+//        request.setCallBack("https://cloud.tencent.com/xxx");
         //3.调用接口,获取任务响应对象
         MediaJobResponseV2 response = client.createMediaJobsV2(request);
         System.out.println(response.getJobsDetail().getJobId());
@@ -275,7 +276,7 @@ public class JobDemo {
         //1.创建任务请求对象
         MediaJobsRequest request = new MediaJobsRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("markjrzhang-1251704708");
+        request.setBucketName("demo-1251704708");
         request.setTag("Transcode");
         //3.调用接口,获取任务响应对象
         MediaListJobResponse response = client.describeMediaJobsV2(request);

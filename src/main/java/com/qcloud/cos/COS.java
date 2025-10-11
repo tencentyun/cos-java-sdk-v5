@@ -56,6 +56,8 @@ import com.qcloud.cos.model.ciModel.persistence.AIGameRecResponse;
 import com.qcloud.cos.model.ciModel.persistence.CIUploadResult;
 import com.qcloud.cos.model.ciModel.persistence.AIRecRequest;
 import com.qcloud.cos.model.ciModel.persistence.DetectCarResponse;
+import com.qcloud.cos.model.ciModel.persistence.DetectPetRequest;
+import com.qcloud.cos.model.ciModel.persistence.DetectPetResponse;
 import com.qcloud.cos.model.ciModel.queue.DocListQueueResponse;
 import com.qcloud.cos.model.ciModel.queue.DocQueueRequest;
 import com.qcloud.cos.model.ciModel.queue.MediaListQueueResponse;
@@ -3318,4 +3320,6 @@ public interface COS extends COSDirectSpi {
     InputStream imageSlimDownload(ImageSlimRequest imageSlimRequest);
 
     CIUploadResult imageSlimProcess(ImageProcessRequest imageProcessRequest);
+
+    DetectPetResponse detectPet(DetectPetRequest detectPetRequest);
 }

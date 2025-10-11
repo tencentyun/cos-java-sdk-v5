@@ -112,7 +112,7 @@ public class AIGCMetadataTest  extends AbstractCOSClientCITest {
         video.setWidth("1280");
         video.setFps("30");
         video.setPreset("medium");
-        video.setBufSize("0");
+        video.setBufSize("1100");
         video.setMaxrate("50000");
 
         MediaTimeIntervalObject timeInterval = transcode.getTimeInterval();
