@@ -19,7 +19,7 @@ public class CreatePosterProductionDemo {
     }
 
     /**
-     * createPosterProduction 提交一个图片处理任务
+     * createPosterProduction 提交一个海报合成任务
      * 该接口属于 POST 请求。
      */
     public static void createPosterProduction(COSClient client) {
@@ -33,8 +33,8 @@ public class CreatePosterProductionDemo {
         request.getOperation().getPosterProduction().setTemplateId("6324349b569067d4d11a2c2c");
 
         // 设置Info信息
-        request.getOperation().getPosterProduction().getInfo().setMain("https://test-123456789.cos.ap-chongqing.myqcloud.com/demo.jpg");
-        request.getOperation().getPosterProduction().getInfo().setTextMain("demo");
+        request.getOperation().getPosterProduction().getInfo().setHeight("https://test-123456789.cos.ap-chongqing.myqcloud.com/demo.jpg");
+        request.getOperation().getPosterProduction().getInfo().setName("demo");
 
         // 设置存储桶的地域;
         request.getOperation().getOutput().setRegion("ap-chongqing");

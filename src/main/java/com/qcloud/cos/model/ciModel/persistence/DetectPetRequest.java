@@ -22,11 +22,6 @@ public class DetectPetRequest extends CosServiceRequest {
     @XStreamOmitField
     private String objectKey;
 
-    /**
-     * 待识别图片url,需要进行urlencode
-     */
-    private String detectUrl;
-
     public String getBucketName() {
         return bucketName;
     }
@@ -43,20 +38,11 @@ public class DetectPetRequest extends CosServiceRequest {
         this.objectKey = objectKey;
     }
 
-    public String getDetectUrl() {
-        return detectUrl;
-    }
-
-    public void setDetectUrl(String detectUrl) {
-        this.detectUrl = detectUrl;
-    }
-
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("DetectPetRequest{");
         sb.append("bucketName='").append(bucketName).append('\'');
         sb.append(", objectKey='").append(objectKey).append('\'');
-        sb.append(", detectUrl='").append(detectUrl).append('\'');
         sb.append('}');
         return sb.toString();
     }

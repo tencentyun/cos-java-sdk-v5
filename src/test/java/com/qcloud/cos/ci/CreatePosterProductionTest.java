@@ -31,10 +31,6 @@ public class CreatePosterProductionTest extends AbstractCOSClientCITest {
         // 设置模板 ID;
         request.getOperation().getPosterProduction().setTemplateId("6324349b569067d4d11a2c2c");
         
-        // 设置Info信息
-        request.getOperation().getPosterProduction().getInfo().setMain("https://test-123456789.cos.ap-chongqing.myqcloud.com/demo.jpg");
-        request.getOperation().getPosterProduction().getInfo().setTextMain("demo");
-        
         // 设置存储桶的地域;是否必传：是
         request.getOperation().getOutput().setRegion("ap-chongqing");
         // 设置存储结果的存储桶;是否必传：是
