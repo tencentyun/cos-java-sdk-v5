@@ -38,27 +38,27 @@ import com.qcloud.cos.model.ciModel.job.v2.VirusDetectRequest;import com.qcloud.
     /**
      * 查询病毒检测任务结果
      */
-    public static void describeVirusDetectJob(COSClient client, String jobId) {
-        VirusDetectJobRequest request = new VirusDetectJobRequest();
-        request.setBucketName("demo-1234567890");
-        request.setJobId(jobId);
+public static void describeVirusDetectJob(COSClient client, String jobId) {
+    VirusDetectJobRequest request = new VirusDetectJobRequest();
+    request.setBucketName("demo-1234567890");
+    request.setJobId(jobId);
 
-        // 查询病毒检测任务结果
-        VirusDetectJobResponse response = client.describeVirusDetectJob(request);
-        System.out.println("病毒检测任务查询响应: " + Jackson.toJsonString(response));
+    // 查询病毒检测任务结果
+    VirusDetectJobResponse response = client.describeVirusDetectJob(request);
+    System.out.println("病毒检测任务查询响应: " + Jackson.toJsonString(response));
 
-        if (response.getJobsDetail() != null) {
-            System.out.println("任务状态: " + response.getJobsDetail().getState());
-            System.out.println("检测建议: " + response.getJobsDetail().getSuggestion());
+    if (response.getJobsDetail() != null) {
+        System.out.println("任务状态: " + response.getJobsDetail().getState());
+        System.out.println("检测建议: " + response.getJobsDetail().getSuggestion());
 
-            // 如果有检测详情，打印病毒信息
-            if (response.getJobsDetail().getDetectDetail() != null &&
-                    response.getJobsDetail().getDetectDetail().getResult() != null) {
-                System.out.println("检测到的病毒数量: " + response.getJobsDetail().getDetectDetail().getResult().size());
-                response.getJobsDetail().getDetectDetail().getResult().forEach(result -> {
-                    System.out.println("文件名: " + result.getFileName() + ", 病毒名: " + result.getVirusName());
-                });
-            }
+        // 如果有检测详情，打印病毒信息
+        if (response.getJobsDetail().getDetectDetail() != null &&
+                response.getJobsDetail().getDetectDetail().getResult() != null) {
+            System.out.println("检测到的病毒数量: " + response.getJobsDetail().getDetectDetail().getResult().size());
+            response.getJobsDetail().getDetectDetail().getResult().forEach(result -> {
+                System.out.println("文件名: " + result.getFileName() + ", 病毒名: " + result.getVirusName());
+            });
         }
     }
+}
 }

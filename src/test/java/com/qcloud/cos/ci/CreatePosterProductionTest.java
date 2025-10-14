@@ -30,11 +30,12 @@ public class CreatePosterProductionTest extends AbstractCOSClientCITest {
         
         // 设置模板 ID;
         request.getOperation().getPosterProduction().setTemplateId("6324349b569067d4d11a2c2c");
-        
+        request.getOperation().getPosterProduction().getInfo().setName("test-poster");
+        request.getOperation().getPosterProduction().getInfo().setHeight("1080");
         // 设置存储桶的地域;是否必传：是
-        request.getOperation().getOutput().setRegion("ap-chongqing");
+        request.getOperation().getOutput().setRegion(region);
         // 设置存储结果的存储桶;是否必传：是
-        request.getOperation().getOutput().setBucket("chongqingtest-1251704708");
+        request.getOperation().getOutput().setBucket(bucket);
         // 设置输出结果的文件名;是否必传：是
         request.getOperation().getOutput().setObject("/SDK/Images/output/PosterProductionOut.jpg");
         // 设置透传用户信息, 可打印的 ASCII 码, 长度不超过1024;是否必传：否
@@ -44,7 +45,7 @@ public class CreatePosterProductionTest extends AbstractCOSClientCITest {
         // 设置任务回调格式，JSON 或 XML，默认 XML，优先级高于队列的回调格式;是否必传：否
         request.setCallBackFormat("JSON");
         // 设置任务回调地址，优先级高于队列的回调地址。设置为 no 时，表示队列的回调地址不产生回调;是否必传：否
-        request.setCallBack("http://callback.demo.com");
+//        request.setCallBack("http://callback.demo.com");
 
         CreatePosterProductionResponse response = cosclient.createPosterProduction(request);
         

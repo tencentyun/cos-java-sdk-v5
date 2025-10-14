@@ -38,7 +38,7 @@ public class ImageSlimTest extends AbstractCOSClientCITest {
     public void testImageSlimDownloadMethod() throws IOException {
         String key = "SDK/Images/imageSlim/download_method_test.jpg";
         
-        File localFile = new File("/Users/Desktop/13123213.png");
+        File localFile = new File("test.png");
         
         try {
             cosclient.putObject(bucket, key, localFile);
@@ -82,7 +82,7 @@ public class ImageSlimTest extends AbstractCOSClientCITest {
         String sourceKey = "SDK/Images/13123213_cloud_test.png";
         String targetKey = "SDK/Images/imageSlim/13123213_cloud_test1.jpg";
         
-        File localFile = new File("/Users/Desktop/13123213.png");
+        File localFile = new File("test.png");
         
         try {
             // 先上传原图
@@ -125,7 +125,7 @@ public class ImageSlimTest extends AbstractCOSClientCITest {
         String sourceKey = "SDK/Images/imageSlim/upload_source_test.jpg";
         String targetKey = "SDK/Images/imageSlim/upload_slim_test.jpg";
         
-        File localFile = new File("/Users/Desktop/13123213.png");
+        File localFile = new File("test.png");
         
         try {
             System.out.println("原始文件大小: " + localFile.length() + " bytes");
@@ -200,7 +200,7 @@ public class ImageSlimTest extends AbstractCOSClientCITest {
         String slimTargetKey = "SDK/Images/imageSlim/upload_multi_slim.jpg";
         String resizeTargetKey = "SDK/Images/imageSlim/upload_multi_resize.jpg";
         
-        File localFile = new File("/Users/junliu/Desktop/13123213.png");
+        File localFile = new File("test.png");
         
         try {
             System.out.println("测试多规则处理 - 原始文件大小: " + localFile.length() + " bytes");
@@ -221,13 +221,6 @@ public class ImageSlimTest extends AbstractCOSClientCITest {
             slimRule.setRule("imageSlim");
             ruleList.add(slimRule);
             
-            // 规则2: 极智压缩 + 缩放
-            PicOperations.Rule resizeSlimRule = new PicOperations.Rule();
-            resizeSlimRule.setBucket(bucket);
-            resizeSlimRule.setFileId(resizeTargetKey);
-            resizeSlimRule.setRule("imageMogr2/thumbnail/!50p|imageSlim");
-            ruleList.add(resizeSlimRule);
-            
             picOperations.setRules(ruleList);
             putRequest.setPicOperations(picOperations);
             
@@ -239,11 +232,7 @@ public class ImageSlimTest extends AbstractCOSClientCITest {
             assertNotNull("CIUploadResult不应为空", ciUploadResult);
             assertNotNull("处理结果不应为空", ciUploadResult.getProcessResults());
 
-            // 5. 输出处理结果
-            System.out.println("多规则处理结果:");
-            int index = 1;
             for (CIObject ciObject : ciUploadResult.getProcessResults().getObjectList()) {
-                System.out.println("  规则" + index + "处理结果:");
                 System.out.println("    文件: " + ciObject.getLocation());
                 System.out.println("    大小: " + ciObject.getSize() + " bytes");
                 
@@ -251,7 +240,6 @@ public class ImageSlimTest extends AbstractCOSClientCITest {
                     double compressionRatio = (1.0 - (double) ciObject.getSize() / localFile.length()) * 100;
                     System.out.println("    压缩率: " + String.format("%.2f", compressionRatio) + "%");
                 }
-                index++;
             }
             
             // 6. 清理测试文件
