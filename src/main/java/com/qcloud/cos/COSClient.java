@@ -5852,43 +5852,6 @@ public class COSClient implements COS {
     }
 
     @Override
-    public InputStream imageSlimDownload(ImageSlimRequest imageSlimRequest) {
-
-        CosHttpRequest<ImageSlimRequest> request =
-                createRequest(imageSlimRequest.getBucketName(), imageSlimRequest.getObjectKey(), imageSlimRequest, HttpMethodName.GET);
-
-        request.addParameter("imageSlim", null);
-
-        return invoke(request, new CIGetSnapshotResponseHandler());
-    }
-
-    @Override
-    public CIUploadResult imageSlimProcess(ImageProcessRequest imageProcessRequest) {
-
-        String bucketName = imageProcessRequest.getBucketName();
-        String key = imageProcessRequest.getKey();
-
-        CosHttpRequest<ImageProcessRequest> request =
-                createRequest(bucketName, key, imageProcessRequest, HttpMethodName.POST);
-        request.addParameter("image_process", null);
-        request.addHeader(Headers.PIC_OPERATIONS, Jackson.toJsonString(imageProcessRequest.getPicOperations()));
-
-        Map<String, String> customRequestHeader = imageProcessRequest.getCustomRequestHeader();
-        if (customRequestHeader != null) {
-            for (String headerKey : customRequestHeader.keySet()) {
-                request.addHeader(headerKey, customRequestHeader.get(headerKey));
-            }
-        }
-
-        ObjectMetadata returnedMetadata = invoke(request, new ResponseHeaderHandlerChain<>(
-                new Unmarshallers.ImagePersistenceUnmarshaller(), new CosMetadataResponseHandler()));
-        if (returnedMetadata.getRequestId() != null) {
-            returnedMetadata.getCiUploadResult().setRequestId(returnedMetadata.getRequestId());
-        }
-        return returnedMetadata.getCiUploadResult();
-    }
-
-    @Override
     public DetectPetResponse detectPet(DetectPetRequest detectPetRequest) {
         rejectNull(detectPetRequest.getBucketName(),
                 "The bucketName parameter must be specified setting the object tags");

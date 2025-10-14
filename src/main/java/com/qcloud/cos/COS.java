@@ -3317,9 +3317,5 @@ public interface COS extends COSDirectSpi {
 
     VirusDetectJobResponse describeVirusDetectJob(VirusDetectJobRequest request);
 
-    InputStream imageSlimDownload(ImageSlimRequest imageSlimRequest);
-
-    CIUploadResult imageSlimProcess(ImageProcessRequest imageProcessRequest);
-
     DetectPetResponse detectPet(DetectPetRequest detectPetRequest);
 }
