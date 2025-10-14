@@ -97,7 +97,6 @@ import com.qcloud.cos.model.ciModel.image.ImageLabelV2Request;
 import com.qcloud.cos.model.ciModel.image.ImageLabelV2Response;
 import com.qcloud.cos.model.ciModel.image.ImageSearchRequest;
 import com.qcloud.cos.model.ciModel.image.ImageSearchResponse;
-import com.qcloud.cos.model.ciModel.image.ImageSlimRequest;
 import com.qcloud.cos.model.ciModel.image.ImageStyleRequest;
 import com.qcloud.cos.model.ciModel.image.ImageStyleResponse;
 import com.qcloud.cos.model.ciModel.image.OpenImageSearchRequest;
@@ -5825,6 +5824,18 @@ public class COSClient implements COS {
     }
 
     @Override
+    public AIGCMetadataResponse getDocumentAIGCMetadata(String bucketName, String key) {
+        rejectNull(bucketName, "The bucket name parameter must be specified when getting document AIGC metadata");
+        rejectNull(key, "The key parameter must be specified when getting document AIGC metadata");
+
+        GetObjectRequest getObjectRequest = new GetObjectRequest(bucketName, key);
+        CosHttpRequest<GetObjectRequest> request = createRequest(bucketName, key, getObjectRequest, HttpMethodName.GET);
+        request.addParameter("ci-process", "DocAIGCMetadata");
+
+        return invoke(request, new Unmarshallers.AigcMetadataUnmarshaller());
+    }
+
+    @Override
     public CreatePosterProductionResponse createPosterProduction(CreatePosterProductionRequest customRequest) {
         rejectNull(customRequest, "The request parameter must be specified setting the object tags");
 
@@ -5860,6 +5871,17 @@ public class COSClient implements COS {
         return invoke(request, new Unmarshallers.CICommonUnmarshaller<DetectPetResponse>(DetectPetResponse.class));
     }
 
+    @Override
+    public DocAIGCMetadataJobResponse createDocAIGCMetadataJob(DocAIGCMetadataJobRequest request) {
+        rejectNull(request, "The request parameter must be specified when creating document AIGC metadata job");
+        rejectNull(request.getBucketName(), "The bucket name parameter must be specified when creating document AIGC metadata job");
+
+        checkCIRequestCommon(request);
+        CosHttpRequest<DocAIGCMetadataJobRequest> httpRequest = createRequest(request.getBucketName(), "/doc_jobs", request, HttpMethodName.POST);
+        this.setContent(httpRequest, CIAuditingXmlFactoryV2.convertToXmlByteArray( request ), "application/xml", false);
+
+        return invoke(httpRequest, new Unmarshallers.CICommonUnmarshaller<DocAIGCMetadataJobResponse>(DocAIGCMetadataJobResponse.class));
+    }
 
 }
 
