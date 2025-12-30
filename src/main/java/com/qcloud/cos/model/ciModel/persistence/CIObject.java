@@ -39,9 +39,8 @@ public class CIObject {
     private Integer watermarkStatus;
     @XStreamAlias("CodeStatus")
     private Integer codeStatus;
-    @XStreamImplicit(keyFieldName = "QRcodeInfo")
+    @XStreamImplicit(itemFieldName = "QRcodeInfo")
     private List<QRcodeInfo> QRcodeInfoList;
-
 
     @XStreamAlias("AIGCMetadata")
     private AigcMetadata aigcMetadata;

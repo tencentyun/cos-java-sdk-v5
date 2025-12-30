@@ -1,12 +1,13 @@
 package com.qcloud.cos.model.ciModel.workflow;
 
-import java.util.HashMap;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
  * 媒体处理工作流 拓扑信息实体
  */
+@XStreamAlias("Topology")
 public class MediaTopology {
     /**
      * 节点依赖关系
@@ -18,11 +19,13 @@ public class MediaTopology {
      *  <Animation_1581665960539>End</Animation_1581665960539>
      *  <SmartCover_1581665960539>End</SmartCover_1581665960539>
      */
+    @XStreamAlias("Dependencies")
     private Map<String,MediaWorkflowDependency> mediaWorkflowDependency;
 
     /**
      * 节点列表
      */
+    @XStreamAlias("Nodes")
     private Map<String, MediaWorkflowNode> mediaWorkflowNodes;
 
     public Map<String,MediaWorkflowDependency> getMediaWorkflowDependency() {

@@ -16,7 +16,7 @@ import static org.junit.Assert.assertTrue;
 
 public class MediaQueueTest extends AbstractCOSClientCITest {
 
-    public static final String QUEUE_NAME = "test-queue";
+    public static final String QUEUE_NAME = "queue-1";
     public static final String QUEUE_URL = "cloud.tencent.com";
     public static final String QUEUE_STATE = "Active";
 
@@ -81,4 +81,20 @@ public class MediaQueueTest extends AbstractCOSClientCITest {
 
     }
 
+    @Test
+    public void categoryMediaQueueTest() {
+        try {
+            if (!judgeUserInfoValid()) {
+                return;
+            }
+            MediaQueueRequest request = new MediaQueueRequest();
+            request.setBucketName(bucket);
+            request.setCategory("CateAll");
+            MediaListQueueResponse response = cosclient.describeMediaQueues(request);
+            if (response != null && !response.getQueueList().isEmpty()) {
+                assertTrue(response.getQueueList().size() > 1);
+            }
+        } catch (Exception e) {
+        }
+    }
 }

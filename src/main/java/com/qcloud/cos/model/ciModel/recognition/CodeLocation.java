@@ -5,7 +5,7 @@ import com.thoughtworks.xstream.annotations.XStreamImplicit;
 import java.util.List;
 
 public class CodeLocation {
-    @XStreamImplicit(keyFieldName = "Point")
+    @XStreamImplicit(itemFieldName = "Point")
     List<String> points;
 
     public List<String> getPoints() {

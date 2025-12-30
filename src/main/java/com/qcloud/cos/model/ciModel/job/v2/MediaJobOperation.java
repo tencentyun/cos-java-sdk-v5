@@ -85,7 +85,7 @@ public class MediaJobOperation {
     @XStreamAlias("Animation")
     private MediaAnimationObject mediaAnimation;
 
-    @XStreamAlias("Info")
+    @XStreamAlias("MediaInfo")
     private MediaInfoObjcet mediaInfo;
 
     @XStreamImplicit(itemFieldName = "RemoveWatermark")
@@ -127,7 +127,7 @@ public class MediaJobOperation {
     @XStreamAlias("PicProcessTemplate")
     private MediaPicProcessTemplateObject picProcess;
 
-    @XStreamAlias("Result")
+    @XStreamAlias("MediaResult")
     private MediaResult mediaResult;
 
     @XStreamAlias("PicProcessResult")
@@ -749,5 +749,66 @@ public class MediaJobOperation {
 
     public void setRemoveWatermarkList(List<MediaRemoveWaterMark> removeWatermarkList) {
         this.removeWatermarkList = removeWatermarkList;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("MediaJobOperation{");
+        sb.append("templateId='").append(templateId).append('\'');
+        sb.append(", customId='").append(customId).append('\'');
+        sb.append(", jobLevel='").append(jobLevel).append('\'');
+        sb.append(", UserData='").append(UserData).append('\'');
+        sb.append(", templateName='").append(templateName).append('\'');
+        sb.append(", decryptKey='").append(decryptKey).append('\'');
+        sb.append(", decryptIv='").append(decryptIv).append('\'');
+        sb.append(", decryptMode='").append(decryptMode).append('\'');
+        sb.append(", encryptKey='").append(encryptKey).append('\'');
+        sb.append(", encryptIv='").append(encryptIv).append('\'');
+        sb.append(", encryptMode='").append(encryptMode).append('\'');
+        sb.append(", freeTranscode='").append(freeTranscode).append('\'');
+        sb.append(", snapshotPrefix='").append(snapshotPrefix).append('\'');
+        sb.append(", output=").append(output);
+        sb.append(", mediaAnimation=").append(mediaAnimation);
+        sb.append(", mediaInfo=").append(mediaInfo);
+        sb.append(", removeWatermarkList=").append(removeWatermarkList);
+        sb.append(", watermark=").append(watermark);
+        sb.append(", transcode=").append(transcode);
+        sb.append(", watermarkTemplateId=").append(watermarkTemplateId);
+        sb.append(", watermarkList=").append(watermarkList);
+        sb.append(", mediaConcatTemplate=").append(mediaConcatTemplate);
+        sb.append(", snapshot=").append(snapshot);
+        sb.append(", segment=").append(segment);
+        sb.append(", smartCover=").append(smartCover);
+        sb.append(", videoMontage=").append(videoMontage);
+        sb.append(", digitalWatermark=").append(digitalWatermark);
+        sb.append(", extractDigitalWatermark=").append(extractDigitalWatermark);
+        sb.append(", picProcess=").append(picProcess);
+        sb.append(", mediaResult=").append(mediaResult);
+        sb.append(", picProcessResult=").append(picProcessResult);
+        sb.append(", videoTargetRec=").append(videoTargetRec);
+        sb.append(", voiceSeparate=").append(voiceSeparate);
+        sb.append(", timeInterval=").append(timeInterval);
+        sb.append(", ttsConfig=").append(ttsConfig);
+        sb.append(", videoEnhance=").append(videoEnhance);
+        sb.append(", ttsTpl=").append(ttsTpl);
+        sb.append(", subtitles=").append(subtitles);
+        sb.append(", videoTag=").append(videoTag);
+        sb.append(", videoTagResult=").append(videoTagResult);
+        sb.append(", qualityEstimateConfig=").append(qualityEstimateConfig);
+        sb.append(", qualityEstimate=").append(qualityEstimate);
+        sb.append(", vocalScore=").append(vocalScore);
+        sb.append(", vocalScoreResult=").append(vocalScoreResult);
+        sb.append(", soundHoundResult=").append(soundHoundResult);
+        sb.append(", segmentVideoBody=").append(segmentVideoBody);
+        sb.append(", speechRecognition=").append(speechRecognition);
+        sb.append(", speechRecognitionResult=").append(speechRecognitionResult);
+        sb.append(", fillConcat=").append(fillConcat);
+        sb.append(", splitVideoParts=").append(splitVideoParts);
+        sb.append(", dnaConfig=").append(dnaConfig);
+        sb.append(", splitVideoInfoResult=").append(splitVideoInfoResult);
+        sb.append(", dnaResult=").append(dnaResult);
+        sb.append(", videoTargetRecResult=").append(videoTargetRecResult);
+        sb.append('}');
+        return sb.toString();
     }
 }

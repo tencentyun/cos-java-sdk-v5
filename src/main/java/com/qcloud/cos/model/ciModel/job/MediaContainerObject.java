@@ -25,6 +25,9 @@ public class MediaContainerObject {
     }
 
     public MediaClipConfig getClipConfig() {
+        if (clipConfig == null) {
+             clipConfig = new MediaClipConfig();
+        }
         return clipConfig;
     }
 

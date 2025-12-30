@@ -18,7 +18,8 @@
 
 package com.qcloud.cos.internal;
 
-import com.qcloud.cos.model.ciModel.job.AigcMetadata;
+import com.qcloud.cos.model.ciModel.job.*;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -91,32 +92,6 @@ import com.qcloud.cos.model.ciModel.image.ImageLabelV2Response;
 import com.qcloud.cos.model.ciModel.image.Label;
 import com.qcloud.cos.model.ciModel.image.LabelV2;
 import com.qcloud.cos.model.ciModel.image.LocationLabel;
-import com.qcloud.cos.model.ciModel.job.DocJobDetail;
-import com.qcloud.cos.model.ciModel.job.DocJobListResponse;
-import com.qcloud.cos.model.ciModel.job.DocJobResponse;
-import com.qcloud.cos.model.ciModel.job.DocProcessObject;
-import com.qcloud.cos.model.ciModel.job.DocProcessPageInfo;
-import com.qcloud.cos.model.ciModel.job.DocProcessResult;
-import com.qcloud.cos.model.ciModel.job.ExtractDigitalWatermark;
-import com.qcloud.cos.model.ciModel.job.Md5Info;
-import com.qcloud.cos.model.ciModel.job.MediaAudioObject;
-import com.qcloud.cos.model.ciModel.job.MediaConcatFragmentObject;
-import com.qcloud.cos.model.ciModel.job.MediaConcatTemplateObject;
-import com.qcloud.cos.model.ciModel.job.MediaContainerObject;
-import com.qcloud.cos.model.ciModel.job.MediaDigitalWatermark;
-import com.qcloud.cos.model.ciModel.job.MediaJobObject;
-import com.qcloud.cos.model.ciModel.job.MediaJobOperation;
-import com.qcloud.cos.model.ciModel.job.MediaJobResponse;
-import com.qcloud.cos.model.ciModel.job.MediaListJobResponse;
-import com.qcloud.cos.model.ciModel.job.MediaPicProcessTemplateObject;
-import com.qcloud.cos.model.ciModel.job.MediaRemoveWaterMark;
-import com.qcloud.cos.model.ciModel.job.MediaTimeIntervalObject;
-import com.qcloud.cos.model.ciModel.job.MediaTransConfigObject;
-import com.qcloud.cos.model.ciModel.job.MediaTranscodeVideoObject;
-import com.qcloud.cos.model.ciModel.job.MediaVideoObject;
-import com.qcloud.cos.model.ciModel.job.OutputFile;
-import com.qcloud.cos.model.ciModel.job.ProcessResult;
-import com.qcloud.cos.model.ciModel.job.VideoTargetRec;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaFormat;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoAudio;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoResponse;
@@ -2462,18 +2437,6 @@ public class XmlResponsesSaxParser {
         private static final String BUCKET = "Bucket";
         private static final String STORAGECLASS = "StorageClass";
 
-        private static final String FILTER = "Filter";
-        private static final String AND = "And";
-        private static final String TAG = "Tag";
-        private static final String KEY = "Key";
-        private static final String VALUE = "Value";
-
-        private List<TagSet> currentTagSets = new ArrayList<>();
-
-        private String currentTagKey = "";
-
-        private String currentTagValue = "";
-
         public BucketReplicationConfiguration getConfiguration() {
             return bucketReplicationConfiguration;
         }
@@ -2507,11 +2470,6 @@ public class XmlResponsesSaxParser {
                     currentRule.setID(getText());
                 } else if (name.equals(PREFIX)) {
                     currentRule.setPrefix(getText());
-                } else if (name.equals(FILTER)) {
-                    if (!currentTagSets.isEmpty()) {
-                        currentRule.setTagSets(currentTagSets);
-                        currentTagSets = new ArrayList<>();
-                    }
                 } else {
                     if (name.equals(STATUS)) {
                         currentRule.setStatus(getText());
@@ -2520,53 +2478,11 @@ public class XmlResponsesSaxParser {
                         currentRule.setDestinationConfig(destinationConfig);
                     }
                 }
-            } else if (in(REPLICATION_CONFIG, RULE, "DeleteMarkerReplication")) {
-                if (name.equals("Status")) {
-                    currentRule.setDeleteMarkerReplication(getText());
-                }
-            }else if (in(REPLICATION_CONFIG, RULE, DESTINATION)) {
+            } else if (in(REPLICATION_CONFIG, RULE, DESTINATION)) {
                 if (name.equals(BUCKET)) {
                     destinationConfig.setBucketQCS(getText());
                 } else if (name.equals(STORAGECLASS)) {
                     destinationConfig.setStorageClass(getText());
-                }
-            } else if (in(REPLICATION_CONFIG, RULE, FILTER)) {
-                if (name.equals(PREFIX)) {
-                    currentRule.setPrefix(getText());
-                } else if (name.equals(TAG)) {
-                    if (!currentTagKey.isEmpty() && !currentTagValue.isEmpty()) {
-                        TagSet tagSet = new TagSet();
-                        tagSet.setTag(currentTagKey, currentTagValue);
-                        currentTagSets.add(tagSet);
-
-                        currentTagKey = "";
-                        currentTagValue = "";
-                    }
-                }
-            } else if (in(REPLICATION_CONFIG, RULE, FILTER, TAG)) {
-                if (name.equals(KEY)) {
-                    currentTagKey = getText();
-                } else if (name.equals(VALUE)) {
-                    currentTagValue = getText();
-                }
-            } else if (in(REPLICATION_CONFIG, RULE, FILTER, AND)) {
-                if (name.equals(PREFIX)) {
-                    currentRule.setPrefix(getText());
-                } else if (name.equals(TAG)) {
-                    if (!currentTagKey.isEmpty() && !currentTagValue.isEmpty()) {
-                        TagSet tagSet = new TagSet();
-                        tagSet.setTag(currentTagKey, currentTagValue);
-                        currentTagSets.add(tagSet);
-
-                        currentTagKey = "";
-                        currentTagValue = "";
-                    }
-                }
-            } else if (in(REPLICATION_CONFIG, RULE, FILTER, AND, TAG)) {
-                if (name.equals(KEY)) {
-                    currentTagKey = getText();
-                } else if (name.equals(VALUE)) {
-                    currentTagValue = getText();
                 }
             }
         }
@@ -5260,6 +5176,42 @@ public class XmlResponsesSaxParser {
                     default:
                         break;
                 }
+            }else if (in("Response", "JobsDetail", "Operation", "DocWatermark")) {
+                DocWatermark docWatermarkObject = response.getJobsDetail().getOperation().getDocWatermarkObject();
+                switch (name) {
+                    case "Dx":
+                        docWatermarkObject.setDx(getText());
+                        break;
+                    case "Dy":
+                        docWatermarkObject.setDy(getText());
+                        break;
+                    case "Image":
+                        docWatermarkObject.setImage(getText());
+                        break;
+                    case "Type":
+                        docWatermarkObject.setType(getText());
+                        break;
+                    default:
+                        break;
+                }
+            }else if (in("Response", "JobsDetail", "Operation", "DocProcess","DocWatermark")) {
+                DocWatermark docWatermarkObject = response.getJobsDetail().getOperation().getDocProcessObject().getDocWatermark();
+                switch (name) {
+                    case "Dx":
+                        docWatermarkObject.setDx(getText());
+                        break;
+                    case "Dy":
+                        docWatermarkObject.setDy(getText());
+                        break;
+                    case "Image":
+                        docWatermarkObject.setImage(getText());
+                        break;
+                    case "Type":
+                        docWatermarkObject.setType(getText());
+                        break;
+                    default:
+                        break;
+                }
             }
         }
 
@@ -5425,6 +5377,48 @@ public class XmlResponsesSaxParser {
                         break;
                 }
 
+            } else if (in("Response", "JobsDetail", "Operation", "DocProcessResult", "WatermarkInfo")) {
+                WatermarkInfo watermarkInfo = response.getJobsDetail().getOperation().getDocProcessResult().getWatermarkInfo();
+                switch (name) {
+                    case "Etag":
+                        watermarkInfo.setEtag(getText());
+                        break;
+                    case "Size":
+                        watermarkInfo.setSize(getText());
+                        break;
+                    default:
+                        break;
+                }
+            }else if (in("Response", "JobsDetail", "Operation", "DocWatermarkResult")) {
+                WatermarkInfo watermarkInfo = response.getJobsDetail().getOperation().getDocProcessResult().getWatermarkInfo();
+                switch (name) {
+                    case "Etag":
+                        watermarkInfo.setEtag(getText());
+                        break;
+                    case "Size":
+                        watermarkInfo.setSize(getText());
+                        break;
+                    default:
+                        break;
+                }
+            } else if (in("Response", "JobsDetail", "Operation", "DocWatermark")) {
+                DocWatermark docWatermarkObject = response.getJobsDetail().getOperation().getDocWatermarkObject();
+                switch (name) {
+                    case "Dx":
+                        docWatermarkObject.setDx(getText());
+                        break;
+                    case "Dy":
+                        docWatermarkObject.setDy(getText());
+                        break;
+                    case "Image":
+                        docWatermarkObject.setImage(getText());
+                        break;
+                    case "Type":
+                        docWatermarkObject.setType(getText());
+                        break;
+                    default:
+                        break;
+                }
             }
 
             if ("PageInfo".equalsIgnoreCase(name)) {
@@ -5743,6 +5737,8 @@ public class XmlResponsesSaxParser {
                 ParserMediaInfoUtils.parseOrcInfo(response.getAdsInfo().getOcrResults(), name, getText());
             } else if (in("RecognitionResult", "TeenagerInfo","OcrResults")) {
                 ParserMediaInfoUtils.parseOrcInfo(response.getTeenagerInfo().getOcrResults(), name, getText());
+            } else if (in("RecognitionResult","PoliticsInfo","ObjectResults")) {
+                ParserMediaInfoUtils.parseObjectResultsInfo(response.getPoliticsInfo().getPoliticsInfoObjectResults(), name, getText());
             }
         }
 
@@ -5762,6 +5758,9 @@ public class XmlResponsesSaxParser {
                     break;
                 case "Label":
                     obj.setLabel(getText());
+                    break;
+                case "SubLabel":
+                    obj.setSubLabel(getText());
                     break;
                 default:
                     break;

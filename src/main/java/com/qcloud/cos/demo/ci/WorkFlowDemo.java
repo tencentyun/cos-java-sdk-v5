@@ -16,7 +16,7 @@ public class WorkFlowDemo {
         // 1 初始化用户身份信息（secretId, secretKey）。
         COSClient client = ClientUtils.getTestClient();
         // 2 调用要使用的方法。
-        triggerWorkflowList(client);
+        describeWorkflowExecution(client);
     }
 
     /**

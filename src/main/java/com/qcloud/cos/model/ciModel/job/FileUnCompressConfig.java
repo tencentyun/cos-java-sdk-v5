@@ -13,6 +13,8 @@ public class FileUnCompressConfig {
     private String mode;
     @XStreamAlias("DownloadConfig")
     private DownloadConfig downloadConfig;
+    @XStreamAlias("ListingFile")
+    private Boolean ListingFile;
 
     public String getUnCompressKey() {
         return unCompressKey;
@@ -55,6 +57,14 @@ public class FileUnCompressConfig {
 
     public void setPrefixReplaced(String prefixReplaced) {
         this.prefixReplaced = prefixReplaced;
+    }
+
+    public Boolean getListingFile() {
+        return ListingFile;
+    }
+
+    public void setListingFile(Boolean listingFile) {
+        ListingFile = listingFile;
     }
 
     @Override

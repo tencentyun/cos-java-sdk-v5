@@ -1,9 +1,13 @@
 package com.qcloud.cos.model.ciModel.workflow;
 
 import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 
+@XStreamAlias("Operation")
 public class MediaOperation {
+    @XStreamAlias("TemplateId")
     private String templateId;
+    @XStreamAlias("Output")
     private MediaOutputObject output;
 
     public MediaOutputObject getOutput() {

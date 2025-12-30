@@ -54,6 +54,10 @@ import com.qcloud.cos.model.ciModel.job.TtsTpl;
 import com.qcloud.cos.model.ciModel.job.VideoTag;
 import com.qcloud.cos.model.ciModel.job.VideoTargetRec;
 import com.qcloud.cos.model.ciModel.job.VqaPlusResult;
+import com.qcloud.cos.model.ciModel.job.StreamData;
+import com.qcloud.cos.model.ciModel.job.ActionTag;
+import com.qcloud.cos.model.ciModel.job.PlaceTag;
+import com.qcloud.cos.model.ciModel.job.MediaTags;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaFormat;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoAudio;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoSubtitle;
@@ -174,13 +178,13 @@ public class ParserMediaInfoUtils {
             case "Width":
                 video.setWidth(value);
                 break;
-            case "PixFmt":
+            case "Pixfmt":
                 video.setPixFmt(value);
                 break;
             case "Maxrate":
                 video.setMaxrate(value);
                 break;
-            case "BufSize":
+            case "Bufsize":
                 video.setBufSize(value);
                 break;
             case "Preset":
@@ -254,7 +258,7 @@ public class ParserMediaInfoUtils {
             case "Maxrate":
                 video.setMaxrate(value);
                 break;
-            case "BufSize":
+            case "Bufsize":
                 video.setBufSize(value);
                 break;
             case "Preset":
@@ -772,6 +776,12 @@ public class ParserMediaInfoUtils {
             case "Name":
                 obj.setName(value);
                 break;
+            case "Location":
+                obj.setLocation(value);
+                break;
+            case "SubLabel":
+                obj.setSubLabel(value);
+                break;
             default:
                 break;
         }
@@ -886,6 +896,9 @@ public class ParserMediaInfoUtils {
                 break;
             case "Progress":
                 jobsDetail.setProgress(value);
+                break;
+            case "StartTime":
+                jobsDetail.setStartTime(value);
                 break;
             default:
                 break;
@@ -1591,6 +1604,67 @@ public class ParserMediaInfoUtils {
         switch (name) {
             case "Score":
                 qualityEstimate.setScore(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParseStreamData(StreamData streamData, String name, String value) {
+        switch (name) {
+            case "SubErrCode":
+                streamData.setSubErrCode(value);
+                break;
+            case "SubErrMsg":
+                streamData.setSubErrMsg(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParseActionTag(ActionTag actionTag, String name, String value) {
+        switch (name) {
+            case "StartTime":
+                actionTag.setStartTime(value);
+                break;
+            case "EndTime":
+                actionTag.setEndTime(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParsePlaceTag(PlaceTag placeTag, String name, String value) {
+        switch (name) {
+            case "StartIndex":
+                placeTag.setStartIndex(value);
+                break;
+            case "EndIndex":
+                placeTag.setEndIndex(value);
+                break;
+            case "StartTime":
+                placeTag.setStartTime(value);
+                break;
+            case "EndTime":
+                placeTag.setEndTime(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void ParseMediaTags(MediaTags mediaTags, String name, String value) {
+        switch (name) {
+            case "Tag":
+                mediaTags.setTag(value);
+                break;
+            case "TagCls":
+                mediaTags.setTagCls(value);
+                break;
+            case "Confidence":
+                mediaTags.setConfidence(value);
                 break;
             default:
                 break;

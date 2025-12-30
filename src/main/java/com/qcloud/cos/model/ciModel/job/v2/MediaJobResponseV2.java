@@ -18,6 +18,10 @@ public class MediaJobResponseV2 extends CiServiceResult {
         return jobsDetail;
     }
 
+    public void setJobsDetail(MediaJobObject jobsDetail) {
+        this.jobsDetail = jobsDetail;
+    }
+
     @Override
     public String toString() {
         return "MediaJobResponse{" +

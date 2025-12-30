@@ -14,7 +14,7 @@ public class QueueDemo {
         // 1 初始化用户身份信息（secretId, secretKey）。
         COSClient client = ClientUtils.getTestClient();
         // 2 调用要使用的方法。
-        updateMediaQueue(client);
+        describeMediaQueues(client);
     }
 
     /**
@@ -26,7 +26,9 @@ public class QueueDemo {
         MediaQueueRequest request = new MediaQueueRequest();
         //2.添加请求参数 参数详情请见api接口文档
         request.setBucketName("DemoBucket-123456789");
-        //3.调用接口,获取队列响应对象
+        //3.添加返回队列类型
+        request.setCategory("CateAll");
+        //4.调用接口,获取队列响应对象
         MediaListQueueResponse response = client.describeMediaQueues(request);
         System.out.println(response);
     }

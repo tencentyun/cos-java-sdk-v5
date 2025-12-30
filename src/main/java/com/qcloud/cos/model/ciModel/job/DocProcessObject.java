@@ -75,6 +75,19 @@ public class DocProcessObject {
      */
     private String imageDpi;
 
+    private DocWatermark docWatermark;
+
+    public DocWatermark getDocWatermark() {
+        if (docWatermark == null) {
+            docWatermark = new DocWatermark();
+        }
+        return docWatermark;
+    }
+
+    public void setDocWatermark(DocWatermark docWatermark) {
+        this.docWatermark = docWatermark;
+    }
+
     public String getPicPagination() {
         return picPagination;
     }

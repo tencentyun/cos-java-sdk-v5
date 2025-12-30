@@ -6,6 +6,7 @@ package com.qcloud.cos.model.ciModel.auditing;
 public class PoliticsInfoObjectResults {
     private String name;
     private String location;
+    private String SubLabel;
 
     public String getName() {
         return name;
@@ -23,12 +24,20 @@ public class PoliticsInfoObjectResults {
         this.location = location;
     }
 
+    public void setSubLabel(String SubLabel) {
+        this.SubLabel = SubLabel;
+    }
+
+    public String getSubLabel() {
+        return SubLabel;
+    }
+
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("PoliticsInfoObjectResults{");
-        sb.append("name='").append(name).append('\'');
-        sb.append(", location='").append(location).append('\'');
-        sb.append('}');
-        return sb.toString();
+        return "PoliticsInfoObjectResults{" +
+                "name='" + name + '\'' +
+                ", location='" + location + '\'' +
+                ", SubLabel='" + SubLabel + '\'' +
+                '}';
     }
 }

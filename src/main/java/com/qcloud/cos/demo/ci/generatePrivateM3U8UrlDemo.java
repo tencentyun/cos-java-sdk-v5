@@ -17,6 +17,7 @@ public class generatePrivateM3U8UrlDemo {
     private static String bucket = "demo-123456789";
     private static String objectKey = "test.m3u8";
     private static String expires = "3600";
+    // https://console.cloud.tencent.com/cos/bucket?bucket=桶名&region=地域&type=ci&anchorType=video 获取播放密钥
     private static byte[] secret = "YourSecret".getBytes();
 
     public static String  generateCosDomainPrivateM3U8Url(COSClient client) throws UnsupportedEncodingException {

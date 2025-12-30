@@ -118,7 +118,7 @@ public class ResettableInputStream extends ReleasableInputStream {
      * via {@link ResettableInputStream#disableClose()}, so that the release method becomes the only
      * way to truly close the opened file.
      * 
-     * @param _ ignored
+     * @param readlimit ignored
      */
     @Override
     public void mark(int readlimit) {

@@ -26,8 +26,14 @@ public class MediaJobObject extends CIServiceRequest implements Serializable {
     @XStreamAlias("CreationTime")
     private String creationTime;
 
+    @XStreamAlias("StartTime")
+    private String startTime;
+
     @XStreamAlias("EndTime")
     private String endTime;
+
+    @XStreamAlias("SubTag")
+    private String subTag;
 
     @XStreamAlias("QueueId")
     private String queueId;
@@ -171,6 +177,22 @@ public class MediaJobObject extends CIServiceRequest implements Serializable {
         this.queueType = queueType;
     }
 
+    public String getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(String startTime) {
+        this.startTime = startTime;
+    }
+
+    public String getSubTag() {
+        return subTag;
+    }
+
+    public void setSubTag(String subTag) {
+        this.subTag = subTag;
+    }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("MediaJobObject{");
@@ -179,6 +201,7 @@ public class MediaJobObject extends CIServiceRequest implements Serializable {
         sb.append(", jobId='").append(jobId).append('\'');
         sb.append(", state='").append(state).append('\'');
         sb.append(", creationTime='").append(creationTime).append('\'');
+        sb.append(", startTime='").append(startTime).append('\'');
         sb.append(", endTime='").append(endTime).append('\'');
         sb.append(", queueId='").append(queueId).append('\'');
         sb.append(", tag='").append(tag).append('\'');

@@ -93,7 +93,7 @@ public class MediaVideoObject implements Serializable {
     /**
      * 缓冲区大小
      */
-    @XStreamAlias("BufSize")
+    @XStreamAlias("Bufsize")
     private String bufSize;
 
     /**
@@ -105,7 +105,7 @@ public class MediaVideoObject implements Serializable {
     @XStreamAlias("ScanMode")
     private String scanMode;
 
-    @XStreamAlias("PixFmt")
+    @XStreamAlias("Pixfmt")
     private String pixFmt;
 
     @XStreamAlias("Quality")
