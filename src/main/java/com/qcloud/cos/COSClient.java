@@ -1045,6 +1045,9 @@ public class COSClient implements COS {
                 } else {
                     returnedMetadata = invoke(request, new CosMetadataResponseHandler());
                 }
+            } catch (CosServiceException cse) {
+                updatePreflightStatus(cse.isNeedPreflight(), bucketName);
+                throw Throwables.failure(cse);
             } catch (Throwable t) {
                 throw Throwables.failure(t);
             }
@@ -1052,21 +1055,7 @@ public class COSClient implements COS {
             CosDataSource.Utils.cleanupDataSource(uploadObjectRequest, file, isOrig, input, log);
         }
 
-        if (returnedMetadata.isNeedPreflight()) {
-            Long currentTime = System.currentTimeMillis();
-            if ((preflightBuckets.get(bucketName) == null) || ((currentTime - preflightBuckets.get(bucketName)) > clientConfig.getPreflightStatusUpdateInterval())) {
-                String reqMsg = String.format("will update preflight status, bucket[%s]", bucketName);
-                log.info(reqMsg);
-                preflightBuckets.put(bucketName, currentTime);
-            }
-        } else {
-            Long currentTime = System.currentTimeMillis();
-            if ((preflightBuckets.get(bucketName) != null) && ((currentTime - preflightBuckets.get(bucketName)) > clientConfig.getPreflightStatusUpdateInterval())) {
-                String reqMsg = String.format("will remove bucket[%s] from preflight lists", bucketName);
-                log.info(reqMsg);
-                preflightBuckets.remove(bucketName);
-            }
-        }
+        updatePreflightStatus(returnedMetadata.isNeedPreflight(), bucketName);
 
         String contentMd5 = metadata.getContentMD5();
         if (md5DigestStream != null) {
@@ -1835,21 +1824,7 @@ public class COSClient implements COS {
             ObjectMetadata metadata = invoke(request, new CosMetadataResponseHandler());
             final String etag = metadata.getETag();
 
-            if (metadata.isNeedPreflight()) {
-                Long currentTime = System.currentTimeMillis();
-                if ((preflightBuckets.get(bucketName) == null) || ((currentTime - preflightBuckets.get(bucketName)) > clientConfig.getPreflightStatusUpdateInterval())) {
-                    String reqMsg = String.format("will update preflight status, bucket[%s]", bucketName);
-                    log.info(reqMsg);
-                    preflightBuckets.put(bucketName, currentTime);
-                }
-            } else {
-                Long currentTime = System.currentTimeMillis();
-                if ((preflightBuckets.get(bucketName) != null) && ((currentTime - preflightBuckets.get(bucketName)) > clientConfig.getPreflightStatusUpdateInterval())) {
-                    String reqMsg = String.format("will remove bucket[%s] from preflight lists", bucketName);
-                    log.info(reqMsg);
-                    preflightBuckets.remove(bucketName);
-                }
-            }
+            updatePreflightStatus(metadata.isNeedPreflight(), bucketName);
 
             if (md5DigestStream != null && !skipMd5CheckStrategy
                     .skipClientSideValidationPerUploadPartResponse(metadata)) {
@@ -1880,6 +1855,9 @@ public class COSClient implements COS {
             result.setRequestId(metadata.getRequestId());
 
             return result;
+        } catch (CosServiceException cse) {
+            updatePreflightStatus(cse.isNeedPreflight(), bucketName);
+            throw Throwables.failure(cse);
         } catch (Throwable t) {
             throw Throwables.failure(t);
         }
@@ -5720,7 +5698,7 @@ public class COSClient implements COS {
                 "The bucket name parameter must be specified when doing preflight request");
         rejectEmpty(key,
                 "The key parameter must be specified when doing preflight request");
-        if (clientConfig.isCheckPreflightStatus() && preflightBuckets.containsKey(bucketName)) {
+        if (clientConfig.isForcePreflight() || (clientConfig.isCheckPreflightStatus() && preflightBuckets.containsKey(bucketName))) {
             String reqMsg = String.format("will do preflight request for put object[%s] to the bucket[%s]", key, bucketName);
             log.debug(reqMsg);
             putObjectRequest.setHasDonePreflight(true);
@@ -5752,7 +5730,7 @@ public class COSClient implements COS {
                 "The bucket name parameter must be specified when doing preflight request");
         rejectEmpty(key,
                 "The key parameter must be specified when doing preflight request");
-        if (clientConfig.isCheckPreflightStatus() && preflightBuckets.containsKey(bucketName)) {
+        if (clientConfig.isForcePreflight() || (clientConfig.isCheckPreflightStatus() && preflightBuckets.containsKey(bucketName))) {
             String reqMsg = String.format("will do preflight request for upload part object[%s] to the bucket[%s]", key, bucketName);
             log.debug(reqMsg);
             uploadPartRequest.setHasDonePreflight(true);
@@ -5819,6 +5797,23 @@ public class COSClient implements COS {
         request.addParameter("ci-process", "MediaAIGCMetadata");
 
         return invoke(request, new Unmarshallers.AigcMetadataUnmarshaller());
+    }
+
+    private void updatePreflightStatus(boolean needPreflight, String bucketName) {
+        Long currentTime = System.currentTimeMillis();
+        if (needPreflight) {
+            if ((preflightBuckets.get(bucketName) == null) || ((currentTime - preflightBuckets.get(bucketName)) > clientConfig.getPreflightStatusUpdateInterval())) {
+                String reqMsg = String.format("will update preflight status, bucket[%s]", bucketName);
+                log.info(reqMsg);
+                preflightBuckets.put(bucketName, currentTime);
+            }
+        } else {
+            if ((preflightBuckets.get(bucketName) != null) && ((currentTime - preflightBuckets.get(bucketName)) > clientConfig.getPreflightStatusUpdateInterval())) {
+                String reqMsg = String.format("will remove bucket[%s] from preflight lists", bucketName);
+                log.info(reqMsg);
+                preflightBuckets.remove(bucketName);
+            }
+        }
     }
 }
 

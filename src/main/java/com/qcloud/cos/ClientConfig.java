@@ -129,6 +129,8 @@ public class ClientConfig {
 
     private boolean checkPreflightStatus = true;
 
+    private boolean forcePreflight = false;
+
     private long preflightStatusUpdateInterval = 10 * 1000L;
 
     private boolean isRedirectsEnabled = false;
@@ -478,6 +480,14 @@ public class ClientConfig {
 
     public void setCheckPreflightStatus(boolean checkPreflightStatus) {
         this.checkPreflightStatus = checkPreflightStatus;
+    }
+
+    public boolean isForcePreflight() {
+        return forcePreflight;
+    }
+
+    public void setForcePreflight(boolean forcePreflight) {
+        this.forcePreflight = forcePreflight;
     }
 
     public long getPreflightStatusUpdateInterval() {
