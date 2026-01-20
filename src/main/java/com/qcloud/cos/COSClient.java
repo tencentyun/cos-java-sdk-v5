@@ -630,9 +630,9 @@ public class COSClient implements COS {
      * @param header The header name.
      * @param value The header value.
      */
-    private static void addHeaderIfNotNull(CosHttpRequest<?> request, String header, String value) {
+    private static void addHeaderIfNotNull(CosHttpRequest<?> request, String header, Object value) {
         if (value != null) {
-            request.addHeader(header, value);
+            request.addHeader(header, value.toString());
         }
     }
 
@@ -3076,6 +3076,8 @@ public class COSClient implements COS {
 
         addHeaderIfNotNull(request, Headers.CONTENT_TYPE, req.getContentType());
         addHeaderIfNotNull(request, Headers.CONTENT_MD5, req.getContentMd5());
+        addHeaderIfNotNull(request, Headers.CONTENT_LENGTH, req.getContentLength());
+        
 
         // Custom headers that open up the possibility of supporting unexpected
         // cases.

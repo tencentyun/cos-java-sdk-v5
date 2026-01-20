@@ -44,6 +44,9 @@ public class GeneratePresignedUrlRequest extends CosServiceRequest {
     /** The optional Content-Type header that will be sent when the presigned URL is accessed */
     private String contentType;
 
+    /** The optional Content-Length header that will be sent when the presigned URL is accessed */
+    private Long contentLength;
+
     /** The optional Content-MD5 header that will be sent when the presigned URL is accessed */
     private String contentMd5;
 
@@ -152,6 +155,51 @@ public class GeneratePresignedUrlRequest extends CosServiceRequest {
      */
     public GeneratePresignedUrlRequest withMethod(HttpMethodName method) {
         setMethod(method);
+        return this;
+    }
+
+    /**
+     * The Content-Length HTTP header value to be used in this request. The
+     * same Content-Length header value <b>must</b> be used in the request when
+     * the pre-signed URL is used. 
+     * If it was null, it means the Content-Length header was not set.
+     *
+     * @return  The Content-Length HTTP header value to be used in this request. 
+     *          If it was null, it means the Content-Length header value is not set.
+     */
+    public Long getContentLength() {
+        return contentLength;
+    }
+
+    /**
+     * Sets the Content-Length HTTP header value to be used in this request. 
+     * The same Content-Length header value <b>must</b> be used in the request 
+     * when the pre-signed URL is used.
+     * If it was null, it means the Content-Length header was not set.
+     *
+     * @param contentLength The Content-Length HTTP header value to be used in this request.
+     */
+    public void setContentLength(Long contentLength) {
+        
+        if(contentLength != null && contentLength < 0) {
+            throw new IllegalArgumentException("Content Length Can't be negative");
+        }
+        this.contentLength = contentLength;
+    }
+
+    /**
+     * Sets the Content-Length HTTP header value to be used in this request, and
+     * returns this request object to enable additional method calls to be chained
+     * together.
+     *
+     * @param contentLength
+     *            The Content-Length HTTP header value to be used in this request.
+     *
+     * @return The updated request object, so that additional method calls can
+     *         be chained together.
+     */
+    public GeneratePresignedUrlRequest withContentLength(Long contentLength) {
+        setContentLength(contentLength);;
         return this;
     }
 
