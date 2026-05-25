@@ -118,6 +118,12 @@ public class CreateAuditingPictureJobResponse extends CosServiceResult {
     @XStreamAlias("TerroristInfo")
     private AuditingResultInfo terroristInfo;
 
+    /**
+     * OCR 命中详情信息
+     */
+    @XStreamAlias("OcrHitInfos")
+    private OcrHitInfos ocrHitInfos;
+
     public String getDataId() { return dataId; }
 
     public void setDataId(String dataId) { this.dataId = dataId; }
@@ -189,6 +195,10 @@ public class CreateAuditingPictureJobResponse extends CosServiceResult {
     public AuditingResultInfo getTerroristInfo() { return terroristInfo; }
 
     public void setTerroristInfo(AuditingResultInfo terroristInfo) { this.terroristInfo = terroristInfo; }
+
+    public OcrHitInfos getOcrHitInfos() { return ocrHitInfos; }
+
+    public void setOcrHitInfos(OcrHitInfos ocrHitInfos) { this.ocrHitInfos = ocrHitInfos; }
 
 
     @XStreamAlias("AuditingResultInfo")

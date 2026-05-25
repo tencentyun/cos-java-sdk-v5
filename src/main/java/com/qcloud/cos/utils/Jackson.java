@@ -21,16 +21,16 @@ package com.qcloud.cos.utils;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
+import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import com.qcloud.cos.exception.CosClientException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 
@@ -43,6 +43,14 @@ public enum Jackson {
     static {
         objectMapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        objectMapper.configure(com.fasterxml.jackson.databind.SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+        // 配置序列化时忽略null值
+        objectMapper.setSerializationInclusion(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL);
+
+        // 配置 CosServiceFilter 过滤器，允许序列化所有字段
+        SimpleFilterProvider filterProvider = new SimpleFilterProvider();
+        filterProvider.addFilter("CosServiceFilter", SimpleBeanPropertyFilter.serializeAll());
+        objectMapper.setFilterProvider(filterProvider);
     }
 
     private static final ObjectWriter writer = objectMapper.writer();

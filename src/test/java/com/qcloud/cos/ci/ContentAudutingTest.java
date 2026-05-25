@@ -17,6 +17,8 @@ import com.qcloud.cos.model.ciModel.auditing.DocumentAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.DocumentAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.ImageAuditingRequest;
 import com.qcloud.cos.model.ciModel.auditing.ImageAuditingResponse;
+import com.qcloud.cos.model.ciModel.auditing.HitInfo;
+import com.qcloud.cos.model.ciModel.auditing.OcrHitInfos;
 import com.qcloud.cos.model.ciModel.auditing.ReportBadCaseRequest;
 import com.qcloud.cos.model.ciModel.auditing.SuggestedLabel;
 import com.qcloud.cos.model.ciModel.auditing.TextAuditingRequest;
@@ -363,6 +365,85 @@ public class ContentAudutingTest extends AbstractCOSClientCITest {
             request.setObjectKey("ceshi.png");
             CreateAuditingPictureJobResponse response = cosclient.imageAuditingV2(request);
             System.out.println(Jackson.toJsonString(response));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // ============================================================================
+    // 测试用例：OcrHitInfos - OCR 命中详情模型验证
+    // ============================================================================
+
+    /**
+     * 验证 OcrHitInfos 模型的 getter/setter 基本功能
+     */
+    @Test
+    public void testOcrHitInfosModel() {
+        OcrHitInfos ocrHitInfos = new OcrHitInfos();
+        ocrHitInfos.setText("测试OCR文本");
+        assert "测试OCR文本".equals(ocrHitInfos.getText());
+
+        java.util.List<HitInfo> hitInfoList = new java.util.ArrayList<>();
+        HitInfo hitInfo = new HitInfo();
+        hitInfo.setType("keyword");
+        hitInfo.setKeyword("敏感词");
+        hitInfo.setLibName("自定义库");
+        hitInfoList.add(hitInfo);
+        ocrHitInfos.setHitInfos(hitInfoList);
+
+        assert ocrHitInfos.getHitInfos() != null;
+        assert ocrHitInfos.getHitInfos().size() == 1;
+        assert "keyword".equals(ocrHitInfos.getHitInfos().get(0).getType());
+        assert "敏感词".equals(ocrHitInfos.getHitInfos().get(0).getKeyword());
+        assert "自定义库".equals(ocrHitInfos.getHitInfos().get(0).getLibName());
+
+        // 验证 toString 不抛异常
+        String str = ocrHitInfos.toString();
+        assert str != null && str.contains("测试OCR文本");
+    }
+
+    /**
+     * 验证 OcrHitInfos 字段为 null 时各响应实体的 getter 不抛异常（向后兼容）
+     */
+    @Test
+    public void testOcrHitInfosNullSafe() {
+        // ImageAuditingResponse
+        ImageAuditingResponse imageResponse = new ImageAuditingResponse();
+        assert imageResponse.getOcrHitInfos() == null;
+
+        // BatchImageJobDetail
+        BatchImageJobDetail batchDetail = new BatchImageJobDetail();
+        assert batchDetail.getOcrHitInfos() == null;
+
+        // CreateAuditingPictureJobResponse
+        CreateAuditingPictureJobResponse pictureResponse = new CreateAuditingPictureJobResponse();
+        assert pictureResponse.getOcrHitInfos() == null;
+    }
+
+    /**
+     * 验证图片审核响应中 OcrHitInfos 的获取（集成测试，依赖后端返回）
+     */
+    @Test
+    public void testImageAuditingWithOcrHitInfos() {
+        try {
+            if (!judgeUserInfoValid()) {
+                return;
+            }
+            ImageAuditingRequest request = new ImageAuditingRequest();
+            request.setBucketName(bucket);
+            request.setObjectKey("1.png");
+            ImageAuditingResponse response = cosclient.imageAuditing(request);
+            // OcrHitInfos 可能为 null（取决于图片内容和审核策略），验证不抛异常即可
+            OcrHitInfos ocrHitInfos = response.getOcrHitInfos();
+            if (ocrHitInfos != null) {
+                System.out.println("OCR Text: " + ocrHitInfos.getText());
+                if (ocrHitInfos.getHitInfos() != null) {
+                    for (HitInfo hitInfo : ocrHitInfos.getHitInfos()) {
+                        System.out.println("  Type: " + hitInfo.getType());
+                        System.out.println("  Keyword: " + hitInfo.getKeyword());
+                    }
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

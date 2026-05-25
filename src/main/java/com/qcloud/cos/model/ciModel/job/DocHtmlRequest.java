@@ -70,10 +70,14 @@ public class DocHtmlRequest extends CosServiceRequest {
 
     private String imageDpi;
 
+    private String type;
+
+    private String text;
+
     private DocType dstType = DocType.html;
 
     public enum DocType {
-        html, jpg, png, pdf
+        html, jpg, png, pdf,watermark
     }
 
     public String getImageDpi() {
@@ -188,6 +192,22 @@ public class DocHtmlRequest extends CosServiceRequest {
 
     public void setExcelPaperSize(String excelPaperSize) {
         this.excelPaperSize = excelPaperSize;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
     }
 
     @Override

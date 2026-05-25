@@ -82,7 +82,7 @@ public class Region implements Serializable {
 
     public static String formatCIRegion(String regionName) throws CosClientException {
         UrlComponentUtils.validateRegionName(regionName);
-        if (regionName.startsWith("ap-") || regionName.startsWith("eu-") || regionName.startsWith("na-")) {
+        if (regionName.startsWith("ap-") || regionName.startsWith("eu-") || regionName.startsWith("na-") || regionName.startsWith("sa-")) {
             return regionName;
         } else {
             return "ap-" + regionName;

@@ -24,6 +24,7 @@ public class BatchImageJobDetail {
     private UserInfo userInfo = new UserInfo();
     private ListInfo listInfo = new ListInfo();
     private OcrResults ocrResults = new OcrResults();
+    private OcrHitInfos ocrHitInfos;
 
     public String getDataId() {
         return dataId;
@@ -169,6 +170,14 @@ public class BatchImageJobDetail {
         this.ocrResults = ocrResults;
     }
 
+    public OcrHitInfos getOcrHitInfos() {
+        return ocrHitInfos;
+    }
+
+    public void setOcrHitInfos(OcrHitInfos ocrHitInfos) {
+        this.ocrHitInfos = ocrHitInfos;
+    }
+
     public void setAdsInfo(AdsInfo adsInfo) {
         this.adsInfo = adsInfo;
     }
@@ -249,6 +258,7 @@ public class BatchImageJobDetail {
         sb.append(", userInfo=").append(userInfo);
         sb.append(", listInfo=").append(listInfo);
         sb.append(", ocrResults=").append(ocrResults);
+        sb.append(", ocrHitInfos=").append(ocrHitInfos);
         sb.append('}');
         return sb.toString();
     }

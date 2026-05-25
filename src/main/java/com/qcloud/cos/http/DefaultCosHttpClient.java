@@ -505,8 +505,8 @@ public class DefaultCosHttpClient implements CosHttpClient {
     }
 
     private <X extends CosServiceRequest> void checkResponse(CosHttpRequest<X> request,
-            HttpRequestBase httpRequest,
-            HttpResponse httpResponse) {
+                                                             HttpRequestBase httpRequest,
+                                                             HttpResponse httpResponse) {
         if (!isRequestSuccessful(httpResponse)) {
             try {
                 throw handlerErrorMessage(request, httpRequest, httpResponse);
@@ -530,8 +530,8 @@ public class DefaultCosHttpClient implements CosHttpClient {
     }
 
     private <X extends CosServiceRequest> boolean shouldRetry(CosHttpRequest<X> request, HttpResponse response,
-            Exception exception, int retryIndex,
-            RetryPolicy retryPolicy) {
+                                                              Exception exception, int retryIndex,
+                                                              RetryPolicy retryPolicy) {
         if (retryIndex >= maxErrorRetry) {
             return false;
         }
@@ -585,7 +585,7 @@ public class DefaultCosHttpClient implements CosHttpClient {
 
     @Override
     public <X, Y extends CosServiceRequest> X exeute(CosHttpRequest<Y> request,
-            HttpResponseHandler<CosServiceResponse<X>> responseHandler)
+                                                     HttpResponseHandler<CosServiceResponse<X>> responseHandler)
             throws CosClientException, CosServiceException {
 
         HttpResponse httpResponse = null;

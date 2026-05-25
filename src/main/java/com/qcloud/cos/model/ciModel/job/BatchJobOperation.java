@@ -12,6 +12,7 @@ public class BatchJobOperation {
     private MediaOutputObject output;
     private JobParam jobParam;
     private String queueId;
+    private String queueType;
     private String userData;
     private String jobLevel;
     private String callBackFormat;
@@ -68,6 +69,14 @@ public class BatchJobOperation {
 
     public void setQueueId(String queueId) {
         this.queueId = queueId;
+    }
+
+    public String getQueueType() {
+        return queueType;
+    }
+
+    public void setQueueType(String queueType) {
+        this.queueType = queueType;
     }
 
     public String getUserData() {
@@ -148,6 +157,7 @@ public class BatchJobOperation {
         sb.append(", output=").append(output);
         sb.append(", jobParam=").append(jobParam);
         sb.append(", queueId='").append(queueId).append('\'');
+        sb.append(", queueType='").append(queueType).append('\'');
         sb.append(", userData='").append(userData).append('\'');
         sb.append(", jobLevel='").append(jobLevel).append('\'');
         sb.append(", callBackFormat='").append(callBackFormat).append('\'');
@@ -155,6 +165,7 @@ public class BatchJobOperation {
         sb.append(", callBack='").append(callBack).append('\'');
         sb.append(", callBackMqConfig='").append(callBackMqConfig).append('\'');
         sb.append(", callBackKafkaConfig='").append(callBackKafkaConfig).append('\'');
+        sb.append(", workflowIds='").append(workflowIds).append('\'');
         sb.append('}');
         return sb.toString();
     }

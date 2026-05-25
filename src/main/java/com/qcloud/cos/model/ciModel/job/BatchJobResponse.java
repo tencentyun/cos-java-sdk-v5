@@ -15,4 +15,12 @@ public class BatchJobResponse extends CiServiceResult {
     public void setJobDetail(BatchJobDetail jobDetail) {
         this.jobDetail = jobDetail;
     }
+
+    @Override
+    public String toString() {
+        return "BatchJobResponse{" +
+                "jobDetail=" + jobDetail +
+                ", requestId='" + getRequestId() + '\'' +
+                '}';
+    }
 }

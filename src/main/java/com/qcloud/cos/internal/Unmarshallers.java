@@ -49,13 +49,16 @@ import com.qcloud.cos.model.ciModel.image.ImageLabelV2Response;
 import com.qcloud.cos.model.ciModel.image.ImageSearchResponse;
 import com.qcloud.cos.model.ciModel.image.ImageStyleResponse;
 import com.qcloud.cos.model.ciModel.job.AIGCMetadataResponse;
+import com.qcloud.cos.model.ciModel.job.BatchJobListResponse;
 import com.qcloud.cos.model.ciModel.job.BatchJobResponse;
 import com.qcloud.cos.model.ciModel.job.DocJobListResponse;
 import com.qcloud.cos.model.ciModel.job.DocJobResponse;
+import com.qcloud.cos.model.ciModel.job.FileHashCodeSyncResponse;
 import com.qcloud.cos.model.ciModel.job.FileProcessJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaJobResponse;
 import com.qcloud.cos.model.ciModel.job.MediaListJobResponse;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoResponse;
+import com.qcloud.cos.model.ciModel.ai.CreateAIObjectDetectJobResponse;
 import com.qcloud.cos.model.ciModel.persistence.AIGameRecResponse;
 import com.qcloud.cos.model.ciModel.persistence.CIUploadResult;
 import com.qcloud.cos.model.ciModel.persistence.DetectCarResponse;
@@ -626,6 +629,15 @@ public class Unmarshallers {
         }
     }
 
+    public static final class BatchJobListUnmarshaller
+            implements Unmarshaller<BatchJobListResponse, InputStream> {
+
+        public BatchJobListResponse unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser()
+                    .parseBatchJobListResponse(in).getResponse();
+        }
+    }
+
 
     public static final class ListBucketUnmarshaller
             implements Unmarshaller<MediaBucketResponse, InputStream> {
@@ -840,6 +852,15 @@ public class Unmarshallers {
         }
     }
 
+    public static final class AIObjectDetectUnmarshaller
+            implements Unmarshaller<CreateAIObjectDetectJobResponse, InputStream> {
+
+        public CreateAIObjectDetectJobResponse unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser()
+                    .parseAIObjectDetectResponse(in).getResponse();
+        }
+    }
+
     public static final class SearchImagesUnmarshaller
             implements Unmarshaller<ImageSearchResponse, InputStream> {
 
@@ -998,6 +1019,15 @@ public class Unmarshallers {
     public static final class AigcMetadataUnmarshaller implements Unmarshaller<AIGCMetadataResponse, InputStream> {
         public AIGCMetadataResponse unmarshall(InputStream in) throws IOException {
             return new AigcMetadataJsonResponseHandler().getResponse(in);
+        }
+    }
+
+    public static final class FileHashCodeSyncResponseUnmarshaller
+            implements Unmarshaller<FileHashCodeSyncResponse, InputStream> {
+
+        public FileHashCodeSyncResponse unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser()
+                    .parseFileHashCodeSyncResponse(in).getResponse();
         }
     }
 }

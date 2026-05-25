@@ -66,6 +66,12 @@ public class SnapshotInfo {
     @XStreamAlias("SnapshotTime")
     private String snapshotTime;
 
+    /**
+     * OCR命中信息
+     */
+    @XStreamAlias("OcrHitInfos")
+    private OcrHitInfos ocrHitInfos;
+
     public String getUrl() {
         return url;
     }
@@ -158,6 +164,14 @@ public class SnapshotInfo {
         this.result = result;
     }
 
+    public OcrHitInfos getOcrHitInfos() {
+        return ocrHitInfos;
+    }
+
+    public void setOcrHitInfos(OcrHitInfos ocrHitInfos) {
+        this.ocrHitInfos = ocrHitInfos;
+    }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("SnapshotInfo{");
@@ -167,6 +181,7 @@ public class SnapshotInfo {
         sb.append(", politicsInfo=").append(politicsInfo);
         sb.append(", adsInfo=").append(adsInfo);
         sb.append(", text='").append(text).append('\'');
+        sb.append(", ocrHitInfos=").append(ocrHitInfos);
         sb.append('}');
         return sb.toString();
     }

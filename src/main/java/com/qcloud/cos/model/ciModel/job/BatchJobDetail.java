@@ -99,4 +99,20 @@ public class BatchJobDetail {
     public void setInput(BatchInputObject input) {
         this.input = input;
     }
+
+    @Override
+    public String toString() {
+        return "BatchJobDetail{" +
+                "input=" + input +
+                ", operation=" + operation +
+                ", name='" + name + '\'' +
+                ", type='" + type + '\'' +
+                ", code='" + code + '\'' +
+                ", message='" + message + '\'' +
+                ", jobId='" + jobId + '\'' +
+                ", state='" + state + '\'' +
+                ", creationTime='" + creationTime + '\'' +
+                ", endTime='" + endTime + '\'' +
+                '}';
+    }
 }

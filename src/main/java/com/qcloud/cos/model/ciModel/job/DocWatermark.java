@@ -5,6 +5,15 @@ public class DocWatermark {
     private String image;
     private String dx;
     private String dy;
+    private String srcType;
+
+    public String getSrcType() {
+        return srcType;
+    }
+
+    public void setSrcType(String srcType) {
+        this.srcType = srcType;
+    }
 
     public String getType() {
         return type;

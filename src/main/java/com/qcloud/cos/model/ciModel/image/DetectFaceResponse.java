@@ -9,6 +9,10 @@ public class DetectFaceResponse {
     private String imageHeight;
     private String faceModelVersion;
     private String requestId;
+    /**
+     * 识别情况，为1时表示识别到图片内有人脸，为0表示未在图片内识别到人脸。
+     */
+    private String status;
     private List<FaceInfo> faceInfos;
 
     public String getImageWidth() {
@@ -43,6 +47,14 @@ public class DetectFaceResponse {
         this.requestId = requestId;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
     public List<FaceInfo> getFaceInfo() {
         if (faceInfos == null) {
             faceInfos = new ArrayList<>();
@@ -61,6 +73,7 @@ public class DetectFaceResponse {
         sb.append(", imageHeight='").append(imageHeight).append('\'');
         sb.append(", faceModelVersion='").append(faceModelVersion).append('\'');
         sb.append(", requestId='").append(requestId).append('\'');
+        sb.append(", status='").append(status).append('\'');
         sb.append(", faceInfos=").append(faceInfos);
         sb.append('}');
         return sb.toString();

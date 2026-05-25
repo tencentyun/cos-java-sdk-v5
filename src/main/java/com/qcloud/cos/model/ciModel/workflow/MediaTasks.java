@@ -16,6 +16,9 @@ public class MediaTasks {
     @XStreamAlias("CreateTime")
     private String createTime;
 
+    @XStreamAlias("StartTime")
+    private String startTime;
+
     @XStreamAlias("EndTime")
     private String endTime;
 
@@ -51,6 +54,14 @@ public class MediaTasks {
 
     public void setCreateTime(String createTime) {
         this.createTime = createTime;
+    }
+
+    public String getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(String startTime) {
+        this.startTime = startTime;
     }
 
     public String getEndTime() {
@@ -141,6 +152,7 @@ public class MediaTasks {
                 ", state='" + state + '\'' +
                 ", jobId='" + jobId + '\'' +
                 ", createTime='" + createTime + '\'' +
+                ", startTime='" + startTime + '\'' +
                 ", endTime='" + endTime + '\'' +
                 ", code='" + code + '\'' +
                 ", message='" + message + '\'' +

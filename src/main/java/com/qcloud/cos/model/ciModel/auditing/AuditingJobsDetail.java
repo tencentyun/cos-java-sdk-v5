@@ -181,6 +181,9 @@ public class AuditingJobsDetail {
     @XStreamAlias("MaskInfo")
     private MaskInfo maskInfo;
 
+    @XStreamAlias("OcrHitInfos")
+    private OcrHitInfos ocrHitInfos;
+
     public MeaninglessInfo getMeaninglessInfo() {
         if (meaninglessInfo == null) {
             meaninglessInfo = new MeaninglessInfo();
@@ -474,6 +477,14 @@ public class AuditingJobsDetail {
         this.maskInfo = maskInfo;
     }
 
+    public OcrHitInfos getOcrHitInfos() {
+        return ocrHitInfos;
+    }
+
+    public void setOcrHitInfos(OcrHitInfos ocrHitInfos) {
+        this.ocrHitInfos = ocrHitInfos;
+    }
+
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("AuditingJobsDetail{");
@@ -506,6 +517,7 @@ public class AuditingJobsDetail {
         sb.append(", audioSection=").append(audioSection);
         sb.append(", userInfo=").append(userInfo);
         sb.append(", listInfo=").append(listInfo);
+        sb.append(", ocrHitInfos=").append(ocrHitInfos);
         sb.append('}');
         return sb.toString();
     }

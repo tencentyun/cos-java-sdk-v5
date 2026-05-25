@@ -84,6 +84,9 @@ public class ImagePersistenceDemo {
         PicOperations.Rule rule1 = new PicOperations.Rule();
         rule1.setBucket(bucketName);
         rule1.setFileId("test-1.jpg");
+        
+        // 构建AIGC元数据规则
+        // 注意：所有参数值需要进行Base64编码，Label参数是必填的，其他参数为可选
         String label = Base64.getUrlEncoder().withoutPadding().encodeToString("label".getBytes(StandardCharsets.UTF_8));
         String contentProducer = Base64.getUrlEncoder().withoutPadding().encodeToString("content_producer".getBytes(StandardCharsets.UTF_8));
         String produceId = Base64.getUrlEncoder().withoutPadding().encodeToString("produce_id".getBytes(StandardCharsets.UTF_8));
@@ -99,6 +102,7 @@ public class ImagePersistenceDemo {
                 + "/ReservedCode2/" + reservedCode2
                 + "/PropagateID/" + propagateId
                 + "/ContentPropagator/" + contentPropagator;
+        
         rule1.setRule(rule);
         ruleList.add(rule1);
         PicOperations.Rule rule2 = new PicOperations.Rule();
@@ -254,7 +258,7 @@ public class ImagePersistenceDemo {
     }
 
     /**
-     * 云上图片处理
+     * 云上图片处理 - 带AIGC元数据
      */
     public static void persistenceImagePostWithAigcMetadata(COSClient cosClient) {
         String bucketName = "examplebucket-1250000000";
@@ -267,6 +271,9 @@ public class ImagePersistenceDemo {
         PicOperations.Rule rule1 = new PicOperations.Rule();
         rule1.setBucket(bucketName);
         rule1.setFileId("test-1.jpg");
+
+        // 手动构建AIGC元数据规则
+        // 注意：所有参数值需要进行Base64编码，Label参数是必填的，其他参数为可选
         String label = Base64.getUrlEncoder().withoutPadding().encodeToString("label".getBytes(StandardCharsets.UTF_8));
         String contentProducer = Base64.getUrlEncoder().withoutPadding().encodeToString("content_producer".getBytes(StandardCharsets.UTF_8));
         String produceId = Base64.getUrlEncoder().withoutPadding().encodeToString("produce_id".getBytes(StandardCharsets.UTF_8));
@@ -282,6 +289,7 @@ public class ImagePersistenceDemo {
                 + "/ReservedCode2/" + reservedCode2
                 + "/PropagateID/" + propagateId
                 + "/ContentPropagator/" + contentPropagator;
+
         rule1.setRule(rule);
         ruleList.add(rule1);
         PicOperations.Rule rule2 = new PicOperations.Rule();

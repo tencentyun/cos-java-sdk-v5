@@ -29,6 +29,7 @@ public class ImageAuditingResponse extends CosServiceResult {
     private TeenagerInfo teenagerInfo = new TeenagerInfo();
     private UserInfo userInfo = new UserInfo();
     private ListInfo listInfo = new ListInfo();
+    private OcrHitInfos ocrHitInfos;
 
     public String getJobId() {
         return jobId;
@@ -226,6 +227,14 @@ public class ImageAuditingResponse extends CosServiceResult {
         this.forbidState = forbidState;
     }
 
+    public OcrHitInfos getOcrHitInfos() {
+        return ocrHitInfos;
+    }
+
+    public void setOcrHitInfos(OcrHitInfos ocrHitInfos) {
+        this.ocrHitInfos = ocrHitInfos;
+    }
+
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("ImageAuditingResponse{");
@@ -252,6 +261,7 @@ public class ImageAuditingResponse extends CosServiceResult {
         sb.append(", teenagerInfo=").append(teenagerInfo);
         sb.append(", userInfo=").append(userInfo);
         sb.append(", listInfo=").append(listInfo);
+        sb.append(", ocrHitInfos=").append(ocrHitInfos);
         sb.append('}');
         return sb.toString();
     }

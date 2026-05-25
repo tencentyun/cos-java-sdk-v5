@@ -27,6 +27,11 @@ public class MediaWorkflowExecutionObject {
     @XStreamAlias("WorkflowName")
     private String workflowName;
     /**
+     * 工作流名称
+     */
+    @XStreamAlias("Name")
+    private String name;
+    /**
      * 工作流实例状态
      */
     @XStreamAlias("State")
@@ -74,6 +79,14 @@ public class MediaWorkflowExecutionObject {
 
     public void setWorkflowName(String workflowName) {
         this.workflowName = workflowName;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getState() {
@@ -128,6 +141,7 @@ public class MediaWorkflowExecutionObject {
                 "runId='" + runId + '\'' +
                 ", workflowId='" + workflowId + '\'' +
                 ", workflowName='" + workflowName + '\'' +
+                ", name='" + name + '\'' +
                 ", state='" + state + '\'' +
                 ", createTime='" + createTime + '\'' +
                 ", object='" + object + '\'' +

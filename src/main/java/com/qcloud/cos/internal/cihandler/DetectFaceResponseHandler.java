@@ -37,6 +37,9 @@ public class DetectFaceResponseHandler extends CIAbstractHandler {
                 case "RequestId":
                     response.setRequestId(getText());
                     break;
+                case "Status":
+                    response.setStatus(getText());
+                    break;
                 default:
                     break;
             }
@@ -58,6 +61,9 @@ public class DetectFaceResponseHandler extends CIAbstractHandler {
                     break;
                 case "Height":
                     info.setHeight(getText());
+                    break;
+                case "Score":
+                    info.setScore(getText());
                     break;
                 default:
                     break;

@@ -21,6 +21,9 @@ public class ImageOCRResponse extends CosServiceResult {
     @XStreamAlias("PdfPageSize")
     private Integer pdfPageSize; // PDF的总页数
 
+    @XStreamAlias("RequestId")
+    private String requestId; // 唯一请求 ID，每次请求都会返回。定位问题时需要提供该次请求的 RequestId
+
     public List<TextDetection> getTextDetections() {
         return textDetections;
     }
@@ -51,5 +54,13 @@ public class ImageOCRResponse extends CosServiceResult {
 
     public void setPdfPageSize(Integer pdfPageSize) {
         this.pdfPageSize = pdfPageSize;
+    }
+
+    public String getRequestId() {
+        return requestId;
+    }
+
+    public void setRequestId(String requestId) {
+        this.requestId = requestId;
     }
 }

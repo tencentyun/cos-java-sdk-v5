@@ -1,5 +1,7 @@
 package com.qcloud.cos.model.ciModel.job;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
 import com.qcloud.cos.model.ciModel.mediaInfo.MediaInfoObjcet;
 import com.qcloud.cos.model.ciModel.template.MediaSegmentObject;
@@ -15,7 +17,7 @@ import java.util.List;
 /**
  * 媒体处理 operation实体 https://cloud.tencent.com/document/product/460/48234
  */
-
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class MediaJobOperation {
     @XStreamAlias("TemplateId")
     private String templateId;
@@ -300,6 +302,7 @@ public class MediaJobOperation {
         this.extractDigitalWatermark = extractDigitalWatermark;
     }
 
+    @JsonIgnore
     public MediaSnapshotObject getSnapshot() {
         if (snapshot == null) {
             snapshot = new MediaSnapshotObject();
@@ -311,6 +314,7 @@ public class MediaJobOperation {
         this.snapshot = snapshot;
     }
 
+    @JsonIgnore
     public MediaSegmentObject getSegment() {
         if (segment == null) {
             segment = new MediaSegmentObject();
@@ -431,6 +435,7 @@ public class MediaJobOperation {
         this.videoTargetRec = videoTargetRec;
     }
 
+    @JsonIgnore
     public VoiceSeparate getVoiceSeparate() {
         if (voiceSeparate == null) {
             voiceSeparate = new VoiceSeparate();

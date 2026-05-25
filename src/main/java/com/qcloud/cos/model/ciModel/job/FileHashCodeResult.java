@@ -18,10 +18,7 @@ public class FileHashCodeResult {
     @XStreamAlias("LastModified")
     private String lastModified;
 
-    /**
-     * HTTP1.1规定 ETag需要放在双引号内 该值内容为"xxxxxx"
-     */
-    @XStreamAlias("ETag")
+    @XStreamAlias("Etag")
     private String etag;
 
     public String getMd5() {

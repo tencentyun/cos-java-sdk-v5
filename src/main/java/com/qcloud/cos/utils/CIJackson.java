@@ -19,25 +19,19 @@
 package com.qcloud.cos.utils;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
-import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.internal.CosServiceRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
-import java.util.Collection;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 public enum CIJackson {
@@ -50,7 +44,7 @@ public enum CIJackson {
         objectMapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
-        objectMapper.setPropertyNamingStrategy(PropertyNamingStrategy.UPPER_CAMEL_CASE);
+        objectMapper.setPropertyNamingStrategy(PropertyNamingStrategies.UPPER_CAMEL_CASE);
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         SimpleBeanPropertyFilter filter = SimpleBeanPropertyFilter.serializeAllExcept(getFieldsToFilter(CosServiceRequest.class));
         FilterProvider filters = new SimpleFilterProvider().addFilter("CosServiceFilter", filter);

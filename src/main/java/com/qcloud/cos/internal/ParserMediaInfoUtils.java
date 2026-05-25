@@ -6,14 +6,17 @@ import com.qcloud.cos.model.ciModel.auditing.AuditingLiveInfo;
 import com.qcloud.cos.model.ciModel.auditing.AuditingRecordInfo;
 import com.qcloud.cos.model.ciModel.auditing.AudtingCommonInfo;
 import com.qcloud.cos.model.ciModel.auditing.BatchImageJobDetail;
+import com.qcloud.cos.model.ciModel.auditing.HitInfo;
 import com.qcloud.cos.model.ciModel.auditing.LanguageResult;
 import com.qcloud.cos.model.ciModel.auditing.LibResult;
 import com.qcloud.cos.model.ciModel.auditing.ListResult;
 import com.qcloud.cos.model.ciModel.auditing.ObjectResults;
 import com.qcloud.cos.model.ciModel.auditing.OcrResults;
+import com.qcloud.cos.model.ciModel.auditing.OcrHitInfos;
 import com.qcloud.cos.model.ciModel.auditing.PoliticsInfoObjectResults;
 import com.qcloud.cos.model.ciModel.auditing.SectionInfo;
 import com.qcloud.cos.model.ciModel.auditing.SnapshotInfo;
+import com.qcloud.cos.model.ciModel.auditing.TextPosition;
 import com.qcloud.cos.model.ciModel.auditing.UserInfo;
 import com.qcloud.cos.model.ciModel.common.BatchInputObject;
 import com.qcloud.cos.model.ciModel.common.MediaOutputObject;
@@ -147,12 +150,16 @@ public class ParserMediaInfoUtils {
                 break;
             case "Bitrate":
                 video.setBitrate(value);
+                break;
             case "Language":
                 video.setLanguage(value);
+                break;
             case "NumFrames":
                 video.setNumFrames(value);
+                break;
             case "CreationTime":
                 video.setCreationTime(value);
+                break;
             default:
                 break;
         }
@@ -1665,6 +1672,64 @@ public class ParserMediaInfoUtils {
                 break;
             case "Confidence":
                 mediaTags.setConfidence(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    /**
+     * 解析 OcrHitInfos 节点的 Text 字段
+     */
+    public static void parseOcrHitInfos(OcrHitInfos ocrHitInfos, String name, String value) {
+        if (ocrHitInfos == null) return;
+        switch (name) {
+            case "Text":
+                ocrHitInfos.setText(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    /**
+     * 解析 OcrHitInfos -> HitInfos 子节点中的 HitInfo 字段
+     */
+    public static void parseOcrHitInfo(List<HitInfo> hitInfos, String name, String value) {
+        if (hitInfos == null || hitInfos.isEmpty()) return;
+        HitInfo hitInfo = hitInfos.get(hitInfos.size() - 1);
+        switch (name) {
+            case "Type":
+                hitInfo.setType(value);
+                break;
+            case "Keywords":
+            case "Keyword":
+                hitInfo.setKeyword(value);
+                break;
+            case "LibName":
+            case "Libname":
+                hitInfo.setLibName(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    /**
+     * 解析 OcrHitInfos -> HitInfos -> Positions 子节点
+     */
+    public static void parseOcrHitInfoPosition(List<HitInfo> hitInfos, String name, String value) {
+        if (hitInfos == null || hitInfos.isEmpty()) return;
+        HitInfo hitInfo = hitInfos.get(hitInfos.size() - 1);
+        List<TextPosition> positions = hitInfo.getPositions();
+        if (positions == null || positions.isEmpty()) return;
+        TextPosition position = positions.get(positions.size() - 1);
+        switch (name) {
+            case "Start":
+                position.setStart(string2int(value));
+                break;
+            case "End":
+                position.setEnd(string2int(value));
                 break;
             default:
                 break;
