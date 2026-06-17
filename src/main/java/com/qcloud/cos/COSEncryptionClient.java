@@ -49,6 +49,7 @@ import com.qcloud.cos.model.PutObjectRequest;
 import com.qcloud.cos.model.PutObjectResult;
 import com.qcloud.cos.model.UploadPartRequest;
 import com.qcloud.cos.model.UploadPartResult;
+import com.tencentcloudapi.common.profile.ClientProfile;
 
 public class COSEncryptionClient extends COSClient implements COSEncryption {
 
@@ -67,6 +68,12 @@ public class COSEncryptionClient extends COSClient implements COSEncryption {
         this(null, credentialsProvider, kekMaterialsProvider, clientConfig, cryptoConfig);
     }
 
+    public COSEncryptionClient(COSCredentialsProvider credentialsProvider,
+            EncryptionMaterialsProvider kekMaterialsProvider, ClientConfig clientConfig,
+            CryptoConfiguration cryptoConfig,ClientProfile clientProfile) {
+        this(null, credentialsProvider, kekMaterialsProvider, clientConfig, cryptoConfig, clientProfile);
+    }
+
     public COSEncryptionClient(QCLOUDKMS kms, COSCredentialsProvider credentialsProvider,
             EncryptionMaterialsProvider kekMaterialsProvider, ClientConfig clientConfig,
             CryptoConfiguration cryptoConfig) {
@@ -81,6 +88,20 @@ public class COSEncryptionClient extends COSClient implements COSEncryption {
                 kekMaterialsProvider, cryptoConfig);
     }
 
+    public COSEncryptionClient(QCLOUDKMS kms, COSCredentialsProvider credentialsProvider,
+            EncryptionMaterialsProvider kekMaterialsProvider, ClientConfig clientConfig,
+            CryptoConfiguration cryptoConfig, ClientProfile clientProfile) {
+        super(credentialsProvider.getCredentials(), clientConfig);
+        assertParameterNotNull(kekMaterialsProvider,
+                        "EncryptionMaterialsProvider parameter must not be null.");
+        assertParameterNotNull(cryptoConfig, "CryptoConfiguration parameter must not be null.");
+        this.isKMSClientInternal = kms == null;
+        this.kms = isKMSClientInternal ?
+                        newTencentCloudKMSClient(credentialsProvider, clientConfig, cryptoConfig, clientProfile) : kms;
+        this.crypto = new CryptoModuleDispatcher(this.kms, new COSDirectImpl(), credentialsProvider,
+                        kekMaterialsProvider, cryptoConfig);
+    }
+
     private TencentCloudKMSClient newTencentCloudKMSClient(
             COSCredentialsProvider credentialsProvider,
             ClientConfig clientConfig,
@@ -91,6 +112,21 @@ public class COSEncryptionClient extends COSClient implements COSEncryption {
         }
 
         final TencentCloudKMSClient kmsClient = new TencentCloudKMSClient(credentialsProvider, region);
+
+        return kmsClient;
+    }
+
+    private TencentCloudKMSClient newTencentCloudKMSClient(
+            COSCredentialsProvider credentialsProvider,
+            ClientConfig clientConfig,
+            CryptoConfiguration cryptoConfig,
+            ClientProfile clientProfile) {
+        String region = cryptoConfig.getKmsRegion();
+        if (region == null) {
+            region = clientConfig.getRegion().getRegionName();
+        }
+
+        final TencentCloudKMSClient kmsClient = new TencentCloudKMSClient(credentialsProvider, region, clientProfile);
 
         return kmsClient;
     }
