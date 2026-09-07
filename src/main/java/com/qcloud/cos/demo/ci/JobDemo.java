@@ -5,6 +5,7 @@ import com.qcloud.cos.model.ciModel.job.*;
 import com.qcloud.cos.model.ciModel.job.v2.MediaJobOperation;
 import com.qcloud.cos.model.ciModel.job.v2.MediaJobResponseV2;
 import com.qcloud.cos.model.ciModel.job.v2.MediaJobsRequestV2;
+import com.qcloud.cos.model.ciModel.template.MediaSmartCoverObject;
 import com.qcloud.cos.model.ciModel.template.MediaWaterMarkText;
 import com.qcloud.cos.model.ciModel.template.MediaWatermark;
 
@@ -140,21 +141,7 @@ public class JobDemo {
         request.getInput().setObject("2.mp4");
         //2.1添加媒体任务操作参数
         MediaJobOperation operation = request.getOperation();
-        MediaWatermark watermark = operation.getWatermark();
-        watermark.setType("Text");
-        watermark.setLocMode("Absolute");
-        watermark.setDx("10");
-        watermark.setDy("10");
-        watermark.setPos("Pos");
-        watermark.setPos("TopRight");
-        watermark.setStartTime("0");
-        watermark.setEndTime("100.5");
-        MediaWaterMarkText text = watermark.getText();
-        text.setFontType("simfang.ttf");
-        text.setText("水印内容");
-        text.setFontSize("30");
-        text.setFontColor("0xFF0000");
-        text.setTransparency("30");
+//        operation.setCustomId("t11282671b1a0846a9be6b438563*****");
         MediaTranscodeObject transcode = operation.getTranscode();
         MediaContainerObject container = transcode.getContainer();
         container.setFormat("mp4");
@@ -165,9 +152,12 @@ public class JobDemo {
         video.setWidth("1280");
         video.setFps("30");
         video.setPreset("medium");
-        video.setBufSize("0");
         video.setMaxrate("50000");
-
+        MediaVideoColorParam colorParam = video.getColorParam();
+        colorParam.setColorRange("tv");
+        colorParam.setColorSpace("bt709");
+        colorParam.setColorTrc("bt709");
+        colorParam.setColorPrimaries("bt709");
         MediaAudioObject audio = transcode.getAudio();
         audio.setCodec("aac");
         audio.setSamplerate("44100");
@@ -185,7 +175,8 @@ public class JobDemo {
 
         operation.getOutput().setBucket("demo-1234567890");
         operation.getOutput().setRegion("ap-chongqing");
-        operation.getOutput().setObject("result.mp4");
+        operation.getOutput().setObject("result/1.mp4");
+        request.setCallBack("https://cloud.tencent.com/xxx");
         //3.调用接口,获取任务响应对象
         MediaJobResponseV2 response = client.createMediaJobsV2(request);
         System.out.println(response.getJobsDetail().getJobId());

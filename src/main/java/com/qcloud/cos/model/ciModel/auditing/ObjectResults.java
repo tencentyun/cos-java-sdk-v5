@@ -7,6 +7,9 @@ package com.qcloud.cos.model.ciModel.auditing;
 public class ObjectResults {
     private String name;
     private String keywords;
+    // 命中的二级标签（如 SexyBaby / Terrorist_pistol 等），
+    // 视频审核 Snapshot/*Info/ObjectResults 下会返回。
+    private String subLabel;
     private Location location = new Location();
 
     public class Location {
@@ -91,5 +94,13 @@ public class ObjectResults {
 
     public void setKeywords(String keywords) {
         this.keywords = keywords;
+    }
+
+    public String getSubLabel() {
+        return subLabel;
+    }
+
+    public void setSubLabel(String subLabel) {
+        this.subLabel = subLabel;
     }
 }

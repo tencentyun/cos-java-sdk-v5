@@ -31,6 +31,7 @@ import com.qcloud.cos.model.ciModel.job.MediaTimeIntervalObject;
 import com.qcloud.cos.model.ciModel.job.MediaTransConfigObject;
 import com.qcloud.cos.model.ciModel.job.MediaTranscodeObject;
 import com.qcloud.cos.model.ciModel.job.MediaTranscodeVideoObject;
+import com.qcloud.cos.model.ciModel.job.MediaVideoColorParam;
 import com.qcloud.cos.model.ciModel.job.MediaTtsConfig;
 import com.qcloud.cos.model.ciModel.job.MediaVideoObject;
 import com.qcloud.cos.model.ciModel.job.MsSharpen;
@@ -489,12 +490,14 @@ public class CIMediaXmlFactory {
             addIfNotNull(xml, "DirectMix", audioMix.getDirectMix());
             EffectConfig effectConfig = audioMix.getEffectConfig();
             if (objIsNotValid(effectConfig)) {
-                addIfNotNull(xml, "BgmFadeTime", effectConfig.getBgmFadeTime());
-                addIfNotNull(xml, "EnableBgmFade", effectConfig.getEnableBgmFade());
-                addIfNotNull(xml, "EnableEndFadeout", effectConfig.getEnableEndFadeout());
+                xml.start("EffectConfig");
                 addIfNotNull(xml, "EnableStartFadein", effectConfig.getEnableStartFadein());
-                addIfNotNull(xml, "EndFadeoutTime", effectConfig.getEndFadeoutTime());
                 addIfNotNull(xml, "StartFadeinTime", effectConfig.getStartFadeinTime());
+                addIfNotNull(xml, "EnableEndFadeout", effectConfig.getEnableEndFadeout());
+                addIfNotNull(xml, "EndFadeoutTime", effectConfig.getEndFadeoutTime());
+                addIfNotNull(xml, "EnableBgmFade", effectConfig.getEnableBgmFade());
+                addIfNotNull(xml, "BgmFadeTime", effectConfig.getBgmFadeTime());
+                xml.end();
             }
             xml.end();
         }
@@ -758,7 +761,27 @@ public class CIMediaXmlFactory {
         addIfNotNull(xml, "Remove", video.getRemove());
         addIfNotNull(xml, "ScanMode", video.getScanMode());
         addIfNotNull(xml, "Pixfmt", video.getPixfmt());
+        addIfNotNull(xml, "LongShortMode", video.getLongShortMode());
+        addIfNotNull(xml, "Rotate", video.getRotate());
+        addIfNotNull(xml, "Interlaced", video.getInterlaced());
+        addIfNotNull(xml, "Crop", video.getCrop());
+        addIfNotNull(xml, "Roi", video.getRoi());
+        addIfNotNull(xml, "Pad", video.getPad());
+        addIfNotNull(xml, "Quality", video.getQuality());
+        addIfNotNull(xml, "HlsTsTime", video.getHlsTsTime());
+        addColorParam(xml, video.getColorParam());
         xml.end();
+    }
+
+    private static void addColorParam(XmlWriter xml, MediaVideoColorParam colorParam) {
+        if (objIsNotValid(colorParam)) {
+            xml.start("ColorParam");
+            addIfNotNull(xml, "ColorSpace", colorParam.getColorSpace());
+            addIfNotNull(xml, "ColorRange", colorParam.getColorRange());
+            addIfNotNull(xml, "ColorTrc", colorParam.getColorTrc());
+            addIfNotNull(xml, "ColorPrimaries", colorParam.getColorPrimaries());
+            xml.end();
+        }
     }
 
     private static void addAudio(XmlWriter xml, MediaAudioObject audio) {
@@ -770,6 +793,10 @@ public class CIMediaXmlFactory {
             addIfNotNull(xml, "Profile", audio.getProfile());
             addIfNotNull(xml, "Remove", audio.getRemove());
             addIfNotNull(xml, "Samplerate", audio.getSamplerate());
+            addIfNotNull(xml, "KeepAllTracks", audio.getKeepAllTracks());
+            addIfNotNull(xml, "KeepTwoTracks", audio.getKeepTwoTracks());
+            addIfNotNull(xml, "SwitchTrack", audio.getSwitchTrack());
+            addIfNotNull(xml, "SampleFormat", audio.getSampleFormat());
             xml.end();
         }
     }
@@ -803,6 +830,20 @@ public class CIMediaXmlFactory {
                 addIfNotNull(xml, "UriKey", hlsEncrypt.getUriKey());
                 xml.end();
             }
+            HlsEncrypt dashEncrypt = transConfig.getDashEncrypt();
+            if (objIsNotValid(dashEncrypt)) {
+                xml.start("DashEncrypt");
+                addIfNotNull(xml, "IsEncrypt", dashEncrypt.getIsEncrypt());
+                addIfNotNull(xml, "UriKey", dashEncrypt.getUriKey());
+                xml.end();
+            }
+            addIfNotNull(xml, "IsCheckVideoFps", transConfig.getIsCheckVideoFps());
+            addIfNotNull(xml, "VideoFpsAdjMethod", transConfig.getVideoFpsAdjMethod());
+            addIfNotNull(xml, "IsCheckAudioChannel", transConfig.getIsCheckAudioChannel());
+            addIfNotNull(xml, "IsStreamCopy", transConfig.getIsStreamCopy());
+            addIfNotNull(xml, "InitialClipNum", transConfig.getInitialClipNum());
+            addIfNotNull(xml, "CosTag", transConfig.getCosTag());
+            addIfNotNull(xml, "TranscodeIndex", transConfig.getTranscodeIndex());
             addAigcMetadata(xml, transConfig.getAigcMetadata());
             xml.end();
         }

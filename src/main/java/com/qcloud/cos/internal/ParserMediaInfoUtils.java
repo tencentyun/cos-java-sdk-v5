@@ -12,6 +12,7 @@ import com.qcloud.cos.model.ciModel.auditing.LibResult;
 import com.qcloud.cos.model.ciModel.auditing.ListResult;
 import com.qcloud.cos.model.ciModel.auditing.ObjectResults;
 import com.qcloud.cos.model.ciModel.auditing.OcrResults;
+import com.qcloud.cos.model.ciModel.auditing.Location;
 import com.qcloud.cos.model.ciModel.auditing.OcrHitInfos;
 import com.qcloud.cos.model.ciModel.auditing.PoliticsInfoObjectResults;
 import com.qcloud.cos.model.ciModel.auditing.SectionInfo;
@@ -688,6 +689,18 @@ public class ParserMediaInfoUtils {
             case "Type":
                 userInfo.setType(value);
                 break;
+            case "ReceiveTokenId":
+                userInfo.setReceiveTokenId(value);
+                break;
+            case "Gender":
+                userInfo.setGender(value);
+                break;
+            case "Level":
+                userInfo.setLevel(value);
+                break;
+            case "Role":
+                userInfo.setRole(value);
+                break;
             default:
                 break;
         }
@@ -723,6 +736,17 @@ public class ParserMediaInfoUtils {
             case "Score":
                 result.setScore(value);
                 break;
+            case "LibType":
+                result.setLibType(value);
+                break;
+            case "LibName":
+                result.setLibName(value);
+                break;
+            case "Keywords":
+                // 音频审核 AudioSection.*Info.LibResults.Keywords 为可重复出现的多值节点，
+                // 采用 append 方式，避免后一次覆盖前一次。
+                result.getKeywords().add(value);
+                break;
             default:
                 break;
         }
@@ -749,7 +773,9 @@ public class ParserMediaInfoUtils {
                 obj.setCategory(value);
                 break;
             case "Keywords":
+                // 兼容：单值 keywords 仍写入（记录最后一次值）；同时 append 到 keywordsList 支持多值。
                 obj.setKeywords(value);
+                obj.getKeywordsList().add(value);
                 break;
             case "Count":
                 obj.setCount(value);
@@ -770,11 +796,107 @@ public class ParserMediaInfoUtils {
                     ocrResults.setText(value);
                     break;
                 case "Keywords":
+                    // 兼容：单值 keywords 仍写入（记录最后一次值）；同时 append 到 keywordsList 支持多值。
                     ocrResults.setKeywords(value);
+                    ocrResults.getKeywordsList().add(value);
                     break;
                 default:
                     break;
             }
+        }
+    }
+
+    /**
+     * 解析 OcrResults.Location 的子字段（X/Y/Width/Height/Rotate）。
+     * 若父 OcrResults 尚未创建 Location，会自动初始化一个。
+     */
+    public static void parseLocation(OcrResults ocrResults, String name, String value) {
+        if (ocrResults == null) {
+            return;
+        }
+        Location location = ocrResults.getLocation();
+        if (location == null) {
+            location = new Location();
+            ocrResults.setLocation(location);
+        }
+        switch (name) {
+            case "X":
+                location.setX(value);
+                break;
+            case "Y":
+                location.setY(value);
+                break;
+            case "Width":
+                location.setWidth(value);
+                break;
+            case "Height":
+                location.setHeight(value);
+                break;
+            case "Rotate":
+                location.setRotate(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    /**
+     * 解析视频审核 Snapshot/*Info/ObjectResults 或顶层 *Info/ObjectResults 的直接子字段。
+     * 目标为 obj 列表的最后一个元素（起始标签由 Handler 侧 push）。
+     * 覆盖字段：Name / SubLabel / Keywords。
+     */
+    public static void parseObjectResults(List<ObjectResults> obj, String name, String value) {
+        if (obj == null || obj.isEmpty()) {
+            return;
+        }
+        ObjectResults last = obj.get(obj.size() - 1);
+        switch (name) {
+            case "Name":
+                last.setName(value);
+                break;
+            case "SubLabel":
+                last.setSubLabel(value);
+                break;
+            case "Keywords":
+                last.setKeywords(value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    /**
+     * 解析视频审核 Snapshot/*Info/ObjectResults/Location 的坐标字段（X/Y/Width/Height/Rotate）。
+     * 目标为 obj 列表最后一个元素的 Location（若尚未创建则自动初始化）。
+     */
+    public static void parseObjectResultsLocation(List<ObjectResults> obj, String name, String value) {
+        if (obj == null || obj.isEmpty()) {
+            return;
+        }
+        ObjectResults last = obj.get(obj.size() - 1);
+        ObjectResults.Location location = last.getLocation();
+        if (location == null) {
+            location = last.new Location();
+            last.setLocation(location);
+        }
+        switch (name) {
+            case "X":
+                location.setX(value);
+                break;
+            case "Y":
+                location.setY(value);
+                break;
+            case "Width":
+                location.setWidth(value);
+                break;
+            case "Height":
+                location.setHeight(value);
+                break;
+            case "Rotate":
+                location.setRotate(value);
+                break;
+            default:
+                break;
         }
     }
 
@@ -839,6 +961,9 @@ public class ParserMediaInfoUtils {
             case "Label":
                 snapshotInfo.setLabel(value);
                 break;
+            case "SubLabel":
+                snapshotInfo.setSubLabel(value);
+                break;
             case "Result":
                 snapshotInfo.setResult(value);
                 break;
@@ -860,6 +985,9 @@ public class ParserMediaInfoUtils {
                 break;
             case "Label":
                 audioSectionInfo.setLabel(value);
+                break;
+            case "SubLabel":
+                audioSectionInfo.setSubLabel(value);
                 break;
             case "Result":
                 audioSectionInfo.setResult(value);

@@ -18,7 +18,11 @@ public class DeleteDatasetBindingRequest extends CIServiceRequest {
     private String datasetName;
 
     /**
-     *资源标识字段，表示需要与数据集绑定的资源，当前仅支持COS存储桶，字段规则：cos://<BucketName>，其中BucketName表示COS存储桶名称，例如：cos://examplebucket-1250000000;是否必传：是
+     * 资源标识字段，表示需要与数据集绑定的资源，当前支持 COS 存储桶及桶内的目录，可添加 prefix 进行目录绑定；
+     * 字段规则：{@code cos://<BucketName>/prefix}，其中 BucketName 表示 COS 存储桶名称，
+     * 例如：{@code cos://examplebucket-1250000000}，可直接绑定某存储桶；
+     * 亦可以添加 prefix，prefix 代表了某个路径，例如：{@code cos://examplebucket-1250000000/test_data}。
+     * 是否必传：是
      */
     @JsonProperty("URI")
     private String uRI;

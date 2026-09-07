@@ -231,6 +231,9 @@ public class MediaTransConfigObject implements Serializable {
     }
 
     public HlsEncrypt getDashEncrypt() {
+        if (dashEncrypt == null) {
+            dashEncrypt = new HlsEncrypt();
+        }
         return dashEncrypt;
     }
 

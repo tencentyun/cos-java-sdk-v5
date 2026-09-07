@@ -17,7 +17,10 @@ public class DescribeDatasetRequest extends CIServiceRequest {
     private String datasetname;
 
     /**
-     *是否需要实时统计数据集中文件相关信息。有效值： false：不统计，返回的文件的总大小、数量信息可能不正确也可能都为0。 true：需要统计，返回数据集中当前的文件的总大小、数量信息。 默认值为false。;是否必传：否
+     * 该参数用于指定是否需要立即统计一次数据集中最新的文件数量、大小等数据，参数有效值如下，默认值为 false。
+     * false：不立即统计，接口返回的文件总大小、数量等数据存在10分钟的延迟。
+     * true：立即统计，接口返回的文件总大小、数量等统计数据为实时统计的，统计实时数据需要一定时间，请耐心等待。
+     * 是否必传：否
      */
     private boolean statistics;
 

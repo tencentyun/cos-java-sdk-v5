@@ -42,9 +42,18 @@ public class AudtingCommonInfo {
 
     /**
      * 在当前审核场景下命中的关键词，多关键词以,分隔。
+     * 兼容旧版本：保留单值字段，值为最后一次出现的 &lt;Keywords&gt; 节点内容。
      */
     @XStreamAlias("Keywords")
     private String keywords;
+
+    /**
+     * 在当前审核场景下命中的关键词列表（多值），对应 XML 中重复出现的 &lt;Keywords&gt; 节点。
+     * 新增字段：文档中 Keywords 在部分审核维度下为 String Array，SDK 用 List 承载完整值，
+     * 避免因多值 Keywords 相互覆盖导致数据丢失。
+     */
+    @XStreamImplicit(itemFieldName = "Keywords")
+    private List<String> keywordsList;
 
     /**
      * 次数
@@ -174,6 +183,17 @@ public class AudtingCommonInfo {
         this.keywords = keywords;
     }
 
+    public List<String> getKeywordsList() {
+        if (keywordsList == null) {
+            keywordsList = new ArrayList<String>();
+        }
+        return keywordsList;
+    }
+
+    public void setKeywordsList(List<String> keywordsList) {
+        this.keywordsList = keywordsList;
+    }
+
     public String getCategory() {
         return category;
     }
@@ -202,6 +222,7 @@ public class AudtingCommonInfo {
         sb.append(", score='").append(score).append('\'');
         sb.append(", label='").append(label).append('\'');
         sb.append(", keywords='").append(keywords).append('\'');
+        sb.append(", keywordsList=").append(keywordsList);
         sb.append(", count='").append(count).append('\'');
         sb.append(", subLabel='").append(subLabel).append('\'');
         sb.append(", ocrResults=").append(ocrResults);

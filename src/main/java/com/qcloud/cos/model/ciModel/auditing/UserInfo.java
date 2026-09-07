@@ -140,6 +140,10 @@ public class UserInfo {
         sb.append(", room='").append(room).append('\'');
         sb.append(", ip='").append(ip).append('\'');
         sb.append(", type='").append(type).append('\'');
+        sb.append(", receiveTokenId='").append(receiveTokenId).append('\'');
+        sb.append(", gender='").append(gender).append('\'');
+        sb.append(", level='").append(level).append('\'');
+        sb.append(", role='").append(role).append('\'');
         sb.append('}');
         return sb.toString();
     }

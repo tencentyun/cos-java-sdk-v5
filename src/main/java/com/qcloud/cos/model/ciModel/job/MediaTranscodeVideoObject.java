@@ -67,7 +67,7 @@ public class MediaTranscodeVideoObject extends MediaVideoCommon {
     private String rotate;
 
     @XStreamAlias("ColorParam")
-    private String colorParam;
+    private MediaVideoColorParam colorParam;
 
     @XStreamAlias("Interlaced")
     private String interlaced;
@@ -77,6 +77,24 @@ public class MediaTranscodeVideoObject extends MediaVideoCommon {
 
     @XStreamAlias("Roi")
     private String roi;
+
+    /**
+     * 视频贴黑边，参数格式:{width}:{height}:{left}:{top}
+     */
+    @XStreamAlias("Pad")
+    private String pad;
+
+    /**
+     * 设置相对质量
+     */
+    @XStreamAlias("Quality")
+    private String quality;
+
+    /**
+     * hls 分片时间，单位为秒
+     */
+    @XStreamAlias("HlsTsTime")
+    private String hlsTsTime;
 
     public String getRemove() {
         return remove;
@@ -175,11 +193,14 @@ public class MediaTranscodeVideoObject extends MediaVideoCommon {
         this.rotate = rotate;
     }
 
-    public String getColorParam() {
+    public MediaVideoColorParam getColorParam() {
+        if (colorParam == null){
+            colorParam = new MediaVideoColorParam();
+        }
         return colorParam;
     }
 
-    public void setColorParam(String colorParam) {
+    public void setColorParam(MediaVideoColorParam colorParam) {
         this.colorParam = colorParam;
     }
 
@@ -207,6 +228,30 @@ public class MediaTranscodeVideoObject extends MediaVideoCommon {
         this.roi = roi;
     }
 
+    public String getPad() {
+        return pad;
+    }
+
+    public void setPad(String pad) {
+        this.pad = pad;
+    }
+
+    public String getQuality() {
+        return quality;
+    }
+
+    public void setQuality(String quality) {
+        this.quality = quality;
+    }
+
+    public String getHlsTsTime() {
+        return hlsTsTime;
+    }
+
+    public void setHlsTsTime(String hlsTsTime) {
+        this.hlsTsTime = hlsTsTime;
+    }
+
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("MediaTranscodeVideoObject{");
@@ -222,6 +267,13 @@ public class MediaTranscodeVideoObject extends MediaVideoCommon {
         sb.append(", pixfmt='").append(pixfmt).append('\'');
         sb.append(", longShortMode='").append(longShortMode).append('\'');
         sb.append(", rotate='").append(rotate).append('\'');
+        sb.append(", colorParam=").append(colorParam);
+        sb.append(", interlaced='").append(interlaced).append('\'');
+        sb.append(", crop='").append(crop).append('\'');
+        sb.append(", roi='").append(roi).append('\'');
+        sb.append(", pad='").append(pad).append('\'');
+        sb.append(", quality='").append(quality).append('\'');
+        sb.append(", hlsTsTime='").append(hlsTsTime).append('\'');
         sb.append('}');
         return sb.toString();
     }

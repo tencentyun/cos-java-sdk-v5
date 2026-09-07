@@ -22,6 +22,9 @@ public class HlsEncrypt {
     @XStreamAlias("IsHlsEncrypt")
     private String isHlsEncrypt;
 
+    @XStreamAlias("IsEncrypt")
+    private String isEncrypt;
+
     public String getCiphertextBlob() {
         return ciphertextBlob;
     }
@@ -60,6 +63,14 @@ public class HlsEncrypt {
 
     public void setIsHlsEncrypt(String isHlsEncrypt) {
         this.isHlsEncrypt = isHlsEncrypt;
+    }
+
+    public String getIsEncrypt() {
+        return isEncrypt;
+    }
+
+    public void setIsEncrypt(String isEncrypt) {
+        this.isEncrypt = isEncrypt;
     }
 
     public String getUriKey() {

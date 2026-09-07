@@ -14,7 +14,7 @@ public class DocJobDemo {
         // 1 初始化用户身份信息（secretId, secretKey）。
         COSClient client = ClientUtils.getTestClient();
         // 2 调用要使用的方法。
-        createDocJobs(client);
+        describeDocProcessJob(client);
     }
 
     /**
@@ -28,7 +28,7 @@ public class DocJobDemo {
         //1.创建任务请求对象
         DocJobRequest request = new DocJobRequest();
         //2.添加请求参数 参数详情请见api接口文档
-        request.setBucketName("demo-1234567890");
+        request.setBucketName("examplebucket-1250000000");
         DocJobObject docJobObject = request.getDocJobObject();
         docJobObject.setTag("DocProcess");
         docJobObject.getInput().setObject("1.docx");
@@ -39,16 +39,16 @@ public class DocJobDemo {
         docProcessObject.setEndPage("3");
         docProcessObject.setTgtType("pdf");
         docProcessObject.setDocPassword("123");
-        DocWatermark docWatermark = docProcessObject.getDocWatermark();
-        docWatermark.setType("1");
-        docWatermark.setImage("https://markjrzhang-1251704708.cos.ap-chongqing.myqcloud.com/case/xhs.png");
-        docWatermark.setDx("10");
-        docWatermark.setDy("10");
+//        DocWatermark docWatermark = docProcessObject.getDocWatermark();
+//        docWatermark.setType("1");
+//        docWatermark.setImage("https://examplebucket-1250000000.cos.ap-chongqing.myqcloud.com/case/xhs.png");
+//        docWatermark.setDx("10");
+//        docWatermark.setDy("10");
 
         MediaOutputObject output = docJobObject.getOperation().getOutput();
         output.setRegion("ap-singapore");
-        output.setBucket("demo-1234567890");
-        output.setObject("mark/test-${Page}.pdf");
+        output.setBucket("examplebucket-1250000000");
+        output.setObject("result/test-${Page}.pdf");
 
         docJobObject.getOperation().setUserData("user-data");
         docJobObject.setCallBackFormat("json");
@@ -68,7 +68,7 @@ public class DocJobDemo {
         docJobObject.getInput().setObject("1.docx");
         DocWatermark docWatermark = docJobObject.getOperation().getDocWatermarkObject();
         docWatermark.setType("1");
-        docWatermark.setImage("https://markjrzhang-1251704708.cos.ap-chongqing.myqcloud.com/case/xhs.png");
+        docWatermark.setImage("https://examplebucket-1250000000.cos.ap-chongqing.myqcloud.com/case/xhs.png");
         docWatermark.setDx("10");
         docWatermark.setDy("10");
 
@@ -107,8 +107,8 @@ public class DocJobDemo {
         docProcessObject.setDocPassword("123");
         MediaOutputObject output = docJobObject.getOperation().getOutput();
         output.setRegion("ap-chongqing");
-        output.setBucket("markjrzhang-1251704708");
-        output.setObject("mark/pic-${Page}.jpg");
+        output.setBucket("examplebucket-1250000000");
+        output.setObject("result/pic-${Page}.jpg");
 
         docJobObject.getOperation().setUserData("user-data");
         docJobObject.setCallBackFormat("json");

@@ -55,6 +55,12 @@ public class SnapshotInfo {
     private String label;
 
     /**
+     * 子标签信息
+     */
+    @XStreamAlias("SubLabel")
+    private String subLabel;
+
+    /**
      * 结果信息
      */
     @XStreamAlias("Result")
@@ -156,6 +162,14 @@ public class SnapshotInfo {
         this.label = label;
     }
 
+    public String getSubLabel() {
+        return subLabel;
+    }
+
+    public void setSubLabel(String subLabel) {
+        this.subLabel = subLabel;
+    }
+
     public String getResult() {
         return result;
     }
@@ -181,6 +195,10 @@ public class SnapshotInfo {
         sb.append(", politicsInfo=").append(politicsInfo);
         sb.append(", adsInfo=").append(adsInfo);
         sb.append(", text='").append(text).append('\'');
+        sb.append(", label='").append(label).append('\'');
+        sb.append(", subLabel='").append(subLabel).append('\'');
+        sb.append(", result='").append(result).append('\'');
+        sb.append(", snapshotTime='").append(snapshotTime).append('\'');
         sb.append(", ocrHitInfos=").append(ocrHitInfos);
         sb.append('}');
         return sb.toString();

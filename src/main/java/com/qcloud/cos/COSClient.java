@@ -113,6 +113,8 @@ import com.qcloud.cos.model.ciModel.persistence.AIRecRequest;
 import com.qcloud.cos.model.ciModel.persistence.DetectCarResponse;
 import com.qcloud.cos.model.ciModel.image.AIImageAnalysisRequest;
 import com.qcloud.cos.model.ciModel.image.AIImageAnalysisResponse;
+import com.qcloud.cos.model.ciModel.image.AIImageAnalysisJobRequest;
+import com.qcloud.cos.model.ciModel.image.AIImageAnalysisJobResponse;
 import com.qcloud.cos.model.ciModel.persistence.DetectPetRequest;
 import com.qcloud.cos.model.ciModel.persistence.DetectPetResponse;
 import com.qcloud.cos.model.ciModel.queue.DocListQueueResponse;
@@ -5506,6 +5508,64 @@ public class COSClient implements COS {
     }
 
     @Override
+    public DatasetHybridSearchResponse hybridsearch(DatasetHybridSearchRequest customRequest) {
+        rejectNull(customRequest, "The request parameter must be specified setting the object tags");
+
+        CosHttpRequest<DatasetHybridSearchRequest> request = createRequest(customRequest.getAppId(), "/datasetquery/hybridsearch", customRequest , HttpMethodName.POST);
+        request.addHeader("Accept", "application/json");
+
+        this.setContent(request, CIJackson.toJsonBytes(customRequest), "application/json", false);
+        return invoke(request, new Unmarshallers.CICommonJsonUnmarshaller<DatasetHybridSearchResponse>(DatasetHybridSearchResponse.class));
+    }
+
+    @Override
+    public CreateDatasetExportJobResponse createDatasetExportJob(CreateDatasetExportJobRequest customRequest) {
+        rejectNull(customRequest, "The request parameter must be specified setting the object tags");
+
+        CosHttpRequest<CreateDatasetExportJobRequest> request = createRequest(customRequest.getAppId(), "/datasetquery/export", customRequest , HttpMethodName.POST);
+        request.addHeader("Accept", "application/json");
+
+        this.setContent(request, CIJackson.toJsonBytes(customRequest), "application/json", false);
+        return invoke(request, new Unmarshallers.CICommonJsonUnmarshaller<CreateDatasetExportJobResponse>(CreateDatasetExportJobResponse.class));
+    }
+
+    @Override
+    public DescribeDatasetExportJobResponse describeDatasetExportJob(DescribeDatasetExportJobRequest customRequest) {
+        rejectNull(customRequest, "The request parameter must be specified setting the object tags");
+
+        CosHttpRequest<DescribeDatasetExportJobRequest> request = createRequest(customRequest.getAppId(), "/datasetquery/export", customRequest , HttpMethodName.GET);
+        addParameterIfNotNull(request, "datasetname", customRequest.getDatasetname());
+        addParameterIfNotNull(request, "jobid", customRequest.getJobid());
+        request.addHeader("Accept", "application/json");
+
+        return invoke(request, new Unmarshallers.CICommonJsonUnmarshaller<DescribeDatasetExportJobResponse>(DescribeDatasetExportJobResponse.class));
+    }
+
+    @Override
+    public DescribeDatasetExportJobsResponse describeDatasetExportJobs(DescribeDatasetExportJobsRequest customRequest) {
+        rejectNull(customRequest, "The request parameter must be specified setting the object tags");
+
+        CosHttpRequest<DescribeDatasetExportJobsRequest> request = createRequest(customRequest.getAppId(), "/datasetquery/exports", customRequest , HttpMethodName.GET);
+        addParameterIfNotNull(request, "datasetname", customRequest.getDatasetname());
+        addParameterIfNotNull(request, "maxresults", customRequest.getMaxresults());
+        addParameterIfNotNull(request, "nexttoken", customRequest.getNexttoken());
+        request.addHeader("Accept", "application/json");
+
+        return invoke(request, new Unmarshallers.CICommonJsonUnmarshaller<DescribeDatasetExportJobsResponse>(DescribeDatasetExportJobsResponse.class));
+    }
+
+    @Override
+    public CancelDatasetExportJobResponse cancelDatasetExportJob(CancelDatasetExportJobRequest customRequest) {
+        rejectNull(customRequest, "The request parameter must be specified setting the object tags");
+
+        CosHttpRequest<CancelDatasetExportJobRequest> request = createRequest(customRequest.getAppId(), "/datasetquery/export", customRequest , HttpMethodName.DELETE);
+        request.addHeader("Accept", "application/json");
+
+        this.setContent(request, CIJackson.toJsonBytes(customRequest), "application/json", false);
+        return invoke(request, new Unmarshallers.CICommonJsonUnmarshaller<CancelDatasetExportJobResponse>(CancelDatasetExportJobResponse.class));
+    }
+
+    @Override
     public DatasetSimpleQueryResponse datasetSimpleQuery(DatasetSimpleQueryRequest customRequest) {
         rejectNull(customRequest, "The request parameter must be specified setting the object tags");
 
@@ -5965,6 +6025,30 @@ public class COSClient implements COS {
         addParameterIfNotNull(request, "template-id", aiImageAnalysisRequest.getTemplateId());
         return invoke(request, new Unmarshallers.CICommonUnmarshaller<AIImageAnalysisResponse>(
                 AIImageAnalysisResponse.class));
+    }
+
+    /**
+     * 通用图片分析（任务式）接口，基于大模型多模态能力，通过 POST 请求一次性传入多张图片进行联合分析。
+     *
+     * <p>请求方式：POST /?ci-process=AIImageAnalysis，请求体为 XML。</p>
+     *
+     * @param request 通用图片分析请求
+     * @return 通用图片分析响应，包含 code、message、state、analysisResult
+     */
+    @Override
+    public AIImageAnalysisJobResponse createAIImageAnalysisJob(AIImageAnalysisJobRequest request) {
+        rejectNull(request, "The request parameter must be specified when creating AI image analysis job");
+        rejectNull(request.getBucketName(),
+                "The bucketName parameter must be specified when creating AI image analysis job");
+        rejectNull(request.getInput(),
+                "The input parameter must be specified when creating AI image analysis job");
+        CosHttpRequest<AIImageAnalysisJobRequest> httpRequest = createRequest(
+                request.getBucketName(), "/", request, HttpMethodName.POST);
+        httpRequest.addParameter("ci-process", "AIImageAnalysis");
+        this.setContent(httpRequest, CIAuditingXmlFactoryV2.convertToXmlByteArray(request),
+                "application/xml", false);
+        return invoke(httpRequest, new Unmarshallers.CICommonUnmarshaller<AIImageAnalysisJobResponse>(
+                AIImageAnalysisJobResponse.class));
     }
 
     @Override

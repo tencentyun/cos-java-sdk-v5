@@ -1,5 +1,7 @@
 package com.qcloud.cos.model.ciModel.template;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 
 public class MediaSmartCoverObject {
 
@@ -7,28 +9,33 @@ public class MediaSmartCoverObject {
      * 封面图片类型
      * png、jpg、webp
      */
+    @XStreamAlias("Format")
     private String format;
     /**
      * 封面图片宽度
      * 1. 值范围：[128，4096]
      * 2. 单位：px
      */
+    @XStreamAlias("Width")
     private String width;
     /**
      * 封面图片高度
      * 1. 值范围：[128，4096]
      * 2. 单位：px
      */
+    @XStreamAlias("Height")
     private String height;
     /**
      * 封面图片数量
      * 值范围：[1，10] 默认为3
      */
+    @XStreamAlias("Count")
     private String count;
     /**
      * 封面是否去重
      * true/false
      */
+    @XStreamAlias("DeleteDuplicates")
     private String deleteDuplicates;
 
     public String getFormat() {

@@ -436,8 +436,33 @@ public class RequestXmlFactory {
                 addIfNotNull(xml, "ResoAdjMethod", transConfig.getResoAdjMethod());
                 addIfNotNull(xml, "TransMode", transConfig.getTransMode());
                 addIfNotNull(xml, "VideoBitrateAdjMethod", transConfig.getVideoBitrateAdjMethod());
+                addIfNotNull(xml, "DeleteMetadata", transConfig.getDeleteMetadata());
+                addIfNotNull(xml, "IsHdr2Sdr", transConfig.getIsHdr2Sdr());
+                HlsEncrypt hlsEncrypt = transConfig.getHlsEncrypt();
+                if (CheckObjectUtils.objIsNotValid(hlsEncrypt)) {
+                    xml.start("HlsEncrypt");
+                    addIfNotNull(xml, "IsHlsEncrypt", hlsEncrypt.getIsHlsEncrypt());
+                    addIfNotNull(xml, "UriKey", hlsEncrypt.getUriKey());
+                    xml.end();
+                }
+                HlsEncrypt dashEncrypt = transConfig.getDashEncrypt();
+                if (CheckObjectUtils.objIsNotValid(dashEncrypt)) {
+                    xml.start("DashEncrypt");
+                    addIfNotNull(xml, "IsEncrypt", dashEncrypt.getIsEncrypt());
+                    addIfNotNull(xml, "UriKey", dashEncrypt.getUriKey());
+                    xml.end();
+                }
+                addIfNotNull(xml, "IsCheckVideoFps", transConfig.getIsCheckVideoFps());
+                addIfNotNull(xml, "VideoFpsAdjMethod", transConfig.getVideoFpsAdjMethod());
+                addIfNotNull(xml, "IsCheckAudioChannel", transConfig.getIsCheckAudioChannel());
+                addIfNotNull(xml, "IsStreamCopy", transConfig.getIsStreamCopy());
+                addIfNotNull(xml, "InitialClipNum", transConfig.getInitialClipNum());
+                addIfNotNull(xml, "CosTag", transConfig.getCosTag());
+                addIfNotNull(xml, "TranscodeIndex", transConfig.getTranscodeIndex());
                 xml.end();
             }
+            addAudioMix(xml, transcode.getAudioMix(), "AudioMix");
+            addAudioMixArray(xml, transcode.getAudioMixArray());
             xml.end();
         }
 
@@ -637,6 +662,41 @@ public class RequestXmlFactory {
         addIfNotNull(xml, "Profile", audio.getProfile());
         addIfNotNull(xml, "Remove", audio.getRemove());
         addIfNotNull(xml, "Samplerate", audio.getSamplerate());
+        addIfNotNull(xml, "KeepAllTracks", audio.getKeepAllTracks());
+        addIfNotNull(xml, "KeepTwoTracks", audio.getKeepTwoTracks());
+        addIfNotNull(xml, "SwitchTrack", audio.getSwitchTrack());
+        addIfNotNull(xml, "SampleFormat", audio.getSampleFormat());
+        xml.end();
+    }
+
+    private static void addAudioMixArray(XmlWriter xml, List<MediaAudioMixObject> audioMixArray) {
+        if (audioMixArray != null && !audioMixArray.isEmpty()) {
+            for (MediaAudioMixObject mediaAudioMixObject : audioMixArray) {
+                addAudioMix(xml, mediaAudioMixObject, "AudioMixArray");
+            }
+        }
+    }
+
+    private static void addAudioMix(XmlWriter xml, MediaAudioMixObject audioMix, String key) {
+        if (audioMix == null || !CheckObjectUtils.objIsNotValid(audioMix)) {
+            return;
+        }
+        xml.start(key);
+        addIfNotNull(xml, "MixMode", audioMix.getMixMode());
+        addIfNotNull(xml, "AudioSource", audioMix.getAudioSource());
+        addIfNotNull(xml, "Replace", audioMix.getReplace());
+        addIfNotNull(xml, "DirectMix", audioMix.getDirectMix());
+        EffectConfig effectConfig = audioMix.getEffectConfig();
+        if (CheckObjectUtils.objIsNotValid(effectConfig)) {
+            xml.start("EffectConfig");
+            addIfNotNull(xml, "EnableStartFadein", effectConfig.getEnableStartFadein());
+            addIfNotNull(xml, "StartFadeinTime", effectConfig.getStartFadeinTime());
+            addIfNotNull(xml, "EnableEndFadeout", effectConfig.getEnableEndFadeout());
+            addIfNotNull(xml, "EndFadeoutTime", effectConfig.getEndFadeoutTime());
+            addIfNotNull(xml, "EnableBgmFade", effectConfig.getEnableBgmFade());
+            addIfNotNull(xml, "BgmFadeTime", effectConfig.getBgmFadeTime());
+            xml.end();
+        }
         xml.end();
     }
 
@@ -996,7 +1056,27 @@ public class RequestXmlFactory {
         addIfNotNull(xml, "Remove", video.getRemove());
         addIfNotNull(xml, "ScanMode", video.getScanMode());
         addIfNotNull(xml, "Pixfmt", video.getPixfmt());
+        addIfNotNull(xml, "LongShortMode", video.getLongShortMode());
+        addIfNotNull(xml, "Rotate", video.getRotate());
+        addIfNotNull(xml, "Interlaced", video.getInterlaced());
+        addIfNotNull(xml, "Crop", video.getCrop());
+        addIfNotNull(xml, "Roi", video.getRoi());
+        addIfNotNull(xml, "Pad", video.getPad());
+        addIfNotNull(xml, "Quality", video.getQuality());
+        addIfNotNull(xml, "HlsTsTime", video.getHlsTsTime());
+        addColorParam(xml, video.getColorParam());
         xml.end();
+    }
+
+    private static void addColorParam(XmlWriter xml, MediaVideoColorParam colorParam) {
+        if (CheckObjectUtils.objIsNotValid(colorParam)) {
+            xml.start("ColorParam");
+            addIfNotNull(xml, "ColorSpace", colorParam.getColorSpace());
+            addIfNotNull(xml, "ColorRange", colorParam.getColorRange());
+            addIfNotNull(xml, "ColorTrc", colorParam.getColorTrc());
+            addIfNotNull(xml, "ColorPrimaries", colorParam.getColorPrimaries());
+            xml.end();
+        }
     }
 
     private static void addUserInfo(XmlWriter xml, UserInfo userInfo) {

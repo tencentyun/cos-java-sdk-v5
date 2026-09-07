@@ -58,6 +58,8 @@ import com.qcloud.cos.model.ciModel.persistence.AIRecRequest;
 import com.qcloud.cos.model.ciModel.persistence.DetectCarResponse;
 import com.qcloud.cos.model.ciModel.image.AIImageAnalysisRequest;
 import com.qcloud.cos.model.ciModel.image.AIImageAnalysisResponse;
+import com.qcloud.cos.model.ciModel.image.AIImageAnalysisJobRequest;
+import com.qcloud.cos.model.ciModel.image.AIImageAnalysisJobResponse;
 import com.qcloud.cos.model.ciModel.persistence.DetectPetRequest;
 import com.qcloud.cos.model.ciModel.persistence.DetectPetResponse;
 import com.qcloud.cos.model.ciModel.queue.DocListQueueResponse;
@@ -3285,6 +3287,16 @@ public interface COS extends COSDirectSpi {
 
     DatasetFaceSearchResponse datasetFaceSearch(DatasetFaceSearchRequest customRequest);
 
+    DatasetHybridSearchResponse hybridsearch(DatasetHybridSearchRequest customRequest);
+
+    CreateDatasetExportJobResponse createDatasetExportJob(CreateDatasetExportJobRequest customRequest);
+
+    DescribeDatasetExportJobResponse describeDatasetExportJob(DescribeDatasetExportJobRequest customRequest);
+
+    DescribeDatasetExportJobsResponse describeDatasetExportJobs(DescribeDatasetExportJobsRequest customRequest);
+
+    CancelDatasetExportJobResponse cancelDatasetExportJob(CancelDatasetExportJobRequest customRequest);
+
     DatasetSimpleQueryResponse datasetSimpleQuery(DatasetSimpleQueryRequest customRequest);
 
     DeleteDatasetResponse deleteDataset(DeleteDatasetRequest customRequest);
@@ -3341,4 +3353,6 @@ public interface COS extends COSDirectSpi {
      * @return 大模型图片分析响应，包含分析结果
      */
     AIImageAnalysisResponse aiImageAnalysis(AIImageAnalysisRequest aiImageAnalysisRequest);
+
+    AIImageAnalysisJobResponse createAIImageAnalysisJob(AIImageAnalysisJobRequest request);
 }

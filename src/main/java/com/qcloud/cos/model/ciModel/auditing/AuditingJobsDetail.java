@@ -37,6 +37,9 @@ public class AuditingJobsDetail {
     @XStreamAlias("Message")
     private String message;
 
+    @XStreamAlias("Score")
+    private String score;
+
     /**
      * 任务对象
      */
@@ -483,6 +486,14 @@ public class AuditingJobsDetail {
 
     public void setOcrHitInfos(OcrHitInfos ocrHitInfos) {
         this.ocrHitInfos = ocrHitInfos;
+    }
+
+    public String getScore() {
+        return score;
+    }
+
+    public void setScore(String score) {
+        this.score = score;
     }
 
     @Override

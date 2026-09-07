@@ -55,6 +55,41 @@ public class Dataset {
 
     private String region;
 
+    /**
+     * 数据集类型。
+     * @since 5.6.271
+     */
+    @XStreamAlias("DatasetType")
+    private Integer datasetType;
+
+    /**
+     * 场景类型，用于标记数据集的业务场景。
+     * @since 5.6.271
+     */
+    @XStreamAlias("SceneType")
+    private String sceneType;
+
+    /**
+     * 数据集状态。可选值：Unstart / Running / Success / Failed 等。
+     * @since 5.6.271
+     */
+    @XStreamAlias("State")
+    private String state;
+
+    /**
+     * 任务进度，取值范围 0-100。
+     * @since 5.6.271
+     */
+    @XStreamAlias("TaskProgress")
+    private Integer taskProgress;
+
+    /**
+     * 数据集版本号。
+     * @since 5.6.271
+     */
+    @XStreamAlias("Version")
+    private String version;
+
     public String getRegion() {
         return region;
     }
@@ -95,6 +130,25 @@ public class Dataset {
 
     public void setDatasetName(String datasetName) { this.datasetName = datasetName; }
 
+    public Integer getDatasetType() { return datasetType; }
+
+    public void setDatasetType(Integer datasetType) { this.datasetType = datasetType; }
+
+    public String getSceneType() { return sceneType; }
+
+    public void setSceneType(String sceneType) { this.sceneType = sceneType; }
+
+    public String getState() { return state; }
+
+    public void setState(String state) { this.state = state; }
+
+    public Integer getTaskProgress() { return taskProgress; }
+
+    public void setTaskProgress(Integer taskProgress) { this.taskProgress = taskProgress; }
+
+    public String getVersion() { return version; }
+
+    public void setVersion(String version) { this.version = version; }
 
 
 }

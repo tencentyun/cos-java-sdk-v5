@@ -78,6 +78,8 @@ import com.qcloud.cos.model.ciModel.auditing.HitInfo;
 import com.qcloud.cos.model.ciModel.auditing.ImageAuditingResponse;
 import com.qcloud.cos.model.ciModel.auditing.LanguageResult;
 import com.qcloud.cos.model.ciModel.auditing.LibResult;
+import com.qcloud.cos.model.ciModel.auditing.OcrResults;
+import com.qcloud.cos.model.ciModel.auditing.Location;
 import com.qcloud.cos.model.ciModel.auditing.ListResult;
 import com.qcloud.cos.model.ciModel.auditing.OcrHitInfos;
 import com.qcloud.cos.model.ciModel.auditing.ObjectResults;
@@ -5887,6 +5889,130 @@ public class XmlResponsesSaxParser {
                     }
                 }
             }
+            // ---- LibResults 容器起始（视频截图 Snapshot.*Info.LibResults / 音频段 AudioSection.*Info.LibResults）----
+            // 每遇到一个新的 <LibResults> 起始标签，向对应 AudtingCommonInfo 的 libResults 列表 push 一个新的 LibResult 元素。
+            if ("LibResults".equals(name)) {
+                AudtingCommonInfo target = null;
+                if (in("Response", "JobsDetail", "Snapshot", "PornInfo")) {
+                    target = snapshotList != null && !snapshotList.isEmpty()
+                            ? snapshotList.get(snapshotList.size() - 1).getPornInfo() : null;
+                } else if (in("Response", "JobsDetail", "Snapshot", "PoliticsInfo")) {
+                    target = snapshotList != null && !snapshotList.isEmpty()
+                            ? snapshotList.get(snapshotList.size() - 1).getPoliticsInfo() : null;
+                } else if (in("Response", "JobsDetail", "Snapshot", "TerrorismInfo")) {
+                    target = snapshotList != null && !snapshotList.isEmpty()
+                            ? snapshotList.get(snapshotList.size() - 1).getTerroristInfo() : null;
+                } else if (in("Response", "JobsDetail", "Snapshot", "AdsInfo")) {
+                    target = snapshotList != null && !snapshotList.isEmpty()
+                            ? snapshotList.get(snapshotList.size() - 1).getAdsInfo() : null;
+                } else if (in("Response", "JobsDetail", "Snapshot", "TeenagerInfo")) {
+                    target = snapshotList != null && !snapshotList.isEmpty()
+                            ? snapshotList.get(snapshotList.size() - 1).getTeenagerInfo() : null;
+                } else if (in("Response", "JobsDetail", "AudioSection", "PornInfo")) {
+                    target = audioSectionList != null && !audioSectionList.isEmpty()
+                            ? audioSectionList.get(audioSectionList.size() - 1).getPornInfo() : null;
+                } else if (in("Response", "JobsDetail", "AudioSection", "PoliticsInfo")) {
+                    target = audioSectionList != null && !audioSectionList.isEmpty()
+                            ? audioSectionList.get(audioSectionList.size() - 1).getPoliticsInfo() : null;
+                } else if (in("Response", "JobsDetail", "AudioSection", "TerrorismInfo")) {
+                    target = audioSectionList != null && !audioSectionList.isEmpty()
+                            ? audioSectionList.get(audioSectionList.size() - 1).getTerroristInfo() : null;
+                } else if (in("Response", "JobsDetail", "AudioSection", "AdsInfo")) {
+                    target = audioSectionList != null && !audioSectionList.isEmpty()
+                            ? audioSectionList.get(audioSectionList.size() - 1).getAdsInfo() : null;
+                } else if (in("Response", "JobsDetail", "PornInfo")) {
+                    target = response.getJobsDetail().getPornInfo();
+                } else if (in("Response", "JobsDetail", "PoliticsInfo")) {
+                    target = response.getJobsDetail().getPoliticsInfo();
+                } else if (in("Response", "JobsDetail", "TerrorismInfo")) {
+                    target = response.getJobsDetail().getTerroristInfo();
+                } else if (in("Response", "JobsDetail", "AdsInfo")) {
+                    target = response.getJobsDetail().getAdsInfo();
+                } else if (in("Response", "JobsDetail", "TeenagerInfo")) {
+                    target = response.getJobsDetail().getTeenagerInfo();
+                }
+                if (target != null) {
+                    if (target.getLibResults() == null) {
+                        target.setLibResults(new java.util.ArrayList<LibResult>());
+                    }
+                    target.getLibResults().add(new LibResult());
+                }
+            }
+            // ---- OcrResults 容器起始（视频截图 Snapshot.*Info.OcrResults）----
+            // 每遇到一个新的 <OcrResults> 起始标签，向对应 AudtingCommonInfo 的 ocrResults 列表 push 一个新的 OcrResults 元素。
+            if ("OcrResults".equals(name)) {
+                AudtingCommonInfo ocrTarget = null;
+                if (in("Response", "JobsDetail", "Snapshot", "PornInfo")) {
+                    ocrTarget = snapshotList != null && !snapshotList.isEmpty()
+                            ? snapshotList.get(snapshotList.size() - 1).getPornInfo() : null;
+                } else if (in("Response", "JobsDetail", "Snapshot", "PoliticsInfo")) {
+                    ocrTarget = snapshotList != null && !snapshotList.isEmpty()
+                            ? snapshotList.get(snapshotList.size() - 1).getPoliticsInfo() : null;
+                } else if (in("Response", "JobsDetail", "Snapshot", "TerrorismInfo")) {
+                    ocrTarget = snapshotList != null && !snapshotList.isEmpty()
+                            ? snapshotList.get(snapshotList.size() - 1).getTerroristInfo() : null;
+                } else if (in("Response", "JobsDetail", "Snapshot", "AdsInfo")) {
+                    ocrTarget = snapshotList != null && !snapshotList.isEmpty()
+                            ? snapshotList.get(snapshotList.size() - 1).getAdsInfo() : null;
+                } else if (in("Response", "JobsDetail", "Snapshot", "TeenagerInfo")) {
+                    ocrTarget = snapshotList != null && !snapshotList.isEmpty()
+                            ? snapshotList.get(snapshotList.size() - 1).getTeenagerInfo() : null;
+                } else if (in("Response", "JobsDetail", "PornInfo")) {
+                    ocrTarget = response.getJobsDetail().getPornInfo();
+                } else if (in("Response", "JobsDetail", "PoliticsInfo")) {
+                    ocrTarget = response.getJobsDetail().getPoliticsInfo();
+                } else if (in("Response", "JobsDetail", "TerrorismInfo")) {
+                    ocrTarget = response.getJobsDetail().getTerroristInfo();
+                } else if (in("Response", "JobsDetail", "AdsInfo")) {
+                    ocrTarget = response.getJobsDetail().getAdsInfo();
+                } else if (in("Response", "JobsDetail", "TeenagerInfo")) {
+                    ocrTarget = response.getJobsDetail().getTeenagerInfo();
+                }
+                if (ocrTarget != null) {
+                    if (ocrTarget.getOcrResults() == null) {
+                        ocrTarget.setOcrResults(new java.util.ArrayList<OcrResults>());
+                    }
+                    ocrTarget.getOcrResults().add(new OcrResults());
+                }
+            }
+            // ---- ObjectResults 容器起始（视频截图 Snapshot.*Info.ObjectResults / 顶层 *Info.ObjectResults）----
+            // 每遇到一个新的 <ObjectResults> 起始标签，向对应 AudtingCommonInfo 的 objectResults 列表 push 一个新的 ObjectResults 元素。
+            if ("ObjectResults".equals(name)) {
+                AudtingCommonInfo objTarget = null;
+                if (in("Response", "JobsDetail", "Snapshot", "PornInfo")) {
+                    objTarget = snapshotList != null && !snapshotList.isEmpty()
+                            ? snapshotList.get(snapshotList.size() - 1).getPornInfo() : null;
+                } else if (in("Response", "JobsDetail", "Snapshot", "PoliticsInfo")) {
+                    objTarget = snapshotList != null && !snapshotList.isEmpty()
+                            ? snapshotList.get(snapshotList.size() - 1).getPoliticsInfo() : null;
+                } else if (in("Response", "JobsDetail", "Snapshot", "TerrorismInfo")) {
+                    objTarget = snapshotList != null && !snapshotList.isEmpty()
+                            ? snapshotList.get(snapshotList.size() - 1).getTerroristInfo() : null;
+                } else if (in("Response", "JobsDetail", "Snapshot", "AdsInfo")) {
+                    objTarget = snapshotList != null && !snapshotList.isEmpty()
+                            ? snapshotList.get(snapshotList.size() - 1).getAdsInfo() : null;
+                } else if (in("Response", "JobsDetail", "Snapshot", "TeenagerInfo")) {
+                    objTarget = snapshotList != null && !snapshotList.isEmpty()
+                            ? snapshotList.get(snapshotList.size() - 1).getTeenagerInfo() : null;
+                } else if (in("Response", "JobsDetail", "PornInfo")) {
+                    objTarget = response.getJobsDetail().getPornInfo();
+                } else if (in("Response", "JobsDetail", "TerrorismInfo")) {
+                    objTarget = response.getJobsDetail().getTerroristInfo();
+                } else if (in("Response", "JobsDetail", "AdsInfo")) {
+                    objTarget = response.getJobsDetail().getAdsInfo();
+                } else if (in("Response", "JobsDetail", "TeenagerInfo")) {
+                    objTarget = response.getJobsDetail().getTeenagerInfo();
+                }
+                // 注：顶层 PoliticsInfo.ObjectResults 走的是 PoliticsInfoObjectResults（单值）分支，
+                // 由 doEndElement 的 in("Response","JobsDetail","PoliticsInfo","ObjectResults") 分支单独处理，
+                // 这里不 push 到 AudtingCommonInfo.objectResults 列表以避免重复。
+                if (objTarget != null) {
+                    if (objTarget.getObjectResults() == null) {
+                        objTarget.setObjectResults(new java.util.ArrayList<ObjectResults>());
+                    }
+                    objTarget.getObjectResults().add(new ObjectResults());
+                }
+            }
         }
 
         @Override
@@ -5943,6 +6069,9 @@ public class XmlResponsesSaxParser {
                         break;
                     case "Type":
                         jobsDetail.setType(getText());
+                        break;
+                    case "Score":
+                        jobsDetail.setScore(getText());
                         break;
                     default:
                         break;
@@ -6027,6 +6156,199 @@ public class XmlResponsesSaxParser {
                     if (ocrHitInfos != null) {
                         ParserMediaInfoUtils.parseOcrHitInfoPosition(ocrHitInfos.getHitInfos(), name, getText());
                     }
+                }
+            }
+            // ---- LibResults 内部字段解析 ----
+            // 处于 <LibResults> 内部时，将子元素（ImageId/Score/LibType/LibName/Keywords 等）
+            // 追加到对应 AudtingCommonInfo.libResults 列表的最后一个元素上。
+            // 注意：这里独立 if 语句而非 else if，避免与上面 OcrHitInfos 等分支互斥后被跳过；
+            //      但同时需要确保只在真正处于 LibResults 内部时命中。
+            AudtingCommonInfo libTarget = null;
+            if (in("Response", "JobsDetail", "Snapshot", "PornInfo", "LibResults")) {
+                libTarget = snapshotList != null && !snapshotList.isEmpty()
+                        ? snapshotList.get(snapshotList.size() - 1).getPornInfo() : null;
+            } else if (in("Response", "JobsDetail", "Snapshot", "PoliticsInfo", "LibResults")) {
+                libTarget = snapshotList != null && !snapshotList.isEmpty()
+                        ? snapshotList.get(snapshotList.size() - 1).getPoliticsInfo() : null;
+            } else if (in("Response", "JobsDetail", "Snapshot", "TerrorismInfo", "LibResults")) {
+                libTarget = snapshotList != null && !snapshotList.isEmpty()
+                        ? snapshotList.get(snapshotList.size() - 1).getTerroristInfo() : null;
+            } else if (in("Response", "JobsDetail", "Snapshot", "AdsInfo", "LibResults")) {
+                libTarget = snapshotList != null && !snapshotList.isEmpty()
+                        ? snapshotList.get(snapshotList.size() - 1).getAdsInfo() : null;
+            } else if (in("Response", "JobsDetail", "Snapshot", "TeenagerInfo", "LibResults")) {
+                libTarget = snapshotList != null && !snapshotList.isEmpty()
+                        ? snapshotList.get(snapshotList.size() - 1).getTeenagerInfo() : null;
+            } else if (in("Response", "JobsDetail", "AudioSection", "PornInfo", "LibResults")) {
+                libTarget = audioSectionList != null && !audioSectionList.isEmpty()
+                        ? audioSectionList.get(audioSectionList.size() - 1).getPornInfo() : null;
+            } else if (in("Response", "JobsDetail", "AudioSection", "PoliticsInfo", "LibResults")) {
+                libTarget = audioSectionList != null && !audioSectionList.isEmpty()
+                        ? audioSectionList.get(audioSectionList.size() - 1).getPoliticsInfo() : null;
+            } else if (in("Response", "JobsDetail", "AudioSection", "TerrorismInfo", "LibResults")) {
+                libTarget = audioSectionList != null && !audioSectionList.isEmpty()
+                        ? audioSectionList.get(audioSectionList.size() - 1).getTerroristInfo() : null;
+            } else if (in("Response", "JobsDetail", "AudioSection", "AdsInfo", "LibResults")) {
+                libTarget = audioSectionList != null && !audioSectionList.isEmpty()
+                        ? audioSectionList.get(audioSectionList.size() - 1).getAdsInfo() : null;
+            } else if (in("Response", "JobsDetail", "PornInfo", "LibResults")) {
+                libTarget = response.getJobsDetail().getPornInfo();
+            } else if (in("Response", "JobsDetail", "PoliticsInfo", "LibResults")) {
+                libTarget = response.getJobsDetail().getPoliticsInfo();
+            } else if (in("Response", "JobsDetail", "TerrorismInfo", "LibResults")) {
+                libTarget = response.getJobsDetail().getTerroristInfo();
+            } else if (in("Response", "JobsDetail", "AdsInfo", "LibResults")) {
+                libTarget = response.getJobsDetail().getAdsInfo();
+            } else if (in("Response", "JobsDetail", "TeenagerInfo", "LibResults")) {
+                libTarget = response.getJobsDetail().getTeenagerInfo();
+            }
+            if (libTarget != null && libTarget.getLibResults() != null) {
+                ParserMediaInfoUtils.parsingLastLibResult(libTarget.getLibResults(), name, getText());
+            }
+
+            // ---- OcrResults 内部字段与 Location 子层解析 ----
+            // 处于 <OcrResults> 内部时，将子元素（Text / Keywords）追加到对应 AudtingCommonInfo.ocrResults 列表最后一个元素上；
+            // 处于 <OcrResults><Location> 内部时，将 X/Y/Width/Height/Rotate 写入 Location。
+            AudtingCommonInfo ocrParent = null;
+            boolean insideLocation = false;
+            if (in("Response", "JobsDetail", "Snapshot", "PornInfo", "OcrResults")) {
+                ocrParent = snapshotList != null && !snapshotList.isEmpty()
+                        ? snapshotList.get(snapshotList.size() - 1).getPornInfo() : null;
+            } else if (in("Response", "JobsDetail", "Snapshot", "PoliticsInfo", "OcrResults")) {
+                ocrParent = snapshotList != null && !snapshotList.isEmpty()
+                        ? snapshotList.get(snapshotList.size() - 1).getPoliticsInfo() : null;
+            } else if (in("Response", "JobsDetail", "Snapshot", "TerrorismInfo", "OcrResults")) {
+                ocrParent = snapshotList != null && !snapshotList.isEmpty()
+                        ? snapshotList.get(snapshotList.size() - 1).getTerroristInfo() : null;
+            } else if (in("Response", "JobsDetail", "Snapshot", "AdsInfo", "OcrResults")) {
+                ocrParent = snapshotList != null && !snapshotList.isEmpty()
+                        ? snapshotList.get(snapshotList.size() - 1).getAdsInfo() : null;
+            } else if (in("Response", "JobsDetail", "Snapshot", "TeenagerInfo", "OcrResults")) {
+                ocrParent = snapshotList != null && !snapshotList.isEmpty()
+                        ? snapshotList.get(snapshotList.size() - 1).getTeenagerInfo() : null;
+            } else if (in("Response", "JobsDetail", "PornInfo", "OcrResults")) {
+                ocrParent = response.getJobsDetail().getPornInfo();
+            } else if (in("Response", "JobsDetail", "PoliticsInfo", "OcrResults")) {
+                ocrParent = response.getJobsDetail().getPoliticsInfo();
+            } else if (in("Response", "JobsDetail", "TerrorismInfo", "OcrResults")) {
+                ocrParent = response.getJobsDetail().getTerroristInfo();
+            } else if (in("Response", "JobsDetail", "AdsInfo", "OcrResults")) {
+                ocrParent = response.getJobsDetail().getAdsInfo();
+            } else if (in("Response", "JobsDetail", "TeenagerInfo", "OcrResults")) {
+                ocrParent = response.getJobsDetail().getTeenagerInfo();
+            } else if (in("Response", "JobsDetail", "Snapshot", "PornInfo", "OcrResults", "Location")) {
+                ocrParent = snapshotList != null && !snapshotList.isEmpty()
+                        ? snapshotList.get(snapshotList.size() - 1).getPornInfo() : null;
+                insideLocation = true;
+            } else if (in("Response", "JobsDetail", "Snapshot", "PoliticsInfo", "OcrResults", "Location")) {
+                ocrParent = snapshotList != null && !snapshotList.isEmpty()
+                        ? snapshotList.get(snapshotList.size() - 1).getPoliticsInfo() : null;
+                insideLocation = true;
+            } else if (in("Response", "JobsDetail", "Snapshot", "TerrorismInfo", "OcrResults", "Location")) {
+                ocrParent = snapshotList != null && !snapshotList.isEmpty()
+                        ? snapshotList.get(snapshotList.size() - 1).getTerroristInfo() : null;
+                insideLocation = true;
+            } else if (in("Response", "JobsDetail", "Snapshot", "AdsInfo", "OcrResults", "Location")) {
+                ocrParent = snapshotList != null && !snapshotList.isEmpty()
+                        ? snapshotList.get(snapshotList.size() - 1).getAdsInfo() : null;
+                insideLocation = true;
+            } else if (in("Response", "JobsDetail", "Snapshot", "TeenagerInfo", "OcrResults", "Location")) {
+                ocrParent = snapshotList != null && !snapshotList.isEmpty()
+                        ? snapshotList.get(snapshotList.size() - 1).getTeenagerInfo() : null;
+                insideLocation = true;
+            } else if (in("Response", "JobsDetail", "PornInfo", "OcrResults", "Location")) {
+                ocrParent = response.getJobsDetail().getPornInfo();
+                insideLocation = true;
+            } else if (in("Response", "JobsDetail", "PoliticsInfo", "OcrResults", "Location")) {
+                ocrParent = response.getJobsDetail().getPoliticsInfo();
+                insideLocation = true;
+            } else if (in("Response", "JobsDetail", "TerrorismInfo", "OcrResults", "Location")) {
+                ocrParent = response.getJobsDetail().getTerroristInfo();
+                insideLocation = true;
+            } else if (in("Response", "JobsDetail", "AdsInfo", "OcrResults", "Location")) {
+                ocrParent = response.getJobsDetail().getAdsInfo();
+                insideLocation = true;
+            } else if (in("Response", "JobsDetail", "TeenagerInfo", "OcrResults", "Location")) {
+                ocrParent = response.getJobsDetail().getTeenagerInfo();
+                insideLocation = true;
+            }
+            if (ocrParent != null && ocrParent.getOcrResults() != null && !ocrParent.getOcrResults().isEmpty()) {
+                if (insideLocation) {
+                    OcrResults last = ocrParent.getOcrResults().get(ocrParent.getOcrResults().size() - 1);
+                    ParserMediaInfoUtils.parseLocation(last, name, getText());
+                } else {
+                    ParserMediaInfoUtils.parseOrcInfo(ocrParent.getOcrResults(), name, getText());
+                }
+            }
+
+            // ---- ObjectResults 内部字段与 Location 子层解析 ----
+            // 处于 <ObjectResults> 内部时：Name/SubLabel/Keywords 追加到对应 AudtingCommonInfo.objectResults 列表最后一个元素上；
+            // 处于 <ObjectResults><Location> 内部时：X/Y/Width/Height/Rotate 写入其 Location。
+            // 注：顶层 Response/JobsDetail/PoliticsInfo/ObjectResults 走 PoliticsInfoObjectResults 单值分支（见下方现有代码），
+            //     这里不覆盖顶层 PoliticsInfo，避免与已有解析冲突；仅覆盖 Snapshot 下的 5 类 Info + 顶层 PornInfo/AdsInfo/TerrorismInfo/TeenagerInfo。
+            AudtingCommonInfo objParent = null;
+            boolean objInsideLocation = false;
+            if (in("Response", "JobsDetail", "Snapshot", "PornInfo", "ObjectResults")) {
+                objParent = snapshotList != null && !snapshotList.isEmpty()
+                        ? snapshotList.get(snapshotList.size() - 1).getPornInfo() : null;
+            } else if (in("Response", "JobsDetail", "Snapshot", "PoliticsInfo", "ObjectResults")) {
+                objParent = snapshotList != null && !snapshotList.isEmpty()
+                        ? snapshotList.get(snapshotList.size() - 1).getPoliticsInfo() : null;
+            } else if (in("Response", "JobsDetail", "Snapshot", "TerrorismInfo", "ObjectResults")) {
+                objParent = snapshotList != null && !snapshotList.isEmpty()
+                        ? snapshotList.get(snapshotList.size() - 1).getTerroristInfo() : null;
+            } else if (in("Response", "JobsDetail", "Snapshot", "AdsInfo", "ObjectResults")) {
+                objParent = snapshotList != null && !snapshotList.isEmpty()
+                        ? snapshotList.get(snapshotList.size() - 1).getAdsInfo() : null;
+            } else if (in("Response", "JobsDetail", "Snapshot", "TeenagerInfo", "ObjectResults")) {
+                objParent = snapshotList != null && !snapshotList.isEmpty()
+                        ? snapshotList.get(snapshotList.size() - 1).getTeenagerInfo() : null;
+            } else if (in("Response", "JobsDetail", "PornInfo", "ObjectResults")) {
+                objParent = response.getJobsDetail().getPornInfo();
+            } else if (in("Response", "JobsDetail", "TerrorismInfo", "ObjectResults")) {
+                objParent = response.getJobsDetail().getTerroristInfo();
+            } else if (in("Response", "JobsDetail", "AdsInfo", "ObjectResults")) {
+                objParent = response.getJobsDetail().getAdsInfo();
+            } else if (in("Response", "JobsDetail", "TeenagerInfo", "ObjectResults")) {
+                objParent = response.getJobsDetail().getTeenagerInfo();
+            } else if (in("Response", "JobsDetail", "Snapshot", "PornInfo", "ObjectResults", "Location")) {
+                objParent = snapshotList != null && !snapshotList.isEmpty()
+                        ? snapshotList.get(snapshotList.size() - 1).getPornInfo() : null;
+                objInsideLocation = true;
+            } else if (in("Response", "JobsDetail", "Snapshot", "PoliticsInfo", "ObjectResults", "Location")) {
+                objParent = snapshotList != null && !snapshotList.isEmpty()
+                        ? snapshotList.get(snapshotList.size() - 1).getPoliticsInfo() : null;
+                objInsideLocation = true;
+            } else if (in("Response", "JobsDetail", "Snapshot", "TerrorismInfo", "ObjectResults", "Location")) {
+                objParent = snapshotList != null && !snapshotList.isEmpty()
+                        ? snapshotList.get(snapshotList.size() - 1).getTerroristInfo() : null;
+                objInsideLocation = true;
+            } else if (in("Response", "JobsDetail", "Snapshot", "AdsInfo", "ObjectResults", "Location")) {
+                objParent = snapshotList != null && !snapshotList.isEmpty()
+                        ? snapshotList.get(snapshotList.size() - 1).getAdsInfo() : null;
+                objInsideLocation = true;
+            } else if (in("Response", "JobsDetail", "Snapshot", "TeenagerInfo", "ObjectResults", "Location")) {
+                objParent = snapshotList != null && !snapshotList.isEmpty()
+                        ? snapshotList.get(snapshotList.size() - 1).getTeenagerInfo() : null;
+                objInsideLocation = true;
+            } else if (in("Response", "JobsDetail", "PornInfo", "ObjectResults", "Location")) {
+                objParent = response.getJobsDetail().getPornInfo();
+                objInsideLocation = true;
+            } else if (in("Response", "JobsDetail", "TerrorismInfo", "ObjectResults", "Location")) {
+                objParent = response.getJobsDetail().getTerroristInfo();
+                objInsideLocation = true;
+            } else if (in("Response", "JobsDetail", "AdsInfo", "ObjectResults", "Location")) {
+                objParent = response.getJobsDetail().getAdsInfo();
+                objInsideLocation = true;
+            } else if (in("Response", "JobsDetail", "TeenagerInfo", "ObjectResults", "Location")) {
+                objParent = response.getJobsDetail().getTeenagerInfo();
+                objInsideLocation = true;
+            }
+            if (objParent != null && objParent.getObjectResults() != null && !objParent.getObjectResults().isEmpty()) {
+                if (objInsideLocation) {
+                    ParserMediaInfoUtils.parseObjectResultsLocation(objParent.getObjectResults(), name, getText());
+                } else {
+                    ParserMediaInfoUtils.parseObjectResults(objParent.getObjectResults(), name, getText());
                 }
             }
         }
