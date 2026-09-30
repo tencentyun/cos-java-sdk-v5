@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.6.283]
+- AgentBucket: add enhanced APIs (https://cloud.tencent.com/document/product/436/133858)
+  - putSpaceQuota / getSpaceQuota
+  - putSpaceExtension / getSpaceExtension
+  - copyObjectRecursive
+  - moveObject / moveObjectRecursive
+  - deleteObjectRecursive
+- AgentBucket: HTTP 200 responses with an Error body are converted to CosServiceException (status code 200)
+- Note: new abstract methods are added to the `COS` interface; custom implementations of `COS` need to implement them
+
 ## [5.6.271]
 - MetaInsight: CreateDataset add 7 fields (DatasetType/Version/Volume/TrainingMode/TrainingDataset/TrainingURI/SceneType) and Dataset add 5 fields (DatasetType/SceneType/State/TaskProgress/Version)
 - MetaInsight: hybridsearch (multi-modal hybrid search)

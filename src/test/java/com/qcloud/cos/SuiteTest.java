@@ -19,7 +19,8 @@ import org.junit.runners.Suite.SuiteClasses;
         GetSetDelPolicyTest.class, ObjecTaggingTest.class, RestoreObjectTest.class,
 	MediaBucketTest.class, MediaJobTest.class, MediaQueueTest.class, MediaTemplateTest.class,MediaWorkflowTest.class,
         DefaultClientErrorTest.class, CosClientWithErrorTest.class, CosClientWithMockTest.class, DefaultHttpClientTest.class,
-        CosServiceExceptionTest.class
+        CosServiceExceptionTest.class,
+        AgentBucketXmlParseTest.class, AgentBucketMockTest.class, AgentBucketTest.class
         })
 public class SuiteTest {
 }

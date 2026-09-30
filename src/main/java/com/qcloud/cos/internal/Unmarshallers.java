@@ -1030,4 +1030,34 @@ public class Unmarshallers {
                     .parseFileHashCodeSyncResponse(in).getResponse();
         }
     }
+
+    // AgentBucket 增强 API（@since 5.6.283）
+
+    public static final class SpaceQuotaUnmarshaller
+            implements Unmarshaller<com.qcloud.cos.model.agentbucket.SpaceQuotaResult, InputStream> {
+        public com.qcloud.cos.model.agentbucket.SpaceQuotaResult unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser().parseSpaceQuotaResponse(in).getResult();
+        }
+    }
+
+    public static final class SpaceExtensionUnmarshaller
+            implements Unmarshaller<com.qcloud.cos.model.agentbucket.SpaceExtensionResult, InputStream> {
+        public com.qcloud.cos.model.agentbucket.SpaceExtensionResult unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser().parseSpaceExtensionResponse(in).getResult();
+        }
+    }
+
+    public static final class AgentObjectOperationResultUnmarshaller
+            implements Unmarshaller<XmlResponsesSaxParser.AgentObjectOperationResultHandler, InputStream> {
+        public XmlResponsesSaxParser.AgentObjectOperationResultHandler unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser().parseAgentObjectOperationResponse(in);
+        }
+    }
+
+    public static final class DeleteObjectRecursiveUnmarshaller
+            implements Unmarshaller<XmlResponsesSaxParser.DeleteObjectRecursiveHandler, InputStream> {
+        public XmlResponsesSaxParser.DeleteObjectRecursiveHandler unmarshall(InputStream in) throws Exception {
+            return new XmlResponsesSaxParser().parseDeleteObjectRecursiveResponse(in);
+        }
+    }
 }

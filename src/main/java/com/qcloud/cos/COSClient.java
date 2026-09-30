@@ -30,6 +30,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -69,6 +70,7 @@ import com.qcloud.cos.internal.*;
 import com.qcloud.cos.internal.XmlResponsesSaxParser.CompleteMultipartUploadHandler;
 import com.qcloud.cos.internal.XmlResponsesSaxParser.CopyObjectResultHandler;
 import com.qcloud.cos.model.*;
+import com.qcloud.cos.model.agentbucket.*;
 import com.qcloud.cos.model.IntelligentTiering.BucketIntelligentTieringConfiguration;
 import com.qcloud.cos.model.bucketcertificate.BucketDomainCertificateRequest;
 import com.qcloud.cos.model.bucketcertificate.BucketGetDomainCertificate;
@@ -6127,6 +6129,310 @@ public class COSClient implements COS {
         addParameterIfNotNull(request, "addtoheader", fileHashCodeSyncRequest.getAddToHeader());
         
         return invoke(request, new COSXmlResponseHandler<>(new Unmarshallers.FileHashCodeSyncResponseUnmarshaller()));
+    }
+
+    // ---------------------------------------------------------------------------------------
+    // AgentBucket 增强 API（@since 5.6.283）
+    // https://cloud.tencent.com/document/product/436/133858
+    // ---------------------------------------------------------------------------------------
+
+    private static final String AGENT_PARAM_RECURSIVE = "recursive";
+    private static final String AGENT_PARAM_CONFLICT_STRATEGY = "conflict_resolution_strategy";
+
+    @Override
+    public SpaceQuotaResult putSpaceQuota(PutSpaceQuotaRequest putSpaceQuotaRequest)
+            throws CosClientException, CosServiceException {
+        rejectNull(putSpaceQuotaRequest, "The PutSpaceQuotaRequest must be specified when putting space quota");
+        rejectNull(putSpaceQuotaRequest.getBucketName(),
+                "The bucket name must be specified when putting space quota");
+        rejectNull(putSpaceQuotaRequest.getCapacity(), "The capacity must be specified when putting space quota");
+        if (putSpaceQuotaRequest.getCapacity() < 0) {
+            throw new IllegalArgumentException("The capacity must be a non-negative integer in bytes, but got "
+                    + putSpaceQuotaRequest.getCapacity());
+        }
+        rejectNull(clientConfig.getRegion(),
+                "region is null, region in clientConfig must be specified when putting space quota");
+        String spaceKey = normalizeSpaceKey(putSpaceQuotaRequest.getSpaceId(), "putting space quota");
+
+        CosHttpRequest<PutSpaceQuotaRequest> request = createRequest(putSpaceQuotaRequest.getBucketName(),
+                spaceKey, putSpaceQuotaRequest, HttpMethodName.PUT);
+        request.addParameter("space-quota", null);
+        setAgentBucketXmlContent(request, new AgentBucketXmlFactory().convertToXmlByteArray(putSpaceQuotaRequest));
+        return invoke(request, new Unmarshallers.SpaceQuotaUnmarshaller());
+    }
+
+    @Override
+    public SpaceQuotaResult getSpaceQuota(GetSpaceQuotaRequest getSpaceQuotaRequest)
+            throws CosClientException, CosServiceException {
+        rejectNull(getSpaceQuotaRequest, "The GetSpaceQuotaRequest must be specified when getting space quota");
+        rejectNull(getSpaceQuotaRequest.getBucketName(),
+                "The bucket name must be specified when getting space quota");
+        rejectNull(clientConfig.getRegion(),
+                "region is null, region in clientConfig must be specified when getting space quota");
+        String spaceKey = normalizeSpaceKey(getSpaceQuotaRequest.getSpaceId(), "getting space quota");
+
+        CosHttpRequest<GetSpaceQuotaRequest> request = createRequest(getSpaceQuotaRequest.getBucketName(),
+                spaceKey, getSpaceQuotaRequest, HttpMethodName.GET);
+        request.addParameter("space-quota", null);
+        return invoke(request, new Unmarshallers.SpaceQuotaUnmarshaller());
+    }
+
+    @Override
+    public void putSpaceExtension(PutSpaceExtensionRequest putSpaceExtensionRequest)
+            throws CosClientException, CosServiceException {
+        rejectNull(putSpaceExtensionRequest,
+                "The PutSpaceExtensionRequest must be specified when putting space extension");
+        rejectNull(putSpaceExtensionRequest.getBucketName(),
+                "The bucket name must be specified when putting space extension");
+        rejectNull(putSpaceExtensionRequest.getSpaceTag(),
+                "The space tag must be specified when putting space extension");
+        rejectEmpty(putSpaceExtensionRequest.getSpaceTag(),
+                "The length of the space tag must be greater than 0");
+        rejectNull(clientConfig.getRegion(),
+                "region is null, region in clientConfig must be specified when putting space extension");
+        String spaceKey = normalizeSpaceKey(putSpaceExtensionRequest.getSpaceId(), "putting space extension");
+
+        CosHttpRequest<PutSpaceExtensionRequest> request = createRequest(putSpaceExtensionRequest.getBucketName(),
+                spaceKey, putSpaceExtensionRequest, HttpMethodName.PUT);
+        request.addParameter("space-extension", null);
+        setAgentBucketXmlContent(request,
+                new AgentBucketXmlFactory().convertToXmlByteArray(putSpaceExtensionRequest));
+        invoke(request, voidCosResponseHandler);
+    }
+
+    @Override
+    public SpaceExtensionResult getSpaceExtension(GetSpaceExtensionRequest getSpaceExtensionRequest)
+            throws CosClientException, CosServiceException {
+        rejectNull(getSpaceExtensionRequest,
+                "The GetSpaceExtensionRequest must be specified when getting space extension");
+        rejectNull(getSpaceExtensionRequest.getBucketName(),
+                "The bucket name must be specified when getting space extension");
+        rejectNull(clientConfig.getRegion(),
+                "region is null, region in clientConfig must be specified when getting space extension");
+        String spaceKey = normalizeSpaceKey(getSpaceExtensionRequest.getSpaceId(), "getting space extension");
+
+        CosHttpRequest<GetSpaceExtensionRequest> request = createRequest(getSpaceExtensionRequest.getBucketName(),
+                spaceKey, getSpaceExtensionRequest, HttpMethodName.GET);
+        request.addParameter("space-extension", null);
+        return invoke(request, new Unmarshallers.SpaceExtensionUnmarshaller());
+    }
+
+    @Override
+    public CopyObjectResult copyObjectRecursive(CopyObjectRecursiveRequest copyObjectRecursiveRequest)
+            throws CosClientException, CosServiceException {
+        final String action = "copying object recursively";
+        rejectNull(copyObjectRecursiveRequest, "The CopyObjectRecursiveRequest must be specified when " + action);
+        rejectNull(copyObjectRecursiveRequest.getSourceBucketName(),
+                "The source bucket name must be specified when " + action);
+        rejectNull(copyObjectRecursiveRequest.getDestinationBucketName(),
+                "The destination bucket name must be specified when " + action);
+        validateAgentObjectKey(copyObjectRecursiveRequest.getSourceKey(), "source key", action);
+        validateAgentObjectKey(copyObjectRecursiveRequest.getDestinationKey(), "destination key", action);
+        validateConflictStrategy(copyObjectRecursiveRequest.getConflictResolutionStrategy(), false, action);
+        rejectNull(clientConfig.getRegion(),
+                "region is null, region in clientConfig must be specified when " + action);
+
+        CosHttpRequest<CopyObjectRecursiveRequest> request = createRequest(
+                copyObjectRecursiveRequest.getDestinationBucketName(),
+                copyObjectRecursiveRequest.getDestinationKey(), copyObjectRecursiveRequest, HttpMethodName.PUT);
+        request.addParameter(AGENT_PARAM_RECURSIVE, null);
+        addConflictStrategyParameter(request, copyObjectRecursiveRequest.getConflictResolutionStrategy());
+        request.addHeader(Headers.COPY_SOURCE, buildAgentSourceHeader(
+                copyObjectRecursiveRequest.getSourceBucketName(), copyObjectRecursiveRequest.getSourceKey()));
+        setZeroContentLength(request);
+
+        XmlResponsesSaxParser.AgentObjectOperationResultHandler handler = invokeAgentObjectOperation(request);
+        throwIfAgentBucketError(handler, "copyObjectRecursive");
+
+        CopyObjectResult result = new CopyObjectResult();
+        result.setETag(handler.getETag());
+        result.setLastModifiedDate(handler.getLastModified());
+        result.setCrc64Ecma(handler.getCrc64Ecma());
+        result.setRequestId(handler.getHeaderRequestId());
+        return result;
+    }
+
+    @Override
+    public MoveObjectResult moveObject(MoveObjectRequest moveObjectRequest)
+            throws CosClientException, CosServiceException {
+        return doMoveObject(moveObjectRequest, false);
+    }
+
+    @Override
+    public MoveObjectResult moveObjectRecursive(MoveObjectRequest moveObjectRequest)
+            throws CosClientException, CosServiceException {
+        return doMoveObject(moveObjectRequest, true);
+    }
+
+    private MoveObjectResult doMoveObject(MoveObjectRequest moveObjectRequest, boolean recursive) {
+        final String action = recursive ? "moving object recursively" : "moving object";
+        rejectNull(moveObjectRequest, "The MoveObjectRequest must be specified when " + action);
+        rejectNull(moveObjectRequest.getBucketName(), "The bucket name must be specified when " + action);
+        validateAgentObjectKey(moveObjectRequest.getSourceKey(), "source key", action);
+        validateAgentObjectKey(moveObjectRequest.getDestinationKey(), "destination key", action);
+        // 仅非递归 Move Object 支持 overwrite
+        validateConflictStrategy(moveObjectRequest.getConflictResolutionStrategy(), !recursive, action);
+        rejectNull(clientConfig.getRegion(),
+                "region is null, region in clientConfig must be specified when " + action);
+
+        CosHttpRequest<MoveObjectRequest> request = createRequest(moveObjectRequest.getBucketName(),
+                moveObjectRequest.getDestinationKey(), moveObjectRequest, HttpMethodName.PUT);
+        if (recursive) {
+            request.addParameter(AGENT_PARAM_RECURSIVE, null);
+        }
+        addConflictStrategyParameter(request, moveObjectRequest.getConflictResolutionStrategy());
+        request.addHeader(Headers.MOVE_SOURCE,
+                buildAgentSourceHeader(moveObjectRequest.getBucketName(), moveObjectRequest.getSourceKey()));
+        setZeroContentLength(request);
+
+        XmlResponsesSaxParser.AgentObjectOperationResultHandler handler = invokeAgentObjectOperation(request);
+        throwIfAgentBucketError(handler, recursive ? "moveObjectRecursive" : "moveObject");
+
+        MoveObjectResult result = new MoveObjectResult();
+        result.setETag(handler.getETag());
+        result.setLastModified(handler.getLastModified());
+        result.setLastModifiedStr(handler.getLastModifiedStr());
+        result.setCrc64Ecma(handler.getCrc64Ecma());
+        result.setRequestId(handler.getHeaderRequestId());
+        return result;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public DeleteObjectRecursiveResult deleteObjectRecursive(DeleteObjectRecursiveRequest deleteObjectRecursiveRequest)
+            throws CosClientException, CosServiceException {
+        final String action = "deleting object recursively";
+        rejectNull(deleteObjectRecursiveRequest,
+                "The DeleteObjectRecursiveRequest must be specified when " + action);
+        rejectNull(deleteObjectRecursiveRequest.getBucketName(),
+                "The bucket name must be specified when " + action);
+        // 防止误删整桶：拒绝空 key 与只由 "/" 组成的 key
+        validateAgentObjectKey(deleteObjectRecursiveRequest.getKey(), "key", action);
+        rejectNull(clientConfig.getRegion(),
+                "region is null, region in clientConfig must be specified when " + action);
+
+        CosHttpRequest<DeleteObjectRecursiveRequest> request = createRequest(
+                deleteObjectRecursiveRequest.getBucketName(), deleteObjectRecursiveRequest.getKey(),
+                deleteObjectRecursiveRequest, HttpMethodName.DELETE);
+        request.addParameter(AGENT_PARAM_RECURSIVE, null);
+
+        ResponseHeaderHandlerChain<XmlResponsesSaxParser.DeleteObjectRecursiveHandler> responseHandler =
+                new ResponseHeaderHandlerChain<XmlResponsesSaxParser.DeleteObjectRecursiveHandler>(
+                        new Unmarshallers.DeleteObjectRecursiveUnmarshaller(),
+                        new RequestIdHeaderHandler<XmlResponsesSaxParser.DeleteObjectRecursiveHandler>());
+        XmlResponsesSaxParser.DeleteObjectRecursiveHandler handler = invoke(request, responseHandler);
+        if (handler == null) {
+            handler = new XmlResponsesSaxParser.DeleteObjectRecursiveHandler();
+        }
+        throwIfAgentBucketError(handler, "deleteObjectRecursive");
+
+        DeleteObjectRecursiveResult result = new DeleteObjectRecursiveResult();
+        result.setDeletedKeys(new ArrayList<String>(handler.getDeletedKeys()));
+        result.setErrors(new ArrayList<DeleteObjectRecursiveResult.DeleteError>(handler.getErrors()));
+        result.setRequestId(handler.getHeaderRequestId());
+        if (result.hasErrors()) {
+            log.warn("deleteObjectRecursive partially failed, bucket: {}, key: {}, deleted: {}, errors: {}, requestId: {}",
+                    deleteObjectRecursiveRequest.getBucketName(), deleteObjectRecursiveRequest.getKey(),
+                    result.getDeletedKeys().size(), result.getErrors().size(), result.getRequestId());
+        }
+        return result;
+    }
+
+    @SuppressWarnings("unchecked")
+    private <X extends CosServiceRequest> XmlResponsesSaxParser.AgentObjectOperationResultHandler
+            invokeAgentObjectOperation(CosHttpRequest<X> request) {
+        ResponseHeaderHandlerChain<XmlResponsesSaxParser.AgentObjectOperationResultHandler> responseHandler =
+                new ResponseHeaderHandlerChain<XmlResponsesSaxParser.AgentObjectOperationResultHandler>(
+                        new Unmarshallers.AgentObjectOperationResultUnmarshaller(),
+                        new RequestIdHeaderHandler<XmlResponsesSaxParser.AgentObjectOperationResultHandler>());
+        XmlResponsesSaxParser.AgentObjectOperationResultHandler handler = invoke(request, responseHandler);
+        return handler != null ? handler : new XmlResponsesSaxParser.AgentObjectOperationResultHandler();
+    }
+
+    /**
+     * AgentBucket 递归/移动类接口执行期间出错时返回 HTTP 200 + Error 响应体，这里转换为 CosServiceException。
+     * 不做额外重试：递归操作非幂等，是否重试交由调用方决定。
+     */
+    private void throwIfAgentBucketError(AgentBucketErrorAware handler, String apiName) {
+        if (handler == null || !handler.isErrorResponse()) {
+            return;
+        }
+        String message = handler.getErrorMessage();
+        if (message == null || message.isEmpty()) {
+            message = "AgentBucket " + apiName + " failed";
+        }
+        if (handler.getErrorResource() != null && !handler.getErrorResource().isEmpty()) {
+            message = message + " (Resource: " + handler.getErrorResource() + ")";
+        }
+        String requestId = handler.getErrorRequestId();
+        if (requestId == null || requestId.isEmpty()) {
+            requestId = handler.getHeaderRequestId();
+        }
+        CosServiceException cse = new CosServiceException(message);
+        cse.setErrorCode(handler.getErrorCode());
+        cse.setRequestId(requestId);
+        cse.setStatusCode(200);
+        cse.setErrorType(ErrorType.Service);
+        log.debug("AgentBucket {} returned HTTP 200 with error body, errorCode: {}, requestId: {}",
+                apiName, handler.getErrorCode(), requestId);
+        throw cse;
+    }
+
+    /**
+     * SpaceId 必须为单级目录名，统一规整为以 "/" 结尾的一级目录 key（如 "my-space/"）。
+     */
+    private String normalizeSpaceKey(String spaceId, String action) {
+        rejectNull(spaceId, "The space id must be specified when " + action);
+        String name = spaceId.endsWith("/") ? spaceId.substring(0, spaceId.length() - 1) : spaceId;
+        if (name.trim().isEmpty() || name.contains("/")) {
+            throw new IllegalArgumentException(
+                    "The space id must be a single-level directory name (e.g. \"my-space\"), but got: " + spaceId);
+        }
+        return name + "/";
+    }
+
+    private void validateAgentObjectKey(String key, String fieldName, String action) {
+        rejectNull(key, "The " + fieldName + " must be specified when " + action);
+        rejectEmpty(key, "The length of the " + fieldName + " must be greater than 0");
+        if (key.replace("/", "").isEmpty()) {
+            throw new IllegalArgumentException("The " + fieldName + " should not be / when " + action);
+        }
+    }
+
+    private void validateConflictStrategy(ConflictResolutionStrategy strategy, boolean allowOverwrite,
+            String action) {
+        if (strategy == ConflictResolutionStrategy.OVERWRITE && !allowOverwrite) {
+            throw new IllegalArgumentException("Conflict resolution strategy overwrite is not supported when "
+                    + action + ", only ask and rename are supported");
+        }
+    }
+
+    private void addConflictStrategyParameter(CosHttpRequest<?> request, ConflictResolutionStrategy strategy) {
+        if (strategy != null) {
+            request.addParameter(AGENT_PARAM_CONFLICT_STRATEGY, strategy.getValue());
+        }
+    }
+
+    /**
+     * 构造 x-cos-copy-source / x-cos-move-source 的值：&lt;BucketName-APPID&gt;.cos.&lt;Region&gt;.myqcloud.com/&lt;Key&gt;，
+     * 编码规则与 copyObject 保持一致。
+     */
+    private String buildAgentSourceHeader(String bucketName, String key) {
+        String sourceBucket = formatBucket(bucketName, fetchCredential().getCOSAppId());
+        String endpoint = clientConfig.getEndpointBuilder().buildGeneralApiEndpoint(sourceBucket);
+        return endpoint + UrlEncoderUtils.encodeEscapeDelimiter(formatKey(key));
+    }
+
+    private void setAgentBucketXmlContent(CosHttpRequest<?> request, byte[] content) {
+        request.addHeader(Headers.CONTENT_LENGTH, String.valueOf(content.length));
+        request.addHeader(Headers.CONTENT_TYPE, "application/xml");
+        request.setContent(new ByteArrayInputStream(content));
+        try {
+            byte[] md5 = Md5Utils.computeMD5Hash(content);
+            request.addHeader(Headers.CONTENT_MD5, BinaryUtils.toBase64(md5));
+        } catch (Exception e) {
+            throw new CosClientException("Couldn't compute md5 sum", e);
+        }
     }
 
     private void updatePreflightStatus(boolean needPreflight, String bucketName) {
