@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - moveObject / moveObjectRecursive
   - deleteObjectRecursive
 - AgentBucket: HTTP 200 responses with an Error body are converted to CosServiceException (status code 200)
+- AgentBucket: when no conflict resolution strategy is set, the SDK sends `ask` explicitly (the documented default), so moveObject never overwrites an existing file unless OVERWRITE is specified
 - Note: new abstract methods are added to the `COS` interface; custom implementations of `COS` need to implement them
 
 ## [5.6.271]

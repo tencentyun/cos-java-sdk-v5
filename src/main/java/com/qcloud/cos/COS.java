@@ -3452,6 +3452,8 @@ public interface COS extends COSDirectSpi {
      * <p>
      * <b>Note:</b> HTTP 200 may carry an Error body, in which case {@link CosServiceException}
      * (status code 200) is thrown. Supports {@code ASK}, {@code RENAME} and {@code OVERWRITE}.
+     * If no strategy is set, the SDK sends {@code ask} explicitly (the documented default), so an existing
+     * destination is never overwritten unless {@code OVERWRITE} is specified.
      * A retry after timeout may report 404 because the source has already been moved.
      * </p>
      *

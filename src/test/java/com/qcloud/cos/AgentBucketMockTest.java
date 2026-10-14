@@ -223,7 +223,7 @@ public class AgentBucketMockTest {
         stub.responseBody = "<CopyObjectResult><ETag>\"e\"</ETag></CopyObjectResult>";
         client.copyObjectRecursive(new CopyObjectRecursiveRequest(BUCKET, "my space/中文 dir", BUCKET, "dst"));
         assertEquals(HOST + "/my%20space/%E4%B8%AD%E6%96%87%20dir", headers().get(Headers.COPY_SOURCE));
-        assertFalse("未设置策略时不传该参数", params().containsKey("conflict_resolution_strategy"));
+        assertEquals("未设置策略时显式传 ask", "ask", params().get("conflict_resolution_strategy"));
     }
 
     @Test

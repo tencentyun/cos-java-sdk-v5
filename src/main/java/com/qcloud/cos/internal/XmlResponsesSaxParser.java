@@ -7806,15 +7806,23 @@ public class XmlResponsesSaxParser {
     }
 
     /**
-     * 空响应体（Content-Length 为 0）时直接返回空结果，避免 SAX 抛 "Premature end of file"；
-     * 非空时流式解析，不整体读入内存（递归删除的响应可能很长）。
+     * 解析 AgentBucket 响应体：
+     * <ul>
+     * <li>递归复制/删除等耗时操作执行期间，服务端会先在响应体开头输出空白字符保持连接，
+     * 而 XML 声明前出现任何字符都会导致 SAX 报错，因此先跳过开头的空白；</li>
+     * <li>空响应体或只有空白时直接返回空结果，避免 SAX 抛 "Premature end of file"；</li>
+     * <li>流式解析，不整体读入内存（递归删除的响应可能很长）。</li>
+     * </ul>
      */
     private void parseAgentBucketXml(DefaultHandler handler, InputStream inputStream) throws IOException {
         if (inputStream == null) {
             return;
         }
         java.io.PushbackInputStream pushback = new java.io.PushbackInputStream(inputStream, 1);
-        int first = pushback.read();
+        int first;
+        do {
+            first = pushback.read();
+        } while (first == ' ' || first == '\t' || first == '\r' || first == '\n');
         if (first == -1) {
             return;
         }
@@ -7828,6 +7836,18 @@ public class XmlResponsesSaxParser {
         }
         String trimmed = text.trim();
         return trimmed.isEmpty() ? null : trimmed;
+    }
+
+    /**
+     * 去掉 ETag 外层的所有双引号。真机实测：移动、复制单个文件时服务端返回 &lt;ETag&gt;""md5""&lt;/ETag&gt;（两层引号），
+     * StringUtils.removeQuotes 只去一层，这里循环去除，使结果与 putObject、getObjectMetadata 返回的 ETag 一致。
+     */
+    private static String removeAllQuotes(String text) {
+        String value = text;
+        while (value != null && value.length() >= 2 && value.startsWith("\"") && value.endsWith("\"")) {
+            value = value.substring(1, value.length() - 1).trim();
+        }
+        return value;
     }
 
     private static Long parseLongOrNull(String text, String fieldName) {
@@ -8017,7 +8037,7 @@ public class XmlResponsesSaxParser {
             }
             if (in("CopyObjectResult") || in("MoveObjectResult")) {
                 if ("ETag".equals(name)) {
-                    eTag = StringUtils.removeQuotes(trimToNull(getText()));
+                    eTag = removeAllQuotes(trimToNull(getText()));
                 } else if ("LastModified".equals(name)) {
                     lastModifiedStr = trimToNull(getText());
                     if (lastModifiedStr != null) {
