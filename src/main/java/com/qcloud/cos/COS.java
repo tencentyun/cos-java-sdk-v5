@@ -3490,9 +3490,8 @@ public interface COS extends COSDirectSpi {
      * (status code 200) is thrown. An empty key or "/" is rejected to avoid deleting the whole bucket.
      * </p>
      * <p>
-     * <b>Important:</b> to delete a directory, the key must end with "/" (e.g. "my-space/dir/").
-     * A key without the trailing "/" is treated as a file with the same name: the server returns
-     * success but a nested directory is NOT deleted.
+     * To delete a directory, the key should end with "/" (e.g. "my-space/dir/").
+     * To delete a single file, pass the file key directly.
      * </p>
      *
      * @param deleteObjectRecursiveRequest The request containing bucket and key.

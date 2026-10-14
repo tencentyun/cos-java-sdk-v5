@@ -132,8 +132,7 @@ public class AgentBucketDemo {
             MoveObjectResult result = cosClient.moveObjectRecursive(request);
             System.out.println("move recursive: " + result);
         } catch (CosServiceException e) {
-            if ("FileAlreadyExists".equals(e.getErrorCode())
-                    || "SameNameDirectoryOrFileExists".equals(e.getErrorCode())) {
+            if ("FileAlreadyExists".equals(e.getErrorCode())) {
                 System.out.println("destination already exists, requestId: " + e.getRequestId());
             } else {
                 throw e;
@@ -142,8 +141,7 @@ public class AgentBucketDemo {
     }
 
     /**
-     * 递归删除目录，删除后无法恢复。
-     * 目录 key 必须以 "/" 结尾；不带 "/" 时服务端按同名文件处理，返回成功但目录不会被删除。
+     * 递归删除目录，删除后无法恢复。目录 key 以 "/" 结尾。
      */
     private static void deleteObjectRecursive(COSClient cosClient) {
         DeleteObjectRecursiveResult result =

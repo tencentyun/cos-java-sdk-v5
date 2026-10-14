@@ -12,8 +12,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Properties;
 
 import org.junit.After;
@@ -51,8 +49,7 @@ import com.qcloud.cos.region.Region;
  * </p>
  */
 public class AgentBucketTest {
-    private static final List<String> CONFLICT_CODES =
-            Arrays.asList("FileAlreadyExists", "SameNameDirectoryOrFileExists");
+    private static final String CONFLICT_CODE = "FileAlreadyExists";
 
     private static String secretId;
     private static String secretKey;
@@ -175,13 +172,14 @@ public class AgentBucketTest {
         assertTrue(client.doesObjectExist(bucket, dst + "/sub/b.txt"));
         assertTrue("复制不应删除源", client.doesObjectExist(bucket, src + "/a.txt"));
 
-        // 默认 ask：目标已存在时报冲突（409 或 HTTP 200 + Error）
+        // 默认 ask：目标已存在时抛出冲突异常
         try {
             client.copyObjectRecursive(new CopyObjectRecursiveRequest(bucket, src, bucket, dst)
                     .withConflictResolutionStrategy(ConflictResolutionStrategy.ASK));
             fail("目标已存在时应抛出冲突异常");
         } catch (CosServiceException e) {
-            assertTrue("unexpected error code: " + e.getErrorCode(), CONFLICT_CODES.contains(e.getErrorCode()));
+            assertEquals(CONFLICT_CODE, e.getErrorCode());
+            assertEquals(200, e.getStatusCode());
             assertNotNull(e.getRequestId());
         }
 
@@ -222,7 +220,8 @@ public class AgentBucketTest {
             client.moveObjectRecursive(new MoveObjectRequest(bucket, src2, dst));
             fail("目标已存在时应抛出冲突异常");
         } catch (CosServiceException e) {
-            assertTrue("unexpected error code: " + e.getErrorCode(), CONFLICT_CODES.contains(e.getErrorCode()));
+            assertEquals(CONFLICT_CODE, e.getErrorCode());
+            assertEquals(200, e.getStatusCode());
         }
     }
 
@@ -231,7 +230,7 @@ public class AgentBucketTest {
         String dir = space + "/to-delete";
         buildTree(dir);
 
-        // 删除非一级目录时 key 必须以 "/" 结尾；不带 "/" 时服务端按同名文件处理，返回成功但目录不会被删除
+        // 删除目录时 key 以 "/" 结尾
         DeleteObjectRecursiveResult result =
                 client.deleteObjectRecursive(new DeleteObjectRecursiveRequest(bucket, dir + "/"));
         assertNotNull(result.getRequestId());

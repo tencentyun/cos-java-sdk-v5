@@ -10,8 +10,7 @@ import com.qcloud.cos.internal.CosServiceRequest;
  * <b>删除后无法恢复，请谨慎操作。</b>为防止误删整桶，SDK 拒绝空 key 与 "/"。
  * </p>
  * <p>
- * <b>删除目录时 key 必须以 "/" 结尾</b>（如 "my-space/dir/"）。不带 "/" 时服务端按同名文件处理：
- * 返回成功，但二级及以下目录不会被删除。删除单个文件时直接传文件 key。
+ * 删除目录时 key 以 "/" 结尾（如 "my-space/dir/"）；删除单个文件时直接传文件 key。
  * </p>
  *
  * @see <a href="https://cloud.tencent.com/document/product/436/133861">Delete Object Recursive</a>
