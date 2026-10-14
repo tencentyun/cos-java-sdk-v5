@@ -218,6 +218,16 @@ public interface Headers {
     public static final String COPY_PART_RANGE = "x-cos-copy-source-range";
 
     /**
+     * Source object header for the copy object request
+     */
+    public static final String COPY_SOURCE = "x-cos-copy-source";
+
+    /**
+     * Source object header for the AgentBucket move object request
+     */
+    public static final String MOVE_SOURCE = "x-cos-move-source";
+
+    /**
      * Modified since constraint header for the get object request
      */
     public static final String GET_OBJECT_IF_MODIFIED_SINCE = "If-Modified-Since";

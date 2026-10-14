@@ -7774,5 +7774,317 @@ public class XmlResponsesSaxParser {
         parseXmlInputStream(handler, inputStream);
         return handler;
     }
+
+    // ---------------------------------------------------------------------------------------
+    // AgentBucket 增强 API 响应解析（@since 5.6.283）
+    // ---------------------------------------------------------------------------------------
+
+    public SpaceQuotaHandler parseSpaceQuotaResponse(InputStream inputStream) throws IOException {
+        SpaceQuotaHandler handler = new SpaceQuotaHandler();
+        parseAgentBucketXml(handler, inputStream);
+        return handler;
+    }
+
+    public SpaceExtensionHandler parseSpaceExtensionResponse(InputStream inputStream) throws IOException {
+        SpaceExtensionHandler handler = new SpaceExtensionHandler();
+        parseAgentBucketXml(handler, inputStream);
+        return handler;
+    }
+
+    public AgentObjectOperationResultHandler parseAgentObjectOperationResponse(InputStream inputStream)
+            throws IOException {
+        AgentObjectOperationResultHandler handler = new AgentObjectOperationResultHandler();
+        parseAgentBucketXml(handler, inputStream);
+        return handler;
+    }
+
+    public DeleteObjectRecursiveHandler parseDeleteObjectRecursiveResponse(InputStream inputStream)
+            throws IOException {
+        DeleteObjectRecursiveHandler handler = new DeleteObjectRecursiveHandler();
+        parseAgentBucketXml(handler, inputStream);
+        return handler;
+    }
+
+    /**
+     * 空响应体（Content-Length 为 0）时直接返回空结果，避免 SAX 抛 "Premature end of file"；
+     * 非空时流式解析，不整体读入内存（递归删除的响应可能很长）。
+     */
+    private void parseAgentBucketXml(DefaultHandler handler, InputStream inputStream) throws IOException {
+        if (inputStream == null) {
+            return;
+        }
+        java.io.PushbackInputStream pushback = new java.io.PushbackInputStream(inputStream, 1);
+        int first = pushback.read();
+        if (first == -1) {
+            return;
+        }
+        pushback.unread(first);
+        parseXmlInputStream(handler, pushback);
+    }
+
+    private static String trimToNull(String text) {
+        if (text == null) {
+            return null;
+        }
+        String trimmed = text.trim();
+        return trimmed.isEmpty() ? null : trimmed;
+    }
+
+    private static Long parseLongOrNull(String text, String fieldName) {
+        String value = trimToNull(text);
+        if (value == null) {
+            return null;
+        }
+        try {
+            return Long.parseLong(value);
+        } catch (NumberFormatException e) {
+            log.warn("AgentBucket response field {} is not a valid int64: {}", fieldName, value);
+            return null;
+        }
+    }
+
+    private static Boolean parseBooleanOrNull(String text) {
+        String value = trimToNull(text);
+        return value == null ? null : Boolean.valueOf(value);
+    }
+
+    /**
+     * 识别顶层 &lt;Error&gt; 的公共基类：AgentBucket 递归/移动类接口执行中出错时仍返回 HTTP 200，
+     * 错误以响应体返回。
+     */
+    public static abstract class AgentBucketErrorAwareHandler extends AbstractHandler
+            implements AgentBucketErrorAware {
+        private boolean receivedErrorResponse = false;
+        private String errorCode;
+        private String errorMessage;
+        private String errorResource;
+        private String errorRequestId;
+        private String headerRequestId;
+
+        /** 子类在 doStartElement 开头调用：识别顶层 Error */
+        protected final void startTopLevel(String name) {
+            if (atTopLevel() && "Error".equals(name)) {
+                receivedErrorResponse = true;
+            }
+        }
+
+        /** 子类在 doEndElement 开头调用：解析顶层 Error 子节点，返回 true 表示已处理 */
+        protected final boolean endTopLevelError(String name) {
+            if (!in("Error")) {
+                return false;
+            }
+            if ("Code".equals(name)) {
+                errorCode = getText();
+            } else if ("Message".equals(name)) {
+                errorMessage = getText();
+            } else if ("Resource".equals(name)) {
+                errorResource = getText();
+            } else if ("RequestId".equals(name)) {
+                errorRequestId = getText();
+            }
+            return true;
+        }
+
+        @Override
+        public boolean isErrorResponse() {
+            return receivedErrorResponse;
+        }
+
+        @Override
+        public String getErrorCode() {
+            return errorCode;
+        }
+
+        @Override
+        public String getErrorMessage() {
+            return errorMessage;
+        }
+
+        @Override
+        public String getErrorResource() {
+            return errorResource;
+        }
+
+        @Override
+        public String getErrorRequestId() {
+            return errorRequestId;
+        }
+
+        @Override
+        public String getHeaderRequestId() {
+            return headerRequestId;
+        }
+
+        @Override
+        public void setHeaderRequestId(String headerRequestId) {
+            this.headerRequestId = headerRequestId;
+        }
+    }
+
+    /**
+     * 解析 Put/Get Space Quota 响应：
+     * &lt;SpaceQuota&gt;&lt;QuotaId&gt;..&lt;/QuotaId&gt;&lt;Capacity&gt;..&lt;/Capacity&gt;&lt;/SpaceQuota&gt;
+     */
+    public static class SpaceQuotaHandler extends AbstractHandler {
+        private final com.qcloud.cos.model.agentbucket.SpaceQuotaResult result =
+                new com.qcloud.cos.model.agentbucket.SpaceQuotaResult();
+
+        public com.qcloud.cos.model.agentbucket.SpaceQuotaResult getResult() {
+            return result;
+        }
+
+        @Override
+        protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
+        }
+
+        @Override
+        protected void doEndElement(String uri, String name, String qName) {
+            if (in("SpaceQuota")) {
+                if ("QuotaId".equals(name)) {
+                    result.setQuotaId(trimToNull(getText()));
+                } else if ("Capacity".equals(name)) {
+                    result.setCapacity(parseLongOrNull(getText(), "SpaceQuota.Capacity"));
+                }
+            }
+        }
+    }
+
+    /**
+     * 解析 Get Space Extension 响应：
+     * &lt;SpaceExtension&gt;&lt;IsPublicRead/&gt;&lt;RecognizeSensitiveContent/&gt;&lt;SpaceTag/&gt;&lt;/SpaceExtension&gt;
+     */
+    public static class SpaceExtensionHandler extends AbstractHandler {
+        private final com.qcloud.cos.model.agentbucket.SpaceExtensionResult result =
+                new com.qcloud.cos.model.agentbucket.SpaceExtensionResult();
+
+        public com.qcloud.cos.model.agentbucket.SpaceExtensionResult getResult() {
+            return result;
+        }
+
+        @Override
+        protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
+        }
+
+        @Override
+        protected void doEndElement(String uri, String name, String qName) {
+            if (in("SpaceExtension")) {
+                if ("IsPublicRead".equals(name)) {
+                    result.setIsPublicRead(parseBooleanOrNull(getText()));
+                } else if ("RecognizeSensitiveContent".equals(name)) {
+                    result.setRecognizeSensitiveContent(parseBooleanOrNull(getText()));
+                } else if ("SpaceTag".equals(name)) {
+                    result.setSpaceTag(getText());
+                }
+            }
+        }
+    }
+
+    /**
+     * 解析 Copy Object Recursive / Move Object / Move Object Recursive 响应：
+     * 顶层为 CopyObjectResult 或 MoveObjectResult（ETag/LastModified/CRC64），或 Error。
+     */
+    public static class AgentObjectOperationResultHandler extends AgentBucketErrorAwareHandler {
+        private String eTag;
+        private String lastModifiedStr;
+        private Date lastModified;
+        private String crc64Ecma;
+
+        public String getETag() {
+            return eTag;
+        }
+
+        public String getLastModifiedStr() {
+            return lastModifiedStr;
+        }
+
+        public Date getLastModified() {
+            return lastModified;
+        }
+
+        public String getCrc64Ecma() {
+            return crc64Ecma;
+        }
+
+        @Override
+        protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
+            startTopLevel(name);
+        }
+
+        @Override
+        protected void doEndElement(String uri, String name, String qName) {
+            if (endTopLevelError(name)) {
+                return;
+            }
+            if (in("CopyObjectResult") || in("MoveObjectResult")) {
+                if ("ETag".equals(name)) {
+                    eTag = StringUtils.removeQuotes(trimToNull(getText()));
+                } else if ("LastModified".equals(name)) {
+                    lastModifiedStr = trimToNull(getText());
+                    if (lastModifiedStr != null) {
+                        try {
+                            lastModified = DateUtils.parseISO8601Date(lastModifiedStr);
+                        } catch (Exception e) {
+                            log.warn("AgentBucket response LastModified is not ISO8601: {}", lastModifiedStr);
+                        }
+                    }
+                } else if ("CRC64".equals(name)) {
+                    crc64Ecma = trimToNull(getText());
+                }
+            }
+        }
+    }
+
+    /**
+     * 解析 Delete Object Recursive 响应：
+     * &lt;DeleteResult&gt;&lt;Deleted&gt;&lt;Key/&gt;&lt;/Deleted&gt;...&lt;/DeleteResult&gt;，或顶层 Error。
+     * DeleteResult 下的 Error 子节点（逐条失败）做防御性解析。
+     */
+    public static class DeleteObjectRecursiveHandler extends AgentBucketErrorAwareHandler {
+        private final List<String> deletedKeys = new ArrayList<String>();
+        private final List<com.qcloud.cos.model.agentbucket.DeleteObjectRecursiveResult.DeleteError> errors =
+                new ArrayList<com.qcloud.cos.model.agentbucket.DeleteObjectRecursiveResult.DeleteError>();
+        private com.qcloud.cos.model.agentbucket.DeleteObjectRecursiveResult.DeleteError currentError;
+
+        public List<String> getDeletedKeys() {
+            return deletedKeys;
+        }
+
+        public List<com.qcloud.cos.model.agentbucket.DeleteObjectRecursiveResult.DeleteError> getErrors() {
+            return errors;
+        }
+
+        @Override
+        protected void doStartElement(String uri, String name, String qName, Attributes attrs) {
+            startTopLevel(name);
+            if (in("DeleteResult") && "Error".equals(name)) {
+                currentError = new com.qcloud.cos.model.agentbucket.DeleteObjectRecursiveResult.DeleteError();
+            }
+        }
+
+        @Override
+        protected void doEndElement(String uri, String name, String qName) {
+            if (endTopLevelError(name)) {
+                return;
+            }
+            if (in("DeleteResult")) {
+                if ("Error".equals(name) && currentError != null) {
+                    errors.add(currentError);
+                    currentError = null;
+                }
+            } else if (in("DeleteResult", "Deleted")) {
+                if ("Key".equals(name)) {
+                    deletedKeys.add(getText());
+                }
+            } else if (in("DeleteResult", "Error") && currentError != null) {
+                if ("Key".equals(name)) {
+                    currentError.setKey(getText());
+                } else if ("Code".equals(name)) {
+                    currentError.setCode(getText());
+                } else if ("Message".equals(name)) {
+                    currentError.setMessage(getText());
+                }
+            }
+        }
+    }
 }
 

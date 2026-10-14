@@ -41,6 +41,7 @@ import com.qcloud.cos.exception.MultiObjectDeleteException;
 import com.qcloud.cos.http.HttpMethodName;
 import com.qcloud.cos.internal.COSDirectSpi;
 import com.qcloud.cos.model.*;
+import com.qcloud.cos.model.agentbucket.*;
 import com.qcloud.cos.model.ciModel.auditing.*;
 import com.qcloud.cos.model.ciModel.bucket.DocBucketRequest;
 import com.qcloud.cos.model.ciModel.bucket.DocBucketResponse;
@@ -3363,4 +3364,143 @@ public interface COS extends COSDirectSpi {
     AIImageAnalysisResponse aiImageAnalysis(AIImageAnalysisRequest aiImageAnalysisRequest);
 
     AIImageAnalysisJobResponse createAIImageAnalysisJob(AIImageAnalysisJobRequest request);
+
+    // ---------------------------------------------------------------------------------------
+    // AgentBucket enhanced APIs
+    // https://cloud.tencent.com/document/product/436/133858
+    // ---------------------------------------------------------------------------------------
+
+    /**
+     * Sets the storage quota of the specified space in an AgentBucket.
+     * <p>
+     * The space id is the first-level directory of object keys, which must be created in advance
+     * by uploading an empty directory object (e.g. "my-space/") via PUT Object.
+     * </p>
+     *
+     * @param putSpaceQuotaRequest The request containing bucket, space id and capacity (bytes, non-negative).
+     * @return The quota id and capacity returned by the server.
+     * @throws CosClientException If any errors are encountered in the client while making the request.
+     * @throws CosServiceException If any errors occurred in COS while processing the request.
+     * @see <a href="https://cloud.tencent.com/document/product/436/133860">Put Space Quota</a>
+     * @since 5.6.283
+     */
+    SpaceQuotaResult putSpaceQuota(PutSpaceQuotaRequest putSpaceQuotaRequest)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * Gets the storage quota of the specified space in an AgentBucket.
+     *
+     * @param getSpaceQuotaRequest The request containing bucket and space id.
+     * @return The quota id and capacity of the space.
+     * @throws CosClientException If any errors are encountered in the client while making the request.
+     * @throws CosServiceException If any errors occurred in COS while processing the request.
+     * @see <a href="https://cloud.tencent.com/document/product/436/133859">Get Space Quota</a>
+     * @since 5.6.283
+     */
+    SpaceQuotaResult getSpaceQuota(GetSpaceQuotaRequest getSpaceQuotaRequest)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * Sets the extension attributes (space tag) of the specified space in an AgentBucket.
+     *
+     * @param putSpaceExtensionRequest The request containing bucket, space id and space tag.
+     * @throws CosClientException If any errors are encountered in the client while making the request.
+     * @throws CosServiceException If any errors occurred in COS while processing the request.
+     * @see <a href="https://cloud.tencent.com/document/product/436/133864">Put Space Extension</a>
+     * @since 5.6.283
+     */
+    void putSpaceExtension(PutSpaceExtensionRequest putSpaceExtensionRequest)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * Gets the extension attributes of the specified space in an AgentBucket.
+     *
+     * @param getSpaceExtensionRequest The request containing bucket and space id.
+     * @return IsPublicRead, RecognizeSensitiveContent and SpaceTag of the space.
+     * @throws CosClientException If any errors are encountered in the client while making the request.
+     * @throws CosServiceException If any errors occurred in COS while processing the request.
+     * @see <a href="https://cloud.tencent.com/document/product/436/133863">Get Space Extension</a>
+     * @since 5.6.283
+     */
+    SpaceExtensionResult getSpaceExtension(GetSpaceExtensionRequest getSpaceExtensionRequest)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * Recursively copies a whole directory tree (all sub files and sub directories) to the destination.
+     * <p>
+     * <b>Note:</b> if an error occurs during the copy, COS still returns HTTP 200 with an Error body.
+     * The SDK parses the body and throws {@link CosServiceException} (status code 200) in this case.
+     * The operation is synchronous; for large directories, increase
+     * {@link ClientConfig#setSocketTimeout(int)}. The request follows the SDK default retry policy,
+     * a retry after timeout may produce a conflict error or a renamed copy, so callers should verify
+     * the result when an exception is thrown.
+     * Only {@code ASK} and {@code RENAME} conflict strategies are supported.
+     * </p>
+     *
+     * @param copyObjectRecursiveRequest The request containing source/destination and conflict strategy.
+     * @return ETag, LastModified and CRC64 of the destination.
+     * @throws CosClientException If any errors are encountered in the client while making the request.
+     * @throws CosServiceException If any errors occurred in COS while processing the request.
+     * @see <a href="https://cloud.tencent.com/document/product/436/133866">Copy Object Recursive</a>
+     * @since 5.6.283
+     */
+    CopyObjectResult copyObjectRecursive(CopyObjectRecursiveRequest copyObjectRecursiveRequest)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * Moves an object (file or directory) to a new location in the same AgentBucket.
+     * <p>
+     * <b>Note:</b> HTTP 200 may carry an Error body, in which case {@link CosServiceException}
+     * (status code 200) is thrown. Supports {@code ASK}, {@code RENAME} and {@code OVERWRITE}.
+     * A retry after timeout may report 404 because the source has already been moved.
+     * </p>
+     *
+     * @param moveObjectRequest The request containing bucket, source key, destination key and strategy.
+     * @return ETag, LastModified and CRC64 of the destination.
+     * @throws CosClientException If any errors are encountered in the client while making the request.
+     * @throws CosServiceException If any errors occurred in COS while processing the request.
+     * @see <a href="https://cloud.tencent.com/document/product/436/133865">Move Object</a>
+     * @since 5.6.283
+     */
+    MoveObjectResult moveObject(MoveObjectRequest moveObjectRequest)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * Recursively moves a whole directory tree to the destination in the same AgentBucket.
+     * <p>
+     * <b>Note:</b> HTTP 200 may carry an Error body, in which case {@link CosServiceException}
+     * (status code 200) is thrown. Only {@code ASK} and {@code RENAME} are supported.
+     * For large directories, increase {@link ClientConfig#setSocketTimeout(int)}.
+     * </p>
+     *
+     * @param moveObjectRequest The request containing bucket, source key, destination key and strategy.
+     * @return ETag, LastModified and CRC64 of the destination.
+     * @throws CosClientException If any errors are encountered in the client while making the request.
+     * @throws CosServiceException If any errors occurred in COS while processing the request.
+     * @see <a href="https://cloud.tencent.com/document/product/436/133862">Move Object Recursive</a>
+     * @since 5.6.283
+     */
+    MoveObjectResult moveObjectRecursive(MoveObjectRequest moveObjectRequest)
+            throws CosClientException, CosServiceException;
+
+    /**
+     * Recursively deletes a whole directory tree in an AgentBucket. <b>Deleted data cannot be recovered.</b>
+     * <p>
+     * <b>Note:</b> HTTP 200 may carry an Error body, in which case {@link CosServiceException}
+     * (status code 200) is thrown. An empty key or "/" is rejected to avoid deleting the whole bucket.
+     * </p>
+     * <p>
+     * To delete a directory, the key should end with "/" (e.g. "my-space/dir/").
+     * To delete a single file, pass the file key directly.
+     * </p>
+     *
+     * @param deleteObjectRecursiveRequest The request containing bucket and key.
+     * @return The deleted keys.
+     * @throws CosClientException If any errors are encountered in the client while making the request.
+     * @throws CosServiceException If any errors occurred in COS while processing the request.
+     * @see <a href="https://cloud.tencent.com/document/product/436/133861">Delete Object Recursive</a>
+     * @since 5.6.283
+     */
+    DeleteObjectRecursiveResult deleteObjectRecursive(DeleteObjectRecursiveRequest deleteObjectRecursiveRequest)
+            throws CosClientException, CosServiceException;
 }

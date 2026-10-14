@@ -2,3 +2,5 @@
 .project
 *.iml
 target/
+ut_account.prop
+output/
