@@ -3497,7 +3497,8 @@ public interface COS extends COSDirectSpi {
      * </p>
      *
      * @param deleteObjectRecursiveRequest The request containing bucket and key.
-     * @return The deleted keys.
+     * @return The Deleted/Key entries returned by COS. COS only returns the requested key (e.g. the directory
+     *         key), not every deleted file under it, so the list cannot be used to count deleted files.
      * @throws CosClientException If any errors are encountered in the client while making the request.
      * @throws CosServiceException If any errors occurred in COS while processing the request.
      * @see <a href="https://cloud.tencent.com/document/product/436/133861">Delete Object Recursive</a>
