@@ -8,8 +8,8 @@ import com.qcloud.cos.utils.Jackson;
 import java.util.Arrays;
 
 /**
- * 多模态混合检索 Demo（V2.7.0 新增）。
- * <p>详情见 <a href="https://write.woa.com/document/200892020456558592">官方文档</a>。</p>
+ * 多模态混合检索 Demo。
+ * <p>详情见 <a href="https://cloud.tencent.com/document/product/460/135101">官方文档</a>。</p>
  *
  * <p>本 Demo 演示 3 种典型场景：</p>
  * <ol>

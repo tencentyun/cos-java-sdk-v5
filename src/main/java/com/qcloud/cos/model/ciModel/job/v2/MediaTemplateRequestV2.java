@@ -54,6 +54,12 @@ public class MediaTemplateRequestV2 extends CIServiceRequest {
     private MediaTransConfigObject transConfig;
 
     /**
+     * 转码扩展字段，值为 Base64 编码后的 JSON 字符串，需编码后传入 https://cloud.tencent.com/document/product/460/84790
+     */
+    @XStreamAlias("StdExtInfo")
+    private String stdExtInfo;
+
+    /**
      * 时间区间
      */
     @XStreamAlias("TimeInterval")
@@ -197,6 +203,14 @@ public class MediaTemplateRequestV2 extends CIServiceRequest {
 
     public void setTransConfig(MediaTransConfigObject transConfig) {
         this.transConfig = transConfig;
+    }
+
+    public String getStdExtInfo() {
+        return stdExtInfo;
+    }
+
+    public void setStdExtInfo(String stdExtInfo) {
+        this.stdExtInfo = stdExtInfo;
     }
 
     public MediaTimeIntervalObject getTimeInterval() {

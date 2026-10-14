@@ -76,6 +76,12 @@ public class MediaJobOperation {
     @XStreamAlias("FreeTranscode")
     private String freeTranscode;
 
+    /**
+     * 转码扩展字段，值为 Base64 编码后的 JSON 字符串，需编码后传入 https://cloud.tencent.com/document/product/460/84790
+     */
+    @XStreamAlias("StdExtInfo")
+    private String stdExtInfo;
+
     @XStreamAlias("SnapshotPrefix")
     private String snapshotPrefix;
 
@@ -280,6 +286,14 @@ public class MediaJobOperation {
 
     public void setFreeTranscode(String freeTranscode) {
         this.freeTranscode = freeTranscode;
+    }
+
+    public String getStdExtInfo() {
+        return stdExtInfo;
+    }
+
+    public void setStdExtInfo(String stdExtInfo) {
+        this.stdExtInfo = stdExtInfo;
     }
 
     public void setSegmentVideoBody(SegmentVideoBody segmentVideoBody) {
@@ -766,6 +780,7 @@ public class MediaJobOperation {
         sb.append(", encryptIv='").append(encryptIv).append('\'');
         sb.append(", encryptMode='").append(encryptMode).append('\'');
         sb.append(", freeTranscode='").append(freeTranscode).append('\'');
+        sb.append(", stdExtInfo='").append(stdExtInfo).append('\'');
         sb.append(", snapshotPrefix='").append(snapshotPrefix).append('\'');
         sb.append(", output=").append(output);
         sb.append(", mediaAnimation=").append(mediaAnimation);

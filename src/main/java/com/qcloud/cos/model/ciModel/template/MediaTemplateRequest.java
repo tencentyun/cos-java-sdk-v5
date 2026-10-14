@@ -57,6 +57,12 @@ public class MediaTemplateRequest extends CIServiceRequest implements Serializab
     private MediaTransConfigObject transConfig;
 
     /**
+     * 转码扩展字段，值为 Base64 编码后的 JSON 字符串，需编码后传入 https://cloud.tencent.com/document/product/460/84790
+     */
+    @XStreamAlias("StdExtInfo")
+    private String stdExtInfo;
+
+    /**
      * 时间区间
      */
     @XStreamAlias("TimeInterval")
@@ -315,6 +321,14 @@ public class MediaTemplateRequest extends CIServiceRequest implements Serializab
         this.transConfig = transConfig;
     }
 
+    public String getStdExtInfo() {
+        return stdExtInfo;
+    }
+
+    public void setStdExtInfo(String stdExtInfo) {
+        this.stdExtInfo = stdExtInfo;
+    }
+
     public MediaWatermark getWatermark() {
         if (watermark == null) {
             watermark = new MediaWatermark();
@@ -383,6 +397,6 @@ public class MediaTemplateRequest extends CIServiceRequest implements Serializab
 
     @Override
     public String toString() {
-        return "MediaTemplateRequest{" + "templateId='" + templateId + '\'' + ", tag='" + tag + '\'' + ", name='" + name + '\'' + ", container=" + container + ", video=" + video + ", audio=" + audio + ", transConfig=" + transConfig + ", timeInterval=" + timeInterval + ", snapshot=" + snapshot + ", waterMark=" + watermark + ", pageNumber='" + pageNumber + '\'' + ", pageSize='" + pageSize + '\'' + ", category='" + category + '\'' + ", ids='" + ids + '\'' + '}';
+        return "MediaTemplateRequest{" + "templateId='" + templateId + '\'' + ", tag='" + tag + '\'' + ", name='" + name + '\'' + ", container=" + container + ", video=" + video + ", audio=" + audio + ", transConfig=" + transConfig + ", stdExtInfo='" + stdExtInfo + '\'' + ", timeInterval=" + timeInterval + ", snapshot=" + snapshot + ", waterMark=" + watermark + ", pageNumber='" + pageNumber + '\'' + ", pageSize='" + pageSize + '\'' + ", category='" + category + '\'' + ", ids='" + ids + '\'' + '}';
     }
 }

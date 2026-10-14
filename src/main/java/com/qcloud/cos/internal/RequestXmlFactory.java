@@ -466,6 +466,8 @@ public class RequestXmlFactory {
             xml.end();
         }
 
+        addIfNotNull(xml, "StdExtInfo", operation.getStdExtInfo());
+
         MediaDigitalWatermark digitalWatermark = operation.getDigitalWatermark();
         if (CheckObjectUtils.objIsNotValid(digitalWatermark)) {
             xml.start("DigitalWatermark");
@@ -645,6 +647,8 @@ public class RequestXmlFactory {
             xml.end();
 
             addVideo(xml, request);
+
+            addIfNotNull(xml, "StdExtInfo", request.getStdExtInfo());
 
         }
         xml.end();

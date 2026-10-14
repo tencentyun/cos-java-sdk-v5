@@ -12,6 +12,7 @@ import com.qcloud.cos.model.ciModel.template.MediaTemplateRequest;
 import com.qcloud.cos.model.ciModel.template.MediaTemplateResponse;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import org.apache.commons.codec.binary.Base64;
 

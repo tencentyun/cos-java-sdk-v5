@@ -21,11 +21,6 @@ import java.util.List;
 public class DatasetHybridSearchResponse extends CiServiceResult {
 
     /**
-     * 请求 ID。
-     */
-    private String requestId;
-
-    /**
      * 图像检索结果列表（{@code Templates=ImageSearch} 时返回）。
      * <p>复用现有的 {@link ImageResult} 类（含 URI / Score 字段）。</p>
      */
@@ -40,10 +35,6 @@ public class DatasetHybridSearchResponse extends CiServiceResult {
      * 视频检索结果列表（{@code Templates=VideoSearch} 时返回）。
      */
     private List<VideoResult> videoResult;
-
-    public String getRequestId() { return requestId; }
-
-    public void setRequestId(String requestId) { this.requestId = requestId; }
 
     public List<ImageResult> getImageResult() { return imageResult; }
 

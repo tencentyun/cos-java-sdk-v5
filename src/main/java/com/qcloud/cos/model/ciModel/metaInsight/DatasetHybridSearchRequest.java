@@ -15,7 +15,7 @@ import java.util.List;
  * </p>
  *
  * @since 5.6.271 (MetaInsight V2.7.0)
- * @see <a href="https://write.woa.com/document/200892020456558592">官方文档</a>
+ * @see <a href="https://cloud.tencent.com/document/product/460/135101">混合检索-视频检索</a>
  */
 public class DatasetHybridSearchRequest extends CIServiceRequest {
 

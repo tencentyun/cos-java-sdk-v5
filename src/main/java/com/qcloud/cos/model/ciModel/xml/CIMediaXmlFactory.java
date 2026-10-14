@@ -173,6 +173,7 @@ public class CIMediaXmlFactory {
             addAudio(xml, request.getAudio());
             addVideo(xml, request.getVideo());
             addTransConfig(xml, request.getTransConfig());
+            addIfNotNull(xml, "StdExtInfo", request.getStdExtInfo());
         } else if ("Concat".equalsIgnoreCase(tag)) {
             addConcat(xml, request.getConcat());
             addAudio(xml, request.getAudio());

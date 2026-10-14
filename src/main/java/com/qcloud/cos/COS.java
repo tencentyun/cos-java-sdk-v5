@@ -3287,6 +3287,14 @@ public interface COS extends COSDirectSpi {
 
     DatasetFaceSearchResponse datasetFaceSearch(DatasetFaceSearchRequest customRequest);
 
+    GetAIMediaInfoResponse getAIMediaInfo(GetAIMediaInfoRequest customRequest);
+
+    MediaFaceSearchResponse mediaFaceSearch(MediaFaceSearchRequest customRequest);
+
+    MediaFaceClipSearchResponse mediaFaceClipSearch(MediaFaceClipSearchRequest customRequest);
+
+    IngestStatusResponse ingestStatus(IngestStatusRequest customRequest);
+
     DatasetHybridSearchResponse hybridsearch(DatasetHybridSearchRequest customRequest);
 
     CreateDatasetExportJobResponse createDatasetExportJob(CreateDatasetExportJobRequest customRequest);

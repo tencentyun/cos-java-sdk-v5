@@ -31,6 +31,12 @@ public class VideoResult {
     @JsonProperty("Score")
     private Integer score;
 
+    /**
+     * 视频片段内容的大模型描述（V2.8.2 新增）。
+     */
+    @JsonProperty("Description")
+    private String description;
+
     public String getURI() { return uRI; }
 
     public void setURI(String uRI) { this.uRI = uRI; }
@@ -46,5 +52,9 @@ public class VideoResult {
     public Integer getScore() { return score; }
 
     public void setScore(Integer score) { this.score = score; }
+
+    public String getDescription() { return description; }
+
+    public void setDescription(String description) { this.description = description; }
 
 }

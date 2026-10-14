@@ -16,6 +16,7 @@ import com.qcloud.cos.model.ciModel.job.MediaTransConfigObject;
 import com.qcloud.cos.model.ciModel.job.MediaTranscodeObject;
 import com.qcloud.cos.model.ciModel.job.MediaTranscodeVideoObject;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import org.apache.commons.codec.binary.Base64;
 
@@ -67,6 +68,10 @@ public class TranscodeJobDemo {
         MediaTimeIntervalObject timeInterval = transcode.getTimeInterval();
         timeInterval.setStart("0");
         timeInterval.setDuration("60");
+
+        //转码扩展字段，值为 Base64 编码后的 JSON 字符串
+        String stdExtInfo = "{\"ext_info\":{\"adapt-dqp-depth\":\"0\"}}";
+        request.getOperation().setStdExtInfo(Base64.encodeBase64String(stdExtInfo.getBytes(StandardCharsets.UTF_8)));
 
         request.getOperation().getOutput().setBucket("demo-1234567890");
         request.getOperation().getOutput().setRegion("ap-chongqing");

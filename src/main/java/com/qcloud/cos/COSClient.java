@@ -5508,6 +5508,50 @@ public class COSClient implements COS {
     }
 
     @Override
+    public GetAIMediaInfoResponse getAIMediaInfo(GetAIMediaInfoRequest customRequest) {
+        rejectNull(customRequest, "The request parameter must be specified setting the object tags");
+
+        CosHttpRequest<GetAIMediaInfoRequest> request = createRequest(customRequest.getAppId(), "/datasetquery/getaimediainfo", customRequest , HttpMethodName.POST);
+        request.addHeader("Accept", "application/json");
+
+        this.setContent(request, CIJackson.toJsonBytes(customRequest), "application/json", false);
+        return invoke(request, new Unmarshallers.CICommonJsonUnmarshaller<GetAIMediaInfoResponse>(GetAIMediaInfoResponse.class));
+    }
+
+    @Override
+    public MediaFaceSearchResponse mediaFaceSearch(MediaFaceSearchRequest customRequest) {
+        rejectNull(customRequest, "The request parameter must be specified setting the object tags");
+
+        CosHttpRequest<MediaFaceSearchRequest> request = createRequest(customRequest.getAppId(), "/datasetquery/mediafacesearch", customRequest , HttpMethodName.POST);
+        request.addHeader("Accept", "application/json");
+
+        this.setContent(request, CIJackson.toJsonBytes(customRequest), "application/json", false);
+        return invoke(request, new Unmarshallers.CICommonJsonUnmarshaller<MediaFaceSearchResponse>(MediaFaceSearchResponse.class));
+    }
+
+    @Override
+    public MediaFaceClipSearchResponse mediaFaceClipSearch(MediaFaceClipSearchRequest customRequest) {
+        rejectNull(customRequest, "The request parameter must be specified setting the object tags");
+
+        CosHttpRequest<MediaFaceClipSearchRequest> request = createRequest(customRequest.getAppId(), "/datasetquery/mediafaceclipsearch", customRequest , HttpMethodName.POST);
+        request.addHeader("Accept", "application/json");
+
+        this.setContent(request, CIJackson.toJsonBytes(customRequest), "application/json", false);
+        return invoke(request, new Unmarshallers.CICommonJsonUnmarshaller<MediaFaceClipSearchResponse>(MediaFaceClipSearchResponse.class));
+    }
+
+    @Override
+    public IngestStatusResponse ingestStatus(IngestStatusRequest customRequest) {
+        rejectNull(customRequest, "The request parameter must be specified setting the object tags");
+
+        CosHttpRequest<IngestStatusRequest> request = createRequest(customRequest.getAppId(), "/datasetquery/ingeststatus", customRequest , HttpMethodName.POST);
+        request.addHeader("Accept", "application/json");
+
+        this.setContent(request, CIJackson.toJsonBytes(customRequest), "application/json", false);
+        return invoke(request, new Unmarshallers.CICommonJsonUnmarshaller<IngestStatusResponse>(IngestStatusResponse.class));
+    }
+
+    @Override
     public DatasetHybridSearchResponse hybridsearch(DatasetHybridSearchRequest customRequest) {
         rejectNull(customRequest, "The request parameter must be specified setting the object tags");
 
