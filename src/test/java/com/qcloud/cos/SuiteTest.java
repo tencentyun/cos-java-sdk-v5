@@ -20,7 +20,8 @@ import org.junit.runners.Suite.SuiteClasses;
 	MediaBucketTest.class, MediaJobTest.class, MediaQueueTest.class, MediaTemplateTest.class,MediaWorkflowTest.class,
         DefaultClientErrorTest.class, CosClientWithErrorTest.class, CosClientWithMockTest.class, DefaultHttpClientTest.class,
         CosServiceExceptionTest.class,
-        AgentBucketXmlParseTest.class, AgentBucketMockTest.class, AgentBucketTest.class
+        AgentBucketXmlParseTest.class, AgentBucketMockTest.class, AgentBucketModelTest.class,
+        AgentBucketDemoTest.class, AgentBucketTest.class
         })
 public class SuiteTest {
 }

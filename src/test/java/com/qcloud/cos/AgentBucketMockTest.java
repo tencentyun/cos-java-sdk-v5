@@ -7,13 +7,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.After;
@@ -21,15 +15,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.qcloud.cos.auth.BasicCOSCredentials;
-import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.exception.CosServiceException;
-import com.qcloud.cos.http.CosHttpClient;
-import com.qcloud.cos.http.CosHttpRequest;
-import com.qcloud.cos.http.CosHttpResponse;
 import com.qcloud.cos.http.HttpMethodName;
-import com.qcloud.cos.http.HttpResponseHandler;
-import com.qcloud.cos.internal.CosServiceRequest;
-import com.qcloud.cos.internal.CosServiceResponse;
 import com.qcloud.cos.model.CopyObjectResult;
 import com.qcloud.cos.model.agentbucket.ConflictResolutionStrategy;
 import com.qcloud.cos.model.agentbucket.CopyObjectRecursiveRequest;
@@ -59,65 +46,14 @@ public class AgentBucketMockTest {
     private static final String REQUEST_ID = "NWQ1YmUwYTdfM2FiMDJhMDlfYzczN18zMGM1";
 
     private COSClient client;
-    private StubHttpClient stub;
-
-    /** 捕获请求并以给定响应走真实 handler 链的桩 */
-    private static class StubHttpClient implements CosHttpClient {
-        CosHttpRequest<?> lastRequest;
-        String lastBody;
-        String responseBody = "";
-        Map<String, String> responseHeaders = new HashMap<String, String>();
-
-        @Override
-        public <X, Y extends CosServiceRequest> X exeute(CosHttpRequest<Y> request,
-                HttpResponseHandler<CosServiceResponse<X>> responseHandler) {
-            lastRequest = request;
-            lastBody = readBody(request.getContent());
-            CosHttpResponse response = new CosHttpResponse(request, null);
-            response.setStatusCode(200);
-            response.setContent(new ByteArrayInputStream(responseBody.getBytes(StandardCharsets.UTF_8)));
-            response.setHeaders(new HashMap<String, String>(responseHeaders));
-            try {
-                return responseHandler.handle(response).getResult();
-            } catch (CosClientException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new CosClientException("stub handle failed", e);
-            }
-        }
-
-        private static String readBody(InputStream in) {
-            if (in == null) {
-                return null;
-            }
-            try {
-                ByteArrayOutputStream out = new ByteArrayOutputStream();
-                byte[] buf = new byte[1024];
-                int n;
-                while ((n = in.read(buf)) != -1) {
-                    out.write(buf, 0, n);
-                }
-                return new String(out.toByteArray(), StandardCharsets.UTF_8);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        @Override
-        public void shutdown() {
-        }
-    }
+    private AgentBucketStubHttpClient stub;
 
     @Before
     public void setUp() throws Exception {
         client = new COSClient(new BasicCOSCredentials("AKIDfakeSecretId", "fakeSecretKey"),
                 new ClientConfig(new Region(REGION)));
-        stub = new StubHttpClient();
+        stub = AgentBucketStubHttpClient.install(client);
         stub.responseHeaders.put(Headers.REQUEST_ID, REQUEST_ID);
-        Field field = COSClient.class.getDeclaredField("cosHttpClient");
-        field.setAccessible(true);
-        ((CosHttpClient) field.get(client)).shutdown();
-        field.set(client, stub);
     }
 
     @After
@@ -444,6 +380,73 @@ public class AgentBucketMockTest {
             }
         });
         assertNull("防误删：不应发出任何请求", stub.lastRequest);
+    }
+
+    @Test
+    public void testDeleteObjectRecursivePartialErrors() {
+        stub.responseBody = "<DeleteResult><Deleted><Key>myspace/bbb/a.txt</Key></Deleted>"
+                + "<Error><Key>myspace/bbb/b.txt</Key><Code>AccessDenied</Code><Message>denied</Message></Error>"
+                + "</DeleteResult>";
+        DeleteObjectRecursiveResult result =
+                client.deleteObjectRecursive(new DeleteObjectRecursiveRequest(BUCKET, "myspace/bbb/"));
+        assertTrue(result.hasErrors());
+        assertEquals(1, result.getDeletedKeys().size());
+        assertEquals(1, result.getErrors().size());
+        assertEquals("myspace/bbb/b.txt", result.getErrors().get(0).getKey());
+        assertEquals("AccessDenied", result.getErrors().get(0).getCode());
+        assertEquals(REQUEST_ID, result.getRequestId());
+    }
+
+    @Test
+    public void testErrorBodyWithoutMessageUsesDefault() {
+        stub.responseBody = "<Error><Code>InternalError</Code></Error>";
+        try {
+            client.moveObjectRecursive(new MoveObjectRequest(BUCKET, "a", "b"));
+            fail("expect CosServiceException");
+        } catch (CosServiceException e) {
+            assertEquals("InternalError", e.getErrorCode());
+            assertEquals("AgentBucket moveObjectRecursive failed", e.getErrorMessage());
+            assertEquals(REQUEST_ID, e.getRequestId());
+        }
+    }
+
+    @Test
+    public void testNullHandlerFallsBackToEmptyResult() {
+        stub.returnNull = true;
+        CopyObjectResult copyResult =
+                client.copyObjectRecursive(new CopyObjectRecursiveRequest(BUCKET, "a", BUCKET, "b"));
+        assertNull(copyResult.getETag());
+        assertNull(copyResult.getRequestId());
+
+        DeleteObjectRecursiveResult deleteResult =
+                client.deleteObjectRecursive(new DeleteObjectRecursiveRequest(BUCKET, "a/"));
+        assertTrue(deleteResult.getDeletedKeys().isEmpty());
+        assertFalse(deleteResult.hasErrors());
+    }
+
+    @Test
+    public void testRequestValidationRejectNulls() {
+        expectIllegalArgument(new Runnable() {
+            public void run() {
+                client.putSpaceQuota(null);
+            }
+        });
+        expectIllegalArgument(new Runnable() {
+            public void run() {
+                client.getSpaceExtension(new GetSpaceExtensionRequest(null, "s"));
+            }
+        });
+        expectIllegalArgument(new Runnable() {
+            public void run() {
+                client.moveObject(new MoveObjectRequest(BUCKET, "a", null));
+            }
+        });
+        expectIllegalArgument(new Runnable() {
+            public void run() {
+                client.copyObjectRecursive(new CopyObjectRecursiveRequest(BUCKET, "a", null, "b"));
+            }
+        });
+        assertNull("参数校验失败时不应发出请求", stub.lastRequest);
     }
 
     private static void expectIllegalArgument(Runnable runnable) {

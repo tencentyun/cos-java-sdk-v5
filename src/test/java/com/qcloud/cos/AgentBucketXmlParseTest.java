@@ -54,6 +54,21 @@ public class AgentBucketXmlParseTest {
     }
 
     @Test
+    public void testParseSpaceQuotaEmptyCapacity() throws Exception {
+        SpaceQuotaResult result = new XmlResponsesSaxParser().parseSpaceQuotaResponse(xml(
+                "<SpaceQuota><QuotaId> </QuotaId><Capacity></Capacity></SpaceQuota>")).getResult();
+        assertNull(result.getQuotaId());
+        assertNull(result.getCapacity());
+    }
+
+    @Test
+    public void testParseNullStream() throws Exception {
+        assertNull(new XmlResponsesSaxParser().parseSpaceQuotaResponse(null).getResult().getQuotaId());
+        assertFalse(new XmlResponsesSaxParser().parseAgentObjectOperationResponse(null).isErrorResponse());
+        assertTrue(new XmlResponsesSaxParser().parseDeleteObjectRecursiveResponse(null).getDeletedKeys().isEmpty());
+    }
+
+    @Test
     public void testParseSpaceQuotaEmptyBody() throws Exception {
         SpaceQuotaResult result = new XmlResponsesSaxParser().parseSpaceQuotaResponse(xml("")).getResult();
         assertNull(result.getQuotaId());
