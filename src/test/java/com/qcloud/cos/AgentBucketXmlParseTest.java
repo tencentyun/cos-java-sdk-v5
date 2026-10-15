@@ -68,6 +68,95 @@ public class AgentBucketXmlParseTest {
         assertTrue(new XmlResponsesSaxParser().parseDeleteObjectRecursiveResponse(null).getDeletedKeys().isEmpty());
     }
 
+    /**
+     * 真机抓包：递归复制/删除执行时间较长时，服务端先在响应体开头输出空白保持连接（30 个文件约 3 个、80 个文件约 6 个），
+     * 之后才输出带 XML 声明的结果。XML 声明前出现任何字符 SAX 都会报错，SDK 需要先跳过。
+     */
+    @Test
+    public void testParseLeadingWhitespaceBeforeXmlDeclaration() throws Exception {
+        String decl = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+        XmlResponsesSaxParser.DeleteObjectRecursiveHandler delete = new XmlResponsesSaxParser()
+                .parseDeleteObjectRecursiveResponse(xml("     " + decl
+                        + "<DeleteResult>\n  <Deleted>\n    <Key>space/dir/</Key>\n  </Deleted>\n</DeleteResult>"));
+        assertEquals(1, delete.getDeletedKeys().size());
+        assertEquals("space/dir/", delete.getDeletedKeys().get(0));
+
+        XmlResponsesSaxParser.AgentObjectOperationResultHandler copy = new XmlResponsesSaxParser()
+                .parseAgentObjectOperationResponse(xml(" \n\t \r\n " + decl
+                        + "<CopyObjectResult><ETag>&#34;abc&#34;</ETag><CRC64>1</CRC64></CopyObjectResult>"));
+        assertFalse(copy.isErrorResponse());
+        assertEquals("abc", copy.getETag());
+
+        XmlResponsesSaxParser.AgentObjectOperationResultHandler error = new XmlResponsesSaxParser()
+                .parseAgentObjectOperationResponse(xml("      " + decl
+                        + "<Error><Code>FileAlreadyExists</Code><Message>m</Message></Error>"));
+        assertTrue(error.isErrorResponse());
+        assertEquals("FileAlreadyExists", error.getErrorCode());
+    }
+
+    /**
+     * 前向兼容：后端若去掉响应体开头的空白（即改为文档中的标准格式），解析结果必须与带空白时完全一致。
+     * 同一份响应体分别加 0～8 个前导空白，逐字段比对。
+     */
+    @Test
+    public void testLeadingWhitespaceForwardCompatible() throws Exception {
+        String decl = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+        String copyBody = decl + "<CopyObjectResult><ETag>\"e\"</ETag><LastModified>2026-06-04T13:30:01Z</LastModified>"
+                + "<CRC64>5</CRC64></CopyObjectResult>";
+        String errorBody = decl + "<Error><Code>FileAlreadyExists</Code><Message>m</Message></Error>";
+        String deleteBody = decl + "<DeleteResult><Deleted><Key>s/d/</Key></Deleted></DeleteResult>";
+        for (int n = 0; n <= 8; n++) {
+            String pad = new String(new char[n]).replace('\0', ' ');
+            XmlResponsesSaxParser.AgentObjectOperationResultHandler copy =
+                    new XmlResponsesSaxParser().parseAgentObjectOperationResponse(xml(pad + copyBody));
+            assertFalse(copy.isErrorResponse());
+            assertEquals("e", copy.getETag());
+            assertEquals("5", copy.getCrc64Ecma());
+            assertNotNull(copy.getLastModified());
+
+            XmlResponsesSaxParser.AgentObjectOperationResultHandler error =
+                    new XmlResponsesSaxParser().parseAgentObjectOperationResponse(xml(pad + errorBody));
+            assertTrue(error.isErrorResponse());
+            assertEquals("FileAlreadyExists", error.getErrorCode());
+
+            XmlResponsesSaxParser.DeleteObjectRecursiveHandler delete =
+                    new XmlResponsesSaxParser().parseDeleteObjectRecursiveResponse(xml(pad + deleteBody));
+            assertEquals(1, delete.getDeletedKeys().size());
+            assertEquals("s/d/", delete.getDeletedKeys().get(0));
+        }
+    }
+
+    /**
+     * 真机抓包：移动、复制单个文件时 ETag 带两层引号；目录的 ETag 不带引号。
+     * 前向兼容：后端若改为文档中的一层引号或不带引号，结果都一致。
+     */
+    @Test
+    public void testParseETagQuotes() throws Exception {
+        String[][] cases = {
+            {"&#34;&#34;93b885adfe0da089cdf634904fd59f71&#34;&#34;", "93b885adfe0da089cdf634904fd59f71"},
+            {"&#34;93b885adfe0da089cdf634904fd59f71&#34;", "93b885adfe0da089cdf634904fd59f71"},
+            {"93b885adfe0da089cdf634904fd59f71", "93b885adfe0da089cdf634904fd59f71"},
+            {"&quot;&quot;&quot;abc&quot;&quot;&quot;", "abc"},
+            {"\"abc\"", "abc"},
+            {"d-1791986361687703073", "d-1791986361687703073"},
+            {"\"", "\""},
+            {"\"\"", ""},
+        };
+        for (String[] c : cases) {
+            XmlResponsesSaxParser.AgentObjectOperationResultHandler handler = new XmlResponsesSaxParser()
+                    .parseAgentObjectOperationResponse(xml("<MoveObjectResult><ETag>" + c[0] + "</ETag></MoveObjectResult>"));
+            assertEquals(c[0], c[1], handler.getETag());
+        }
+    }
+
+    @Test
+    public void testParseWhitespaceOnlyBody() throws Exception {
+        assertTrue(new XmlResponsesSaxParser().parseDeleteObjectRecursiveResponse(xml("   \n  "))
+                .getDeletedKeys().isEmpty());
+        assertFalse(new XmlResponsesSaxParser().parseAgentObjectOperationResponse(xml(" \r\n\t"))
+                .isErrorResponse());
+    }
+
     @Test
     public void testParseSpaceQuotaEmptyBody() throws Exception {
         SpaceQuotaResult result = new XmlResponsesSaxParser().parseSpaceQuotaResponse(xml("")).getResult();

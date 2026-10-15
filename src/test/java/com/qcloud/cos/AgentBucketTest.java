@@ -195,11 +195,28 @@ public class AgentBucketTest {
         putText(src, "move me");
         putText(dst, "old");
 
+        // 显式 ask：目标文件已存在时报冲突且不覆盖。
+        // 注：2026-10 真机实测，不传 conflict_resolution_strategy 时服务端会直接覆盖已存在的同名文件，
+        // 与官方文档"默认 ask"的描述不一致（已反馈后端）。SDK 不替用户设置默认值，未设置时由服务端决定，
+        // 因此这里显式传 ASK 验证冲突行为。
+        try {
+            client.moveObject(new MoveObjectRequest(bucket, src, dst)
+                    .withConflictResolutionStrategy(ConflictResolutionStrategy.ASK));
+            fail("ask 策略下目标已存在应抛出冲突异常");
+        } catch (CosServiceException e) {
+            assertEquals(CONFLICT_CODE, e.getErrorCode());
+            assertNotNull(e.getRequestId());
+        }
+        assertTrue("冲突时源文件应保留", client.doesObjectExist(bucket, src));
+        assertEquals("冲突时目标文件不应被覆盖", 3L, client.getObjectMetadata(bucket, dst).getContentLength());
+
         MoveObjectResult result = client.moveObject(new MoveObjectRequest(bucket, src, dst)
                 .withConflictResolutionStrategy(ConflictResolutionStrategy.OVERWRITE));
         assertNotNull(result.getRequestId());
         assertFalse(client.doesObjectExist(bucket, src));
         assertTrue(client.doesObjectExist(bucket, dst));
+        assertEquals("ETag 应与 getObjectMetadata 一致（无引号）",
+                client.getObjectMetadata(bucket, dst).getETag(), result.getETag());
     }
 
     @Test
@@ -238,6 +255,41 @@ public class AgentBucketTest {
         assertFalse(client.doesObjectExist(bucket, dir + "/"));
         assertFalse(client.doesObjectExist(bucket, dir + "/a.txt"));
         assertFalse(client.doesObjectExist(bucket, dir + "/sub/b.txt"));
+    }
+
+    /**
+     * 目录较大、执行耗时较长时，服务端会先在响应体开头输出空白保持连接（约 30 个文件起出现）。
+     * 覆盖递归复制成功、冲突（200 + Error）和递归删除三种响应。
+     */
+    @Test
+    public void testLargeDirectoryRecursive() {
+        String src = space + "/large";
+        int count = 40;
+        putEmpty(src + "/");
+        for (int i = 0; i < count; i++) {
+            putText(src + "/d" + (i % 4) + "/f" + i + ".txt", "v" + i);
+        }
+
+        String dst = space + "/large-copy";
+        CopyObjectResult copy = client.copyObjectRecursive(new CopyObjectRecursiveRequest(bucket, src, bucket, dst));
+        assertNotNull(copy.getRequestId());
+        assertTrue(client.doesObjectExist(bucket, dst + "/d3/f39.txt"));
+
+        try {
+            client.copyObjectRecursive(new CopyObjectRecursiveRequest(bucket, src, bucket, dst));
+            fail("目标已存在时应抛出冲突异常");
+        } catch (CosServiceException e) {
+            assertEquals(CONFLICT_CODE, e.getErrorCode());
+            assertEquals(200, e.getStatusCode());
+        }
+
+        DeleteObjectRecursiveResult result =
+                client.deleteObjectRecursive(new DeleteObjectRecursiveRequest(bucket, src + "/"));
+        assertFalse(result.hasErrors());
+        assertNotNull(result.getRequestId());
+        assertFalse(client.doesObjectExist(bucket, src + "/d0/f0.txt"));
+        assertFalse(client.doesObjectExist(bucket, src + "/"));
+        assertTrue("删除源目录不应影响复制出的目录", client.doesObjectExist(bucket, dst + "/d0/f0.txt"));
     }
 
     @Test

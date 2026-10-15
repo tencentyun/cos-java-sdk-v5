@@ -3495,7 +3495,7 @@ public interface COS extends COSDirectSpi {
      * </p>
      *
      * @param deleteObjectRecursiveRequest The request containing bucket and key.
-     * @return The deleted keys.
+     * @return The deleted keys returned by COS.
      * @throws CosClientException If any errors are encountered in the client while making the request.
      * @throws CosServiceException If any errors occurred in COS while processing the request.
      * @see <a href="https://cloud.tencent.com/document/product/436/133861">Delete Object Recursive</a>

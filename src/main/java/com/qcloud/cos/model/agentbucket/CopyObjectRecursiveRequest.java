@@ -20,7 +20,7 @@ public class CopyObjectRecursiveRequest extends CosServiceRequest implements Ser
     private String sourceKey;
     private String destinationBucketName;
     private String destinationKey;
-    /** 冲突解决策略，为 null 时不传该参数，由服务端按默认 ask 处理 */
+    /** 冲突解决策略，为 null 时不传该参数 */
     private ConflictResolutionStrategy conflictResolutionStrategy;
 
     public CopyObjectRecursiveRequest() {

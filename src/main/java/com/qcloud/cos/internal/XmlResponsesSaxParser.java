@@ -7806,15 +7806,17 @@ public class XmlResponsesSaxParser {
     }
 
     /**
-     * 空响应体（Content-Length 为 0）时直接返回空结果，避免 SAX 抛 "Premature end of file"；
-     * 非空时流式解析，不整体读入内存（递归删除的响应可能很长）。
+     * 解析 AgentBucket 响应体：跳过开头的空白字符；空响应体直接返回空结果；流式解析，不整体读入内存。
      */
     private void parseAgentBucketXml(DefaultHandler handler, InputStream inputStream) throws IOException {
         if (inputStream == null) {
             return;
         }
         java.io.PushbackInputStream pushback = new java.io.PushbackInputStream(inputStream, 1);
-        int first = pushback.read();
+        int first;
+        do {
+            first = pushback.read();
+        } while (first == ' ' || first == '\t' || first == '\r' || first == '\n');
         if (first == -1) {
             return;
         }
@@ -7828,6 +7830,15 @@ public class XmlResponsesSaxParser {
         }
         String trimmed = text.trim();
         return trimmed.isEmpty() ? null : trimmed;
+    }
+
+    /** 去掉 ETag 外层的双引号 */
+    private static String removeAllQuotes(String text) {
+        String value = text;
+        while (value != null && value.length() >= 2 && value.startsWith("\"") && value.endsWith("\"")) {
+            value = value.substring(1, value.length() - 1).trim();
+        }
+        return value;
     }
 
     private static Long parseLongOrNull(String text, String fieldName) {
@@ -8017,7 +8028,7 @@ public class XmlResponsesSaxParser {
             }
             if (in("CopyObjectResult") || in("MoveObjectResult")) {
                 if ("ETag".equals(name)) {
-                    eTag = StringUtils.removeQuotes(trimToNull(getText()));
+                    eTag = removeAllQuotes(trimToNull(getText()));
                 } else if ("LastModified".equals(name)) {
                     lastModifiedStr = trimToNull(getText());
                     if (lastModifiedStr != null) {
@@ -8037,7 +8048,7 @@ public class XmlResponsesSaxParser {
     /**
      * 解析 Delete Object Recursive 响应：
      * &lt;DeleteResult&gt;&lt;Deleted&gt;&lt;Key/&gt;&lt;/Deleted&gt;...&lt;/DeleteResult&gt;，或顶层 Error。
-     * DeleteResult 下的 Error 子节点（逐条失败）做防御性解析。
+     * DeleteResult 下的 Error 子节点解析为逐条失败信息。
      */
     public static class DeleteObjectRecursiveHandler extends AgentBucketErrorAwareHandler {
         private final List<String> deletedKeys = new ArrayList<String>();

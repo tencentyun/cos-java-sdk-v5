@@ -9,9 +9,8 @@ import com.qcloud.cos.model.CosServiceResult;
 /**
  * Delete Object Recursive 的返回结果。
  * <p>
- * {@link #getDeletedKeys()} 为删除成功的对象路径。官方文档未定义逐条失败条目，
- * SDK 对 DeleteResult 下可能出现的 Error 子节点做防御性解析，存放于 {@link #getErrors()}，
- * 调用方可据此判断是否部分失败。
+ * {@link #getDeletedKeys()} 为服务端返回的已删除路径；{@link #getErrors()} 为 DeleteResult 下的逐条失败信息，
+ * 可通过 {@link #hasErrors()} 判断是否部分失败。
  * </p>
  *
  * @since 5.6.283
