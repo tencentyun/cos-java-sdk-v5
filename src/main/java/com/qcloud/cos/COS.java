@@ -3452,8 +3452,6 @@ public interface COS extends COSDirectSpi {
      * <p>
      * <b>Note:</b> HTTP 200 may carry an Error body, in which case {@link CosServiceException}
      * (status code 200) is thrown. Supports {@code ASK}, {@code RENAME} and {@code OVERWRITE}.
-     * If no strategy is set, the SDK sends {@code ask} explicitly (the documented default), so an existing
-     * destination is never overwritten unless {@code OVERWRITE} is specified.
      * A retry after timeout may report 404 because the source has already been moved.
      * </p>
      *
@@ -3497,8 +3495,7 @@ public interface COS extends COSDirectSpi {
      * </p>
      *
      * @param deleteObjectRecursiveRequest The request containing bucket and key.
-     * @return The Deleted/Key entries returned by COS. COS only returns the requested key (e.g. the directory
-     *         key), not every deleted file under it, so the list cannot be used to count deleted files.
+     * @return The deleted keys returned by COS.
      * @throws CosClientException If any errors are encountered in the client while making the request.
      * @throws CosServiceException If any errors occurred in COS while processing the request.
      * @see <a href="https://cloud.tencent.com/document/product/436/133861">Delete Object Recursive</a>

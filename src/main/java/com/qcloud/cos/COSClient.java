@@ -6407,13 +6407,10 @@ public class COSClient implements COS {
         }
     }
 
-    /**
-     * 未设置策略时显式传 ask，与官方文档的默认值一致。
-     * 真机实测：Move Object 不带该参数时，服务端会直接覆盖已存在的同名文件，与文档描述的默认 ask 不符；显式传 ask 可避免静默覆盖。
-     */
     private void addConflictStrategyParameter(CosHttpRequest<?> request, ConflictResolutionStrategy strategy) {
-        ConflictResolutionStrategy effective = strategy != null ? strategy : ConflictResolutionStrategy.ASK;
-        request.addParameter(AGENT_PARAM_CONFLICT_STRATEGY, effective.getValue());
+        if (strategy != null) {
+            request.addParameter(AGENT_PARAM_CONFLICT_STRATEGY, strategy.getValue());
+        }
     }
 
     /**

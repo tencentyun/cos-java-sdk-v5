@@ -195,10 +195,14 @@ public class AgentBucketTest {
         putText(src, "move me");
         putText(dst, "old");
 
-        // 未设置策略：按文档默认 ask，目标文件已存在时必须报冲突且不能覆盖
+        // 显式 ask：目标文件已存在时报冲突且不覆盖。
+        // 注：2026-10 真机实测，不传 conflict_resolution_strategy 时服务端会直接覆盖已存在的同名文件，
+        // 与官方文档"默认 ask"的描述不一致（已反馈后端）。SDK 不替用户设置默认值，未设置时由服务端决定，
+        // 因此这里显式传 ASK 验证冲突行为。
         try {
-            client.moveObject(new MoveObjectRequest(bucket, src, dst));
-            fail("未设置策略时目标已存在应抛出冲突异常");
+            client.moveObject(new MoveObjectRequest(bucket, src, dst)
+                    .withConflictResolutionStrategy(ConflictResolutionStrategy.ASK));
+            fail("ask 策略下目标已存在应抛出冲突异常");
         } catch (CosServiceException e) {
             assertEquals(CONFLICT_CODE, e.getErrorCode());
             assertNotNull(e.getRequestId());

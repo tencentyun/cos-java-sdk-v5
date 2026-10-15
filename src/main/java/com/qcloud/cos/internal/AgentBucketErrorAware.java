@@ -21,7 +21,7 @@ public interface AgentBucketErrorAware {
     /** Error/Resource，出错的资源路径 */
     String getErrorResource();
 
-    /** Error/RequestId，官方示例中可能缺失 */
+    /** Error/RequestId，为空时使用响应头中的 requestId */
     String getErrorRequestId();
 
     /** 响应头 x-cos-request-id，由 {@link RequestIdHeaderHandler} 写入 */

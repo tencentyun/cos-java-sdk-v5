@@ -94,11 +94,49 @@ public class AgentBucketXmlParseTest {
         assertEquals("FileAlreadyExists", error.getErrorCode());
     }
 
-    /** 真机抓包：移动、复制单个文件时 ETag 带两层引号；目录的 ETag 不带引号 */
+    /**
+     * 前向兼容：后端若去掉响应体开头的空白（即改为文档中的标准格式），解析结果必须与带空白时完全一致。
+     * 同一份响应体分别加 0～8 个前导空白，逐字段比对。
+     */
+    @Test
+    public void testLeadingWhitespaceForwardCompatible() throws Exception {
+        String decl = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+        String copyBody = decl + "<CopyObjectResult><ETag>\"e\"</ETag><LastModified>2026-06-04T13:30:01Z</LastModified>"
+                + "<CRC64>5</CRC64></CopyObjectResult>";
+        String errorBody = decl + "<Error><Code>FileAlreadyExists</Code><Message>m</Message></Error>";
+        String deleteBody = decl + "<DeleteResult><Deleted><Key>s/d/</Key></Deleted></DeleteResult>";
+        for (int n = 0; n <= 8; n++) {
+            String pad = new String(new char[n]).replace('\0', ' ');
+            XmlResponsesSaxParser.AgentObjectOperationResultHandler copy =
+                    new XmlResponsesSaxParser().parseAgentObjectOperationResponse(xml(pad + copyBody));
+            assertFalse(copy.isErrorResponse());
+            assertEquals("e", copy.getETag());
+            assertEquals("5", copy.getCrc64Ecma());
+            assertNotNull(copy.getLastModified());
+
+            XmlResponsesSaxParser.AgentObjectOperationResultHandler error =
+                    new XmlResponsesSaxParser().parseAgentObjectOperationResponse(xml(pad + errorBody));
+            assertTrue(error.isErrorResponse());
+            assertEquals("FileAlreadyExists", error.getErrorCode());
+
+            XmlResponsesSaxParser.DeleteObjectRecursiveHandler delete =
+                    new XmlResponsesSaxParser().parseDeleteObjectRecursiveResponse(xml(pad + deleteBody));
+            assertEquals(1, delete.getDeletedKeys().size());
+            assertEquals("s/d/", delete.getDeletedKeys().get(0));
+        }
+    }
+
+    /**
+     * 真机抓包：移动、复制单个文件时 ETag 带两层引号；目录的 ETag 不带引号。
+     * 前向兼容：后端若改为文档中的一层引号或不带引号，结果都一致。
+     */
     @Test
     public void testParseETagQuotes() throws Exception {
         String[][] cases = {
             {"&#34;&#34;93b885adfe0da089cdf634904fd59f71&#34;&#34;", "93b885adfe0da089cdf634904fd59f71"},
+            {"&#34;93b885adfe0da089cdf634904fd59f71&#34;", "93b885adfe0da089cdf634904fd59f71"},
+            {"93b885adfe0da089cdf634904fd59f71", "93b885adfe0da089cdf634904fd59f71"},
+            {"&quot;&quot;&quot;abc&quot;&quot;&quot;", "abc"},
             {"\"abc\"", "abc"},
             {"d-1791986361687703073", "d-1791986361687703073"},
             {"\"", "\""},

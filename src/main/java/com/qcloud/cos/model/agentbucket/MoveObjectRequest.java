@@ -19,7 +19,7 @@ public class MoveObjectRequest extends CosServiceRequest implements Serializable
     private String bucketName;
     private String sourceKey;
     private String destinationKey;
-    /** 冲突解决策略，为 null 时 SDK 按 ask 传参（与官方文档默认值一致） */
+    /** 冲突解决策略，为 null 时不传该参数 */
     private ConflictResolutionStrategy conflictResolutionStrategy;
 
     public MoveObjectRequest() {

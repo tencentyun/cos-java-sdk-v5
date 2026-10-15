@@ -9,10 +9,8 @@ import com.qcloud.cos.model.CosServiceResult;
 /**
  * Delete Object Recursive 的返回结果。
  * <p>
- * {@link #getDeletedKeys()} 为服务端返回的 Deleted/Key。真机实测只返回请求删除的那个 key（如目录 "my-space/dir/"），
- * 不会逐个列出目录下被删除的文件，不能用于统计删除的文件数。官方文档未定义逐条失败条目，
- * SDK 对 DeleteResult 下可能出现的 Error 子节点做防御性解析，存放于 {@link #getErrors()}，
- * 调用方可据此判断是否部分失败。
+ * {@link #getDeletedKeys()} 为服务端返回的已删除路径；{@link #getErrors()} 为 DeleteResult 下的逐条失败信息，
+ * 可通过 {@link #hasErrors()} 判断是否部分失败。
  * </p>
  *
  * @since 5.6.283

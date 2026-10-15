@@ -7806,13 +7806,7 @@ public class XmlResponsesSaxParser {
     }
 
     /**
-     * 解析 AgentBucket 响应体：
-     * <ul>
-     * <li>递归复制/删除等耗时操作执行期间，服务端会先在响应体开头输出空白字符保持连接，
-     * 而 XML 声明前出现任何字符都会导致 SAX 报错，因此先跳过开头的空白；</li>
-     * <li>空响应体或只有空白时直接返回空结果，避免 SAX 抛 "Premature end of file"；</li>
-     * <li>流式解析，不整体读入内存（递归删除的响应可能很长）。</li>
-     * </ul>
+     * 解析 AgentBucket 响应体：跳过开头的空白字符；空响应体直接返回空结果；流式解析，不整体读入内存。
      */
     private void parseAgentBucketXml(DefaultHandler handler, InputStream inputStream) throws IOException {
         if (inputStream == null) {
@@ -7838,10 +7832,7 @@ public class XmlResponsesSaxParser {
         return trimmed.isEmpty() ? null : trimmed;
     }
 
-    /**
-     * 去掉 ETag 外层的所有双引号。真机实测：移动、复制单个文件时服务端返回 &lt;ETag&gt;""md5""&lt;/ETag&gt;（两层引号），
-     * StringUtils.removeQuotes 只去一层，这里循环去除，使结果与 putObject、getObjectMetadata 返回的 ETag 一致。
-     */
+    /** 去掉 ETag 外层的双引号 */
     private static String removeAllQuotes(String text) {
         String value = text;
         while (value != null && value.length() >= 2 && value.startsWith("\"") && value.endsWith("\"")) {
@@ -8057,7 +8048,7 @@ public class XmlResponsesSaxParser {
     /**
      * 解析 Delete Object Recursive 响应：
      * &lt;DeleteResult&gt;&lt;Deleted&gt;&lt;Key/&gt;&lt;/Deleted&gt;...&lt;/DeleteResult&gt;，或顶层 Error。
-     * DeleteResult 下的 Error 子节点（逐条失败）做防御性解析。
+     * DeleteResult 下的 Error 子节点解析为逐条失败信息。
      */
     public static class DeleteObjectRecursiveHandler extends AgentBucketErrorAwareHandler {
         private final List<String> deletedKeys = new ArrayList<String>();
